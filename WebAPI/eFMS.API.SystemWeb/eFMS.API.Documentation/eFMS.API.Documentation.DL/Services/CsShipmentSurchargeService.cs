@@ -91,7 +91,12 @@ namespace eFMS.API.Documentation.DL.Services
                 var charge = DataContext.Where(x => x.Id == chargeId).FirstOrDefault();
                 if (charge == null)
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
-                if (charge != null && (charge.CreditNo != null || charge.Soano != null || charge.DebitNo != null || charge.PaySoano != null))
+                if (charge != null
+                    && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.CreditNo)
+                    || !string.IsNullOrEmpty(charge.DebitNo)
+                    || !string.IsNullOrEmpty(charge.SettlementCode)
+                    || !string.IsNullOrEmpty(charge.VoucherId)))
                 {
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
@@ -435,6 +440,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var surchargesAdd = new List<CsShipmentSurcharge>();
             var surchargesUpdate = new List<CsShipmentSurcharge>();
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
             foreach (var item in surcharges)
             {
@@ -442,7 +448,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -525,7 +531,7 @@ namespace eFMS.API.Documentation.DL.Services
                             surcharge.ExchangeDate = item.ExchangeDate;
                         }
 
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge);
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
                         surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -587,13 +593,14 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var result = new HandleState();
             var surcharges = DataContext.Get(x => (x.AmountVnd == null && x.VatAmountVnd == null) && x.NetAmount == null).Take(500);
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     foreach (var item in surcharges)
                     {
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                         item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                         item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                         item.FinalExchangeRate = item.FinalExchangeRate == null ? amountSurcharge.FinalExchangeRate : item.FinalExchangeRate; //Tỉ giá so với Local
@@ -1313,18 +1320,6 @@ namespace eFMS.API.Documentation.DL.Services
                     item.Hblid = HblId;
                     item.Quantity = (decimal)item.Qty;
                     
-                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
-                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
-           
                     item.JobNo = opsTransRepository.Get(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
                     item.TransactionType = "CL";
                     string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
@@ -1400,6 +1395,20 @@ namespace eFMS.API.Documentation.DL.Services
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                 item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                 item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+
+                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
                 if (item.Type.ToLower() == "buying")
                 {
                     item.Type = "BUY";

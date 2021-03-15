@@ -12,14 +12,12 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -661,14 +659,14 @@ namespace eFMS.API.Documentation.DL.Services
                                      select new Shipments
                                      {
                                          Id = ops.Id,
-                                         JobId = ops.JobNo,
-                                         HBL = ops.Hwbno,
-                                         MBL = ops.Mblno,
+                                         JobId = !string.IsNullOrEmpty(ops.JobNo) ? ops.JobNo.Trim() : ops.JobNo,
+                                         HBL = !string.IsNullOrEmpty(ops.Hwbno) ? ops.Hwbno.Trim() : ops.Hwbno,
+                                         MBL = !string.IsNullOrEmpty(ops.Mblno) ? ops.Mblno.Trim() : ops.Mblno,
                                          CustomerId = ops.CustomerId,
                                          AgentId = ops.AgentId,
                                          CarrierId = ops.SupplierId,
                                          HBLID = ops.Hblid,
-                                         CustomNo = cus.ClearanceNo
+                                         CustomNo = !string.IsNullOrEmpty(cus.ClearanceNo) ? cus.ClearanceNo.Trim() : cus.ClearanceNo
                                      };
             shipmentsOperation = shipmentsOperation.GroupBy(x => new { x.Id, x.JobId, x.HBL, x.MBL, x.CustomerId, x.AgentId, x.CarrierId, x.HBLID, x.CustomNo }).Select(s => new Shipments
             {
@@ -726,7 +724,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Service = "CL"
             }).Distinct();
 
-            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+            var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
             var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             //Shipment doc assign is current user
@@ -752,7 +750,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLID = x.y.Id,
                 Service = x.x.TransactionType
             });
-            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBL).Select(s => s.FirstOrDefault());
+            var _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
             var result = _shipmentsOperation.Union(_shipmentsDocumention);
             return result.OrderByDescending(o => o.MBL);
@@ -2830,12 +2828,14 @@ namespace eFMS.API.Documentation.DL.Services
             var lstCharge = catChargeRepo.Get();
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
+            var dataCustom = customsDeclarationRepo.Get().ToList();
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             foreach (var charge in dataExportAccountants)
             {
                 AccountingPlSheetExportResult data = new AccountingPlSheetExportResult();
                 data.ServiceDate = charge.ServiceDate;
                 data.JobId = charge.JobNo;
+                data.CustomNo = charge.ClearanceNo;
                 var _taxInvNoRevenue = string.Empty;
                 var _voucherRevenue = string.Empty;
                 decimal? _usdRevenue = 0;
@@ -3269,6 +3269,15 @@ namespace eFMS.API.Documentation.DL.Services
                 .FirstOrDefault()?.ClearanceNo;
             return clearanceNo;
         }
+
+        private string GetCustomNoOldOfShipment1(string JobNo, List<CustomsDeclaration> customsDeclarations)
+        {
+            var clearanceNo = customsDeclarations.Where(x => x.JobNo != null && x.JobNo == JobNo)
+                .OrderBy(o => o.DatetimeModified)
+                .FirstOrDefault()?.ClearanceNo;
+            return clearanceNo;
+        }
+
         private IQueryable<SummaryOfCostsIncurredExportResult> SummaryOfCostsIncurred(GeneralReportCriteria criteria)
         {
             var dataShipment = QueryDataSummaryOfCostsIncurred(criteria);
@@ -4209,22 +4218,30 @@ namespace eFMS.API.Documentation.DL.Services
                     return null;
                 }
                 commissionData.Details = new List<CommissionDetail>();
+                var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
+                var listcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                           || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
                 foreach (var item in data)
                 {
-                    commissionData.Details.Add(new CommissionDetail()
+                    var charges = listcharge[item.Select(x => x.Hblid).FirstOrDefault()];
+                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
+                    if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
                     {
-                        ServiceDate = item.Select(x => x.ServiceDate).FirstOrDefault(),
-                        JobId = item.Select(x => x.JobNo).FirstOrDefault(),
-                        HBLNo = string.Empty,
-                        MBLNo = string.Empty,
-                        CustomSheet = string.IsNullOrEmpty(criteria.CustomNo) ? string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Select(c => c.ClearanceNo).ToArray())
-                                                                              : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
-                        ChargeWeight = 0,
-                        PortCode = string.Empty,
-                        BuyingRate = GetBuyingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
-                        SellingRate = GetSellingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
-                        ComAmount = GetCommissionAmount(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency)
-                    });
+                        commissionData.Details.Add(new CommissionDetail()
+                        {
+                            ServiceDate = item.Select(x => x.ServiceDate).FirstOrDefault(),
+                            JobId = item.Select(x => x.JobNo).FirstOrDefault(),
+                            HBLNo = string.Empty,
+                            MBLNo = string.Empty,
+                            CustomSheet = string.IsNullOrEmpty(criteria.CustomNo) ? string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Select(c => c.ClearanceNo).ToArray())
+                                                                                  : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
+                            ChargeWeight = 0,
+                            PortCode = string.Empty,
+                            BuyingRate = GetBuyingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
+                            SellingRate = GetSellingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
+                            ComAmount = GetCommissionAmount(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency)
+                        });
+                    }
                 }
             }
             else // Commission Air/Sea Report
@@ -4239,25 +4256,33 @@ namespace eFMS.API.Documentation.DL.Services
                     return null;
                 }
                 commissionData.Details = new List<CommissionDetail>();
+                var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
+                var listcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                           || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
                 foreach (var item in dataShipment)
                 {
-                    commissionData.Details.Add(new CommissionDetail()
+                    var charges = listcharge[(Guid)item.HblId];
+                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
+                    if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
                     {
-                        ServiceDate = item.ServiceDate,
-                        JobId = item.JobId,
-                        HBLNo = item.Hawb,
-                        MBLNo = string.Empty,
-                        CustomSheet = string.Empty,
-                        ChargeWeight = item.ChargeWeight,
-                        PortCode = GetPortCode((Guid)item.HblId, item.Service),
-                        BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
-                        SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
-                        ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency)
-                    });
+                        commissionData.Details.Add(new CommissionDetail()
+                        {
+                            ServiceDate = item.ServiceDate,
+                            JobId = item.JobId,
+                            HBLNo = item.Hawb,
+                            MBLNo = string.Empty,
+                            CustomSheet = string.Empty,
+                            ChargeWeight = item.ChargeWeight,
+                            PortCode = GetPortCode((Guid)item.HblId, item.Service),
+                            BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
+                            SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                            ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency)
+                        });
+                    }
                 }
             }
             // Get header
-            var listOrder = commissionData.Details.OrderBy(x => x.ServiceDate);          
+            var listOrder = commissionData.Details.OrderBy(x => x.ServiceDate);
             if (listOrder.Select(x => x.ServiceDate?.Year).Distinct().Count() == 1)
             {
                 var startMonth = listOrder.Select(x => x.ServiceDate).FirstOrDefault();
@@ -4284,6 +4309,10 @@ namespace eFMS.API.Documentation.DL.Services
                 commissionData.TaxCode = beneficiaryInfo?.TaxCode;
             }
             // get current user
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = currentUser.UserID;
+            }
             var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
             var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
             commissionData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;
@@ -4358,21 +4387,29 @@ namespace eFMS.API.Documentation.DL.Services
                 return null;
             }
             commissionData.Details = new List<CommissionDetail>();
+            var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
+            var listcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
+                                       || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
             foreach (var item in list)
             {
-                commissionData.Details.Add(new CommissionDetail()
+                var charges = listcharge[(Guid)item.HblId];
+                var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
+                if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
                 {
-                    ServiceDate = item.ServiceDate,
-                    JobId = item.JobId,
-                    HBLNo = item.Hawb,
-                    MBLNo = item.Mawb,
-                    CustomSheet = string.Empty,
-                    ChargeWeight = 0,
-                    PortCode = string.Empty,
-                    BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
-                    SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
-                    ComAmount = 0
-                });
+                    commissionData.Details.Add(new CommissionDetail()
+                    {
+                        ServiceDate = item.ServiceDate,
+                        JobId = item.JobId,
+                        HBLNo = item.Hawb,
+                        MBLNo = item.Mawb,
+                        CustomSheet = string.Empty,
+                        ChargeWeight = 0,
+                        PortCode = string.Empty,
+                        BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
+                        SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                        ComAmount = 0
+                    });
+                }
             }
 
             // Get header
@@ -4403,6 +4440,10 @@ namespace eFMS.API.Documentation.DL.Services
                 commissionData.TaxCode = beneficiaryInfo?.TaxCode;
             }
             // get current user
+            if (string.IsNullOrEmpty(userId))
+            {
+                userId = currentUser.UserID;
+            }
             var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
             var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
             commissionData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;

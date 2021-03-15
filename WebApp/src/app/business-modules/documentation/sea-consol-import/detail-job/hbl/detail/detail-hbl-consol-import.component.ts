@@ -181,6 +181,8 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._store.dispatch(new fromShareBussiness.GetDetailHBLAction(this.hblId));
+
                     } else {
                         this._toastService.error(res.message);
                     }

@@ -80,7 +80,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     ngOnInit() {
         this.headers = [
             { title: 'Charge Name', field: 'chargeNameEn', sortable: true, required: true, width: 250 },
-            { title: 'Payer', field: 'payerName', sortable: true, required: true, width: 250 },
+            { title: 'Payee', field: 'payerName', sortable: true, required: true, width: 250 },
             { title: 'Qty', field: 'quantity', sortable: true, required: true },
             { title: 'Unit', field: 'unitId', sortable: true, required: true },
             { title: 'Unit Price', field: 'unitPrice', sortable: true, required: true },
@@ -412,7 +412,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 chargeItem.objectBePaid = 'OTHER';
                 chargeItem.paymentObjectId = data.id;
                 chargeItem.payerId = null;
-                chargeItem.obhPartnerName = '';
+                // chargeItem.obhPartnerName = '';
                 break;
             case 'obh':
                 chargeItem.obhPartnerName = data.shortName;
@@ -607,6 +607,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 || charge.unitPrice < 0
                 || charge.vatrate > 100
                 || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && !charge.obhId
+                || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && charge.obhId === charge.paymentObjectId
+
             ) {
                 valid = false;
                 break;

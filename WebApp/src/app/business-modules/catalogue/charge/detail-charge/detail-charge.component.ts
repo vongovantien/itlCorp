@@ -23,7 +23,7 @@ export class DetailChargeComponent extends AddChargeComponent {
         { id: "DEBIT", text: "DEBIT" },
         { id: "OBH", text: "OBH" }
     ];
-    ngDataTypeChargeDefault: Array<string> = ["Công-Nợ", "Giải-Chi", "Loại Khác"];
+    ngDataTypeChargeDefault: Array<string> = ["Công Nợ", "Giải Chi", "Loại Khác"];
 
     ngDataService = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },

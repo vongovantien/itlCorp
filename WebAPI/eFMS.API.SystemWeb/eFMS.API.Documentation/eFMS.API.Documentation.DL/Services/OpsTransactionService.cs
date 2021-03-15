@@ -195,16 +195,16 @@ namespace eFMS.API.Documentation.DL.Services
                 if (dataGroup.Any())
                 {
                     SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataGroup.Where(x => x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataGroup.Where(x => x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataGroup.Where(x => x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
                 else
                 {
                     SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                    SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                    SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                    SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                    SalesDepartmentId = String.Join(";", dataUserLevels.Where(x=>x.DepartmentId != null).Select(t => t.DepartmentId).Distinct());
+                    SalesOfficeId = String.Join(";", dataUserLevels.Where(x=>x.OfficeId != null).Select(t => t.OfficeId).Distinct());
+                    SalesCompanyId = String.Join(";", dataUserLevels.Where(x=>x.CompanyId != null).Select(t => t.CompanyId).Distinct());
                 }
 
             }
@@ -1617,6 +1617,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<CsShipmentSurcharge> surCharges = null;
             var charges = surchargeRepository.Get(x => x.Hblid == _oldHblId && x.IsFromShipment == true);
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
             if (charges.Select(x => x.Id).Count() != 0)
             {
                 surCharges = new List<CsShipmentSurcharge>();
@@ -1649,7 +1650,7 @@ namespace eFMS.API.Documentation.DL.Services
                     //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                     item.FinalExchangeRate = null;
 
-                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item);
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
                     item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local

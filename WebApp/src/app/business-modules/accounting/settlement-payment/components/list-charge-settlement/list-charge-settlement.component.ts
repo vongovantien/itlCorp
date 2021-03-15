@@ -90,7 +90,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'total', sortable: true },
-            { title: 'Payer', field: 'payer', sortable: true },
+            { title: 'Payee', field: 'payer', sortable: true },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
@@ -127,17 +127,20 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
         if (charges.length) {
             this.selectedIndexSurcharge = -1;
-            const hblIds: string[] = charges.map(x => x.hblid);
 
+            const surchargeFromShipment = this.surcharges.filter(x => x.isFromShipment);
+            const hblIds: string[] = charges.map(x => x.hblid);
             if (charges[0].isChangeShipment) {
-                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && x.isChangeShipment === false);
+                const chargeMarkedChangeShipment = this.surcharges.filter(x => x.isChangeShipment === false && !x.isFromShipment);
+                this.surcharges = [...chargeMarkedChangeShipment];
+                // this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid));
             } else {
                 const jobNos: string[] = charges.map(x => x.jobNo);
 
-                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && jobNos.indexOf(x.jobId));
+                this.surcharges = this.surcharges.filter(x => hblIds.indexOf(x.hblid) && jobNos.indexOf(x.jobId) && !x.isFromShipment);
             }
 
-            this.surcharges = [...charges, ...this.surcharges];
+            this.surcharges = [...charges, ...this.surcharges, ...surchargeFromShipment];
             this.surcharges.forEach(c => c.isChangeShipment = undefined)
 
         }
@@ -300,7 +303,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             return;
         }
         if (charge.isFromShipment) {
-            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.isFromShipment);
+            const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
             this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
             this.listChargeFromShipmentPopup.show();
@@ -311,7 +314,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 this.tableListChargePopup.settlementCode = this.settlementCode || null;
 
                 // * Filter charge with hblID.
-                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid);
+                const surcharges: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && !surcharge.isFromShipment);
                 if (!!surcharges.length) {
                     const hblIds: string[] = surcharges.map(x => x.hblid);
 
@@ -385,8 +388,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.selectedIndexSurcharge = null;
 
         const surChargeisNotFromShipment = this.surcharges.filter(x => !x.isFromShipment);
+        const hblidsSurchargefromshipmentUpdate = surchargeFromShipment.map(x => x.hblid);
+
+        const surChargeFromShipmentAnother = this.surcharges.filter(x => x.isFromShipment && !hblidsSurchargefromshipmentUpdate.includes(x.hblid));
+
         this.surcharges.length = 0;
-        this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment];
+        this.surcharges = [...surChargeisNotFromShipment, ...surchargeFromShipment, ...surChargeFromShipmentAnother];
 
     }
 

@@ -211,12 +211,12 @@
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
-                                            <label for="">Invoice Date</label>
+                                            <label for="">Invoice Date {{invoiceDate.value?.startDate}}</label>
                                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                                 <input type="text" class="form-control m-input m-input--square"
                                                     ngxDaterangepickerMd
                                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                    [maxDate]="maxDate" name="daterange" readonly [autoApply]="true"
+                                                    name="daterange" readonly [autoApply]="true"
                                                     [singleDatePicker]="true" formControlName="invoiceDate"
                                                     [placeholder]="'Select Invoice Date'" />
                                                 <span class="m-input-icon_clear" (click)="resetFormControl(invoiceDate)"

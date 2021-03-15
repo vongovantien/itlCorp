@@ -28,7 +28,7 @@ namespace eFMS.API.Documentation.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    // [Authorize]
+    //[Authorize]
     public class OpsTransactionController : CustomAuthcontroller
     {
         private readonly IStringLocalizer stringLocalizer;
@@ -121,6 +121,7 @@ namespace eFMS.API.Documentation.Controllers
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
         public IActionResult Add(OpsTransactionModel model)
         {
+            currentUser.Action = "AddOpsTransaction";
             if (!ModelState.IsValid) return BadRequest();
 
             var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
@@ -149,6 +150,8 @@ namespace eFMS.API.Documentation.Controllers
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.Update)]
         public IActionResult Update(OpsTransactionModel model)
         {
+            currentUser.Action = "UpdateOpsTransaction";
+
             if (!ModelState.IsValid) return BadRequest();
             var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
             if (existedMessage != null)
@@ -181,6 +184,8 @@ namespace eFMS.API.Documentation.Controllers
         [AuthorizeEx(Menu.opsJobManagement, UserPermission.Add)]
         public IActionResult InsertDuplicateJob(OpsTransactionModel model)
         {
+            currentUser.Action = "InsertDuplicateJobOps";
+
             if (!ModelState.IsValid) return BadRequest();
             model.Id = Guid.NewGuid();
             var existedMessage = transactionService.CheckExist(model, string.Empty, string.Empty);
@@ -202,6 +207,8 @@ namespace eFMS.API.Documentation.Controllers
         [Route("Delete/{id}")]
         public IActionResult Delete(Guid id)
         {
+            currentUser.Action = "DeleteJobOps";
+
             if (transactionService.CheckAllowDeleteJobUsed(id) == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[DocumentationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
@@ -245,7 +252,9 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult ConvertClearanceToJob(CustomsDeclarationModel model)
         {
+
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            currentUser.Action = "ConvertClearanceToJob";
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return Forbid();
             var hs = transactionService.ConvertClearanceToJob(model);
@@ -267,7 +276,10 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult ConvertExistedClearancesToJobs([FromBody]List<CustomsDeclarationModel> list)
         {
+
             currentUser = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            currentUser.Action = "ConvertExistedClearancesToJobs";
+
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return Forbid();
             HandleState hs = transactionService.ConvertExistedClearancesToJobs(list);
@@ -301,6 +313,8 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult LockOpsTransaction(Guid id)
         {
+            currentUser.Action = "LockOpsTransaction";
+
             HandleState hs = transactionService.LockOpsTransaction(id);
 
             string message = HandleError.GetMessage(hs, Crud.Update);

@@ -32,7 +32,7 @@ export class SettlementTableSurchargeComponent extends AppList {
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Payer', field: 'payer', sortable: true, width: 200 },
+            { title: 'Payee', field: 'payer', sortable: true, width: 200 },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true, width: 200 },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },

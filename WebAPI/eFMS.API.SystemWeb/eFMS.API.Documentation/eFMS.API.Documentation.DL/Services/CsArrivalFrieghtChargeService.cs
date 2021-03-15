@@ -34,6 +34,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysOffice> officeRepo;
         private readonly IContextBase<SysCompany> companyRepo;
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
+        private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
         ICsTransactionDetailService houseBills;
@@ -53,7 +54,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> partnerRepo,
             ICsTransactionDetailService houseBill,
             IContextBase<SysOffice> sysOffice,
-            IContextBase<SysCompany> sysCompany
+            IContextBase<SysCompany> sysCompany,
+            IContextBase<SysUserLevel> userlevelRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -70,6 +72,7 @@ namespace eFMS.API.Documentation.DL.Services
             houseBills = houseBill;
             officeRepo = sysOffice;
             companyRepo = sysCompany;
+            userlevelRepository = userlevelRepo;
         }
 
         #region Arrival
@@ -442,16 +445,18 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
+            var pic = transactionRepository.Get(x => x.Id == houserBill.JobId).Select(x => x.PersonIncharge).FirstOrDefault();
+            var userInfo = userlevelRepository.Get(x => x.UserId == pic).FirstOrDefault();
             // Company Information of Creator
-            var companyUser = companyRepo.Get(x => x.Id == houserBill.CompanyId).FirstOrDefault();
+            var companyUser = companyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             // Office Information of Creator
-            var officeUser = officeRepo.Get(x => x.Id == houserBill.OfficeId).FirstOrDefault();
+            var officeUser = officeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new SeaArrivalNotesReportParams();
             parameter.No = string.Empty;
             parameter.ShipperName = string.Empty;
-            parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
+            parameter.CompanyName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? companyUser?.BunameVn : companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = officeUser.AddressEn; // Office Address En of user
+            parameter.CompanyAddress1 = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser.AddressVn : officeUser.AddressEn; // Office Address En of user
             parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
             parameter.Website = companyUser?.Website; // Website Company of user
             parameter.MAWB = houserBill != null ? (houserBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
@@ -605,17 +610,19 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
+            var pic = transactionRepository.Get(x => x.Id == houseBill.JobId).Select(x => x.PersonIncharge).FirstOrDefault();
+            var userInfo = userlevelRepository.Get(x => x.UserId == pic).FirstOrDefault();
             // Company Information
-            var companyUser = companyRepo.Get(x => x.Id == houseBill.CompanyId).FirstOrDefault();
+            var companyUser = companyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             // Office Information
-            var officeUser = officeRepo.Get(x => x.Id == houseBill.OfficeId).FirstOrDefault();            
+            var officeUser = officeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();            
             var parameter = new AirImptArrivalReportParams();
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             // Thông tin Company
-            parameter.CompanyName = companyUser?.BunameEn; // Company Name En of user
+            parameter.CompanyName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? companyUser?.BunameVn : companyUser?.BunameEn; // Company Name En of user
             parameter.CompanyDescription = string.Empty;
-            parameter.CompanyAddress1 = officeUser?.AddressEn; // Office Address En of user 
+            parameter.CompanyAddress1 = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser?.AddressVn : officeUser?.AddressEn; // Office Address En of user 
             parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
             parameter.Website = companyUser?.Website; // Website Company of user
             parameter.AccountInfo = string.Empty;
@@ -751,17 +758,19 @@ namespace eFMS.API.Documentation.DL.Services
             var detail = detailTransactionRepository.First(x => x.Id == hblid);
             if (detail.DeliveryOrderNo == null) return new Crystal();
 
+            var pic = transactionRepository.Get(x => x.Id == detail.JobId).Select(x => x.PersonIncharge).FirstOrDefault();
+            var userInfo = userlevelRepository.Get(x => x.UserId == pic).FirstOrDefault();
             // Company Information
-            var companyUser = companyRepo.Get(x => x.Id == detail.CompanyId).FirstOrDefault();
+            var companyUser = companyRepo.Get(x => x.Id == userInfo.CompanyId).FirstOrDefault();
             // Office Information
-            var officeUser = officeRepo.Get(x => x.Id == detail.OfficeId).FirstOrDefault();
+            var officeUser = officeRepo.Get(x => x.Id == userInfo.OfficeId).FirstOrDefault();
             var parameter = new SeaDeliveryCommandParam
             {
                 Consignee = "s",
                 No = "s",
-                CompanyName = companyUser?.BunameEn, //Company Name En of user
+                CompanyName = companyUser?.BunameVn, //Company Name En of user
                 CompanyDescription = "Company Description",
-                CompanyAddress1 = officeUser?.AddressEn, //Office Address En of user
+                CompanyAddress1 = officeUser?.AddressVn, //Office Address En of user
                 CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty), //Tel & Fax of Office user
                 Website = companyUser?.Website, //Website Company of user
                 MAWB = detail.Mawb?.ToUpper(),

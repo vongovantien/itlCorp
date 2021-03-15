@@ -1013,7 +1013,8 @@ namespace eFMS.API.Setting.DL.Services
                                 userApproveNext = buHeadLevel.UserId;
                                 mailUserApproveNext = buHeadLevel.EmailUser;
                                 mailUsersDeputy = buHeadLevel.EmailDeputies;
-                                if (buHeadLevel.Role == SettingConstants.ROLE_AUTO)
+                                //Nếu Role BUHead là Auto or Special thì chuyển trạng thái Done
+                                if (buHeadLevel.Role == SettingConstants.ROLE_AUTO || buHeadLevel.Role == SettingConstants.ROLE_SPECIAL)
                                 {
                                     unlockRequest.StatusApproval = SettingConstants.STATUS_APPROVAL_DONE;
                                     approve.BuheadApr = buHeadLevel.UserId;
@@ -1272,7 +1273,7 @@ namespace eFMS.API.Setting.DL.Services
 
                     var isBuHead = userBaseService.GetBUHead(currentUser.CompanyID, currentUser.OfficeID).FirstOrDefault() == currentUser.UserID;
                     var isBod = userBaseService.CheckIsBOD(currentUser.DepartmentId, currentUser.OfficeID, currentUser.CompanyID);
-                    if ((buHeadLevel.Role == SettingConstants.ROLE_APPROVAL || buHeadLevel.Role == SettingConstants.ROLE_AUTO) && isBod
+                    if ((buHeadLevel.Role == SettingConstants.ROLE_APPROVAL || buHeadLevel.Role == SettingConstants.ROLE_AUTO | buHeadLevel.Role == SettingConstants.ROLE_SPECIAL) && isBod
                         &&
                         (
                           (isBuHead && currentUser.GroupId == SettingConstants.SpecialGroup && userCurrent == buHeadLevel.UserId)
@@ -1281,7 +1282,7 @@ namespace eFMS.API.Setting.DL.Services
                         )
                        )
                     {
-                        if (accountantLevel.Role == SettingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
+                        if (buHeadLevel.Role == SettingConstants.ROLE_APPROVAL && accountantLevel.Role == SettingConstants.ROLE_APPROVAL && string.IsNullOrEmpty(approve.AccountantApr))
                         {
                             return new HandleState("The accountant has not approved it yet");
                         }
