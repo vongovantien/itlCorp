@@ -35,6 +35,7 @@ namespace eFMS.API.Documentation.DL.Models
         public DateTime? ShipmentEtd { get; set; }
         public string ShipmentMawb { get; set; }
         public string PackageTypeName { get; set; }
+        public string ShipmentPIC { get; set; }
 
         public PermissionAllowBase Permission { get; set; }
     }
