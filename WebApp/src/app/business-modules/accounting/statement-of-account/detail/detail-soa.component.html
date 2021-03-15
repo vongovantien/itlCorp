@@ -92,9 +92,9 @@
                         <span *ngSwitchCase="'Issued Voucher'" class="text-info m--margin-left-5">{{soa.status}}</span>
                         <span *ngSwitchDefault class="text-primary m--margin-left-5">{{soa.status}}</span>
                     </div>
-                    <div class="col-lg-4 m--margin-bottom-10">
-                        <span class="m--font-bolder">Currency:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.currency}}</span>
+                    <div class="col-lg-4  m--margin-bottom-10">
+                        <span class="m--font-bolder">Type:</span>
+                        <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
                     </div>
                 </div>
                 <div class="row">
@@ -108,21 +108,31 @@
                             </span>
                         </ng-template>
                     </div>
+                    <div class="col-lg-4 m--margin-bottom-10">
+                        <span class="m--font-bolder">Currency:</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.currency}}</span>
+                    </div>
+                    <div class="col-lg-4  m--margin-bottom-10">
+                        <span class="m--font-bolder">ExcRate USD To Local:</span>
+                        <span class="m--font-brand m--margin-left-5 m--font-info">{{soa.excRateUsdToLocal |
+                            number:
+                            '.0-3'}}</span>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-lg-4  m--margin-bottom-10">
                         <span class="m--font-bolder">Total Shipment/Charge:</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}/{{soa.totalCharge
                             | number: '.0-2'}}</span>
                     </div>
                     <div class="col-lg-4  m--margin-bottom-10">
-                        <span class="m--font-bolder">Create Date:</span>
+                        <span class="m--font-bolder">Created Date:</span>
                         <span class="m--font-brand m--margin-left-5">
                             {{soa.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}
                         </span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.userNameCreated}}</span>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-lg-4 m--margin-bottom-10">
                         <span class="m--font-bolder">Modified Date:</span>
                         <span class="m--font-brand m--margin-left-5">
@@ -130,14 +140,6 @@
                         </span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{soa.userNameModified}}</span>
-                    </div>
-                    <div class="col-lg-4  m--margin-bottom-10">
-                        <span class="m--font-bolder">Note:</span>
-                        <span class="m--font-brand m--margin-left-5">{{soa.note}}</span>
-                    </div>
-                    <div class="col-lg-4  m--margin-bottom-10">
-                        <span class="m--font-bolder">Type:</span>
-                        <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
                     </div>
                 </div>
                 <div class="row">
@@ -157,9 +159,15 @@
                             class="m--margin-left-5 m-badge m-badge--danger m-badge--wide">{{soa.syncStatus}}</span>
                         <span *ngSwitchDefault class="m--margin-left-5">{{soa.syncStatus}}</span>
                     </div>
-                    <div class="col-lg-4 m--margin-bottom-10">
+                    <div class="col-lg-4  m--margin-bottom-10">
+                        <span class="m--font-bolder">Note:</span>
+                        <span class="m--font-brand m--margin-left-5">{{soa.note}}</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 m--margin-bottom-10">
                         <span class="m--font-bolder">Reason Reject:</span>
-                        <span class="m--font-brand m--margin-left-5 text-danger">{{soa.reasonReject}}</span>
+                        <span class="m--font-brand m--margin-left-5 m--font-danger">{{soa.reasonReject}}</span>
                     </div>
                 </div>
             </div>
