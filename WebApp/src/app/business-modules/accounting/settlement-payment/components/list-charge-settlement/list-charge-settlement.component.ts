@@ -90,7 +90,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'total', sortable: true },
-            { title: 'Payer', field: 'payer', sortable: true },
+            { title: 'Payee', field: 'payer', sortable: true },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
