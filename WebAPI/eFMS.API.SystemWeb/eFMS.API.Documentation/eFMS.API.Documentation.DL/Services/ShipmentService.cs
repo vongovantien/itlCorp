@@ -1160,7 +1160,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = !string.IsNullOrEmpty(item.Salesman) ? LookupUser[item.Salesman].FirstOrDefault()?.Username : string.Empty;
-                data.AgentName = catPartnerRepo.Get(x => x.Id == item.Agent).FirstOrDefault()?.PartnerNameVn;
+                data.AgentName = LookupPartner[item.Agent].FirstOrDefault()?.PartnerNameVn;
                 data.GW = item.GW;
                 data.CW = item.CW;
                 data.CBM = item.CBM;
@@ -1866,16 +1866,16 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
-            {
-                var dataOperation = GeneralReportOperation(criteria);
-                list = dataDocumentation.Union(dataOperation);
-            }
-            else
-            {
-                list = dataDocumentation;
-            }
-
+            //if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
+            //{
+            //    var dataOperation = GeneralReportOperation(criteria);
+            //    list = dataDocumentation.Union(dataOperation);
+            //}
+            //else
+            //{
+            //    list = dataDocumentation;
+            //}
+            list = dataDocumentation;
             var results = new List<GeneralReportResult>();
             if (list == null)
             {
@@ -1905,15 +1905,16 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var dataDocumentation = GeneralReportDocumentation(criteria);
             IQueryable<GeneralReportResult> list;
-            if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
-            {
-                var dataOperation = GeneralReportOperation(criteria);
-                list = dataDocumentation.Union(dataOperation);
-            }
-            else
-            {
-                list = dataDocumentation;
-            }
+            //if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
+            //{
+            //    var dataOperation = GeneralReportOperation(criteria);
+            //    list = dataDocumentation.Union(dataOperation);
+            //}
+            //else
+            //{
+            //    list = dataDocumentation;
+            //}
+            list = dataDocumentation;
             var tempList = list.ToList();
             int no = 1;
             tempList.ForEach(fe =>
@@ -2057,6 +2058,34 @@ namespace eFMS.API.Documentation.DL.Services
             return dataList.AsQueryable();
         }
 
+        private List<sp_GetDataGeneralReport> GetDataGeneralReport(GeneralReportCriteria criteria)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.ServiceDateFrom },
+                new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.ServiceDateTo },
+                new SqlParameter(){ ParameterName = "@createdDateFrom", Value = criteria.CreatedDateFrom },
+                new SqlParameter(){ ParameterName = "@createdDateTo", Value = criteria.CreatedDateTo },
+                new SqlParameter(){ ParameterName = "@customerId", Value = criteria.CustomerId },
+                new SqlParameter(){ ParameterName = "@service", Value = criteria.Service },
+                new SqlParameter(){ ParameterName = "@currency", Value = criteria.Currency },
+                new SqlParameter(){ ParameterName = "@jobId", Value = criteria.JobId },
+                new SqlParameter(){ ParameterName = "@mawb", Value = criteria.Mawb },
+                new SqlParameter(){ ParameterName = "@hawb", Value = criteria.Hawb },
+                new SqlParameter(){ ParameterName = "@officeId", Value = criteria.OfficeId },
+                new SqlParameter(){ ParameterName = "@departmentId", Value = criteria.DepartmentId },
+                new SqlParameter(){ ParameterName = "@groupId", Value = criteria.GroupId },
+                new SqlParameter(){ ParameterName = "@personalInCharge", Value = criteria.PersonInCharge },
+                new SqlParameter(){ ParameterName = "@salesMan", Value = criteria.SalesMan },
+                new SqlParameter(){ ParameterName = "@creator", Value = criteria.Creator },
+                new SqlParameter(){ ParameterName = "@carrierId", Value = criteria.CarrierId },
+                new SqlParameter(){ ParameterName = "@agentId", Value = criteria.AgentId },
+                new SqlParameter(){ ParameterName = "@pol", Value = criteria.Pol },
+                new SqlParameter(){ ParameterName = "@pod", Value = criteria.Pod }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataGeneralReport>(parameters);
+            return list;
+        }
+
         private IQueryable<GeneralReportResult> QueryDataDocumentation(GeneralReportCriteria criteria)
         {
             Expression<Func<CsTransaction, bool>> queryTrans = GetQueryTransationDocumentation(criteria);
@@ -2119,84 +2148,49 @@ namespace eFMS.API.Documentation.DL.Services
 
         private IQueryable<GeneralReportResult> GeneralReportDocumentation(GeneralReportCriteria criteria)
         {
-            var dataShipment = QueryDataDocumentation(criteria);
+            //var dataShipment = QueryDataDocumentation(criteria);
+            var dataShipment = GetDataGeneralReport(criteria);
             List<GeneralReportResult> dataList = new List<GeneralReportResult>();
             var LstSurcharge = surCharge.Get();
             var LookupSurchage = LstSurcharge.ToLookup(x => x.Hblid);
             var PartnerList = catPartnerRepo.Get();
             var LookupPartner = PartnerList.ToLookup(x => x.Id);
-            var PlaceList = catPlaceRepo.Get();
+            var PlaceLookup = catPlaceRepo.Get().ToLookup(q=>q.Id);
+            var lookupUser = sysUserRepo.Get().ToLookup(q => q.Id);
+            var lookupEmployee = sysEmployeeRepo.Get().ToLookup(q => q.Id);
             foreach (var item in dataShipment)
             {
                 GeneralReportResult data = new GeneralReportResult();
-                data.JobId = item.JobId;
+                data.JobId = item.JobNo;
                 data.Mawb = item.Mawb;
-                data.Hawb = item.Hawb;
-                foreach (var partner in LookupPartner[item.CustomerId])
-                {
-                    data.CustomerName = partner?.PartnerNameEn;
-                    break;
-                }
-                foreach (var partner in LookupPartner[item.CarrierId])
-                {
-                    data.CarrierName = partner?.PartnerNameEn;
-                    break;
-                }
-                foreach (var partner in LookupPartner[item.AgentId])
-                {
-                    data.AgentName = partner?.PartnerNameEn;
-                    break;
-                }
-
+                data.Hawb = item.HwbNo;
+                data.CustomerName = LookupPartner[item.CustomerId].FirstOrDefault()?.PartnerNameEn;
+                data.CarrierName = LookupPartner[item.ColoaderId].FirstOrDefault()?.PartnerNameEn;
+                data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameEn;
                 data.ServiceDate = item.ServiceDate;
 
-                var _polCode = PlaceList.Where(x => x.Id == item.Pol).FirstOrDefault()?.Code;
-                var _podCode = PlaceList.Where(x => x.Id == item.Pod).FirstOrDefault()?.Code;
+                var _polCode = item.Pol != null ? PlaceLookup[(Guid)item.Pol].FirstOrDefault()?.Code : string.Empty;
+                var _podCode = item.Pod != null ? PlaceLookup[(Guid)item.Pod].FirstOrDefault()?.Code : string.Empty;
                 data.Route = _polCode + "/" + _podCode;
 
                 //Qty lấy theo Housebill
-                var houseBill = detailRepository.Get(x => x.Id == item.HblId).FirstOrDefault();
-                data.Qty = houseBill?.PackageQty ?? 0;
-                data.ChargeWeight = houseBill?.ChargeWeight ?? 0;
+                data.Qty = item.PackageQty ?? 0;
+                data.ChargeWeight = item.ChargeWeight ?? 0;
 
                 #region -- Phí Selling trước thuế --
-                decimal? _revenue = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeSell = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE);
-                    foreach (var charge in _chargeSell)
-                    {
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _revenue += charge.AmountVnd;
-                        }
-                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            _revenue += charge.AmountUsd;
-                        }
-                    }
-                    data.Revenue = _revenue;
+                    data.Revenue = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? _chargeSell.Sum(x => x.AmountVnd ?? 0) : _chargeSell.Sum(x => x.AmountUsd ?? 0);
                 }
 
                 #endregion -- Phí Selling trước thuế --
 
                 #region -- Phí Buying trước thuế --
-                decimal? _cost = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeBuy = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE);
-                    foreach (var charge in _chargeBuy)
-                    {
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _cost += charge.AmountVnd;
-                        }
-                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            _cost += charge.AmountUsd;
-                        }
-                    }
-                    data.Cost = _cost;
+                    data.Cost = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? _chargeBuy.Sum(x => x.AmountVnd ?? 0) : _chargeBuy.Sum(x => x.AmountUsd ?? 0);
                 }
 
                 #endregion -- Phí Buying trước thuế --
@@ -2204,41 +2198,27 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Profit = data.Revenue - data.Cost;
 
                 #region -- Phí OBH sau thuế --
-                decimal? _obh = 0;
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
                     var _chargeObh = LookupSurchage[(Guid)item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_OBH_TYPE);
-                    foreach (var charge in _chargeObh)
-                    {
-                        // Phí OBH sau thuế
-                        if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _obh += charge.VatAmountVnd + charge.AmountVnd;
-                        }
-                        else if (criteria.Currency == DocumentConstants.CURRENCY_USD)
-                        {
-                            _obh += charge.VatAmountUsd + charge.VatAmountUsd;
-                        }
-                    }
-                    data.Obh = _obh;
+                    data.Obh = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? _chargeObh.Sum(x => x.AmountVnd + x.VatAmountVnd  ?? 0) : _chargeObh.Sum(x => x.AmountUsd + x.VatAmountUsd ?? 0);
                 }
 
                 #endregion -- Phí OBH sau thuế --
 
-                var _empPic = sysUserRepo.Get(j => j.Id == item.PicId).FirstOrDefault()?.EmployeeId;
+                var _empPic = lookupUser[item.PersonInCharge].FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(_empPic))
                 {
-                    data.PersonInCharge = sysEmployeeRepo.Get(x => x.Id == _empPic).FirstOrDefault()?.EmployeeNameEn;
+                    data.PersonInCharge = lookupEmployee[_empPic].FirstOrDefault()?.EmployeeNameEn;
                 }
 
-                var _empSale = sysUserRepo.Get(j => j.Id == item.SalesmanId).FirstOrDefault()?.EmployeeId;
+                var _empSale = lookupUser[item.SalemanId].FirstOrDefault()?.EmployeeId;
                 if (!string.IsNullOrEmpty(_empSale))
                 {
-
-                    data.Salesman = sysEmployeeRepo.Get(x => x.Id == _empSale).FirstOrDefault()?.EmployeeNameEn;
+                    data.Salesman = lookupEmployee[_empSale].FirstOrDefault()?.EmployeeNameEn;
                 }
 
-                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.Service).FirstOrDefault()?.DisplayName;
+                data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == item.TransactionType).FirstOrDefault()?.DisplayName;
 
                 dataList.Add(data);
             }
