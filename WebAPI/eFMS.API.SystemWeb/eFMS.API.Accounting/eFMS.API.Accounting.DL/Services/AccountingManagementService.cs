@@ -2296,5 +2296,21 @@ namespace eFMS.API.Accounting.DL.Services
 
             return payeeId;
         }
+
+        /// <summary>
+        /// Check tồn tại phí Debit đã sync
+        /// </summary>
+        /// <param name="charges">List charge issue Vat Invoice</param>
+        /// <returns></returns>
+        public bool CheckExistDebitChargeSynced(List<ChargeOfAccountingManagementModel> charges)
+        {
+            var result = false;
+            if (charges.Count > 0)
+            {
+                var chargeIds = charges.Select(s => s.SurchargeId);
+                result = surchargeRepo.Get(x => chargeIds.Any(a => a == x.Id) && !string.IsNullOrEmpty(x.SyncedFrom) && x.Type != AccountingConstants.TYPE_CHARGE_BUY).Any();
+            }
+            return result;
+        }
     }
 }

@@ -130,6 +130,12 @@
             <param name="billingDate">Billing Date of Invoice</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckExistDebitChargeSynced(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.ChargeOfAccountingManagementModel})">
+            <summary>
+            Check tồn tại phí Debit đã sync
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">
             <summary>
             A base class for an MVC controller without view support.
