@@ -1,18 +1,18 @@
-import { Component, ViewChild } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
-import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
+import { Router } from '@angular/router';
+import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
-import { AccountingRepo } from 'src/app/shared/repositories';
-import { catchError, finalize } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { NgProgress } from '@ngx-progressbar/core';
+
+import { AppPage } from '@app';
+import { AccountingRepo } from '@repositories';
 import { RoutingConstants } from '@constants';
 
+import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
+import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 @Component({
     selector: 'app-advance-payment-new',
     templateUrl: './add-new-advance-payment.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class AdvancePaymentAddNewComponent extends AppPage {
@@ -24,11 +24,9 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         private _toastService: ToastrService,
         private _accoutingRepo: AccountingRepo,
         private _router: Router,
-        private _progressService: NgProgress
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
     }
 
@@ -53,16 +51,11 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         }
 
         const body = this.getFormData();
-        this._progressRef.start();
         this._accoutingRepo.addNewAdvancePayment(body)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(`${res.data.advanceNo + ' is added successfully'}`, 'Save Success !',);
+                        this._toastService.success(`${res.data.advanceNo + ' is added successfully'}`, 'Save Success !');
 
                         //  * go to detail page
                         this._router.navigate([`home/accounting/advance-payment/${res.data.id}`]);
@@ -85,16 +78,11 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             return;
         }
         const body = this.getFormData();
-        this._progressRef.start();
         this._accoutingRepo.sendRequestAdvPayment(body)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
-                        this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !', { positionClass: 'toast-bottom-right' });
+                        this._toastService.success(`${res.data.advanceNo + 'Save and Send Request successfully'}`, 'Save Success !');
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${res.data.id}/approve`]);
                     } else {
                         this.handleError(null, (data: any) => {
@@ -111,10 +99,10 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
             requester: this.formCreateComponent.requester.value || 'Admin',
             // statusApproval: this.formCreateComponent.statusApproval.value || '',
-            paymentMethod: this.formCreateComponent.paymentMethod.value.value,
+            paymentMethod: this.formCreateComponent.paymentMethod.value,
             advanceCurrency: this.formCreateComponent.currency.value || 'VND',
             requestDate: formatDate(this.formCreateComponent.requestDate.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
-            deadlinePayment: formatDate(this.formCreateComponent.deadLine.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
+            deadlinePayment: formatDate(this.formCreateComponent.deadlinePayment.value.startDate || new Date(), 'yyyy-MM-dd', 'en'),
             advanceNote: this.formCreateComponent.note.value || '',
             paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
             bankAccountNo: this.formCreateComponent.bankAccountNo.value,
@@ -125,7 +113,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
     }
 
     checkValidateAmountAdvance(): boolean {
-        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
+        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value === 'Cash') {
             return false;
         }
         return true;
