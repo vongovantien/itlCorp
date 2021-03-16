@@ -68,6 +68,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     STATE: string = 'WRITE';  // * list'state READ/WRITE
 
     isShowButtonCopyCharge: boolean = false;
+    requester: string = '';
 
     constructor(
         private _sortService: SortService,
@@ -198,7 +199,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         data.event.stopPropagation();
         data.event.preventDefault();
 
-        this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
+        this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl, this.requester);
 
         this.showPaymentManagementPopup();
         return false;
@@ -272,7 +273,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     showPaymentManagement(surcharge: Surcharge) {
-        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
+        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl, this.requester);
         this.showPaymentManagementPopup();
     }
 

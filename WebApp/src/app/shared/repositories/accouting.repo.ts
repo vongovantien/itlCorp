@@ -267,8 +267,8 @@ export class AccountingRepo {
             );
     }
 
-    getPaymentManagement(jobId: string, mbl: string, hbl: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl }).pipe(
+    getPaymentManagement(jobId: string, mbl: string, hbl: string, requester: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPaymentManagementByShipment`, { JobId: jobId, mbl: mbl, hbl: hbl, requester: requester }).pipe(
             map((data: any) => data)
         );
     }

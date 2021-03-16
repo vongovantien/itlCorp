@@ -180,6 +180,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
                     this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
+                    this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // if (this.requestSurchargeListComponent.groupShipments.length) {
                     //     this.requestSurchargeListComponent.openAllCharge.next(true);

@@ -587,13 +587,14 @@
             <param name="settlementId"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPaymentManagementByShipment(System.String,System.String,System.String,System.String)">
             <summary>
             Get Payment Management By Shipment
             </summary>
             <param name="JobId"></param>
             <param name="MBL"></param>
             <param name="HBL"></param>
+            <param name="requester"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">

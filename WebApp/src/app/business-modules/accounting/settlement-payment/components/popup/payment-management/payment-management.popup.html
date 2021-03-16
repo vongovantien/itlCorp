@@ -149,7 +149,7 @@
                                         <li *ngFor="let charge of settlement.chargeSettlementPaymentMngts"
                                             class="list-group-item">
                                             <div class="row">
-                                                <div class="col text-center"></div>
+                                                <div class="col text-center">{{charge.advanceNo}}</div>
                                                 <div class="col text-center">{{charge.chargeName}}</div>
                                                 <div class="col text-center">{{charge.totalAmount | number: '.0-3'}}
                                                 </div>

@@ -27,9 +27,9 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
 
-        List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl);
+        List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester);
 
-        List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl);
+        List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl, string requester);
 
         List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
