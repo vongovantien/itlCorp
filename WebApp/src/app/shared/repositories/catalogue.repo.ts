@@ -664,6 +664,13 @@ export class CatalogueRepo {
         );
     }
 
+    customerRequest(body: any = {}) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatContract/customerRequest`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
     updateContract(body: any) {
         return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/update`, body).pipe(
             map((data: any) => data)

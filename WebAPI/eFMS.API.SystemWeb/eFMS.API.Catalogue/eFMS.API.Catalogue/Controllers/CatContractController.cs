@@ -146,9 +146,6 @@ namespace eFMS.API.Catalogue.Controllers
         {
             string messageDuplicate = string.Empty;
 
-            var officeIds = catContractService.Get().Select(t => t.OfficeId).ToArray();
-            var saleServices = catContractService.Get().Select(t => t.SaleService).ToArray();
-            var office = model.OfficeId.Split(";").ToArray();
             var sale = model.SaleService.Split(";").ToArray();
             var dataContract = catContractService.Get(x => x.PartnerId == model.PartnerId).ToList();
             var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
@@ -220,6 +217,33 @@ namespace eFMS.API.Catalogue.Controllers
                 }
             }
             return messageDuplicate;
+        }
+
+        /// <summary>
+        /// add new saleman
+        /// </summary>
+        /// <param name="model">object to add</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CustomerRequest")]
+        [Authorize]
+        public IActionResult CustomerRequest(CatContractModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            string messageExisted = CheckExistedContract(model);
+            if (!string.IsNullOrEmpty(messageExisted))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = messageExisted });
+            }
+            model.Id = Guid.NewGuid();
+            var hs = catContractService.CustomerRequest(model);
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model.Id };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
 
         /// <summary>
