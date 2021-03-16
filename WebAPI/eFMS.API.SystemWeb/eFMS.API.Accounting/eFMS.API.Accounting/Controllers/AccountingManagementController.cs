@@ -514,15 +514,6 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
-
-        /// <summary>
-        /// Check tồn tại phí Debit đã sync
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckExistDebitChargeSynced(List<ChargeOfAccountingManagementModel> Charges)
-        {
-            var result = accountingService.CheckExistDebitChargeSynced(Charges);
-            return result;
-        }
+        
     }
 }
