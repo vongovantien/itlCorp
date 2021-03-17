@@ -91,6 +91,7 @@ export class ChargeOfAccountingManagementModel {
     isValidVatAmount: boolean = true; // ? +- 1000
     isSynced: boolean = false;
     syncedFromBy: string = null;
+    chargeType: string = null;
 
     constructor(object?: any) {
         const self = this;

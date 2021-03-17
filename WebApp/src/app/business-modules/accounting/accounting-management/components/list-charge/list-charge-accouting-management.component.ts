@@ -157,7 +157,8 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                     if (res.generalExchangeRate) {
                         if (!!this.charges.length) {
                             this.charges.forEach(c => {
-                                if (c.currency !== 'VND') {
+                                // Chỉ Update ExcRate cho những charge có Currency != VND && Type != OBH
+                                if (c.currency !== 'VND' && c.chargeType !== 'OBH') {
                                     c.exchangeRate = res.generalExchangeRate; // * for Display
                                     c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
                                 }
