@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -19,7 +19,7 @@ import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
 @Component({
     selector: 'app-detail-job-air-export',
@@ -36,6 +36,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('Permission403PopupComponent') permissionPopup: Permission403PopupComponent;
     @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -61,6 +62,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _ngProgressService: NgProgress,
+        private readonly _viewContainerRef: ViewContainerRef
 
     ) {
         super(_toastService, _documentRepo, _router, _store);
@@ -247,6 +249,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             case 'files':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
+        }
+        if (tabName !== 'advance-settle') {
+            this._viewContainerRef.clear();
         }
     }
 
@@ -450,6 +458,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     showReport(): void {
         this.previewPopup.frm.nativeElement.submit();
         this.previewPopup.show();
+    }
+
+    async getAdvanceSettleInfoComponent() {
+        const { ShareBusinessAdvanceSettlementInforComponent } = await import('./../../../share-business/components/advance-settlement-info/advance-settlement-info.component');
+        this.renderDynamicComponent(ShareBusinessAdvanceSettlementInforComponent, this.advSettleContainerRef)
     }
 
 }
