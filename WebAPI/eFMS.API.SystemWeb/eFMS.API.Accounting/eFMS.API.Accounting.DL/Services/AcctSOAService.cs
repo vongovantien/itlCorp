@@ -2834,7 +2834,7 @@ namespace eFMS.API.Accounting.DL.Services
             var office = officeRepo.Get(x => x.Id == soa.OfficeId).FirstOrDefault();
 
             var parameter = new AccountStatementFullReportParams();
-            parameter.UptoDate = soa.SoaformDate?.ToString("dd/MM/yyyy") ?? string.Empty; //From To SOA
+            parameter.UptoDate = string.Format("{0} - {1}", soa.SoaformDate?.ToString("dd/MM/yyyy") ?? string.Empty,  soa.SoatoDate?.ToString("dd/MM/yyyy") ?? string.Empty) ; //From - To SOA
             parameter.dtPrintDate = soa.DatetimeCreated?.ToString("dd/MM/yyyy") ?? string.Empty; //Created Date SOA
             parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
             parameter.CompanyDescription = string.Empty; //NOT USE
