@@ -117,7 +117,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
-    @Input() isCustomerRequest: boolean = false;
+    isCustomerRequest: boolean = false;
 
     constructor(
         private _fb: FormBuilder,

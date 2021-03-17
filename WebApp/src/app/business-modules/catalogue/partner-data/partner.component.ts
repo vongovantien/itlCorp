@@ -256,7 +256,7 @@ export class PartnerComponent extends AppList implements OnInit {
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
         this.formContractPopup.effectiveDate.setValue(null);
-
+        this.formContractPopup.isCustomerRequest = true;
         this.formContractPopup.show();
         this.formContractPopup.show();
     }
