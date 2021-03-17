@@ -178,6 +178,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
+            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges);
+            if (isExistDebitSynced)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Existing charges have been synchronized to the accounting system, Please check it again!" });
+            }
+
             var hs = accountingService.AddAcctMgnt(model);
 
             if (hs.Success)
@@ -230,6 +236,12 @@ namespace eFMS.API.Accounting.Controllers
                 string accountType = model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE ? "VAT Invoice" : "Voucher";
                 ResultHandle _result = new ResultHandle { Status = false, Message = accountType + " don't have any charge in this period, Please check it again!" };
                 return BadRequest(_result);
+            }
+
+            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges);
+            if (isExistDebitSynced)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = "Existing charges have been synchronized to the accounting system, Please check it again!" });
             }
 
             var hs = accountingService.UpdateAcctMngt(model);
@@ -502,5 +514,6 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
+        
     }
 }
