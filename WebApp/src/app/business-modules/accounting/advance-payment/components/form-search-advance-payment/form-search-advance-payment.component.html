@@ -56,12 +56,9 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
                                         name="daterange" readonly formControlName="requestDate" [ranges]="ranges"
-                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY"
+                                        [allowRemove]="!!requestDate.value && !!requestDate.value.startDate"
+                                        (remove)="resetFormControl(requestDate)" calendar />
                                 </div>
                             </div>
                         </div>
@@ -72,12 +69,10 @@
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
                                         name="daterange" readonly formControlName="modifiedDate" [ranges]="ranges"
-                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                                        [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY"
+                                        [allowRemove]="!!modifiedDate.value && !!modifiedDate.value.startDate"
+                                        (remove)="resetFormControl(modifiedDate)" calendar />
+
                                 </div>
                             </div>
                         </div>
