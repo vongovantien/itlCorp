@@ -9,6 +9,7 @@ import { CustomerAgentImportComponent } from '../components/customer-agent-impor
 import { ContractImportComponent } from '../components/contract/import/contract-import.component';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
+import { ShareModulesModule } from '../../share-modules/share-modules.module';
 
 const routing: Routes = [
     {
@@ -45,6 +46,7 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         SharedModule,
         ShareCommercialModule,
+        ShareModulesModule,
         StoreModule.forFeature('customer', reducers),
     ],
     exports: [],
