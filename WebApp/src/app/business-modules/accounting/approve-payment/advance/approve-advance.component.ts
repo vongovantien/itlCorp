@@ -91,7 +91,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                             advanceNo: this.advancePayment.advanceNo,
                             requester: this.advancePayment.requester,
                             requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
-                            paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
+                            paymentMethod: this.advancePayment.paymentMethod,
                             statusApproval: this.advancePayment.statusApproval,
                             deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                             note: this.advancePayment.advanceNote,
@@ -99,7 +99,8 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                             paymentTerm: this.advancePayment.paymentTerm,
                             bankAccountNo: this.advancePayment.bankAccountNo,
                             bankAccountName: this.advancePayment.bankAccountName,
-                            bankName: this.advancePayment.bankName
+                            bankName: this.advancePayment.bankName,
+                            payee: this.advancePayment.payee
                         });
 
                         this.formCreateComponent.formCreate.disable();

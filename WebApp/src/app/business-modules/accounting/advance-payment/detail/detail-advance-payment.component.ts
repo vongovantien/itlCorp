@@ -1,22 +1,27 @@
-import { Component, ViewChild } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AccountingRepo, ExportRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
-import { AdvancePayment } from '@models';
-import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
+import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute, Router, Params } from '@angular/router';
 import { formatDate } from '@angular/common';
-import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 import { ToastrService } from 'ngx-toastr';
+
+import { AppPage } from '@app';
+import { AccountingRepo, ExportRepo } from '@repositories';
+import { AdvancePayment } from '@models';
 import { ReportPreviewComponent } from '@common';
-import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
-import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
 import { delayTime } from '@decorators';
+import { ICrystalReport } from '@interfaces';
+
+import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
+import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
+
+import { catchError, tap, switchMap } from 'rxjs/operators';
+import isUUID from 'validator/lib/isUUID';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     selector: 'app-advance-payment-detail',
     templateUrl: './detail-advance-payment.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdvancePaymentDetailComponent extends AppPage implements ICrystalReport {
 
@@ -30,26 +35,32 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     advId: string = '';
     actionList: string = 'update';
     approveInfo: any = null;
-    dataReport: any = null;
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: any) => {
-            if (!!param.id) {
-                this.advId = param.id;
-                this.getDetail(this.advId);
+        this._activedRouter.params.pipe(
+            tap((param: Params) => {
+                this.advId = !!param.id ? param.id : '';
+            }),
+            switchMap(() => of(this.advId)),
+        ).subscribe(
+            (advanceId: string) => {
+                if (isUUID(advanceId)) {
+                    this.getDetail(advanceId);
+                } else {
+                    this.back();
+                }
             }
-        });
+        );
     }
 
     @delayTime(1000)
@@ -64,20 +75,11 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
             item.requestCurrency = currency;
         }
         this.listRequestAdvancePaymentComponent.currency = currency;
-
     }
 
     getDetail(advanceId: string) {
-        this._progressRef.start();
-        this.listRequestAdvancePaymentComponent.isLoading = true;
         this._accoutingRepo.getDetailAdvancePayment(advanceId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.listRequestAdvancePaymentComponent.isLoading = false;
-                })
-            )
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     if (!res) {
@@ -102,7 +104,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                         advanceNo: this.advancePayment.advanceNo,
                         requester: this.advancePayment.requester,
                         requestDate: { startDate: new Date(this.advancePayment.requestDate), endDate: new Date(this.advancePayment.requestDate) },
-                        paymentMethod: this.formCreateComponent.methods.filter(method => method.value === this.advancePayment.paymentMethod)[0],
+                        paymentMethod: this.advancePayment.paymentMethod,
                         statusApproval: this.advancePayment.statusApproval,
                         deadLine: { startDate: new Date(this.advancePayment.deadlinePayment), endDate: new Date(this.advancePayment.deadlinePayment) },
                         note: this.advancePayment.advanceNote,
@@ -110,7 +112,8 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                         paymentTerm: this.advancePayment.paymentTerm || 9,
                         bankAccountNo: this.advancePayment.bankAccountNo,
                         bankAccountName: this.advancePayment.bankAccountName,
-                        bankName: this.advancePayment.bankName
+                        bankName: this.advancePayment.bankName,
+                        payee: this.advancePayment.payee
                     });
 
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
@@ -127,39 +130,40 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
 
     }
 
+    getAndModifiedBodyAdvance() {
+        return {
+            advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
+
+            requester: this.formCreateComponent.requester.value,
+            paymentMethod: this.formCreateComponent.paymentMethod.value,
+            advanceCurrency: this.formCreateComponent.currency.value || 'VND',
+            requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            deadlinePayment: !!this.formCreateComponent.deadlinePayment.value.startDate ? formatDate(this.formCreateComponent.deadlinePayment.value.startDate, 'yyyy-MM-dd', 'en') : null,
+            advanceNote: this.formCreateComponent.note.value,
+            statusApproval: this.advancePayment.statusApproval,
+            advanceNo: this.advancePayment.advanceNo,
+            id: this.advancePayment.id,
+            UserCreated: this.advancePayment.userCreated,
+            DatetimeCreated: this.advancePayment.datetimeCreated,
+            paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
+            bankAccountNo: this.formCreateComponent.bankAccountNo.value,
+            bankAccountName: this.formCreateComponent.bankAccountName.value,
+            bankName: this.formCreateComponent.bankName.value,
+            payee: this.formCreateComponent.payee.value
+        };
+    }
+
     updateAdvPayment() {
-        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
-            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '', { positionClass: 'toast-bottom-right' });
+        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value === 'Cash') {
+            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '');
             return;
         }
         if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
-            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '');
             return;
         } else {
-            const body = {
-                advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
-                requester: this.formCreateComponent.requester.value || 'Admin',
-                paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-                advanceCurrency: this.formCreateComponent.currency.value || 'VND',
-                requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-                deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
-                advanceNote: this.formCreateComponent.note.value || '',
-                statusApproval: this.advancePayment.statusApproval,
-                advanceNo: this.advancePayment.advanceNo,
-                id: this.advancePayment.id,
-                UserCreated: this.advancePayment.userCreated,
-                DatetimeCreated: this.advancePayment.datetimeCreated,
-                paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
-                bankAccountNo: this.formCreateComponent.bankAccountNo.value,
-                bankAccountName: this.formCreateComponent.bankAccountName.value,
-                bankName: this.formCreateComponent.bankName.value
-            };
-            this._progressRef.start();
+            const body = this.getAndModifiedBodyAdvance();
             this._accoutingRepo.updateAdvPayment(body)
-                .pipe(
-                    catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
-                )
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -181,12 +185,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     }
 
     previewAdvPayment() {
-        this._progressRef.start();
         this._accoutingRepo.previewAdvancePayment(this.advId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
             .subscribe(
                 (res: any) => {
                     this.dataReport = res;
@@ -196,38 +195,16 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     }
 
     sendRequest() {
-        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value.value === 'Cash') {
-            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '', { positionClass: 'toast-bottom-right' });
+        if (this.listRequestAdvancePaymentComponent.totalAmount > 100000000 && this.formCreateComponent.paymentMethod.value === 'Cash') {
+            this._toastService.warning(`Total Advance Amount by cash is not exceed 100.000.000 VND `, '');
             return;
         }
         if (!this.listRequestAdvancePaymentComponent.listRequestAdvancePayment.length) {
-            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '', { positionClass: 'toast-bottom-right' });
+            this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, '');
             return;
         }
-        const body = {
-            advanceRequests: this.listRequestAdvancePaymentComponent.listRequestAdvancePayment,
-            requester: this.formCreateComponent.requester.value || 'Admin',
-            paymentMethod: this.formCreateComponent.paymentMethod.value.value,
-            advanceCurrency: this.formCreateComponent.currency.value || 'VND',
-            requestDate: !!this.formCreateComponent.requestDate.value.startDate ? formatDate(this.formCreateComponent.requestDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            deadlinePayment: !!this.formCreateComponent.deadLine.value.startDate ? formatDate(this.formCreateComponent.deadLine.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            advanceNote: this.formCreateComponent.note.value || '',
-            statusApproval: this.advancePayment.statusApproval,
-            advanceNo: this.advancePayment.advanceNo,
-            id: this.advancePayment.id,
-            UserCreated: this.advancePayment.userCreated,
-            DatetimeCreated: this.advancePayment.datetimeCreated,
-            paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
-            bankAccountNo: this.formCreateComponent.bankAccountNo.value,
-            bankAccountName: this.formCreateComponent.bankAccountName.value,
-            bankName: this.formCreateComponent.bankName.value
-        };
-        this._progressRef.start();
+        const body = this.getAndModifiedBodyAdvance();
         this._accoutingRepo.sendRequestAdvPayment(body)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -243,44 +220,19 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
             );
     }
 
-
-
     exportAdvPayment(lang: string) {
-        this._progressRef.start();
         this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
-            )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
-                },
-            );
+            .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx'); });
     }
 
     getInfoApprove(advanceNo: string) {
-        this._accoutingRepo.getInfoApprove(advanceNo)
-            .pipe(
-                catchError(this.catchError)
-            )
-            .subscribe(
-                (res: any) => {
-                    this.approveInfo = res;
-                },
-            );
+        this._accoutingRepo.getInfoApprove(advanceNo).subscribe((res: any) => { this.approveInfo = res; });
     }
 
     recall() {
-        this._progressRef.start();
         this._accoutingRepo.recallRequest(this.advId)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => { this._progressRef.complete(); })
-            )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message, 'Recall Is Successfull');
                         this.getDetail(this.advId);
