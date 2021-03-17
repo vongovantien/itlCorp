@@ -56,5 +56,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? Amount3 { get; set; }
         public string CustomerCodeBook { get; set; } // Mã đối tượng Payer,
         public decimal? DueDate { get; set; }
+        public string CustomerCodeVAT { get; set; }
+        public string CustomerCodeTransfer { get; set; }
     }
 }

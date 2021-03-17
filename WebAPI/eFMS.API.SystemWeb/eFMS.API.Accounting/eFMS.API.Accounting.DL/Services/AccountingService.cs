@@ -363,7 +363,9 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              AtchDocSerialNo = surcharge.SeriesNo,
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                              // CustomerCodeBook = obhP.AccountNo
-                                                                                             CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId) //CR: 15500
+                                                                                             CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId), //CR: 15500
+                                                                                             CustomerCodeVAT = GetCustomerCodeVAT(surcharge),
+                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode)
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -664,6 +666,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
+                        charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        charge.CustomerCodeTransfer = sync.PaymentMethod == "Bank Transfer" ? sync.CustomerCode : null;
+
                         charges.Add(charge);
                     }
                     sync.Details = charges;
@@ -954,6 +959,9 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocDate = surcharge.InvoiceDate.HasValue ? surcharge.InvoiceDate.Value.Date : surcharge.InvoiceDate; //Chỉ lấy Date (không lấy Time)
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
+
+                        charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        charge.CustomerCodeTransfer = sync.PaymentMethod == "Bank Transfer" ? sync.CustomerCode : null;
 
                         charges.Add(charge);
                     }
@@ -1693,14 +1701,14 @@ namespace eFMS.API.Accounting.DL.Services
             string PayeeCode = string.Empty;
             CatPartner payee = PartnerRepository.Get(x => x.Id == PayeeId)?.FirstOrDefault();
             //Nếu Payment Method của Settle là Other & Partner Mode của đối tượng Payee (Settlement) là External thì lấy AccountNo theo đối tượng Payee của Settment
-            if (paymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(PayeeId) && payee?.PartnerMode == "External")
+            if (paymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER && !string.IsNullOrEmpty(PayeeId))// && payee?.PartnerMode == "External")
             {
                 PayeeCode = payee.AccountNo;
             }
             else
             {
                 //Nếu Type là OBH thì AccountNo lấy theo đối tượng PayerID của Surcharge; Ngược lại lấy theo đối tượng PaymentObjectID
-                if (typeCharge == AccountingConstants.TYPE_CHARGE_OBH)
+                /*if (typeCharge == AccountingConstants.TYPE_CHARGE_OBH)
                 {
                     //var payer = PartnerRepository.Get(x => x.Id == payerId)?.FirstOrDefault();
                     //PayeeCode = payer?.AccountNo;
@@ -1709,9 +1717,39 @@ namespace eFMS.API.Accounting.DL.Services
                 else
                 {
                     PayeeCode = accountNo;
-                }
+                }*/
+                PayeeCode = accountNo;
             }
             return PayeeCode;
+        }
+
+        private string GetCustomerCodeVAT(CsShipmentSurcharge surcharge)
+        {
+            string codeVat = string.Empty;
+            if (!string.IsNullOrEmpty(surcharge.InvoiceNo))
+            {
+                if (surcharge.Type == "BUY")
+                {
+                    var partner = PartnerRepository.Get(x => x.Id == surcharge.PaymentObjectId)?.FirstOrDefault();
+                    codeVat = partner?.AccountNo;
+                }
+                if (surcharge.Type == "OBH")
+                {
+                    var partner = PartnerRepository.Get(x => x.Id == surcharge.PayerId)?.FirstOrDefault();
+                    codeVat = partner?.AccountNo;
+                }
+            }
+            return codeVat;
+        }
+
+        private string GetCustomerCodeTransfer(string paymentMethod, string realPartnerTransfer)
+        {
+            string codeTransfer = string.Empty;
+            if (paymentMethod == AccountingConstants.PAYMENT_METHOD_BANK)
+            {
+                codeTransfer = realPartnerTransfer;
+            }
+            return codeTransfer;
         }
 
         /// <summary>
