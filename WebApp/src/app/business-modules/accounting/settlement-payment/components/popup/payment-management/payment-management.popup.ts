@@ -33,10 +33,10 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
         };
     }
 
-    getDataPaymentManagement(jobId: string, hbl: string, mbl: string) {
+    getDataPaymentManagement(jobId: string, hbl: string, mbl: string, requester: string) {
         this.isLoading = true;
         this._progressRef.start();
-        this._accountingRepo.getPaymentManagement(jobId, mbl, hbl)
+        this._accountingRepo.getPaymentManagement(jobId, mbl, hbl, requester)
             .pipe(catchError(this.catchError), finalize(() => { this._progressRef.complete(); this.isLoading = false; }))
             .subscribe(
                 (response: IPaymentManagement) => {

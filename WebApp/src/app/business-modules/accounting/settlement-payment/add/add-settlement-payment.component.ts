@@ -45,6 +45,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     ngAfterViewInit() {
         this.requestSurchargeListComponent.isShowButtonCopyCharge = true;
         this.cdRef.detectChanges(); // * Force to update view
+        if(!!this.formCreateSurcharge){
+            this.requestSurchargeListComponent.requester = this.formCreateSurcharge.requester.value;
+        }
     }
 
     onChangeCurrency(currency: string) {
