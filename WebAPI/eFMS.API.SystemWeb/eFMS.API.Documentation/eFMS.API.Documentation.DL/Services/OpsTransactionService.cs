@@ -1072,7 +1072,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress1 = "CompanyAddress1",
                 CompanyAddress2 = "CompanyAddress2",
                 Website = "Website",
-                CurrDecimalNo = 3,
+                CurrDecimalNo = 2,
                 DecimalNo = 0,
                 HBLList = shipment.Hwbno
             };
@@ -1172,8 +1172,9 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                     surchargeRpt.SalesProfit = surchargeRpt.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                     surchargeRpt.Quantity = item.Quantity;
-                    surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
-                    surchargeRpt.UnitPrice = surchargeRpt.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    //surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
+                    surchargeRpt.UnitPrice = (item.UnitPrice ?? 0) + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.UnitPriceStr = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (item.UnitPrice ?? 0)) : string.Format("{0:n3}", (item.UnitPrice ?? 0));
                     surchargeRpt.Unit = unitCode;
                     surchargeRpt.LastRevised = string.Empty;
                     surchargeRpt.OBH = isOBH;
