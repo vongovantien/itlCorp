@@ -1174,6 +1174,7 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.Quantity = item.Quantity;
                     surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
                     surchargeRpt.UnitPrice = surchargeRpt.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.UnitPriceStr = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (item.UnitPrice ?? 0)) : string.Format("{0:n3}", (item.UnitPrice ?? 0));
                     surchargeRpt.Unit = unitCode;
                     surchargeRpt.LastRevised = string.Empty;
                     surchargeRpt.OBH = isOBH;
