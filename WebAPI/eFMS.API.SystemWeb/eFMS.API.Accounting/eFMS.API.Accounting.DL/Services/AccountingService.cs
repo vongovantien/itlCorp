@@ -278,7 +278,9 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       VATAccount = chgDef.CreditVat,
                                                                                       ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                       CustomerCodeBook = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? partnerGrp.AccountNo : obhP.AccountNo,
-                                                                                      DueDate = item.PaymentTerm ?? 0
+                                                                                      DueDate = item.PaymentTerm ?? 0,
+                                                                                      CustomerCodeVAT = GetCustomerCodeVAT(surcharge),
+                                                                                      CustomerCodeTransfer = item.PaymentMethod == "Bank Transfer" ? item.CustomerCode : null
                                                                                   };
                         if (queryChargesVoucher.Count() > 0)
                         {
@@ -1744,7 +1746,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GetCustomerCodeTransfer(string paymentMethod, string realPartnerTransfer)
         {
-            string codeTransfer = string.Empty;
+            string codeTransfer = null;
             if (paymentMethod == AccountingConstants.PAYMENT_METHOD_BANK)
             {
                 codeTransfer = realPartnerTransfer;
