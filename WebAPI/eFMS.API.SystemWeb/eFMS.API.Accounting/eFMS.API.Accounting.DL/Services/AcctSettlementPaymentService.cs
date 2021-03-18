@@ -1988,6 +1988,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+                //.GroupBy(x => new { x.SettlementCode, x.JobNo, x.Hblno, x.Mblno, x.CurrencyId, x.Hblid, x.Type, x.AdvanceNo });
             var data = new List<AscSettlementPaymentRequestReport>();
             foreach (var surcharge in surcharges)
             {
@@ -4222,14 +4223,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.Select(s => new { hblId = s.Hblid, customNo = s.ClearanceNo }).Distinct();
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid,s.AdvanceNo,s.ClearanceNo}).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
 
                 #region -- CHANRGE AND ADVANCE OF SETTELEMENT --
-                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
-                var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
+                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
+                var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 shipmentSettlement.ShipmentCharges = _shipmentCharges;
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
                 #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
@@ -4286,11 +4287,11 @@ namespace eFMS.API.Accounting.DL.Services
             return result.ToList();
         }
 
-        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var shipmentSettlement = new InfoShipmentSettlementExport();
             var listCharge = new List<InfoShipmentChargeSettlementExport>();
-            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId);
+            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var sur in surChargeByHblId)
             {
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
@@ -4319,11 +4320,11 @@ namespace eFMS.API.Accounting.DL.Services
             return listCharge;
         }
 
-        private List<InfoAdvanceExport> GetAdvanceOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        private List<InfoAdvanceExport> GetAdvanceOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var listAdvance = new List<InfoAdvanceExport>();
             // Gom surcharge theo AdvanceNo & HBLID
-            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId);
+            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId && x.Key.AdvanceNo == advanceNo);  // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var item in groupAdvanceNoAndHblID)
             {
                 //Advance Payment có Status Approve là Done
@@ -4336,6 +4337,7 @@ namespace eFMS.API.Accounting.DL.Services
                         .Select(s => s.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementCurrency)).Sum();
                     advance.AdvanceAmount = advanceAmountByHbl;
                     advance.RequestDate = advanceIsDone.RequestDate;
+                    advance.AdvanceNo = advanceIsDone.AdvanceNo;
                     listAdvance.Add(advance);
                 }
             }
