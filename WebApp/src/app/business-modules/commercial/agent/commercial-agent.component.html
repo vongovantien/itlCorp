@@ -54,8 +54,8 @@
                                                 title="Collapse">
                                                 <i class="la la-angle-up"></i>
                                             </button>
-                                            <app-permission-button type="detail" [user]="agent.userCreated"
-                                                (onClick)="showDetail(agent)"></app-permission-button>
+                                            <app-permission-button type="detail" (onClick)="showDetail(agent)">
+                                            </app-permission-button>
 
                                             <ng-container *ngIf="!agent.active">
                                                 <app-permission-button type="delete" [user]="agent.userCreated"
