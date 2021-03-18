@@ -1165,7 +1165,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 UserCreated = currentUser.UserID,
                                 UserModified = currentUser.UserID,
                                 Action = "Detail",
-                                ActionLink = string.Format(@"home/accounting/settlement-payment/", settlement.Id),
+                                ActionLink = string.Format(@"home/accounting/settlement-payment/{0}", settlement.Id),
                                 UserIds = settlement.UserCreated
                             };
                             sysNotificationRepository.Add(sysNotify);
