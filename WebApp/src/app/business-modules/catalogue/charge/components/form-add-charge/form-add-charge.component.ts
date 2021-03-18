@@ -63,7 +63,7 @@ export class FormAddChargeComponent extends AppForm {
 
     debitCharges: Observable<Charge[]>;
     modes: string[] = [
-        "INTERNAL", "NINV"
+        "INTERNAL", "N.INV"
     ];
 
     constructor(

@@ -528,8 +528,15 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             return;
         }
 
-        if (!this.checkValidate()) {
-            return;
+        const error = this.checkValidate();
+        if (error < 0) {
+            if (error === -1) {
+                return;
+            }
+            if (error === -2) {
+                this._toastService.warning("Payee must be different with OBH Partner.");
+                return;
+            }
         }
 
         if (!this.checkDuplicate()) {
@@ -595,7 +602,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     checkValidate() {
-        let valid: boolean = true;
+        let errorCode: number = 1;
         for (const charge of this.charges) {
             if (
                 !charge.paymentObjectId
@@ -607,14 +614,18 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 || charge.unitPrice < 0
                 || charge.vatrate > 100
                 || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && !charge.obhId
-                || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && charge.obhId === charge.paymentObjectId
 
             ) {
-                valid = false;
+                errorCode = -1;
+                break;
+            }
+
+            if (charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && charge.obhId === charge.paymentObjectId) {
+                errorCode = -2;
                 break;
             }
         }
-        return valid;
+        return errorCode;
     }
 
     checkDuplicate() {
