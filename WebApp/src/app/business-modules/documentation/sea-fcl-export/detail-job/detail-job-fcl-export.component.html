@@ -56,6 +56,11 @@
                 <ng-container *ngIf="selectedTab === 'ASSIGNMENT'" loadModule="SeaFCLExport_assignment">
                 </ng-container>
             </tab>
+            <tab heading="Advance/Settlement" (selectTab)="onSelectTab('advance-settle')"
+                [active]="selectedTab === 'ADVANCE-SETTLE'" [disabled]="isDuplicate">
+                <ng-container *ngIf="selectedTab === 'ADVANCE-SETTLE'" loadModule="SeaFclExport_advanceSettle">
+                </ng-container>
+            </tab>
         </tabset>
     </div>
     <ul class="m-nav-sticky fms-shipment-sidebar" *ngIf="ACTION !== 'COPY'">
