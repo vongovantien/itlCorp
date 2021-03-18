@@ -1,3 +1,4 @@
+import { DomSanitizer } from '@angular/platform-browser';
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { IdentityRepo, SystemRepo } from '@repositories';
@@ -55,7 +56,8 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         private _signalRService: SignalRService,
         private _toast: ToastrService,
         private _spinner: NgxSpinnerService,
-        private _store: Store<any>
+        private _store: Store<any>,
+        private _domSantizer: DomSanitizer
     ) { }
 
     ngOnInit() {
@@ -115,17 +117,17 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
             console.log("new notification", data);
             if (data && data.userIds.includes(this.currenUser.id)) {
-                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
             }
             this.getListNotification();
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            this._toast.info(`${data}`, 'eFMS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
+            this._toast.info(`${data}`, 'eFMS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            this._toast.info(`${data}`, 'eMFS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 3000, });
+            this._toast.info(`${data}`, 'eMFS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
@@ -159,13 +161,53 @@ export class HeaderComponent implements OnInit, AfterViewInit {
             );
     }
 
+    getAllUrlParams(url: string) {
+        let obj = {};
+        if (url) {
+            const arr = url.split('?')[1].split('#')[0].split('&');
+            for (let i = 0; i < arr.length; i++) {
+                const a = arr[i].split('=');
+
+                const paramName = a[0];
+                let paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+
+                if (typeof paramValue === 'string') paramValue = paramValue;
+
+                if (paramName.match(/\[(\d+)?\]$/)) {
+
+                    const key = paramName.replace(/\[(\d+)?\]/, '');
+                    if (!obj[key]) obj[key] = [];
+
+                    if (paramName.match(/\[\d+\]$/)) {
+                        const index = /\[(\d+)\]/.exec(paramName)[1];
+                        obj[key][index] = paramValue;
+                    } else {
+                        obj[key].push(paramValue);
+                    }
+                } else {
+                    if (!obj[paramName]) {
+                        obj[paramName] = paramValue;
+                    } else if (obj[paramName] && typeof obj[paramName] === 'string') {
+                        obj[paramName] = [obj[paramName]];
+                        obj[paramName].push(paramValue);
+                    } else {
+                        obj[paramName].push(paramValue);
+                    }
+                }
+            }
+        }
+        return obj;
+    }
+
     selectNotification(noti: SysUserNotification, e: any) {
+        console.log(noti);
         e.stopPropagation();
         if (noti.actionLink) {
             if (noti.actionLink.includes("?")) {
-                // TODO handle query param
-                // console.log(window.location.host + "/#" + window.location.pathname + noti.actionLink);
-                // this.router.navigateByUrl(window.location.host + "/#" + window.location.pathname + noti.actionLink, { skipLocationChange: true });
+                const queryParamObject = this.getAllUrlParams(noti.actionLink);
+                if (!!Object.keys(queryParamObject).length) {
+                    this.router.navigate([noti.actionLink.substring(0, noti.actionLink.indexOf("?"))], { queryParams: queryParamObject });
+                }
             } else {
                 this.router.navigate([noti.actionLink]);
             }
