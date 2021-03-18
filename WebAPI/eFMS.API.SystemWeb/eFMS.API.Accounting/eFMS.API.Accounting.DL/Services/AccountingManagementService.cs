@@ -134,23 +134,17 @@ namespace eFMS.API.Accounting.DL.Services
                             if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
                             {
                                 item.PayerAcctManagementId = null;
-                            }
-                            else
-                            {
-                                item.AcctManagementId = null;
-                            }
-                            item.InvoiceNo = null;
-                            item.InvoiceDate = null;
-                            if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                            {
                                 item.VoucherIdre = null;
                                 item.VoucherIdredate = null;
                             }
                             else
                             {
+                                item.AcctManagementId = null;
                                 item.VoucherId = null;
                                 item.VoucherIddate = null;
                             }
+                            item.InvoiceNo = null;
+                            item.InvoiceDate = null;
                             item.SeriesNo = null;
                             
                             // item.AmountVnd = item.VatAmountVnd = null;
