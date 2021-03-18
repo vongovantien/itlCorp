@@ -3033,8 +3033,17 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 9, j - 2, 9].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 var _requestDateAdvance = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Select(s => s.RequestDate).FirstOrDefault();
+                var _advanceNo = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Select(s => s.AdvanceNo).FirstOrDefault();
                 workSheet.Cells[p, 10, j - 2, 10].Merge = true;
-                workSheet.Cells[p, 10, j - 2, 10].Value = _requestDateAdvance.HasValue ? _requestDateAdvance.Value.ToString("dd/MM/yyyy") : string.Empty; //Value Ngày tạm ứng
+                if (!string.IsNullOrEmpty(_advanceNo))
+                {
+                    workSheet.Cells[p, 10, j - 2, 10].Style.WrapText = true; // Xuống dòng
+                    workSheet.Cells[p, 10, j - 2, 10].Value = _requestDateAdvance.HasValue ? _requestDateAdvance.Value.ToString("dd/MM/yyyy") + "\n" + _advanceNo : string.Empty; //Value Ngày tạm ứng + Số tạm ứng
+                }
+                else
+                {
+                    workSheet.Cells[p, 10, j - 2, 10].Value = _requestDateAdvance.HasValue ? _requestDateAdvance.Value.ToString("dd/MM/yyyy")  : string.Empty; //Value Ngày tạm ứng
+                }
                 workSheet.Cells[p, 10, j - 2, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 10, j - 2, 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 10, j - 2, 10].Style.Border.Right.Style = ExcelBorderStyle.Thin;
