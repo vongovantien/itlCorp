@@ -185,7 +185,7 @@ namespace eFMS.API.Setting.DL.Services
                 var advance = advancePaymentRepo.Get(x => x.AdvanceNo == adv && !string.IsNullOrEmpty(x.VoucherNo)).FirstOrDefault();
                 if (advance != null)
                 {
-                    object message = "You cant's unlock " + advance.AdvanceNo + ", because it has  existed in " + advance.VoucherNo + ", please recheck!";
+                    object message = "You cant's unlock " + advance.AdvanceNo + ", because it has existed in " + advance.VoucherNo + ", please recheck!";
                     return new HandleState(message);
                 }
             }
@@ -197,10 +197,10 @@ namespace eFMS.API.Setting.DL.Services
             if (criteria.Settlements == null || criteria.Settlements.Count == 0) return hs;
             foreach (var settle in criteria.Settlements)
             {
-                var charge = surchargeRepo.Get(x => x.SettlementCode == settle && (!string.IsNullOrEmpty(x.InvoiceNo) || !string.IsNullOrEmpty(x.VoucherId))).FirstOrDefault();
+                var charge = surchargeRepo.Get(x => x.SettlementCode == settle && (x.AcctManagementId != null || x.PayerAcctManagementId != null)).FirstOrDefault();
                 if (charge != null)
                 {
-                    object message = "You cant's unlock " + settle + ", because it has  existed in " + charge.InvoiceNo + " " + charge.VoucherId + ", please recheck!";
+                    object message = "You cant's unlock " + settle + ", because it has existed in " + charge.InvoiceNo + " " + charge.VoucherId + ", please recheck!";
                     return new HandleState(message);
                 }
             }
