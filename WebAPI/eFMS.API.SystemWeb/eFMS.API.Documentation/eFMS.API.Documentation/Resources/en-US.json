@@ -40,7 +40,7 @@
   "MSG_MAWBCONTAINER_PACKAGE_QUANTITY_EMPTY": "Package quantity is empty",
 
   "MSG_SURCHARGE_NOT_FOUND": "Charge not found!",
-  "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note/SOA no!",
+  "MSG_SURCHARGE_NOT_ALLOW_DELETED": "Cannot delete, this charge is containing Credit Debit Note / SOA no / Voucher / Vat Invoice!",
 
   "MSG_CDNOTE_NOT_ALLOW_DELETED_NOT_FOUND": "Credit debit note not found !",
   "MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA": "Cannot delete, this credit debit not is containing at least one charge have SOA no!",

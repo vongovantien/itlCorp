@@ -4713,8 +4713,11 @@ namespace eFMS.API.Accounting.DL.Services
             (!string.IsNullOrEmpty(x.Soano) 
             || !string.IsNullOrEmpty(x.PaySoano) 
             || !string.IsNullOrEmpty(x.VoucherId)
+            || !string.IsNullOrEmpty(x.VoucherIdre)
             || !string.IsNullOrEmpty(x.CreditNo)
             || !string.IsNullOrEmpty(x.DebitNo)
+            || x.AcctManagementId != null
+            || x.PayerAcctManagementId != null
             )
             ))
             {

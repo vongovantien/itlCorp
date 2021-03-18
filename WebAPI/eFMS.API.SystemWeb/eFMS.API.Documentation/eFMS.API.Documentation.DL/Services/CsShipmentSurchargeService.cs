@@ -93,10 +93,14 @@ namespace eFMS.API.Documentation.DL.Services
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                 if (charge != null
                     && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
                     || !string.IsNullOrEmpty(charge.CreditNo)
                     || !string.IsNullOrEmpty(charge.DebitNo)
                     || !string.IsNullOrEmpty(charge.SettlementCode)
-                    || !string.IsNullOrEmpty(charge.VoucherId)))
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
                 {
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }

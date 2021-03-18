@@ -1243,7 +1243,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 surchargeOfAcct.AcctManagementId = null;
                             }
 
-                            surchargeOfAcct.FinalExchangeRate = null;
+                            //[18/03/2021 - Andy - 11518] Không set = null vì nếu 1 charge được gỡ bỏ khỏi Voucher/Invoice thì FinalExchangeRate của charge đó sẽ bằng null
+                            //surchargeOfAcct.FinalExchangeRate = null;
 
                             if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                             {
@@ -1422,7 +1423,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soa != null)
                 {
                     //Tồn tại Voucher thì update Status là Issued Voucher
-                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && !string.IsNullOrEmpty(charge.VoucherId))
+                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && (!string.IsNullOrEmpty(charge.VoucherId) || !string.IsNullOrEmpty(charge.VoucherIdre)))
                     {
                         UpdateStatusSOA(soa, AccountingConstants.ACCOUNTING_VOUCHER_TYPE);
                     }
