@@ -4,7 +4,7 @@ import { LAZY_MODULES_MAP, ILazyModules } from "src/app/load-module-map";
 export const lazyModulesFClMap: ILazyModules = {
     SeaLCLImport_cdNote: () => import('./detail-job/cd-note/sea-lcl-import-cd-note.module').then(m => m.SeaLCLImportCDNoteModule),
     SeaLCLImport_assignment: () => import('./detail-job/assignment/sea-lcl-import-asignment.module').then(m => m.SeaLCLImportAsignmentModule),
-    SeaLCLImport_advanceSettle: () => import('./detail-job/advance-settle/sea-lcl-import-advance-settle.module').then(m => m.SeaLCLImportAdvanceSettleModule)
+    Share_advanceSettle: () => import('../../share-business/components/advance-settle/share-advance-settle.module').then(m => m.ShareAdvanceSettleModule)
 };
 
 @NgModule({

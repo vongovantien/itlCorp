@@ -52,7 +52,7 @@
                 </tab>
                 <tab heading="Advance/Settlement" (selectTab)="onSelectTab('advance-settle')"
                     [active]="selectedTab === 'ADVANCE-SETTLE'" [disabled]="isDuplicate">
-                    <ng-container *ngIf="selectedTab === 'ADVANCE-SETTLE'" loadModule="SeaConsolImport_advanceSettle">
+                    <ng-container *ngIf="selectedTab === 'ADVANCE-SETTLE'" loadModule="Share_advanceSettle">
                     </ng-container>
                 </tab>
             </tabset>

@@ -5,7 +5,7 @@ export const lazyModulesFClMap: ILazyModules = {
     AirExport_cdNote: () => import('./detail-job/cd-note/air-export-cd-note.module').then(m => m.AirExportCDNoteModule),
     AirExport_assignment: () => import('./detail-job/assignment/air-export-assigment.module').then(m => m.AirExportAssignmentModule),
     AirExport_attachFile: () => import('./detail-job/attach-file/air-export-attach-file.module').then(m => m.AirExportAttachFilesModule),
-    AirExport_advanceSettle: () => import('./detail-job/advance-settle/air-export-advance-settle.module').then(m => m.AirExportAdvanceSettleModule)
+    Share_advanceSettle: () => import('../../share-business/components/advance-settle/share-advance-settle.module').then(m => m.ShareAdvanceSettleModule)
 };
 
 @NgModule({

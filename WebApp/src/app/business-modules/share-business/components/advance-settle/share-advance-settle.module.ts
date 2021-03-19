@@ -16,6 +16,6 @@ import { ShareBusinessAdvanceSettlementInforComponent } from 'src/app/business-m
         ShareBusinessAdvanceSettlementInforComponent
     ]
 })
-export class SeaFCLImportAdvanceSettleModule {
+export class ShareAdvanceSettleModule {
     static rootComponent = ShareBusinessAdvanceSettlementInforComponent;
 }
