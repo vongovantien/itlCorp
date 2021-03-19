@@ -11,7 +11,7 @@ import { ChargeConstants } from '@constants';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
@@ -127,12 +127,10 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = body.transactionType = ChargeConstants.SFE_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -151,7 +149,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -169,7 +166,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
