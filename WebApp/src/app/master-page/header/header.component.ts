@@ -1,4 +1,3 @@
-import { DomSanitizer } from '@angular/platform-browser';
 import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { IdentityRepo, SystemRepo } from '@repositories';
@@ -57,7 +56,6 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         private _toast: ToastrService,
         private _spinner: NgxSpinnerService,
         private _store: Store<any>,
-        private _domSantizer: DomSanitizer
     ) { }
 
     ngOnInit() {
@@ -116,7 +114,9 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         // * Subscribe notification change.
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
             console.log("new notification", data);
-            if (data && data.userIds.includes(this.currenUser.id)) {
+            if (data.type === "System") {
+                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 15000, });
+            } else if (data.userIds.includes(this.currenUser.id)) {
                 this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
             }
             this.getListNotification();

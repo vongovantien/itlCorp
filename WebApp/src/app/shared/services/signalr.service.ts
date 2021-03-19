@@ -27,7 +27,6 @@ export class SignalRService {
                 // return this.hubConnection.invoke('getConnectionId');
             })
             // .then((connectionId: string) => {
-            //     // console.log("ConnectionId", connectionId);
             //     this.connectionId = connectionId;
             //     return this.hubConnection.invoke('GetConnectionIds');
             // })
