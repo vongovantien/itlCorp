@@ -24,18 +24,18 @@ export class SignalRService {
             .start()
             .then(() => {
                 console.log("SignalR was connected");
-                return this.hubConnection.invoke('getConnectionId');
+                // return this.hubConnection.invoke('getConnectionId');
             })
-            .then((connectionId: string) => {
-                // console.log("ConnectionId", connectionId);
-                this.connectionId = connectionId;
-                return this.hubConnection.invoke('GetConnectionIds');
-            })
-            .then((connectionIds: string[]) => {
-                if (connectionIds) {
-                    this.connectionIds.push(...connectionIds);
-                }
-            })
+            // .then((connectionId: string) => {
+            //     // console.log("ConnectionId", connectionId);
+            //     this.connectionId = connectionId;
+            //     return this.hubConnection.invoke('GetConnectionIds');
+            // })
+            // .then((connectionIds: string[]) => {
+            //     if (connectionIds) {
+            //         this.connectionIds.push(...connectionIds);
+            //     }
+            // })
             .catch(err => {
                 console.log('Error while starting connection ' + err)
             });

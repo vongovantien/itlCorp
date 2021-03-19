@@ -3,23 +3,35 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></settle-payment-form-create>
-                <div class="row" *ngIf="!!settlementPayment">
-                    <div class="col-6">
-                        <div class="m--align-left">
-                            Created: {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+                <tabset class="custom-class-tab">
+                    <tab heading="Settlement Info" [active]="true">
+                        <settle-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                        </settle-payment-form-create>
+
+                        <div class="row" *ngIf="!!settlementPayment">
+                            <div class="col-6">
+                                <div class="m--align-left">
+                                    Created: {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp;
+                                    By <span
+                                        class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="m--align-left">
+                                    Modified:
+                                    {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp; By <span
+                                        class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="m--align-left">
-                            Modified: {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
-                        </div>
-                    </div>
-                </div>
+                    </tab>
+                    <tab heading="Attach files">
+                        <settlement-attach-file-list></settlement-attach-file-list>
+                    </tab>
+                </tabset>
+
             </div>
         </div>
     </div>
