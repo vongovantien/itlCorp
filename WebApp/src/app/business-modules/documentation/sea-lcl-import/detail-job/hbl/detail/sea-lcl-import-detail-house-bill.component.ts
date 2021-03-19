@@ -1,7 +1,6 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
@@ -12,7 +11,7 @@ import { ChargeConstants, RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
 import { SeaLCLImportCreateHouseBillComponent } from '../create/sea-lcl-import-create-house-bill.component';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
@@ -40,7 +39,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     isClickSubMenu: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -53,7 +51,7 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         protected _dataService: DataService,
 
     ) {
-        super(_progressService, _documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
+        super(_documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     @delayTime(1000)
@@ -164,29 +162,16 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
             c.hblid = this.hblId;
         });
 
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelUpdate.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-        //     } else {
-        //     }
-        // });
+
         this.updateHbl(modelUpdate);
 
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = ChargeConstants.SLI_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -202,13 +187,11 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
     }
 
     getDetailHbl() {
-        // this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 skip(1),
                 catchError(this.catchError),
                 takeUntil(this.ngUnsubscribe),
-                finalize(() => this._progressRef.complete()),
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -264,7 +247,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._documentationRepo.previewProofofDelivery(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -277,7 +259,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -295,7 +276,6 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
         this._documentationRepo.previewDeliveryOrder(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
