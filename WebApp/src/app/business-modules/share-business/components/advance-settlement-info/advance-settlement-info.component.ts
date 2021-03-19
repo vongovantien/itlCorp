@@ -28,7 +28,7 @@ export class ShareBusinessAdvanceSettlementInforComponent {
 
     ngOnInit() {
         this.adSetInfos = this._activedRouter.params.pipe(
-            switchMap((param: Params) => this._documentRepo.getListAdvanceSettlement(param.id)),
+            switchMap((param: Params) => this._documentRepo.getListAdvanceSettlement(!param.id ? param.jobId : param.id)),
             takeUntil(this._destroy$),
             shareReplay()
         ) as Observable<AdvanceSettlementInfo[]>;
