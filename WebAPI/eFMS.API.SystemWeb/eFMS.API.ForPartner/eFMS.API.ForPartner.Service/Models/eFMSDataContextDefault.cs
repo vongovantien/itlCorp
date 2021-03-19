@@ -173,7 +173,7 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-
+                
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -899,6 +899,8 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.PaySyncedFrom)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.PayerAcctManagementId).HasColumnName("PayerAcctManagementID");
 
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")

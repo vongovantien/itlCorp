@@ -1663,6 +1663,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                     item.ClearanceNo = null;
                     item.AdvanceNo = null;
+                    item.PayerAcctManagementId = null;
+                    item.VoucherIdre = null;
+                    item.VoucherIdredate = null;
 
                     item.JobNo = shipment.JobNo;
                     item.Hblno = shipment.Hwbno;

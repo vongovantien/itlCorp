@@ -93,10 +93,14 @@ namespace eFMS.API.Documentation.DL.Services
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                 if (charge != null
                     && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
                     || !string.IsNullOrEmpty(charge.CreditNo)
                     || !string.IsNullOrEmpty(charge.DebitNo)
                     || !string.IsNullOrEmpty(charge.SettlementCode)
-                    || !string.IsNullOrEmpty(charge.VoucherId)))
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
                 {
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
@@ -507,45 +511,47 @@ namespace eFMS.API.Documentation.DL.Services
                     var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (surcharge != null)
                     {
-                        surcharge.PaymentObjectId = item.PaymentObjectId;
-                        surcharge.PayerId = item.PayerId;
-                        surcharge.ChargeId = item.ChargeId;
-                        surcharge.ChargeGroup = item.ChargeGroup;
-                        surcharge.Quantity = item.Quantity;
-                        surcharge.UnitId = item.UnitId;
-                        surcharge.UnitPrice = item.UnitPrice;
-                        surcharge.Vatrate = item.Vatrate;
-                        surcharge.CurrencyId = item.CurrencyId;
-                        surcharge.Notes = item.Notes;
-                        surcharge.KickBack = item.KickBack;
-                        surcharge.QuantityType = item.QuantityType;
-
-                        //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                        //Chỉ cập nhật và tính lại giá trị Amount cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
                         if (string.IsNullOrEmpty(surcharge.SettlementCode)
                             && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
+                            && (surcharge.PayerAcctManagementId == Guid.Empty || surcharge.PayerAcctManagementId == null)
                             && (string.IsNullOrEmpty(surcharge.Soano) && string.IsNullOrEmpty(surcharge.PaySoano))
                             && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
                         {
+                            surcharge.PaymentObjectId = item.PaymentObjectId;
+                            surcharge.PayerId = item.PayerId;
+                            surcharge.ChargeId = item.ChargeId;
+                            surcharge.ChargeGroup = item.ChargeGroup;
+                            surcharge.Quantity = item.Quantity;
+                            surcharge.UnitId = item.UnitId;
+                            surcharge.UnitPrice = item.UnitPrice;
+                            surcharge.Vatrate = item.Vatrate;
+                            surcharge.CurrencyId = item.CurrencyId;
+                            surcharge.Notes = item.Notes;
+                            surcharge.KickBack = item.KickBack;
+                            surcharge.QuantityType = item.QuantityType;
+
                             //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             surcharge.FinalExchangeRate = null;
                             surcharge.ExchangeDate = item.ExchangeDate;
-                        }
 
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
-                        surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                        surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                        surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                        surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                        surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                        surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                        surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
+                            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-                        //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
-                        if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
-                        {
-                            surcharge.InvoiceNo = item.InvoiceNo;
-                            surcharge.InvoiceDate = item.InvoiceDate;
-                            surcharge.SeriesNo = item.SeriesNo;
+                            //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
+                            if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
+                            {
+                                surcharge.InvoiceNo = item.InvoiceNo;
+                                surcharge.InvoiceDate = item.InvoiceDate;
+                                surcharge.SeriesNo = item.SeriesNo;
+                            }
+
                         }
 
                         surcharge.JobNo = _jobNo;
