@@ -9,7 +9,6 @@ import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
-import * as fromShare from './../../../store';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
 @Component({
@@ -78,9 +77,6 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
                         if (this.fileList.length !== 0 && Object.keys(this.files).length === 0) {
                             this.uploadFilePOD();
                         }
-
-                        // * Dispatch for detail HBL to update HBL state.
-                        //this._store.dispatch(new fromShare.GetDetailHBLAction(this.hblid));
                     } else {
                         this._toastService.error(res.message);
                     }
