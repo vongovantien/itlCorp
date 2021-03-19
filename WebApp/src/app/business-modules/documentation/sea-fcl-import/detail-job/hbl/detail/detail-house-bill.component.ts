@@ -162,13 +162,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = ChargeConstants.SFI_CODE;
 
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -184,17 +182,14 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     }
 
     getDetailHbl() {
-        this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
 
