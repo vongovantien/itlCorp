@@ -20,6 +20,7 @@ import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 
 import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 
 @Component({
@@ -32,6 +33,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
 
@@ -151,6 +153,17 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             this.infoPopup.show();
             return;
         }
+
+        // if (!this.proofOfDeliveryComponent.proofOfDelievey.referenceNo
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.note
+        // ) {
+        //     this.activeTab = 'proof';
+        //     this.infoPopup.show();
+        //     return;
+        // }
+
         this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
             .pipe(
                 catchError(this.catchError),
@@ -204,6 +217,14 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        // const deliveryDate = {
+                        //     deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        // };
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        // const proofOfDelivery = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
+
                         return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),

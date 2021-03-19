@@ -187,6 +187,13 @@
             <param name="type"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetProofOfDelivery(System.Guid)">
+            <summary>
+            get delivery order by housebill id
+            </summary>
+            <param name="hblid"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateArrival(eFMS.API.Documentation.DL.Models.CsArrivalViewModel)">
             <summary>
             update arrival info
@@ -201,6 +208,23 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UpdateProofOfDelivery(eFMS.API.Documentation.DL.Models.ProofOfDeliveryViewModel)">
+            <summary>
+            update delivery order
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.UploadFileProofOfDelivery(Microsoft.AspNetCore.Http.IFormFile,System.Guid)">
+            <summary>
+            attach multi files to shipment
+            </summary>
+            <param name="files"></param>
+            <param name="HblId"></param>
+            
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.GetFileAttachsProofOfDelivery(System.Guid)" -->
         <member name="M:eFMS.API.Documentation.Controllers.CsArrivalDeliveryOrderController.SetArrivalChargeDefault(eFMS.API.Documentation.DL.Models.CsArrivalFrieghtChargeDefaultEditModel)">
             <summary>
             set freight charge default of an user in a shipment type

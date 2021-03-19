@@ -500,6 +500,38 @@ export class DocumentationRepo {
         );
     }
 
+    getProofOfDelivery(hblId: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/GetProofOfDelivery`, { hblid: hblId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    updateProofOfDelivery(body: any = {}) {
+        return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/UpdateProofOfDelivery`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    uploadFileProofOfDelivery(hblId: string, body: any) {
+        return this._api.putFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/uploadFileProofOfDelivery/${hblId}`, body, 'files').pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getPODFilesAttach(hblid: string) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/GetFileAttachsProofOfDelivery`, { hblId: hblid }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deletePODFilesAttach(fileId: string) {
+        return this._api.delete(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/DeletePODAttachedFile/${fileId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     setDefaultHeaderFooterDeliveryOrder(body: any = {}) {
         return this._api.put(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsArrivalDeliveryOrder/SetDeliveryOrderHeaderFooterDefault`, body).pipe(
             catchError((error) => throwError(error)),

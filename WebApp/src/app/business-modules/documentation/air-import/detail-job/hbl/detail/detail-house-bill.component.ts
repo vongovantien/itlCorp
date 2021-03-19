@@ -22,7 +22,8 @@ import isUUID from 'validator/lib/isUUID';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    AUTHORIZE = 'AUTHORIZE'
+    AUTHORIZE = 'AUTHORIZE',
+    PROOF = 'PROOF'
 
 }
 @Component({
@@ -136,6 +137,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 } else {
                     return;
                 }
+                break;
+            }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.confirmPopup.hide();
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
                 break;
             }
             default:

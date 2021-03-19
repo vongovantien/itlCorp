@@ -281,6 +281,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.Payee)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -337,8 +341,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasMaxLength(50);
 
                 entity.Property(e => e.Hbl)
                     .HasColumnName("HBL")
@@ -2267,6 +2269,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PayerAcctManagementId).HasColumnName("PayerAcctManagementID");
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)
@@ -2585,7 +2589,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
+                entity.Property(e => e.PodDescription).HasMaxLength(150);
+
                 entity.Property(e => e.Pol).HasColumnName("POL");
+
+                entity.Property(e => e.PolDescription).HasMaxLength(150);
 
                 entity.Property(e => e.Pono)
                     .HasColumnName("PONo")
@@ -2712,9 +2720,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("DCLRCUS")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DeliveryOrderNo).HasMaxLength(100);
 
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryPerson).HasMaxLength(250);
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
