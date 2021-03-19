@@ -14,7 +14,7 @@ import { ICrystalReport } from '@interfaces';
 import { SeaConsolExportCreateHBLComponent } from '../create/create-hbl-consol-export.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, skip, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 
 @Component({
@@ -42,7 +42,6 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
 
     ) {
         super(
-            _progressService,
             _activedRoute,
             _store,
             _documentationRepo,
@@ -124,29 +123,15 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         modelUpdate.jobId = this.jobId;
         modelUpdate.userCreated = this.hblDetail.userCreated;
 
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelUpdate.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-        //     } else {
-        //     }
-        // });
         this.updateHbl(modelUpdate);
 
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = body.transactionType = ChargeConstants.SCE_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -165,7 +150,6 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -183,7 +167,6 @@ export class SeaConsolExportDetailHBLComponent extends SeaConsolExportCreateHBLC
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {

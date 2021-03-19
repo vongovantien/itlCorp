@@ -1,7 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
-import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -20,7 +19,7 @@ import { AppForm } from '@app';
 import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, finalize, map, takeUntil, tap, switchMap } from 'rxjs/operators';
+import { catchError, map, takeUntil, tap, switchMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import * as fromShareBussiness from './../../share-business/store';
 
@@ -61,7 +60,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _router: Router,
         private _toastService: ToastrService,
@@ -72,7 +70,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     ) {
         super();
 
-        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
@@ -389,7 +386,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this._documentRepo.getDetailShipment(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             ).subscribe(
                 (response: any) => {
                     if (response != null) {

@@ -1,7 +1,6 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
@@ -42,7 +41,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     isClickSubMenu: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -55,7 +53,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         protected _dataService: DataService
 
     ) {
-        super(_progressService, _documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
+        super(_documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     @delayTime(1000)

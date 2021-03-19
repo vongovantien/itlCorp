@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
@@ -16,7 +15,7 @@ import { InputBookingNotePopupComponent } from '../components/input-booking-note
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 
 import { merge } from 'rxjs';
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 
 @Component({
@@ -31,7 +30,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     hblDetail: CsTransactionDetail;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -42,7 +40,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         protected _exportRepo: ExportRepo,
     ) {
         super(
-            _progressService,
             _activedRoute,
             _store,
             _documentationRepo,
@@ -173,11 +170,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
     }
 
     updateHbl(body: any, isSeparate?: boolean) {
-        this._progressRef.start();
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -196,7 +191,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this._documentationRepo.previewHouseAirwayBillLastest(id, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -214,7 +208,6 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -230,11 +223,9 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     exportNeutralHawb() {
         const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this._progressRef.start();
         this._exportRepo.exportHawbAirwayBill(this.hblId, userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: ArrayBuffer) => {

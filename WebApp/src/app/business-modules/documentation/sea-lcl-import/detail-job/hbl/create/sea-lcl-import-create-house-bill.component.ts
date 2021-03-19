@@ -1,5 +1,4 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
@@ -22,7 +21,7 @@ import {
 
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 
-import { catchError, takeUntil, mergeMap, finalize } from 'rxjs/operators';
+import { catchError, takeUntil, mergeMap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 import * as fromShareBussiness from '../../../../../share-business/store';
@@ -57,7 +56,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     selectedTab: string = HBL_TAB.DETAIL;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -71,7 +69,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
             .pipe(
@@ -167,19 +164,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
-            // this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
-            //     if (!!res.salemanId) {
-            //         if (res.salemanId !== body.saleManId) {
-            //             this._toastService.error('Not found contract information, please check!');
-            //             return;
-            //         }
-            //     }
-            //     if (!!res.officeNameAbbr) {
-            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-            //     } else {
 
-            //     }
-            // });
             this.createHbl(body);
 
         }
@@ -203,7 +188,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
 
-            this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
                     mergeMap((res: CommonInterface.IResult) => {
@@ -224,7 +208,6 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         return forkJoin([arrival, delivery]);
                     }),
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
                 ).subscribe(result => {
                     this._toastService.success(result[0].message, '');
                 }
