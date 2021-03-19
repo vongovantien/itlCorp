@@ -55,6 +55,18 @@ namespace eFMS.API.System.Controllers
             return Ok(result);
         }
 
-
+        /// <summary>
+        /// Get Users with permission in a menu
+        /// </summary>
+        /// <param name="menuID">menu name</param>
+        /// <param name="action">detail permission type</param>
+        /// <returns></returns>
+        [HttpGet("GetListUserHasPermission")]
+        [Authorize]
+        public IActionResult GetListUserHasPermission(string menuID, string action)
+        {
+            var result = menuService.GetListUserHasPermission(menuID, action);
+            return Ok(result);
+        }
     }
 }

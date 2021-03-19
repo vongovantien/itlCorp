@@ -6,6 +6,7 @@ using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.System.DL.IService
 {
@@ -13,5 +14,6 @@ namespace eFMS.API.System.DL.IService
     {
         List<MenuUserModel> GetMenus(string userId, Guid officeId);
         List<CommonData> GetListService();
+        IQueryable<SysUser> GetListUserHasPermission(string menuID, string action);
     }
 }

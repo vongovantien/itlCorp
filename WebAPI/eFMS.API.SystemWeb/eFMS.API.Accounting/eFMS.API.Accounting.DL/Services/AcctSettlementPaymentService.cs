@@ -16,6 +16,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,9 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         readonly IContextBase<SysOffice> sysOfficeRepo;
         readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
+        private readonly IContextBase<AcctSoa> acctSoaRepo;
+        private readonly IContextBase<CustomsDeclaration> customClearanceRepo;
+        private readonly IContextBase<AcctCdnote> acctCdnoteRepo;
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
@@ -76,6 +80,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysSentEmailHistory> sentEmailHistory,
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysAuthorizedApproval> authourizedApproval,
+            IContextBase<AcctSoa> acctSoa,
+            IContextBase<CustomsDeclaration> customClearance,
+            IContextBase<AcctCdnote> acctCdnote,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IUserBaseService userBase) : base(repository, mapper)
@@ -104,6 +111,9 @@ namespace eFMS.API.Accounting.DL.Services
             sentEmailHistoryRepo = sentEmailHistory;
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
+            acctSoaRepo = acctSoa;
+            customClearanceRepo = customClearance;
+            acctCdnoteRepo = acctCdnote;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -553,7 +563,7 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<CsTransaction> csTrans = csTransactionRepo.Get();
             IQueryable<CustomsDeclaration> cdNos = customsDeclarationRepo.Get();
             IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
-            IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
+            //IQueryable<AcctAdvancePayment> advances = acctAdvancePaymentRepo.Get(a => a.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE);
 
 
             AcctSettlementPayment settleCurrent = settlement.Where(x => x.SettlementNo == settlementNo).FirstOrDefault();
@@ -1159,46 +1169,93 @@ namespace eFMS.API.Accounting.DL.Services
                      && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId)
                      || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
                 );
+            // Get data source
             var charge = catChargeRepo.Get();
-            var unit = catUnitRepo.Get();
+            //var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
-            var csTrans = csTransactionRepo.Get();
+            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
+            var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
 
-            if (criteria.jobIds != null)
+            // Data search = jobNo
+            criteria.jobIds = criteria.jobIds != null ? criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.jobIds;
+            if (criteria.jobIds != null && criteria.jobIds.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
-                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase));
+                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
+                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
             }
-            if (criteria.mbls != null)
+            // Data search = mblNo
+            criteria.mbls = criteria.mbls != null ? criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.mbls;
+            if (criteria.mbls != null && criteria.mbls.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase));
-                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase));
+                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) && x.Mblno != null);
+                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) && x.Mawb != null);
             }
-            if (criteria.hbls != null)
+            // Data search = hblNo
+            criteria.hbls = criteria.hbls != null ? criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList(): criteria.hbls;
+            if (criteria.hbls != null && criteria.hbls.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
-                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase));
+                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
+                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
             }
-            if (criteria.customNos != null)
+            // Data search = soaNo
+            criteria.soaNo = criteria.soaNo != null ? criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.soaNo;
+            if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
             {
-                var join = from ops in opsTrans
-                           join cd in customsDeclarationRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)) on ops.JobNo equals cd.JobNo
+                surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0 || criteria.soaNo.IndexOf(x.Soano ?? "") >= 0);
+            }
+            // Data search = customNo
+            criteria.customNos = criteria.customNos != null ? criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.customNos;
+            if (criteria.customNos != null && criteria.customNos.Count() > 0)
+            {
+                var clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo));
+                opsTrans = from ops in opsTrans
+                           join custom in clearanceData on ops.JobNo equals custom.JobNo into customs
+                           from custom in customs.DefaultIfEmpty()
                            select ops;
-                opsTrans = join;
+
             }
+            // Data search = creditNo
+            criteria.creditNo = criteria.creditNo != null ? criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.creditNo;
+            if (criteria.creditNo != null && criteria.creditNo.Count() > 0)
+            {
+                surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
+            }
+            // Data search = ETD/ETA(Air Sea Service) and Service Date(ops)
+            if (criteria.serviceDateFrom != null || criteria.serviceDateTo != null)
+            {
+                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom <= x.ServiceDate.Value && x.ServiceDate.Value <= criteria.serviceDateTo : false);
+                csTrans = csTrans.Where(x => x.TransactionType.Contains("E") ? (x.Etd.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Etd.Value.Date && x.Etd.Value.Date <= criteria.serviceDateTo.Value.Date : false)
+                                                                            : (x.Eta.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Eta.Value.Date && x.Eta.Value.Date <= criteria.serviceDateTo.Value.Date : false));
+            }
+            // Data search = serviceType
+            if (!string.IsNullOrEmpty(criteria.servicesType))
+            {
+                surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
+            }
+            // Data search = PIC
+            if (!string.IsNullOrEmpty(criteria.personInCharge))
+            {
+                opsTrans = opsTrans.Where(x => x.UserCreated == criteria.personInCharge);
+                csTransD = csTransD.Where(x => x.UserCreated == criteria.personInCharge);
+            }
+            var clearance = customClearanceRepo.Get();
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
-                                join u in unit on sur.UnitId equals u.Id into u2
-                                from u in u2.DefaultIfEmpty()
+                                    //join u in unit on sur.UnitId equals u.Id into u2
+                                    //from u in u2.DefaultIfEmpty()
                                 join par in payer on sur.PayerId equals par.Id into par2
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                from advGrp in advGrps.DefaultIfEmpty()
+                                join cl in clearance on opst.JobNo equals cl.JobNo into cls
+                                from cl in cls.DefaultIfEmpty()
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -1213,11 +1270,16 @@ namespace eFMS.API.Accounting.DL.Services
                                     ChargeName = cc.ChargeNameEn,
                                     Quantity = sur.Quantity,
                                     UnitId = sur.UnitId,
-                                    UnitName = u.UnitNameEn,
+                                    //UnitName = u.UnitNameEn,
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
+                                    NetAmount = sur.NetAmount,
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total,
+                                    AmountVnd = sur.AmountVnd,
+                                    VatAmountVnd = sur.VatAmountVnd,
+                                    AmountUSD = sur.AmountUsd,
+                                    VatAmountUSD = sur.VatAmountUsd,
                                     PayerId = sur.PayerId,
                                     Payer = par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -1228,7 +1290,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     ClearanceNo = sur.ClearanceNo,
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
-                                    IsFromShipment = sur.IsFromShipment
+                                    IsFromShipment = sur.IsFromShipment,
+                                    AdvanceNo = advGrp.AdvanceNo,
+                                    CustomNo = cl.ClearanceNo ?? string.Empty
                                 };
 
             if (criteria.customNos != null)
@@ -1239,14 +1303,16 @@ namespace eFMS.API.Accounting.DL.Services
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
                                from cc in cc2.DefaultIfEmpty()
-                               join u in unit on sur.UnitId equals u.Id into u2
-                               from u in u2.DefaultIfEmpty()
+                                   //join u in unit on sur.UnitId equals u.Id into u2
+                                   //from u in u2.DefaultIfEmpty()
                                join par in payer on sur.PayerId equals par.Id into par2
                                from par in par2.DefaultIfEmpty()
                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                from pae in pae2.DefaultIfEmpty()
                                join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id
+                               join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                               from advGrp in advGrps.DefaultIfEmpty()
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1261,11 +1327,16 @@ namespace eFMS.API.Accounting.DL.Services
                                    ChargeName = cc.ChargeNameEn,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
-                                   UnitName = u.UnitNameEn,
+                                   //UnitName = u.UnitNameEn,
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
+                                   NetAmount = sur.NetAmount,
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total,
+                                   AmountVnd = sur.AmountVnd,
+                                   VatAmountVnd = sur.VatAmountVnd,
+                                   AmountUSD = sur.AmountUsd,
+                                   VatAmountUSD = sur.VatAmountUsd,
                                    PayerId = sur.PayerId,
                                    Payer = par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -1276,7 +1347,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    ClearanceNo = sur.ClearanceNo,
                                    ContNo = sur.ContNo,
                                    Notes = sur.Notes,
-                                   IsFromShipment = sur.IsFromShipment
+                                   IsFromShipment = sur.IsFromShipment,
+                                   AdvanceNo = advGrp.AdvanceNo
                                };
 
             var data = dataDocument.Union(dataOperation);
@@ -4717,6 +4789,35 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return isValidate;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public IQueryable<CatPartner> GetPartnerForSettlement(ExistsChargeCriteria criteria)
+        {
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.IsFromShipment == true);
+            var partner = catPartnerRepo.Get();
+            if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
+            {
+                var soa = acctSoaRepo.Get(x => criteria.soaNo.Contains(x.Soano));
+                var result = from pner in partner
+                             join ss in soa on pner.Id equals ss.Customer
+                             select pner;
+                return result;
+            }
+            if (criteria.creditNo != null && criteria.creditNo.Count() > 0)
+            {
+                var cdNote = acctCdnoteRepo.Get(x => criteria.creditNo.Contains(x.Code) && x.Type == AccountingConstants.ACCOUNTANT_TYPE_CREDIT);
+                var result = from pner in partner
+                             join cd in cdNote on pner.Id equals cd.PartnerId
+                             select pner;
+
+                return result;
+            }
+            return partner.AsQueryable();
         }
     }
 }

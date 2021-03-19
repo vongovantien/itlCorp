@@ -275,7 +275,44 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge([FromQuery]ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            return Ok(data);
+            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.Type, x.AdvanceNo });
+            List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
+            foreach (var item in dataGroups)
+            {
+                var shipment = new ShipmentSettlement();
+                shipment.JobId = item.Key.JobId;
+                shipment.MBL = item.Key.MBL;
+                shipment.HBL = item.Key.HBL;
+                shipment.ChargeSettlements = item.ToList();
+                shipment.HblId = item.Key.Hblid;
+                shipment.Type = item.Key.Type;
+                shipment.AdvanceNo = item.Key.AdvanceNo;
+                shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
+                shipment.TotalNetAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
+                shipment.TotalAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);
+                shipment.TotalAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);
+                shipment.TotalNetVND = item.Sum(x => x.AmountVnd ?? 0);
+                shipment.TotalVATVND = item.Sum(x => x.VatAmountVnd ?? 0);
+                shipment.TotalNetUSD = item.Sum(x => x.AmountUSD ?? 0);
+                shipment.TotalVATUSD = item.Sum(x => x.VatAmountUSD ?? 0);
+                shipment.TotalVND = shipment.TotalNetVND + shipment.TotalVATVND;
+                shipmentSettlement.Add(shipment);
+            }
+            var _totalNetVND = shipmentSettlement.Sum(x => x.TotalNetVND);
+            var _totalVATVND = shipmentSettlement.Sum(x => x.TotalVATVND);
+            var _totalNetUSD = shipmentSettlement.Sum(x => x.TotalNetUSD);
+            var _totalVATUSD = shipmentSettlement.Sum(x => x.TotalVATUSD);
+            var total = new
+            {
+                TotalNetVND = _totalNetVND,
+                TotalVATVND = _totalVATVND,
+                TotalVND = _totalNetVND + _totalVATVND,
+                TotalNetUSD = _totalNetUSD,
+                TotalVATUSD = _totalVATUSD,
+                TotalUSD = _totalNetUSD + _totalVATUSD,
+            };
+            var result = new { shipmentSettlement, data, total };
+            return Ok(result);
         }
 
         /// <summary>
@@ -908,6 +945,31 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetPartnerForSettlement")]
+        public IActionResult GetPartnerForSettlement([FromQuery]ExistsChargeCriteria criteria)
+        {
+            var result = acctSettlementPaymentService.GetPartnerForSettlement(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exchangeRate"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateTemporateSettlePayments")]
+        public IActionResult UpdateTemporateSettlePayments(decimal exchangeRate)
+        {
+
+            return Ok(null);
         }
     }
 }

@@ -104,6 +104,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.System.Controllers.MenuController.GetListUserHasPermission(System.String,System.String)">
+            <summary>
+            Get Users with permission in a menu
+            </summary>
+            <param name="menuID">menu name</param>
+            <param name="action">detail permission type</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysAuthorizationController">
             <summary>
             Controller Authorization

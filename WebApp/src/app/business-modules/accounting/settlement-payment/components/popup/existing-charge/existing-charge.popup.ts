@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@
 import { PopupBase } from 'src/app/popup.base';
 import { catchError, finalize } from 'rxjs/operators';
 import { SortService } from '@services';
-import { AccountingRepo, DocumentationRepo, CatalogueRepo } from '@repositories';
+import { AccountingRepo, DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
 import { ButtonType } from 'src/app/shared/enums/type-button.enum';
 import { Surcharge } from '@models';
@@ -63,6 +63,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _documentRepo: DocumentationRepo,
+        private _sysRepo: SystemRepo,
         private _cd: ChangeDetectorRef
     ) {
         super();
@@ -107,7 +108,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getProductService() {
-        this._catalogueRepo.getListService()
+        this._sysRepo.getListServiceByPermision()
+        // this._catalogueRepo.getListService()
             .pipe(catchError(this.catchError))
             .subscribe(
                 (data: CommonInterface.IValueDisplay[]) => {

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -22,6 +23,8 @@ namespace eFMS.API.System.DL.Services
     {
         private IContextBase<SysUserPermission> userpermissionRepository;
         private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
+        private readonly IContextBase<SysUser> sysUserRepo;
+        private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly ICurrentUser currentUser;
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
@@ -31,11 +34,15 @@ namespace eFMS.API.System.DL.Services
             IMapper mapper,
             IContextBase<SysUserPermission> userpermissionRepo,
             ICurrentUser icurrentUser,
-            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo,
+            IContextBase<SysUser> sysUser,
+            IContextBase<SysUserLevel> sysUserLevel) : base(repository, cacheService, mapper)
         {
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
             currentUser = icurrentUser;
+            sysUserRepo = sysUser;
+            sysUserLevelRepo = sysUserLevel;
         }
 
         //public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
@@ -128,6 +135,105 @@ namespace eFMS.API.System.DL.Services
 
             }
             return results;
+        }
+
+
+        /// <summary>
+        /// Get Users with permission in a menu
+        /// </summary>
+        /// <param name="menuID">menu name</param>
+        /// <param name="action">detail permission type</param>
+        /// <returns></returns>
+        public IQueryable<SysUser> GetListUserHasPermission(string menuID, string action)
+        {
+            var usersResult = new List<SysUser>();
+            // Lấy ra Permisison của User
+            Guid? permissionId = userpermissionRepository.Get(x => x.UserId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)?.FirstOrDefault().Id;
+            if (permissionId != Guid.Empty)
+            {
+                SysMenu menuDetail = DataContext.Get(x => x.Route == menuID)?.FirstOrDefault();
+                var permissionDetails = permissionGeneralRepository.Get(x => x.UserPermissionId == permissionId && x.Access == true)
+                                                                                                    .Where(p => p.MenuId == menuDetail.Id).FirstOrDefault();
+
+                var permission = string.Empty;
+                switch (action)
+                {
+                    case "Detail":
+                        permission = permissionDetails.Detail;
+                        break;
+                    case "Write":
+                        permission = permissionDetails.Write;
+                        break;
+                    case "Delete":
+                        permission = permissionDetails.Delete;
+                        break;
+                    default:
+                        permission = permissionDetails.List;
+                        break;
+                }
+                PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(permission);
+                var sysUser = sysUserRepo.Get();
+                var userpermission = userpermissionRepository.Get();
+                switch (rangeSearch)
+                {
+                    case PermissionRange.None:
+                        break;
+                    case PermissionRange.Owner:
+                        var curUserInfo = sysUser.Where(x => x.Id == currentUser.UserID).FirstOrDefault();
+                        usersResult.Add(curUserInfo);
+                        break;
+                    case PermissionRange.Group:
+                        var userLevelGrp = sysUserLevelRepo.Get(x => x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                        var permissionGeneralGrp = permissionGeneralRepository.Get(x => x.Access == true && x.MenuId == menuDetail.Id);
+                        var userGrp = from user in sysUser
+                                      join userLv in userLevelGrp on user.Id equals userLv.UserId
+                                      join per in userpermission on userLv.UserId equals per.UserId
+                                      join perGeneral in permissionGeneralGrp on per.Id equals perGeneral.UserPermissionId
+                                      select user;
+                        usersResult = userGrp.ToList();
+                        break;
+                    case PermissionRange.Department:
+                        var userLevelDep = sysUserLevelRepo.Get(x => x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                        var permissionGeneralDep = permissionGeneralRepository.Get(x => x.Access == true && x.MenuId == menuDetail.Id);
+                        var userDep = from user in sysUser
+                                      join userLv in userLevelDep on user.Id equals userLv.UserId
+                                      join per in userpermission on userLv.UserId equals per.UserId
+                                      join perGeneral in permissionGeneralDep on per.Id equals perGeneral.UserPermissionId
+                                      select user;
+                        usersResult = userDep.ToList();
+                        break;
+                    case PermissionRange.Office:
+                        var userLevelOff = sysUserLevelRepo.Get(x => x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID);
+                        var permissionGeneralOff = permissionGeneralRepository.Get(x => x.Access == true && x.MenuId == menuDetail.Id);
+                        var userOff = from user in sysUser
+                                      join userLv in userLevelOff on user.Id equals userLv.UserId
+                                      join per in userpermission on userLv.UserId equals per.UserId
+                                      join perGeneral in permissionGeneralOff on per.Id equals perGeneral.UserPermissionId
+                                      select user;
+                        usersResult = userOff.ToList();
+                        break;
+                    case PermissionRange.Company:
+                        var userLevelCom = sysUserLevelRepo.Get(x => x.CompanyId == currentUser.CompanyID);
+                        var permissionGeneralCom = permissionGeneralRepository.Get(x => x.Access == true && x.MenuId == menuDetail.Id);
+                        var userCom = from user in sysUser
+                                      join userLv in userLevelCom on user.Id equals userLv.UserId
+                                      join per in userpermission on userLv.UserId equals per.UserId
+                                      join perGeneral in permissionGeneralCom on per.Id equals perGeneral.UserPermissionId
+                                      select user;
+                        usersResult = userCom.ToList();
+                        break;
+                    default:
+                        var permissionGeneralAll = permissionGeneralRepository.Get(x => x.Access == true && x.MenuId == menuDetail.Id);
+                        var userAll = from user in sysUser
+                                      join userLv in sysUserLevelRepo.Get() on user.Id equals userLv.UserId
+                                      join per in userpermission on userLv.UserId equals per.UserId
+                                      join perGeneral in permissionGeneralAll on per.Id equals perGeneral.UserPermissionId
+                                      select user;
+                        usersResult = sysUser.ToList();
+                        break;
+                }
+            }
+            return usersResult.AsQueryable();
         }
     }
 }
