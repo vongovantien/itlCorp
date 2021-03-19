@@ -2,7 +2,6 @@ import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from '@app';
@@ -19,7 +18,7 @@ import {
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
@@ -42,7 +41,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     selectedHbl: CsTransactionDetail;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -54,12 +52,9 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
@@ -72,7 +67,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
                             });
                         }
 
-                        console.log(this.containers);
                         // * Update field inword with container data.
                         this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
@@ -118,19 +112,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
         const modelAdd = this.getDataForm();
 
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelAdd.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelAdd.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-        //     } else {
-
-        //     }
-        // });
         this.createHbl(modelAdd);
 
     }
@@ -169,7 +150,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             serviceType: form.serviceType,
             originBlnumber: form.originBlnumber,
             moveType: form.moveType,
-            freightPayment: form.freightPaymen,
+            freightPayment: form.freightPayment,
             hbltype: form.hbltype,
 
             customerId: form.customer,
@@ -227,11 +208,9 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     }
 
     createHbl(body: any) {
-        this._progressRef.start();
         this._documentationRepo.createHousebill(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
