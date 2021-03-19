@@ -2,7 +2,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { formatDate } from '@angular/common';
-import { NgProgress } from '@ngx-progressbar/core';
 
 import { AppPage } from '@app';
 import { Surcharge } from '@models';
@@ -14,7 +13,7 @@ import { DataService } from '@services';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 @Component({
     selector: 'app-settle-payment-new',
     templateUrl: './add-settle-payment.component.html'
@@ -29,13 +28,10 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress,
         private cdRef: ChangeDetectorRef,
         private _dataService: DataService
     ) {
         super();
-
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -58,20 +54,21 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        this.requestSurchargeListComponent.surcharges.forEach(s => {
-            if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
-                s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
-            }
-        });
+        // this.requestSurchargeListComponent.surcharges.forEach(s => {
+        //     if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
+        //         s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
+        //     }
+        // });
 
-        this._progressRef.start();
+        this.formatInvoiceDateSurcharge();
+
         const body: IDataSettlement = {
             settlement: this.getDataForm(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
         this._accountingRepo.addNewSettlement(body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -98,14 +95,15 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        this._progressRef.start();
+
+        this.formatInvoiceDateSurcharge();
         const body: IDataSettlement = {
             settlement: this.getDataForm(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
         this._accountingRepo.saveAndSendRequestSettlemntPayment(body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -117,6 +115,13 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                     }
                     this.requestSurchargeListComponent.selectedIndexSurcharge = null;
 
+                },
+                (error) => {
+                    if (error instanceof HttpErrorResponse) {
+                        if (error.error?.data) {
+                            this._dataService.setData('duplicateChargeSettlement', error.error);
+                        }
+                    }
                 }
             );
     }
@@ -140,8 +145,15 @@ export class SettlementPaymentAddNewComponent extends AppPage {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
     }
 
-
-
+    formatInvoiceDateSurcharge() {
+        this.requestSurchargeListComponent.surcharges.forEach(s => {
+            if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
+                if (Object.prototype.toString.call(s.invoiceDate) === '[object Date]') {
+                    s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
+                }
+            }
+        });
+    }
 }
 interface IDataSettlement {
     settlement: any;
