@@ -1,7 +1,6 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
@@ -16,7 +15,7 @@ import { DataService } from '@services';
 import { SeaConsolImportCreateHBLComponent } from '../create/create-hbl-consol-import.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { catchError, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 
 enum HBL_TAB {
@@ -43,7 +42,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
     isClickSubMenu: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -56,7 +54,7 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         protected _dataService: DataService
 
     ) {
-        super(_progressService, _documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
+        super(_documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     ngOnInit() {
@@ -153,29 +151,16 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         modelUpdate.dosentTo1 = this.hblDetail.dosentTo1;
         modelUpdate.dosentTo2 = this.hblDetail.dosentTo2;
         modelUpdate.userCreated = this.hblDetail.userCreated;
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelUpdate.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-        //     } else {
-        //     }
-        // });
+
         this.updateHbl(modelUpdate);
 
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = ChargeConstants.SCI_CODE;
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -191,17 +176,14 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
     }
 
     getDetailHbl() {
-        this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
                         // this.formHouseBill.getListSaleman();
@@ -255,7 +237,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._documentationRepo.previewProofofDelivery(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -270,7 +251,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._documentationRepo.previewArrivalNotice({ hblId: this.hblId, currency: _currency })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -291,7 +271,6 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
         this._documentationRepo.previewDeliveryOrder(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
