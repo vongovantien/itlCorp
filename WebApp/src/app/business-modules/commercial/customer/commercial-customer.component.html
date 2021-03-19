@@ -56,9 +56,8 @@
                                                 <i class="la la-angle-up"></i>
                                             </button>
 
-                                            <app-permission-button type="detail" [user]="customer.userCreated"
-                                                (onClick)="showDetail(customer)"></app-permission-button>
-
+                                            <app-permission-button type="detail" (onClick)="showDetail(customer)">
+                                            </app-permission-button>
                                             <ng-container *ngIf="!customer.active">
                                                 <app-permission-button type="delete" [user]="customer.userCreated"
                                                     (onClick)="showConfirmDelete(customer)"></app-permission-button>
