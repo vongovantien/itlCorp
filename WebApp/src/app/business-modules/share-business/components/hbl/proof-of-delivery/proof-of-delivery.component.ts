@@ -86,7 +86,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
 
     handleFileInput(event: any) {
         this.fileList = event.target['files'];
-        if (!!this.proofOfDelievey.hblid) {
+        if (!!this.proofOfDelievey.hblid || this.hblid != SystemConstants.EMPTY_GUID) {
             if (!!this.files && !!this.files.id && this.fileList.length > 0) {
                 this.deleteFilePOD();
             } else {
@@ -131,7 +131,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
 
     getFilePOD() {
         this.isLoading = true;
-        this._documentRepo.getPODFilesAttach(this.hblid).
+        this._documentRepo.getPODFilesAttach(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;

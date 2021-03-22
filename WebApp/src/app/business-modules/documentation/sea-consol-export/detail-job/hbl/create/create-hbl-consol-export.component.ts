@@ -8,7 +8,7 @@ import { formatDate } from '@angular/common';
 import { AppForm } from '@app';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
-import { Container, CsTransactionDetail } from '@models';
+import { Container, CsTransactionDetail, HouseBill } from '@models';
 import { SystemConstants, RoutingConstants } from '@constants';
 import {
     ShareBusinessImportHouseBillDetailComponent,
@@ -19,9 +19,10 @@ import {
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 @Component({
     selector: 'app-create-hbl-consol-export',
@@ -36,6 +37,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string;
     containers: Container[] = [];
@@ -169,7 +171,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             serviceType: form.serviceType,
             originBlnumber: form.originBlnumber,
             moveType: form.moveType,
-            freightPayment: form.freightPaymen,
+            freightPayment: form.freightPayment,
             hbltype: form.hbltype,
 
             customerId: form.customer,
@@ -228,8 +230,20 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     createHbl(body: any) {
         this._progressRef.start();
-        this._documentationRepo.createHousebill(body)
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        body.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
             .pipe(
+                tap((result: any) => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.hblid = result.data;
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
@@ -238,7 +252,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl/${res.data}`]);
-                    } else {
                     }
                 }
             );

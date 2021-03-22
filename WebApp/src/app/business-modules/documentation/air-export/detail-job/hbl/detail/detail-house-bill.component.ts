@@ -16,8 +16,9 @@ import { InputBookingNotePopupComponent } from '../components/input-booking-note
 import { AirExportCreateHBLComponent } from '../create/create-house-bill.component';
 
 import { merge } from 'rxjs';
-import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
+import { catchError, finalize, takeUntil, skip, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-detail-hbl-air-export',
@@ -174,8 +175,18 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
 
     updateHbl(body: any, isSeparate?: boolean) {
         this._progressRef.start();
-        this._documentationRepo.updateHbl(body)
+        const house = this.setProofOfDelivery(body);
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        house.deliveryDate = deliveryDate;
+        this._documentationRepo.updateHbl(Object.assign({}, house, deliveryDate))
             .pipe(
+                tap(() => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )

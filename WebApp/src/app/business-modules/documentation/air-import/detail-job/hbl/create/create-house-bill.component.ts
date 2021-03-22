@@ -222,7 +222,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         //     deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
                         // };
                         this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        // const proofOfDelivery = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
                         this.proofOfDeliveryComponent.saveProofOfDelivery();
 
                         return forkJoin([arrival, delivery]);

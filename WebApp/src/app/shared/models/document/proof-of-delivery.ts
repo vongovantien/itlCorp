@@ -1,9 +1,9 @@
 export class ProofOfDelivery {
-    deliveryPerson: string = '';
+    deliveryPerson: string = null;
     deliveryDate: any = null;
-    note: string = '';
-    referenceNo: string = '';
-    hblid: string = '';
+    note: string = null;
+    referenceNo: string = null;
+    hblid: string = null;
     constructor(object: any = {}) {
         const self = this;
         for (const key of Object.keys(object)) {
