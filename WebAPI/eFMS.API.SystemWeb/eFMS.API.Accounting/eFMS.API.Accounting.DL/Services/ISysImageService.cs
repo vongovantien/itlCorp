@@ -13,8 +13,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -35,7 +37,7 @@ namespace eFMS.API.Accounting.DL.Services
             this.webUrl = webUrl;
         }
 
-        public async Task<HandleState> DeleteFile(Guid id)
+        public async Task<HandleState> DeleteFile(string folder, Guid id)
         {
             SysImage item = DataContext.Get(x => x.Id == id).FirstOrDefault();
 
@@ -44,64 +46,68 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState result = DataContext.Delete(x => x.Id == id);
             if (result.Success)
             {
-                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                string fileName = Path.GetFileName(item.Url);
+                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + fileName, folder);
             }
             return result;
         }
 
-        public async Task<ResultHandle> UploadFiles(FileUploadModel model)
+        public List<SysImage> GetFiles(string folderName, Guid Id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<HandleState> UploadFiles(FileUploadModel model)
         {
             return await WriteFile(model);
         }
 
-        private async Task<ResultHandle> WriteFile(FileUploadModel model)
+        private async Task<HandleState> WriteFile(FileUploadModel model)
         {
-            string fileName = "";
-           
-            string path = this.webUrl.Value.Url + "/Accounting";
+            string path = this.webUrl.Value.Url;
             try
             {
                 List<SysImage> list = new List<SysImage>();
-                ResultHandle result = new ResultHandle();
+                HandleState result = new HandleState();
 
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.Id.ToString());
                 List<SysImage> resultUrls = new List<SysImage>();
 
                 foreach (IFormFile file in model.Files)
                 {
-                    fileName = file.FileName;
-                    string objectId = model.Id.ToString();
-                    await ImageHelper.SaveFile(fileName, model.FolderName, objectId, file);
+                    string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    string extension = Path.GetExtension(file.FileName);
+                    fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"\s+", "") + "_" + StringHelper.RandomString(5);
 
-                    string urlImage = path + "/" + model.FolderName + "/" + objectId + "/" + fileName;
+                    string fullFileName = fileName + extension;
+
+                    string objectId = model.Id.ToString();
+                    await ImageHelper.SaveFile(fullFileName, model.FolderName, objectId, file);
+
+                    string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fullFileName;
                     var sysImage = new SysImage
                     {
                         Id = Guid.NewGuid(),
                         Url = urlImage,
-                        Name = file.Name,
+                        Name = file.FileName,
                         Folder = model.FolderName,
                         ObjectId = model.Id.ToString(),
-                        UserCreated = currentUser.UserName, 
+                        UserCreated = currentUser.UserName,
                         UserModified = currentUser.UserName,
                         DateTimeCreated = DateTime.Now,
                         DatetimeModified = DateTime.Now
                     };
                     list.Add(sysImage);
                 }
-                HandleState hs = new HandleState();
                 if (list.Count > 0)
                 {
-                    hs = await DataContext.AddAsync(list);
-
-                    result.Status = hs.Success;
-                    result.Message = hs.Message?.ToString();
-                    result.Data = list;
+                    result = await DataContext.AddAsync(list);
                 }
                 return result;
             }
             catch (Exception ex)
             {
-                return new ResultHandle { Data = null, Status = false, Message = ex.Message };
+                return new HandleState(ex.ToString());
             }
         }
     }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
+import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -23,6 +23,7 @@ import isUUID from 'validator/lib/isUUID';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementPaymentDetailComponent extends AppPage implements ICrystalReport {
@@ -35,6 +36,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
+
+    attachFiles: SysImage[] = [];
 
     constructor(
         private _activedRouter: ActivatedRoute,

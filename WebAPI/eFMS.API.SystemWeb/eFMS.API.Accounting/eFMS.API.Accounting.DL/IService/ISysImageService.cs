@@ -13,8 +13,9 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface ISysImageService: IRepositoryBase<SysImage, SysImageModel> 
     {
-        Task<ResultHandle> UploadFiles(FileUploadModel model);
-        Task<HandleState> DeleteFile(Guid id);
+        Task<HandleState> UploadFiles(FileUploadModel model);
+        Task<HandleState> DeleteFile(string folder, Guid id);
+        List<SysImage> GetFiles(string folderName, Guid Id);
     }
 
     public class FileUploadModel

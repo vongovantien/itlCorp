@@ -522,7 +522,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper,eFMS.API.Accounting.DL.IService.ISysImageService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
             <summary>
             Contructor
             </summary>

@@ -40,8 +40,8 @@
             }
         }
         .list-files {
-            max-height: 60vh;
-            overflow: scroll;
+            max-height: 270px;
+            overflow-y: scroll;
             .file__item {
                 cursor: pointer;
                 .file-item__name {

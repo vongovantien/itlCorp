@@ -19,8 +19,6 @@ using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Common.Helpers;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -38,7 +36,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
-        private readonly ISysImageService sysFileService;
 
         /// <summary>
         /// Contructor
@@ -49,15 +46,13 @@ namespace eFMS.API.Accounting.Controllers
         public AcctSettlementPaymentController(
             IStringLocalizer<LanguageSub> localizer, 
             IAcctSettlementPaymentService service, 
-            ICurrentUser user, IMapper _mapper,
-            ISysImageService SysImageService
+            ICurrentUser user, IMapper _mapper
             )
         {
             stringLocalizer = localizer;
             acctSettlementPaymentService = service;
             currentUser = user;
             mapper = _mapper;
-            sysFileService = SysImageService;
         }
 
         /// <summary>
@@ -917,28 +912,6 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            return Ok(result);
-        }
-
-        [HttpPut("{id}/UploadFiles")]
-        [Authorize]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, Guid Id)
-        {
-            FileUploadModel model = new FileUploadModel
-            {
-                Files = files,
-                FolderName = "Settlement",
-                Id = Id,
-            };
-            var result = await sysFileService.UploadFiles(model);
-            return Ok(result);
-        }
-
-        [HttpDelete("DeleteAttachedFile/{id}")]
-        [Authorize]
-        public IActionResult DeleteAttachedFile(Guid id)
-        {
-            var result = sysFileService.DeleteFile(id);
             return Ok(result);
         }
     }

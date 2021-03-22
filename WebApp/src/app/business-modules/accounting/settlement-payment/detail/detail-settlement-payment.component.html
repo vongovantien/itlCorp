@@ -27,8 +27,13 @@
                             </div>
                         </div>
                     </tab>
-                    <tab heading="Attach files">
-                        <settlement-attach-file-list [Id]="settlementPayment?.settlement?.id">
+                    <tab>
+                        <ng-template tabHeading>
+                            <span class="m--margin-right-10">Attached files</span>
+                            <span class="badge badge-success"
+                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                        </ng-template>
+                        <settlement-attach-file-list (onChange)="attachFiles = $event">
                         </settlement-attach-file-list>
                     </tab>
                 </tabset>

@@ -25,13 +25,13 @@
     <div class="m-portlet list-files">
         <div class="m-portlet__body">
             <ul class="list-group list-unstyled">
-                <ng-container *ngIf="!isLoading && !!files.length">
+                <ng-container *ngIf="!!(files.length)">
                     <li class="list-group-item file__item m-animate-fade-in"
-                        *ngFor="let file of files; trackBy:trackByFn">
+                        *ngFor="let file of files; let i = index; trackBy:trackByFn">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <div class="file-item__icon">
-                                    <ng-container [ngSwitch]="file.extension">
+                                    <ng-container [ngSwitch]="(file.name | extension)">
                                         <ng-container *ngSwitchCase="'pdf'">
                                             <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i>
                                         </ng-container>
@@ -65,19 +65,13 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span>Created: {{file.dateTimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
+                                <span>Uploaded: {{file.dateTimeCreated | date: 'dd/MM/yyyy'}} by </span>
                                 <span class="text-success">{{file.userCreated}}</span>
                             </div>
                         </div>
                     </li>
                 </ng-container>
-                <li *ngIf="isLoading">
-                    <div class="on-loading text-center">
-                        <div class="m-loader m-loader--brand">
-                        </div><span>Loading</span>
-                    </div>
-                </li>
-                <li *ngIf="!isLoading && !files.length">
+                <li *ngIf="!(files?.length)">
                     <div class="no-data">
                         <i class="flaticon-coins"></i>
                         <span class="no-data-text">No files found</span>
@@ -87,3 +81,5 @@
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>
