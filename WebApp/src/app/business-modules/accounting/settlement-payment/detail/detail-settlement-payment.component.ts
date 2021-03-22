@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
@@ -23,7 +23,6 @@ import isUUID from 'validator/lib/isUUID';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementPaymentDetailComponent extends AppPage implements ICrystalReport {

@@ -258,11 +258,10 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId,bool? isTemp)
         {
-            string folderName = Request.Headers["Module"];
             DocumentFileUploadModel model = new DocumentFileUploadModel
             {
                 Files = files,
-                FolderName = folderName,
+                FolderName = "Shipment",
                 JobId = jobId,
                 IsTemp = isTemp
             };
@@ -306,18 +305,26 @@ namespace eFMS.API.Documentation.Controllers
 
         [Authorize]
         [HttpDelete("DeleteAttachedFile/{id}")]
-        public IActionResult DeleteAttachedFile([Required]Guid id)
+        public async Task<IActionResult> DeleteAttachedFile([Required]Guid id)
         {
-            var result = sysImageService.DeleteFile(id);
-            return Ok(result);
+            HandleState hs = await sysImageService.DeleteFile(id);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Delete file Successfully" });
+            }
+            return BadRequest(hs);
         }
 
         [Authorize]
         [HttpDelete("DeleteFileTempPreAlert/{jobId}")]
-        public IActionResult DeleteFileTempPreAlert([Required]Guid jobId)
+        public async Task<IActionResult> DeleteFileTempPreAlert([Required]Guid jobId)
         {
-            var result = sysImageService.DeleteFileTempPreAlert(jobId);
-            return Ok(result);
+            HandleState hs = await sysImageService.DeleteFileTempPreAlert(jobId);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Delete file Successfully" });
+            }
+            return BadRequest(hs);
         }
         #endregion -- INSERT & UPDATE
 
