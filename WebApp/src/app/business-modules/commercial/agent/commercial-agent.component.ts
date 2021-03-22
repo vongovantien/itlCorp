@@ -15,6 +15,9 @@ import { AppList } from 'src/app/app.list';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAgentState, getAgentSearchParamsState, SearchList } from './store';
+import { FormContractCommercialPopupComponent } from '../../share-modules/components';
+import { Observable } from 'rxjs';
+import { getMenuUserSpecialPermissionState } from '@store';
 
 
 @Component({
@@ -26,6 +29,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+
+    menuSpecialPermission: Observable<any[]>;
 
     agents: Partner[] = [];
     saleMans: Contract[] = [];
@@ -55,6 +61,7 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
 
     ngOnInit(): void {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getAgentSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -107,6 +114,57 @@ export class CommercialAgentComponent extends AppList implements OnInit {
         this.dataSearch.partnerType = 'Agent';
         // this.getPartners();
         this.onSearch(this.dataSearch);
+    }
+
+    onCustomerRequest() {
+        this.formContractPopup.formGroup.patchValue({
+            officeId: [this.formContractPopup.offices[0]],
+            contractNo: null,
+            effectiveDate: null,
+            expiredDate: null,
+            paymentTerm: null,
+            creditLimit: null,
+            creditLimitRate: null,
+            trialCreditLimit: null,
+            trialCreditDays: null,
+            trialEffectDate: null,
+            trialExpiredDate: null,
+            creditAmount: null,
+            billingAmount: null,
+            paidAmount: null,
+            unpaidAmount: null,
+            customerAmount: null,
+            creditRate: null,
+            description: null,
+            vas: null,
+            saleService: null,
+        });
+        this.formContractPopup.files = null;
+        this.formContractPopup.fileList = null;
+        this.formContractPopup.isUpdate = false;
+        this.formContractPopup.isSubmitted = false;
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.formContractPopup.salesmanId.setValue(userLogged.id);
+        this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
+        this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+
+        this.formContractPopup.contractType.setValue('Trial');
+        this.formContractPopup.currencyId.setValue('VND');
+        this.formContractPopup.baseOn.setValue('Invoice Date');
+
+        this.formContractPopup.trialEffectDate.setValue(null);
+        this.formContractPopup.trialExpiredDate.setValue(null);
+        this.formContractPopup.effectiveDate.setValue(null);
+        this.formContractPopup.isCustomerRequest = true;
+        this.formContractPopup.show();
+        this.formContractPopup.show();
+    }
+
+    onRequestContract($event: boolean) {
+        const success = $event;
+        if (success === true) {
+            this.requestList();
+        }
     }
 
     onSearch(event: CommonInterface.ISearchOption) {

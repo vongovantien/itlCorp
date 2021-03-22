@@ -1,7 +1,7 @@
-import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
-import { Office, Company, User } from '@models';
+import { Office, Company, User, Customer } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
 import { SystemRepo, CatalogueRepo } from '@repositories';
@@ -16,6 +16,7 @@ import { formatDate } from '@angular/common';
 import { PartnerRejectPopupComponent } from './partner-reject/partner-reject.popup';
 import { ConfirmPopupComponent } from '@common';
 import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/commercial/components/popup/salesman-credit-limit.popup';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'popup-form-contract-commercial-catalogue',
@@ -25,6 +26,7 @@ import { SalesmanCreditLimitPopupComponent } from 'src/app/business-modules/comm
 export class FormContractCommercialPopupComponent extends PopupBase {
 
     formGroup: FormGroup;
+    partners: Observable<Customer[]>;
 
     isUpdate: boolean = false;
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
@@ -54,7 +56,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialCreditDays: AbstractControl;
     contractNo: AbstractControl;
     currencyId: AbstractControl;
-
+    partnerIds: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -115,6 +117,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     vaslst: CommonInterface.INg2Select[] = this.serviceTypes;
     isCollapsed: boolean = false;
+    isCustomerRequest: boolean = false;
 
     constructor(
         private _fb: FormBuilder,
@@ -138,7 +141,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.listCurrency = this._store.select(getCatalogueCurrencyState).pipe(map(data => this.utility.prepareNg2SelectData(data, 'id', 'id')));
         this.initForm();
         this.initDataForm();
-
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
         if (!this.isUpdate) {
             const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
             this.companyId.setValue(userLogged.companyId);
@@ -185,6 +188,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.formGroup = this._fb.group({
             salesmanId: [null, Validators.required],
             companyId: [null, Validators.required],
+            partnerId: [null],
             officeId: [null, Validators.required],
             contractNo: [null, Validators.maxLength(50)],
             effectiveDate: [null, Validators.required],
@@ -225,6 +229,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.trialCreditDays = this.formGroup.controls['trialCreditDays'];
         this.contractNo = this.formGroup.controls['contractNo'];
         this.currencyId = this.formGroup.controls['currencyId'];
+        this.partnerIds = this.formGroup.controls['partnerId'];
     }
 
     initDataForm() {
@@ -279,6 +284,10 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.companyId.setValue($event.id);
         } else if (type === 'office') {
             this.officeId.setValue($event.id);
+
+        }
+        else if (type === 'partner') {
+            this.partnerIds.setValue($event.id);
 
         }
     }
@@ -350,6 +359,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                 break;
             case 'office': this.officeId.setValue(null);
                 break;
+            case 'partner': this.partnerIds.setValue(null);
+                break;
         }
     }
 
@@ -359,7 +370,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.setError(this.currencyId);
         this.isSubmitted = true;
         this.selectedContract.index = this.indexDetailContract;
-        if (!this.effectiveDate.value.startDate) {
+        if (this.effectiveDate.value == null || (!this.effectiveDate.value.startDate || this.effectiveDate.value.startDate == null)) {
             return;
         }
         if (!!this.contractType.value && this.contractType.value.length > 0) {
@@ -375,6 +386,29 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         }
         if (this.formGroup.valid) {
             this.asignValueToModel();
+            if (this.isCustomerRequest === true) {
+                if (!this.partnerIds.value) return;
+                this.selectedContract.partnerId = this.partnerIds.value;
+                this.selectedContract.isRequestApproval = isRequestApproval;
+                this._catalogueRepo.customerRequest(this.selectedContract)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: CommonInterface.IResult) => {
+                            if (res.status) {
+                                this._toastService.success(res.message);
+                                if (!!this.fileList) {
+                                    this.partnerId = this.selectedContract.partnerId;
+                                    this.uploadFileContract(res.data);
+                                }
+                                this.onRequest.emit(true);
+                                this.hide();
+                            } else {
+                                this._toastService.error(res.message);
+                            }
+                        }
+                    );
+                return;
+            }
             if (isRequestApproval === true) {
                 this.selectedContract.isRequestApproval = true;
             } else {

@@ -338,6 +338,42 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
+
+        public HandleState CustomerRequest(CatContractModel entity)
+        {
+            var contract = mapper.Map<CatContract>(entity);
+            contract.DatetimeCreated = contract.DatetimeModified = DateTime.Now;
+            contract.UserCreated = contract.UserModified = currentUser.UserID;
+            contract.Active = false;
+            var hs = DataContext.Add(contract, false);
+            DataContext.SubmitChanges();
+            var hsPartner = new HandleState();
+            if (hs.Success)
+            {
+                var ObjPartner = catPartnerRepository.Get(x => x.Id == contract.PartnerId).FirstOrDefault();
+                ObjPartner.PartnerGroup = ObjPartner.PartnerGroup + ";CUSTOMER";
+                ObjPartner.UserModified = currentUser.UserID;
+                ObjPartner.DatetimeModified = DateTime.Now;
+                ObjPartner.PartnerType = "Customer";
+                hsPartner = catPartnerRepository.Update(ObjPartner, x => x.Id == contract.PartnerId, false);
+                catPartnerRepository.SubmitChanges();
+                if (entity.IsRequestApproval == true && hsPartner.Success)
+                {
+                    CatPartnerModel modelPartner = mapper.Map<CatPartnerModel>(ObjPartner);
+                    modelPartner.ContractService = entity.SaleService;
+                    modelPartner.ContractService = GetContractServicesName(modelPartner.ContractService);
+                    modelPartner.ContractType = contract.ContractType;
+                    modelPartner.ContractNo = contract.ContractNo;
+                    modelPartner.SalesmanId = contract.SaleManId;
+                    modelPartner.UserCreatedContract = contract.UserCreated;
+                    ClearCache();
+                    Get();
+                    SendMailActiveSuccess(modelPartner, string.Empty);
+                }
+               
+            }
+            return hsPartner;
+        }
         public HandleState Delete(Guid id)
         {
             var hs = DataContext.Delete(x => x.Id == id);
