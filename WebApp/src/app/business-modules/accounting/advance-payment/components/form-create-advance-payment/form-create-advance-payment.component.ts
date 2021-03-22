@@ -2,15 +2,14 @@ import { Component, Output, EventEmitter, Input, ChangeDetectionStrategy } from 
 import { User, Currency, Partner } from '@models';
 import { DataService } from '@services';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
-import { SystemConstants } from '@constants';
 
-import { Observable } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonEnum } from '@enums';
 import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -168,11 +167,14 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             this.bankAccountName.setValue(this.userLogged.nameVn || null);
             this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
             this.bankName.setValue(this.userLogged.bankName || null);
+        } else {
+            this.bankAccountName.setValue(null);
+            this.bankAccountNo.setValue(null);
+            this.bankName.setValue(null);
         }
     }
 
     onSelectPayee(payee) {
-        console.log(payee);
         if (this.paymentMethod.value === 'Bank') {
             if (!!payee.bankAccountNo) {
                 this.bankAccountNo.setValue(payee.bankAccountNo);
