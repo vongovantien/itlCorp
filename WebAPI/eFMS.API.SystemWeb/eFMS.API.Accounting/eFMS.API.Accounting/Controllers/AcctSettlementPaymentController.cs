@@ -959,17 +959,5 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctSettlementPaymentService.GetPartnerForSettlement(criteria);
             return Ok(result);
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="exchangeRate"></param>
-        /// <returns></returns>
-        [HttpPut("UpdateTemporateSettlePayments")]
-        public IActionResult UpdateTemporateSettlePayments(decimal exchangeRate)
-        {
-
-            return Ok(null);
-        }
     }
 }

@@ -51,6 +51,15 @@ export class Surcharge {
     shipmentId: string = SystemConstants.EMPTY_GUID; // * Id trong OpsTransation,CsTransation.
     typeService: string = null; // * "DOC | OPS"
 
+    customNo: string = null;
+    netAmount: number = 0;
+    finalExchangeRate: number = 0;
+    amountVnd: number = 0;
+    vatAmountVnd: number = 0;
+    amountUSD: number = 0;
+    vatAmountUSD: number = 0;
+    totalAmountVnd: number = 0;
+    picName: string = null;
     // * Custom
     obhId: string = null;
     isDuplicate: boolean = false;

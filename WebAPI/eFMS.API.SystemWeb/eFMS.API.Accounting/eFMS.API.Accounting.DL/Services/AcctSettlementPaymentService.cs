@@ -1242,11 +1242,13 @@ namespace eFMS.API.Accounting.DL.Services
                 csTransD = csTransD.Where(x => x.UserCreated == criteria.personInCharge);
             }
             var clearance = customClearanceRepo.Get();
+            var userRepo = sysUserRepo.Get();
+            var unit = catUnitRepo.Get();
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
-                                    //join u in unit on sur.UnitId equals u.Id into u2
-                                    //from u in u2.DefaultIfEmpty()
+                                join u in unit on sur.UnitId equals u.Id into u2
+                                from u in u2.DefaultIfEmpty()
                                 join par in payer on sur.PayerId equals par.Id into par2
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
@@ -1256,6 +1258,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 from advGrp in advGrps.DefaultIfEmpty()
                                 join cl in clearance on opst.JobNo equals cl.JobNo into cls
                                 from cl in cls.DefaultIfEmpty()
+                                join user in userRepo on opst.UserCreated equals user.Id into sysUser
+                                from user in sysUser.DefaultIfEmpty()
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -1264,20 +1268,22 @@ namespace eFMS.API.Accounting.DL.Services
                                     HBL = opst.Hwbno,
                                     Hblid = sur.Hblid,
                                     Type = sur.Type,
-                                    SettlementCode = sur.SettlementCode,
+                                    //SettlementCode = sur.SettlementCode,
                                     ChargeId = sur.ChargeId,
                                     ChargeCode = cc.Code,
                                     ChargeName = cc.ChargeNameEn,
                                     Quantity = sur.Quantity,
                                     UnitId = sur.UnitId,
-                                    //UnitName = u.UnitNameEn,
+                                    UnitName = u.UnitNameEn,
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
+                                    FinalExchangeRate = sur.FinalExchangeRate,
                                     NetAmount = sur.NetAmount,
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total,
                                     AmountVnd = sur.AmountVnd,
                                     VatAmountVnd = sur.VatAmountVnd,
+                                    TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
                                     AmountUSD = sur.AmountUsd,
                                     VatAmountUSD = sur.VatAmountUsd,
                                     PayerId = sur.PayerId,
@@ -1292,7 +1298,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     AdvanceNo = advGrp.AdvanceNo,
-                                    CustomNo = cl.ClearanceNo ?? string.Empty
+                                    CustomNo = cl.ClearanceNo ?? string.Empty,
+                                    PICName = user.Username
                                 };
 
             if (criteria.customNos != null)
@@ -1303,8 +1310,8 @@ namespace eFMS.API.Accounting.DL.Services
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
                                from cc in cc2.DefaultIfEmpty()
-                                   //join u in unit on sur.UnitId equals u.Id into u2
-                                   //from u in u2.DefaultIfEmpty()
+                               join u in unit on sur.UnitId equals u.Id into u2
+                               from u in u2.DefaultIfEmpty()
                                join par in payer on sur.PayerId equals par.Id into par2
                                from par in par2.DefaultIfEmpty()
                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
@@ -1313,6 +1320,8 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id
                                join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
                                from advGrp in advGrps.DefaultIfEmpty()
+                               join user in userRepo on cst.UserCreated equals user.Id into sysUser
+                               from user in sysUser.DefaultIfEmpty()
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1321,20 +1330,22 @@ namespace eFMS.API.Accounting.DL.Services
                                    HBL = cstd.Hwbno,
                                    Hblid = sur.Hblid,
                                    Type = sur.Type,
-                                   SettlementCode = sur.SettlementCode,
+                                   //SettlementCode = sur.SettlementCode,
                                    ChargeId = sur.ChargeId,
                                    ChargeCode = cc.Code,
                                    ChargeName = cc.ChargeNameEn,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
-                                   //UnitName = u.UnitNameEn,
+                                   UnitName = u.UnitNameEn,
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
+                                   FinalExchangeRate = sur.FinalExchangeRate,
                                    NetAmount = sur.NetAmount,
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total,
                                    AmountVnd = sur.AmountVnd,
                                    VatAmountVnd = sur.VatAmountVnd,
+                                   TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
                                    AmountUSD = sur.AmountUsd,
                                    VatAmountUSD = sur.VatAmountUsd,
                                    PayerId = sur.PayerId,
@@ -1348,7 +1359,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    ContNo = sur.ContNo,
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
-                                   AdvanceNo = advGrp.AdvanceNo
+                                   AdvanceNo = advGrp.AdvanceNo,
+                                   PICName = user.Username
                                };
 
             var data = dataDocument.Union(dataOperation);
@@ -1490,10 +1502,15 @@ namespace eFMS.API.Accounting.DL.Services
                                 var chargeSettlementCurrentToAddCsShipmentSurcharge = model.ShipmentCharge.First(x => x.Id == charge.Id);
                                 if (chargeSettlementCurrentToAddCsShipmentSurcharge != null)
                                 {
+                                    var exchangeRate = chargeSettlementCurrentToAddCsShipmentSurcharge.FinalExchangeRate;
                                     charge.Notes = chargeSettlementCurrentToAddCsShipmentSurcharge.Notes;
                                     charge.SeriesNo = chargeSettlementCurrentToAddCsShipmentSurcharge.SeriesNo;
                                     charge.InvoiceNo = chargeSettlementCurrentToAddCsShipmentSurcharge.InvoiceNo;
                                     charge.InvoiceDate = chargeSettlementCurrentToAddCsShipmentSurcharge.InvoiceDate;
+                                    charge.FinalExchangeRate = charge.FinalExchangeRate == exchangeRate ? charge.FinalExchangeRate
+                                                                                                        : (charge.Type == AccountingConstants.TYPE_CHARGE_BUY && charge.KickBack == true) ? kickBackExcRate : exchangeRate;
+                                    charge.AmountVnd = chargeSettlementCurrentToAddCsShipmentSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                    charge.VatAmountVnd = chargeSettlementCurrentToAddCsShipmentSurcharge.VatAmountVnd; //Tiền thuế (Local)
                                 }
 
                                 charge.SettlementCode = settlement.SettlementNo;
@@ -1672,10 +1689,15 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phí Chứng từ cho phép cập nhật lại số HD, Ngày HD, Số SerieNo, Note.
                                 var chargeSettlementCurrentToUpdateCsShipmentSurcharge = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true && x.Id == charge.Id)?.FirstOrDefault();
+                                var exchangeRate = chargeSettlementCurrentToUpdateCsShipmentSurcharge.FinalExchangeRate;
                                 charge.Notes = chargeSettlementCurrentToUpdateCsShipmentSurcharge.Notes;
                                 charge.SeriesNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.SeriesNo;
                                 charge.InvoiceNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceNo;
                                 charge.InvoiceDate = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceDate;
+                                charge.FinalExchangeRate = charge.FinalExchangeRate == exchangeRate ? charge.FinalExchangeRate
+                                                                                                        : (charge.Type == AccountingConstants.TYPE_CHARGE_BUY && charge.KickBack == true) ? kickBackExcRate : exchangeRate;
+                                charge.AmountVnd = chargeSettlementCurrentToUpdateCsShipmentSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                charge.VatAmountVnd = chargeSettlementCurrentToUpdateCsShipmentSurcharge.VatAmountVnd; //Tiền thuế (Local)
 
                                 charge.SettlementCode = settlement.SettlementNo;
                                 charge.UserModified = userCurrent;
