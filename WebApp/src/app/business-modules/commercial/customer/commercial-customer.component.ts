@@ -17,6 +17,9 @@ import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { SearchList } from './store/actions/customer.action';
 import { ICustomerState, getCustomerSearchParamsState } from './store';
+import { Observable } from 'rxjs';
+import { getMenuUserSpecialPermissionState } from '@store';
+import { FormContractCommercialPopupComponent } from '../../share-modules/components';
 
 
 @Component({
@@ -28,6 +31,9 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
+    @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+
+    menuSpecialPermission: Observable<any[]>;
 
     customers: Customer[] = [];
     saleMans: Contract[] = [];
@@ -59,6 +65,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
 
     ngOnInit(): void {
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getCustomerSearchParamsState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -135,6 +142,56 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.requestList();
     }
 
+    onCustomerRequest() {
+        this.formContractPopup.formGroup.patchValue({
+            officeId: [this.formContractPopup.offices[0]],
+            contractNo: null,
+            effectiveDate: null,
+            expiredDate: null,
+            paymentTerm: null,
+            creditLimit: null,
+            creditLimitRate: null,
+            trialCreditLimit: null,
+            trialCreditDays: null,
+            trialEffectDate: null,
+            trialExpiredDate: null,
+            creditAmount: null,
+            billingAmount: null,
+            paidAmount: null,
+            unpaidAmount: null,
+            customerAmount: null,
+            creditRate: null,
+            description: null,
+            vas: null,
+            saleService: null,
+        });
+        this.formContractPopup.files = null;
+        this.formContractPopup.fileList = null;
+        this.formContractPopup.isUpdate = false;
+        this.formContractPopup.isSubmitted = false;
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this.formContractPopup.salesmanId.setValue(userLogged.id);
+        this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
+        this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+
+        this.formContractPopup.contractType.setValue('Trial');
+        this.formContractPopup.currencyId.setValue('VND');
+        this.formContractPopup.baseOn.setValue('Invoice Date');
+
+        this.formContractPopup.trialEffectDate.setValue(null);
+        this.formContractPopup.trialExpiredDate.setValue(null);
+        this.formContractPopup.effectiveDate.setValue(null);
+        this.formContractPopup.isCustomerRequest = true;
+        this.formContractPopup.show();
+        this.formContractPopup.show();
+    }
+
+    onRequestContract($event: boolean) {
+        const success = $event;
+        if (success === true) {
+            this.requestList();
+        }
+    }
     ngAfterViewInit() {
         if (Object.keys(this.dataSearchs).length > 0) {
             this.searchOptionsComponent.searchObject.searchString = this.dataSearchs.keyword;

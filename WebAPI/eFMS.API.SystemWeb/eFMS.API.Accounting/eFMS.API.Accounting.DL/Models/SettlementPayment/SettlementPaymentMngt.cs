@@ -21,6 +21,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
     public class ChargeSettlementPaymentMngt
     {
         public string SettlementNo { get; set; }
+        public string AdvanceNo { get; set; }
         public string ChargeName { get; set; }
         public decimal TotalAmount { get; set; }
         public string SettlementCurrency { get; set; }

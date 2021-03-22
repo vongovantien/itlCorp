@@ -328,6 +328,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (advancePayments == null) return null;
             var requestAdvances = acctAdvanceRequestRepo.Get();
             var users = sysUserRepo.Get();
+            IQueryable<CatPartner> partners =  catPartnerRepo.Get();
 
             var data = from advancePayment in advancePayments
                        join user in users on advancePayment.Requester equals user.Id into user2
@@ -338,6 +339,8 @@ namespace eFMS.API.Accounting.DL.Services
                        from Umgrp in UmGrps.DefaultIfEmpty()
                        join requestAdvance in requestAdvances on advancePayment.AdvanceNo equals requestAdvance.AdvanceNo into requestAdvances2
                        from requestAdvance in requestAdvances2.DefaultIfEmpty()
+                       join partner in partners on advancePayment.Payee equals partner.Id into payeeGrps
+                       from payeeGrp in payeeGrps.DefaultIfEmpty()
                        select new AcctAdvancePaymentResult
                        {
                            Id = advancePayment.Id,
@@ -361,7 +364,8 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = advancePayment.SyncStatus,
                            UserCreatedName = Ucgrp.Username,
                            UserModifiedName = Umgrp.Username,
-                           ReasonReject = advancePayment.ReasonReject
+                           ReasonReject = advancePayment.ReasonReject,
+                           PayeeName = payeeGrp.ShortName
                        };
 
             //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
@@ -387,7 +391,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.SyncStatus,
                 x.UserCreatedName,
                 x.UserModifiedName,
-                x.ReasonReject
+                x.ReasonReject,
+                x.PayeeName
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -414,7 +419,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SyncStatus = s.Key.SyncStatus,
                 UserCreatedName = s.Key.UserCreatedName,
                 UserModifiedName = s.Key.UserModifiedName,
-                ReasonReject = s.Key.ReasonReject
+                ReasonReject = s.Key.ReasonReject,
+                PayeeName = s.Key.PayeeName
             });
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
@@ -597,6 +603,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel.UserNameCreated = sysUserRepo.Get(x => x.Id == advance.UserCreated).FirstOrDefault()?.Username;
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
             advanceModel.RequesterName = sysUserRepo.Get(x => x.Id == advance.Requester).FirstOrDefault()?.Username;
+            advanceModel.PayeeName = catPartnerRepo.Get(x => x.Id == advance.Payee).FirstOrDefault()?.ShortName;
 
             var advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
 

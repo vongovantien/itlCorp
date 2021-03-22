@@ -312,7 +312,11 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        if (this.CdNoteDetail.cdNote.type !== 'CREDIT') {
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                        } else {
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        }
                         this.validateSyncedPopup.show();
                     } else {
                         if (this.CdNoteDetail.cdNote.type === 'CREDIT' && this.CdNoteDetail.creditPayment === 'Direct') {

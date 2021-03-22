@@ -1933,7 +1933,7 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             ClearCache();
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            var data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
+            IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             if (!string.IsNullOrEmpty(criteria.Id))
@@ -1941,7 +1941,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 data = data.Where(x => x.ParentId != criteria.Id);
             }
             if (data == null) return null;
-            var results = data.Select(x => new CatPartnerViewModel
+
+            IQueryable<CatPartnerViewModel> results = data.Select(x => new CatPartnerViewModel
             {
                 Id = x.Id,
                 PartnerGroup = x.PartnerGroup,
@@ -1956,10 +1957,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 CoLoaderCode = x.CoLoaderCode,
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
-                AccountNo = x.AccountNo
-            }).ToList();
-            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
-            return results.AsQueryable();
+                AccountNo = x.AccountNo,
+                BankAccountNo = x.BankAccountNo,
+                BankAccountName = x.BankAccountName,
+                TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName,
+                
+            });
+
+            return results;
         }
 
         /// <summary>

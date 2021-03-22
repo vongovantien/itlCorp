@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { Router, ActivatedRoute, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -61,7 +61,6 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
         private _ngProgressService: NgProgress
-
     ) {
         super(_toastService, _documenRepo, _router, _actionStoreSubject, _cd);
 
@@ -235,6 +234,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                 break;
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
         }
     }
