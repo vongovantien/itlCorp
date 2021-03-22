@@ -204,13 +204,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="JobId"></param>
         /// <param name="MBL"></param>
         /// <param name="HBL"></param>
+        /// <param name="requester"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetPaymentManagementByShipment")]
-        public IActionResult GetPaymentManagementByShipment(string JobId, string MBL, string HBL)
+        public IActionResult GetPaymentManagementByShipment(string JobId, string MBL, string HBL, string requester)
         {
-            var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL);
-            var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL);
+            var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL, requester);
+            var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL, requester);
 
             //Lấy ra list các currency của cả 2 (không trùng currency)
             List<string> currencies = new List<string>();
