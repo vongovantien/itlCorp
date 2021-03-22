@@ -57,15 +57,11 @@
                                 </div>
                                 <div class="file-item__name m--margin-left-20">
                                     <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
-                                    <ng-container *ngIf="(isLocked | async) === false">
-                                        <ng-container *ngIf="(permissionShipments | async)?.allowUpdate">
-                                            <span class="pointer text-center">
-                                                <a title="Delete" (click)="deleteFile(file)">
-                                                    <i class="la la-times fa-lg text-danger"></i>
-                                                </a>
-                                            </span>
-                                        </ng-container>
-                                    </ng-container>
+                                    <span class="pointer text-center">
+                                        <a title="Delete" (click)="deleteFile(file)">
+                                            <i class="la la-times fa-lg text-danger"></i>
+                                        </a>
+                                    </span>
                                 </div>
                             </div>
                             <div class="text-right">

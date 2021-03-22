@@ -815,6 +815,10 @@ export class AccountingRepo {
     denySettlePayments(Ids: string[]) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
     }
+
+    uploadFileSettlement(id: string, files: FileList[]) {
+        return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/${id}/UploadFiles`, files, 'files');
+    }
 }
 
 

@@ -28,7 +28,8 @@
                         </div>
                     </tab>
                     <tab heading="Attach files">
-                        <settlement-attach-file-list></settlement-attach-file-list>
+                        <settlement-attach-file-list [Id]="settlementPayment?.settlement?.id">
+                        </settlement-attach-file-list>
                     </tab>
                 </tabset>
 
