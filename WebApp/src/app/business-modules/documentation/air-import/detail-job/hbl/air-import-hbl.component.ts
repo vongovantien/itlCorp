@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -72,6 +72,9 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
             case 'files':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
+                break;
         }
     }
 
@@ -80,4 +83,5 @@ export class AirImportHBLComponent extends AppShareHBLBase implements OnInit {
             queryParams: Object.assign({}, { tab: 'SHIPMENT' }, { action: 'copy' })
         });
     }
+
 }

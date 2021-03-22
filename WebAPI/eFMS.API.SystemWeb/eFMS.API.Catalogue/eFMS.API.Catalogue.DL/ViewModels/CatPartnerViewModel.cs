@@ -33,5 +33,7 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string PartnerType { get; set; }
         public string CountryShippingName { get; set; }
         public string TaxCodeAbbrName { get; set; }
+        public string BankAccountNo { get; set; }
+        public string BankAccountName { get; set; }
     }
 }

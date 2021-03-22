@@ -9,6 +9,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { AppShareHBLBase, IShareBussinessState } from '@share-bussiness';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { RoutingConstants } from '@constants';
 
 
 @Component({
@@ -40,6 +41,9 @@ export class SeaFCLImportHBLComponent extends AppShareHBLBase {
                 break;
             case 'assignment':
                 this._router.navigate([`home/documentation/sea-fcl-import/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
         }
     }

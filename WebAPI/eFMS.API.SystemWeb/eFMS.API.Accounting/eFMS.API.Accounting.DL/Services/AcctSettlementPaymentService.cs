@@ -954,19 +954,20 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
 
         #region --- PAYMENT MANAGEMENT ---
-        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl)
+        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester)
         {
             var advance = acctAdvancePaymentRepo.Get();
             var request = acctAdvanceRequestRepo.Get();
-            //Chỉ lấy những advance có status là Done
+            //Chỉ lấy những advance có status là Done => update sprint22: lấy tất cả
             var data = from req in request
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
                        where
-                            ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                       && req.JobId == jobId
+                            //ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                       req.JobId == jobId
                        && req.Mbl == mbl
                        && req.Hbl == hbl
+                       && ad.Requester == requester
                        select new AdvancePaymentMngt
                        {
                            AdvanceNo = ad.AdvanceNo,
@@ -999,7 +1000,7 @@ namespace eFMS.API.Accounting.DL.Services
             return dataResult;
         }
 
-        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl)
+        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl, string requester)
         {
             var settlement = DataContext.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
@@ -1017,7 +1018,7 @@ namespace eFMS.API.Accounting.DL.Services
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
-            //Chỉ lấy ra những settlement có status là done     
+            // Chỉ lấy ra những settlement có status là done => update sprint22: lấy tất cả
             var dataOperation = from settle in settlement
                                 join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
                                 from sur in sur2.DefaultIfEmpty()
@@ -1025,10 +1026,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 where
-                                        settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                                     && opst.JobNo == jobId
+                                        //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                     opst.JobNo == jobId
                                      && opst.Hwbno == hbl
                                      && opst.Mblno == mbl
+                                     && settle.Requester == requester
                                 select new SettlementPaymentMngt
                                 {
                                     SettlementNo = settle.SettlementNo,
@@ -1046,10 +1048,11 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
-                                       settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                                    && cst.JobNo == jobId
+                                       //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                    cst.JobNo == jobId
                                     && cstd.Hwbno == hbl
                                     && cst.Mawb == mbl
+                                    && settle.Requester == requester
                                select new SettlementPaymentMngt
                                {
                                    SettlementNo = settle.SettlementNo,
@@ -1111,6 +1114,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 select new ChargeSettlementPaymentMngt
                                 {
                                     SettlementNo = settlementNo,
+                                    AdvanceNo = sur.AdvanceNo,
                                     ChargeName = cc.ChargeNameEn,
                                     TotalAmount = sur.Total,
                                     SettlementCurrency = sur.CurrencyId,
@@ -1136,6 +1140,7 @@ namespace eFMS.API.Accounting.DL.Services
                                select new ChargeSettlementPaymentMngt
                                {
                                    SettlementNo = settlementNo,
+                                   AdvanceNo = sur.AdvanceNo,
                                    ChargeName = cc.ChargeNameEn,
                                    TotalAmount = sur.Total,
                                    SettlementCurrency = sur.CurrencyId,
