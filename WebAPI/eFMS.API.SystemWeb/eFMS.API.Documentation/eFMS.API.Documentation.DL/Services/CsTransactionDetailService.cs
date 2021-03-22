@@ -164,7 +164,8 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 try
                 {
-                    var hs = Add(model);
+                    var houseBill = mapper.Map<CsTransactionDetail>(model);
+                    var hs = DataContext.Add(houseBill);
                     if (hs.Success)
                     {
                         if (model.CsMawbcontainers != null)
@@ -232,64 +233,66 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
         {
+            var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
+            if (hb == null)
+            {
+                return new HandleState("Housebill not found !");
+            }
+            model.GroupId = hb.GroupId;
+            model.DepartmentId = hb.DepartmentId;
+            model.OfficeId = hb.OfficeId;
+            model.CompanyId = hb.CompanyId;
+            model.UserCreated = hb.UserCreated;
+            model.UserModified = currentUser.UserID;
+            if (model.SaleManId != hb.SaleManId)
+            {
+                var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
+                if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
+                {
+                    var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
+                    if (dataGroup.Any())
+                    {
+                        model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
+                        model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
+                        model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
+                        model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
+                    }
+                    else
+                    {
+                        model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
+                        model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
+                        model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
+                        model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
+                    }
+                }
+            }
+            else
+            {
+                model.SalesGroupId = hb.SalesGroupId;
+                model.SalesDepartmentId = hb.SalesDepartmentId;
+                model.SalesOfficeId = hb.SalesOfficeId;
+                model.SalesCompanyId = hb.SalesCompanyId;
+            }
+
+            ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
+            var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
+            int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
+            if (code == 403) return new HandleState(403, "");
+            model.DatetimeModified = DateTime.Now;
+            model.Active = true;
+            model.DatetimeCreated = hb.DatetimeCreated;
+            model.FlexId = hb.FlexId;
+            model.FlightNoRowTwo = hb.FlightNoRowTwo;
+            model.ContactPerson = hb.ContactPerson;
+            model.ClosingTime = hb.ClosingTime;
+            model.ManifestRefNo = hb.ManifestRefNo;
+
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
-                    if (hb == null)
-                    {
-                        return new HandleState("Housebill not found !");
-                    }
-                    model.GroupId = hb.GroupId;
-                    model.DepartmentId = hb.DepartmentId;
-                    model.OfficeId = hb.OfficeId;
-                    model.CompanyId = hb.CompanyId;
-                    model.UserCreated = hb.UserCreated;
-                    model.UserModified = currentUser.UserID;
-                    if(model.SaleManId != hb.SaleManId)
-                    {
-                        var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
-                        if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
-                        {
-                            var dataGroup = dataUserLevels.Where(x => x.OfficeId == currentUser.OfficeID).ToList();
-                            if (dataGroup.Any())
-                            {
-                                model.SalesGroupId = String.Join(";", dataGroup.Select(t => t.GroupId).Distinct());
-                                model.SalesDepartmentId = String.Join(";", dataGroup.Select(t => t.DepartmentId).Distinct());
-                                model.SalesOfficeId = String.Join(";", dataGroup.Select(t => t.OfficeId).Distinct());
-                                model.SalesCompanyId = String.Join(";", dataGroup.Select(t => t.CompanyId).Distinct());
-                            }
-                            else
-                            {
-                                model.SalesGroupId = String.Join(";", dataUserLevels.Select(t => t.GroupId).Distinct());
-                                model.SalesDepartmentId = String.Join(";", dataUserLevels.Select(t => t.DepartmentId).Distinct());
-                                model.SalesOfficeId = String.Join(";", dataUserLevels.Select(t => t.OfficeId).Distinct());
-                                model.SalesCompanyId = String.Join(";", dataUserLevels.Select(t => t.CompanyId).Distinct());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        model.SalesGroupId = hb.SalesGroupId;
-                        model.SalesDepartmentId = hb.SalesDepartmentId;
-                        model.SalesOfficeId = hb.SalesOfficeId;
-                        model.SalesCompanyId = hb.SalesCompanyId;
-                    }
-
-                    ICurrentUser _currentUser = PermissionEx.GetUserMenuPermissionTransaction(model.TransactionType, currentUser);
-                    var permissionRange = PermissionExtention.GetPermissionRange(_currentUser.UserMenuPermission.Write);
-                    int code = GetPermissionToUpdate(new ModelUpdate { SaleManId = model.SaleManId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange, model.TransactionType);
-                    if (code == 403) return new HandleState(403, "");
-                    model.DatetimeModified = DateTime.Now;
-                    model.Active = true;
-                    model.DatetimeCreated = hb.DatetimeCreated;
-                    model.FlexId = hb.FlexId;
-                    model.FlightNoRowTwo = hb.FlightNoRowTwo;
-                    model.ContactPerson = hb.ContactPerson;
-                    model.ClosingTime = hb.ClosingTime;
-                    model.ManifestRefNo = hb.ManifestRefNo;
-                    var isUpdateDone = Update(model, x => x.Id == hb.Id);
+                    var houseBill = mapper.Map<CsTransactionDetail>(model);
+                    var isUpdateDone = DataContext.Update(houseBill, x => x.Id == hb.Id);
                     if (isUpdateDone.Success)
                     {
                         if (model.CsMawbcontainers != null)

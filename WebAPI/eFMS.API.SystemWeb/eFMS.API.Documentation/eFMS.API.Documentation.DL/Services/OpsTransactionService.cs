@@ -1252,7 +1252,9 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                var hs = Update(model, x => x.Id == model.Id);
+
+                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)
                 {
                     if (model.CsMawbcontainers != null)
