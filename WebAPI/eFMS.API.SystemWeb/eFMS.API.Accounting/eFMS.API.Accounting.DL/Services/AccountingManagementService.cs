@@ -407,7 +407,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          AcctManagementId = sur.AcctManagementId,
                                          RequesterId = null,
                                          ChargeType = sur.Type,
-                                         IsFromShipment = sur.IsFromShipment                                         
+                                         IsFromShipment = sur.IsFromShipment,
+                                         IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -459,7 +460,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              AcctManagementId = sur.AcctManagementId,
                                              RequesterId = null,
                                              ChargeType = sur.Type,
-                                             IsFromShipment = sur.IsFromShipment
+                                             IsFromShipment = sur.IsFromShipment,
+                                             IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -469,8 +471,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<PartnerOfAcctManagementResult> GetChargeSellForInvoiceByCriteria(PartnerOfAcctManagementCriteria criteria)
         {
-            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher
-            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null);
+            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher và chưa được Sync
+            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null) && chg.IsSynced == false;
 
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
@@ -2295,6 +2297,22 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return payeeId;
+        }
+
+        /// <summary>
+        /// Check tồn tại phí Debit đã sync
+        /// </summary>
+        /// <param name="charges">List charge issue Vat Invoice</param>
+        /// <returns></returns>
+        public bool CheckExistDebitChargeSynced(List<ChargeOfAccountingManagementModel> charges)
+        {
+            var result = false;
+            if (charges.Count > 0)
+            {
+                var chargeIds = charges.Select(s => s.SurchargeId);
+                result = surchargeRepo.Get(x => chargeIds.Any(a => a == x.Id) && !string.IsNullOrEmpty(x.SyncedFrom) && x.Type != AccountingConstants.TYPE_CHARGE_BUY).Any();
+            }
+            return result;
         }
     }
 }

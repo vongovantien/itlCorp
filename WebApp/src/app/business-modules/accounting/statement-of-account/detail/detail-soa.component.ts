@@ -303,7 +303,11 @@ export class StatementOfAccountDetailComponent extends AppList {
             ).subscribe(
                 (res: any) => {
                     if (res) {
-                        this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        if (this.soa.type !== 'Credit') {
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system or the charge has issue VAT invoices on eFMS! Please you check again!";
+                        } else {
+                            this.messageValidate = "Existing charge has been synchronized to the accounting system! Please you check again!";
+                        }
                         this.validateSyncedPopup.show();
                     } else {
                         this.confirmType = "SYNC";
