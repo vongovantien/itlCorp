@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
@@ -19,7 +18,7 @@ import { forkJoin, merge } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 
-import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, mergeMap, takeUntil } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 
@@ -44,7 +43,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     activeTab: string = 'hawb';
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -55,7 +53,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         protected _dataService: DataService
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -202,7 +199,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     createHbl(houseBill: HouseBill) {
         if (this.formCreateHBLComponent.formCreate.valid) {
-            this._progressRef.start();
             this._documentationRepo.createHousebill(houseBill)
                 .pipe(
                     mergeMap((res: any) => {
@@ -229,7 +225,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         return forkJoin([arrival, delivery, proof]);
                     }),
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
                 ).subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');

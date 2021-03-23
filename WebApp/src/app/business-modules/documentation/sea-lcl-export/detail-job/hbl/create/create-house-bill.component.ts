@@ -135,19 +135,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         }
 
         const modelAdd = this.getDataForm();
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelAdd.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelAdd.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-        //     } else {
 
-        //     }
-        // });
         this.createHbl(modelAdd);
 
     }
@@ -290,7 +278,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     updateInwordField(containers: Container[]) {
-        console.log(containers);
         if (!containers.length) {
             return null;
         }

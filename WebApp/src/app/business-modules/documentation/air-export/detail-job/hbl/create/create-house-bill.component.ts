@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -24,9 +23,9 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirExportHBLFormCreateComponent } from '../components/form-create-house-bill-air-export/form-create-house-bill-air-export.component';
 
 import _merge from 'lodash/merge';
-import { catchError, finalize, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
+import { catchError, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
-import { forkJoin, merge, of } from 'rxjs';
+import { forkJoin, merge } from 'rxjs';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 @Component({
@@ -47,7 +46,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     isImport: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -58,7 +56,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -137,19 +134,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                         } else {
                             const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);
-                            // this._catalogueRepo.getSalemanIdByPartnerId(houseBill.customerId, this.jobId).subscribe((res: any) => {
-                            //     if (!!res.salemanId) {
-                            //         if (res.salemanId !== houseBill.saleManId) {
-                            //             this._toastService.error('Not found contract information, please check!');
-                            //             return;
-                            //         }
-                            //     }
-                            //     if (!!res.officeNameAbbr) {
-                            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-                            //     } else {
 
-                            //     }
-                            // });
                             this.createHbl(houseBill);
 
                         }
@@ -232,7 +217,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     }
                 }),
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             ).subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

@@ -59,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         private readonly IContextBase<CatContract> catContractRepository;
+        private readonly IContextBase<CsTransaction> transactionRepository;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -85,7 +86,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctSettlementPayment> _acctSettlementPayment,
             IContextBase<OpsTransaction> _opsTransactionRepository,
             IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
-            IContextBase<CatContract> catContractRepo
+            IContextBase<CatContract> catContractRepo,
+            IContextBase<CsTransaction> transactionRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -117,6 +119,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransactionRepository = _opsTransactionRepository;
             accAdvancePaymentRepository = _accAdvancePaymentRepository;
             catContractRepository = catContractRepo;
+            transactionRepository = transactionRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -1252,7 +1255,9 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                var hs = Update(model, x => x.Id == model.Id);
+
+                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)
                 {
                     if (model.CsMawbcontainers != null)
@@ -1663,6 +1668,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                     item.ClearanceNo = null;
                     item.AdvanceNo = null;
+                    item.PayerAcctManagementId = null;
+                    item.VoucherIdre = null;
+                    item.VoucherIdredate = null;
 
                     item.JobNo = shipment.JobNo;
                     item.Hblno = shipment.Hwbno;
@@ -1701,16 +1709,17 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<OpsAdvanceSettlementModel> results = new List<OpsAdvanceSettlementModel>();
 
-            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get();
-            IQueryable<AcctSettlementPayment> settlements = acctSettlementPayment.Get();
+            //IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get();
+            //IQueryable<AcctSettlementPayment> settlements = acctSettlementPayment.Get();
             IQueryable<SysUser> users = userRepository.Get();
 
             OpsTransaction opsJob = DataContext.Get(x => x.Id == JobID)?.FirstOrDefault();
-            if(opsJob == null)
+            CsTransaction csJob = transactionRepository.Get(x => x.Id == JobID)?.FirstOrDefault();
+
+            if (opsJob == null && csJob == null)
             {
                 return results;
             }
-
             //var querySettle = from sur in surcharges
             //            join s in settlements on sur.SettlementCode equals s.SettlementNo
             //            join u in users on s.Requester equals u.Id
@@ -1793,8 +1802,8 @@ namespace eFMS.API.Documentation.DL.Services
             //        RequesterAdvance = x.Requester,
             //    }).ToList();
             //}
-
-            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(opsJob.JobNo);
+            string jobNo = opsJob == null ? csJob.JobNo : opsJob.JobNo;
+            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(jobNo);
             if(dta.Count > 0)
             {
                 results = dta.Select(s => new OpsAdvanceSettlementModel

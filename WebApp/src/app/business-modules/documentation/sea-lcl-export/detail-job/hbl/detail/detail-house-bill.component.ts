@@ -12,7 +12,7 @@ import { ICrystalReport } from '@interfaces';
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, skip, takeUntil, tap } from 'rxjs/operators';
+import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
 import { formatDate } from '@angular/common';
@@ -120,18 +120,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         modelUpdate.id = this.hblId;
         modelUpdate.jobId = this.jobId;
         modelUpdate.userCreated = this.hblDetail.userCreated;
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelUpdate.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-        //     } else {
-        //     }
-        // });
+
         this.updateHbl(modelUpdate);
 
     }
@@ -169,7 +158,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -187,7 +175,6 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {

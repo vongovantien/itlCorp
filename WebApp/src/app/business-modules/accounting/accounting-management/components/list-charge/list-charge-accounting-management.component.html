@@ -75,7 +75,8 @@
                             <td>{{charge.currency}}</td>
                             <td>
                                 <input type="text" class="form-control" [(ngModel)]="charge.exchangeRate"
-                                    autoFormatCurrency numeric (ngModelChange)="onChangeExcRate($event,charge)">
+                                    autoFormatCurrency numeric (ngModelChange)="onChangeExcRate($event,charge)"
+                                    [attr.disabled]="charge.chargeType === 'OBH' && type === 'voucher'">
                             </td>
                             <ng-container *ngIf="type === 'invoice'">
                                 <td>
@@ -93,7 +94,8 @@
                                         [title]="charge.isValidAmount === false ? titleErrorRangeAmount: ''"
                                         [ngClass]="{'m-form__group has-danger': charge.isValidAmount === false}">
                                         <input type="text" class="form-control" [(ngModel)]="charge.amountVnd"
-                                            autoFormatCurrency numeric>
+                                            autoFormatCurrency numeric
+                                            [attr.disabled]="charge.chargeType === 'OBH' ? '' : null">
                                     </div>
                                 </td>
                                 <td class="m-form--state m-form">
@@ -101,7 +103,8 @@
                                         [title]="charge.isValidVatAmount === false ? titleErrorRangeAmount: ''"
                                         [ngClass]="{'m-form__group has-danger': charge.isValidVatAmount === false}">
                                         <input type="text" class="form-control" [(ngModel)]="charge.vatAmountVnd"
-                                            autoFormatCurrency numeric>
+                                            autoFormatCurrency numeric
+                                            [attr.disabled]="charge.chargeType === 'OBH' ? '' : null">
                                     </div>
                                 </td>
                                 <td>

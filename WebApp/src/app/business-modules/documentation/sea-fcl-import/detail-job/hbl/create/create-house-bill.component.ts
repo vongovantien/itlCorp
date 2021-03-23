@@ -1,5 +1,4 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
@@ -27,7 +26,6 @@ import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/bu
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
-import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
@@ -58,7 +56,6 @@ export class CreateHouseBillComponent extends AppForm {
     selectedTab: string = HBL_TAB.DETAIL;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -71,7 +68,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
             .pipe(
@@ -213,7 +209,6 @@ export class CreateHouseBillComponent extends AppForm {
                     }),
 
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
                     if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
