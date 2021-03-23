@@ -1,3 +1,4 @@
+import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { ReportPreviewComponent } from '@common';
@@ -10,6 +11,7 @@ import { ReportPreviewComponent } from '@common';
 
 export class SettlementShipmentItemComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
 
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
@@ -73,6 +75,10 @@ export class SettlementShipmentItemComponent extends AppList {
             return;
         }
         this.onPrintPlUSD.emit(this.data);
+    }
+
+    showShipmentAttachFile() {
+        this.shipmentAttachFilePopup.show();
     }
 
 }
