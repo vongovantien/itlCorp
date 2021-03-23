@@ -1,12 +1,13 @@
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { AppForm } from '@app';
 import { AccountingRepo } from '@repositories';
 import { SysImage } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'settlement-attach-file-list',
@@ -17,8 +18,16 @@ import { ConfirmPopupComponent } from '@common';
 export class SettlementAttachFileListComponent extends AppForm implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
     @Output() onChange: EventEmitter<SysImage[]> = new EventEmitter<SysImage[]>();
+    @Input() set readOnly(val: any) {
+        this._readonly = coerceBooleanProperty(val);
+    }
 
-    _id: string;
+    get readonly(): boolean {
+        return this._readonly;
+    }
+
+    private _readonly: boolean = false;
+    private _id: string;
 
     files: SysImage[] = [];
     selectedFile: SysImage;
@@ -53,6 +62,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     chooseFile(_$event: any) {
+        if (this._readonly) {
+            return;
+        }
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0 && !!this._id) {
             this._accountingRepo.uploadAttachedFiles('Settlement', this._id, fileList)
@@ -68,6 +80,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     deleteFile(_file: SysImage) {
+        if (this._readonly) {
+            return;
+        }
         this.selectedFile = _file;
         this.showPopupDynamicRender<ConfirmPopupComponent>(
             ConfirmPopupComponent,
