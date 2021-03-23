@@ -551,6 +551,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             this.departmentActive = [];
         }
 
+        this.departmentList.forEach(dept => {
+            this.groupsInit.push({ departmentId: dept.id, groupId: 11, groupAbbrName: 'Manager' });
+        });
         this.getGroup(this.groupsInit);
     }
 
