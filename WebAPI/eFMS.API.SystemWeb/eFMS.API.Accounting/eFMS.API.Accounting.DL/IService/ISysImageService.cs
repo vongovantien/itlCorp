@@ -23,5 +23,6 @@ namespace eFMS.API.Accounting.DL.IService
         public List<IFormFile> Files { get; set; }
         public string FolderName { get; set; }
         public Guid Id { get; set; }
+        public string Child { get; set; }
     }
 }

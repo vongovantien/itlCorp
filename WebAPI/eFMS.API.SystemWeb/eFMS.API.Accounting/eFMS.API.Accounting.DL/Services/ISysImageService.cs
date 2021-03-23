@@ -64,8 +64,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         private async Task<HandleState> WriteFile(FileUploadModel model)
         {
-            // string path = this.webUrl.Value.Url; // Local
-            string path = this.webUrl.Value.Url + "/Accounting"; // Server
+            string path = this.webUrl.Value.Url; // Local
+            //string path = this.webUrl.Value.Url + "/Accounting"; // Server
             try
             {
                 List<SysImage> list = new List<SysImage>();
@@ -96,7 +96,8 @@ namespace eFMS.API.Accounting.DL.Services
                         UserCreated = currentUser.UserName,
                         UserModified = currentUser.UserName,
                         DateTimeCreated = DateTime.Now,
-                        DatetimeModified = DateTime.Now
+                        DatetimeModified = DateTime.Now,
+                        ChildId = model.Child
                     };
                     list.Add(sysImage);
                 }

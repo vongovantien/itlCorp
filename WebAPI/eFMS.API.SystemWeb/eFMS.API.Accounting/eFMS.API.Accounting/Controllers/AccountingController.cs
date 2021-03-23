@@ -1169,13 +1169,15 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPut("UploadAttachedFiles/{folder}/{id}")]
         [Authorize]
-        public async Task<IActionResult> UploadFiles(List<IFormFile> files, Guid id, string folder)
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, Guid id, string folder, string child = null)
         {
             FileUploadModel model = new FileUploadModel
             {
                 Files = files,
                 FolderName = folder,
                 Id = id,
+                Child = child
+
             };
             HandleState hs = await sysFileService.UploadFiles(model);
             if (hs.Success)

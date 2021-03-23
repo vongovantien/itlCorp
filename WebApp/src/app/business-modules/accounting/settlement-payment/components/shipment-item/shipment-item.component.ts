@@ -78,15 +78,16 @@ export class SettlementShipmentItemComponent extends AppList {
     }
 
     showShipmentAttachFile($event: Event) {
-        console.log($event);
         $event.stopPropagation();
         $event.preventDefault();
+
+        this.shipmentAttachFilePopup.shipmentGroups = this.data;
         this.shipmentAttachFilePopup.show();
     }
 
 }
 
-interface ISettlementShipmentGroup {
+export interface ISettlementShipmentGroup {
     advanceAmount: number;
     advanceNo: string;
     balance: number;
