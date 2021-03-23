@@ -186,16 +186,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            // this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
-            //     if (!!res.salemanId) {
-            //         if (res.salemanId !== body.saleManId) {
-            //             this._toastService.error('Not found contract information, please check!');
-            //             return;
-            //         }
-            //     }
-            //     if (!!res.officeNameAbbr) {
-            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-            //     } else {
             this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
@@ -212,22 +202,26 @@ export class CreateHouseBillComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
+
                         this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
 
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
-
-                        return forkJoin([arrival, delivery]);
+                        return forkJoin([arrival, delivery, proof]);
                     }),
 
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
-            // }
-            // });
         }
     }
     onsubmitData() {

@@ -216,15 +216,26 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
                         this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        this.proofOfDeliveryComponent.saveProofOfDelivery();
-                        return forkJoin([arrival, delivery]);
+
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        return forkJoin([arrival, delivery, proof]);
                     }),
 
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
-                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${result.data}`]);
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
         }

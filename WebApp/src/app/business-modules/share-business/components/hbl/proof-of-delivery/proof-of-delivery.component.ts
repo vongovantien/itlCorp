@@ -66,7 +66,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
     saveProofOfDelivery() {
         this._progressRef.start();
         const deliveryDate = {
-            deliveryDate: !!this.proofOfDelievey.deliveryDate && !!this.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            deliveryDate: !!this.proofOfDelievey.deliveryDate && !!this.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDelievey.deliveryDate,
         };
         this.proofOfDelievey.hblid = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
         this._documentRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDelievey, deliveryDate))
@@ -75,7 +75,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        if (this.fileList.length !== 0 && Object.keys(this.files).length === 0) {
+                        if (this.fileList !== null && this.fileList.length !== 0 && Object.keys(this.files).length === 0) {
                             this.uploadFilePOD();
                         }
                     } else {
@@ -97,14 +97,15 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
     }
 
     uploadFilePOD() {
-        this._documentRepo.uploadFileProofOfDelivery(this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid, this.fileList)
+        const hblId = this.hblid !== SystemConstants.EMPTY_GUID ? this.hblid : this.proofOfDelievey.hblid;
+        this._documentRepo.uploadFileProofOfDelivery(hblId, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this.fileList = null;
                         this._toastService.success("Upload file successfully!");
-                        if (!!this.hblid) {
+                        if (!!hblId) {
                             this.getFilePOD();
                         }
                     }

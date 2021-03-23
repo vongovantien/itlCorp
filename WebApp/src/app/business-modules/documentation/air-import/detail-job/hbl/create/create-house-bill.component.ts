@@ -218,19 +218,24 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
-                        // const deliveryDate = {
-                        //     deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
-                        // };
-                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
-                        this.proofOfDeliveryComponent.saveProofOfDelivery();
 
-                        return forkJoin([arrival, delivery]);
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        return forkJoin([arrival, delivery, proof]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');
+                        if (res[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                            this.proofOfDeliveryComponent.uploadFilePOD();
+                        }
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
                 });

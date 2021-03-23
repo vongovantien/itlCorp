@@ -177,7 +177,7 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
         this._progressRef.start();
         const house = this.setProofOfDelivery(body);
         const deliveryDate = {
-            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate,
         };
         house.deliveryDate = deliveryDate;
         this._documentationRepo.updateHbl(Object.assign({}, house, deliveryDate))

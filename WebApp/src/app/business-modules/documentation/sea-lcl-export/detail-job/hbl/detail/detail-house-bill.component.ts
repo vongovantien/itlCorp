@@ -12,9 +12,10 @@ import { ICrystalReport } from '@interfaces';
 import { SeaLCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, skip, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-detail-hbl-lcl-export',
@@ -137,9 +138,20 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
 
     updateHbl(body: any) {
         body.transactionType = ChargeConstants.SLE_CODE;
-
-        this._documentationRepo.updateHbl(body)
-            .pipe(catchError(this.catchError))
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate,
+        };
+        body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        body.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
+            .pipe(
+                tap(() => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
+                catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {

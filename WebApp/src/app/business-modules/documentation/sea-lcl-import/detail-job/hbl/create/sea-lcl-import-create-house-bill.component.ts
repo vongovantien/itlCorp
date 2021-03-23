@@ -28,6 +28,7 @@ import { forkJoin } from 'rxjs';
 import * as fromShareBussiness from '../../../../../share-business/store';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -49,6 +50,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessArrivalNoteComponent) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent) deliveryComponent: ShareBusinessDeliveryOrderComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string = '';
     shipmentDetail: CsTransaction;
@@ -219,14 +221,21 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
-
-                        return forkJoin([arrival, delivery]);
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+                        return forkJoin([arrival, delivery, proof]);
                     }),
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 ).subscribe(result => {
                     this._toastService.success(result[0].message, '');
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
         }
