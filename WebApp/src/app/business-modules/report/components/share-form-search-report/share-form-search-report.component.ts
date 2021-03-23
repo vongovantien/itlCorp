@@ -683,7 +683,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.join(";") : null,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
@@ -710,7 +710,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.toString() : null,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.toString() : null,
             service: this.mapObject(this.serviceActive, this.serviceList),
             currency: this.typeReport.value === this.typeComReportList[1].id ? "VND" : "USD",
             jobId: this.mapShipment('JOBID'),
@@ -844,15 +844,18 @@ export class ShareFormSearchReportComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (group: any) => {
+                    //Add group 11 cho department hiện hành của User
+                    this.groupSpecial.push({ departmentId: this.userLogged.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                     if (!!group) {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
                         group.forEach(element => {
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                            //Add group 11 cho mỗi department trong list group
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                         });
-                        this.groupsInit = this.groupSpecial;
-                        this.getGroup(this.groupSpecial);
                     }
+                    this.groupsInit = this.groupSpecial;
+                    this.getGroup(this.groupSpecial);
                 },
             );
     }
