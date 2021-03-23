@@ -77,7 +77,10 @@ export class SettlementShipmentItemComponent extends AppList {
         this.onPrintPlUSD.emit(this.data);
     }
 
-    showShipmentAttachFile() {
+    showShipmentAttachFile($event: Event) {
+        console.log($event);
+        $event.stopPropagation();
+        $event.preventDefault();
         this.shipmentAttachFilePopup.show();
     }
 
