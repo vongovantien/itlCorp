@@ -148,16 +148,8 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             PermissionRange rangeSearch = 0;
+            rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
 
-
-            if (partnerType == "Customer" || partnerType == "Agent")
-            {
-                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            }
-            else
-            {
-                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            }
             switch (rangeSearch)
             {
                 case PermissionRange.None:
