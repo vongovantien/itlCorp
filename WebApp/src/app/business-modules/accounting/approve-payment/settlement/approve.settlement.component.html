@@ -3,34 +3,53 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <settle-payment-form-create>
-                    <ng-container
-                        *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
-                        <span
-                            class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
-                            {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus ===
-                            'Rejected' &&
-                            settlementPayment.settlement.reasonReject ? ' - ' +
-                            settlementPayment.settlement.reasonReject : ''}}
-                        </span>
-                    </ng-container>
-                </settle-payment-form-create>
-                <div class="row" *ngIf="!!settlementPayment">
-                    <div class="col-lg-6">
-                        <div class="m--align-left">
-                            Created: {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+                <tabset class="custom-class-tab">
+                    <tab heading="Settlement Info" [active]="true">
+                        <settle-payment-form-create>
+                            <ng-container
+                                *ngIf="!!settlementPayment && !!settlementPayment.settlement && settlementPayment.settlement.syncStatus">
+                                <span
+                                    class="m-badge m-badge--{{settlementPayment.settlement.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
+                                    {{settlementPayment.settlement.syncStatus}}{{settlementPayment.settlement.syncStatus
+                                    ===
+                                    'Rejected' &&
+                                    settlementPayment.settlement.reasonReject ? ' - ' +
+                                    settlementPayment.settlement.reasonReject : ''}}
+                                </span>
+                            </ng-container>
+                        </settle-payment-form-create>
+                        <div class="row" *ngIf="!!settlementPayment">
+                            <div class="col-lg-6">
+                                <div class="m--align-left">
+                                    Created:
+                                    {{settlementPayment.settlement.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp;
+                                    By <span
+                                        class="text-success">{{settlementPayment.settlement.userNameCreated}}</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="m--align-left">
+                                    Modified:
+                                    {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp;
+                                    By <span
+                                        class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="m--align-left">
-                            Modified: {{settlementPayment.settlement.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{settlementPayment.settlement.userNameModified}}</span>
-                        </div>
-                    </div>
-                </div>
+                    </tab>
+                    <tab>
+                        <ng-template tabHeading>
+                            <span class="m--margin-right-10">Attach files</span>
+                            <span class="badge badge-success"
+                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                        </ng-template>
+                        <settlement-attach-file-list (onChange)="attachFiles = $event" readOnly>
+                        </settlement-attach-file-list>
+                    </tab>
+                </tabset>
+
             </div>
         </div>
     </div>
@@ -148,16 +167,6 @@
     </div>
 </ng-template>
 
-<!-- <ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container> -->
-
 <ng-template inject></ng-template>
 
-
-<confirm-popup #confirmDenyPopup (onSubmit)="openModalDeny(modal_deny)"
-    [body]="'Do you want to deny this settlement payment ?'" [labelConfirm]="'Yes'"></confirm-popup>
-
-<confirm-popup #confirmApprovePopup (onSubmit)="onConfirmApprove()"
-    [body]="'Do you want to approve this settlement payment?'" [labelConfirm]="'Yes'"></confirm-popup>
 <history-denied-popup></history-denied-popup>
