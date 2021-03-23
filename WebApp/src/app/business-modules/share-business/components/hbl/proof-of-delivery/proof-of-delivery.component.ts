@@ -74,6 +74,7 @@ export class ShareBusinessProofOfDelieveyComponent extends AppForm {
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
+                        this._toastService.success(res.message);
                         if (this.fileList.length !== 0 && Object.keys(this.files).length === 0) {
                             this.uploadFilePOD();
                         }

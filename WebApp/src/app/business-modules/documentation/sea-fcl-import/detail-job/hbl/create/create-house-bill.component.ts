@@ -29,6 +29,7 @@ import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
 import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -49,6 +50,7 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string = '';
     selectedHbl: any = {}; // TODO model.
@@ -209,6 +211,9 @@ export class CreateHouseBillComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        this.proofOfDeliveryComponent.saveProofOfDelivery();
 
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
 

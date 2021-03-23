@@ -217,9 +217,6 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
                         this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
                         this.proofOfDeliveryComponent.saveProofOfDelivery();
-
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
-
                         return forkJoin([arrival, delivery]);
                     }),
 
@@ -227,6 +224,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
                     finalize(() => this._progressRef.complete())
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${result.data}`]);
                 }
                 );
         }

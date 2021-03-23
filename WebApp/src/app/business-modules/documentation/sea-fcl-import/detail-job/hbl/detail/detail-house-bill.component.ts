@@ -22,7 +22,8 @@ import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    DELIVERY = 'DELIVERY'
+    DELIVERY = 'DELIVERY',
+    PROOF = 'PROOF'
 }
 
 @Component({
@@ -120,6 +121,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
                 } else {
                     return;
                 }
+                break;
+            }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
                 break;
             }
             default:
