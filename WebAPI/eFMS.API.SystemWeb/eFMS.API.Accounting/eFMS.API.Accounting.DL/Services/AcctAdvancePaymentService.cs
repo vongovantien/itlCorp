@@ -189,7 +189,11 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePayment> GetDataAdvancePayment(AcctAdvancePaymentCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
-            var advancePayments = DataContext.Get();
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria); 
+            var advancePayments = DataContext.Get(queryDefault);
+
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
@@ -315,6 +319,30 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return advancePayments;
+        }
+
+        /// <summary>
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<AcctAdvancePayment, bool>> ExpressionQueryDefault(AcctAdvancePaymentCriteria criteria)
+        {
+            Expression<Func<AcctAdvancePayment, bool>> query = q => true;
+            if ((criteria.ReferenceNos == null || criteria.ReferenceNos.Count == 0)
+                && criteria.RequestDateFrom == null 
+                && criteria.RequestDateTo == null
+                && criteria.AdvanceModifiedDateFrom == null 
+                && criteria.AdvanceModifiedDateTo == null
+                && string.IsNullOrEmpty(criteria.PaymentMethod)
+                && string.IsNullOrEmpty(criteria.StatusApproval)
+                && string.IsNullOrEmpty(criteria.StatusPayment)
+                && string.IsNullOrEmpty(criteria.CurrencyID))
+            {
+                var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
+                var minDate = maxDate.AddMonths(-3); //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+            }
+            return query;
         }
 
         public IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
