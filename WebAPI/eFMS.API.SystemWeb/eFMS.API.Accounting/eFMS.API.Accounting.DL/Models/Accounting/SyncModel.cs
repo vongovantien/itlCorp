@@ -45,6 +45,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string OBHPartnerCode { get; set; }
         public string ChargeType { get; set; }      
         public decimal? DueDate { get; set; }
+        public string AtchDocNo { get; set; }
+        public string AtchDocSerialNo { get; set; }
     }
     
     public class SyncCreditModel
@@ -97,5 +99,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? Amount3 { get; set; }
         public string CustomerCodeBook { get; set; }
         public decimal? DueDate { get; set; }
+        public string CustomerCodeVAT { get; set; }
+        public string CustomerCodeTransfer { get; set; }
     }
 }
