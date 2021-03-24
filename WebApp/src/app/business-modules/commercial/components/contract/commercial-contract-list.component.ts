@@ -50,7 +50,6 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     }
 
     ngOnInit(): void {
-        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._activeRoute.data.subscribe((result: { name: string, type: string }) => {
             this.type = result.type;
 
