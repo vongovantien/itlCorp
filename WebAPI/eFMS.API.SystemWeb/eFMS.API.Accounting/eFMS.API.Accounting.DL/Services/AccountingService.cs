@@ -234,7 +234,7 @@ namespace eFMS.API.Accounting.DL.Services
                     foreach (BravoVoucherModel item in data)
                     {
                         // Ds surcharge của voucher
-                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => x.AcctManagementId == item.Stt);
+                        IQueryable<CsShipmentSurcharge> surcharges = SurchargeRepository.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == item.Stt);
 
                         IQueryable<BravoVoucherChargeModel> queryChargesVoucher = from surcharge in surcharges
                                                                                   join charge in charges on surcharge.ChargeId equals charge.Id

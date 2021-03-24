@@ -122,7 +122,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
-            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Debit Note', field: 'cdno', sortable: true },
             // { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },

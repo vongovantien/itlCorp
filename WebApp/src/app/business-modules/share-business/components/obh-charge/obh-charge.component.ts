@@ -116,13 +116,13 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'SOA', field: 'soano', sortable: true },
-            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'SOA', field: 'soano', sortable: true, width: 170 },
+            { title: 'Credit/Debit Note', field: 'cdno', sortable: true, width: 230 },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
-            { title: 'Voucher ID', field: 'voucherId', sortable: true },
-            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
+            { title: 'Voucher ID', field: 'voucherId', sortable: true, width: 210 },
+            { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true, width: 160 },
             { title: 'Net Amount', field: 'netAmount', sortable: true },
         ];
     }
