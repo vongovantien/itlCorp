@@ -472,7 +472,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var specialActions = _user.UserMenuPermission.SpecialActions;
             if (specialActions.Count > 0)
             {
-                if (specialActions.FirstOrDefault(x => x.Action == "DetailAgreement").IsAllow == true)
+                if (specialActions.FirstOrDefault(x => x.Action == "DetailAgreement").IsAllow == true || result.UserCreated == currentUser.UserID || result.SaleManId == currentUser.UserID)
                 {
                     data.ViewDetail = true;
                 }
