@@ -2089,7 +2089,7 @@ namespace eFMS.API.Documentation.DL.Services
                             item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
                             hawbCurrentMax = item.Hwbno;
                         }
-                        if (model.TransactionType == "SFE" || model.TransactionType == "SLE" && model.TransactionType == "SCE")
+                        if (model.TransactionType == "SFE" || model.TransactionType == "SLE" || model.TransactionType == "SCE")
                         {
                             string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
                             if (string.IsNullOrEmpty(podCode))
