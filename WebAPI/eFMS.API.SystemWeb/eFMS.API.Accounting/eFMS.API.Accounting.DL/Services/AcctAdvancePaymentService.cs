@@ -342,9 +342,9 @@ namespace eFMS.API.Accounting.DL.Services
                 && (string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment == "All")
                 && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All") )
             {
-                var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
-                var minDate = maxDate.AddMonths(-3); //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
-                query = query.And(x => x.DatetimeCreated.Value.Date >= minDate.Date && x.DatetimeCreated.Value.Date <= maxDate.Date);
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
             }
             return query;
         }
