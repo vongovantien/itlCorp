@@ -89,7 +89,10 @@
     <div class="col-lg-2">
         <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)">
             <i class="flaticon-folder-1"></i>
-            <span class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{files.length}}</span>
+            <ng-container *ngIf="data?.files?.length > 0">
+                <span
+                    class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{data?.files?.length}}</span>
+            </ng-container>
         </a>
     </div>
 </div>

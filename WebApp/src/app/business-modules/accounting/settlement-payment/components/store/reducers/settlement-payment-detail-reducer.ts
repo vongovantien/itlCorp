@@ -1,10 +1,6 @@
 import { createReducer, on, Action } from '@ngrx/store';
 import * as Actions from './../actions';
 import { ISettlementPaymentData } from '../../../detail/detail-settlement-payment.component';
-
-
-
-
 export interface SettlePaymentDetailState {
     settlement: ISettlementPaymentData;
     isLoading: boolean;

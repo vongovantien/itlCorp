@@ -1,3 +1,5 @@
+import { ChangeDetectorRef } from '@angular/core';
+import { getSettlementPaymentDetailState } from './../../store/reducers/index';
 import { AccountingRepo } from '@repositories';
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
@@ -6,6 +8,10 @@ import { SysImage } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ISettlementShipmentGroup } from '../../shipment-item/shipment-item.component';
+import { ISettlementPaymentState } from '../../store';
+import { Store } from '@ngrx/store';
+import { takeUntil, finalize } from 'rxjs/operators';
+import { ConfirmPopupComponent } from '@common';
 
 @Component({
     selector: 'shipment-attach-file',
@@ -21,36 +27,40 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
-
     get readonly(): boolean {
         return this._readonly;
     }
-
     private _readonly: boolean = false;
 
-    private files: SysImage[] = [];
-    private selectedFile: SysImage;
-
+    files: SysImage[] = [];
     settlementId: string;
-    hblId: string;
 
     shipmentGroups: ISettlementShipmentGroup = null;
 
     constructor(
         private _accountingRepo: AccountingRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _store: Store<ISettlementPaymentState>,
+        private _cd: ChangeDetectorRef
     ) {
         super();
     }
 
-    ngOnInit() { }
+    ngOnInit() {
+        this._store.select(getSettlementPaymentDetailState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((res) => {
+                if (res) {
+                    this.settlementId = res.settlement.id;
+                }
+            })
+    }
 
     chooseFile() {
         if (this._readonly) {
             return;
         }
         const fileList: FileList[] = event.target['files'];
-        console.log(this.shipmentGroups);
         if (fileList.length > 0 && !!this.settlementId && !!this.shipmentGroups) {
             const folderChild = this.generateChild(this.shipmentGroups);
             this._accountingRepo.uploadAttachedFiles("Settlement", this.settlementId, fileList, folderChild)
@@ -58,25 +68,55 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success("Upload file successfully!");
-                            this.getFiles(this.settlementId, this.hblId);
+                            this.getFiles(this.settlementId, folderChild);
                         }
                     }
                 );
         }
     }
 
-    getFiles(settlementId: string, hblId: string) {
-        this._accountingRepo.getAttachedFiles('Settlement', hblId)
+    getFiles(settlementId: string, folderChild: string) {
+        this.isLoading = true;
+        this._accountingRepo.getAttachedFiles('Settlement', settlementId, folderChild)
+            .pipe(finalize(() => this.isLoading = false))
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
                     this.onChange.emit(this.files);
+
                 }
             )
     }
 
-    deleteFile() {
+    onDeleteFile(id: string) {
+        this._accountingRepo.deleteAttachedFile('Settlement', id)
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this.getFiles(this.settlementId, this.generateChild(this.shipmentGroups));
+                        this._toastService.success(res.message);
+                    } else {
+                        this._toastService.error(res.message);
+                    }
+                }
+            )
+    }
 
+    deleteFile(file: SysImage) {
+        if (this._readonly) {
+            return;
+        }
+        this.showPopupDynamicRender<ConfirmPopupComponent>(
+            ConfirmPopupComponent,
+            this.confirmPopupContainerRef.viewContainerRef, {
+            body: 'Do you want to delete this file ?',
+            labelConfirm: 'Yes',
+            labelCancel: 'No',
+            iconConfirm: 'la la-trash'
+
+        }, () => {
+            this.onDeleteFile(file.id)
+        })
     }
 
     generateChild(shipmentGroups: ISettlementShipmentGroup): string {
@@ -84,15 +124,13 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
 
         const grp = {
             folder1: shipmentGroups.hblId,
-            folder2: shipmentGroups.advanceNo,
-            folder3: shipmentGroups.customNo
+            folder2: shipmentGroups?.advanceNo,
+            folder3: shipmentGroups?.customNo
         };
-        const c = Object.entries(grp);
-        console.log(c);
 
-        c.forEach((item: string[]) => {
+        Object.entries(grp).forEach((item: string[]) => {
             if (!!item[1]) {
-                child += "/" + item[1];
+                child += item[1] + '/';
             }
         })
         return child;

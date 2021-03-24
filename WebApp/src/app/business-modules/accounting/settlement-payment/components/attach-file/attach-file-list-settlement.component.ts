@@ -1,7 +1,7 @@
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
 import { AppForm } from '@app';
 import { AccountingRepo } from '@repositories';
 import { SysImage } from '@models';
@@ -13,6 +13,7 @@ import { coerceBooleanProperty } from '@angular/cdk/coercion';
     selector: 'settlement-attach-file-list',
     templateUrl: './attach-file-list-settlement.component.html',
     styleUrls: ['./attach-file-list-settlement.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class SettlementAttachFileListComponent extends AppForm implements OnInit {
@@ -89,7 +90,8 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
             this.confirmPopupContainerRef.viewContainerRef, {
             body: 'Do you want to delete this file ?',
             labelConfirm: 'Yes',
-            labelCancel: 'No'
+            labelCancel: 'No',
+            iconConfirm: 'la la-trash'
         }, () => {
             this.onDeleteFile(this.selectedFile.id)
         })

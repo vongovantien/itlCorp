@@ -1,4 +1,5 @@
-﻿using System;
+﻿using eFMS.API.Accounting.Service.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,5 +21,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public decimal? AdvanceAmount { get; set; }
         public decimal? Balance { get; set; }
         public List<ShipmentChargeSettlement> ChargeSettlements { get; set; }
+        public List<SysImage> Files { get; set; }
     }
 }

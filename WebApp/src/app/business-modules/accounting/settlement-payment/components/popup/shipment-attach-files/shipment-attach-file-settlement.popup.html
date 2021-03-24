@@ -25,7 +25,8 @@
                                                     </h3>
                                                 </div>
                                                 <input type="file" multiple (change)="chooseFile($event)"
-                                                    [accept]="accepctFilesUpload" title="Upload files" />
+                                                    [accept]="'image/*,.txt,.pdf,.doc,.xlsx,.xls'"
+                                                    title="Upload files" />
                                             </div>
                                         </div>
                                     </div>
@@ -86,26 +87,38 @@
                                         </div>
                                     </li>
                                 </ng-container>
-                                <li *ngIf="!(files?.length)">
+                                <li *ngIf="!(files?.length) && !isLoading">
                                     <div class="no-data">
                                         <i class="flaticon-coins"></i>
                                         <span class="no-data-text">No files found</span>
+                                    </div>
+                                </li>
+                                <li *ngIf="isLoading">
+                                    <div class="on-loading text-center">
+                                        <div class="m-loader m-loader--brand">
+                                        </div><span>Loading</span>
                                     </div>
                                 </li>
                             </ul>
                         </div>
                     </div>
                 </div>
-
-                <ng-template inject></ng-template>
             </div>
-            <div class="modal-footer m--align-center">
-                <div class="row">
-                    <div class="col-lg-12">
-
+            <ng-container *ngIf="!readonly">
+                <div class="modal-footer m--align-center">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="m--align-center m--margin-top-20">
+                                <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="hide()">
+                                </app-default-button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
+
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>

@@ -1188,9 +1188,9 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("GetAttachedFiles/{folder}/{id}")]
-        public IActionResult GetFiles(string folder, Guid id)
+        public IActionResult GetFiles(string folder, Guid id, string child = null)
         {
-            List<SysImageModel> result = sysFileService.Get(x => x.Folder == folder && x.ObjectId == id.ToString()).ToList();
+            List<SysImageModel> result = sysFileService.Get(x => x.Folder == folder && x.ObjectId == id.ToString() && x.ChildId == child).ToList();
             return Ok(result);
         }
 
