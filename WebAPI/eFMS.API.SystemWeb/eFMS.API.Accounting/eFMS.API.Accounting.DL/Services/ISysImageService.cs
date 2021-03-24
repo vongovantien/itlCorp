@@ -64,8 +64,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         private async Task<HandleState> WriteFile(FileUploadModel model)
         {
-            string path = this.webUrl.Value.Url; // Local
-            //string path = this.webUrl.Value.Url + "/Accounting"; // Server
+            // string path = this.webUrl.Value.Url; // Local
+            string path = this.webUrl.Value.Url + "/Accounting"; // Server
             try
             {
                 List<SysImage> list = new List<SysImage>();
