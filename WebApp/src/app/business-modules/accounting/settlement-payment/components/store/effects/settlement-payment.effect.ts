@@ -26,4 +26,11 @@ export class SettlePaymentEffect {
                     )
             )
         ));
+
+
+    // getDetailSettlePaymentEffect$: Observable<Action> = createEffect(() => this.actions$
+    //     .pipe(
+    //         ofType(SettlementPaymentActionTypes.)
+    //     )
+    // );
 }

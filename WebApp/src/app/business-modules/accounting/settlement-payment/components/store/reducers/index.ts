@@ -1,7 +1,7 @@
 import { createFeatureSelector, ActionReducerMap, createSelector } from "@ngrx/store";
-import { reducer, SettlePaymentListState } from "./settlement-payment.reducer";
+import { SettlePaymentListState, settlePaymentListreducer } from "./settlement-payment-list.reducer";
 
-export * from './settlement-payment.reducer';
+export * from './settlement-payment-list.reducer';
 export interface ISettlementPaymentState {
     list: SettlePaymentListState;
 }
@@ -17,5 +17,5 @@ export const getSettlementPaymentListPagingState = createSelector(settlementPaym
 export const getSettlementPaymentListLoadingState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.list?.isLoading);
 
 export const reducers: ActionReducerMap<ISettlementPaymentState> = {
-    list: reducer
+    list: settlePaymentListreducer
 };

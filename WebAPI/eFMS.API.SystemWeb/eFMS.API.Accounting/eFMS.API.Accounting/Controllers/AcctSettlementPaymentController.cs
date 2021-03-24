@@ -43,7 +43,11 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSettlementPaymentController(IStringLocalizer<LanguageSub> localizer, IAcctSettlementPaymentService service, ICurrentUser user, IMapper _mapper)
+        public AcctSettlementPaymentController(
+            IStringLocalizer<LanguageSub> localizer, 
+            IAcctSettlementPaymentService service, 
+            ICurrentUser user, IMapper _mapper
+            )
         {
             stringLocalizer = localizer;
             acctSettlementPaymentService = service;

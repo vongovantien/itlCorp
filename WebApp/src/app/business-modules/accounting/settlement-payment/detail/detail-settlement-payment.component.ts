@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
+import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -34,6 +34,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementId: string = '';
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
+
+    attachFiles: SysImage[] = [];
 
     constructor(
         private _activedRouter: ActivatedRoute,

@@ -105,7 +105,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
             }))
             .subscribe(
                 (res: any) => {
-                    if (res.result.success) {
+                    if (res.status) {
                         this._toastService.success("File deleted successfully!");
                         this.getFileShipment(this.jobId);
                     } else {
