@@ -89,9 +89,7 @@
     <div class="col-lg-2">
         <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)">
             <i class="flaticon-folder-1"></i>
-            <span class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">2</span>
+            <span class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{files.length}}</span>
         </a>
     </div>
 </div>
-
-<shipment-attach-file></shipment-attach-file>

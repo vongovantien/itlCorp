@@ -79,7 +79,8 @@
                                 (onClick)="onClickHeadingShipment($event)"
                                 (onCheck)="onCheckBoxShipmentItemInGroupShipment($event, i)"
                                 (onPrintPlUSD)="previewPLsheet($event,'USD')"
-                                (onPrintPlVND)="previewPLsheet($event, 'VND')"></shipment-item>
+                                (onPrintPlVND)="previewPLsheet($event, 'VND')"
+                                (onViewFiles)="viewShipmentAttachFile($event, item)"></shipment-item>
                             <table-surcharge-settlement [data]="item" #tableSurcharge
                                 (onChangeCheckBox)="onChangeCheckBoxSurChargeListInGroupShipment($event, i)"
                                 (onClickSurcharge)="openSurchargeDetail($event,null,'update')"
@@ -188,6 +189,7 @@
 </div>
 
 <payment-management-popup></payment-management-popup>
+<shipment-attach-file></shipment-attach-file>
 
 <ng-container *ngIf="!readonly">
 

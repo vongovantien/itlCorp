@@ -1,3 +1,4 @@
+import { SysImage } from '@models';
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { AppList } from 'src/app/app.list';
@@ -17,8 +18,10 @@ export class SettlementShipmentItemComponent extends AppList {
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlVND: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onViewFiles: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() data: ISettlementShipmentGroup = null;
+    @Input() files: SysImage[] = [];
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -78,11 +81,7 @@ export class SettlementShipmentItemComponent extends AppList {
     }
 
     showShipmentAttachFile($event: Event) {
-        $event.stopPropagation();
-        $event.preventDefault();
-
-        this.shipmentAttachFilePopup.shipmentGroups = this.data;
-        this.shipmentAttachFilePopup.show();
+        this.onViewFiles.emit($event);
     }
 
 }

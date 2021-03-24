@@ -16,7 +16,7 @@ import { SettlementExistingChargePopupComponent } from '../popup/existing-charge
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
-import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
+import { SettlementShipmentItemComponent, ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
 import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
@@ -511,6 +511,16 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     }
                 }
             )
+    }
+
+    viewShipmentAttachFile(e: Event, groupShipmentData: ISettlementShipmentGroup) {
+        // * prevent collapse/expand within accordion-heading
+        e.stopPropagation();
+        e.preventDefault();
+
+
+        console.log(groupShipmentData);
+        return false;
     }
 }
 
