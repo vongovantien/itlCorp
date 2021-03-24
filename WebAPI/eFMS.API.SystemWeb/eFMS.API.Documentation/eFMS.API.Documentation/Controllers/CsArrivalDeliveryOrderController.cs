@@ -161,6 +161,7 @@ namespace eFMS.API.Documentation.Controllers
         {
             ProofDeliveryFileUploadModel model = new ProofDeliveryFileUploadModel
             {
+                FolderName = "Shipment",
                 Files = files,
                 HblId = HblId
             };
