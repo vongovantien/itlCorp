@@ -15,7 +15,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
 
-        IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria);
+        IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
 

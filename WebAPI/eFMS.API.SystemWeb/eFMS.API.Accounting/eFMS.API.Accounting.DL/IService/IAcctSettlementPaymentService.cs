@@ -17,7 +17,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount);
 
-        IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria);
+        IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria);
 
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 

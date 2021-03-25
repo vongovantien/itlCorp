@@ -1187,8 +1187,14 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 foreach (var item in surcharges)
                                 {
-                                    item.PaySyncedFrom = null;
-                                    item.SyncedFrom = null;
+                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                    {
+                                        item.PaySyncedFrom = null;
+                                    }
+                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_BUY)
+                                    {
+                                        item.SyncedFrom = null;
+                                    }
 
                                     var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
@@ -1513,7 +1519,15 @@ namespace eFMS.API.ForPartner.DL.Service
                             //Update SyncedFrom equal NULL by Id of Voucher
                             foreach (var surcharge in surcharges)
                             {
-                                surcharge.SyncedFrom = null;
+                                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surcharge.PaySyncedFrom = null;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                
                                 surcharge.UserModified = currentUser.UserID;
                                 surcharge.DatetimeModified = DateTime.Now;
                                 var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
