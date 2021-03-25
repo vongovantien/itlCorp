@@ -1695,7 +1695,6 @@ namespace eFMS.API.Accounting.DL.Services
                 soas = soas.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            //var dataResult = QueryDataListSOA(soas);
             return soas;
         }
 

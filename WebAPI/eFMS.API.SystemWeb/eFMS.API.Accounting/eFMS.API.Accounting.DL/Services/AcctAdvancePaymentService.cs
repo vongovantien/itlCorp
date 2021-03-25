@@ -196,7 +196,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
             var queryDefault = ExpressionQueryDefault(criteria); 
-            var advancePayments = DataContext.Get(queryDefault);
+            var advancePayments = DataContext.Get().Where(queryDefault);
 
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
