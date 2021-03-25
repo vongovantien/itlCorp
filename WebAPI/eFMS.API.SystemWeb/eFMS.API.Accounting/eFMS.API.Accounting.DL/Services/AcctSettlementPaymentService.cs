@@ -113,12 +113,14 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = GetDatas(criteria);
+            var data = GetSettlementsByCriteria(criteria);
             if (data == null)
             {
                 rowsCount = 0;
                 return null;
             }
+
+            var result = new List<AcctSettlementPaymentResult>();
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -130,9 +132,11 @@ namespace eFMS.API.Accounting.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
+
+                result = TakeSettlements(data).ToList();
             }
 
-            return data.ToList();
+            return result;
         }
 
         private PermissionRange GetPermissionRangeOfRequester()
@@ -170,10 +174,14 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
-        private IQueryable<AcctSettlementPayment> GetDataSettlementPayment(AcctSettlementPaymentCriteria criteria)
+        private IQueryable<AcctSettlementPayment> GetSettlementByPermission(AcctSettlementPaymentCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
-            var settlementPayments = DataContext.Get();
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            var settlementPayments = DataContext.Get().Where(queryDefault);
+
             var settlementPaymentAprs = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
@@ -324,18 +332,44 @@ namespace eFMS.API.Accounting.DL.Services
             return settlementPayments;
         }
 
-        public IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria)
+        /// <summary>
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<AcctSettlementPayment, bool>> ExpressionQueryDefault(AcctSettlementPaymentCriteria criteria)
+        {
+            Expression<Func<AcctSettlementPayment, bool>> query = q => true;
+            if ((criteria.ReferenceNos == null || criteria.ReferenceNos.Count == 0)
+                && criteria.RequestDateFrom == null
+                && criteria.RequestDateTo == null
+                && (string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod == "All")
+                && (string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval == "All")
+                && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All"))
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+            }
+            return query;
+        }
+
+        public IQueryable<AcctSettlementPayment> GetSettlementsByCriteria(AcctSettlementPaymentCriteria criteria)
         {
             var querySettlementPayment = ExpressionQuery(criteria);
-            var dataSettlementPayments = GetDataSettlementPayment(criteria);
+            var dataSettlementPayments = GetSettlementByPermission(criteria);
             if (dataSettlementPayments == null) return null;
             var settlementPayments = dataSettlementPayments.Where(querySettlementPayment);
             settlementPayments = QueryWithShipment(settlementPayments, criteria);
+            return settlementPayments;
+        }
+
+        private IQueryable<AcctSettlementPaymentResult> TakeSettlements(IQueryable<AcctSettlementPayment> settlementPayments)
+        {
             if (settlementPayments == null) return null;
 
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
-            
+
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
                        from partnerGrp in partnerGrps.DefaultIfEmpty()
@@ -369,6 +403,13 @@ namespace eFMS.API.Accounting.DL.Services
             //Sort Array sẽ nhanh hơn
             data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return data;
+        }
+
+        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
+        {
+            var settlementPayments = GetSettlementsByCriteria(criteria);
+            var result = TakeSettlements(settlementPayments);
+            return result;
         }
 
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)

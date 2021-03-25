@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -1569,7 +1570,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get List More Charges & Add More Charge Shipment By Criteria --
 
         #region -- Get List & Paging SOA By Criteria --
-        private IQueryable<AcctSOAResult> QueryDataListSOA(IQueryable<AcctSoa> soas)
+        private IQueryable<AcctSOAResult> TakeSoas(IQueryable<AcctSoa> soas)
         {
             var partner = catPartnerRepo.Get();
             var resultData = from s in soas
@@ -1646,7 +1647,7 @@ namespace eFMS.API.Accounting.DL.Services
             return soas;
         }
 
-        private IQueryable<AcctSOAResult> GetDatas(AcctSOACriteria criteria, IQueryable<AcctSoa> soas)
+        private IQueryable<AcctSoa> GetSoaByCriteria(AcctSOACriteria criteria, IQueryable<AcctSoa> soas)
         {
             if (soas == null) return null;
 
@@ -1694,20 +1695,46 @@ namespace eFMS.API.Accounting.DL.Services
                 soas = soas.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            var dataResult = QueryDataListSOA(soas);
-            return dataResult;
+            return soas;
         }
 
-        public IQueryable<AcctSOAResult> QueryDataPermission(AcctSOACriteria criteria)
+        /// <summary>
+        /// Nếu không có điều kiện search thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<AcctSoa, bool>> ExpressionQueryDefault(AcctSOACriteria criteria)
         {
-            var soas = GetSoasPermission();
-            return GetDatas(criteria, soas);
+            Expression<Func<AcctSoa, bool>> query = q => true;
+            if (string.IsNullOrEmpty(criteria.StrCodes)
+                && string.IsNullOrEmpty(criteria.CustomerID)
+                && criteria.SoaFromDateCreate == null
+                && criteria.SoaToDateCreate == null
+                && string.IsNullOrEmpty(criteria.SoaStatus)
+                && string.IsNullOrEmpty(criteria.SoaCurrency)
+                && string.IsNullOrEmpty(criteria.SoaUserCreate))
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+            }
+            return query;
+        }
+
+        public IQueryable<AcctSoa> QueryDataPermission(AcctSOACriteria criteria)
+        {
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            var soas = GetSoasPermission().Where(queryDefault);
+            var soaList = GetSoaByCriteria(criteria, soas);
+            return soaList;
         }
 
         public IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria)
         {
             var soas = DataContext.Get();
-            return GetDatas(criteria, soas);
+            var soaList = GetSoaByCriteria(criteria, soas);
+            var dataResult = TakeSoas(soaList);
+            return dataResult;
         }
 
         public IQueryable<AcctSOAResult> Paging(AcctSOACriteria criteria, int page, int size, out int rowsCount)
@@ -1719,6 +1746,8 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
+            IQueryable<AcctSOAResult> result = null;
+
             var _totalItem = data.Select(s => s.Id).Count();
             rowsCount = (_totalItem > 0) ? _totalItem : 0;
             if (size > 0)
@@ -1728,9 +1757,11 @@ namespace eFMS.API.Accounting.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
+
+                result = TakeSoas(data);
             }
 
-            return data;
+            return result;
         }
         #endregion -- Get List & Paging SOA By Criteria --
 

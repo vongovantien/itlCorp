@@ -1187,8 +1187,14 @@ namespace eFMS.API.ForPartner.DL.Service
                             {
                                 foreach (var item in surcharges)
                                 {
-                                    item.PaySyncedFrom = null;
-                                    item.SyncedFrom = null;
+                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                    {
+                                        item.PaySyncedFrom = null;
+                                    }
+                                    if (item.Type == ForPartnerConstants.TYPE_CHARGE_BUY)
+                                    {
+                                        item.SyncedFrom = null;
+                                    }
 
                                     var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
                                 }
@@ -1465,7 +1471,7 @@ namespace eFMS.API.ForPartner.DL.Service
             voucher.DatetimeModified = DateTime.Now;
             voucher.ReasonReject = reason;
 
-            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+            var surcharges = surchargeRepo.Get(x => (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == voucher.Id);
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -1510,10 +1516,18 @@ namespace eFMS.API.ForPartner.DL.Service
                             };
                             sysUserNotificationRepository.Add(sysUserNotify);
 
-                            //Update SyncedFrom equal NULL by Id of Voucher
+                            //Update SyncedFrom/PaySyncedFrom equal NULL by Id of Voucher
                             foreach (var surcharge in surcharges)
                             {
-                                surcharge.SyncedFrom = null;
+                                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surcharge.PaySyncedFrom = null;
+                                }
+                                else
+                                {
+                                    surcharge.SyncedFrom = null;
+                                }
+                                
                                 surcharge.UserModified = currentUser.UserID;
                                 surcharge.DatetimeModified = DateTime.Now;
                                 var hsUpdateSurcharge = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
@@ -1663,18 +1677,28 @@ namespace eFMS.API.ForPartner.DL.Service
                     HandleState hs = DataContext.Delete(x => x.Id == voucher.Id, false);
                     if (hs.Success)
                     {
-                        var charges = surchargeRepo.Get(x => x.AcctManagementId == voucher.Id);
+                        var charges = surchargeRepo.Get(x => (x.Type == ForPartnerConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == voucher.Id);
                         foreach (CsShipmentSurcharge charge in charges)
-                        {
-                            charge.AcctManagementId = null;
-                            charge.VoucherId = null;
-                            charge.VoucherIddate = null;
+                        {                                                       
                             charge.InvoiceNo = null;
                             charge.InvoiceDate = null;
                             charge.SeriesNo = null;
                             charge.DatetimeModified = DateTime.Now;
                             charge.UserModified = currentUser.UserID;
-                            charge.SyncedFrom = null; //Update SyncedFrom equal NULL
+                            if (charge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                            {
+                                charge.PayerAcctManagementId = null;
+                                charge.VoucherIdre = null;
+                                charge.VoucherIdredate = null;
+                                charge.PaySyncedFrom = null;
+                            }
+                            else
+                            {
+                                charge.AcctManagementId = null;
+                                charge.VoucherId = null;
+                                charge.VoucherIddate = null;
+                                charge.SyncedFrom = null;
+                            }
                             charge.ReferenceNo = null;
                             surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
                         }
