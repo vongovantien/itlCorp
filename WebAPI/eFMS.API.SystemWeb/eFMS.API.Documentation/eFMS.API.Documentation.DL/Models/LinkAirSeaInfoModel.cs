@@ -9,7 +9,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string JobId { get; set; }
         public string JobNo { get; set; }
         public decimal? GW { get; set; }
-        public decimal? PackgeQty { get; set; }
+        public decimal? PackageQty { get; set; }
         public decimal? CW { get; set; }
 
         public List<CsMawbcontainer> Containers { get; set; }

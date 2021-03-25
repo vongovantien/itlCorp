@@ -853,35 +853,46 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="serviceName">product service</param>
         /// <param name="serviceMode">service mode</param>
         /// <returns></returns>
-        public object GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
+        public LinkAirSeaInfoModel GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode)
         {
-            String jobNo = null;
-            String id = null;
-            var shipmentType = GetServiceType(serviceName, serviceMode);
+            string jobNo = null;
+            string hblid = null;
+            string jobId = null;
+            decimal? cw = null;
+            decimal? gw = null;
+            decimal? pkgQty = null;
+
+            string shipmentType = GetServiceType(serviceName, serviceMode);
             if (!string.IsNullOrEmpty(shipmentType))
             {
                 var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
-                var transaction = houseDetail != null ? transactionRepository.Get(x => x.TransactionType == shipmentType).Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, y.Id, x.Mawb, x.BookingNo })
-                                                    : null;
+                var transaction = houseDetail != null ?
+                    transactionRepository
+                    .Get(x => x.TransactionType == shipmentType)
+                    .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight,y.ChargeWeight,y.PackageQty })
+                    : null;
+
                 if (transaction?.Count() == 1)
                 {
                     jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
-                    id = transaction.FirstOrDefault()?.Id.ToString();
+                    jobId = transaction.FirstOrDefault()?.jobId.ToString();
+                    hblid = transaction.FirstOrDefault().Id.ToString();
                 }
                 else
                 {
-                    if (transaction?.Count() > 1)
+                    if (transaction?.Count() > 1) // Có nhiều hbl
                     {
                         var masDetail = transaction == null ? null : transaction.Where(x => x.Mawb == mblNo).FirstOrDefault();
-                        if (masDetail == null)
+                        if (masDetail == null) // Tìm theo BookingNo
                         {
                             masDetail = transaction.Where(x => x.BookingNo == mblNo).FirstOrDefault();
                             masDetail = masDetail == null ? transaction?.FirstOrDefault() : masDetail;
                         }
                         jobNo = masDetail?.JobNo.ToString();
-                        id = masDetail?.Id.ToString();
+                        jobId = masDetail?.Id.ToString();
+                        hblid = null;
                     }
-                    else
+                    else // không có hbl nào -> tìm theo mawb
                     {
                         var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
                         if (masDetail == null)
@@ -889,11 +900,46 @@ namespace eFMS.API.Documentation.DL.Services
                             masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
                         }
                         jobNo = masDetail?.JobNo.ToString();
-                        id = null;
+                        jobId = masDetail?.Id.ToString();
+                        hblid = null;
                     }
                 }
             }
-            return new { jobNo, id };
+            IQueryable<CsTransactionDetail> hbls = Enumerable.Empty<CsTransactionDetail>().AsQueryable();
+            List<CsMawbcontainer> containers = new List<CsMawbcontainer>();
+
+            if (!string.IsNullOrEmpty(jobId))
+            {
+                if (!string.IsNullOrEmpty(hblid))
+                {
+                    hbls = csTransactionDetailRepo.Get(x => x.Id.ToString() == hblid);
+
+                    containers = csMawbcontainerRepo.Get(x => x.Hblid.ToString() == hblid).ToList();
+                }
+                else
+                {
+                    hbls = csTransactionDetailRepo.Get(x => x.JobId.ToString() == jobId);
+
+                    containers = csMawbcontainerRepo.Get(x => x.Mblid.ToString() == jobId).ToList();
+                }
+
+                if (hbls != null && hbls.Count() > 0)
+                {
+                    gw = hbls.Sum(x => x.GrossWeight);
+                    cw = hbls.Sum(x => x.GrossWeight);
+                    pkgQty = hbls.Sum(x => x.PackageQty);
+                }
+            }
+            return new LinkAirSeaInfoModel
+            {
+                JobNo = jobNo,
+                HblId = hblid,
+                JobId = jobId,
+                GW = gw,
+                CW = cw,
+                PackageQty = pkgQty,
+                Containers = containers
+            };
         }
 
         private string GetServiceType(string serviceName, string serviceMode)
@@ -2612,7 +2658,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                         // charge.UnitPrice = (surcharge.UnitPrice ?? 0);
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân nhỏ riêng trường hợp này
-                        charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}",(surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}",(surcharge.UnitPrice ?? 0));
+                        charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}", (surcharge.UnitPrice ?? 0));
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
