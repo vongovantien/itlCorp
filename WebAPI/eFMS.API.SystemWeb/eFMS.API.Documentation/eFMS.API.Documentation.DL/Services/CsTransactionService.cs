@@ -53,6 +53,8 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
+        private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
+
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -75,7 +77,6 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surService,
             ICsTransactionDetailService tranDetailService,
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
-            ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
             IUserPermissionService perService,
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
@@ -86,6 +87,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
+            ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -105,7 +107,6 @@ namespace eFMS.API.Documentation.DL.Services
             catCountryRepo = catCountry;
             transactionDetailService = tranDetailService;
             csArrivalFrieghtChargeService = arrivalFrieghtChargeService;
-            dimensionDetailService = dimensionService;
             dimensionDetailRepository = dimensionDetailRepo;
             permissionService = perService;
             freighchargesRepository = freighchargesRepo;
@@ -117,6 +118,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             accAdvancePaymentRepository = accAdvancePaymentRepo;
+            shipmentOtherChargeService = otherChargeService;
 
         }
 
@@ -2084,11 +2086,7 @@ namespace eFMS.API.Documentation.DL.Services
                         item.ArrivalFooter = null;
                         item.ArrivalDate = null;
 
-                        if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                        {
-                            item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
-                            hawbCurrentMax = item.Hwbno;
-                        }
+
                         if (model.TransactionType == "SFE" || model.TransactionType == "SLE" || model.TransactionType == "SCE")
                         {
                             string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
@@ -2101,6 +2099,12 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
                                 hawbSeaExportCurrent = item.Hwbno;
                             }
+                        }
+                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        {
+                            //item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
+                            //hawbCurrentMax = item.Hwbno;
+                            if (item.Hwbno == "N/H") item.Hwbno = item.Hwbno;
                         }
                         else
                         {
@@ -2171,7 +2175,42 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsFreighcharges = freighchargesRepository.Add(freightCharges, false);
                         freighchargesRepository.SubmitChanges();
                     }
+                    if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                    {
+                        var DataAirwayBilss = airwaybillRepository.Get(x => x.JobId == model.Id).FirstOrDefault();
+                        var DataDimensionDetail = dimensionDetailRepository.Get(x => x.AirWayBillId == DataAirwayBilss.Id).ToList();
+                        var DataOtherCharge = shipmentOtherChargeService.Get(x => x.JobId == model.Id).ToList();
+                        DataAirwayBilss.Id = Guid.NewGuid();
+                        DataAirwayBilss.DatetimeModified = DateTime.Now;
+                        DataAirwayBilss.UserModified = currentUser.UserID;
+                        DataAirwayBilss.JobId = transaction.Id;
+                        HandleState hsAirwayBilss = airwaybillRepository.Add(DataAirwayBilss);
+                        if (hsAirwayBilss.Success)
+                        {
+                            if (DataDimensionDetail != null)
+                            {
+                                DataDimensionDetail.ForEach(x =>
+                                {
+                                    x.UserCreated = currentUser.UserID;
+                                    x.DatetimeCreated = DateTime.Now;
+                                    x.Id = Guid.NewGuid();
+                                    x.AirWayBillId = DataAirwayBilss.Id;
+                                });
 
+                                var hsDimensions = dimensionDetailRepository.Add(DataDimensionDetail);
+                            }
+                            if(DataOtherCharge != null)
+                            {
+                                DataOtherCharge.ForEach(x => {
+                                    x.UserModified = currentUser.UserID;
+                                    x.DatetimeModified = DateTime.Now;
+                                    x.Id = Guid.NewGuid();
+                                    x.JobId = DataAirwayBilss.JobId;
+                                });
+                                var hsOtherCharges = shipmentOtherChargeService.Add(DataOtherCharge);
+                            }
+                        }
+                    }
                     return new ResultHandle { Status = true, Message = "Import successfully!!!", Data = transaction };
                 }
 
@@ -2612,7 +2651,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                         // charge.UnitPrice = (surcharge.UnitPrice ?? 0);
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân nhỏ riêng trường hợp này
-                        charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}",(surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}",(surcharge.UnitPrice ?? 0));
+                        charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}", (surcharge.UnitPrice ?? 0));
                         charge.Unit = unitCode;
                         charge.LastRevised = _dateNow;
                         charge.OBH = isOBH;
