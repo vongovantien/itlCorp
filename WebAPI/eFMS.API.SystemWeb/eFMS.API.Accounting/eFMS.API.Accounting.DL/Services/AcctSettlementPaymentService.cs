@@ -174,7 +174,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
 
-            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
             var settlementPayments = DataContext.Get().Where(queryDefault);
 
@@ -329,7 +329,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
         /// </summary>
         /// <returns></returns>
         private Expression<Func<AcctSettlementPayment, bool>> ExpressionQueryDefault(AcctSettlementPaymentCriteria criteria)
@@ -342,9 +342,9 @@ namespace eFMS.API.Accounting.DL.Services
                 && (string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval == "All")
                 && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All"))
             {
-                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
-                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
             return query;
         }
@@ -356,6 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (dataSettlementPayments == null) return null;
             var settlementPayments = dataSettlementPayments.Where(querySettlementPayment);
             settlementPayments = QueryWithShipment(settlementPayments, criteria);
+            settlementPayments = settlementPayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return settlementPayments;
         }
 
@@ -394,10 +395,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
                            PayeeName = partnerGrp.ShortName
-                       };
-
-            //Sort Array sẽ nhanh hơn
-            data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+                       };           
             return data;
         }
 
