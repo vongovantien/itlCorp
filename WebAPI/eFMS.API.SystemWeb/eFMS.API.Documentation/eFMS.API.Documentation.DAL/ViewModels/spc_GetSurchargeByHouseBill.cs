@@ -71,6 +71,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public Guid? OfficeId { get; set; }
         public string TransactionType { get; set; }
         public Guid? AcctManagementId { get; set; }
+        public Guid? PayerAcctManagementId { get; set; }
         public decimal? AmountVnd { get; set; }
         public decimal? VatAmountVnd { get; set; }
         public decimal? AmountUsd { get; set; }

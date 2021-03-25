@@ -186,7 +186,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
             { title: 'KB', field: 'kickBack', sortable: true },
             { title: 'SOA', field: 'soano', sortable: true },
-            { title: 'Credit/Debit Note', field: 'cdno', sortable: true },
+            { title: 'Credit Note', field: 'cdno', sortable: true },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
             { title: 'Voucher ID', field: 'voucherId', sortable: true },
             { title: 'Voucher ID Date', field: 'voucherIddate', sortable: true },
