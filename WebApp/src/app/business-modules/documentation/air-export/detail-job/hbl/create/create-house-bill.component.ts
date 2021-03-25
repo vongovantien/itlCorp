@@ -202,7 +202,6 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     }
 
     createHbl(houseBill: HouseBill, hbId?: string) {
-        this._progressRef.start();
         const house = this.setProofOfDelivery(houseBill);
         const deliveryDate = {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,

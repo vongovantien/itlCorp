@@ -813,7 +813,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(model.FolderName, model.HblId.ToString());
                 List<SysImage> resultUrls = new List<SysImage>();
-                fileName = model.Files.FileName.Replace("+", "_");
+                fileName = model.Files.FileName.Contains("+") ? model.Files.FileName.Replace("+", "_") : model.Files.FileName;
                 string objectId = model.HblId.ToString();
                 await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
                 string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
