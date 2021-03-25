@@ -2253,14 +2253,26 @@ namespace eFMS.API.Accounting.DL.Services
             var cdNote = cdNoteRepository.Get(x => x.Id == idCdNote).FirstOrDefault();
             if (cdNote != null)
             {
-                var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySyncedFrom));
-                var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.SyncedFrom));
-                var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                if (surchargeCreditObhs.Any() || surchargeDebitObhs.Any() || surchargeCredits.Any() || surchargeDebits.Any())
+                if (cdNote.Type == "CREDIT")
                 {
-                    return true;
+                    var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                    var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.SyncedFrom));
+                    if (surchargeCreditObhs.Any() || surchargeCredits.Any())
+                    {
+                        return true;
+                    }
                 }
+
+                if (cdNote.Type == "DEBIT" || cdNote.Type == "INVOICE")
+                {
+                    var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    if (surchargeDebitObhs.Any() || surchargeDebits.Any())
+                    {
+                        return true;
+                    }
+                }
+                
             }
             return false;
         }
@@ -2270,14 +2282,25 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = soaRepository.Get(x => x.Id == idSoa).FirstOrDefault();
             if (soa != null)
             {
-                var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.PaySyncedFrom));
-                var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
-                var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                if (surchargeCreditObhs.Any() || surchargeDebitObhs.Any() || surchargeCredits.Any() || surchargeDebits.Any())
+                if (soa.Type == "Debit")
                 {
-                    return true;
+                    var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
+                    if (surchargeDebitObhs.Any() && surchargeDebits.Any())
+                    {
+                        return true;
+                    }
                 }
+
+                if (soa.Type == "Credit")
+                {
+                    var surchargeCreditObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                    var surchargeCredits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaySoano == soa.Soano && !string.IsNullOrEmpty(x.SyncedFrom));
+                    if (surchargeCreditObhs.Any() || surchargeCredits.Any())
+                    {
+                        return true;
+                    }
+                }                
             }
             return false;
         }
