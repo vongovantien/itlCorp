@@ -121,12 +121,14 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = GetDatas(criteria);
+            var data = GetAdvancesByCriteria(criteria);
             if (data == null)
             {
                 rowsCount = 0;
                 return null;
             }
+
+            var result = new List<AcctAdvancePaymentResult>();
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -138,9 +140,11 @@ namespace eFMS.API.Accounting.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
+
+                result = TakeAdvances(data).ToList();
             }
 
-            return data.ToList();
+            return result;
         }
 
         private PermissionRange GetPermissionRangeOfRequester()
@@ -186,10 +190,14 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
-        private IQueryable<AcctAdvancePayment> GetDataAdvancePayment(AcctAdvancePaymentCriteria criteria)
+        private IQueryable<AcctAdvancePayment> GetAdvancesByPermission(AcctAdvancePaymentCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
-            var advancePayments = DataContext.Get();
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria); 
+            var advancePayments = DataContext.Get().Where(queryDefault);
+
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
@@ -317,18 +325,46 @@ namespace eFMS.API.Accounting.DL.Services
             return advancePayments;
         }
 
-        public IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria)
+        /// <summary>
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<AcctAdvancePayment, bool>> ExpressionQueryDefault(AcctAdvancePaymentCriteria criteria)
+        {
+            Expression<Func<AcctAdvancePayment, bool>> query = q => true;
+            if ((criteria.ReferenceNos == null || criteria.ReferenceNos.Count == 0)
+                && criteria.RequestDateFrom == null 
+                && criteria.RequestDateTo == null
+                && criteria.AdvanceModifiedDateFrom == null 
+                && criteria.AdvanceModifiedDateTo == null
+                && (string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod == "All")
+                && (string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval == "All")
+                && (string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment == "All")
+                && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All") )
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+            }
+            return query;
+        }
+
+        private IQueryable<AcctAdvancePayment> GetAdvancesByCriteria(AcctAdvancePaymentCriteria criteria)
         {
             var queryAdvancePayment = ExpressionQuery(criteria);
-            var dataAdvancePayments = GetDataAdvancePayment(criteria);
+            var dataAdvancePayments = GetAdvancesByPermission(criteria);
             if (dataAdvancePayments == null) return null;
             var advancePayments = dataAdvancePayments.Where(queryAdvancePayment);
             advancePayments = QueryWithAdvanceRequest(advancePayments, criteria);
+            return advancePayments;
+        } 
 
+        private IQueryable<AcctAdvancePaymentResult> TakeAdvances(IQueryable<AcctAdvancePayment> advancePayments)
+        {
             if (advancePayments == null) return null;
             var requestAdvances = acctAdvanceRequestRepo.Get();
             var users = sysUserRepo.Get();
-            IQueryable<CatPartner> partners =  catPartnerRepo.Get();
+            IQueryable<CatPartner> partners = catPartnerRepo.Get();
 
             var data = from advancePayment in advancePayments
                        join user in users on advancePayment.Requester equals user.Id into user2
@@ -358,6 +394,7 @@ namespace eFMS.API.Accounting.DL.Services
                            StatusApproval = advancePayment.StatusApproval,
                            PaymentMethod = advancePayment.PaymentMethod,
                            Amount = requestAdvance.Amount,
+                           StatusPayment = requestAdvance.StatusPayment,
                            VoucherNo = advancePayment.VoucherNo,
                            VoucherDate = advancePayment.VoucherDate,
                            LastSyncDate = advancePayment.LastSyncDate,
@@ -410,7 +447,7 @@ namespace eFMS.API.Accounting.DL.Services
                 StatusApproval = s.Key.StatusApproval,
                 VoucherNo = s.Key.VoucherNo,
                 VoucherDate = s.Key.VoucherDate,
-                AdvanceStatusPayment = GetAdvanceStatusPayment(s.Key.AdvanceNo), //***
+                AdvanceStatusPayment = GetAdvanceStatusPayment(s.Select(se => se.StatusPayment).ToList()),
                 PaymentMethod = s.Key.PaymentMethod,
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
@@ -427,12 +464,18 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public string GetAdvanceStatusPayment(string advanceNo)
+        public IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria)
         {
-            var requestTmp = acctAdvanceRequestRepo.Get();
-            var totalRequestAdvance = requestTmp.Where(x => x.AdvanceNo == advanceNo).Select(s => s.Id).Count();
-            var totalRequestNotSettled = requestTmp.Where(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.AdvanceNo == advanceNo).Select(s => s.Id).Count();
-            var totalRequestSettled = requestTmp.Where(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_SETTLED && x.AdvanceNo == advanceNo).Select(s => s.Id).Count();
+            var advancePayments = GetAdvancesByCriteria(criteria);
+            var result = TakeAdvances(advancePayments);
+            return result;
+        }
+        
+        public string GetAdvanceStatusPayment(List<string> statusPayments)
+        {
+            var totalRequestAdvance = statusPayments.Count();
+            var totalRequestNotSettled = statusPayments.Where(x => x == AccountingConstants.STATUS_PAYMENT_NOTSETTLED).Count();
+            var totalRequestSettled = statusPayments.Where(x => x == AccountingConstants.STATUS_PAYMENT_SETTLED).Count();
 
             var result = string.Empty;
             if (totalRequestNotSettled == totalRequestAdvance)
@@ -453,6 +496,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion --- LIST & PAGING ---
 
+        #region -- GROUP --
         public List<AcctAdvanceRequestModel> GetGroupRequestsByAdvanceNo(string advanceNo)
         {
             //Sum(Amount) theo lô hàng (JobId, HBL)
@@ -544,6 +588,7 @@ namespace eFMS.API.Accounting.DL.Services
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             return datamap;
         }
+        #endregion -- GROUP --
 
         #region --- DETAIL ---
         public AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo)
