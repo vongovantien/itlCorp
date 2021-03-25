@@ -182,7 +182,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             RowId = x.First().Id,
                             Ma_SpHt = x.First().JobId,
-                            BillEntryNo = x.First().Hbl,
+                            BillEntryNo = !string.IsNullOrEmpty(x.First().CustomNo) ? x.First().CustomNo : x.First().Hbl, //15559
                             MasterBillNo = x.First().Mbl,
                             OriginalAmount = x.Sum(d => d.Amount),
                             DeptCode = GetDeptCode(x.First().JobId),
@@ -259,7 +259,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                       CurrencyCode = (item.AccountNo == "3311" || item.AccountNo == "3313") ? item.CurrencyCode : surcharge.CurrencyId,
                                                                                       ExchangeRate = (item.AccountNo == "3311" || item.AccountNo == "3313") && item.CurrencyCode == AccountingConstants.CURRENCY_LOCAL ? 1
                                                                                       : currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL),
-                                                                                      BillEntryNo = surcharge.Hblno,
+                                                                                      BillEntryNo = GetBillEntryNoForSyncAcct(surcharge), //15559
                                                                                       Ma_SpHt = surcharge.JobNo,
                                                                                       MasterBillNo = surcharge.Mblno,
                                                                                       DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
@@ -354,7 +354,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Unit = unit.UnitNameVn,
                                                                                              CurrencyCode = surcharge.CurrencyId,
                                                                                              ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL),
-                                                                                             BillEntryNo = surcharge.Hblno,
+                                                                                             BillEntryNo = GetBillEntryNoForSyncAcct(surcharge), //15559
                                                                                              Ma_SpHt = surcharge.JobNo,
                                                                                              MasterBillNo = surcharge.Mblno,
                                                                                              DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
@@ -443,7 +443,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.BillEntryNo = surcharge.Hblno;
+                    charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
@@ -614,7 +614,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
-                        charge.BillEntryNo = surcharge.Hblno;
+                        charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                         charge.NganhCode = "FWD";
@@ -742,7 +742,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Description = _description;
                     var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                     charge.Unit = _unit?.UnitNameVn; //Unit Name En
-                    charge.BillEntryNo = surcharge.Hblno;
+                    charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                     charge.MasterBillNo = surcharge.Mblno;
                     charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                     charge.NganhCode = "FWD";
@@ -908,7 +908,7 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
                         charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, soa.Currency);
-                        charge.BillEntryNo = surcharge.Hblno;
+                        charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
                         charge.NganhCode = "FWD";
@@ -1828,6 +1828,31 @@ namespace eFMS.API.Accounting.DL.Services
                 _description = string.Format("{0} {1}", chargeName, _hblNo); //Format: ChargeName + HBL [CR: 12-01-2020]
             }
             return _description;
+        }
+
+        /// <summary>
+        /// Task: 15559: Get HblNo of surcharge
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <returns></returns>
+        private string GetBillEntryNoForSyncAcct(CsShipmentSurcharge surcharge)
+        {
+            string _billEntryNo = null;
+            if (!string.IsNullOrEmpty(surcharge.Hblno))
+            {                
+                if (surcharge.TransactionType == "CL" )
+                {
+                    _billEntryNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) ? surcharge.ClearanceNo : surcharge.Hblno;
+                }
+                else
+                {
+                    if (!surcharge.Hblno.Equals("N/H"))
+                    {
+                        _billEntryNo = surcharge.Hblno;
+                    }
+                }
+            }            
+            return _billEntryNo;
         }
 
         #endregion -- Private Method --
