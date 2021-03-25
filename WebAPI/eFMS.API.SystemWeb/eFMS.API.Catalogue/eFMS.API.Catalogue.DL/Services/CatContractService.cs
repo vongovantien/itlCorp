@@ -1062,6 +1062,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
             string employeeId = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var salesmanObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string employeeIdUserCreated = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
@@ -1108,7 +1110,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
 
             lstTo.Add(salesmanObj?.Email);
-
+            lstTo.Add(userCreatedObj?.Email);
             //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
             var logSendMail = new SysSentEmailHistory
