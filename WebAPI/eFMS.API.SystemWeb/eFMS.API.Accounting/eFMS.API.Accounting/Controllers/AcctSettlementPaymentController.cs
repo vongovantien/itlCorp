@@ -92,7 +92,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
         {
-            var data = acctSettlementPaymentService.GetDatas(criteria);
+            var data = acctSettlementPaymentService.QueryData(criteria);
             return Ok(data);
         }
 
