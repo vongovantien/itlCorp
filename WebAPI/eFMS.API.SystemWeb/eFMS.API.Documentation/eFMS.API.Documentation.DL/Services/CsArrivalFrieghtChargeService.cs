@@ -41,7 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
-        private readonly IOptions<ApiUrl> ApiUrl;
+        private readonly IOptions<WebUrl> webUrl;
         private readonly IContextBase<SysImage> sysImageRepository;
 
         ICsTransactionDetailService houseBills;
@@ -63,7 +63,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysUserLevel> userlevelRepo,
-            IOptions<ApiUrl> apiurl,
+            IOptions<WebUrl> url,
             IContextBase<SysImage> sysImageRepo
             ) : base(repository, mapper)
         {
@@ -82,7 +82,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepo = sysOffice;
             companyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
-            ApiUrl = apiurl;
+            webUrl = url;
             sysImageRepository = sysImageRepo;
         }
 
@@ -805,18 +805,18 @@ namespace eFMS.API.Documentation.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.ApiUrl.Value.Url;
+            string path = this.webUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();
                 /* Kiểm tra các thư mục có tồn tại */
                 var hs = new HandleState();
-                ImageHelper.CreateDirectoryFile(string.Empty, model.HblId.ToString());
+                ImageHelper.CreateDirectoryFile(model.FolderName, model.HblId.ToString());
                 List<SysImage> resultUrls = new List<SysImage>();
-                fileName = model.Files.FileName.Replace("+", "_");
+                fileName = model.Files.FileName.Contains("+") ? model.Files.FileName.Replace("+", "_") : model.Files.FileName;
                 string objectId = model.HblId.ToString();
-                await ImageHelper.SaveFile(fileName, string.Empty, objectId, model.Files);
-                string urlImage = path + "/files/" + objectId + "/" + fileName;
+                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+                string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
                 var sysImage = new SysImage
                 {
                     Id = Guid.NewGuid(),

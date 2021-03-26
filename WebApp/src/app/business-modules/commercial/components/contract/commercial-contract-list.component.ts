@@ -5,11 +5,13 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { ConfirmPopupComponent } from '@common';
+import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants, SystemConstants } from '@constants';
 import { SortService } from '@services';
 import { FormContractCommercialPopupComponent } from 'src/app/business-modules/share-modules/components';
+import { Store } from '@ngrx/store';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 
 @Component({
     selector: 'commercial-contract-list',
@@ -18,6 +20,7 @@ import { FormContractCommercialPopupComponent } from 'src/app/business-modules/s
 export class CommercialContractListComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
+    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @Input() partnerId: string;
     @Input() openOnPartner: boolean = false;
     @Output() onActiveContract: EventEmitter<any> = new EventEmitter<any>();
@@ -37,7 +40,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
-        protected _activeRoute: ActivatedRoute
+        protected _activeRoute: ActivatedRoute,
+        private _store: Store<IAppState>
 
     ) {
         super();
@@ -141,11 +145,15 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 .subscribe(
                     (res: Contract) => {
                         if (!!res) {
-
                             this.selectedContract = res;
+                            if (this.selectedContract.viewDetail === null || this.selectedContract.viewDetail === false) {
+                                this.permissionPopup.show();
+                                return
+                            }
                             this.formContractPopup.idContract = this.selectedContract.id;
                             this.formContractPopup.selectedContract = res;
                             this.formContractPopup.statusContract = this.formContractPopup.selectedContract.active;
+
                             this.formContractPopup.pachValueToFormContract();
                             this.formContractPopup.show();
                         }
