@@ -1158,7 +1158,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
                 var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
-                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) && item.TransactionType == "CL" ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
                 data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
