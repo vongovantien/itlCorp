@@ -2118,7 +2118,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<Guid> GetSurchargeIdByAcctMngtId(Guid? acctMngt)
         {
-            var surchargeIds = surchargeRepo.Get(x => x.AcctManagementId == acctMngt).Select(s => s.Id).ToList();
+            var surchargeIds = surchargeRepo.Get(x => x.AcctManagementId == acctMngt || x.PayerAcctManagementId == acctMngt).Select(s => s.Id).ToList();
             return surchargeIds;
         }
 
