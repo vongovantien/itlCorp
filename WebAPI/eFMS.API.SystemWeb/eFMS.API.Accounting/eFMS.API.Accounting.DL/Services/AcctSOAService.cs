@@ -1573,12 +1573,14 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctSOAResult> TakeSoas(IQueryable<AcctSoa> soas)
         {
             var partner = catPartnerRepo.Get();
+            var users = sysUserRepo.Get();
+
             var resultData = from s in soas
                              join pat in partner on s.Customer equals pat.Id into pat2
                              from pat in pat2.DefaultIfEmpty()
-                             join ucreate in sysUserRepo.Get() on s.UserCreated equals ucreate.Id into ucreate2
+                             join ucreate in users on s.UserCreated equals ucreate.Id into ucreate2
                              from ucreate in ucreate2.DefaultIfEmpty()
-                             join umodifies in sysUserRepo.Get() on s.UserModified equals umodifies.Id into umodifies2
+                             join umodifies in users on s.UserModified equals umodifies.Id into umodifies2
                              from umodifies in umodifies2.DefaultIfEmpty()
                              select new AcctSOAResult
                              {
@@ -1603,8 +1605,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  UserNameCreated = ucreate.Username,
                                  UserNameModified = umodifies.Username
                              };
-            //Sort Array sẽ nhanh hơn
-            resultData = resultData.ToArray().OrderByDescending(x => x.DatetimeModified).AsQueryable();
+            
             return resultData;
         }
 
@@ -1695,11 +1696,12 @@ namespace eFMS.API.Accounting.DL.Services
                 soas = soas.Where(x => x.UserCreated == criteria.SoaUserCreate);
             }
 
-            return soas;
+            var dataSoas = soas.OrderByDescending(x => x.DatetimeModified).AsQueryable();
+            return dataSoas;
         }
 
         /// <summary>
-        /// Nếu không có điều kiện search thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// Nếu không có điều kiện search thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
         /// </summary>
         /// <returns></returns>
         private Expression<Func<AcctSoa, bool>> ExpressionQueryDefault(AcctSOACriteria criteria)
@@ -1713,16 +1715,16 @@ namespace eFMS.API.Accounting.DL.Services
                 && string.IsNullOrEmpty(criteria.SoaCurrency)
                 && string.IsNullOrEmpty(criteria.SoaUserCreate))
             {
-                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
-                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
             return query;
         }
 
         public IQueryable<AcctSoa> QueryDataPermission(AcctSOACriteria criteria)
         {
-            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
             var soas = GetSoasPermission().Where(queryDefault);
             var soaList = GetSoaByCriteria(criteria, soas);

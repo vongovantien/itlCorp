@@ -194,7 +194,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
 
-            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày tạo mới nhất
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria); 
             var advancePayments = DataContext.Get().Where(queryDefault);
 
@@ -326,7 +326,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày tạo mới nhất trở về trước
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
         /// </summary>
         /// <returns></returns>
         private Expression<Func<AcctAdvancePayment, bool>> ExpressionQueryDefault(AcctAdvancePaymentCriteria criteria)
@@ -342,9 +342,9 @@ namespace eFMS.API.Accounting.DL.Services
                 && (string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment == "All")
                 && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All") )
             {
-                var maxDate = (DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now).AddDays(1).Date;
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
-                query = query.And(x => x.DatetimeCreated.Value > minDate && x.DatetimeCreated.Value < maxDate);
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
             return query;
         }
@@ -356,6 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (dataAdvancePayments == null) return null;
             var advancePayments = dataAdvancePayments.Where(queryAdvancePayment);
             advancePayments = QueryWithAdvanceRequest(advancePayments, criteria);
+            advancePayments = advancePayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return advancePayments;
         } 
 
@@ -405,7 +406,7 @@ namespace eFMS.API.Accounting.DL.Services
                            PayeeName = payeeGrp.ShortName
                        };
 
-            //Gom nhóm và Sắp xếp giảm dần theo Advance DatetimeModified
+            //Gom nhóm
             data = data.GroupBy(x => new
             {
                 x.Id,
@@ -459,8 +460,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ReasonReject = s.Key.ReasonReject,
                 PayeeName = s.Key.PayeeName
             });
-            //Sort Array sẽ nhanh hơn
-            data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            
             return data;
         }
 
