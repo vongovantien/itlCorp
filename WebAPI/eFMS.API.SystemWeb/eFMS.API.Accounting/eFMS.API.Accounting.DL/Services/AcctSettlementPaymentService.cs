@@ -50,6 +50,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
+        private readonly IContextBase<SysImage> sysImageRepository;
+
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -78,6 +80,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysAuthorizedApproval> authourizedApproval,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
+            IContextBase<SysImage> sysImageRepo,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -104,6 +107,7 @@ namespace eFMS.API.Accounting.DL.Services
             sentEmailHistoryRepo = sentEmailHistory;
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
+            sysImageRepository = sysImageRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -697,11 +701,32 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
-                    CustomNo = advInfo.CustomNo
+                    CustomNo = advInfo.CustomNo,
+                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo)
                 });
             }
 
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+        }
+
+        private List<SysImage> GetShipmentAttachFile(string settleCode, Guid hblId, string advanceNo, string customNo)
+        {
+            List<SysImage> files = new List<SysImage>();
+
+            var id = DataContext.Get(x => x.SettlementNo == settleCode)?.FirstOrDefault().Id;
+
+            string folderChild = string.Format("{0}/", hblId.ToString());
+            if (!string.IsNullOrEmpty(advanceNo))
+            {
+                folderChild += advanceNo + "/";
+            }
+            if (!string.IsNullOrEmpty(customNo))
+            {
+                folderChild += customNo + "/";
+            }
+
+            files = sysImageRepository.Get(x => x.Folder == "Settlement" && x.ObjectId == id.ToString() && x.ChildId == folderChild).ToList();
+            return files;
         }
 
         public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, Guid _hbl, string _settleCurrency, string _advanceNo, List<CatCurrencyExchange> currencyExchange)

@@ -17,11 +17,13 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 
 import { catchError, takeUntil, skip } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { formatDate } from '@angular/common';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    DELIVERY = 'DELIVERY'
+    DELIVERY = 'DELIVERY',
+    PROOF = 'PROOF'
 
 }
 
@@ -114,6 +116,11 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
                 }
                 break;
             }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
+                break;
+            }
             default:
                 break;
         }
@@ -158,7 +165,10 @@ export class SeaConsolImportDetailHBLComponent extends SeaConsolImportCreateHBLC
 
     updateHbl(body: any) {
         body.transactionType = ChargeConstants.SCI_CODE;
-        this._documentationRepo.updateHbl(body)
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
             .pipe(
                 catchError(this.catchError),
             )

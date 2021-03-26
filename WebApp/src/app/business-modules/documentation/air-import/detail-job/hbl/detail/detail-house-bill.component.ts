@@ -21,7 +21,8 @@ import isUUID from 'validator/lib/isUUID';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    AUTHORIZE = 'AUTHORIZE'
+    AUTHORIZE = 'AUTHORIZE',
+    PROOF = 'PROOF'
 
 }
 @Component({
@@ -135,6 +136,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 }
                 break;
             }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.confirmPopup.hide();
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
+                break;
+            }
             default:
                 break;
         }
@@ -159,18 +166,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
-                            // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-                            //     if (!!res.salemanId) {
-                            //         if (res.salemanId !== modelUpdate.saleManId) {
-                            //             this._toastService.error('Not found contract information, please check!');
-                            //             return;
-                            //         }
-                            //     }
-                            //     if (!!res.officeNameAbbr) {
-                            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-                            //     } else {
-                            //     }
-                            // });
                             this.updateHbl(modelUpdate);
 
                         }

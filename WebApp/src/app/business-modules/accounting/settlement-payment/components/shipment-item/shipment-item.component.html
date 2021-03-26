@@ -17,7 +17,6 @@
                     <a class="dropdown-item pointer" (click)="previewPLsheet($event,'VND')">Preview PL with VND</a>
                 </div>
             </a>
-
         </div>
     </div>
     <div class="col-lg-2">
@@ -59,8 +58,6 @@
             <span class="font-weight-bold">Total:</span>
             &nbsp;
             <span> {{data.totalAmount | number: '.0-3'}} </span>
-            <!-- &nbsp; -->
-            <!-- <span> {{ data.currencyShipment | uppercase }} </span> -->
         </div>
     </div>
     <div class="col-lg-2">
@@ -88,5 +85,14 @@
                 <span> ({{data.balance | abs | number: '.0-3'}}) </span>
             </ng-template>
         </div>
+    </div>
+    <div class="col-lg-2">
+        <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)">
+            <i class="flaticon-folder-1"></i>
+            <ng-container *ngIf="data?.files?.length > 0">
+                <span
+                    class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{data?.files?.length}}</span>
+            </ng-container>
+        </a>
     </div>
 </div>

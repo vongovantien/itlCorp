@@ -1,4 +1,7 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using eFMS.API.Catalogue.DL.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
@@ -8,6 +11,7 @@ using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.IdentityServer.DL.UserManager;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using SystemManagementAPI.Infrastructure.Middlewares;
@@ -72,6 +76,20 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        /// <summary>
+        /// get delivery order by housebill id
+        /// </summary>
+        /// <param name="hblid"></param>
+        /// <returns></returns>
+        [HttpGet("GetProofOfDelivery")]
+        [Authorize]
+        public IActionResult GetProofOfDelivery(Guid hblid)
+        {
+            var result = arrivalFreightChargeServices.GetProofOfDelivery(hblid);
+            return Ok(result);
+        }
+
         /// <summary>
         /// update arrival info
         /// </summary>
@@ -107,6 +125,66 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// update delivery order
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateProofOfDelivery")]
+        [Authorize]
+        public IActionResult UpdateProofOfDelivery(ProofOfDeliveryViewModel model)
+        {
+            var hs = arrivalFreightChargeServices.UpdateProofOfDelivery(model);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// attach multi files to shipment
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="HblId"></param>
+        /// 
+        /// <returns></returns>
+        [HttpPut("UploadFileProofOfDelivery/{HblId}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFileProofOfDelivery(IFormFile files, Guid HblId)
+        {
+            ProofDeliveryFileUploadModel model = new ProofDeliveryFileUploadModel
+            {
+                Files = files,
+                HblId = HblId
+            };
+
+            var result = await arrivalFreightChargeServices.UploadProofOfDeliveryFile(model);
+            return Ok(result);
+        }
+
+        /// get file contract of partner
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <returns></returns>
+        [HttpGet("GetFileAttachsProofOfDelivery")]
+        public IActionResult GetFileAttachsProofOfDelivery(Guid HblId)
+        {
+            var results = arrivalFreightChargeServices.GetFileProofOfDelivery(HblId);
+            return Ok(results);
+        }
+
+        [Authorize]
+        [HttpDelete("DeletePODAttachedFile/{id}")]
+        public IActionResult DeleteAttachedFile([Required]Guid id)
+        {
+            var result = arrivalFreightChargeServices.DeleteFilePOD(id);
             return Ok(result);
         }
 

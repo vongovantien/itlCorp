@@ -161,6 +161,9 @@ export class HouseBill extends BaseModel {
     transactionType: string = null;
     otherCharges: CsOtherCharge[] = [];
     asArranged: boolean = false;
+    deliveryPerson: string = null;
+    deliveryDate: any = null;
+    note: string = null;
     constructor(object?: any) {
         super();
         const self = this;

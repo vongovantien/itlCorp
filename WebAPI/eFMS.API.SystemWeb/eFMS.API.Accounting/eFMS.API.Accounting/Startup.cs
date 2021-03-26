@@ -97,6 +97,7 @@ namespace eFMS.API.Accounting
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
+            app.UseStaticFiles();
             //app.UseRequestLocalization();
         }
     }

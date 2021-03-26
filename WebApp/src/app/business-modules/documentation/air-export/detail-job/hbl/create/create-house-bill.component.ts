@@ -26,6 +26,7 @@ import _merge from 'lodash/merge';
 import { catchError, takeUntil, map, tap, mergeMap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { forkJoin, merge } from 'rxjs';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 @Component({
     selector: 'app-create-hbl-air-export',
@@ -39,7 +40,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
-
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
     jobId: string;
     selectedHbl: CsTransactionDetail;
     isImport: boolean = false;
@@ -192,9 +193,29 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
         return valid;
     }
 
+    setProofOfDelivery(houseBill: HouseBill) {
+        houseBill.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        houseBill.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        houseBill.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+
+        return houseBill;
+    }
+
     createHbl(houseBill: HouseBill, hbId?: string) {
-        this._documentationRepo.createHousebill(houseBill)
+        this._progressRef.start();
+        const house = this.setProofOfDelivery(houseBill);
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        house.deliveryDate = deliveryDate;
+        this._documentationRepo.createHousebill(Object.assign({}, house, deliveryDate))
             .pipe(
+                tap((result: any) => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.hblid = result.data;
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
             ).subscribe(
                 (res: CommonInterface.IResult) => {
@@ -206,6 +227,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             if (!!hbId) {
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}${this.jobId}/hbl/${hbId}/separate`]);
                             } else {
+
                                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl/${res.data}`]);
                             }
                         }

@@ -815,6 +815,25 @@ export class AccountingRepo {
     denySettlePayments(Ids: string[]) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
     }
+
+    uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
+        if (!!child) {
+            return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
+        }
+        return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files');
+    }
+
+    getAttachedFiles(folder: string, id: string, child?: string) {
+        if (!!child) {
+            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/GetAttachedFiles/${folder}/${id}`, { child: child });
+        }
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/GetAttachedFiles/${folder}/${id}`);
+
+    }
+
+    deleteAttachedFile(folder: string, id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/DeleteAttachedFile/${folder}/${id}`);
+    }
 }
 
 
