@@ -178,12 +178,13 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges);
+            //Check tồn tại phí debit đã sync khi issue Vat Invoice
+            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges, model.Type);
             if (isExistDebitSynced)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Existing charges have been synchronized to the accounting system, Please check it again!" });
             }
-
+            
             var hs = accountingService.AddAcctMgnt(model);
 
             if (hs.Success)
@@ -238,7 +239,8 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges);
+            //Check tồn tại phí đã Sync khi issue Vat Invoice
+            var isExistDebitSynced = accountingService.CheckExistDebitChargeSynced(model.Charges, model.Type);
             if (isExistDebitSynced)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Existing charges have been synchronized to the accounting system, Please check it again!" });
