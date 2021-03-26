@@ -26,10 +26,8 @@ export const environment = {
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner"
         },
-
         AUTHORIZATION:
         {
                 requireHttps: false
         },
 };
-
