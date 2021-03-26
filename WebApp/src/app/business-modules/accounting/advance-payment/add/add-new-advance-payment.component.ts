@@ -1,5 +1,5 @@
 import { Router } from '@angular/router';
-import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
 
@@ -12,7 +12,6 @@ import { AdvancePaymentFormCreateComponent } from '../components/form-create-adv
 @Component({
     selector: 'app-advance-payment-new',
     templateUrl: './add-new-advance-payment.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class AdvancePaymentAddNewComponent extends AppPage {
