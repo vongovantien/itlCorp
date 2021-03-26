@@ -22,7 +22,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
-
+    //////
     get readonly(): boolean {
         return this._readonly;
     }
