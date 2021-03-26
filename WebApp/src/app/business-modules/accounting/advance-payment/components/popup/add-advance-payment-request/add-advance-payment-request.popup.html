@@ -92,7 +92,8 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="">Note</label>
-                                <input type="text" class="form-control" placeholder="Note" formControlName="note"></div>
+                                <input type="text" class="form-control" placeholder="Note" formControlName="note">
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -120,14 +121,5 @@
     </div>
 </div>
 
-<confirm-popup #confirmDuplicatePopup (onSubmit)="onSubmitDuplicatePopup()" [title]="'Warning'"
-    [body]="'Data already exists, do you want to save or not ?'" [labelCancel]="'No'">
-</confirm-popup>
 
-<confirm-popup #exitPopup (onSubmit)="onSubmitExitPopup()" [title]="'Warning'" [body]="'Do you want to exit ?'"
-    [labelCancel]="'No'">
-</confirm-popup>
-
-<confirm-popup #existedPopup (onSubmit)="onSubmitShipmentExisted()" [title]="'Warning'"
-    [body]="'Shipment has existed in another Advance'" [title]="'Warning'">
-</confirm-popup>
+<ng-template inject></ng-template>

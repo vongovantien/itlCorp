@@ -8,6 +8,7 @@ import { AdvancePaymentAddRequestPopupComponent } from '../popup/add-advance-pay
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { listAnimation } from '@animations';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'adv-payment-list-request',
@@ -17,7 +18,7 @@ import { listAnimation } from '@animations';
 
 export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(AdvancePaymentAddRequestPopupComponent) addNewRequestPaymentPopup: AdvancePaymentAddRequestPopupComponent;
-    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) confirmDeleteContainerRef: InjectViewContainerRefDirective;
 
     @Input() state: string = 'update';
 
@@ -121,7 +122,9 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.addNewRequestPaymentPopup.action = 'create';
         this.addNewRequestPaymentPopup.advanceNo = this.advanceNo;
         this.addNewRequestPaymentPopup.selectedRequest = new AdvancePaymentRequest();
+        this.addNewRequestPaymentPopup.currency.setValue(this.currency);
         this.addNewRequestPaymentPopup.show();
+
     }
 
     changeCurrency(currency: string) {
@@ -155,14 +158,17 @@ export class AdvancePaymentListRequestComponent extends AppList {
 
     deleteItemRequestAdvancePayment() {
         if (!!this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => item.isSelected).length) {
-            this.confirmDeletePopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmDeleteContainerRef.viewContainerRef, {
+                body: 'Do you want to delete ?',
+                labelCancel: 'No',
+                labelConfirm: 'Yes'
+            }, () => this.onDeletePaymentRequest())
         }
     }
 
     onDeletePaymentRequest() {
         this.listRequestAdvancePayment = this.listRequestAdvancePayment.filter((item: AdvancePaymentRequest) => !item.isSelected);
         this.isCheckAll = false;
-        this.confirmDeletePopup.hide();
     }
 }
 
