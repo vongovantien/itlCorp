@@ -1,10 +1,8 @@
 import { Component, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
 import { User, Currency, Partner } from '@models';
-import { DataService } from '@services';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { AppForm } from 'src/app/app.form';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
-import { SystemConstants } from '@constants';
 
 import { Observable } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -48,10 +46,11 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     paymentTerm: AbstractControl;
     payee: AbstractControl;
 
+    selectedPayee: Partner;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _dataService: DataService,
         private _systemRepo: SystemRepo,
         private _store: Store<IAppState>
     ) {
@@ -164,23 +163,29 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onChangePaymentMethod(method: string) {
-        if (method === 'Bank') {
+        if (method === 'Bank' && !this.payee.value) {
             this.bankAccountName.setValue(this.userLogged.nameVn || null);
             this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
             this.bankName.setValue(this.userLogged.bankName || null);
+        } else if (!!this.selectedPayee) {
+            this.setBankInfoForPayee(this.selectedPayee);
         }
     }
 
-    onSelectPayee(payee) {
-        console.log(payee);
+    onSelectPayee(payee: Partner) {
+        this.selectedPayee = payee;
         if (this.paymentMethod.value === 'Bank') {
-            if (!!payee.bankAccountNo) {
-                this.bankAccountNo.setValue(payee.bankAccountNo);
-            }
+            this.setBankInfoForPayee(payee);
+        }
+    }
 
-            if (!!payee.bankAccountName) {
-                this.bankAccountName.setValue(payee.bankAccountName);
-            }
+    setBankInfoForPayee(payee: Partner) {
+        if (!!payee.bankAccountNo) {
+            this.bankAccountNo.setValue(payee.bankAccountNo);
+        }
+
+        if (!!payee.bankAccountName) {
+            this.bankAccountName.setValue(payee.bankAccountName);
         }
     }
 }

@@ -5,6 +5,7 @@ import { AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared
 import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'adv-payment-add-popup',
@@ -16,9 +17,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
-    @ViewChild('exitPopup') exitPopup: ConfirmPopupComponent;
-    @ViewChild('confirmDuplicatePopup') confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild('existedPopup') existedShipmentPopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
 
     action: string = 'create';
 
@@ -167,7 +166,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         } else if (this.action === 'copy') {
             if (this.detectRequestChange(this.selectedRequest, body)) {
                 this.isDupplicate = true;
-                this.confirmDuplicatePopup.show();
+                this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                    body: 'Data already exists, do you want to save or not ?',
+                    title: 'Warning',
+                    labelCancel: 'No'
+                }, () => this.onSubmitDuplicatePopup())
             } else {
                 this.isDupplicate = false;
                 this.checkRequestAdvancePayment(body);
@@ -214,7 +217,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.resetForm();
                     } else {
                         this.dataRequest = advRequest;
-                        this.existedShipmentPopup.show();
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                            body: 'Shipment has existed in another Advance !',
+                            title: 'Warning'
+                        }, () => {
+                            this.onSubmitShipmentExisted();
+                        })
                     }
                 },
             );
@@ -229,7 +237,6 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
             this.dataRequest.userCreated = "";
             this.onRequest.emit(this.dataRequest);
         }
-        this.existedShipmentPopup.hide();
         this.resetForm();
         this.hide();
     }
@@ -293,7 +300,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     }
 
     onCancel() {
-        this.exitPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+            body: 'Do you want to exit ?',
+            labelCancel: 'No',
+            title: 'Warning'
+        }, () => this.onSubmitExitPopup())
     }
 
     resetForm() {
@@ -332,13 +343,11 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
 
     onSubmitExitPopup() {
         this.hide();
-        this.exitPopup.hide();
         this.resetForm();
     }
 
     onSubmitDuplicatePopup() {
         this.hide();
-        this.confirmDuplicatePopup.hide();
         if (this.isDupplicate) {
             this.onComfirmSaveDupplicateRequestAdvancePayment(this.form);
         }

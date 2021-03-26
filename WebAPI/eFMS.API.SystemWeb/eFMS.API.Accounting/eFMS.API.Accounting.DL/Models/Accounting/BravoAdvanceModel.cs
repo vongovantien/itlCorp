@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? OriginalAmount { get; set; }
         public string Description { get; set; }
         public string DeptCode { get; set; }  // - SEA:ITLCS| AIR:ITLAIR | Custom Logistic: ITLOPS
-
-
+        public string CustomerCodeVAT { get; set; }
+        public string CustomerCodeTransfer { get; set; }
     }
 }

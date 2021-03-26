@@ -116,7 +116,8 @@
                         { field: 'shortName', label: 'Name ABBR' },
                         { field: 'partnerNameEn', label: 'Name EN' },
                         { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"
-                        [disabled]="isDisabled" placeholder="Select payee" (remove)="resetFormControl(payee)">
+                        [disabled]="isDisabled" placeholder="Select payee"
+                        (remove)="resetFormControl(payee);selectedPayee = null">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
