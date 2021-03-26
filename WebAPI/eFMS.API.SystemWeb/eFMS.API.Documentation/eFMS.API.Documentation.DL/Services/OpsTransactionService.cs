@@ -25,6 +25,7 @@ using System.Data.Common;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -532,12 +533,42 @@ namespace eFMS.API.Documentation.DL.Services
                                                 || x.UserCreated == currentUser.UserID));
                     break;
             }
+
             return data;
         }
+
+        /// <summary>
+        /// Nếu không có điều kiện search thì load list Job 3 tháng kể từ ngày modified mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<OpsTransaction, bool>> ExpressionQueryDefault(OpsTransactionCriteria criteria)
+        {
+            Expression<Func<OpsTransaction, bool>> query = q => true;
+            if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
+                && string.IsNullOrEmpty(criteria.Mblno) && string.IsNullOrEmpty(criteria.Hwbno)
+                && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.ClearanceNo)
+                && string.IsNullOrEmpty(criteria.ProductService) && string.IsNullOrEmpty(criteria.ServiceMode)
+                && criteria.CreatedDateFrom == null && criteria.CreatedDateTo == null
+                && string.IsNullOrEmpty(criteria.ShipmentMode) && string.IsNullOrEmpty(criteria.FieldOps)
+                && string.IsNullOrEmpty(criteria.CreditDebitInvoice)
+                && criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            }
+            return query;
+        }
+
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
             IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            data = data.Where(queryDefault);
+
             if (data == null) return null;
 
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
