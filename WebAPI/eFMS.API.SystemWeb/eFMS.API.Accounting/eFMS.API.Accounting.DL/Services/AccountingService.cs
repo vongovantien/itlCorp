@@ -172,6 +172,8 @@ namespace eFMS.API.Accounting.DL.Services
                 List<BravoAdvanceModel> data = queryAdv.ToList();
                 foreach (var item in data)
                 {
+                    var payeeAdvance = AdvanceRepository.Get(x => x.Id == item.Stt).FirstOrDefault()?.Payee;
+
                     // Ds advance request
                     List<BravoAdvanceRequestModel> advRGrps = AdvanceRequestRepository
                         .Get(x => x.AdvanceNo == item.ReferenceNo)
@@ -185,6 +187,8 @@ namespace eFMS.API.Accounting.DL.Services
                             OriginalAmount = x.Sum(d => d.Amount),
                             DeptCode = GetDeptCode(x.First().JobId),
                             Description = GetCustomerHBL(x.Key.Hblid) + " " + x.First().JobId + " " + x.First().Hbl,
+                            CustomerCodeVAT = null,
+                            CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, payeeAdvance)
                         }).ToList();
 
                     if (advRGrps.Count > 0)
@@ -369,7 +373,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              // CustomerCodeBook = obhP.AccountNo
                                                                                              CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId), //CR: 15500
                                                                                              CustomerCodeVAT = GetCustomerCodeVAT(surcharge),
-                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode)
+                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null)
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
@@ -1746,16 +1750,25 @@ namespace eFMS.API.Accounting.DL.Services
             return codeVat;
         }
 
-        private string GetCustomerCodeTransfer(string paymentMethod, string realPartnerTransfer)
+        private string GetCustomerCodeTransfer(string paymentMethod, string realPartnerTransfer, string payee)
         {
             string codeTransfer = null;
-            if (paymentMethod == AccountingConstants.PAYMENT_METHOD_BANK)
+            //Trường hợp payee chỉ dành cho Advance
+            if (!string.IsNullOrEmpty(payee))
             {
-                codeTransfer = realPartnerTransfer;
+                var _payee = PartnerRepository.Get(x => x.Id == payee).FirstOrDefault();
+                codeTransfer = _payee?.AccountNo;
+            }
+            else
+            {
+                if (paymentMethod == AccountingConstants.PAYMENT_METHOD_BANK)
+                {
+                    codeTransfer = realPartnerTransfer;
+                }
             }
             return codeTransfer;
         }
-
+        
         /// <summary>
         /// Get due date by partner & service
         /// </summary>

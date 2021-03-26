@@ -137,7 +137,11 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
                 if (itemIndex !== -1) {
                     this.indexSelected = itemIndex;
-                    this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
+                    // * Trường hợp currentItem về null sau đó get lại source
+                    if (!!this.currentActiveItemId?.data) {
+                        this.setCurrentActiveItem(this.ConstDataSources[itemIndex]);
+                    }
+
                 } else if (!!activeItemData.hardValue) {
                     this.displaySelectedStr = activeItemData.hardValue;
                 }
