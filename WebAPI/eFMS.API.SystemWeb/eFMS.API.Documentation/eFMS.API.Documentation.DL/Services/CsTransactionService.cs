@@ -19,6 +19,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -996,14 +997,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         #region -- LIST & PAGING --       
 
-        private IQueryable<CsTransactionModel> GetTransaction(string transactionType)
+        private IQueryable<CsTransactionModel> GetTransaction(string transactionType, CsTransactionCriteria criteria)
         {
             ICurrentUser _user = PermissionEx.GetUserMenuPermissionTransaction(transactionType, currentUser);
 
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
 
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(transactionType, criteria);
 
-            var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled);
+            var masterBills = DataContext.Get(x => x.TransactionType == transactionType && x.CurrentStatus != TermData.Canceled).Where(queryDefault);
             if (masterBills == null) return null;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds(transactionType, currentUser);
             switch (rangeSearch)
@@ -1049,24 +1052,24 @@ namespace eFMS.API.Documentation.DL.Services
             if (masterBills == null)
                 return null;
 
-            var coloaders = catPartnerRepo.Get(x => x.PartnerGroup.Contains("CARRIER"));
-            var agents = catPartnerRepo.Get(x => x.PartnerGroup.Contains("AGENT"));
-            var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
-            var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
-            var creators = sysUserRepo.Get();
+            //var coloaders = catPartnerRepo.Get(x => x.PartnerGroup.Contains("CARRIER"));
+            //var agents = catPartnerRepo.Get(x => x.PartnerGroup.Contains("AGENT"));
+            //var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            //var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            //var creators = sysUserRepo.Get();
             IQueryable<CsTransactionModel> query = null;
 
             query = from masterBill in masterBills
-                    join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
-                    from coloader in coloader2.DefaultIfEmpty()
-                    join agent in agents on masterBill.AgentId equals agent.Id into agent2
-                    from agent in agent2.DefaultIfEmpty()
-                    join pod in pods on masterBill.Pod equals pod.Id into pod2
-                    from pod in pod2.DefaultIfEmpty()
-                    join pol in pols on masterBill.Pol equals pol.Id into pol2
-                    from pol in pol2.DefaultIfEmpty()
-                    join creator in creators on masterBill.UserCreated equals creator.Id into creator2
-                    from creator in creator2.DefaultIfEmpty()
+                    //join coloader in coloaders on masterBill.ColoaderId equals coloader.Id into coloader2
+                    //from coloader in coloader2.DefaultIfEmpty()
+                    //join agent in agents on masterBill.AgentId equals agent.Id into agent2
+                    //from agent in agent2.DefaultIfEmpty()
+                    //join pod in pods on masterBill.Pod equals pod.Id into pod2
+                    //from pod in pod2.DefaultIfEmpty()
+                    //join pol in pols on masterBill.Pol equals pol.Id into pol2
+                    //from pol in pol2.DefaultIfEmpty()
+                    //join creator in creators on masterBill.UserCreated equals creator.Id into creator2
+                    //from creator in creator2.DefaultIfEmpty()
                     select new CsTransactionModel
                     {
                         Id = masterBill.Id,
@@ -1090,11 +1093,11 @@ namespace eFMS.API.Documentation.DL.Services
                         DatetimeCreated = masterBill.DatetimeCreated,
                         UserModified = masterBill.UserModified,
                         DatetimeModified = masterBill.DatetimeModified,
-                        SupplierName = coloader.ShortName,
-                        AgentName = agent.ShortName,
-                        PODName = pod.NameEn,
-                        POLName = pol.NameEn,
-                        CreatorName = creator.Username,
+                        //SupplierName = coloader.ShortName,
+                        //AgentName = agent.ShortName,
+                        //PODName = pod.NameEn,
+                        //POLName = pol.NameEn,
+                        //CreatorName = creator.Username,
                         PackageQty = masterBill.PackageQty,
                         BookingNo = masterBill.BookingNo
                     };
@@ -1120,7 +1123,7 @@ namespace eFMS.API.Documentation.DL.Services
                     page = 1;
                 }
                 tempList = tempList.Skip((page - 1) * size).Take(size);
-                results = tempList.ToList();
+                results = TakeShipments(tempList).ToList();
                 results.ForEach(fe =>
                 {
                     fe.SumCont = csMawbcontainerRepo.Get(x => x.Mblid == fe.Id).Sum(s => s.Quantity);
@@ -1130,10 +1133,54 @@ namespace eFMS.API.Documentation.DL.Services
             return results;
         }
 
+        /// <summary>
+        /// Nếu không có điều kiện search thì load list Job 3 tháng kể từ ngày modified mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<CsTransaction, bool>> ExpressionQueryDefault(string transactionType, CsTransactionCriteria criteria)
+        {
+            Expression<Func<CsTransaction, bool>> query = q => true;
+            if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
+                && string.IsNullOrEmpty(criteria.MAWB) && string.IsNullOrEmpty(criteria.HWBNo) 
+                && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.SaleManId)
+                && string.IsNullOrEmpty(criteria.SealNo) && string.IsNullOrEmpty(criteria.ContainerNo)
+                && criteria.FromDate == null && criteria.ToDate == null
+                && string.IsNullOrEmpty(criteria.MarkNo) && string.IsNullOrEmpty(criteria.CreditDebitNo)
+                && string.IsNullOrEmpty(criteria.SoaNo) && string.IsNullOrEmpty(criteria.ColoaderId) 
+                && string.IsNullOrEmpty(criteria.AgentId) && string.IsNullOrEmpty(criteria.BookingNo)
+                && string.IsNullOrEmpty(criteria.UserCreated)
+                && criteria.FromServiceDate == null && criteria.ToServiceDate == null)
+            {
+                var maxDate = (DataContext.Get(x => x.TransactionType == transactionType).Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            }
+            return query;
+        }
+
+        public IQueryable<CsTransactionModel> TakeShipments(IQueryable<CsTransactionModel> masterBills)
+        {            
+            var coloaders = catPartnerRepo.Get(x => x.PartnerGroup.Contains("CARRIER"));
+            var agents = catPartnerRepo.Get(x => x.PartnerGroup.Contains("AGENT"));
+            var pols = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            var pods = catPlaceRepo.Get(x => x.PlaceTypeId == "Port");
+            var creators = sysUserRepo.Get();
+
+            masterBills.ToList().ForEach(fe => {
+                fe.SupplierName = coloaders.FirstOrDefault(x => x.Id == fe.ColoaderId)?.ShortName;
+                fe.AgentName = agents.FirstOrDefault(x => x.Id == fe.AgentId)?.ShortName;
+                fe.PODName = pods.FirstOrDefault(x => x.Id == fe.Pod)?.NameEn;
+                fe.POLName = pols.FirstOrDefault(x => x.Id == fe.Pol)?.NameEn;
+                fe.CreatorName = creators.FirstOrDefault(x => x.Id == fe.UserCreated)?.Username;
+            });
+            
+            return masterBills;
+        }
+
         public IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria)
         {
             var transactionType = DataTypeEx.GetType(criteria.TransactionType);
-            var listSearch = GetTransaction(transactionType);
+            var listSearch = GetTransaction(transactionType, criteria);
             if (listSearch == null || listSearch.Any() == false) return null;
 
             IQueryable<CsTransactionModel> results = null;

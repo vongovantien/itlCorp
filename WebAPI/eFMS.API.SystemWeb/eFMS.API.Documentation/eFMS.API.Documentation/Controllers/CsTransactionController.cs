@@ -95,7 +95,9 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Query(CsTransactionCriteria criteria)
         {
-            return Ok(csTransactionService.Query(criteria));
+            var shiments = csTransactionService.Query(criteria);
+            var data = csTransactionService.TakeShipments(shiments);
+            return Ok(data);
         }
 
         /// <summary>

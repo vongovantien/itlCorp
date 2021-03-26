@@ -15,6 +15,7 @@ namespace eFMS.API.Documentation.DL.IService
     {
         ResultHandle ImportMulti();
         IQueryable<CsTransactionModel> Query(CsTransactionCriteria criteria);
+        IQueryable<CsTransactionModel> TakeShipments(IQueryable<CsTransactionModel> masterBills);
         List<CsTransactionModel> Paging(CsTransactionCriteria criteria, int page, int size, out int rowsCount);
         int CheckDetailPermission(Guid id);
         //CsTransactionModel GetById(Guid id);
