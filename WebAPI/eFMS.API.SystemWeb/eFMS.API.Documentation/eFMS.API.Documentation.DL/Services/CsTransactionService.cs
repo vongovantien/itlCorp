@@ -89,6 +89,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
+            ICsDimensionDetailService _dimensionDetailService,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -120,6 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             accAdvancePaymentRepository = accAdvancePaymentRepo;
             shipmentOtherChargeService = otherChargeService;
+            dimensionDetailService = _dimensionDetailService;
 
         }
 
