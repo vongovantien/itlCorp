@@ -356,7 +356,10 @@ namespace eFMS.API.Accounting.DL.Services
             if (dataSettlementPayments == null) return null;
             var settlementPayments = dataSettlementPayments.Where(querySettlementPayment);
             settlementPayments = QueryWithShipment(settlementPayments, criteria);
-            settlementPayments = settlementPayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            if (settlementPayments != null)
+            {
+                settlementPayments = settlementPayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            }
             return settlementPayments;
         }
 
