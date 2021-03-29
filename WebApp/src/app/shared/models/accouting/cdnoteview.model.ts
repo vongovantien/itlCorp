@@ -24,3 +24,17 @@ export class CDNoteViewModel {
         }
     }
 }
+
+export class CombineBillingCriteria {
+    cdNoteCode: string = '';
+    partnerId: string = '';
+    partnerName: string = '';
+    constructor(object?: object) {
+        const self = this;
+        for (const key in object) {
+            if (self.hasOwnProperty(key.toString())) {
+                self[key] = object[key];
+            }
+        }
+    }
+}

@@ -11,7 +11,7 @@
                         <div class="m-portlet__body">
                             <div class="m-form m--margin-bottom-10">
                                 <div class="row">
-                                    <div class="col-lg-12">
+                                    <div class="col-lg-12 c-button-actions">
                                         <ng-container
                                             *ngIf="(menuSpecialPermission | async | specialPermission:'Voucher') || (menuSpecialPermission | async | specialPermission:'Invoice')">
                                             <div class="dropdown m-dropdown m-dropdown--inline">
@@ -28,6 +28,15 @@
                                                 </div>
                                             </div>
                                         </ng-container>
+                                        <button type="button" class="btn btn-default m-btn--icon m-btn--uppercase"
+                                            (click)="previewCombine()">
+                                            <span>
+                                                <i class="la la-print"></i>
+                                                <span>
+                                                    Combine Billing
+                                                </span>
+                                            </span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -40,9 +49,11 @@
                                     <tbody>
                                         <ng-container *ngIf="!!cdNotes">
                                             <tr *ngFor="let cdNote of cdNotes; let i = index; trackBy: trackByFn"
-                                                [class.invalid-row]="cdNote.syncStatus === 'Rejected'">
+                                                [class.invalid-row]="cdNote.syncStatus === 'Rejected'"
+                                                [class.synced-row]="cdNote.status !== 'New'">
                                                 <td class="table-actions-col" ngi>
-                                                    <div class="table-actions" *ngIf="cdNote.status === 'New'">
+                                                    <!-- *ngIf="cdNote.status === 'New'" -->
+                                                    <div class="table-actions">
                                                         <label class="m-checkbox">
                                                             <input type="checkbox" [(ngModel)]="cdNote.isSelected">
                                                             <span></span>
@@ -114,3 +125,4 @@
 <accounting-detail-cd-note></accounting-detail-cd-note>
 
 <select-partner-popup (onSelect)="onSelectPartner()"></select-partner-popup>
+<select-partner-combine-popup (onSelect)="onSelectPartnerCombine($event)"></select-partner-combine-popup>
