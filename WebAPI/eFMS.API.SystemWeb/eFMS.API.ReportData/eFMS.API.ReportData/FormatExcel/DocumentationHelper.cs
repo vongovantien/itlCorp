@@ -1642,7 +1642,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j + addressStartContent, 49].Value = item.SalesOffice;
                 workSheet.Cells[j + addressStartContent, 50].Value = item.Creator;
                 workSheet.Cells[j + addressStartContent, 51].Value = item.POINV;
-                workSheet.Cells[j + addressStartContent, 52].Value = item.BookingNo;
+                workSheet.Cells[j + addressStartContent, 52].Value = item.BKRefNo;
                 workSheet.Cells[j + addressStartContent, 53].Value = item.Commodity;
                 workSheet.Cells[j + addressStartContent, 54].Value = item.ReferenceNo;
                 //workSheet.Cells[i + addressStartContent, 53].Value = item.ShipmentType;
