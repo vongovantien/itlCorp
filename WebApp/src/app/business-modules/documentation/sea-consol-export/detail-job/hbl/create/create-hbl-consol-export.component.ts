@@ -210,7 +210,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     }
 
     createHbl(body: any) {
-        this._progressRef.start();
         const deliveryDate = {
             deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
