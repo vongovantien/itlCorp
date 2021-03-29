@@ -42,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -60,7 +61,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
-            ICurrencyExchangeService currencyExchange
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +83,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserNotifyRepository = sysUserNotifyRepo;
             accAccountReceivableRepository = accAccountRepo;
             unitRepository = unitRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -464,7 +467,6 @@ namespace eFMS.API.Documentation.DL.Services
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.UserCreated = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    //item.ExchangeDate = DateTime.Now; ??? - Rule lạ
 
                     item.TransactionType = GetTransactionType(item.JobNo);
                     if (item.Hblid != Guid.Empty)
@@ -480,6 +482,8 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
+                            item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
                     }
 
@@ -498,6 +502,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var masterBill = csTransactionRepository.Get(x => x.Id == houseBill.JobId).FirstOrDefault();
                             _jobNo = masterBill?.JobNo;
+                            //Ưu tiên lấy MBL của MasterBill >> HouseBill
                             _mblNo = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : houseBill.Mawb;
                         }
                     }
@@ -559,6 +564,11 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharge.Hblno = _hblNo;
                         surcharge.DatetimeModified = DateTime.Now;
                         surcharge.UserModified = currentUser.UserID;
+                        if (surcharge.TransactionType == "CL")
+                        {
+                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
+                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                        }
 
                         surchargesUpdate.Add(surcharge);
                     }
@@ -1479,6 +1489,18 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return string.Empty;
 
+        }
+
+        /// <summary>
+        /// Get custom no old of shipment
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <returns></returns>
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
+            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+            return customNos;
         }
     }
 }

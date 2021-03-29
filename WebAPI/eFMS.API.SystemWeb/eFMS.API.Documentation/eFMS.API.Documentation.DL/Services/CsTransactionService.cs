@@ -2273,36 +2273,39 @@ namespace eFMS.API.Documentation.DL.Services
                     if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
                     {
                         var DataAirwayBilss = airwaybillRepository.Get(x => x.JobId == model.Id).FirstOrDefault();
-                        var DataDimensionDetail = dimensionDetailRepository.Get(x => x.AirWayBillId == DataAirwayBilss.Id).ToList();
-                        var DataOtherCharge = shipmentOtherChargeService.Get(x => x.JobId == model.Id).ToList();
-                        DataAirwayBilss.Id = Guid.NewGuid();
-                        DataAirwayBilss.DatetimeModified = DateTime.Now;
-                        DataAirwayBilss.UserModified = currentUser.UserID;
-                        DataAirwayBilss.JobId = transaction.Id;
-                        HandleState hsAirwayBilss = airwaybillRepository.Add(DataAirwayBilss);
-                        if (hsAirwayBilss.Success)
+                        if(DataAirwayBilss != null)
                         {
-                            if (DataDimensionDetail != null)
+                            var DataDimensionDetail = dimensionDetailRepository.Get(x => x.AirWayBillId == DataAirwayBilss.Id).ToList();
+                            var DataOtherCharge = shipmentOtherChargeService.Get(x => x.JobId == model.Id).ToList();
+                            DataAirwayBilss.Id = Guid.NewGuid();
+                            DataAirwayBilss.DatetimeModified = DateTime.Now;
+                            DataAirwayBilss.UserModified = currentUser.UserID;
+                            DataAirwayBilss.JobId = transaction.Id;
+                            HandleState hsAirwayBilss = airwaybillRepository.Add(DataAirwayBilss);
+                            if (hsAirwayBilss.Success)
                             {
-                                DataDimensionDetail.ForEach(x =>
+                                if (DataDimensionDetail != null)
                                 {
-                                    x.UserCreated = currentUser.UserID;
-                                    x.DatetimeCreated = DateTime.Now;
-                                    x.Id = Guid.NewGuid();
-                                    x.AirWayBillId = DataAirwayBilss.Id;
-                                });
+                                    DataDimensionDetail.ForEach(x =>
+                                    {
+                                        x.UserCreated = currentUser.UserID;
+                                        x.DatetimeCreated = DateTime.Now;
+                                        x.Id = Guid.NewGuid();
+                                        x.AirWayBillId = DataAirwayBilss.Id;
+                                    });
 
-                                var hsDimensions = dimensionDetailRepository.Add(DataDimensionDetail);
-                            }
-                            if(DataOtherCharge != null)
-                            {
-                                DataOtherCharge.ForEach(x => {
-                                    x.UserModified = currentUser.UserID;
-                                    x.DatetimeModified = DateTime.Now;
-                                    x.Id = Guid.NewGuid();
-                                    x.JobId = DataAirwayBilss.JobId;
-                                });
-                                var hsOtherCharges = shipmentOtherChargeService.Add(DataOtherCharge);
+                                    var hsDimensions = dimensionDetailRepository.Add(DataDimensionDetail);
+                                }
+                                if (DataOtherCharge != null)
+                                {
+                                    DataOtherCharge.ForEach(x => {
+                                        x.UserModified = currentUser.UserID;
+                                        x.DatetimeModified = DateTime.Now;
+                                        x.Id = Guid.NewGuid();
+                                        x.JobId = DataAirwayBilss.JobId;
+                                    });
+                                    var hsOtherCharges = shipmentOtherChargeService.Add(DataOtherCharge);
+                                }
                             }
                         }
                     }
