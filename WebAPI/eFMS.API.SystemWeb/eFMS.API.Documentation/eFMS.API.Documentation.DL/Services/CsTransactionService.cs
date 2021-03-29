@@ -78,6 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentSurchargeService surService,
             ICsTransactionDetailService tranDetailService,
             ICsArrivalFrieghtChargeService arrivalFrieghtChargeService,
+            ICsDimensionDetailService dimensionService,
             IContextBase<CsDimensionDetail> dimensionDetailRepo,
             IUserPermissionService perService,
             IContextBase<CsArrivalFrieghtCharge> freighchargesRepo,
@@ -120,6 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAdvanceRequestRepository = accAdvanceRequestRepo;
             accAdvancePaymentRepository = accAdvancePaymentRepo;
             shipmentOtherChargeService = otherChargeService;
+            dimensionDetailService = dimensionService;
 
         }
 

@@ -123,3 +123,6 @@
 
 
 <ng-template inject></ng-template>
+
+<confirm-popup #existedPopup body="Shipment has existed in another Advance " title="Warning"
+    (onSubmit)="existedPopup.hide(); onSubmitShipmentExisted()"></confirm-popup>

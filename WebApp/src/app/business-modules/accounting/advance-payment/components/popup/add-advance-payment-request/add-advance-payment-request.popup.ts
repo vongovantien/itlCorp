@@ -18,6 +18,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
+    @ViewChild('existedPopup') confirmEsixedJobPopup: ConfirmPopupComponent;
 
     action: string = 'create';
 
@@ -217,12 +218,16 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.resetForm();
                     } else {
                         this.dataRequest = advRequest;
-                        this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                            body: 'Shipment has existed in another Advance !',
-                            title: 'Warning'
-                        }, () => {
-                            this.onSubmitShipmentExisted();
-                        })
+
+                        // ! Bỏ bô gọi API, render dynamic không show được
+                        // this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                        //     body: 'Shipment has existed in another Advance !',
+                        //     title: 'Warning'
+                        // }, () => {
+                        //     this.onSubmitShipmentExisted();
+                        // })
+
+                        this.confirmEsixedJobPopup.show();
                     }
                 },
             );
