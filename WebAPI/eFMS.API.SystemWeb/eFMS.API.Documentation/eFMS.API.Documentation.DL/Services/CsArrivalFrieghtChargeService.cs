@@ -856,7 +856,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = sysImageRepository.Delete(x => x.Id == id);
             if (result.Success)
             {
-                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, "Shipment");
             }
             return result;
         }

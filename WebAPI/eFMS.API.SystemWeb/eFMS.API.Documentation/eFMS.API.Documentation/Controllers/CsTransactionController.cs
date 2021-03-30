@@ -312,7 +312,7 @@ namespace eFMS.API.Documentation.Controllers
             HandleState hs = await sysImageService.DeleteFile(id);
             if (hs.Success)
             {
-                return Ok(new ResultHandle { Message = "Delete file Successfully" });
+                return Ok(new ResultHandle { Message = "Delete file Successfully", Status = true });
             }
             return BadRequest(hs);
         }
