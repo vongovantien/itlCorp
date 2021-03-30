@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, Input } from '@angular/core';
+import { Component, ViewChild, ViewChildren, QueryList, Input, Output, EventEmitter } from '@angular/core';
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
 import { takeUntil } from 'rxjs/operators';
 import { AppList } from '@app';
@@ -23,6 +23,7 @@ import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
+import { F } from '@angular/cdk/keycodes';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -33,6 +34,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this._readonly = coerceBooleanProperty(val);
     }
 
+    @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
+    
     get readonly(): boolean {
         return this._readonly;
     }
@@ -68,6 +71,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     STATE: string = 'WRITE';  // * list'state READ/WRITE
 
     isShowButtonCopyCharge: boolean = false;
+    isDirectSettlement: boolean = true;
+    isExistingSettlement: boolean = true;
 
     constructor(
         private _sortService: SortService,
@@ -119,9 +124,20 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     onRequestSurcharge(surcharge: any) {
         // this.surcharges.push(surcharge);
+        surcharge = surcharge.filter((item: any) => this.surcharges.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
         this.surcharges = [...this.surcharges, ...surcharge];
         this.surcharges.forEach(x => x.isSelected = false);
+        console.log('surcharge', this.surcharges)
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
+        if(this.tableListChargePopup.charges.length > 0){
+            this.isDirectSettlement = true;
+            this.isExistingSettlement = false;
+        }
+        if(this.existingChargePopup.selectedCharge.length > 0){
+            this.isExistingSettlement = true;
+            this.isDirectSettlement = false;
+        }
+        this.onChange.emit(true);
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
@@ -305,8 +321,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         if (charge.isFromShipment) {
             const surchargesFromShipment: Surcharge[] = this.surcharges.filter((surcharge: Surcharge) => surcharge.hblid === charge.hblid && surcharge.isFromShipment);
 
-            this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
-            this.listChargeFromShipmentPopup.show();
+            // this.listChargeFromShipmentPopup.charges = cloneDeep(surchargesFromShipment);
+            // this.listChargeFromShipmentPopup.show();
+            this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
+            this.existingChargePopup.state = 'update';
+            this.existingChargePopup.show();
         } else {
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
             if (!!shipment) {

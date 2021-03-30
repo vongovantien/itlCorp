@@ -1164,10 +1164,9 @@ namespace eFMS.API.Accounting.DL.Services
             var surcharge = csShipmentSurchargeRepo
                 .Get(x =>
                         x.IsFromShipment == true
-                     //&& (x.Type == Constants.TYPE_CHARGE_BUY || (x.PayerId != null && x.CreditNo != null))
-                     //&& (x.Type == AccountingConstants.TYPE_CHARGE_BUY || (x.PayerId == criteria.partnerId && x.CreditNo != null))
-                     && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId)
-                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
+                     && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId && string.IsNullOrEmpty(x.SyncedFrom))
+                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId) && string.IsNullOrEmpty(x.PaySyncedFrom))
+                     && string.IsNullOrEmpty(x.SettlementCode)
                 );
             // Get data source
             var charge = catChargeRepo.Get();
@@ -1177,7 +1176,7 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval != AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
+            //var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
 
             // Data search = jobNo
             criteria.jobIds = criteria.jobIds != null ? criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.jobIds;
@@ -1204,7 +1203,7 @@ namespace eFMS.API.Accounting.DL.Services
             criteria.soaNo = criteria.soaNo != null ? criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.soaNo;
             if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
             {
-                surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0 || criteria.soaNo.IndexOf(x.Soano ?? "") >= 0);
+                surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0);
             }
             // Data search = customNo
             criteria.customNos = criteria.customNos != null ? criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.customNos;
@@ -1238,8 +1237,8 @@ namespace eFMS.API.Accounting.DL.Services
             // Data search = PIC
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
-                opsTrans = opsTrans.Where(x => x.UserCreated == criteria.personInCharge);
-                csTransD = csTransD.Where(x => x.UserCreated == criteria.personInCharge);
+                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                csTransD = csTransD.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
             var clearance = customClearanceRepo.Get();
             var userRepo = sysUserRepo.Get();
@@ -1254,8 +1253,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                from advGrp in advGrps.DefaultIfEmpty()
+                                //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                //from advGrp in advGrps.DefaultIfEmpty()
                                 join cl in clearance on opst.JobNo equals cl.JobNo into cls
                                 from cl in cls.DefaultIfEmpty()
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
@@ -1297,12 +1296,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
-                                    AdvanceNo = advGrp.AdvanceNo,
+                                    //AdvanceNo = advGrp.AdvanceNo,
                                     CustomNo = cl.ClearanceNo ?? string.Empty,
                                     PICName = user.Username
                                 };
 
-            if (criteria.customNos != null)
+            if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
                 return dataOperation.ToList();
             }
@@ -1318,8 +1317,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from pae in pae2.DefaultIfEmpty()
                                join cstd in csTransD on sur.Hblid equals cstd.Id
                                join cst in csTrans on cstd.JobId equals cst.Id
-                               join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                               from advGrp in advGrps.DefaultIfEmpty()
+                               //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                               //from advGrp in advGrps.DefaultIfEmpty()
                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                from user in sysUser.DefaultIfEmpty()
                                select new ShipmentChargeSettlement
@@ -1359,7 +1358,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    ContNo = sur.ContNo,
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
-                                   AdvanceNo = advGrp.AdvanceNo,
+                                   //AdvanceNo = advGrp.AdvanceNo,
                                    PICName = user.Username
                                };
 
@@ -4840,6 +4839,68 @@ namespace eFMS.API.Accounting.DL.Services
                 return result;
             }
             return partner.AsQueryable();
+        }
+
+        public string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria)
+        {
+            var surcharges = csShipmentSurchargeRepo
+                .Get(x =>
+                        x.IsFromShipment == true
+                     && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId)
+                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
+                );
+            bool _isSynced = false;
+            string message = string.Empty;
+            if (criteria.soaNo.Count() > 0)
+            {
+                var surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                if (!surchargesFilter.Any())
+                {
+                    surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                    _isSynced = surchargesFilter.Any();
+                }
+                if (surchargesFilter.Any())
+                {
+                    message = "SOA: " + string.Join(',', surchargesFilter.Select(x => x.PaySoano)) + " exist charges that synced to Accountant or made settlement, Please you check again!";
+                }
+                
+            }
+            if (criteria.creditNo.Count() > 0)
+            {
+                var surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
+                if (surchargesFilter.Any())
+                {
+                    surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
+                    _isSynced = surchargesFilter.Any();
+                }
+                if (surchargesFilter.Any())
+                {
+                    message = "CDNote: " + string.Join(',', surchargesFilter.Select(x => x.CreditNo)) + " exist charges that synced to Accountant or made settlement, Please you check again!";
+                }
+            }
+            return message;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <param name="mbl"></param>
+        /// <param name="hbl"></param>
+        /// <returns></returns>
+        public List<string> GetListAdvanceNoForShipment(string jobId, string mbl, string hbl)
+        {
+            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.JobId == jobId && x.Mbl == mbl && x.Hbl == hbl).ToLookup(x=>x.AdvanceNo);
+            if(advanceRequest != null && advanceRequest.Count() > 0)
+            {
+                var advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceRequest.Any(a => a.Key.Contains(x.AdvanceNo)));
+                return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
+            }
+            return new List<string>();
         }
     }
 }

@@ -312,6 +312,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("acctAdvancePayment");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctAdvancePayment");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -348,6 +351,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
+
+                entity.Property(e => e.Payee)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(50)
@@ -405,8 +412,6 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
 
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
-
-                entity.Property(e => e.Description).HasMaxLength(50);
 
                 entity.Property(e => e.Hbl)
                     .HasColumnName("HBL")
@@ -804,6 +809,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("acctSettlementPayment");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSettlementPayment");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -845,6 +853,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SettlementType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.StatusApproval)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -865,6 +877,9 @@ namespace eFMS.API.Accounting.Service.Models
             modelBuilder.Entity<AcctSoa>(entity =>
             {
                 entity.ToTable("acctSOA");
+
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSOA");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -1948,6 +1963,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PayerAcctManagementId).HasColumnName("PayerAcctManagementID");
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)
@@ -2301,9 +2318,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("DCLRCUS")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DeliveryOrderNo).HasMaxLength(100);
 
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryPerson).HasMaxLength(250);
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
@@ -2496,6 +2517,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(250);
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
+
+                entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
 

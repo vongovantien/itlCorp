@@ -39,7 +39,6 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     }
 
     ngOnInit() {
-
     }
 
     ngAfterViewInit() {
@@ -50,6 +49,14 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     onChangeCurrency(currency: string) {
         if (!!this.requestSurchargeListComponent) {
             this.requestSurchargeListComponent.changeCurrency(currency);
+        }
+    }
+
+    getPayeeInfo(event: any) {
+        if (!!this.requestSurchargeListComponent.surcharges) {
+            const partnerId = this.requestSurchargeListComponent.surcharges[0].type === 'OBH' ? this.requestSurchargeListComponent.surcharges[0].payerId
+                : this.requestSurchargeListComponent.surcharges[0].paymentObjectId;
+            this.formCreateSurcharge.payee.setValue(partnerId);
         }
     }
 

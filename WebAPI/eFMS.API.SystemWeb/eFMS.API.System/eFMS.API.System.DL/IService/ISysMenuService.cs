@@ -14,6 +14,5 @@ namespace eFMS.API.System.DL.IService
     {
         List<MenuUserModel> GetMenus(string userId, Guid officeId);
         List<CommonData> GetListService();
-        IQueryable<SysUser> GetListUserHasPermission(string menuID, string action);
     }
 }

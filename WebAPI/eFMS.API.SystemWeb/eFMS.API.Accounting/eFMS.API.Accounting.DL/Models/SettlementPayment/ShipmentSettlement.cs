@@ -34,6 +34,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string Type { get; set; }
         public string CustomNo { get; set; }
         public string AdvanceNo { get; set; }
+        public List<string> AdvanceNoList { get; set; }
         public decimal? AdvanceAmount { get; set; }
         public decimal? Balance { get; set; }
         public List<ShipmentChargeSettlement> ChargeSettlements { get; set; }

@@ -36,6 +36,7 @@ import { reducers, settleEffects } from './components/store';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { SettlePaymentEffect } from './components/store/effects/settlement-payment.effect';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 const routing: Routes = [
     {
@@ -89,6 +90,11 @@ const customCurrencyMaskConfig = {
     nullable: true
 };
 
+const maskConfig: Partial<IConfig> = {
+    validation: false,
+    showMaskTyped: true,
+    dropSpecialCharacters: false
+};
 @NgModule({
     imports: [
         SharedModule,
@@ -106,7 +112,8 @@ const customCurrencyMaskConfig = {
         NgSelectModule,
         StoreModule.forFeature('settlement-payment', reducers),
         EffectsModule.forFeature([SettlePaymentEffect]),
-        ShareModulesModule
+        ShareModulesModule,
+        NgxMaskModule.forRoot(maskConfig),
     ],
     exports: [],
     declarations: [

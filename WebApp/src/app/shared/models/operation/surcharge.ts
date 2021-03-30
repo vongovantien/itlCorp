@@ -59,7 +59,7 @@ export class Surcharge {
     amountUSD: number = 0;
     vatAmountUSD: number = 0;
     totalAmountVnd: number = 0;
-    picName: string = null;
+    picName: string = '';
     // * Custom
     obhId: string = null;
     isDuplicate: boolean = false;

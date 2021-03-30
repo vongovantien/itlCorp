@@ -26,7 +26,7 @@ namespace eFMS.API.System.DL.IService
         List<SysUserImportModel> CheckValidImport(List<SysUserImportModel> list);
         HandleState Import(List<SysUserViewModel> data);
         HandleState Delete(string id);
-
+        IQueryable<SysUser> GetListUserWithPermission(string menuID, string action);
 
 
     }

@@ -75,6 +75,9 @@
                     <select formControlName="paymentMethod" class="form-control">
                         <option *ngFor="let method of methods" [ngValue]="method">{{method.title}}</option>
                     </select>
+                    <div class="form-group">
+                        <label>Settlement Type: </label>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">

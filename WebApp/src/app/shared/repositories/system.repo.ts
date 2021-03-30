@@ -670,5 +670,10 @@ export class SystemRepo {
         );
     }
 
+    getListUserWithPermission(menuID: string, action: string) {
+        return this._api.get(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUser/GetListUserWithPermission`, { menuID: menuID, action: action }).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
