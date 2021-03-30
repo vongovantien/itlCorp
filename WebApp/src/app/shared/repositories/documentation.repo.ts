@@ -1135,4 +1135,10 @@ export class DocumentationRepo {
         );
     }
 
+    previewCombineBilling(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewCombineBilling`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }

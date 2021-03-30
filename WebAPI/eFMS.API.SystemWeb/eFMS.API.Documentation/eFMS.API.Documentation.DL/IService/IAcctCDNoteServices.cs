@@ -27,6 +27,6 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState RejectCreditNote(RejectCreditNoteModel model);
         AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
         Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria);
-        Crystal PreviewCombineBilling(CombineBillingCriteria criteria);
+        Crystal PreviewCombineBilling(List<CombineBillingCriteria> criteria);
     }
 }

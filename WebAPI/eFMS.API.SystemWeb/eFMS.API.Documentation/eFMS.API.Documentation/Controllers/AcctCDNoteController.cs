@@ -310,7 +310,8 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="criteria"></param>
         /// <returns></returns>
         [HttpPost("PreviewCombineBilling")]
-        public IActionResult PreviewCombineBilling(CombineBillingCriteria criteria)
+        [Authorize]
+        public IActionResult PreviewCombineBilling([FromBody]List<CombineBillingCriteria> criteria)
         {
             var result = cdNoteServices.PreviewCombineBilling(criteria);
             return Ok(result);

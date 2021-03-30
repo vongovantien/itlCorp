@@ -128,3 +128,6 @@
 
 <select-partner-popup (onSelect)="onSelectPartner()"></select-partner-popup>
 <select-partner-combine-popup (onSelect)="onSelectPartnerCombine($event)"></select-partner-combine-popup>
+<ng-container *ngIf="dataReport">
+    <app-report-preview [data]="dataReport"></app-report-preview>
+</ng-container>

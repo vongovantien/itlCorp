@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 
 import { DocumentationRepo, AccountingRepo } from '@repositories';
 import { SortService } from '@services';
-import { PartnerOfAcctManagementResult, CDNoteViewModel, CombineBillingCriteria } from '@models';
+import { PartnerOfAcctManagementResult, CDNoteViewModel, CombineBillingCriteria, Crystal } from '@models';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { AccountingConstants, RoutingConstants } from '@constants';
 
@@ -19,6 +19,7 @@ import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-n
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { AccountingManagementSelectPartnerCombinePopupComponent } from '../components/popup/select-partner-combine/select-partner-combine.popup';
+import { ReportPreviewComponent } from '@common';
 
 
 
@@ -33,6 +34,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     @ViewChild(AccountingDetailCdNoteComponent) cdNoteDetailPopupComponent: AccountingDetailCdNoteComponent;
     @ViewChild(AccountingManagementSelectPartnerPopupComponent) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
     @ViewChild(AccountingManagementSelectPartnerCombinePopupComponent) selectPartnerCombinePopup: AccountingManagementSelectPartnerCombinePopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     selectedTab: TAB = 'CDI';
     cdNotes: CDNoteViewModel[] = [];
@@ -237,7 +239,8 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                 this.selectPartnerCombinePopup.selectedPartner = null;
                 this.selectPartnerCombinePopup.show();
             } else {
-                console.log(partners);
+                const combineCriteria = this.cdNoteCombine.filter(x => x.partnerId == partners[0].partnerId);
+                this.previewCombineBilling(combineCriteria);
             }
         } else {
             this._toastService.warning("Please select CD Note to preview");
@@ -246,6 +249,25 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
 
     onSelectPartnerCombine(partner: CombineBillingCriteria) {
         const combineCriteria = this.cdNoteCombine.filter(x => x.partnerId == partner.partnerId);
-        console.log(combineCriteria);
+        this.previewCombineBilling(combineCriteria);
+    }
+
+    previewCombineBilling(combineCriteria: CombineBillingCriteria[]) {
+        this._progressRef.start();
+        this._documentationRepo.previewCombineBilling(combineCriteria)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: Crystal) => {
+                    if (res != null) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

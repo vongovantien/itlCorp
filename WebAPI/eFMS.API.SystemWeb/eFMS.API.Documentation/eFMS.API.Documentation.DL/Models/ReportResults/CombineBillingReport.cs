@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Documentation.DL.Models.ReportResults
 {
@@ -24,6 +22,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string JobNo { get; set; }
         public string CdCode { get; set; }
         public string Docs { get; set; }
+        public DateTime? DatetimeModifiedCdNote { get; set; }
     }
 
     public class CombineBillingReportParams
