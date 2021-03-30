@@ -449,42 +449,72 @@
                                 </div>
                                 <div class="col-lg-4">
                                     <!--Bank name-->
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Bank Name
-                                        </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                            name="bankAccountName" autocomplete="nope"
-                                            formControlName="bankAccountName">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Bank Account Name
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="" name="bankAccountName" autocomplete="nope"
+                                                    formControlName="bankAccountName">
+                                            </div>
+                                        </div>
+
+                                        <!--Round Up Method-->
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-control-label"> Round Up Method </label>
+                                                <ng-select [clearable]="true" [items]="roundMethods"
+                                                    name="roundUpMethod" class="custom" bindLabel="text"
+                                                    formControlName="roundUpMethod" placeholder="Select roundUpMethod">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-control-label"> Apply for Dim </label>
+                                                <ng-select [clearable]="true" [items]="applyDims" name="applyDim"
+                                                    class="custom" bindLabel="text" formControlName="applyDim"
+                                                    placeholder="Select apply for dim">
+                                                </ng-select>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <!--Round Up Method-->
-                                    <div class="form-group">
-                                        <label class="form-control-label"> Round Up Method </label>
-                                        <ng-select [clearable]="true" [items]="roundMethods" name="roundUpMethod"
-                                            class="custom" bindLabel="text" formControlName="roundUpMethod"
-                                            placeholder="Select roundUpMethod">
-                                        </ng-select>
-                                    </div>
+
                                 </div>
                                 <div class="col-lg-4">
                                     <!--Bank address-->
-                                    <div class="form-group">
-                                        <label class="form-control-label" for="">
-                                            Bank Address
-                                        </label>
-                                        <input type="text" class="form-control m-input m-input--square" placeholder=""
-                                            name="bankAccountAddress" autocomplete="nope"
-                                            formControlName="bankAccountAddress">
-                                    </div>
-                                    <!--Apply for dim-->
-                                    <div class="form-group">
-                                        <label class="form-control-label"> Apply for Dim </label>
-                                        <ng-select [clearable]="true" [items]="applyDims" name="applyDim" class="custom"
-                                            bindLabel="text" formControlName="applyDim"
-                                            placeholder="Select apply for dim">
-                                        </ng-select>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Bank Address
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="" name="bankAccountAddress" autocomplete="nope"
+                                                    formControlName="bankAccountAddress">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-lg-12">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Bank Name
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    placeholder="" name="bankName" formControlName="bankName">
+                                            </div>
+                                        </div>
+
+
+
                                     </div>
                                 </div>
+
+                                <!--Apply for dim-->
+
+
                             </div>
                             <div class="row">
                                 <div class="col-lg-12">
