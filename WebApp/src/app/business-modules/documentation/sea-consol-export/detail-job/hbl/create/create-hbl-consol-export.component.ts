@@ -215,7 +215,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
         };
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
-        body.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
         this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
             .pipe(
                 tap((result: any) => {

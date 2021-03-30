@@ -196,7 +196,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     setProofOfDelivery(houseBill: HouseBill) {
         houseBill.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         houseBill.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
-        houseBill.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        houseBill.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
 
         return houseBill;
     }
