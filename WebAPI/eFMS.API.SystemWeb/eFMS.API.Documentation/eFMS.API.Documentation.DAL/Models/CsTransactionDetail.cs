@@ -155,6 +155,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string DeliveryPerson { get; set; }
         public DateTime? DeliveryDate { get; set; }
         public string Note { get; set; }
+        public string ReferenceNoProof { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

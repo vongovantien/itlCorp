@@ -132,7 +132,7 @@ export class SeaLCLExportDetailHBLComponent extends SeaLCLExportCreateHBLCompone
         };
         body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
         body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
-        body.referenceNo = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
         this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
             .pipe(
                 tap(() => {
