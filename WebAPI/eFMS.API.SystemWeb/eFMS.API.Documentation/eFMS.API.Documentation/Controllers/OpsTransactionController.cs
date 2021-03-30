@@ -345,13 +345,5 @@ namespace eFMS.API.Documentation.Controllers
 
             return errorMsg;
         }
-        [HttpGet("AdvanceSettlement")]
-        // [Authorize]
-        public IActionResult opsAdvanceSettlements(Guid JobID)
-        {
-            var job =  transactionService.opsAdvanceSettlements(JobID);
-            return Ok(job);
-        }
-        
     }
 }

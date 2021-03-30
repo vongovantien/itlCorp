@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -307,6 +308,13 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = shipmentService.GetIncentiveReport(criteria, userId);
             return Ok(data);
+        }
+
+        [HttpGet("AdvanceSettlement")]
+        public IActionResult opsAdvanceSettlements(Guid JobID)
+        {
+            var job = shipmentService.GetAdvanceSettlements(JobID);
+            return Ok(job);
         }
     }
 }

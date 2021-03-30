@@ -14,6 +14,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1168,7 +1169,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CBM = item.Cbm;
 
                 data.Cont20 = item.Cont20 ?? 0;
-                data.Cont40 = item.Cont40 ?? 0 ;
+                data.Cont40 = item.Cont40 ?? 0;
                 data.Cont40HC = item.Cont40HC ?? 0;
                 data.Cont45 = item.Cont45 ?? 0;
 
@@ -4445,6 +4446,63 @@ namespace eFMS.API.Documentation.DL.Services
             commissionData.VerifiedBy = _managerDept;
 
             return commissionData;
+        }
+
+        public List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id)
+        {
+
+            List<ShipmentAdvanceSettlementModel> results = new List<ShipmentAdvanceSettlementModel>();
+
+            IQueryable<SysUser> users = sysUserRepo.Get();
+
+            OpsTransaction opsJob = opsRepository.Get(x => x.Id == Id)?.FirstOrDefault();
+            CsTransaction csJob = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+
+            if (opsJob == null && csJob == null)
+            {
+                return results;
+            }
+
+            string jobNo = opsJob == null ? csJob.JobNo : opsJob.JobNo;
+            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(jobNo);
+            if (dta.Count > 0)
+            {
+                results = dta.Select(s => new ShipmentAdvanceSettlementModel
+                {
+                    SettlementCode = s.SettlementCode,
+                    SettlementDate = s.SettlementDate,
+                    SettlementCurrency = s.SettlementCurrency,
+                    SettlementAmount = s.SettlementAmount,
+                    SettleStatusApproval = s.SettleStatusApproval,
+                    SettleRequester = s.SettleRequester,
+
+                    AdvanceNo = s.AdvanceNo,
+                    AdvanceDate = s.AdvanceDate,
+                    AdvanceCurrency = s.AdvanceCurrency,
+                    AdvanceAmount = s.AdvanceAmount,
+                    AdvanceStatusApproval = s.AdvanceStatusApproval,
+                    Balance = s.SettlementAmount - s.AdvanceAmount,
+                    AdvRequester = s.AdvRequester,
+                    AdvanceSyncStatus = s.AdvanceSyncStatus,
+                    SettlementSyncStatus = s.SettlementSyncStatus,
+                    AdvanceVoucherNo = s.AdvanceVoucherNo,
+                    SettlementVoucherNo = s.SettlementVoucherNo,
+                    AdvanceVoucherDate = s.AdvanceVoucherDate,
+                    SettlementVoucherDate = s.SettlementVoucherDate
+                }).ToList();
+            }
+
+            return results;
+        }
+
+
+        private List<sp_GetAdvanceSettleOpsTransaction> GetAdvanceSettleByJobNo(string jobNo)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("jobNo", jobNo)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAdvanceSettleOpsTransaction>(parameters);
         }
         #endregion
 
