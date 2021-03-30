@@ -1120,7 +1120,7 @@ export class DocumentationRepo {
     }
 
     getListAdvanceSettlement(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/AdvanceSettlement`, { jobId: jobId });
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/AdvanceSettlement`, { jobId: jobId });
     }
 
     previewOPSCdNote(body: any) {

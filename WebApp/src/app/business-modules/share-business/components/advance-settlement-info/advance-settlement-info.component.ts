@@ -13,7 +13,7 @@ import { DestroyService } from '@services';
     templateUrl: './advance-settlement-info.component.html',
     styleUrls: ['./advance-settlement-info.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [DestroyService]
+    providers: [DestroyService],
 })
 
 export class ShareBusinessAdvanceSettlementInforComponent {

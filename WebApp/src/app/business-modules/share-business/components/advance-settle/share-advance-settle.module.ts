@@ -1,15 +1,16 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 import { ShareBusinessAdvanceSettlementInforComponent } from 'src/app/business-modules/share-business/components/advance-settlement-info/advance-settlement-info.component';
+import { PipeModule } from 'src/app/shared/pipes/pipe.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        ShareBussinessModule,
+        PipeModule,
     ],
     exports: [],
     declarations: [
+        ShareBusinessAdvanceSettlementInforComponent
     ],
     providers: [],
     entryComponents: [
