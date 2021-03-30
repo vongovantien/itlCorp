@@ -708,7 +708,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
             var data = detailTransactionRepository.Get(x => x.Id == hblId)?.FirstOrDefault();
             result.DeliveryDate = data?.DeliveryDate;
-            result.ReferenceNo = data?.ReferenceNo;
+            result.ReferenceNo = data?.ReferenceNoProof;
             result.Note = data?.Note;
             result.DeliveryPerson = data?.DeliveryPerson;
             return result;
@@ -782,7 +782,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var detailTransaction = detailTransactionRepository.First(x => x.Id == model.HblId);
             if (detailTransaction == null) return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
-            detailTransaction.ReferenceNo = model.ReferenceNo;
+            detailTransaction.ReferenceNoProof = model.ReferenceNo;
             detailTransaction.DeliveryDate = model.DeliveryDate;
             detailTransaction.DeliveryPerson = model.DeliveryPerson;
             detailTransaction.Note = model.Note;

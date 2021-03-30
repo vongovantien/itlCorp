@@ -164,6 +164,7 @@ export class HouseBill extends BaseModel {
     deliveryPerson: string = null;
     deliveryDate: any = null;
     note: string = null;
+    referenceNoProof = null;
     constructor(object?: any) {
         super();
         const self = this;
