@@ -2651,5 +2651,24 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return _link;
         }
+
+        public Crystal PreviewCombineBilling(CombineBillingCriteria criteria)
+        {
+            var cdNotes = new List<CombineBillingReport>();
+
+            var result = new Crystal
+            {
+                ReportName = "CombineBilling.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+
+            var parameters = new CombineBillingReportParams();
+
+            result.AddDataSource(cdNotes);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameters);
+            return result;
+        }
     }
 }

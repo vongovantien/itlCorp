@@ -29,6 +29,7 @@ export class CombineBillingCriteria {
     cdNoteCode: string = '';
     partnerId: string = '';
     partnerName: string = '';
+    currencyCombine: string = '';
     constructor(object?: object) {
         const self = this;
         for (const key in object) {

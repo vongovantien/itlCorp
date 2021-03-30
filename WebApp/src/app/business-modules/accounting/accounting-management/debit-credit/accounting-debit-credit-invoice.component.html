@@ -28,15 +28,17 @@
                                                 </div>
                                             </div>
                                         </ng-container>
-                                        <button type="button" class="btn btn-default m-btn--icon m-btn--uppercase"
-                                            (click)="previewCombine()">
-                                            <span>
-                                                <i class="la la-print"></i>
-                                                <span>
-                                                    Combine Billing
-                                                </span>
-                                            </span>
-                                        </button>
+                                        <div class="dropdown m-dropdown m-dropdown--inline">
+                                            <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown">
+                                                <i class="la la-print"></i>Combine Billing<span class="caret"></span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item pointer"
+                                                    (click)="previewCombine('VND')">Local</a>
+                                                <a class="dropdown-item pointer" (click)="previewCombine('USD')">USD</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

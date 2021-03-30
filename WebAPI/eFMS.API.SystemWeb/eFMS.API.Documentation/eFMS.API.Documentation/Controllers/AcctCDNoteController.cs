@@ -303,5 +303,17 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(new ResultHandle { Status = reject.Success, Message = "Reject credit note successful.", Data = model });
         }
+
+        /// <summary>
+        /// Preview Combine Billing CD Note
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("PreviewCombineBilling")]
+        public IActionResult PreviewCombineBilling(CombineBillingCriteria criteria)
+        {
+            var result = cdNoteServices.PreviewCombineBilling(criteria);
+            return Ok(result);
+        }
     }
 }

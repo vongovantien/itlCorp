@@ -227,17 +227,17 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
 
     }
 
-    previewCombine() {
+    previewCombine(currency: string) {
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected);
         if (!!cdNotes.length) {
-            this.cdNoteCombine = cdNotes.map(i => new CombineBillingCriteria({ cdNoteCode: i.referenceNo, partnerId: i.partnerId, partnerName: i.partnerName })).filter((g, i, arr) => arr.findIndex(t => t.cdNoteCode === g.cdNoteCode) === i); // Distinct CdNote Code;
+            this.cdNoteCombine = cdNotes.map(i => new CombineBillingCriteria({ cdNoteCode: i.referenceNo, partnerId: i.partnerId, partnerName: i.partnerName, currencyCombine: currency })).filter((g, i, arr) => arr.findIndex(t => t.cdNoteCode === g.cdNoteCode) === i); // Distinct CdNote Code;
             const partners: CombineBillingCriteria[] = this.cdNoteCombine.filter((g, i, arr) => arr.findIndex(t => t.partnerId === g.partnerId) === i); //Distinct PartnerId           
             if (partners.length > 1) {
                 this.selectPartnerCombinePopup.listPartners = partners;
                 this.selectPartnerCombinePopup.selectedPartner = null;
                 this.selectPartnerCombinePopup.show();
             } else {
-
+                console.log(partners);
             }
         } else {
             this._toastService.warning("Please select CD Note to preview");
@@ -246,5 +246,6 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
 
     onSelectPartnerCombine(partner: CombineBillingCriteria) {
         const combineCriteria = this.cdNoteCombine.filter(x => x.partnerId == partner.partnerId);
+        console.log(combineCriteria);
     }
 }

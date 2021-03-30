@@ -1,0 +1,18 @@
+PartnerID	String	50	
+PartnerName	String	150	
+PersonalContact	String	150	
+Email	String	150	
+Address	String	255	
+Workphone	String	255	
+Fax	String	255	
+Taxcode	String	50	
+MAWB	String	50	
+HWBNO	String	50	
+Amount	Number	
+Curr	String	50	
+Dpt	Boolean	
+ROBH	Number	
+CustomNo	String	255	
+JobNo	String	50	
+CdCode	String	50	
+Docs	Memo	
