@@ -24,6 +24,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducers } from './store';
 import { AdvancePaymentsPopupComponent } from './components/popup/advance-payments/advance-payments.popup';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AdvancePaymentShipmentExistedPopupComponent } from './components/popup/shipment-existed/shipment-existed.popup';
 const routing: Routes = [
     {
         path: "",
@@ -61,7 +62,8 @@ const COMPONENTS = [
     UpdatePaymentVoucherPopupComponent,
     ImportVoucherAdvancePaymentComponent,
     AdvancePaymentFormsearchComponent,
-    AdvancePaymentsPopupComponent
+    AdvancePaymentsPopupComponent,
+    AdvancePaymentShipmentExistedPopupComponent
 ];
 
 const customCurrencyMaskConfig = {
