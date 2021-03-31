@@ -175,10 +175,5 @@
         public static readonly string RECEIPT_STATUS_DRAFT = "Draft";
         public static readonly string RECEIPT_STATUS_DONE = "Done";
         public static readonly string RECEIPT_STATUS_CANCEL = "Cancel";
-
-        #region -- SETTLEMENT TYPE --
-        public static readonly string SETTLE_TYPE_DIRECT = "DIRECT";
-        public static readonly string SETTLE_TYPE_EXISTING = "EXISTING";
-        #endregion
     }
 }
