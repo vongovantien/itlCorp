@@ -78,6 +78,7 @@ namespace eFMS.API.Catalogue.Models
         public string InternalCode { get; set; }
         public string CreditPayment { get; set; }
         public bool? IsRequestApproval { get; set; }
+        public string BankName { get; set; }
 
 
     }
