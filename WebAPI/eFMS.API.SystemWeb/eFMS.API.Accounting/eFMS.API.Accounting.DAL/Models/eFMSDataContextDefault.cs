@@ -313,6 +313,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("acctAdvancePayment");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctAdvancePayment");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -807,6 +810,9 @@ namespace eFMS.API.Accounting.Service.Models
             {
                 entity.ToTable("acctSettlementPayment");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSettlementPayment");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -868,6 +874,9 @@ namespace eFMS.API.Accounting.Service.Models
             modelBuilder.Entity<AcctSoa>(entity =>
             {
                 entity.ToTable("acctSOA");
+
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSOA");
 
                 entity.Property(e => e.Id).HasColumnName("ID");
 
@@ -3333,7 +3342,6 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ChildId)
                     .HasColumnName("ChildID")
-                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");

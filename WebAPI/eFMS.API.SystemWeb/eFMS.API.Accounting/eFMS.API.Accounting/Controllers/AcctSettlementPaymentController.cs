@@ -777,6 +777,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CopyCharges")]
+        [Authorize]
         public IActionResult CopyCharges(ShipmentsCopyCriteria criteria)
         {
             var data = acctSettlementPaymentService.CopyChargeFromSettlementOldToSettlementNew(criteria);
