@@ -22,6 +22,7 @@ export class ClassStatusApprovalPipe implements PipeTransform {
                 break;
             case AccountingConstants.STATUS_APPROVAL.DONE:
                 status = CommonEnum.ClassColor.SUCCESS
+                break;
             default:
                 break;
         }

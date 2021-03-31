@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using ITL.NetCore.Common;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
+using System;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -30,5 +31,6 @@ namespace eFMS.API.Documentation.DL.IService
         CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId);
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
         HandleState LockShipmentList(List<string> JobIds);
+        List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id);
     }
 }

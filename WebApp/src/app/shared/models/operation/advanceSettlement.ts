@@ -1,11 +1,11 @@
 export class AdvanceSettlementInfo {
     jobNo: string;
 
-    requesterAdvance: string;
-    requesterSettle: string;
+    advRequester: string;
+    settleRequester: string;
 
     advanceNo: string;
-    settlementNo: string;
+    settlementCode: string;
 
     advanceStatusApproval: string;
     settleStatusApproval: string;
@@ -14,10 +14,17 @@ export class AdvanceSettlementInfo {
     settlementCurrency: string;
 
     advanceDate: Date;
-    settlemenDate: Date;
+    settlementDate: Date;
 
     balance: number;
     settlementAmount: number;
     advanceAmount: number;
+
+    advanceVoucherNo: string;
+    advanceSyncStatus: string;
+    settlementSyncStatus: string;
+    settlementVoucherNo: string;
+    settlementVoucherDate: Date;
+    advanceVoucherDate: Date;
 
 }

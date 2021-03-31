@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
 import { Store, ActionsSubject } from '@ngrx/store';
@@ -40,7 +40,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
     @ViewChild(InjectViewContainerRefDirective) public confirmContainerRef: InjectViewContainerRefDirective;
-    @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
 
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
@@ -66,7 +65,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
-        private readonly _viewContainerRef: ViewContainerRef,
     ) {
         super();
 
@@ -456,12 +454,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.getShipmentDetails(this.jobId);
             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
         }
-
-        if (tabName === 'advance-settle') {
-            this.getAdvanceSettleInfoComponent();
-        } else {
-            this._viewContainerRef.clear();
-        }
     }
 
     onOpePLPrint() {
@@ -554,10 +546,5 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.editForm.getBillingOpsId();
             this.headerComponent.resetBreadcrumb("Create Job");
         }
-    }
-
-    async getAdvanceSettleInfoComponent() {
-        const { ShareBusinessAdvanceSettlementInforComponent } = await import('./../../share-business/components/advance-settlement-info/advance-settlement-info.component');
-        this.renderDynamicComponent(ShareBusinessAdvanceSettlementInforComponent, this.advSettleContainerRef)
     }
 }

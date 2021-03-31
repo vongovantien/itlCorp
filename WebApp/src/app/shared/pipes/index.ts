@@ -12,5 +12,6 @@ export * from './date-ago.pipe';
 export * from './safe.pipe';
 export * from './class-status-approval.pipe';
 export * from './extension';
+export * from './class-status-sync.pipe';
 
 

@@ -6,16 +6,28 @@
                     <div class="col-lg-8 ">
                         <div class="adv-info ">
                             <div class="title ">
-                                <span> {{data.advanceNo}} - {{data.requesterAdvance}}</span>
+                                <span> {{data.advanceNo}} - {{data.advRequester}}</span>
                             </div>
                             <div class="description ">
                                 <span class="m--margin-right-30 ">
                                     {{data.advanceDate | date: 'dd/MM/yyyy'}}
                                 </span>
                                 | <span
-                                    class="text-{{data.advanceStatusApproval | classStatusApproval}} m--margin-left-20 ">
+                                    class="text-{{data.advanceStatusApproval | classStatusApproval}} m--margin-left-20 m--margin-right-30">
                                     {{data.advanceStatusApproval}}
                                 </span>
+                                <ng-container *ngIf="!!data.advanceSyncStatus">
+                                    | <span class="m--margin-left-20 m--margin-right-30">
+                                        <div class="stamp-div {{data.advanceSyncStatus | classStatusSync}}">
+                                            {{data.advanceSyncStatus}}
+                                        </div>
+                                    </span>
+                                </ng-container>
+                                <ng-container *ngIf="!!data.advanceVoucherNo">
+                                    | <span class="m--margin-left-20 text-primary">
+                                        {{data.advanceVoucherNo}}
+                                    </span>
+                                </ng-container>
                             </div>
                         </div>
                     </div>
@@ -28,19 +40,31 @@
                         </div>
                     </div>
                 </div>
-                <div class=" row " *ngIf="!!data.settlementNo">
+                <div class=" row " *ngIf="!!data.settlementCode">
                     <div class="col-lg-8 ">
                         <div class="adv-info ">
                             <div class="title ">
-                                <span> {{data.settlementNo}} - {{data.requesterSettle}}</span>
+                                <span> {{data.settlementCode}} - {{data.settleRequester}}</span>
                             </div>
                             <div class="description ">
                                 <span class="m--margin-right-30">
-                                    {{data.settlemenDate | date: 'dd/MM/yyyy'}}</span> |
+                                    {{data.settlementDate | date: 'dd/MM/yyyy'}}</span> |
                                 <span
-                                    class="text-{{data.settleStatusApproval | classStatusApproval}} m--margin-left-20 ">
+                                    class="text-{{data.settleStatusApproval | classStatusApproval}} m--margin-left-20 m--margin-right-30">
                                     {{data.settleStatusApproval}}
                                 </span>
+                                <ng-container *ngIf="!!data.settlementSyncStatus">
+                                    | <span class="m--margin-left-20 m--margin-right-30">
+                                        <div class="stamp-div {{data.settlementSyncStatus | classStatusSync}}">
+                                            {{data.settlementSyncStatus}}
+                                        </div>
+                                    </span>
+                                </ng-container>
+                                <ng-container *ngIf="!!data.settlementVoucherNo">
+                                    | <span class="m--margin-left-20 text-primary">
+                                        {{data.settlementVoucherNo}}
+                                    </span>
+                                </ng-container>
                             </div>
                         </div>
                     </div>
@@ -75,5 +99,8 @@
 </div>
 
 <ng-template #norecord>
-    <none-record-placeholder></none-record-placeholder>
+    <div class="no-data bg-white">
+        <i class="flaticon-coins"></i>
+        <span class="no-data-text">No records found</span>
+    </div>
 </ng-template>
