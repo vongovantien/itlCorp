@@ -97,7 +97,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     menuSpecialPermission: Observable<any[]>;
     listCurrency: Observable<CommonInterface.INg2Select[]>;
 
-    contractTypes: Array<string> = ["Trial", "Official", "Guaranteed", "Cash"];
+    contractTypes: Array<string> = ["Trial", "Official", "Parent Contract", "Cash"];
     serviceTypes: CommonInterface.INg2Select[] = [
         { id: "All", text: "All" },
         { id: "AI", text: "Air Import" },
@@ -215,7 +215,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             creditRate: [],
             description: [],
             currencyId: [],
-            creditCurrency: [this.partnerLocation === "Domestic" ? { id: "VND", text: "VND" } : this.partnerLocation === "Oversea" ? { id: "USD", text: "USD" } : null]
+            creditCurrency: [],
+            creditUnlimited: []
         });
         this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -389,6 +390,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (this.formGroup.valid) {
+            const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.contractNo.value && x.contractType === "Official" && x.index !== this.selectedContract.index) : null;
+            if (objCheckContract) {
+                this.contractNo.setValue(null);
+                this.isDuplicateContract = true;
+                this._toastService.error('Contract no has been existed!');
+                return;
+            }
             this.asignValueToModel();
             if (this.isCustomerRequest === true) {
                 if (!this.partnerIds.value) return;
@@ -490,15 +498,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
                 this.selectedContract.companyNameEn = this.companies.find(x => x.id === this.selectedContract.companyId).bunameEn;
                 this.selectedContract.fileList = this.fileList;
-                const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo && x.index !== this.selectedContract.index) : null;
-
-                if (!objCheckContract) {
-                    this.onRequest.emit(new Contract(this.selectedContract));
-                } else {
-                    this.selectedContract.contractNo = null;
-                    this.isDuplicateContract = true;
-                    this._toastService.error('Contract no has been existed!');
-                }
+                this.onRequest.emit(this.selectedContract);
             }
 
         }
@@ -604,7 +604,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             vas: this.activeVas,
             paymentMethod: !!this.selectedContract.paymentMethod ? this.paymentMethods.find(type => type === this.selectedContract.paymentMethod) : null,
             baseOn: !!this.selectedContract.baseOn ? this.basesOn.find(type => type === this.selectedContract.baseOn) : null,
-            currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null
+            currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null,
+            creditUnlimited: this.selectedContract.creditUnlimited
         });
         this.contractTypeDetail = this.selectedContract.contractType;
         if (this.selectedContract.contractType === 'Trial') {
@@ -683,6 +684,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.customerAdvanceAmount = this.formGroup.controls['customerAmount'].value;
         this.selectedContract.creditRate = this.formGroup.controls['creditRate'].value;
         this.selectedContract.description = this.formGroup.controls['description'].value;
+        this.selectedContract.creditUnlimited = this.formGroup.controls['creditUnlimited'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
     }

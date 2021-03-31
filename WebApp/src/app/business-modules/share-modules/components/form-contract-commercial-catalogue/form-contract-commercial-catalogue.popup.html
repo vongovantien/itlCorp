@@ -339,12 +339,31 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Credit Rate</label>
-                                        <input min="0" disabled type="number" class="form-control"
-                                            formControlName="creditRate" numeric [decimals]="digitDecimal"
-                                            autoFormatCurrency>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Credit Unlimited
+                                                </label>
+                                                <div>
+                                                    <label class="m-checkbox m-checkbox--bold">
+                                                        <input type="checkbox" formControlName="creditUnlimited"
+                                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="form-group">
+                                                <label>Credit Rate</label>
+                                                <input min="0" disabled type="number" class="form-control"
+                                                    formControlName="creditRate" numeric [decimals]="digitDecimal"
+                                                    autoFormatCurrency>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                             </ng-container>
                         </div>

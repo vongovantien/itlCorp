@@ -67,11 +67,7 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         });
     }
 
-    ngAfterViewInit() {
-
-    }
     onChangePartnerLocation($event: string) {
-        console.log($event);
         this.contractList.partnerLocation = $event;
     }
 
