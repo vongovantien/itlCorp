@@ -2197,9 +2197,15 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
                         {
-                            //item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
-                            //hawbCurrentMax = item.Hwbno;
-                            if (item.Hwbno == "N/H") item.Hwbno = item.Hwbno;
+                     
+                            if (item.Hwbno == "N/H") {
+                                item.Hwbno = item.Hwbno;
+                            }
+                            else
+                            {
+                                item.Hwbno = GenerateAirHBLNo(hawbCurrentMax);
+                                hawbCurrentMax = item.Hwbno;
+                            }
                         }
                         else
                         {
