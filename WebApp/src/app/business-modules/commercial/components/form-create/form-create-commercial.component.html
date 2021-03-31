@@ -35,9 +35,9 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': isSubmitted  && ( !partnerLocation.valid || !partnerLocation.value)}">
                                 <label required class="form-control-label"> Partner Location </label>
-                                <ng-select [items]="partnerLocations" class="custom" name="partnerLocation"
-                                    [clearable]="false" formControlName="partnerLocation"
-                                    placeholder="Partner location">
+                                <ng-select (change)="selectedPartnerLocation($event)" [items]="partnerLocations"
+                                    class="custom" name="partnerLocation" [clearable]="false"
+                                    formControlName="partnerLocation" placeholder="Partner location">
                                 </ng-select>
                             </div>
                         </div>

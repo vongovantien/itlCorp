@@ -34,14 +34,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     contract: Contract = new Contract();
 
     type: string = '';
+    partnerLocation: string = null;
 
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
-        protected _activeRoute: ActivatedRoute,
-        private _store: Store<IAppState>
+        protected _activeRoute: ActivatedRoute
 
     ) {
         super();
@@ -128,7 +128,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
         this.formContractPopup.effectiveDate.setValue(null);
-
+        this.formContractPopup.partnerLocation = this.partnerLocation;
+        console.log(this.formContractPopup.partnerLocation);
         this.formContractPopup.show();
 
     }

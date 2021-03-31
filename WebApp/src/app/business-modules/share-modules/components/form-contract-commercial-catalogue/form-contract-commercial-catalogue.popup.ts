@@ -56,6 +56,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     trialCreditDays: AbstractControl;
     contractNo: AbstractControl;
     currencyId: AbstractControl;
+    creditCurrency: AbstractControl;
     partnerIds: AbstractControl;
 
     minDateEffective: any = null;
@@ -81,6 +82,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     type: string = '';
     contractTypeDetail: string = '';
     confirmChangeAgreementTypeText: string = '';
+    partnerLocation: string = '';
     isChangeAgrmentType: boolean = false;
     status: boolean = false;
     isAllowActiveContract: boolean = false;
@@ -212,7 +214,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             customerAmount: [],
             creditRate: [],
             description: [],
-            currencyId: []
+            currencyId: [],
+            creditCurrency: [this.partnerLocation === "Domestic" ? { id: "VND", text: "VND" } : this.partnerLocation === "Oversea" ? { id: "USD", text: "USD" } : null]
         });
         this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -230,6 +233,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.contractNo = this.formGroup.controls['contractNo'];
         this.currencyId = this.formGroup.controls['currencyId'];
         this.partnerIds = this.formGroup.controls['partnerId'];
+        this.creditCurrency = this.formGroup.controls['creditCurrency'];
     }
 
     initDataForm() {

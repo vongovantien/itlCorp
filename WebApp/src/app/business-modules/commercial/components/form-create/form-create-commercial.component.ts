@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
@@ -56,6 +56,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
+    @Output() partnerLocationString: EventEmitter<string> = new EventEmitter<string>();
     isBranchSub: boolean;
     parentName: string = '';
     provinceIdName: string;
@@ -309,6 +310,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                     }
                 );
         }
+    }
+    selectedPartnerLocation(value: any) {
+        this.partnerLocationString.emit(value);
     }
 
 }

@@ -156,6 +156,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             partnerLocation: partner.partnerLocation,
             parentId: this.isAddSubPartner ? partner.id : partner.parentId
         });
+        this.contractList.partnerLocation = this.formCreate.partnerLocation.value;
+        console.log(this.contractList.partnerLocation);
     }
 
     getListContract(partneId: string) {

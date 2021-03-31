@@ -164,11 +164,20 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-2">
                             <div class="form-group">
                                 <label>Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="currencyId" placeholder="Select Currency">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label>Credit Currency</label>
+                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
+                                    class="custom" formControlName="creditCurrency"
+                                    placeholder="Select Credit Currency">
                                 </ng-select>
                             </div>
                         </div>
