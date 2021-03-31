@@ -363,6 +363,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractNo = contract.ContractNo;
                     modelPartner.SalesmanId = contract.SaleManId;
                     modelPartner.UserCreatedContract = contract.UserCreated;
+                    modelPartner.ContractType = contract.ContractType;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -920,10 +921,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
             var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
-            if (listEmailAR != null && listEmailAR.Any())
-            {
-                lstTo = listEmailAR.Split(";").ToList();
-            }
+            //if (listEmailAR != null && listEmailAR.Any())
+            //{
+            //    lstTo = listEmailAR.Split(";").ToList();
+            //}
 
             if(listEmailAccountant != null && listEmailAccountant.Any())
             {
@@ -991,13 +992,14 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 urlToSend = UrlClone.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
-
+                lstTo = listEmailAccountant.Split(";").ToList();
                 if (lstTo.Any())
                 {
                     lstCc = lstTo;
                 }
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
+                lstCc.Add(objInfoCreator?.Email);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
             else
@@ -1027,15 +1029,19 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 urlToSend = UrlClone.Replace("Catalogue", "");
                 body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
-                if (lstAccountant.Any())
+                if(partner.ContractType == "Cash")
                 {
-                    lstTo.AddRange(lstAccountant);
+                    lstTo = listEmailAccountant.Split(";").ToList();
+                }
+                else
+                {
+                    lstTo = listEmailAR.Split(";").ToList();
                 }
 
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
                 lstCc.Add(objInfoModified?.Email);
-                //SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+                lstCc.Add(objInfoCreator?.Email);
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             }

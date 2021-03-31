@@ -236,6 +236,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
             var creatorObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
             string UrlClone = string.Copy(ApiUrl.Value.Url);
+            List<string> ListCC = new List<string>();
 
             string address = webUrl.Value.Url + "/en/#/" + "home/catalogue/partner-data/detail/" + partner.Id;
             subject = "Reject Partner - " + partner.PartnerNameVn;
@@ -256,7 +257,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string UrlImage = UrlClone.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", UrlImage.ToString() + "/ReportPreview/Images/logo-eFMS.png");
-
+            ListCC.Add(creatorObj?.Email);
             List<string> lstCc = ListMailBCC();
             List<string> lstTo = new List<string>();
 
@@ -294,10 +295,10 @@ namespace eFMS.API.Catalogue.DL.Services
             var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
             var listEmailAccoutant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
 
-            if (listEmailAR != null && listEmailAR.Any())
-            {
-                lstTo = listEmailAR.Split(";").ToList();
-            }
+            //if (listEmailAR != null && listEmailAR.Any())
+            //{
+            //    lstTo = listEmailAR.Split(";").ToList();
+            //}
 
             if (listEmailAccoutant != null && listEmailAccoutant.Any())
             {
@@ -357,9 +358,13 @@ namespace eFMS.API.Catalogue.DL.Services
             lstCc.Add(objInfoSalesman?.Email);
             lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoModified?.Email);
-            if (lstToAcc.Any())
+            if (partner.ContractType == "Cash")
             {
-                lstTo.AddRange(lstToAcc);
+                lstTo = listEmailAccoutant.Split(";").ToList();
+            }
+            else
+            {
+                lstTo = listEmailAR.Split(";").ToList();
             }
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
