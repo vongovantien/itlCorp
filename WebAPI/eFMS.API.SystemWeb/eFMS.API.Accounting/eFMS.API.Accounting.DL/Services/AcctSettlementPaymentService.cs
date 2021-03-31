@@ -706,18 +706,41 @@ namespace eFMS.API.Accounting.DL.Services
 
                 // Tính total amount của settlement theo adv đó.
                 IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.AdvanceNo == advNo && x.Mblno == _mbl && x.Hblid == _hbl);
-                result.TotalAmount = surChargeToCalculateAmount.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
-
+                //result.TotalAmount = surChargeToCalculateAmount.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                if (_settleCurrency == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    result.TotalAmount = surChargeToCalculateAmount.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                }
+                else
+                {
+                    result.TotalAmount = surChargeToCalculateAmount.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                }
             }
             else
             {
                 if (surchargeGrp != null && surchargeGrp.Count() > 0)
                 {
-                    result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                    // result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                    if (_settleCurrency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    }
+                    else
+                    {
+                        result.TotalAmount = surchargeGrp?.FirstOrDefault().Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                    }
                 }
                 else
                 {
-                    result.TotalAmount = surcharges.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
+                    if (_settleCurrency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        result.TotalAmount = surcharges.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    }
+                    else
+                    {
+                        result.TotalAmount = surcharges.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                    }
+                    // result.TotalAmount = surcharges.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
                 }
             }
 
@@ -883,13 +906,20 @@ namespace eFMS.API.Accounting.DL.Services
                                     SettlementCode = sur.SettlementCode,
                                     ChargeId = sur.ChargeId,
                                     ChargeName = cc.ChargeNameEn,
+                                    FinalExchangeRate = sur.FinalExchangeRate,
                                     Quantity = sur.Quantity,
                                     UnitId = sur.UnitId,
                                     UnitName = u.UnitNameEn,
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
+                                    NetAmount = sur.NetAmount,
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total,
+                                    VatAmountVnd = sur.VatAmountVnd,
+                                    AmountVnd = sur.AmountVnd,
+                                    VatAmountUSD = sur.VatAmountUsd,
+                                    AmountUSD = sur.AmountUsd,
+                                    TotalAmountVnd = sur.VatAmountVnd + sur.AmountVnd,
                                     PayerId = sur.PayerId,
                                     Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -933,13 +963,20 @@ namespace eFMS.API.Accounting.DL.Services
                                    SettlementCode = sur.SettlementCode,
                                    ChargeId = sur.ChargeId,
                                    ChargeName = cc.ChargeNameEn,
+                                   FinalExchangeRate = sur.FinalExchangeRate,
                                    Quantity = sur.Quantity,
                                    UnitId = sur.UnitId,
                                    UnitName = u.UnitNameEn,
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
+                                   NetAmount = sur.NetAmount,
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total,
+                                   VatAmountVnd = sur.VatAmountVnd,
+                                   AmountVnd = sur.AmountVnd,
+                                   VatAmountUSD = sur.VatAmountUsd,
+                                   AmountUSD = sur.AmountUsd,
+                                   TotalAmountVnd = sur.VatAmountVnd + sur.AmountVnd,
                                    PayerId = sur.PayerId,
                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -1207,12 +1244,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
             // Data search = customNo
             criteria.customNos = criteria.customNos != null ? criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.customNos;
+            var clearanceData = customClearanceRepo.Get();
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
-                var clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo));
+                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo));
                 opsTrans = from ops in opsTrans
-                           join custom in clearanceData on ops.JobNo equals custom.JobNo into customs
-                           from custom in customs.DefaultIfEmpty()
+                           join custom in clearanceData on ops.JobNo equals custom.JobNo
                            select ops;
 
             }
@@ -1240,7 +1277,7 @@ namespace eFMS.API.Accounting.DL.Services
                 opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
                 csTransD = csTransD.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
-            var clearance = customClearanceRepo.Get();
+            
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
             var dataOperation = from sur in surcharge
@@ -1255,7 +1292,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
                                 //from advGrp in advGrps.DefaultIfEmpty()
-                                join cl in clearance on opst.JobNo equals cl.JobNo into cls
+                                join cl in clearanceData on opst.JobNo equals cl.JobNo into cls
                                 from cl in cls.DefaultIfEmpty()
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
@@ -1292,12 +1329,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
-                                    ClearanceNo = sur.ClearanceNo,
+                                    ClearanceNo = cl.ClearanceNo,
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     //AdvanceNo = advGrp.AdvanceNo,
-                                    CustomNo = cl.ClearanceNo ?? string.Empty,
                                     PICName = user.Username
                                 };
 
@@ -1502,6 +1538,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 if (chargeSettlementCurrentToAddCsShipmentSurcharge != null)
                                 {
                                     var exchangeRate = chargeSettlementCurrentToAddCsShipmentSurcharge.FinalExchangeRate;
+                                    charge.AdvanceNo = chargeSettlementCurrentToAddCsShipmentSurcharge.AdvanceNo;
                                     charge.Notes = chargeSettlementCurrentToAddCsShipmentSurcharge.Notes;
                                     charge.SeriesNo = chargeSettlementCurrentToAddCsShipmentSurcharge.SeriesNo;
                                     charge.InvoiceNo = chargeSettlementCurrentToAddCsShipmentSurcharge.InvoiceNo;
@@ -1647,6 +1684,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.SyncStatus = settlementCurrent.SyncStatus;
                 settlement.ReasonReject = settlementCurrent.ReasonReject;
                 settlement.LockedLog = settlementCurrent.LockedLog;
+                settlement.SettlementType = settlementCurrent.SettlementType;
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
@@ -1689,6 +1727,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Phí Chứng từ cho phép cập nhật lại số HD, Ngày HD, Số SerieNo, Note.
                                 var chargeSettlementCurrentToUpdateCsShipmentSurcharge = model.ShipmentCharge.Where(x => x.Id != Guid.Empty && x.IsFromShipment == true && x.Id == charge.Id)?.FirstOrDefault();
                                 var exchangeRate = chargeSettlementCurrentToUpdateCsShipmentSurcharge.FinalExchangeRate;
+                                charge.AdvanceNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.AdvanceNo;
                                 charge.Notes = chargeSettlementCurrentToUpdateCsShipmentSurcharge.Notes;
                                 charge.SeriesNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.SeriesNo;
                                 charge.InvoiceNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceNo;

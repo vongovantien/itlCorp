@@ -642,7 +642,11 @@ namespace eFMS.API.System.DL.Services
             Guid? permissionId = userpermissionRepository.Get(x => x.UserId == currentUser.UserID && x.OfficeId == currentUser.OfficeID)?.FirstOrDefault().Id;
             if (permissionId != Guid.Empty)
             {
-                SysMenu menuDetail = sysMenuRepository.Get(x => x.Route == menuID)?.FirstOrDefault();
+                SysMenu menuDetail = sysMenuRepository.Get(x => x.Id == menuID)?.FirstOrDefault();
+                if(menuDetail == null)
+                {
+                    return usersResult.AsQueryable();
+                }
                 var permissionDetails = permissionGeneralRepository.Get(x => x.UserPermissionId == permissionId && x.Access == true)
                                                                                                     .Where(p => p.MenuId == menuDetail.Id).FirstOrDefault();
 

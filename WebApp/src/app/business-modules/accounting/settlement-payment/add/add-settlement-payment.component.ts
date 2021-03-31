@@ -138,6 +138,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             settlementCurrency: this.formCreateSurcharge.currency.value,
             note: this.formCreateSurcharge.note.value,
             payee: this.formCreateSurcharge.payee.value,
+            settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
         };
 
         return dataSettle;

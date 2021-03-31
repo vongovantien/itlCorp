@@ -170,7 +170,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         currency: this.settlementPayment.settlement.settlementCurrency,
                         payee: this.settlementPayment.settlement.payee
                     });
-console.log('body', this.settlementPayment.settlement.payee)
+
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 

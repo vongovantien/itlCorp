@@ -35,12 +35,12 @@
                                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!this.referenceNo.value || !this.referenceInput.value)}">
                                             <label>Reference No</label>
                                             <ng-select formControlName="referenceNo" [items]="referenceNos"
-                                                class="custom" bindLabel="title" bindValue="value" (change)="refTypeSelectedChange()">
+                                                class="custom" bindLabel="title" bindValue="value">
                                             </ng-select>
                                             <textarea name="" id="" cols="30" rows="5" class="form-control"
                                                 formControlName="referenceInput" placeholder="Reference No"></textarea>
                                             <div class="form-control-feedback"
-                                                *ngIf="isSubmitted && (!this.referenceNo.value || !this.referenceInput.value)">Please Select Reference!
+                                                *ngIf="isSubmitted && (!this.referenceNo.value || !this.referenceInput.value)">Please Correct Reference!
                                             </div>
                                         </div>
                                     </div>
@@ -81,10 +81,9 @@
                                                     <label for="">Date</label>
                                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                                            [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                                            [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
-                                                            formControlName="serviceDate" placeholder="   /   /   " readonly calendar
-                                                            [allowRemove]="true"/>
+                                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
+                                                            name="daterange" readonly formControlName="serviceDate" [ranges]="ranges"
+                                                            [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
                                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                                             <span>
                                                                 <i class="la la-calendar"></i>
@@ -138,7 +137,6 @@
                 </div>
                 <!-- </div> -->
                 <!-- session 2 -->
-                <!-- <div class="div-inside bg-secondary"> -->
                 <div class="div-inside bg-secondary">
                     <div class="m-form m-form--state">
                         <div class="row">
@@ -155,14 +153,9 @@
                                             <button
                                                 class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
                                                 title="Update exchange rate to charges" (click)="updateExchangeRateForCharges()">
-                                                <i class="la la-refresh"></i>
+                                                <i class="la la-calculator"></i>
                                             </button>
-                                            <!-- <label>
-                                                <i class="la la-refresh" style="color: green; font-weight: 900;">
-                                                    <span></span>
-                                                </i>style="padding-top: 16px; padding-left: 0;"
-                                            </label> -->
-                                            <button type="button" class="btn btn-default m-btn--icon m-btn--icon-only" (click)="resetUpdateExchangeRateForCharges()" 
+                                            <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--icon-only" (click)="resetUpdateExchangeRateForCharges()" 
                                                 title=" Reset update exchange rate">
                                                 <i class="la la-refresh" style="color: green; font-weight: 900;"></i>
                                         </button>
@@ -232,8 +225,8 @@
                                         *ngFor="let charge of shipment.chargeSettlements; let i = index; trackBy:trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions">
-                                                <label class="m-checkbox" *ngIf="!charge.settlementCode">
-                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox"
                                                         value="{{charge}}" [(ngModel)]="charge.isSelected" [disabled]="isSOACDNote">
                                                     <span></span>
                                                 </label>
@@ -260,17 +253,11 @@
                                         <td>
                                             <div class="form-group">
                                                 <input type="number" class="form-control"
-                                                    [(ngModel)]="charge.vatAmountVnd" min="0" numeric
+                                                    [(ngModel)]="charge.vatAmountVnd" numeric
                                                     [decimals]="digitDecimal" autoFormatCurrency>
                                             </div>
                                         </td>
-                                        <td>
-                                            <div class="form-group">
-                                                <input type="number" class="form-control"
-                                                    [(ngModel)]="charge.totalAmountVnd" min="0"
-                                                    [decimals]="digitDecimal" autoFormatCurrency>
-                                            </div>
-                                        </td>
+                                        <td>{{charge.amountVnd + charge.vatAmountVnd | number:'1.0-3'}}</td>
                                         <td>
                                             <div class="form-group">
                                                 <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
@@ -303,12 +290,12 @@
                                         <td></td>
                                         <td class="text-center">{{shipment.totalNetAmount | number:'1.2-3'}}$|{{shipment.totalNetAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
-                                        <td>{{shipment.totalAmount | number:'1.2-3'}}$|{{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
+                                        <td class="text-center">{{shipment.totalAmount | number:'1.2-3'}}$|{{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
                                         <td></td>
-                                        <td class="text-center">{{shipment.totalNetVND | number:'1.0-3'}}</td>
-                                        <td class="text-center">{{shipment.totalVATVND | number:'1.0-3'}}</td>
-                                        <td class="text-center">{{shipment.totalVND | number:'1.0-3'}}</td>
+                                        <td>{{shipment.totalNetVND | number:'1.0-3'}}</td>
+                                        <td>{{shipment.totalVATVND | number:'1.0-3'}}</td>
+                                        <td>{{shipment.totalVND | number:'1.0-3'}}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -331,8 +318,11 @@
                                 title="Save" (click)="submit()">
                                 <span>
                                     <i class="la la-save"></i>
-                                    <span>
+                                    <span *ngIf="state === 'new'">
                                         Add Charge
+                                    </span>
+                                    <span *ngIf="state !== 'new'">
+                                        Update Charge
                                     </span>
                                 </span>
                             </button>

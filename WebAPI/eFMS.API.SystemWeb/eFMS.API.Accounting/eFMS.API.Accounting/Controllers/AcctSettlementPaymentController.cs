@@ -275,18 +275,21 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.Type, x.CustomNo });
+            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.Type, x.ClearanceNo });
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.JobId, item.Key.MBL, item.Key.HBL);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
                 shipment.Type = item.Key.Type;
-                shipment.AdvanceNoList = acctSettlementPaymentService.GetListAdvanceNoForShipment(shipment.JobId, shipment.MBL, shipment.HBL);
+                shipment.AdvanceNo = advanceLst == null ? null : advanceLst.FirstOrDefault();
+                shipment.AdvanceNoList = advanceLst;
+                shipment.CustomNo = item.Key.ClearanceNo;
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
                 shipment.TotalNetAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
                 shipment.TotalAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);

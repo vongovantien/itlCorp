@@ -1,22 +1,16 @@
 import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { catchError, concatMap, finalize, map, tap } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { SortService } from '@services';
 import { AccountingRepo, DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
-import { ButtonModalSetting } from 'src/app/shared/models/layout/button-modal-setting.model';
-import { ButtonType } from 'src/app/shared/enums/type-button.enum';
-import { Surcharge, User } from '@models';
+import { Surcharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
-import { ShareModulesInputShipmentPopupComponent } from 'src/app/business-modules/share-modules/components';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { from, Observable, of } from 'rxjs';
-import { RouterStateSnapshot } from '@angular/router';
-import { filter, split } from 'lodash';
-import { formatDate } from '@angular/common';
-import { HttpErrorResponse } from '@angular/common/http';
-import { SystemConstants } from '@constants';
-import { NullLogger } from '@microsoft/signalr';
+import { of } from 'rxjs';
+import { formatCurrency, formatDate } from '@angular/common';
+import { getMenuUserPermissionState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -34,7 +28,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     serviceDate: AbstractControl;
     personInCharge: AbstractControl;
     exchangeRateInput: number = 0;
-    advanceNo: any[] = [];
     totalAmountVnd: string = '';
 
     configPartner: CommonInterface.IComboGirdConfig = {
@@ -52,8 +45,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         dataSource: [],
         selectedDisplayFields: [],
     };
-    selectedShipment: Partial<CommonInterface.IComboGridData> = {};
-    selectedShipmentData: OperationInteface.IShipment;
     referenceNos: CommonInterface.ICommonTitleValue[];
 
     services: any[] = [];
@@ -74,7 +65,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     numberOfShipment: string = '0/0';
     state: string = 'new';
-    isCollapsed: boolean = false;
     searchCondition: any[] = ['SOA', 'Credit Note', 'JOB No', 'HBL/HAWB', 'MBL/MAWB', 'Custom No'];
     personInCharges: any[] = [];
 
@@ -87,6 +77,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         private _sysRepo: SystemRepo,
         private _cd: ChangeDetectorRef,
         private _fb: FormBuilder,
+        private _store: Store<IAppState>
     ) {
         super();
     }
@@ -94,7 +85,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     ngOnInit() {
 
         this.headers = [
-            { title: 'No', field: 'no', sortable: true , width: 50 },
+            { title: 'No', field: 'no', sortable: true, width: 50 },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
             { title: 'Org NetAmount', field: 'unitName', sortable: true },
@@ -110,21 +101,18 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             { title: 'Serial No', field: 'total', sortable: true },
             { title: 'Note', field: 'total', sortable: true },
         ];
-        this.initFormSearch();
         this.referenceNos = this.getRefCombobox();
+        this.initFormSearch();
         this.getPartner();
         this.getProductService();
-        this._sysRepo.getListUserWithPermission('settlement-payment', 'Detail')
+
+        this._store.select(getMenuUserPermissionState)
             .pipe(
-                tap((d) => {
-                    this.personInCharge.setValue(!!d ? d.id : null);
-                })
-            )
-            .subscribe((res: any) =>{
+                switchMap((res: any) => this._sysRepo.getListUserWithPermission(res.menuId, 'Detail')),
+                takeUntil(this.ngUnsubscribe)
+            ).subscribe((res: any) => {
                 this.personInCharges = res;
-            }
-            );
-        this.referenceNo.setValue(this.referenceNos[0]);
+            });
     }
 
     getRefCombobox(): CommonInterface.ICommonTitleValue[] {
@@ -163,7 +151,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     initFormSearch() {
         this.formSearch = this._fb.group({
             referenceInput: ['', Validators.required],
-            referenceNo: [Validators.required],
+            referenceNo: [this.referenceNos[0],Validators.required],
             serviceDate: [],
             personInCharge: [],
         });
@@ -183,8 +171,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     this.initService = data;
                     this.services = (data || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
                     this.selectedServices = this.services;
-
-                    this.getShipment(null, this.selectedServices.map((service: { id: string, text: string }) => service.id));
                 }
             );
     }
@@ -198,18 +184,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             case 'service':
                 this.selectedServices = [];
                 this.selectedServices.push(...data);
-                this.charges = [];
-
-                if (!!this.selectedPartner.value && !!this.selectedPartnerData) {
-                    // this.resetShipment();
-                    this.getShipment(this.selectedPartnerData.id, this.selectedServices.map((service: { id: string, text: string }) => service.id));
-                }
-
-                break;
-            case 'reference':
-                if (this.referenceNo) {
-
-                }
                 break;
             default:
                 break;
@@ -221,57 +195,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             case 'partner':
                 this.selectedPartner = {};
                 this.selectedPartnerData = null;
-                // this.resetShipment();
-                break;
-            case 'shipment':
-                this.selectedShipment = {};
-                this.selectedShipmentData = null;
                 break;
             default:
                 break;
         }
     }
-
-    refTypeSelectedChange(){
-        switch (this.referenceNo.value) {
-            case this.referenceNos[2].value:
-            case this.referenceNos[3].value:
-            case this.referenceNos[4].value:
-            case this.referenceNos[5].value:
-
-                break;
-        }
-    }
-
-    getShipment(partnerId: string, service: string[]) {
-        this.isLoadingShipmentGrid = true;
-        this._documentRepo.getShipmentByPartnerOrService(partnerId, service)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoadingShipmentGrid = false;
-            }))
-            .subscribe(
-                (res: any) => {
-                    this.configShipment.dataSource.length = 0;
-                    this.configShipment.dataSource = [...this.configShipment.dataSource, ...cloneDeep(res)];
-                    this.configShipment.displayFields = [
-                        { field: 'jobId', label: 'Job No' },
-                        { field: 'mbl', label: 'MBL' },
-                        { field: 'hbl', label: 'HBL' },
-                    ];
-                    this.configShipment.selectedDisplayFields = ['jobId', `mbl`, 'hbl'];
-
-                    // * IF PARTNER HAS ONLY ONE SHIPMENT => SELECT THAT SHIPMENT AS WELL.
-                    if (this.configShipment.dataSource.length === 1) {
-                        this.selectedShipment = { field: 'jobId', value: this.configShipment.dataSource[0].jobId };
-                        this.selectedShipmentData = this.configShipment.dataSource[0];
-                    }
-
-                    this.isCheckAll = false;
-                }
-            );
-    }
-
-    
 
     mapDataSearch() {
         let _data = [];
@@ -284,26 +212,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         return _data;
     }
 
-    onAdvanceNoChange(event: any) {
 
-    }
-
-    reset() {
-        this.referenceNo.setValue(null);
-        this.referenceInput.setValue(null)
-        // this.resetShipment();
-        this.resetPartner();
-        this.isCheckAll = false;
-
-        this.shipments = [];
-        this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
-
-        this.resetFormShipmentInput();
-    }
-
-    onChangeCheckBoxCharge() {
-        // this.isCheckAll = this.charges.every((item: Surcharge) => item.isSelected);
-    }
 
     checkUncheckAllCharge(hblId: string) {
         this.shipments.filter((shipment: any) => shipment.hblId === hblId)
@@ -315,20 +224,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             );
     }
 
-    // resetShipment() {
-    //     this.selectedShipment = {};
-    //     this.selectedShipmentData = null;
-    //     this.configShipment = {
-    //         ...this.configShipment,
-    //         dataSource: [],
-    //     };
-    //     this._cd.detectChanges();
-    // }
-
-    resetPartner() {
-        this.selectedPartnerData = null;
-        this.selectedPartner = {};
-        // this.getPartner();
+    isSoaCDNoteSelected() {
+        if (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value) {
+            this.isSOACDNote = true;
+        } else {
+            this.isSOACDNote = false;
+        }
     }
 
     sortSurcharge(dataSort: any) {
@@ -338,9 +239,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     closePopup() {
         this.resetFormShipmentInput();
         this.resetData();
-        // this.resetShipment();
         this.resetPartner();
-        this.serviceDate.setValue(null);
+        this.state = 'new';
         this.hide();
     }
 
@@ -349,52 +249,34 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             const surcharge = [...surcharges].shift();
             let shipment = new ShipmentChargeSettlement();
             shipment.jobId = surcharge.jobId;
-            shipment.mbl = surcharge.mblno;
-            shipment.hbl = surcharge.hblno;
+            shipment.mbl = surcharge.mbl;
+            shipment.hbl = surcharge.hbl;
             shipment.hblId = surcharge.hblid;
             shipment.advanceNo = surcharge.advanceNo;
+            shipment.advanceNoList.push(surcharge.advanceNo);
+            shipment.customNo = surcharge.clearanceNo;
             shipment.chargeSettlements = surcharges.map((surcharge: Surcharge) => new Surcharge(surcharge));
             shipment.totalNetAmount = surcharges.filter((charge: Surcharge) => charge.currencyId === 'USD').reduce((net: number, charge: Surcharge) => net += charge.netAmount, 0);
             shipment.totalNetAmountVND = surcharges.filter((charge: Surcharge) => charge.currencyId === 'VND').reduce((net: number, charge: Surcharge) => net += charge.netAmount, 0);
-            shipment.totalVATUSD = surcharges.reduce((net: number, charge: Surcharge) => net += charge.vatAmountVnd, 0);
             shipment.totalAmount = surcharges.filter((charge: Surcharge) => charge.currencyId === 'USD').reduce((net: number, charge: Surcharge) => net += charge.total, 0);
-            shipment.totalAmountVND = surcharges.filter((charge: Surcharge) => charge.currencyId === 'VND').reduce((net: number, charge: Surcharge) => net += charge.total, 0);
+            shipment.totalAmountVND = surcharges.filter((charge: Surcharge) => charge.currencyId === 'VND').reduce((total: number, charge: Surcharge) => total += (charge.amountVnd + charge.vatAmountVnd), 0);
             shipment.totalNetVND = surcharges.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
             shipment.totalVATVND = surcharges.reduce((net: number, charge: Surcharge) => net += charge.vatAmountVnd, 0);
+            shipment.totalNetUSD = surcharges.reduce((net: number, charge: Surcharge) => net += charge.amountUSD, 0);
+            shipment.totalVATUSD = surcharges.reduce((net: number, charge: Surcharge) => net += charge.vatAmountUSD, 0);
             shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             this.shipments = [...this.shipments, shipment];
-            //     this.total = {};
-            this.total.totalUSDStr = (this.shipments[0].totalNetAmount + this.shipments[0].totalVATUSD).toString() + ' = ' + this.shipments[0].totalNetAmount.toString() + ' + ' + this.shipments[0].totalVATUSD.toString();
-            this.totalAmountVnd = (this.shipments[0].totalNetAmountVND + this.shipments[0].totalVATVND).toLocaleString() + ' = ' + this.shipments[0].totalNetAmountVND.toLocaleString() + '+' + this.shipments[0].totalVATVND.toLocaleString();
+            this.total.totalUSDStr = formatCurrency(this.shipments[0].totalNetUSD + this.shipments[0].totalVATUSD, 'en', '') + ' = ' + formatCurrency(this.shipments[0].totalNetUSD, 'en', '') + ' + ' + formatCurrency(this.shipments[0].totalVATUSD, 'en', '');
+            this.totalAmountVnd = (this.shipments[0].totalVND).toLocaleString() + ' = ' + this.shipments[0].totalNetVND.toLocaleString() + ' + ' + this.shipments[0].totalVATVND.toLocaleString();
             this.total.totalShipment = 1;
             this.total.totalCharges = surcharges.length;
+
+            this.orgChargeShipment = { shipmentSettlement: cloneDeep(this.shipments), total: cloneDeep(this.total) };
             this.checkedAllCharges();
         }
     }
 
-    onShipmentList(data: any) {
-        // this.shipmentInput = data;
-        // if (data) {
-        //     this.numberOfShipment = this.shipmentInput.keyword.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim()).length;
-        //     this.resetShipment();
-        // } else {
-        //     this.numberOfShipment = 0;
-        // }
-    }
 
-    resetData(){
-        this.shipments = [];
-        this.total = {};
-        this.totalAmountVnd = '';
-    }
-    resetFormShipmentInput() {
-        this.referenceNo.setValue(null);
-        this.referenceInput.setValue(null);
-        this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
-        // this.inputShipmentPopupComponent.shipmentSearch = '';
-        // this.shipmentInput = null;
-        // this.inputShipmentPopupComponent.selectedShipmentType = "JOBID";
-    }
 
     updateExchangeRateForCharges() {
         this.shipments.forEach((shipment: any) =>
@@ -406,52 +288,40 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             return;
         } else {
             const exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
-            this.shipments.forEach((shipment: ShipmentChargeSettlement) =>
-                {
-                    shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
-                        .map((charge: Surcharge) => {
-                            if (charge.currencyId === 'USD') {
-                                charge.amountVnd = Number(charge.netAmount * exchangeRate);
-                                charge.vatAmountVnd = Number(charge.vatrate * exchangeRate);
-                                charge.totalAmountVnd = Number(charge.amountVnd + charge.vatAmountVnd);
-                                charge.finalExchangeRate = Number(exchangeRate);
-                        }});
-                        shipment.totalNetVND = shipment.chargeSettlements.reduce((net : number , charge: Surcharge) => net += charge.amountVnd, 0);
-                        shipment.totalVATVND = shipment.chargeSettlements.reduce((vat : number , charge: Surcharge) => vat += charge.vatAmountVnd, 0);
-                        shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
-                }
-            );
-            // this.selectedCharge.forEach((charge: Surcharge) => {
-            //     if (charge.currencyId === 'USD') {
-            //         charge.amountVnd = charge.netAmount * exchangeRate;
-            //         charge.vatAmountVnd = charge.vatrate * exchangeRate;
-            //         charge.totalAmountVnd = charge.amountVnd + charge.vatAmountVnd;
-            //         charge.finalExchangeRate = exchangeRate;
-            //     }
-            // });
-            let netAmountVND = 0, vatAmountVND = 0, totalAmountVnd = 0;
             this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                netAmountVND += shipment.chargeSettlements.reduce((net : number , charge: Surcharge) => net += charge.amountVnd, 0);
-                vatAmountVND += shipment.chargeSettlements.reduce((vat : number , charge: Surcharge) => vat += charge.vatAmountVnd, 0);
-            });
-            totalAmountVnd = vatAmountVND + netAmountVND;
-            this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' = ' + netAmountVND.toLocaleString() + ' + ' + vatAmountVND.toLocaleString());
+                shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
+                    .map((charge: Surcharge) => {
+                        if (charge.currencyId === 'USD') {
+                            charge.amountVnd = Number(charge.netAmount * exchangeRate);
+                            charge.vatAmountVnd = charge.vatrate < 0 ? Number(charge.vatrate * exchangeRate) : (charge.amountVnd * (charge.vatrate / 100));
+                            charge.finalExchangeRate = Number(exchangeRate);
+                        }
+                    });
+                shipment.totalNetVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
+                shipment.totalVATVND = shipment.chargeSettlements.reduce((vat: number, charge: Surcharge) => vat += charge.vatAmountVnd, 0);
+                shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
+            }
+            );
+            this.getTotalAmountVND();
         }
     }
 
     resetUpdateExchangeRateForCharges() {
         this.resetData();
         this.shipments = cloneDeep(this.orgChargeShipment.shipmentSettlement);
-        this.total = {...this.orgChargeShipment.total};
+        this.total = { ...this.orgChargeShipment.total };
+        this.getTotalAmountVND();
+        this.checkedAllCharges();
+    }
+
+    getTotalAmountVND() {
         let netAmountVND = 0, vatAmountVND = 0, totalAmountVnd = 0;
         this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-            netAmountVND += shipment.chargeSettlements.reduce((net : number , charge: Surcharge) => net += charge.amountVnd, 0);
-            vatAmountVND += shipment.chargeSettlements.reduce((vat : number , charge: Surcharge) => vat += charge.vatAmountVnd, 0);
+            netAmountVND += shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
+            vatAmountVND += shipment.chargeSettlements.reduce((vat: number, charge: Surcharge) => vat += charge.vatAmountVnd, 0);
         });
         totalAmountVnd = vatAmountVND + netAmountVND;
         this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' : ' + netAmountVND.toLocaleString() + '+' + vatAmountVND.toLocaleString());
-        console.log('old1', this.orgChargeShipment)
-        this.checkedAllCharges();
     }
 
     onBlurAnyCharge(e: any, hblId: string) {
@@ -468,7 +338,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
-    setAdvanceToSurcharge(shipment: any, advanceNo: string){
+    setAdvanceToSurcharge(shipment: any, advanceNo: string) {
         shipment.chargeSettlements.forEach(element => {
             element.advanceNo = advanceNo;
         });
@@ -476,7 +346,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     // Get List Charges
     searchCharge() {
-        
+
         this.isSubmitted = true;
         let soaNo = [], cdNote = [], jobNo = [], hblNo = [], mblNo = [], customNo = [];
         if (!!this.referenceNo) {
@@ -514,125 +384,104 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             serviceDateTo: !!this.serviceDate.value ? (!this.serviceDate.value.endDate ? null : formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
             personInCharge: !this.personInCharge.value ? this.personInCharges.map((item: any) => item.id).join(';') : this.personInCharge.value.join(';'),
         };
-console.log('body', body)
-console.log('body2', this.selectedPartnerData)
         this.isSoaCDNoteSelected();
         if (!this.selectedPartnerData && (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value)) {
-            if(!this.referenceInput.value){
+            if (!this.referenceInput.value) {
                 return;
             }
             this.searchWithSOAOrCDNote(body);
             // if(this.configPartner.dataSource.length === 0){
             //     this._toastService.warning('There is no partner data to search, please recheck data!');
             // }  
-        }else{
-            if(!this.selectedPartnerData){
+        } else {
+            if (!this.selectedPartnerData) {
                 return
             }
             this._accoutingRepo.getExistingCharge(body)
-            .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
-            .subscribe(
-                (res: any = {}) => {
-                    if (!!res && res.status === false) {
-                        this._toastService.error(res.message);
-                        return;
+                .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
+                .subscribe(
+                    (res: any = {}) => {
+                        if (!!res && res.status === false) {
+                            this._toastService.error(res.message);
+                            return;
+                        }
+                        if (!!res) {
+                            this.shipments = res.shipmentSettlement;
+                            this.total = res.total;
+                            this.totalAmountVnd = this.total.totalVNDStr;
+                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
+                            });
+                            this.checkedAllCharges();
+                            this.orgChargeShipment = cloneDeep(res);
+                            this.isSubmitted = false;
+                        }
                     }
-                    if(!!res){
-                        // this.charges = res.shipmentSettlement.chargeSettlements;
+                );
+        }
+    }
+
+    searchWithSOAOrCDNote(body: any) {
+        this._accoutingRepo.getPartnerForSettlement(body)
+            .pipe(
+                catchError(this.catchError), finalize(() => this.isLoading = false),
+                concatMap((res) => {
+                    if (!res) {
+                        return of(false);
+                    }
+                    if (res.length > 1) {
+                        this._toastService.warning('Please Select Partner!');
+                        return of(false);
+                    }
+                    this.selectedPartnerData = res[0];
+                    this.selectedPartner = { field: 'id', value: res[0].id };
+                    body.partnerId = this.selectedPartnerData.id;
+                    if (!!res.length) {
+                        return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
+                            catchError((err, caught) => this.catchError),
+                            concatMap((rs: any) => {
+                                if (!!rs) {
+                                    this._toastService.error(rs);
+                                    return;
+                                } else {
+                                    return this._accoutingRepo.getExistingCharge(body);
+                                }
+                            })
+                        );
+                    }
+                }))
+            .subscribe(
+                (res: IGetExistsCharge) => {
+                    if (!!res) {
+                        this.orgChargeShipment = cloneDeep(res);
                         this.shipments = res.shipmentSettlement;
                         this.total = res.total;
                         this.totalAmountVnd = this.total.totalVNDStr;
-                        console.log('ref2', this.referenceNo.value)
+                        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                            this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
+                        });
                         this.checkedAllCharges();
-                        this.orgChargeShipment = cloneDeep(res);
                         this.isSubmitted = false;
                     }
                 }
             );
-        }
-        // this.isLoading = false;
-        // this.isCheckAll = false;
-    }
-
-    searchWithSOAOrCDNote(body: any){
-        this._accoutingRepo.getPartnerForSettlement(body)
-        .pipe(
-            catchError(this.catchError), finalize(() => this.isLoading = false),
-            concatMap((res) => {
-                if(!res){
-                    return of(false);
-                }
-                if (res.length > 1) {
-                    this._toastService.warning('Please Select Partner!');
-                    return of(false);
-                }
-                // this.configPartner.dataSource = res;
-                this.selectedPartnerData = res[0];
-                this.selectedPartner = { field: 'id', value: res[0].id };
-                body.partnerId = this.selectedPartnerData.id;
-                if(!!res.length){
-                    return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                        catchError((err, caught) => this.catchError),
-                        concatMap((rs: any) => {
-                            if (!!rs) {
-                                this._toastService.error(rs);
-                                return;
-                            }else{
-                                return this._accoutingRepo.getExistingCharge(body);
-                            }
-                        })
-                    );
-                }
-                // return this._accoutingRepo.getExistingCharge(body);
-            }))
-        .subscribe(
-            (res: IGetExistsCharge) => {
-                if(!!res){
-                this.orgChargeShipment = cloneDeep(res);
-                this.shipments = res.shipmentSettlement;
-                this.total = res.total;
-                this.totalAmountVnd = this.total.totalVNDStr;
-                this.checkedAllCharges();
-                this.isSubmitted = false;
-                }
-            }
-            // (res: HttpErrorResponse) => {
-            //     console.log('body5', res)
-            //     return;
-            // }
-        );
-    }
-
-    isSoaCDNoteSelected() {
-        if (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value) {
-            this.isSOACDNote = true;
-        } else {
-            this.isSOACDNote = false;
-        }
     }
 
     checkedAllCharges() {
         this.shipments.forEach((shipment: any) => {
             shipment.isSelected = true;
             shipment.chargeSettlements.map((i: Surcharge) => {
-            i.isSelected = true;
+                i.isSelected = true;
                 if (!!i.invoiceDate) {
                     i.invoiceDate = formatDate(new Date(i.invoiceDate), 'dd/MM/yyyy', 'en');
                 } else {
                     i.invoiceDate = null;
                 }
-                }
-            ); 
+            }
+            );
         });
-        // this.shipments.forEach((shipment: any) => {
-        //     shipment.chargeSettlements.map((i: any) => {
-        //         if (!!i.invoiceDate) {
-        //             i.invoiceDate = formatDate(new Date(i.invoiceDate), 'dd/MM/yyyy', 'en');
-        //         }
-        //     });
-        // });
     }
-    
+
     // Add Charge Button event
     submit() {
         this.selectedCharge = [];
@@ -640,31 +489,55 @@ console.log('body2', this.selectedPartnerData)
             shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                 .map((surcharge: Surcharge) => this.selectedCharge.push(new Surcharge(surcharge)))
         );
-        // for (const charge of this.selectedCharge) {
-        //     const date = charge.invoiceDate;
-        //     if (typeof date !== 'string') {
-        //         if (Object.prototype.toString.call(date) !== '[object Date]') {
-        //             if (!charge.invoiceDate) {
-        //                 charge.invoiceDate = null;
-        //             } else {
-        //                 charge.invoiceDate = new Date(date.startDate);
-        //             }
-        //         }
-        //     }
-        // }
         console.log('charges', this.selectedCharge)
         if (!this.selectedCharge.length) {
             this._toastService.warning(`Don't have any charges in this period, Please check it again! `);
             return;
         } else {
+            this.selectedCharge.forEach(c => {
+                if (!!c.invoiceDate) {
+                    const [day, month, year]: string[] = c.invoiceDate.split("/");
+                    c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+                } else {
+                    c.invoiceDate = null;
+                }
+                c.amountVnd = !c.amountVnd ? 0 : c.amountVnd;
+                c.vatAmountVnd = !c.vatAmountVnd ? 0 : c.vatAmountVnd;
+            });
             this.onRequest.emit(this.selectedCharge);
             this.selectedCharge = [];
-            // this.total = {};
-            // this.hide();
             this.closePopup();
         }
     }
-    
+
+    reset() {
+        this.referenceNo.setValue(null);
+        this.referenceInput.setValue(null)
+        this.resetPartner();
+        this.isCheckAll = false;
+
+        this.resetData();
+        this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+
+        this.resetFormShipmentInput();
+    }
+
+    resetPartner() {
+        this.selectedPartnerData = null;
+        this.selectedPartner = {};
+    }
+
+    resetData() {
+        this.shipments = [];
+        this.total = {};
+        this.totalAmountVnd = '';
+    }
+
+    resetFormShipmentInput() {
+        this.referenceNo.setValue(null);
+        this.referenceInput.setValue(null);
+        this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+    }
 }
 export interface ISearchExistsChargeSettlePayment {
     soaNo: string[];
@@ -680,7 +553,7 @@ export interface ISearchExistsChargeSettlePayment {
     personInCharge: string;
 }
 
-interface IGetExistsCharge{
+interface IGetExistsCharge {
     shipmentSettlement: ShipmentChargeSettlement[];
     total: any;
 }
@@ -696,17 +569,17 @@ class ShipmentChargeSettlement {
     shipmentId: string = '';
     customNo: string = '';
     advanceNo: string = '';
-    advanceNoList: [] = [];
-    totalNetAmount: number=0;
-    totalNetAmountVND: number=0;
-    totalAmount: number=0;
-    totalAmountVND: number=0;
-    totalNetVND: number=0;
-    totalVATVND: number=0;
-    totalNetUSD: number=0;
-    totalVATUSD: number=0;
-    totalVND: number=0;
-    advanceAmount: number=0;
-    balance: number=0;
+    advanceNoList: string[] = [];
+    totalNetAmount: number = 0;
+    totalNetAmountVND: number = 0;
+    totalAmount: number = 0;
+    totalAmountVND: number = 0;
+    totalNetVND: number = 0;
+    totalVATVND: number = 0;
+    totalNetUSD: number = 0;
+    totalVATUSD: number = 0;
+    totalVND: number = 0;
+    advanceAmount: number = 0;
+    balance: number = 0;
     chargeSettlements: Surcharge[] = [];
 }

@@ -23,7 +23,6 @@ import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
-import { F } from '@angular/cdk/keycodes';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -71,8 +70,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     STATE: string = 'WRITE';  // * list'state READ/WRITE
 
     isShowButtonCopyCharge: boolean = false;
-    isDirectSettlement: boolean = true;
-    isExistingSettlement: boolean = true;
+    isDirectSettlement: boolean = false;
+    isExistingSettlement: boolean = false;
 
     constructor(
         private _sortService: SortService,
@@ -123,19 +122,21 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onRequestSurcharge(surcharge: any) {
-        // this.surcharges.push(surcharge);
-        surcharge = surcharge.filter((item: any) => this.surcharges.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
+        this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
         this.surcharges = [...this.surcharges, ...surcharge];
         this.surcharges.forEach(x => x.isSelected = false);
         console.log('surcharge', this.surcharges)
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
-        if(this.tableListChargePopup.charges.length > 0){
-            this.isDirectSettlement = true;
-            this.isExistingSettlement = false;
-        }
         if(this.existingChargePopup.selectedCharge.length > 0){
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
+            this.isShowButtonCopyCharge = false;
+        }else{
+            if(this.surcharges.length > 0){
+                this.isDirectSettlement = true;
+                this.isExistingSettlement = false;
+                this.isShowButtonCopyCharge = true;
+            }
         }
         this.onChange.emit(true);
     }
@@ -188,6 +189,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 }
             }
             this.selectedSurcharge = surcharge;
+            this.selectedSurcharge.invoiceDate = !this.selectedSurcharge.invoiceDate ? null : new Date(this.selectedSurcharge.invoiceDate);
+
             this.stateFormCharge = 'update';
 
             this.formChargePopup.action = action;

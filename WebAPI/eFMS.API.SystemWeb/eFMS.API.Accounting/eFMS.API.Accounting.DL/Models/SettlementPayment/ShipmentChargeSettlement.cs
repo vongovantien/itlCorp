@@ -47,7 +47,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string TypeService { get; set; } // OPS | DOC
         public Guid ShipmentId { get; set; }
         public Guid? ChargeGroup { get; set; }
-        public string CustomNo { get; set; }
         public decimal? NetAmount { get; set; }
         public decimal? FinalExchangeRate { get; set; }
         public decimal? AmountVnd { get; set; }

@@ -4,7 +4,7 @@
             <div>
                 <ng-container *ngIf="!!STATE && STATE === 'WRITE'">
                     <button type="button" class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10"
-                        (click)="showCreateCharge()" [disabled]="!isDirectSettlement">
+                        (click)="showCreateCharge()" *ngIf="!isExistingSettlement">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -13,7 +13,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-warning  m-btn--icon m-btn--uppercase m--margin-right-10"
-                        (click)="showExistingCharge()" [disabled]="!isExistingSettlement">
+                        (click)="showExistingCharge()" *ngIf="!isDirectSettlement">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -22,7 +22,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10"
-                        (click)="showCopyCharge()" *ngIf="isShowButtonCopyCharge">
+                        (click)="showCopyCharge()" *ngIf="isShowButtonCopyCharge || !isExistingSettlement">
                         <span>
                             <i class="la la-copy"></i>
                             <span>
