@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter, ComponentRef, ChangeDetectorRef } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -65,6 +65,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
         private _accoutingRepo: AccountingRepo,
         private _operationRepo: OperationRepo,
         private _documentationRepo: DocumentationRepo,
+        private _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -219,16 +220,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.resetForm();
                     } else {
                         this.dataRequest = advRequest;
-
-                        // ! Bỏ bô gọi API, render dynamic không show được
-                        // this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                        //     body: 'Shipment has existed in another Advance !',
-                        //     title: 'Warning'
-                        // }, () => {
-                        //     this.onSubmitShipmentExisted();
-                        // })
-
-                        this.confirmEsixedJobPopup.show();
+                        if (!!res.data) {
+                            this.confirmEsixedJobPopup.jobNo = advRequest.jobId;
+                            this.confirmEsixedJobPopup.items = res.data || [];
+                            this.confirmEsixedJobPopup.show();
+                            this._cd.markForCheck();
+                        }
                     }
                 },
             );
