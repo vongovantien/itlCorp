@@ -688,7 +688,7 @@ export class DocumentationRepo {
     }
 
     GetShipmentNotExist(typeSearch: string, shipments: string[] = []) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentNotExist`, { typeSearch: typeSearch, shipments: shipments }).pipe(
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentNotExist`, shipments, { typeSearch: typeSearch }).pipe(
             map((data: any) => data)
         );
     }

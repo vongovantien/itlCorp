@@ -104,9 +104,9 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
-        [HttpGet("GetShipmentNotExist")]
+        [HttpPost("GetShipmentNotExist")]
         [Authorize]
-        public IActionResult GetShipmentNotExist(string typeSearch, List<string> shipments)
+        public IActionResult GetShipmentNotExist(string typeSearch, [FromBody]List<string> shipments)
         {
             var listShipment = shipmentService.GetShipmentNotDelete();
             List<string> shipmentNotExits = new List<string>();
