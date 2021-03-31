@@ -315,7 +315,7 @@ namespace eFMS.API.Accounting.Controllers
             var hs = accountingPaymentService.ImportInvoicePayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 foreach (var item in list) {
                     var paymentInvoiceIds = accountingPaymentService.Get(x => x.Type == "INVOICE" && x.RefId == item.RefId).Select(s => s.RefId);
@@ -326,7 +326,7 @@ namespace eFMS.API.Accounting.Controllers
                         CalculatorReceivableAcctPayment(surchargeIds);
                     }
                 }
-            }
+            }*/ //[31/03/2021]
 
             if (!hs.Success)
             {
@@ -346,7 +346,7 @@ namespace eFMS.API.Accounting.Controllers
             var hs = accountingPaymentService.ImportOBHPayment(list);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 foreach (var item in list)
                 {
@@ -358,7 +358,7 @@ namespace eFMS.API.Accounting.Controllers
                         CalculatorReceivableAcctPayment(surchargeIds);
                     }
                 }
-            }
+            }*/ //[31/03/2021]
 
             if (!hs.Success)
             {
@@ -420,14 +420,14 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 if (surchargeIds.Count > 0)
                 {
                     // Tính công nợ
                     CalculatorReceivableAcctPayment(surchargeIds);
                 }
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };

@@ -2795,7 +2795,7 @@ namespace eFMS.API.Accounting.DL.Services
                 #region -- Info MBL, HBL --
                 _mawb = charge.Mblno;
                 _hwbNo = charge.Hblno;
-                _customNo = charge.TransactionType == "CL" ? GetTopClearanceNoByJobNo(charge.JobNo) : string.Empty;
+                _customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
                 _jobNo = charge.JobNo;
                 #endregion -- Info MBL, HBL --
 

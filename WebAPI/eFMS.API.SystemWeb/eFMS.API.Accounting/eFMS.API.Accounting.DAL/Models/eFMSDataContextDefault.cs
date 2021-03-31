@@ -3352,7 +3352,6 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ChildId)
                     .HasColumnName("ChildID")
-                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");

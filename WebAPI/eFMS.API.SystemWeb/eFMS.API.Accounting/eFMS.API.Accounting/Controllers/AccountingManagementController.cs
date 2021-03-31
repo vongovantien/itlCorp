@@ -85,11 +85,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 // Sau khi xóa thành công >> tính lại công nợ dựa vào list surcharge id của accounting management
                 CalculatorReceivableAcctMngt(surchargeIds);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -187,12 +187,12 @@ namespace eFMS.API.Accounting.Controllers
             
             var hs = accountingService.AddAcctMgnt(model);
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
                 // Tính công nợ
                 CalculatorReceivableAcctMngt(surchargeIds);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -248,12 +248,12 @@ namespace eFMS.API.Accounting.Controllers
 
             var hs = accountingService.UpdateAcctMngt(model);
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
                 // Tính công nợ
                 CalculatorReceivableAcctMngt(surchargeIds);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -432,7 +432,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var result = accountingService.ImportVatInvoice(model);
-            if (result.Status)
+            /*if (result.Status)
             {
                 var acctMngtIds = accountingService.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && model.Select(s => s.VoucherId).Contains(x.VoucherId)).Select(s => s.Id);
                 foreach(var acctMngtId in acctMngtIds)
@@ -440,7 +440,7 @@ namespace eFMS.API.Accounting.Controllers
                     var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(acctMngtId);
                     CalculatorReceivableAcctMngt(surchargeIds);
                 }
-            }
+            }*/ //[31/03/2021]
             return Ok(result);
         }
 

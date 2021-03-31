@@ -334,7 +334,7 @@ namespace eFMS.API.Documentation.DL.Services
                     totalPackages += item.Sum(t => t.PackageQuantity);
                     instructions.Add(instruction);
                 }
-                parameter.TotalPackages = totalPackages?.ToString() + " PKG(S)";
+                parameter.TotalPackages = totalPackages?.ToString(); //+ " PKG(S)"; CR: 15585 [31/03/2021]
                 result = new Crystal
                 {
                     ReportName = "SeaShippingInstructionCont.rpt",
@@ -605,7 +605,7 @@ namespace eFMS.API.Documentation.DL.Services
                 MaskNos = model.ContainerSealNo
             };
             instructions.Add(instruction);
-            parameter.TotalPackages = totalPackage + " PKG(S)";
+            parameter.TotalPackages = totalPackage.ToString(); //+ " PKG(S)"; CR: 15585 [31/03/2021]
             result = new Crystal
             {
                 ReportName = "SeaShippingInstructionSummary.rpt",
