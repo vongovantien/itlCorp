@@ -2286,9 +2286,12 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 var take = _resultDatas.Skip((page - 1) * size).Take(size).AsQueryable();
 
+                var partners = partnerRepositoty.Get();
+                var users = sysUserRepo.Get();
+                
                 //Join to get info PartnerName, Username create CDNote
                 var joinData = from cd in take
-                               join partner in partnerRepositoty.Get() on cd.PartnerId equals partner.Id into partnerGrp
+                               join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
                                from partner in partnerGrp.DefaultIfEmpty()
                                join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
                                from creator in creatorGrp.DefaultIfEmpty()
@@ -2297,14 +2300,14 @@ namespace eFMS.API.Documentation.DL.Services
                                    Id = cd.Id,
                                    JobId = cd.JobId,
                                    PartnerId = cd.PartnerId,
-                                   PartnerName = partner.PartnerNameEn,
+                                   PartnerName = partner != null ? partner.PartnerNameEn : null,
                                    ReferenceNo = cd.ReferenceNo,
                                    JobNo = cd.JobNo,
                                    HBLNo = cd.HBLNo,
                                    Total = cd.Total,
                                    Currency = cd.Currency,
                                    IssuedDate = cd.IssuedDate,
-                                   Creator = creator.Username,
+                                   Creator = creator != null ? creator.Username : null,
                                    Status = cd.Status,
                                    InvoiceNo = cd.InvoiceNo,
                                    VoucherId = cd.VoucherId,
@@ -2650,6 +2653,117 @@ namespace eFMS.API.Documentation.DL.Services
                 _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
             }
             return _link;
+        }
+
+        private List<CombineBillingReport> GetDataCombineBilling(IQueryable<CsShipmentSurcharge> surcharges, string partnerId, string currencyCombine)
+        {
+            var cdNoteCharges = new List<CombineBillingReport>();
+            
+            var partner = partnerRepositoty.Get(x => x.Id == partnerId).FirstOrDefault();
+
+            var grpInvoiceCdNote = surcharges.GroupBy(g => new { CdCode = !string.IsNullOrEmpty(g.CreditNo) ? g.CreditNo : g.DebitNo, InvoiceNo = g.InvoiceNo }).Select(se => new { CdCode = se.Key.CdCode, InvoiceNo = se.Key.InvoiceNo });
+
+            foreach (var surcharge in surcharges)
+            {
+                var _amount = (currencyCombine == DocumentConstants.CURRENCY_LOCAL) ? (surcharge.AmountVnd + surcharge.VatAmountVnd) : (surcharge.AmountUsd + surcharge.VatAmountUsd);
+                var _rObh = (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE) ? _amount : 0;
+
+                var cdNoteCharge = new CombineBillingReport();
+                cdNoteCharge.PartnerID = partnerId;
+                cdNoteCharge.PartnerName = partner?.PartnerNameEn?.ToUpper(); //Name En
+                cdNoteCharge.PersonalContact = partner?.ContactPerson?.ToUpper();
+                cdNoteCharge.Email = partner?.Email;
+                cdNoteCharge.Address = partner?.AddressEn?.ToUpper(); //Address En
+                cdNoteCharge.Workphone = partner?.WorkPhoneEx;
+                cdNoteCharge.Fax = partner?.Fax;
+                cdNoteCharge.Taxcode = partner?.TaxCode;
+                cdNoteCharge.MAWB = surcharge.Mblno;
+                cdNoteCharge.HWBNO = surcharge.Hblno;
+                cdNoteCharge.Amount = _amount + (decimal)0.00000001;
+                cdNoteCharge.Curr = currencyCombine;
+                cdNoteCharge.Dpt = surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE ? true : false;
+                cdNoteCharge.ROBH = _rObh + (decimal)0.00000001;
+                cdNoteCharge.CustomNo = surcharge.ClearanceNo;
+                cdNoteCharge.JobNo = surcharge.JobNo;
+                cdNoteCharge.CdCode = !string.IsNullOrEmpty(surcharge.CreditNo) ? surcharge.CreditNo : surcharge.DebitNo;
+
+                var invoices = grpInvoiceCdNote.Where(x => x.CdCode == cdNoteCharge.CdCode).Select(se => se.InvoiceNo);
+                if (invoices.Count() > 0)
+                {
+                    invoices = invoices.Where(w => !string.IsNullOrEmpty(w)).Distinct();
+                }
+                cdNoteCharge.Docs = string.Join(";", invoices.ToList()); //Invoice No
+
+                cdNoteCharges.Add(cdNoteCharge);
+            }
+            return cdNoteCharges;
+        }
+
+        public Crystal PreviewCombineBilling(List<CombineBillingCriteria> criteria)
+        {
+            var combineCharges = new List<CombineBillingReport>();
+            var parameter = new CombineBillingReportParams();
+
+            var cdNoteCodes = criteria.Select(se => se.CdNoteCode);
+            var cdNotePartnerId = criteria.FirstOrDefault()?.PartnerId;
+            var currencyCombine = criteria.FirstOrDefault()?.CurrencyCombine;
+
+            var surchargesCDNote = surchargeRepository.Get(x => cdNoteCodes.Any(a => a == x.CreditNo || a == x.DebitNo));
+
+            if (surchargesCDNote.Count() > 0)
+            {
+                var combineCharge = GetDataCombineBilling(surchargesCDNote, cdNotePartnerId, currencyCombine);
+                if (combineCharge.Count > 0)
+                {
+                    combineCharges.AddRange(combineCharge);
+                }
+
+                var cdNotes = DataContext.Get(x => cdNoteCodes.Any(a => a == x.Code));
+                combineCharge.ForEach(fe =>
+                {
+                    fe.DatetimeModifiedCdNote = cdNotes.Where(x => x.Code == fe.CdCode).FirstOrDefault()?.DatetimeModified;
+                });
+
+                combineCharges = combineCharges.ToArray().OrderByDescending(o => o.DatetimeModifiedCdNote).ToList();
+
+                //Get info office by Current User
+                var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+
+                parameter.UptoDate = string.Format("{0} - {1}", cdNotes.Min(x => x.DatetimeCreated).Value.ToString("dd/MM/yyyy") ?? string.Empty, cdNotes.Max(x => x.DatetimeCreated).Value.ToString("dd/MM/yyyy") ?? string.Empty); //Min - Max created date CDNote
+                parameter.dtPrintDate = DateTime.Now.ToString("dd/MM/yyyy"); //Currency Date
+                parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
+                parameter.CompanyDescription = string.Empty; //NOT USE
+                parameter.CompanyAddress1 = office?.AddressEn;
+                parameter.CompanyAddress2 = string.Format(@"Tel: {0} Fax: {1}", office?.Tel, office?.Fax);
+                parameter.Website = string.Empty; //Office ko có field Website
+                parameter.IbanCode = string.Empty; //NOT USE
+                parameter.AccountName = office?.BankAccountNameEn?.ToUpper() ?? string.Empty;
+                parameter.AccountNameEn = office?.BankAccountNameVn?.ToUpper() ?? string.Empty;
+                parameter.BankName = office?.BankNameLocal?.ToUpper() ?? string.Empty;
+                parameter.BankNameEn = office?.BankNameEn?.ToUpper() ?? string.Empty;
+                parameter.SwiftAccs = office?.SwiftCode ?? string.Empty;
+                parameter.AccsUSD = office?.BankAccountUsd ?? string.Empty;
+                parameter.AccsVND = office?.BankAccountVnd ?? string.Empty;
+                parameter.BankAddress = office?.BankAddressLocal?.ToUpper() ?? string.Empty;
+                parameter.BankAddressEn = office?.BankAddressEn?.ToUpper() ?? string.Empty;
+                parameter.Paymentterms = string.Empty; //NOT USE
+                parameter.Contact = currentUser.UserName?.ToUpper() ?? string.Empty;
+                parameter.CurrDecimalNo = 3;
+                parameter.RefNo = string.Empty;
+                parameter.Email = office?.Email ?? string.Empty;
+            }
+
+            var result = new Crystal
+            {
+                ReportName = "CombineBilling.rpt",
+                AllowPrint = true,
+                AllowExport = true
+            };
+
+            result.AddDataSource(combineCharges);
+            result.FormatType = ExportFormatType.PortableDocFormat;
+            result.SetParameter(parameter);
+            return result;
         }
     }
 }
