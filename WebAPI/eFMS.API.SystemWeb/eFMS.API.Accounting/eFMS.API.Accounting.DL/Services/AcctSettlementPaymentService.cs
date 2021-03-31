@@ -1288,34 +1288,34 @@ namespace eFMS.API.Accounting.DL.Services
             //var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
 
             // Data search = jobNo
-            criteria.jobIds = criteria.jobIds != null ? criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.jobIds;
+            criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.jobIds != null && criteria.jobIds.Count() > 0)
             {
                 opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
                 csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
             }
             // Data search = mblNo
-            criteria.mbls = criteria.mbls != null ? criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.mbls;
+            criteria.mbls = criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.mbls != null && criteria.mbls.Count() > 0)
             {
                 opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) && x.Mblno != null);
                 csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) && x.Mawb != null);
             }
             // Data search = hblNo
-            criteria.hbls = criteria.hbls != null ? criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList(): criteria.hbls;
+            criteria.hbls = criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.hbls != null && criteria.hbls.Count() > 0)
             {
                 opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
                 csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
             }
             // Data search = soaNo
-            criteria.soaNo = criteria.soaNo != null ? criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.soaNo;
+            criteria.soaNo = criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
             {
                 surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0);
             }
             // Data search = customNo
-            criteria.customNos = criteria.customNos != null ? criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.customNos;
+            criteria.customNos = criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList();
             var clearanceData = customClearanceRepo.Get();
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
@@ -1326,7 +1326,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             }
             // Data search = creditNo
-            criteria.creditNo = criteria.creditNo != null ? criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList() : criteria.creditNo;
+            criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.creditNo != null && criteria.creditNo.Count() > 0)
             {
                 surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
@@ -4960,7 +4960,6 @@ namespace eFMS.API.Accounting.DL.Services
                      && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId)
                      || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
                 );
-            bool _isSynced = false;
             string message = string.Empty;
             if (criteria.soaNo.Count() > 0)
             {
@@ -4970,7 +4969,6 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
                                                     && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
-                    _isSynced = surchargesFilter.Any();
                 }
                 if (surchargesFilter.Any())
                 {
@@ -4986,7 +4984,6 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
                                                     && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
-                    _isSynced = surchargesFilter.Any();
                 }
                 if (surchargesFilter.Any())
                 {
