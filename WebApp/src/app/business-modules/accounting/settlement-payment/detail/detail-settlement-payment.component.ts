@@ -1,12 +1,13 @@
+import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
+import { ISettlementPaymentState } from './../components/store/reducers/index';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
+import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -18,8 +19,10 @@ import { DataService } from '@services';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 
-import { catchError, finalize, pluck } from 'rxjs/operators';
+import { catchError, pluck } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { Store } from '@ngrx/store';
+import { LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -36,18 +39,18 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
+    attachFiles: SysImage[] = [];
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
-        private _progressService: NgProgress,
         private _exportRepo: ExportRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _store: Store<ISettlementPaymentState>
     ) {
         super();
-
-        this._progressRef = this._progressService.ref();
     }
 
 
@@ -104,14 +107,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
         this.formatInvoiceDateSurcharge();
-        this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
         this._accoutingRepo.updateSettlementPayment(body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -132,11 +133,9 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     getDetailSettlement(settlementId: string, typeCharge: string) {
-        this._progressRef.start();
         this._accoutingRepo.getDetailSettlementPayment(settlementId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: ISettlementPaymentData) => {
@@ -146,6 +145,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         return;
                     }
                     this.settlementPayment = res;
+                    this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
+
                     switch (this.settlementPayment.settlement.statusApproval) {
                         case 'New':
                         case 'Denied':
@@ -175,6 +176,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
 
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
+                    this.requestSurchargeListComponent.requester = this.settlementPayment.settlement.requester;
 
                     // *SWITCH UI TO GROUP LIST SHIPMENT
                     this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
@@ -200,14 +202,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
         this.formatInvoiceDateSurcharge();
-        this._progressRef.start();
         const body: any = {
             settlement: this.getBodySettlement(),
             shipmentCharge: this.requestSurchargeListComponent.surcharges || []
         };
 
         this._accoutingRepo.saveAndSendRequestSettlemntPayment(body)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -234,9 +235,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        this._progressRef.start();
         this._accoutingRepo.previewSettlementPayment(this.settlementPayment.settlement.settlementNo)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
                     this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
@@ -264,11 +264,9 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        this._progressRef.start();
         this._exportRepo.exportSettlementPaymentDetail(this.settlementPayment.settlement.id, language)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (response: ArrayBuffer) => {
@@ -287,6 +285,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 export interface ISettlementPaymentData {
     chargeGrpSettlement: any;
     chargeNoGrpSettlement: Surcharge[];
-    settlement: any;
+    settlement: SettlementPayment;
 }
 

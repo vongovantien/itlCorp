@@ -436,7 +436,6 @@ export class ShareFormSearchReportComponent extends AppForm {
                         this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
                         this.serviceList = this.serviceList.sort((one, two) => (one.text > two.text ? 1 : -1));
                         this.serviceList.unshift({ id: 'All', text: 'All' });
-                        console.log(this.serviceList);
                         this.serviceActive = [this.serviceList[0].id];
                     }
                 },
@@ -506,7 +505,10 @@ export class ShareFormSearchReportComponent extends AppForm {
                 || this.menuPermission.list === 'All') {
                 this.officeActive = [this.officeList[0].id];
             } else {
-                this.officeActive = [this.officeList.filter(off => off.id === this.userLogged.officeId)[0].id];
+                const offiUserCurr = this.officeList.filter(off => off.id === this.userLogged.officeId);
+                if (offiUserCurr.length > 0) {
+                    this.officeActive = [offiUserCurr[0].id];
+                }
             }
         } else {
             this.officeActive = [];
@@ -544,7 +546,10 @@ export class ShareFormSearchReportComponent extends AppForm {
                     || this.menuPermission.list === 'All') {
                     this.departmentActive = [this.departmentList[0].id];
                 } else {
-                    this.departmentActive = [this.departmentList.filter(dept => dept.id === this.userLogged.departmentId)[0].id];
+                    const deptUserCurr = this.departmentList.filter(dept => dept.id === this.userLogged.departmentId);
+                    if (deptUserCurr.length > 0) {
+                        this.departmentActive = [deptUserCurr[0].id];
+                    }
                 }
             }
         } else {
@@ -584,7 +589,10 @@ export class ShareFormSearchReportComponent extends AppForm {
                     || this.menuPermission.list === 'All') {
                     this.groupActive = [this.groupList[0].id];
                 } else {
-                    this.groupActive = [this.groupList.filter((grp) => grp.id === this.userLogged.groupId)[0].id];
+                    const grpUserCurr = this.groupList.filter((grp) => grp.id === this.userLogged.groupId);
+                    if (grpUserCurr.length > 0) {
+                        this.groupActive = [grpUserCurr[0].id];
+                    }
                 }
             }
         } else {
@@ -683,7 +691,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.join(";") : null,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList), // ---*
             currency: this.currency.value, // ---**
             jobId: this.refNoType.value === "JOBID" && this.refNo.value !== null ? this.refNo.value.trim() : null,
@@ -710,7 +718,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive != null &&  this.customerActive.length > 0 ? this.customerActive.toString() : null,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.toString() : null,
             service: this.mapObject(this.serviceActive, this.serviceList),
             currency: this.typeReport.value === this.typeComReportList[1].id ? "VND" : "USD",
             jobId: this.mapShipment('JOBID'),
@@ -830,6 +838,11 @@ export class ShareFormSearchReportComponent extends AppForm {
                 (department: any) => {
                     if (!!department) {
                         department = department.map((item: any) => ({ officeId: item.branchId, departmentId: item.id, departmentAbbrName: item.deptNameAbbr }));
+
+                        department.forEach(dept => {
+                            this.groupSpecial.push({ departmentId: dept.departmentId, groupId: 11, groupAbbrName: 'Manager' });
+                        });
+
                         this.departmentsInit = department;
                         this.getDepartment(department);
                     }
@@ -844,15 +857,18 @@ export class ShareFormSearchReportComponent extends AppForm {
                 finalize(() => { }),
             ).subscribe(
                 (group: any) => {
+                    //Add group 11 cho department hiện hành của User
+                    this.groupSpecial.push({ departmentId: this.userLogged.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                     if (!!group) {
                         group = group.map((item: any) => ({ departmentId: item.departmentId, groupId: item.id, groupAbbrName: item.shortName }));
                         group.forEach(element => {
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: element.groupId, groupAbbrName: element.groupAbbrName });
+                            //Add group 11 cho mỗi department trong list group
                             this.groupSpecial.push({ departmentId: element.departmentId, groupId: 11, groupAbbrName: 'Manager' });
                         });
-                        this.groupsInit = this.groupSpecial;
-                        this.getGroup(this.groupSpecial);
                     }
+                    this.groupsInit = this.groupSpecial;
+                    this.getGroup(this.groupSpecial);
                 },
             );
     }

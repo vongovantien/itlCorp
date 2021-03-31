@@ -99,7 +99,7 @@ export class FormAddPartnerComponent extends AppForm {
     internalCode: AbstractControl;
     isAddBranchSub: boolean;
     creditPayment: AbstractControl;
-
+    bankName: AbstractControl;
     roundMethods: CommonInterface.INg2Select[] = [
         { id: 'Standard', text: 'Standard' },
         { id: '0.5', text: 'Round 0.5' },
@@ -334,7 +334,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerMode: [null],
             partnerLocation: [null, Validators.required],
             internalCode: [null],
-            creditPayment: [null]
+            creditPayment: [null],
+            bankName: []
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -376,7 +377,7 @@ export class FormAddPartnerComponent extends AppForm {
         this.partnerLocation = this.partnerForm.controls['partnerLocation'];
         this.internalCode = this.partnerForm.controls['internalCode'];
         this.creditPayment = this.partnerForm.controls['creditPayment'];
-
+        this.bankName = this.partnerForm.controls['bankName'];
         if (!this.isUpdate) {
             this.partnerMode.setValue('External');
             this.partnerLocation.setValue('Domestic');
@@ -505,7 +506,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerMode: partner.partnerMode,
             partnerLocation: partner.partnerLocation,
             internalCode: partner.internalCode,
-            creditPayment: partner.creditPayment
+            creditPayment: partner.creditPayment,
+            bankName: partner.bankName
         });
 
     }

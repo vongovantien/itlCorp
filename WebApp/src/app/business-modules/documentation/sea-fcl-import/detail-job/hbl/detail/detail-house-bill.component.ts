@@ -1,7 +1,6 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
@@ -22,7 +21,8 @@ import { catchError, finalize, takeUntil, skip } from 'rxjs/operators';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    DELIVERY = 'DELIVERY'
+    DELIVERY = 'DELIVERY',
+    PROOF = 'PROOF'
 }
 
 @Component({
@@ -42,7 +42,6 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     isClickSubMenu: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -55,7 +54,7 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
         protected _dataService: DataService
 
     ) {
-        super(_progressService, _documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
+        super(_documentationRepo, _catalogueRepo, _toastService, _activedRoute, _actionStoreSubject, _router, _store, _cd, _dataService);
     }
 
     @delayTime(1000)
@@ -122,6 +121,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
                 }
                 break;
             }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
+                break;
+            }
             default:
                 break;
         }
@@ -164,13 +168,11 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = ChargeConstants.SFI_CODE;
 
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -186,17 +188,14 @@ export class DetailHouseBillComponent extends CreateHouseBillComponent implement
     }
 
     getDetailHbl() {
-        this._progressRef.start();
         this._store.select(fromShareBussiness.getDetailHBlState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
                 skip(1),
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
-                    this._progressRef.complete();
                     if (!!res) {
                         this.hblDetail = res;
 

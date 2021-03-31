@@ -126,18 +126,27 @@ namespace eFMS.API.Accounting.DL.Services
                     HandleState hs = DataContext.Delete(x => x.Id == id, false);
                     if (hs.Success)
                     {
-                        var charges = surchargeRepo.Get(x => x.AcctManagementId == id);
+                        var charges = surchargeRepo.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == id);
                         decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                         foreach (CsShipmentSurcharge item in charges)
                         {
-                            item.AcctManagementId = null;
+                            if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                item.PayerAcctManagementId = null;
+                                item.VoucherIdre = null;
+                                item.VoucherIdredate = null;
+                            }
+                            else
+                            {
+                                item.AcctManagementId = null;
+                                item.VoucherId = null;
+                                item.VoucherIddate = null;
+                            }
                             item.InvoiceNo = null;
                             item.InvoiceDate = null;
-                            item.VoucherId = null;
-                            item.VoucherIddate = null;
                             item.SeriesNo = null;
-
+                            
                             // item.AmountVnd = item.VatAmountVnd = null;
                             // Tính lại do 2 field kế toán edit
                             AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
@@ -407,7 +416,8 @@ namespace eFMS.API.Accounting.DL.Services
                                          AcctManagementId = sur.AcctManagementId,
                                          RequesterId = null,
                                          ChargeType = sur.Type,
-                                         IsFromShipment = sur.IsFromShipment                                         
+                                         IsFromShipment = sur.IsFromShipment,
+                                         IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
                                      };
             querySellOperation = querySellOperation.Where(query);
             var querySellDocumentation = from sur in surcharges
@@ -459,7 +469,8 @@ namespace eFMS.API.Accounting.DL.Services
                                              AcctManagementId = sur.AcctManagementId,
                                              RequesterId = null,
                                              ChargeType = sur.Type,
-                                             IsFromShipment = sur.IsFromShipment
+                                             IsFromShipment = sur.IsFromShipment,
+                                             IsSynced = !string.IsNullOrEmpty(sur.SyncedFrom) && (sur.SyncedFrom.Equals("SOA") || sur.SyncedFrom.Equals("CDNOTE"))
                                          };
             querySellDocumentation = querySellDocumentation.Where(query);
             var mergeSell = querySellOperation.Union(querySellDocumentation);
@@ -469,8 +480,8 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<PartnerOfAcctManagementResult> GetChargeSellForInvoiceByCriteria(PartnerOfAcctManagementCriteria criteria)
         {
-            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher
-            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null);
+            //Chỉ lấy ra những charge chưa issue Invoice hoặc Voucher và chưa được Sync
+            Expression<Func<ChargeOfAccountingManagementModel, bool>> query = chg => (chg.AcctManagementId == Guid.Empty || chg.AcctManagementId == null) && chg.IsSynced == false;
 
 
             if (criteria.CdNotes != null && criteria.CdNotes.Count > 0)
@@ -755,7 +766,7 @@ namespace eFMS.API.Accounting.DL.Services
                                            Mbl = ops.Mblno,
                                            SoaNo = sur.PaySoano,
                                            SettlementCode = sett.SettlementNo,
-                                           AcctManagementId = sur.AcctManagementId,
+                                           AcctManagementId = sur.PayerAcctManagementId,
                                            RequesterId = sett.Requester,
                                            ChargeType = sur.Type,
                                            IsFromShipment = sur.IsFromShipment,
@@ -817,7 +828,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                Mbl = cst.Mawb,
                                                SoaNo = sur.PaySoano,
                                                SettlementCode = sett.SettlementNo,
-                                               AcctManagementId = sur.AcctManagementId,
+                                               AcctManagementId = sur.PayerAcctManagementId,
                                                RequesterId = sett.Requester,
                                                ChargeType = sur.Type,
                                                IsFromShipment = sur.IsFromShipment,
@@ -1065,18 +1076,30 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
                         {
                             CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
-                            charge.AcctManagementId = accounting.Id;
-                            charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+                            if (charge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                charge.PayerAcctManagementId = accounting.Id;
+                            }
+                            else
+                            {
+                                charge.AcctManagementId = accounting.Id;
+                            }
 
-                            #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
-                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                            #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
+                            //Không tính tại Amount cho những phí OBH
+                            if (charge.Type != AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+
+                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                                charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
+                            }
 
                             // CR: 14405
                             charge.VatAmountVnd = chargeOfAcct.VatAmountVnd;
@@ -1084,8 +1107,16 @@ namespace eFMS.API.Accounting.DL.Services
 
                             if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                             {
-                                charge.VoucherId = accounting.VoucherId;
-                                charge.VoucherIddate = accounting.Date;
+                                if (charge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    charge.VoucherIdre = accounting.VoucherId;
+                                    charge.VoucherIdredate = accounting.Date;
+                                }
+                                else
+                                {
+                                    charge.VoucherId = accounting.VoucherId;
+                                    charge.VoucherIddate = accounting.Date;
+                                }
 
                                 // CR: 14344
                                 charge.InvoiceNo = chargeOfAcct.InvoiceNo;
@@ -1200,15 +1231,33 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         // Gỡ bỏ hết charge có tham chiếu tới Id Accounting
                         // Gỡ bỏ luôn các Invoice No, Invoice Date, Voucher No, Voucher Date
-                        var surchargeOfAcctCurrent = surchargeRepo.Get(x => x.AcctManagementId == accounting.Id);
+                        var surchargeOfAcctCurrent = surchargeRepo.Get(x => (x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId) == accounting.Id);
                         foreach (var surchargeOfAcct in surchargeOfAcctCurrent)
                         {
-                            surchargeOfAcct.AcctManagementId = null;
-                            surchargeOfAcct.FinalExchangeRate = null;
+                            if (surchargeOfAcct.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                surchargeOfAcct.PayerAcctManagementId = null;
+                            }
+                            else
+                            {
+                                surchargeOfAcct.AcctManagementId = null;
+                            }
+
+                            //[18/03/2021 - Andy - 11518] Không set = null vì nếu 1 charge được gỡ bỏ khỏi Voucher/Invoice thì FinalExchangeRate của charge đó sẽ bằng null
+                            //surchargeOfAcct.FinalExchangeRate = null;
+
                             if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                             {
-                                surchargeOfAcct.VoucherId = null;
-                                surchargeOfAcct.VoucherIddate = null;
+                                if (surchargeOfAcct.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surchargeOfAcct.VoucherIdre = null;
+                                    surchargeOfAcct.VoucherIdredate = null;
+                                }
+                                else
+                                {
+                                    surchargeOfAcct.VoucherId = null;
+                                    surchargeOfAcct.VoucherIddate = null;
+                                }                                
 
                                 // CR: 14344
                                 surchargeOfAcct.InvoiceNo = null;
@@ -1236,26 +1285,46 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (var chargeOfAcct in chargesOfAcctUpdate)
                         {
                             var charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
-                            charge.AcctManagementId = accounting.Id;
-                            charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+                            if (charge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                charge.PayerAcctManagementId = accounting.Id;
+                            }
+                            else
+                            {
+                                charge.AcctManagementId = accounting.Id;
+                            }
 
-                            #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
-                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
-                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                            #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
+                            //Không tính tại Amount cho những phí OBH
+                            if (charge.Type != AccountingConstants.TYPE_CHARGE_OBH)
+                            {
+                                charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
+
+                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
+                                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                                charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                                charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                                charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                                charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                                #endregion -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
+                            }
 
                             // CR: 14405
                             charge.AmountVnd = chargeOfAcct.AmountVnd;
                             charge.VatAmountVnd = chargeOfAcct.VatAmountVnd;
                             if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
                             {
-                                charge.VoucherId = accounting.VoucherId;
-                                charge.VoucherIddate = accounting.Date;
+                                if (charge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                {
+                                    charge.VoucherIdre = accounting.VoucherId;
+                                    charge.VoucherIdredate = accounting.Date;
+                                }
+                                else
+                                {
+                                    charge.VoucherId = accounting.VoucherId;
+                                    charge.VoucherIddate = accounting.Date;
+                                }
                                 // CR: 14344
                                 charge.InvoiceNo = chargeOfAcct.InvoiceNo;
                                 charge.InvoiceDate = chargeOfAcct.InvoiceDate;
@@ -1354,7 +1423,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soa != null)
                 {
                     //Tồn tại Voucher thì update Status là Issued Voucher
-                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && !string.IsNullOrEmpty(charge.VoucherId))
+                    if ((!string.IsNullOrEmpty(charge.Soano) || !string.IsNullOrEmpty(charge.PaySoano)) && (!string.IsNullOrEmpty(charge.VoucherId) || !string.IsNullOrEmpty(charge.VoucherIdre)))
                     {
                         UpdateStatusSOA(soa, AccountingConstants.ACCOUNTING_VOUCHER_TYPE);
                     }
@@ -1591,7 +1660,7 @@ namespace eFMS.API.Accounting.DL.Services
             var charges = chargeRepo.Get();
             var LookupCharge = charges.ToLookup(x => x.Id);
             var surchargeList = surchargeRepo.Get();
-            var LookupSurcharge = surchargeList.ToLookup(x => x.AcctManagementId);
+            var LookupSurcharge = surchargeList.ToLookup(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerAcctManagementId : x.AcctManagementId);
             var chargeDefaultList = chargeDefaultRepo.Get();
             var LookupChargeDefault = chargeDefaultList.ToLookup(x => x.ChargeId);
             var unitList = unitRepo.Get();
@@ -1726,7 +1795,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.Mbl = surcharge.Mblno;
                     item.SoaNo = _soaNo;
                     item.SettlementCode = surcharge.SettlementCode;
-                    item.AcctManagementId = surcharge.AcctManagementId;
+                    item.AcctManagementId = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? surcharge.PayerAcctManagementId : surcharge.AcctManagementId;
 
                     item.Date = acct.Date; //Date trên VAT Invoice Or Voucher
                     item.VoucherId = acct.VoucherId; //VoucherId trên VAT Invoice Or Voucher
@@ -2049,7 +2118,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<Guid> GetSurchargeIdByAcctMngtId(Guid? acctMngt)
         {
-            var surchargeIds = surchargeRepo.Get(x => x.AcctManagementId == acctMngt).Select(s => s.Id).ToList();
+            var surchargeIds = surchargeRepo.Get(x => x.AcctManagementId == acctMngt || x.PayerAcctManagementId == acctMngt).Select(s => s.Id).ToList();
             return surchargeIds;
         }
 
@@ -2295,6 +2364,22 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return payeeId;
+        }
+
+        /// <summary>
+        /// Check tồn tại phí Debit đã sync khi issue Vat Invoice
+        /// </summary>
+        /// <param name="charges">List charge issue Vat Invoice</param>
+        /// <returns></returns>
+        public bool CheckExistDebitChargeSynced(List<ChargeOfAccountingManagementModel> charges, string typeAcctMngt)
+        {
+            var result = false;
+            if (charges.Count > 0 && typeAcctMngt == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+            {
+                var chargeIds = charges.Select(s => s.SurchargeId);
+                result = surchargeRepo.Get(x => chargeIds.Any(a => a == x.Id) && !string.IsNullOrEmpty(x.SyncedFrom) && x.Type != AccountingConstants.TYPE_CHARGE_BUY).Any();
+            }
+            return result;
         }
     }
 }

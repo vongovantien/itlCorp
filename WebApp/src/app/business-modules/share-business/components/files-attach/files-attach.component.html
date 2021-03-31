@@ -29,13 +29,13 @@
     <div class="m-portlet list-files">
         <div class="m-portlet__body">
             <ul class="list-group list-unstyled">
-                <ng-container *ngIf="!isLoading && !!files.length">
+                <ng-container *ngIf="!!files.length">
                     <li class="list-group-item file__item m-animate-fade-in"
                         *ngFor="let file of files; trackBy:trackByFn">
                         <div class="d-flex align-items-center justify-content-between">
                             <div class="d-flex align-items-center">
                                 <div class="file-item__icon">
-                                    <ng-container [ngSwitch]="file.extension">
+                                    <ng-container [ngSwitch]="file.name | extension">
                                         <ng-container *ngSwitchCase="'pdf'">
                                             <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i>
                                         </ng-container>

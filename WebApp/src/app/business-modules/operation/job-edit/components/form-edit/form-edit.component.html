@@ -476,9 +476,12 @@
 							(click)="showListContainer()">
 							<span>
 								<i class="la la-list"></i>
-								<span>
-									Container list
-								</span>
+								<span> Container list </span>
+								<ng-container *ngIf="(containers | async).length > 0">
+									<span
+										class="m-badge m-badge--warning m-badge--rounded text-white font-weight-bold">{{(containers
+										| async).length}}</span>
+								</ng-container>
 							</span>
 						</button>
 					</div>
@@ -486,9 +489,8 @@
 			</div>
 		</div>
 	</div>
-
 </form>
 
 <container-list-popup></container-list-popup>
-<info-popup #comfirmCusAgreement [body]="" [title]="'Notification'" [label]="'Ok'">
-</info-popup>
+
+<ng-template inject></ng-template>

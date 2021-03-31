@@ -201,7 +201,7 @@ namespace eFMS.API.Operation.DL.Services
 
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
-            string queryString = @"DECLARE @eoMonth DATETIME = DATEADD(MONTH, 1, DATEADD(DAY, -(DAY(GETDATE())), GETDATE()))
+            string queryString = @"DECLARE @eoMonth DATETIME = DATEADD(month, ((YEAR(GETDATE()) - 1900) * 12) + MONTH(GETDATE()), -1)
                                    SELECT TOP (1000) DTOKHAIMD.[_DToKhaiMDID] AS DToKhaiMDID
                                   ,[_XorN] AS XorN
                                   ,[SOTK]

@@ -68,6 +68,7 @@ export class Partner {
     billingEmail: string = '';
     billingPhone: string = '';
 
+
     saleManRequests: SaleManRequest[] = [];
     contracts: Contract[] = [];
     partnerEmails: PartnerEmail[] = [];
@@ -79,8 +80,9 @@ export class Partner {
     partnerLocation: string = '';
     internalCode: string = '';
     creditPayment: string = '';
-    isRequestApproval: boolean = false;
 
+    isRequestApproval: boolean = false;
+    bankName: string = '';
 
     permission: PermissionPartner = new PermissionPartner();
 

@@ -43,7 +43,11 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSettlementPaymentController(IStringLocalizer<LanguageSub> localizer, IAcctSettlementPaymentService service, ICurrentUser user, IMapper _mapper)
+        public AcctSettlementPaymentController(
+            IStringLocalizer<LanguageSub> localizer, 
+            IAcctSettlementPaymentService service, 
+            ICurrentUser user, IMapper _mapper
+            )
         {
             stringLocalizer = localizer;
             acctSettlementPaymentService = service;
@@ -88,7 +92,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult QueryData(AcctSettlementPaymentCriteria criteria)
         {
-            var data = acctSettlementPaymentService.GetDatas(criteria);
+            var data = acctSettlementPaymentService.QueryData(criteria);
             return Ok(data);
         }
 
@@ -204,13 +208,14 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="JobId"></param>
         /// <param name="MBL"></param>
         /// <param name="HBL"></param>
+        /// <param name="requester"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetPaymentManagementByShipment")]
-        public IActionResult GetPaymentManagementByShipment(string JobId, string MBL, string HBL)
+        public IActionResult GetPaymentManagementByShipment(string JobId, string MBL, string HBL, string requester)
         {
-            var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL);
-            var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL);
+            var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL, requester);
+            var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL, requester);
 
             //Lấy ra list các currency của cả 2 (không trùng currency)
             List<string> currencies = new List<string>();
@@ -457,7 +462,8 @@ namespace eFMS.API.Accounting.Controllers
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
                         JobNo = item.JobId,
-                        Notes = item.Notes
+                        Notes = item.Notes,
+                        SettlementNo = model.Settlement.SettlementNo
                     };
                     
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);

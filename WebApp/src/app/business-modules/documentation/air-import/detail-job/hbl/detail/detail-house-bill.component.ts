@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -15,14 +14,15 @@ import { delayTime } from '@decorators';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { AirImportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { skip, catchError, takeUntil, finalize } from 'rxjs/operators';
+import { skip, catchError, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    AUTHORIZE = 'AUTHORIZE'
+    AUTHORIZE = 'AUTHORIZE',
+    PROOF = 'PROOF'
 
 }
 @Component({
@@ -39,7 +39,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     isClickSubMenu: boolean = false;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -51,7 +50,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
 
     ) {
         super(
-            _progressService,
             _activedRoute,
             _store,
             _documentationRepo,
@@ -138,6 +136,12 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 }
                 break;
             }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.confirmPopup.hide();
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
+                break;
+            }
             default:
                 break;
         }
@@ -162,18 +166,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);
-                            // this._catalogueRepo.getSalemanIdByPartnerId(modelUpdate.customerId, this.jobId).subscribe((res: any) => {
-                            //     if (!!res.salemanId) {
-                            //         if (res.salemanId !== modelUpdate.saleManId) {
-                            //             this._toastService.error('Not found contract information, please check!');
-                            //             return;
-                            //         }
-                            //     }
-                            //     if (!!res.officeNameAbbr) {
-                            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Update House Bill!');
-                            //     } else {
-                            //     }
-                            // });
                             this.updateHbl(modelUpdate);
 
                         }
@@ -208,11 +200,9 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         this._documentationRepo.updateHbl(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -231,7 +221,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -255,7 +244,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewArrivalNoticeAir({ hblId: this.hblId, currency: _currency })
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -292,7 +280,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -305,7 +292,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -319,7 +305,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewAirProofofDelivery(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -333,7 +318,6 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         this._documentationRepo.previewAirDocumentRelease(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {

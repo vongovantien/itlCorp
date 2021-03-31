@@ -13,7 +13,7 @@ import { DestroyService } from '@services';
     templateUrl: './advance-settlement-info.component.html',
     styleUrls: ['./advance-settlement-info.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [DestroyService]
+    providers: [DestroyService],
 })
 
 export class ShareBusinessAdvanceSettlementInforComponent {
@@ -28,7 +28,7 @@ export class ShareBusinessAdvanceSettlementInforComponent {
 
     ngOnInit() {
         this.adSetInfos = this._activedRouter.params.pipe(
-            switchMap((param: Params) => this._documentRepo.getListAdvanceSettlement(param.id)),
+            switchMap((param: Params) => this._documentRepo.getListAdvanceSettlement(!param.id ? param.jobId : param.id)),
             takeUntil(this._destroy$),
             shareReplay()
         ) as Observable<AdvanceSettlementInfo[]>;

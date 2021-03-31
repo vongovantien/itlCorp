@@ -1,5 +1,4 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -12,10 +11,11 @@ import { ChargeConstants } from '@constants';
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { SeaFCLExportCreateHBLComponent } from '../create/create-house-bill.component';
 
-import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
+import { catchError, skip, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'app-detail-hbl-fcl-export',
@@ -29,7 +29,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
     hblDetail: CsTransactionDetail;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -41,7 +40,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
 
     ) {
         super(
-            _progressService,
             _activedRoute,
             _store,
             _documentationRepo,
@@ -130,12 +128,21 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
     }
 
     updateHbl(body: any) {
-        this._progressRef.start();
         body.transactionType = body.transactionType = ChargeConstants.SFE_CODE;
-        this._documentationRepo.updateHbl(body)
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate == null ? null : this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate,
+        };
+        body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        this._documentationRepo.updateHbl(Object.assign({}, body, deliveryDate))
             .pipe(
+                tap(() => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files === null) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -154,7 +161,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         this._documentationRepo.previewSeaHBLOfLanding(this.hblId, reportType)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {
@@ -172,7 +178,6 @@ export class SeaFCLExportDetailHBLComponent extends SeaFCLExportCreateHBLCompone
         this._documentationRepo.previewAirAttachList(this.hblId)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => { })
             )
             .subscribe(
                 (res: any) => {

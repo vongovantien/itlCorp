@@ -25,6 +25,7 @@ using System.Data.Common;
 using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
+using System.Linq.Expressions;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -59,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePayment;
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         private readonly IContextBase<CatContract> catContractRepository;
+        private readonly IContextBase<CsTransaction> transactionRepository;
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -85,7 +87,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctSettlementPayment> _acctSettlementPayment,
             IContextBase<OpsTransaction> _opsTransactionRepository,
             IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
-            IContextBase<CatContract> catContractRepo
+            IContextBase<CatContract> catContractRepo,
+            IContextBase<CsTransaction> transactionRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -117,6 +120,7 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransactionRepository = _opsTransactionRepository;
             accAdvancePaymentRepository = _accAdvancePaymentRepository;
             catContractRepository = catContractRepo;
+            transactionRepository = transactionRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -529,12 +533,42 @@ namespace eFMS.API.Documentation.DL.Services
                                                 || x.UserCreated == currentUser.UserID));
                     break;
             }
+
             return data;
         }
+
+        /// <summary>
+        /// Nếu không có điều kiện search thì load list Job 3 tháng kể từ ngày modified mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<OpsTransaction, bool>> ExpressionQueryDefault(OpsTransactionCriteria criteria)
+        {
+            Expression<Func<OpsTransaction, bool>> query = q => true;
+            if (string.IsNullOrEmpty(criteria.All) && string.IsNullOrEmpty(criteria.JobNo)
+                && string.IsNullOrEmpty(criteria.Mblno) && string.IsNullOrEmpty(criteria.Hwbno)
+                && string.IsNullOrEmpty(criteria.CustomerId) && string.IsNullOrEmpty(criteria.ClearanceNo)
+                && string.IsNullOrEmpty(criteria.ProductService) && string.IsNullOrEmpty(criteria.ServiceMode)
+                && criteria.CreatedDateFrom == null && criteria.CreatedDateTo == null
+                && string.IsNullOrEmpty(criteria.ShipmentMode) && string.IsNullOrEmpty(criteria.FieldOps)
+                && string.IsNullOrEmpty(criteria.CreditDebitInvoice)
+                && criteria.ServiceDateFrom == null && criteria.ServiceDateTo == null)
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            }
+            return query;
+        }
+
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
             IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            data = data.Where(queryDefault);
+
             if (data == null) return null;
 
             List<OpsTransactionModel> results = new List<OpsTransactionModel>();
@@ -1072,7 +1106,7 @@ namespace eFMS.API.Documentation.DL.Services
                 CompanyAddress1 = "CompanyAddress1",
                 CompanyAddress2 = "CompanyAddress2",
                 Website = "Website",
-                CurrDecimalNo = 3,
+                CurrDecimalNo = 2,
                 DecimalNo = 0,
                 HBLList = shipment.Hwbno
             };
@@ -1172,8 +1206,9 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
                     surchargeRpt.SalesProfit = surchargeRpt.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
                     surchargeRpt.Quantity = item.Quantity;
-                    surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
-                    surchargeRpt.UnitPrice = surchargeRpt.UnitPrice + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    //surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
+                    surchargeRpt.UnitPrice = (item.UnitPrice ?? 0) + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.UnitPriceStr = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (item.UnitPrice ?? 0)) : string.Format("{0:n3}", (item.UnitPrice ?? 0));
                     surchargeRpt.Unit = unitCode;
                     surchargeRpt.LastRevised = string.Empty;
                     surchargeRpt.OBH = isOBH;
@@ -1251,7 +1286,9 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                var hs = Update(model, x => x.Id == model.Id);
+
+                OpsTransaction entity = mapper.Map<OpsTransaction>(model);
+                var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)
                 {
                     if (model.CsMawbcontainers != null)
@@ -1662,6 +1699,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                     item.ClearanceNo = null;
                     item.AdvanceNo = null;
+                    item.PayerAcctManagementId = null;
+                    item.VoucherIdre = null;
+                    item.VoucherIdredate = null;
 
                     item.JobNo = shipment.JobNo;
                     item.Hblno = shipment.Hwbno;
@@ -1694,138 +1734,6 @@ namespace eFMS.API.Documentation.DL.Services
                 containers.Add(item);
             }
             return containers;
-        }
-
-        public List<OpsAdvanceSettlementModel> opsAdvanceSettlements(Guid JobID)
-        {
-            List<OpsAdvanceSettlementModel> results = new List<OpsAdvanceSettlementModel>();
-
-            IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get();
-            IQueryable<AcctSettlementPayment> settlements = acctSettlementPayment.Get();
-            IQueryable<SysUser> users = userRepository.Get();
-
-            OpsTransaction opsJob = DataContext.Get(x => x.Id == JobID)?.FirstOrDefault();
-            if(opsJob == null)
-            {
-                return results;
-            }
-
-            //var querySettle = from sur in surcharges
-            //            join s in settlements on sur.SettlementCode equals s.SettlementNo
-            //            join u in users on s.Requester equals u.Id
-            //            where sur.JobNo == opsJob.JobNo
-            //            group sur by new { sur.JobNo, sur.SettlementCode, s.SettlementCurrency, s.RequestDate, sur.AdvanceNo, s.StatusApproval, u.Username } into grps                    
-            //            select new
-            //            {
-            //                JobID = grps.Key.JobNo,
-            //                grps.Key.SettlementCode,
-            //                grps.Key.SettlementCurrency,
-            //                grps.Key.RequestDate,                            
-            //                Total = grps.Sum(x => x.Total),
-            //                grps.Key.StatusApproval,
-            //                Requester = grps.Key.Username,
-
-            //                grps.Key.AdvanceNo,
-
-            //            };
-
-            //IQueryable<AcctAdvancePayment> advancePayments = accAdvancePaymentRepository.Get();
-            //IQueryable<AcctAdvanceRequest> advanceRequest = accAdvanceRequestRepository.Get();
-
-            //var queryAdvance = from adv in advancePayments
-            //                   join adr in advanceRequest on adv.AdvanceNo equals adr.AdvanceNo
-            //                   join u in users on adv.Requester equals u.Id
-            //                   where adr.JobId == opsJob.JobNo
-            //                   group adr by new { adr.JobId, adv.AdvanceNo, adv.AdvanceCurrency, adv.RequestDate, adv.StatusApproval, u.Username } into grps
-            //                   select new
-            //                   {
-            //                       JobID = grps.Key.JobId,
-            //                       grps.Key.AdvanceNo,
-            //                       grps.Key.AdvanceCurrency,
-            //                       grps.Key.RequestDate,
-            //                       Total = grps.Sum(x => x.Amount),
-            //                       grps.Key.StatusApproval,
-            //                       Requester = grps.Key.Username
-            //                   };
-
-            //if (querySettle != null && querySettle.Count() > 0)
-            //{
-            //     var queryJoin = from s in querySettle
-            //                    join q2 in queryAdvance on s.AdvanceNo equals q2.AdvanceNo into grps
-            //                    from grp in grps.DefaultIfEmpty()
-            //                    where s.JobID == opsJob.JobNo
-            //                    select new OpsAdvanceSettlementModel
-            //                    {
-            //                        JobNo = grp.JobID,
-            //                        SettlementNo = s.SettlementCode,
-            //                        SettlemenDate = s.RequestDate,
-            //                        SettlementCurrency = s.SettlementCurrency,
-            //                        SettlementAmount = s.Total,
-            //                        SettleStatusApproval = s.StatusApproval,
-
-            //                        AdvanceNo = grp.AdvanceNo,
-            //                        AdvanceDate = grp.RequestDate,
-            //                        AdvanceCurrency = grp.AdvanceCurrency,
-            //                        AdvanceAmount = grp.Total ?? 0,
-            //                        AdvanceStatusApproval = grp.StatusApproval,
-            //                        Balance = s.Total - (grp.Total ?? 0),
-
-            //                        RequesterAdvance = grp.Requester,
-            //                        RequesterSettle = s.Requester,
-
-            //                    };
-            //    if (queryJoin != null)
-            //    {
-            //        results = queryJoin.ToList();
-            //    }
-            //}
-            //else
-            //{
-            //    results = queryAdvance.Select(x => new OpsAdvanceSettlementModel
-            //    {
-            //        AdvanceNo = x.AdvanceNo,
-            //        AdvanceDate = x.RequestDate,
-            //        AdvanceCurrency = x.AdvanceCurrency,
-            //        AdvanceAmount = x.Total ?? 0,
-            //        AdvanceStatusApproval = x.StatusApproval,
-            //        Balance = (x.Total ?? 0),
-            //        RequesterAdvance = x.Requester,
-            //    }).ToList();
-            //}
-
-            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(opsJob.JobNo);
-            if(dta.Count > 0)
-            {
-                results = dta.Select(s => new OpsAdvanceSettlementModel
-                {
-                    SettlementNo = s.SettlementCode,
-                    SettlemenDate = s.SettlementDate,
-                    SettlementCurrency = s.SettlementCurrency,
-                    SettlementAmount = s.SettlementAmount,
-                    SettleStatusApproval = s.SettleStatusApproval,
-                    RequesterSettle = s.SettleRequester,
-
-                    AdvanceNo = s.AdvanceNo,
-                    AdvanceDate = s.AdvanceDate,
-                    AdvanceCurrency = s.AdvanceCurrency,
-                    AdvanceAmount = s.AdvanceAmount,
-                    AdvanceStatusApproval = s.AdvanceStatusApproval,
-                    Balance = s.SettlementAmount - s.AdvanceAmount,
-                    RequesterAdvance = s.AdvRequester,
-
-                }).ToList();
-            }
-
-            return results;
-        }
-
-        private List<sp_GetAdvanceSettleOpsTransaction> GetAdvanceSettleByJobNo(string jobNo)
-        {
-            DbParameter[] parameters =
-            {
-                SqlParam.GetParameter("jobNo", jobNo)
-            };
-            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAdvanceSettleOpsTransaction>(parameters);
         }
 
         public int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs)

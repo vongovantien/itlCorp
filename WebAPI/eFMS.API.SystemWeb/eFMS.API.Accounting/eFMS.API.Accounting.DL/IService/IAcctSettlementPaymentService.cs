@@ -17,7 +17,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount);
 
-        IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria);
+        IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria);
 
         List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo);
 
@@ -27,9 +27,9 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentSettlement> GetListShipmentSettlementBySettlementNo(string settlementNo);
 
-        List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl);
+        List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester);
 
-        List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl);
+        List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl, string requester);
 
         List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 

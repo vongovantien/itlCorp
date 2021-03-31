@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router, ActivatedRoute, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -59,8 +59,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         protected _cd: ChangeDetectorRef,
         protected _activedRoute: ActivatedRoute,
         private _documentRepo: DocumentationRepo,
-        private _ngProgressService: NgProgress,
-
+        private _ngProgressService: NgProgress
 
     ) {
         super(_toastService, _documenRepo, _router, _store, _cd);
@@ -230,6 +229,9 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                 break;
             case 'files':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
+            case 'advance-settle':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
         }
     }

@@ -19,9 +19,10 @@ import {
 import * as fromShareBussiness from './../../../../../share-business/store';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
 
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import groupBy from 'lodash/groupBy';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 @Component({
     selector: 'app-create-hbl-lcl-export',
@@ -36,6 +37,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBussinessHBLGoodSummaryLCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryLCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string;
 
@@ -133,19 +135,7 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
         }
 
         const modelAdd = this.getDataForm();
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelAdd.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelAdd.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-        //     } else {
 
-        //     }
-        // });
         this.createHbl(modelAdd);
 
     }
@@ -255,8 +245,20 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     createHbl(body: any) {
-        this._documentationRepo.createHousebill(body)
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
             .pipe(
+                tap((result: any) => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.hblid = result.data;
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
             )
             .subscribe(
@@ -276,7 +278,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     }
 
     updateInwordField(containers: Container[]) {
-        console.log(containers);
         if (!containers.length) {
             return null;
         }

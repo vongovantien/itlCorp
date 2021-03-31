@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterStateSnapshot, ActivatedRouteSnapshot } from '@angular/router';
 import { AbstractControl } from '@angular/forms';
-import { NgProgress } from '@ngx-progressbar/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -17,10 +16,10 @@ import { RoutingConstants } from '@constants';
 import { ICanComponentDeactivate } from '@core';
 import { AppForm } from '@app';
 
-import { JobManagementFormEditComponent } from './components/form-edit/form-edit.component';
+import { JobManagementFormEditComponent, ILinkAirSeaInfoModel } from './components/form-edit/form-edit.component';
 import { PlSheetPopupComponent } from './pl-sheet-popup/pl-sheet.popup';
 
-import { catchError, finalize, map, takeUntil, tap, switchMap } from 'rxjs/operators';
+import { catchError, map, takeUntil, tap, switchMap, concatMap } from 'rxjs/operators';
 import { combineLatest, Observable, of } from 'rxjs';
 import * as fromShareBussiness from './../../share-business/store';
 
@@ -41,7 +40,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
 
     @ViewChild(InjectViewContainerRefDirective) public confirmContainerRef: InjectViewContainerRefDirective;
-    @ViewChild('advSettleContainer', { read: ViewContainerRef }) public advSettleContainerRef: ViewContainerRef;
 
     opsTransaction: OpsTransaction = null;
     lstMasterContainers: any[];
@@ -61,18 +59,15 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        private _ngProgressService: NgProgress,
         private _documentRepo: DocumentationRepo,
         private _router: Router,
         private _toastService: ToastrService,
         private _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _actionStoreSubject: ActionsSubject,
         protected _cd: ChangeDetectorRef,
-        private readonly _viewContainerRef: ViewContainerRef,
     ) {
         super();
 
-        this._progressRef = this._ngProgressService.ref();
     }
 
     ngOnInit() {
@@ -266,7 +261,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.serviceDate = !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null;
         this.opsTransaction.finishDate = !!form.finishDate && !!form.finishDate.startDate ? formatDate(form.finishDate.startDate, 'yyyy-MM-dd', 'en') : null;
 
-
         this.opsTransaction.hwbno = form.hwbno;
         this.opsTransaction.mblno = form.mblno;
         this.opsTransaction.customerId = form.customerId;
@@ -299,7 +293,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this.opsTransaction.commodityGroupId = form.commodityGroupId;
         this.opsTransaction.shipmentType = form.shipmentType;
 
-        if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal' && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
+        if (this.editForm.shipmentNo !== this.opsTransaction.serviceNo && form.shipmentMode === 'Internal'
+            && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
             this.opsTransaction.serviceNo = null;
@@ -310,25 +305,24 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     updateShipment() {
         if (this.isSaveLink) {
             this._documentRepo.getASTransactionInfo(this.opsTransaction.mblno, this.opsTransaction.hwbno, this.opsTransaction.productService, this.opsTransaction.serviceMode)
-                .pipe(catchError(this.catchError))
-                .subscribe((res: any) => {
-                    if (!!res) {
+                .pipe(
+                    catchError(this.catchError),
+                    concatMap((res: ILinkAirSeaInfoModel) => {
                         this.opsTransaction.serviceNo = res.jobNo;
-                        this.opsTransaction.serviceHblId = res.id;
-                        this._documentRepo.updateShipment(this.opsTransaction)
-                            .pipe(catchError(this.catchError))
-                            .subscribe(
-                                (res: CommonInterface.IResult) => {
-                                    if (res.status) {
-                                        this._toastService.success(res.message);
-                                        this.getShipmentDetails(this.opsTransaction.id);
-                                    } else {
-                                        this._toastService.warning(res.message);
-                                    }
-                                }
-                            );
+                        this.opsTransaction.serviceHblId = res.hblId;
+
+                        return this._documentRepo.updateShipment(this.opsTransaction);
+                    })
+                ).subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.getShipmentDetails(this.opsTransaction.id);
+                        } else {
+                            this._toastService.warning(res.message);
+                        }
                     }
-                });
+                );
         } else {
             this._documentRepo.updateShipment(this.opsTransaction)
                 .pipe(catchError(this.catchError))
@@ -389,7 +383,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         this._documentRepo.getDetailShipment(id)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             ).subscribe(
                 (response: any) => {
                     if (response != null) {
@@ -460,12 +453,6 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         if (tabName === 'job-edit') {
             this.getShipmentDetails(this.jobId);
             this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
-        }
-
-        if (tabName === 'advance-settle') {
-            this.getAdvanceSettleInfoComponent();
-        } else {
-            this._viewContainerRef.clear();
         }
     }
 
@@ -559,10 +546,5 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             this.editForm.getBillingOpsId();
             this.headerComponent.resetBreadcrumb("Create Job");
         }
-    }
-
-    async getAdvanceSettleInfoComponent() {
-        const { ShareBusinessAdvanceSettlementInforComponent } = await import('./../../share-business/components/advance-settlement-info/advance-settlement-info.component');
-        this.renderDynamicComponent(ShareBusinessAdvanceSettlementInforComponent, this.advSettleContainerRef)
     }
 }

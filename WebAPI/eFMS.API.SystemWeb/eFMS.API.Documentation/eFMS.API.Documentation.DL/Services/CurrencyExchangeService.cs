@@ -211,7 +211,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _excRate = 0;
 
             //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
-            decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);            
+            decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);            
             _excRate = exchangeRateToLocal;
 
             if (surcharge.CurrencyId == currencyConvert)

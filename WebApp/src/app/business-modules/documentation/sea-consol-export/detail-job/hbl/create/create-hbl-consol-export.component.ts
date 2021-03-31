@@ -2,7 +2,6 @@ import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { NgProgress } from '@ngx-progressbar/core';
 import { formatDate } from '@angular/common';
 
 import { AppForm } from '@app';
@@ -19,9 +18,10 @@ import {
 
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { ShareSeaServiceFormCreateHouseBillSeaExportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-export/form-create-hbl-sea-export.component';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 @Component({
     selector: 'app-create-hbl-consol-export',
@@ -36,13 +36,13 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBussinessHBLGoodSummaryFCLComponent) goodSummaryComponent: ShareBussinessHBLGoodSummaryFCLComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string;
     containers: Container[] = [];
     selectedHbl: CsTransactionDetail;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -54,12 +54,9 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
-            .pipe(
-                takeUntil(this.ngUnsubscribe)
-            )
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (action: fromShareBussiness.ContainerAction) => {
                     if (action.type === fromShareBussiness.ContainerActionTypes.SAVE_CONTAINER) {
@@ -72,7 +69,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
                             });
                         }
 
-                        console.log(this.containers);
                         // * Update field inword with container data.
                         this.formCreateHBLComponent.formCreate.controls["inWord"].setValue(this.updateInwordField(this.containers));
                     }
@@ -118,19 +114,6 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
 
         const modelAdd = this.getDataForm();
 
-        // this._catalogueRepo.getSalemanIdByPartnerId(modelAdd.customerId, this.jobId).subscribe((res: any) => {
-        //     if (!!res.salemanId) {
-        //         if (res.salemanId !== modelAdd.saleManId) {
-        //             this._toastService.error('Not found contract information, please check!');
-        //             return;
-        //         }
-        //     }
-        //     if (!!res.officeNameAbbr) {
-        //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-        //     } else {
-
-        //     }
-        // });
         this.createHbl(modelAdd);
 
     }
@@ -169,7 +152,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             serviceType: form.serviceType,
             originBlnumber: form.originBlnumber,
             moveType: form.moveType,
-            freightPayment: form.freightPaymen,
+            freightPayment: form.freightPayment,
             hbltype: form.hbltype,
 
             customerId: form.customer,
@@ -227,18 +210,27 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
     }
 
     createHbl(body: any) {
-        this._progressRef.start();
-        this._documentationRepo.createHousebill(body)
+        const deliveryDate = {
+            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+        };
+        body.deliveryPerson = this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson;
+        body.note = this.proofOfDeliveryComponent.proofOfDelievey.note;
+        body.referenceNoProof = this.proofOfDeliveryComponent.proofOfDelievey.referenceNo;
+        this._documentationRepo.createHousebill(Object.assign({}, body, deliveryDate))
             .pipe(
+                tap((result: any) => {
+                    if (this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && this.proofOfDeliveryComponent.files !== null && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.hblid = result.data;
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                }),
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete())
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}/hbl/${res.data}`]);
-                    } else {
                     }
                 }
             );

@@ -1,5 +1,4 @@
 import { Component, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ActionsSubject, Store } from '@ngrx/store';
@@ -24,10 +23,10 @@ import {
 import { ShareSeaServiceFormCreateHouseBillSeaImportComponent } from 'src/app/business-modules/documentation/share-sea/components/form-create-hbl-sea-import/form-create-hbl-sea-import.component';
 import * as fromShareBussiness from './../../../../../share-business/store';
 
-import { finalize } from 'rxjs/internal/operators/finalize';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -47,6 +46,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string = '';
     selectedHbl: CsTransactionDetail;
@@ -54,7 +54,6 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
     selectedTab: string = HBL_TAB.DETAIL;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _documentationRepo: DocumentationRepo,
         protected _catalogueRepo: CatalogueRepo,
         protected _toastService: ToastrService,
@@ -68,7 +67,6 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
 
     ) {
         super();
-        this._progressRef = this._progressService.ref();
 
         this._actionStoreSubject
             .pipe(
@@ -154,19 +152,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             this.infoPopup.show();
         } else {
             const body = this.onsubmitData();
-            // this._catalogueRepo.getSalemanIdByPartnerId(body.customerId, this.jobId).subscribe((res: any) => {
-            //     if (!!res.salemanId) {
-            //         if (res.salemanId !== body.saleManId) {
-            //             this._toastService.error('Not found contract information, please check!');
-            //             return;
-            //         }
-            //     }
-            //     if (!!res.officeNameAbbr) {
-            //         this._toastService.error('The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again', 'Cannot Create House Bill!');
-            //     } else {
 
-            //     }
-            // });
             this.createHbl(body);
 
         }
@@ -198,7 +184,6 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
                     mergeMap((res: any) => {
@@ -213,16 +198,26 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
 
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
 
-                        return forkJoin([arrival, delivery]);
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        return forkJoin([arrival, delivery, proof]);
                     }),
 
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
         }

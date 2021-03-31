@@ -14,6 +14,7 @@ using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1158,7 +1159,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ShipperDescription = ArrayShipperDesc != null && ArrayShipperDesc.Length > 0 ? ArrayShipperDesc[0] : string.Empty;
                 var ArrayConsgineeDesc = item.ConsigneeDescription?.Split("\n").ToArray();
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
-                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) && item.TransactionType == "CL" ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
+                data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
                 data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
                 data.ShipmentType = item.ShipmentType;
                 data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
@@ -1168,7 +1169,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CBM = item.Cbm;
 
                 data.Cont20 = item.Cont20 ?? 0;
-                data.Cont40 = item.Cont40 ?? 0 ;
+                data.Cont40 = item.Cont40 ?? 0;
                 data.Cont40HC = item.Cont40HC ?? 0;
                 data.Cont45 = item.Cont45 ?? 0;
 
@@ -1420,7 +1421,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.Creator = item.TransactionType == "CL" ? LookupUser[item.PersonInCharge].Select(t => t.Username).FirstOrDefault() : LookupUser[item.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.Pono;
-                data.BKRefNo = item.JobNo;
                 data.Commodity = item.Commodity;
                 data.ProductService = item.ProductService;
                 data.ServiceMode = string.Empty;//chua co thong tin
@@ -1429,9 +1429,11 @@ namespace eFMS.API.Documentation.DL.Services
                 data.Created = item.DatetimeCreated;
                 data.CustomerId = LookupPartner[item.CustomerId].Select(t => t.AccountNo).FirstOrDefault();
                 data.CustomerName = LookupPartner[item.CustomerId].Select(t => t.ShortName).FirstOrDefault();
-                string Code = item.PackageQty != null ? LookupUnitList[(short)item.PackageQty].Select(t => t.Code).FirstOrDefault() : string.Empty;
+                string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.PackageQty.ToString() + " " + Code;
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
+                data.BKRefNo = item.BookingNo;
+                data.ReferenceNo = item.ReferenceNo;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();
@@ -4444,6 +4446,63 @@ namespace eFMS.API.Documentation.DL.Services
             commissionData.VerifiedBy = _managerDept;
 
             return commissionData;
+        }
+
+        public List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id)
+        {
+
+            List<ShipmentAdvanceSettlementModel> results = new List<ShipmentAdvanceSettlementModel>();
+
+            IQueryable<SysUser> users = sysUserRepo.Get();
+
+            OpsTransaction opsJob = opsRepository.Get(x => x.Id == Id)?.FirstOrDefault();
+            CsTransaction csJob = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+
+            if (opsJob == null && csJob == null)
+            {
+                return results;
+            }
+
+            string jobNo = opsJob == null ? csJob.JobNo : opsJob.JobNo;
+            List<sp_GetAdvanceSettleOpsTransaction> dta = GetAdvanceSettleByJobNo(jobNo);
+            if (dta.Count > 0)
+            {
+                results = dta.Select(s => new ShipmentAdvanceSettlementModel
+                {
+                    SettlementCode = s.SettlementCode,
+                    SettlementDate = s.SettlementDate,
+                    SettlementCurrency = s.SettlementCurrency,
+                    SettlementAmount = s.SettlementAmount,
+                    SettleStatusApproval = s.SettleStatusApproval,
+                    SettleRequester = s.SettleRequester,
+
+                    AdvanceNo = s.AdvanceNo,
+                    AdvanceDate = s.AdvanceDate,
+                    AdvanceCurrency = s.AdvanceCurrency,
+                    AdvanceAmount = s.AdvanceAmount,
+                    AdvanceStatusApproval = s.AdvanceStatusApproval,
+                    Balance = s.SettlementAmount - s.AdvanceAmount,
+                    AdvRequester = s.AdvRequester,
+                    AdvanceSyncStatus = s.AdvanceSyncStatus,
+                    SettlementSyncStatus = s.SettlementSyncStatus,
+                    AdvanceVoucherNo = s.AdvanceVoucherNo,
+                    SettlementVoucherNo = s.SettlementVoucherNo,
+                    AdvanceVoucherDate = s.AdvanceVoucherDate,
+                    SettlementVoucherDate = s.SettlementVoucherDate
+                }).ToList();
+            }
+
+            return results;
+        }
+
+
+        private List<sp_GetAdvanceSettleOpsTransaction> GetAdvanceSettleByJobNo(string jobNo)
+        {
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("jobNo", jobNo)
+            };
+            return ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetAdvanceSettleOpsTransaction>(parameters);
         }
         #endregion
 

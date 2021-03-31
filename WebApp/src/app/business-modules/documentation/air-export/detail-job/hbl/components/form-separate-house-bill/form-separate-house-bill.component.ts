@@ -1,17 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import * as fromShareBussiness from '@share-bussiness';
 import { DocumentationRepo, ExportRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
-import { HouseBill, CsOtherCharge } from '@models';
+import { HouseBill } from '@models';
 import { SystemConstants } from 'src/constants/system.const';
 
 import { AirExportDetailHBLComponent } from '../../detail/detail-house-bill.component';
 import { catchError } from 'rxjs/operators';
-import { InitShipmentOtherChargeAction } from '@share-bussiness';
 import { RoutingConstants } from '@constants';
 
 
@@ -30,7 +28,6 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
     hblSeparateId: string;
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<fromShareBussiness.IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -40,7 +37,7 @@ export class SeparateHouseBillComponent extends AirExportDetailHBLComponent impl
         protected _router: Router,
         protected _exportRepo: ExportRepo
     ) {
-        super(_progressService,
+        super(
             _activedRoute,
             _store,
             _documentationRepo,

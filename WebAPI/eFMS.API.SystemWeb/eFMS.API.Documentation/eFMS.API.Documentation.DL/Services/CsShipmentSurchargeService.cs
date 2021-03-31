@@ -42,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
+        private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -60,7 +61,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> unitRepo,
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
-            ICurrencyExchangeService currencyExchange
+            ICurrencyExchangeService currencyExchange,
+            IContextBase<CustomsDeclaration> customsDeclarationRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -81,6 +83,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserNotifyRepository = sysUserNotifyRepo;
             accAccountReceivableRepository = accAccountRepo;
             unitRepository = unitRepo;
+            customsDeclarationRepository = customsDeclarationRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -93,10 +96,14 @@ namespace eFMS.API.Documentation.DL.Services
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_FOUND].Value);
                 if (charge != null
                     && (!string.IsNullOrEmpty(charge.Soano)
+                    || !string.IsNullOrEmpty(charge.PaySoano)
                     || !string.IsNullOrEmpty(charge.CreditNo)
                     || !string.IsNullOrEmpty(charge.DebitNo)
                     || !string.IsNullOrEmpty(charge.SettlementCode)
-                    || !string.IsNullOrEmpty(charge.VoucherId)))
+                    || !string.IsNullOrEmpty(charge.VoucherId)
+                    || !string.IsNullOrEmpty(charge.VoucherIdre)
+                    || charge.AcctManagementId != null
+                    || charge.PayerAcctManagementId != null))
                 {
                     hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_SURCHARGE_NOT_ALLOW_DELETED].Value);
                 }
@@ -460,7 +467,6 @@ namespace eFMS.API.Documentation.DL.Services
                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                     item.UserCreated = currentUser.UserID;
                     item.Id = Guid.NewGuid();
-                    //item.ExchangeDate = DateTime.Now; ??? - Rule lạ
 
                     item.TransactionType = GetTransactionType(item.JobNo);
                     if (item.Hblid != Guid.Empty)
@@ -476,6 +482,8 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
+                            item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
                     }
 
@@ -494,6 +502,7 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             var masterBill = csTransactionRepository.Get(x => x.Id == houseBill.JobId).FirstOrDefault();
                             _jobNo = masterBill?.JobNo;
+                            //Ưu tiên lấy MBL của MasterBill >> HouseBill
                             _mblNo = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : houseBill.Mawb;
                         }
                     }
@@ -507,45 +516,47 @@ namespace eFMS.API.Documentation.DL.Services
                     var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (surcharge != null)
                     {
-                        surcharge.PaymentObjectId = item.PaymentObjectId;
-                        surcharge.PayerId = item.PayerId;
-                        surcharge.ChargeId = item.ChargeId;
-                        surcharge.ChargeGroup = item.ChargeGroup;
-                        surcharge.Quantity = item.Quantity;
-                        surcharge.UnitId = item.UnitId;
-                        surcharge.UnitPrice = item.UnitPrice;
-                        surcharge.Vatrate = item.Vatrate;
-                        surcharge.CurrencyId = item.CurrencyId;
-                        surcharge.Notes = item.Notes;
-                        surcharge.KickBack = item.KickBack;
-                        surcharge.QuantityType = item.QuantityType;
-
-                        //Chỉ tính lại giá trị cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
+                        //Chỉ cập nhật và tính lại giá trị Amount cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
                         if (string.IsNullOrEmpty(surcharge.SettlementCode)
                             && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
+                            && (surcharge.PayerAcctManagementId == Guid.Empty || surcharge.PayerAcctManagementId == null)
                             && (string.IsNullOrEmpty(surcharge.Soano) && string.IsNullOrEmpty(surcharge.PaySoano))
                             && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
                         {
+                            surcharge.PaymentObjectId = item.PaymentObjectId;
+                            surcharge.PayerId = item.PayerId;
+                            surcharge.ChargeId = item.ChargeId;
+                            surcharge.ChargeGroup = item.ChargeGroup;
+                            surcharge.Quantity = item.Quantity;
+                            surcharge.UnitId = item.UnitId;
+                            surcharge.UnitPrice = item.UnitPrice;
+                            surcharge.Vatrate = item.Vatrate;
+                            surcharge.CurrencyId = item.CurrencyId;
+                            surcharge.Notes = item.Notes;
+                            surcharge.KickBack = item.KickBack;
+                            surcharge.QuantityType = item.QuantityType;
+
                             //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             surcharge.FinalExchangeRate = null;
                             surcharge.ExchangeDate = item.ExchangeDate;
-                        }
 
-                        var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
-                        surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                        surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                        surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                        surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                        surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                        surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                        surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, kickBackExcRate);
+                            surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            surcharge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            surcharge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            surcharge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            surcharge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            surcharge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
 
-                        //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
-                        if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
-                        {
-                            surcharge.InvoiceNo = item.InvoiceNo;
-                            surcharge.InvoiceDate = item.InvoiceDate;
-                            surcharge.SeriesNo = item.SeriesNo;
+                            //Chỉ phí BUY & OBH mới được update InvoiceNo, InvoiceDate, SeriesNo
+                            if (item.Type != DocumentConstants.CHARGE_SELL_TYPE)
+                            {
+                                surcharge.InvoiceNo = item.InvoiceNo;
+                                surcharge.InvoiceDate = item.InvoiceDate;
+                                surcharge.SeriesNo = item.SeriesNo;
+                            }
+
                         }
 
                         surcharge.JobNo = _jobNo;
@@ -553,6 +564,11 @@ namespace eFMS.API.Documentation.DL.Services
                         surcharge.Hblno = _hblNo;
                         surcharge.DatetimeModified = DateTime.Now;
                         surcharge.UserModified = currentUser.UserID;
+                        if (surcharge.TransactionType == "CL")
+                        {
+                            //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
+                            surcharge.ClearanceNo = !string.IsNullOrEmpty(surcharge.ClearanceNo) && !string.IsNullOrEmpty(surcharge.SettlementCode) ? surcharge.ClearanceNo : GetCustomNoOldOfShipment(surcharge.JobNo);
+                        }
 
                         surchargesUpdate.Add(surcharge);
                     }
@@ -1473,6 +1489,18 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return string.Empty;
 
+        }
+
+        /// <summary>
+        /// Get custom no old of shipment
+        /// </summary>
+        /// <param name="jobNo"></param>
+        /// <returns></returns>
+        private string GetCustomNoOldOfShipment(string jobNo)
+        {
+            var LookupCustomDeclaration = customsDeclarationRepository.Get().ToLookup(x => x.JobNo);
+            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).FirstOrDefault()?.ClearanceNo;
+            return customNos;
         }
     }
 }

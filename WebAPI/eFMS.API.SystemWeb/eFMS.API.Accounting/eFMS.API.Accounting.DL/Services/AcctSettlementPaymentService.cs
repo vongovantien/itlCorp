@@ -54,6 +54,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IUserBaseService userBaseService;
+        private readonly IContextBase<SysImage> sysImageRepository;
+
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -85,6 +87,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctCdnote> acctCdnote,
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
+            IContextBase<SysImage> sysImageRepo,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -114,17 +117,20 @@ namespace eFMS.API.Accounting.DL.Services
             acctSoaRepo = acctSoa;
             customClearanceRepo = customClearance;
             acctCdnoteRepo = acctCdnote;
+            sysImageRepository = sysImageRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
         public List<AcctSettlementPaymentResult> Paging(AcctSettlementPaymentCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = GetDatas(criteria);
+            var data = GetSettlementsByCriteria(criteria);
             if (data == null)
             {
                 rowsCount = 0;
                 return null;
             }
+
+            var result = new List<AcctSettlementPaymentResult>();
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -136,9 +142,11 @@ namespace eFMS.API.Accounting.DL.Services
                     page = 1;
                 }
                 data = data.Skip((page - 1) * size).Take(size);
+
+                result = TakeSettlements(data).ToList();
             }
 
-            return data.ToList();
+            return result;
         }
 
         private PermissionRange GetPermissionRangeOfRequester()
@@ -176,10 +184,14 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
-        private IQueryable<AcctSettlementPayment> GetDataSettlementPayment(AcctSettlementPaymentCriteria criteria)
+        private IQueryable<AcctSettlementPayment> GetSettlementByPermission(AcctSettlementPaymentCriteria criteria)
         {
             var permissionRangeRequester = GetPermissionRangeOfRequester();
-            var settlementPayments = DataContext.Get();
+
+            //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
+            var queryDefault = ExpressionQueryDefault(criteria);
+            var settlementPayments = DataContext.Get().Where(queryDefault);
+
             var settlementPaymentAprs = acctApproveSettlementRepo.Get(x => x.IsDeny == false);
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
@@ -330,18 +342,48 @@ namespace eFMS.API.Accounting.DL.Services
             return settlementPayments;
         }
 
-        public IQueryable<AcctSettlementPaymentResult> GetDatas(AcctSettlementPaymentCriteria criteria)
+        /// <summary>
+        /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
+        /// </summary>
+        /// <returns></returns>
+        private Expression<Func<AcctSettlementPayment, bool>> ExpressionQueryDefault(AcctSettlementPaymentCriteria criteria)
+        {
+            Expression<Func<AcctSettlementPayment, bool>> query = q => true;
+            if ((criteria.ReferenceNos == null || criteria.ReferenceNos.Count == 0)
+                && criteria.RequestDateFrom == null
+                && criteria.RequestDateTo == null
+                && (string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod == "All")
+                && (string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval == "All")
+                && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All"))
+            {
+                var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
+                var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
+                query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
+            }
+            return query;
+        }
+
+        public IQueryable<AcctSettlementPayment> GetSettlementsByCriteria(AcctSettlementPaymentCriteria criteria)
         {
             var querySettlementPayment = ExpressionQuery(criteria);
-            var dataSettlementPayments = GetDataSettlementPayment(criteria);
+            var dataSettlementPayments = GetSettlementByPermission(criteria);
             if (dataSettlementPayments == null) return null;
             var settlementPayments = dataSettlementPayments.Where(querySettlementPayment);
             settlementPayments = QueryWithShipment(settlementPayments, criteria);
+            if (settlementPayments != null)
+            {
+                settlementPayments = settlementPayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+            }
+            return settlementPayments;
+        }
+
+        private IQueryable<AcctSettlementPaymentResult> TakeSettlements(IQueryable<AcctSettlementPayment> settlementPayments)
+        {
             if (settlementPayments == null) return null;
 
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
-            
+
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
                        from partnerGrp in partnerGrps.DefaultIfEmpty()
@@ -370,11 +412,15 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
                            PayeeName = partnerGrp.ShortName
-                       };
-
-            //Sort Array sẽ nhanh hơn
-            data = data.ToArray().OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
+                       };           
             return data;
+        }
+
+        public IQueryable<AcctSettlementPaymentResult> QueryData(AcctSettlementPaymentCriteria criteria)
+        {
+            var settlementPayments = GetSettlementsByCriteria(criteria);
+            var result = TakeSettlements(settlementPayments);
+            return result;
         }
 
         public List<ShipmentOfSettlementResult> GetShipmentOfSettlements(string settlementNo)
@@ -668,11 +714,32 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceNo = advInfo.AdvanceNo,
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
-                    CustomNo = advInfo.CustomNo
+                    CustomNo = advInfo.CustomNo,
+                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo)
                 });
             }
 
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+        }
+
+        private List<SysImage> GetShipmentAttachFile(string settleCode, Guid hblId, string advanceNo, string customNo)
+        {
+            List<SysImage> files = new List<SysImage>();
+
+            var id = DataContext.Get(x => x.SettlementNo == settleCode)?.FirstOrDefault().Id;
+
+            string folderChild = string.Format("{0}/", hblId.ToString());
+            if (!string.IsNullOrEmpty(advanceNo))
+            {
+                folderChild += advanceNo + "/";
+            }
+            if (!string.IsNullOrEmpty(customNo))
+            {
+                folderChild += customNo + "/";
+            }
+
+            files = sysImageRepository.Get(x => x.Folder == "Settlement" && x.ObjectId == id.ToString() && x.ChildId == folderChild).ToList();
+            return files;
         }
 
         public AdvanceInfo GetAdvanceInfo(string _settlementNo, string _mbl, Guid _hbl, string _settleCurrency, string _advanceNo, List<CatCurrencyExchange> currencyExchange)
@@ -1001,19 +1068,20 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
 
         #region --- PAYMENT MANAGEMENT ---
-        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl)
+        public List<AdvancePaymentMngt> GetAdvancePaymentMngts(string jobId, string mbl, string hbl, string requester)
         {
             var advance = acctAdvancePaymentRepo.Get();
             var request = acctAdvanceRequestRepo.Get();
-            //Chỉ lấy những advance có status là Done
+            //Chỉ lấy những advance có status là Done => update sprint22: lấy tất cả
             var data = from req in request
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
                        where
-                            ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                       && req.JobId == jobId
+                            //ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                       req.JobId == jobId
                        && req.Mbl == mbl
                        && req.Hbl == hbl
+                       && ad.Requester == requester
                        select new AdvancePaymentMngt
                        {
                            AdvanceNo = ad.AdvanceNo,
@@ -1046,7 +1114,7 @@ namespace eFMS.API.Accounting.DL.Services
             return dataResult;
         }
 
-        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl)
+        public List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl, string requester)
         {
             var settlement = DataContext.Get();
             var surcharge = csShipmentSurchargeRepo.Get();
@@ -1064,7 +1132,7 @@ namespace eFMS.API.Accounting.DL.Services
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
             }
 
-            //Chỉ lấy ra những settlement có status là done     
+            // Chỉ lấy ra những settlement có status là done => update sprint22: lấy tất cả
             var dataOperation = from settle in settlement
                                 join sur in surcharge on settle.SettlementNo equals sur.SettlementCode into sur2
                                 from sur in sur2.DefaultIfEmpty()
@@ -1072,10 +1140,11 @@ namespace eFMS.API.Accounting.DL.Services
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 where
-                                        settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                                     && opst.JobNo == jobId
+                                        //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                     opst.JobNo == jobId
                                      && opst.Hwbno == hbl
                                      && opst.Mblno == mbl
+                                     && settle.Requester == requester
                                 select new SettlementPaymentMngt
                                 {
                                     SettlementNo = settle.SettlementNo,
@@ -1093,10 +1162,11 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
-                                       settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
-                                    && cst.JobNo == jobId
+                                       //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                    cst.JobNo == jobId
                                     && cstd.Hwbno == hbl
                                     && cst.Mawb == mbl
+                                    && settle.Requester == requester
                                select new SettlementPaymentMngt
                                {
                                    SettlementNo = settle.SettlementNo,
@@ -1158,6 +1228,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 select new ChargeSettlementPaymentMngt
                                 {
                                     SettlementNo = settlementNo,
+                                    AdvanceNo = sur.AdvanceNo,
                                     ChargeName = cc.ChargeNameEn,
                                     TotalAmount = sur.Total,
                                     SettlementCurrency = sur.CurrencyId,
@@ -1183,6 +1254,7 @@ namespace eFMS.API.Accounting.DL.Services
                                select new ChargeSettlementPaymentMngt
                                {
                                    SettlementNo = settlementNo,
+                                   AdvanceNo = sur.AdvanceNo,
                                    ChargeName = cc.ChargeNameEn,
                                    TotalAmount = sur.Total,
                                    SettlementCurrency = sur.CurrencyId,
@@ -1413,12 +1485,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
-                            x.ChargeId == criteria.ChargeID
+                            x.SettlementCode != criteria.SettlementNo
+                            && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
@@ -1457,13 +1527,10 @@ namespace eFMS.API.Accounting.DL.Services
                 if (!string.IsNullOrEmpty(criteria.CustomNo) || !string.IsNullOrEmpty(criteria.InvoiceNo) || !string.IsNullOrEmpty(criteria.ContNo))
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
-                               x.Id != criteria.SurchargeID
+                            x.Id != criteria.SurchargeID
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
-                            //&& (string.IsNullOrEmpty(criteria.CustomNo) ? true : x.ClearanceNo == criteria.CustomNo)
-                            //&& (string.IsNullOrEmpty(criteria.InvoiceNo) ? true : x.InvoiceNo == criteria.InvoiceNo)
-                            //&& (string.IsNullOrEmpty(criteria.ContNo) ? true : x.ContNo == criteria.ContNo)
                             && x.ClearanceNo == criteria.CustomNo
                             && x.InvoiceNo == criteria.InvoiceNo
                             && x.ContNo == criteria.ContNo
@@ -2120,6 +2187,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+                //.GroupBy(x => new { x.SettlementCode, x.JobNo, x.Hblno, x.Mblno, x.CurrencyId, x.Hblid, x.Type, x.AdvanceNo });
             var data = new List<AscSettlementPaymentRequestReport>();
             foreach (var surcharge in surcharges)
             {
@@ -4354,14 +4422,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.Select(s => new { hblId = s.Hblid, customNo = s.ClearanceNo }).Distinct();
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid,s.AdvanceNo,s.ClearanceNo}).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
 
                 #region -- CHANRGE AND ADVANCE OF SETTELEMENT --
-                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
-                var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange);
+                var _shipmentCharges = GetChargeOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
+                var _infoAdvanceExports = GetAdvanceOfShipmentSettlementExport(houseBillId.hblId, settlementPayment.SettlementCurrency, surChargeBySettleCode, currencyExchange, houseBillId.AdvanceNo);
                 shipmentSettlement.ShipmentCharges = _shipmentCharges;
                 shipmentSettlement.InfoAdvanceExports = _infoAdvanceExports;
                 #endregion -- CHANRGE AND ADVANCE OF SETTELEMENT --
@@ -4418,11 +4486,11 @@ namespace eFMS.API.Accounting.DL.Services
             return result.ToList();
         }
 
-        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        private List<InfoShipmentChargeSettlementExport> GetChargeOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var shipmentSettlement = new InfoShipmentSettlementExport();
             var listCharge = new List<InfoShipmentChargeSettlementExport>();
-            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId);
+            var surChargeByHblId = surChargeBySettleCode.Where(x => x.Hblid == hblId && x.AdvanceNo == advanceNo); // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var sur in surChargeByHblId)
             {
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
@@ -4451,11 +4519,11 @@ namespace eFMS.API.Accounting.DL.Services
             return listCharge;
         }
 
-        private List<InfoAdvanceExport> GetAdvanceOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange)
+        private List<InfoAdvanceExport> GetAdvanceOfShipmentSettlementExport(Guid hblId, string settlementCurrency, IQueryable<CsShipmentSurcharge> surChargeBySettleCode, List<CatCurrencyExchange> currencyExchange, string advanceNo)
         {
             var listAdvance = new List<InfoAdvanceExport>();
             // Gom surcharge theo AdvanceNo & HBLID
-            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId);
+            var groupAdvanceNoAndHblID = surChargeBySettleCode.GroupBy(g => new { g.AdvanceNo, g.Hblid }).ToList().Where(x => x.Key.Hblid == hblId && x.Key.AdvanceNo == advanceNo);  // Trường hợp cùng 1 lô nhưng tạm ứng nhiều lần
             foreach (var item in groupAdvanceNoAndHblID)
             {
                 //Advance Payment có Status Approve là Done
@@ -4468,6 +4536,7 @@ namespace eFMS.API.Accounting.DL.Services
                         .Select(s => s.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, s.RequestCurrency, settlementCurrency)).Sum();
                     advance.AdvanceAmount = advanceAmountByHbl;
                     advance.RequestDate = advanceIsDone.RequestDate;
+                    advance.AdvanceNo = advanceIsDone.AdvanceNo;
                     listAdvance.Add(advance);
                 }
             }
@@ -4840,8 +4909,11 @@ namespace eFMS.API.Accounting.DL.Services
             (!string.IsNullOrEmpty(x.Soano) 
             || !string.IsNullOrEmpty(x.PaySoano) 
             || !string.IsNullOrEmpty(x.VoucherId)
+            || !string.IsNullOrEmpty(x.VoucherIdre)
             || !string.IsNullOrEmpty(x.CreditNo)
             || !string.IsNullOrEmpty(x.DebitNo)
+            || x.AcctManagementId != null
+            || x.PayerAcctManagementId != null
             )
             ))
             {

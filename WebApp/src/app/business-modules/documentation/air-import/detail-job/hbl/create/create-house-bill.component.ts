@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { NgProgress } from '@ngx-progressbar/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { Store, ActionsSubject } from '@ngrx/store';
 import { DocumentationRepo, CatalogueRepo } from '@repositories';
@@ -19,7 +18,8 @@ import { forkJoin, merge } from 'rxjs';
 import _merge from 'lodash/merge';
 import isUUID from 'validator/lib/isUUID';
 
-import { catchError, finalize, mergeMap, takeUntil } from 'rxjs/operators';
+import { catchError, mergeMap, takeUntil } from 'rxjs/operators';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 
 @Component({
@@ -32,6 +32,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(ShareBusinessArrivalNoteAirComponent, { static: true }) arrivalNoteComponent: ShareBusinessArrivalNoteAirComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
 
@@ -42,7 +43,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     activeTab: string = 'hawb';
 
     constructor(
-        protected _progressService: NgProgress,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<IShareBussinessState>,
         protected _documentationRepo: DocumentationRepo,
@@ -53,7 +53,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
         protected _dataService: DataService
     ) {
         super();
-        this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
@@ -151,6 +150,17 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
             this.infoPopup.show();
             return;
         }
+
+        // if (!this.proofOfDeliveryComponent.proofOfDelievey.referenceNo
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.deliveryPerson
+        //     || !this.proofOfDeliveryComponent.proofOfDelievey.note
+        // ) {
+        //     this.activeTab = 'proof';
+        //     this.infoPopup.show();
+        //     return;
+        // }
+
         this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
             .pipe(
                 catchError(this.catchError),
@@ -189,7 +199,6 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
     createHbl(houseBill: HouseBill) {
         if (this.formCreateHBLComponent.formCreate.valid) {
-            this._progressRef.start();
             this._documentationRepo.createHousebill(houseBill)
                 .pipe(
                     mergeMap((res: any) => {
@@ -204,13 +213,24 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
-                        return forkJoin([arrival, delivery]);
+
+
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        return forkJoin([arrival, delivery, proof]);
                     }),
                     catchError(this.catchError),
-                    finalize(() => this._progressRef.complete())
                 ).subscribe((res: CommonInterface.IResult) => {
                     if (!!res) {
                         this._toastService.success(res[1].message, '');
+                        if (res[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                            this.proofOfDeliveryComponent.uploadFilePOD();
+                        }
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                     }
                 });

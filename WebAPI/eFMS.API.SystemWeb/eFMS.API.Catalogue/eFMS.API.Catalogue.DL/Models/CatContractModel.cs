@@ -26,5 +26,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public bool? IsRequestApproval { get; set; }
         public IFormFile File { get; set; }
         public bool? isChangeAgrmentType { get; set; }
+        public bool? ViewDetail { get; set; }
     }
 }

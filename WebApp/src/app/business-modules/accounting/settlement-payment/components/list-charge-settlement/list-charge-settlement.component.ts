@@ -2,7 +2,7 @@ import { Component, ViewChild, ViewChildren, QueryList, Input, Output, EventEmit
 import { coerceBooleanProperty } from "@angular/cdk/coercion";
 import { takeUntil } from 'rxjs/operators';
 import { AppList } from '@app';
-import { Surcharge, Partner } from '@models';
+import { Surcharge, Partner, SysImage } from '@models';
 import { SortService, DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { CommonEnum } from '@enums';
@@ -16,10 +16,11 @@ import { SettlementExistingChargePopupComponent } from '../popup/existing-charge
 import { SettlementFormChargePopupComponent } from '../popup/form-charge/form-charge.popup';
 import { SettlementPaymentManagementPopupComponent } from '../popup/payment-management/payment-management.popup';
 import { SettlementTableSurchargeComponent } from '../table-surcharge/table-surcharge.component';
-import { SettlementShipmentItemComponent } from '../shipment-item/shipment-item.component';
+import { SettlementShipmentItemComponent, ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
 import { SettlementFormCopyPopupComponent } from '../popup/copy-settlement/copy-settlement.popup';
 import { SettlementTableListChargePopupComponent } from '../popup/table-list-charge/table-list-charge.component';
 import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from-shipment/charge-form-shipment.popup';
+import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
@@ -48,13 +49,13 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     @ViewChild(SettlementTableListChargePopupComponent) tableListChargePopup: SettlementTableListChargePopupComponent;
     @ViewChild(SettlementChargeFromShipmentPopupComponent) listChargeFromShipmentPopup: SettlementChargeFromShipmentPopupComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentFilePopup: SettlementShipmentAttachFilePopupComponent;
     @ViewChild(InjectViewContainerRefDirective) public reportContainerRef: InjectViewContainerRefDirective;
 
     @ViewChildren('tableSurcharge') tableSurchargeComponent: QueryList<SettlementTableSurchargeComponent>;
     @ViewChildren('headingShipmentGroup') headingShipmentGroup: QueryList<SettlementShipmentItemComponent>;
 
-    groupShipments: any[] = [];
+    groupShipments: ISettlementShipmentGroup[] = [];
     headers: CommonInterface.IHeaderTable[];
 
     surcharges: Surcharge[] = [];
@@ -72,12 +73,14 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     isShowButtonCopyCharge: boolean = false;
     isDirectSettlement: boolean = false;
     isExistingSettlement: boolean = false;
+    requester: string = '';
+    selectedGroupShipmentIndex: number;
 
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
         private _documenRepo: DocumentationRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
     ) {
         super();
     }
@@ -213,11 +216,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     onClickHeadingShipment(data: any): boolean {
-        // * prevent collapse/expand within accordion-heading
-        data.event.stopPropagation();
-        data.event.preventDefault();
 
-        this.paymentManagementPopup.getDataPaymentManagement(data.data.jobId, data.data.hbl, data.data.mbl);
+        this.paymentManagementPopup.getDataPaymentManagement(data.jobId, data.hbl, data.mbl, this.requester);
 
         this.showPaymentManagementPopup();
         return false;
@@ -291,7 +291,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     showPaymentManagement(surcharge: Surcharge) {
-        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl);
+        this.paymentManagementPopup.getDataPaymentManagement(surcharge.jobId, surcharge.hbl, surcharge.mbl, this.requester);
         this.showPaymentManagementPopup();
     }
 
@@ -373,17 +373,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                         }
                     });
                     if (!!this.settlementCode) {
-                        if (charge.advanceNo) {
-                            this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
-                        } else {
-                            this.tableListChargePopup.advs.length = 0;
-                        }
+                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
+
                     } else {
-                        if (charge.advanceNo) {
-                            this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
-                        } else {
-                            this.tableListChargePopup.advs.length = 0;
-                        }
+                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
                     }
 
                     const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
@@ -532,6 +525,26 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     }
                 }
             )
+    }
+
+    viewShipmentAttachFile(index: number) {
+        this.selectedGroupShipmentIndex = index;
+        this.shipmentFilePopup.shipmentGroups = this.groupShipments[index];
+        this.shipmentFilePopup.files = this.shipmentFilePopup.shipmentGroups.files;
+
+        this.shipmentFilePopup.show();
+
+    }
+
+    onChangeShipmentGroupAttachFile(files: SysImage[]) {
+        if (this.selectedGroupShipmentIndex !== -1) {
+            this.groupShipments[this.selectedGroupShipmentIndex].files.length = 0;
+            const oldData = this.groupShipments[this.selectedGroupShipmentIndex];
+            oldData.files = Array.from(files);
+
+            this.groupShipments[this.selectedGroupShipmentIndex] = JSON.parse(JSON.stringify(oldData));  // ? Clone data
+
+        }
     }
 }
 

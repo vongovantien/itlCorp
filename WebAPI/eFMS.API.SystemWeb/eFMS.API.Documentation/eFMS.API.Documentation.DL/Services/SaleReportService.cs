@@ -575,7 +575,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Contact = employeeContact,
                     CompanyName = company != null ? (company.BunameVn ?? string.Empty) : string.Empty,
                     CompanyAddress1 = company != null ? (company.AddressVn ?? string.Empty) : string.Empty,
-                    CurrDecimalNo = 2,
+                    CurrDecimalNo = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? 0 : 2,
                     ReportBy = employeeContact,
                     Director = string.Empty,
                     ChiefAccountant = string.Empty,
@@ -1741,7 +1741,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (item.HblId != null && item.HblId != Guid.Empty)
                 {
-                    var surcharge = detailLookupSur[item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));                    
+                    var surcharge = detailLookupSur[item.HblId].Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && (x.KickBack == true || x.ChargeGroup == comChargeGroup?.Id));
                     foreach (var charge in surcharge)
                     {
                         var partner = lookupPartner[charge.PaymentObjectId].FirstOrDefault();
@@ -1754,7 +1754,7 @@ namespace eFMS.API.Documentation.DL.Services
                             PartnerName = partner?.PartnerNameEn,
                             Description = item.TransactionType == "CL" ? "Logistics" : API.Common.Globals.CustomData.Services.FirstOrDefault(x => x.Value == item.TransactionType)?.DisplayName,
                             Quantity = charge.Quantity,
-                            Unit = unitLookup[charge.UnitId].Select(t=>t.Code).FirstOrDefault() ?? string.Empty,
+                            Unit = unitLookup[charge.UnitId].Select(t => t.Code).FirstOrDefault() ?? string.Empty,
                             UnitPrice = charge.UnitPrice ?? 0,
                             TotalValue = 0,
                             Currency = charge.CurrencyId,
@@ -1763,8 +1763,8 @@ namespace eFMS.API.Documentation.DL.Services
                             UsdExt = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? (NumberHelper.RoundNumber(charge.VatAmountVnd ?? 0, 0) + NumberHelper.RoundNumber(charge.AmountVnd ?? 0, 0))
                                                                                            : (NumberHelper.RoundNumber(charge.VatAmountUsd ?? 0, 2) + NumberHelper.RoundNumber(charge.AmountUsd ?? 0, 2)),
                             MAWB = item.Mawb ?? string.Empty,
-                            Shipper = item.ShipperDescription,
-                            Consignee = item.ConsigneeDescription,
+                            Shipper = item.ShipperDescription == null ? string.Empty : item.ShipperDescription.Split('\n').FirstOrDefault(),
+                            Consignee = item.ConsigneeDescription == null ? string.Empty : item.ConsigneeDescription.Split('\n').FirstOrDefault(),
                             PartnerID = item.CustomerId,
                             Category = partner?.PartnerType,
                         };

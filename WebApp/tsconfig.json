@@ -35,8 +35,8 @@
             "@core": ["src/app/core"],
             "@app": ["src/app"],
             "@animations": ["src/app/shared/animations"],
-            "@share-modules": ["src/app/business-modules/share-modules"]
-
+            "@share-modules": ["src/app/business-modules/share-modules"],
+            "@operators": ["src/app/shared/operators"]
         }
     }
 }

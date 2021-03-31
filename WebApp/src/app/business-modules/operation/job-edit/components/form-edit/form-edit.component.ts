@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
-import { ShareBussinessContainerListPopupComponent, IShareBussinessState } from '@share-bussiness';
-import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit } from '@models';
+import { ShareBussinessContainerListPopupComponent, IShareBussinessState, GetContainerSuccessAction, getContainerSaveState } from '@share-bussiness';
+import { OpsTransaction, Customer, PortIndex, Warehouse, User, CommodityGroup, Unit, Container } from '@models';
 import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, GetCatalogueCarrierAction, GetCatalogueAgentAction, getCatalogueWarehouseState, GetCatalogueWarehouseAction, getCatalogueCommodityGroupState, GetCatalogueCommodityGroupAction } from '@store';
@@ -15,6 +15,7 @@ import { InfoPopupComponent } from '@common';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { InjectViewContainerRefDirective } from '@directives';
 @Component({
     selector: 'job-mangement-form-edit',
     templateUrl: './form-edit.component.html'
@@ -22,7 +23,7 @@ import { ToastrService } from 'ngx-toastr';
 export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
     @ViewChild(ShareBussinessContainerListPopupComponent) containerPopup: ShareBussinessContainerListPopupComponent;
-    @ViewChild('comfirmCusAgreement') infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
 
     opsTransaction: OpsTransaction = null;
 
@@ -94,6 +95,8 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     isJobCopy: boolean = false;
     userLogged: any;
 
+    containers: Observable<any>;
+
     constructor(private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         protected _documentRepo: DocumentationRepo,
@@ -119,6 +122,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.commodityGroups = this._store.select(getCatalogueCommodityGroupState);
         this.packageTypes = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
 
+        this.containers = this._store.select(getContainerSaveState);
 
         this.initForm();
     }
@@ -165,7 +169,6 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
         this.currentFormValue = this.formEdit.getRawValue(); // * for candeactivate.
 
     }
-
 
     initForm() {
         this.formEdit = this._fb.group({
@@ -267,8 +270,9 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
                             this.salemansId.setValue(null);
                         }
                         if (!!res.officeNameAbbr) {
-                            this.infoPopup.body = 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again';
-                            this.infoPopup.show();
+                            this.showPopupDynamicRender(InfoPopupComponent, this.confirmContainerRef.viewContainerRef, {
+                                body: 'The selected customer not have any agreement for service in office ' + res.officeNameAbbr + '! Please check Again'
+                            })
                         }
                     }
                 });
@@ -304,17 +308,29 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             return;
         }
 
-        if (!this.productService.value || !this.serviceMode.value
-            || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
+        if (!this.productService.value || !this.serviceMode.value || (this.productService.value.indexOf('Sea') < 0 && this.productService.value !== 'Air')) {
             this._toaster.warning("Service's not valid to link. Please select another!");
         } else {
             this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
-                .subscribe((res: any) => {
+                .subscribe((res: ILinkAirSeaInfoModel) => {
                     if (!!res) {
                         this.shipmentNo = res.jobNo;
+
                         if (!!res.jobNo) {
                             this.shipmentInfo = res.jobNo;
+                            this.formEdit.patchValue({
+                                sumGrossWeight: res.gw,
+                                sumCbm: res.cw,
+                                sumPackages: res.packageQty
+                            });
+
+                            if (res.containers) {
+                                res.containers.forEach(c => {
+                                    c.id = SystemConstants.EMPTY_GUID;
+                                })
+                                this._store.dispatch(new GetContainerSuccessAction(res.containers));
+                            }
                         } else {
                             this.shipmentInfo = null;
                             this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
@@ -329,4 +345,13 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
 
         this.billingOpsId.setValue(this.userLogged.id);
     }
+}
+export interface ILinkAirSeaInfoModel {
+    hblId: string;
+    jobId: string;
+    jobNo: string;
+    gw: number;
+    cw: number;
+    packageQty: number;
+    containers: Container[];
 }

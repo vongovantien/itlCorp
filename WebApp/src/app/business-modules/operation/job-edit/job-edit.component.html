@@ -138,8 +138,8 @@
                     </tab>
                     <tab heading="Advance/Settlement" [active]="tab === 'advance-settle'"
                         (selectTab)="selectTab('advance-settle')" [disabled]="isDuplicate">
-                        <ng-container #advSettleContainer></ng-container>
-                        <!-- ? new version lazy load component -->
+                        <ng-container *ngIf="tab === 'advance-settle'" loadModule="Share_advanceSettle"></ng-container>
+                        <!-- * old version lazy load component-->
                     </tab>
                 </tabset>
             </div>

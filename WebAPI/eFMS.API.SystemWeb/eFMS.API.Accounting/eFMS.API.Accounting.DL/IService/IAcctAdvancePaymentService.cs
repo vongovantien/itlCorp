@@ -15,7 +15,7 @@ namespace eFMS.API.Accounting.DL.IService
     {
         List<AcctAdvancePaymentResult> Paging(AcctAdvancePaymentCriteria criteria, int page, int size, out int rowsCount);
 
-        IQueryable<AcctAdvancePaymentResult> GetDatas(AcctAdvancePaymentCriteria criteria);
+        IQueryable<AcctAdvancePaymentResult> QueryData(AcctAdvancePaymentCriteria criteria);
 
         AcctAdvancePaymentModel GetAdvancePaymentByAdvanceNo(string advanceNo);
 
@@ -32,7 +32,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState AddAdvancePayment(AcctAdvancePaymentModel model);
 
         // Kiểm tra lô hàng (JobId, HBL, MBL) đã được add trong advance payment nào hay chưa?
-        bool CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
+        List<ShipmentExistedInAdvanceModel> CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
 
         HandleState DeleteAdvancePayment(string advanceNo);
 

@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -83,7 +84,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult QueryData(AcctAdvancePaymentCriteria criteria)
         {
-            var data = acctAdvancePaymentService.GetDatas(criteria);
+            var data = acctAdvancePaymentService.QueryData(criteria);
             return Ok(data);
         }
 
@@ -210,8 +211,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("CheckShipmentsExistInAdvancePament")]
         public IActionResult CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria)
         {
-            var data = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
-            ResultHandle result = new ResultHandle { Status = data, Message = data ? "Exists" : "Not exists" };
+            List<ShipmentExistedInAdvanceModel> data = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
+            ResultHandle result = new ResultHandle { Status = data.Count > 0 ? true : false, Message = data.Count > 0 ? "Exists" : "Not exists", Data = data };
             return Ok(result);
         }
 
