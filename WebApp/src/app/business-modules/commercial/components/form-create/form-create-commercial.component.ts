@@ -56,7 +56,6 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
-    isDisabledInternal: boolean = false;
     isBranchSub: boolean;
     parentName: string = '';
     provinceIdName: string;
@@ -162,8 +161,6 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.addressVn = this.formGroup.controls["addressVn"];
         this.partnerLocation = this.formGroup.controls["partnerLocation"];
         this.isDisabled = this.parentId != null && !this.isUpdate ? true : false;
-        console.log(this.parentId.value);
-        console.log(this.isDisabled);
     }
 
     onRemove() {
