@@ -6,6 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { InjectViewContainerRefDirective } from '@directives';
+import { AdvancePaymentShipmentExistedPopupComponent } from '../shipment-existed/shipment-existed.popup';
 
 @Component({
     selector: 'adv-payment-add-popup',
@@ -18,7 +19,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
-    @ViewChild('existedPopup') confirmEsixedJobPopup: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentShipmentExistedPopupComponent) confirmEsixedJobPopup: AdvancePaymentShipmentExistedPopupComponent;
 
     action: string = 'create';
 
