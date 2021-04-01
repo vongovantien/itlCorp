@@ -2946,6 +2946,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.OfficeType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.ShortName)
                     .HasMaxLength(50)
                     .IsUnicode(false);

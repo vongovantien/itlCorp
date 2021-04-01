@@ -279,6 +279,55 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
+        private ListEmailViewModel GetListAccountantAR(string OfficeId)
+        {
+            List<string> lstAccountant = new List<string>();
+            List<string> lstCCAccountant = new List<string>();
+            List<string> lstAR = new List<string>();
+            List<string> lstCCAR = new List<string>();
+            ListEmailViewModel EmailModel = new ListEmailViewModel();
+            var arrayOffice = OfficeId.Split(";").ToArray();
+            int lengthOffice = arrayOffice.Length;
+
+            var DataHeadOffice = officeRepository.Get(x => x.OfficeType == "Head" && arrayOffice.Contains(x.Id.ToString().ToLower())).FirstOrDefault();
+            var DataBranchOffice = officeRepository.Get(x => x.OfficeType == "Branch" && arrayOffice.Contains(x.Id.ToString().ToLower())).Select(t => t.Id).ToList();
+
+            if (lengthOffice == 1)
+            {
+                var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                lstAccountant = listEmailAccountant?.Split(";").ToList();
+
+                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                lstAR = listEmailAR?.Split(";").ToList();
+
+                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                lstCCAR = listEmailCCAR?.Split(";").ToList();
+            }
+            else if (lengthOffice > 1)
+            {
+                // list mail to Accountant, AR
+                var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                lstAccountant = listEmailAccountant?.Split(";").ToList();
+
+                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                lstAR = listEmailAR?.Split(";").ToList();
+
+                // list mail cc Accountant, AR
+                var listEmailCCAcountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
+
+                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                lstCCAR = listEmailCCAR?.Split(";").ToList();
+            }
+            EmailModel.ListAccountant = lstAccountant.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListCCAccountant = lstCCAccountant.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
+            EmailModel.ListAR = lstAR.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListCCAR = lstCCAR.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
+            return EmailModel;
+        }
+
         private void SendMailRequestApproval(CatPartnerModel partner)
         {
             string employeeId = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
@@ -287,23 +336,16 @@ namespace eFMS.API.Catalogue.DL.Services
 
             string employeeIdUserModified = sysUserRepository.Get(x => x.Id == partner.UserModified).Select(t => t.EmployeeId).FirstOrDefault();
             var objInfoModified = sysEmployeeRepository.Get(e => e.Id == employeeIdUserModified)?.FirstOrDefault();
+
+            string employeeIdPartner = sysUserRepository.Get(x => x.Id == partner.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var objInfoCreatorPartner = sysEmployeeRepository.Get(e => e.Id == employeeIdPartner)?.FirstOrDefault();
+
             List<string> lstTo = new List<string>();
             List<string> lstToAcc = new List<string>();
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
-            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            var listEmailAccoutant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-
-            //if (listEmailAR != null && listEmailAR.Any())
-            //{
-            //    lstTo = listEmailAR.Split(";").ToList();
-            //}
-
-            if (listEmailAccoutant != null && listEmailAccoutant.Any())
-            {
-                lstToAcc = listEmailAccoutant.Split(";").ToList(); 
-            }
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract);
 
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
@@ -355,17 +397,23 @@ namespace eFMS.API.Catalogue.DL.Services
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
-            lstCc.Add(objInfoSalesman?.Email);
-            lstCc.Add(objInfoCreator?.Email);
-            lstCc.Add(objInfoModified?.Email);
             if (partner.ContractType == "Cash")
             {
-                lstTo = listEmailAccoutant.Split(";").ToList();
+                lstTo = listEmailViewModel.ListAccountant;
+                lstCc.AddRange(listEmailViewModel.ListCCAccountant);
             }
             else
             {
-                lstTo = listEmailAR.Split(";").ToList();
+                lstTo = listEmailViewModel.ListAR;
+                lstCc.AddRange(listEmailViewModel.ListCCAR);
+
             }
+
+            lstCc.Add(objInfoSalesman?.Email);
+            lstCc.Add(objInfoCreatorPartner?.Email);
+            lstCc.Add(objInfoModified?.Email);
+            lstCc.Add(objInfoCreator?.Email);
+
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory

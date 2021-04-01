@@ -33,6 +33,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     @ViewChild(SalesmanCreditLimitPopupComponent) salesmanCreditLimitPopup: SalesmanCreditLimitPopupComponent;
     @ViewChild(PartnerRejectPopupComponent) popupRejectPartner: PartnerRejectPopupComponent;
     @ViewChild(ConfirmPopupComponent) confirmChangeAgreementTypePopup: ConfirmPopupComponent;
+    @ViewChild('confirmActive') confirmActiveContractPopup: ConfirmPopupComponent;
 
     openOnPartner: boolean = false;
 
@@ -689,6 +690,12 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.partnerId = this.partnerId;
     }
 
+    onSubmitActiveContract() {
+        this.confirmActiveContractPopup.hide();
+        this.processActiveInActiveContract(this.selectedContract.id);
+
+    }
+
     activeInactiveContract(id: string) {
         if (this.contractType.value === 'Guaranteed'
             && ((this.formGroup.controls['creditLimit'].value <= 0
@@ -697,7 +704,19 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.salesmanCreditLimitPopup.show();
             return;
         }
-        this.processActiveInActiveContract(id);
+        this._catalogueRepo.checkExistedContractActive(id, this.partnerId).pipe(
+            catchError(this.catchError)
+        ).subscribe(
+            (res: boolean) => {
+                if (res === true) {
+                    this.confirmActiveContractPopup.show();
+                }
+                else {
+                    this.processActiveInActiveContract(id);
+                }
+            }
+        );
+
     }
 
     onSalesmanCreditRequest($event: any) {

@@ -488,3 +488,8 @@
 <confirm-popup [body]="confirmChangeAgreementTypeText" [labelConfirm]="'Yes'"
     (onSubmit)="onSubmitChangeAgreementType()">
 </confirm-popup>
+
+<confirm-popup #confirmActive
+    [body]="'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement?'"
+    [labelConfirm]="'OK'" (onSubmit)="onSubmitActiveContract()">
+</confirm-popup>
