@@ -84,12 +84,12 @@ export class CustomClearanceFormDetailComponent extends AppForm implements OnIni
         this._store.dispatch(new GetCataloguePortAction({ placeType: CommonEnum.PlaceTypeEnum.Port }));
         this._store.dispatch(new GetCatalogueCommodityAction());
         this._store.dispatch(new GetCatalogueCountryAction());
-        this._store.dispatch(new GetCataloguePackageAction());
+
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
         this.ports = this._store.select(getCataloguePortState);
         this.countries = this._store.select(getCatalogueCountryState);
         this.commodities = this._store.select(getCatalogueCommodityState);
-        this.units = this._store.select(getCataloguePackageState);
+        this.units = this._catalogueRepo.getUnit({ active: true, unitType: CommonEnum.UnitType.PACKAGE });
 
         this.initForm();
     }

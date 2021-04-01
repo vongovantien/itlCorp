@@ -11,7 +11,7 @@
                                 Clearance No <span class="m--font-danger">(*)</span>
                             </label>
                             <input type="text" class="form-control m-input m-input--square" placeholder="Enter text"
-                                autocomplete="nope" formControlName="clearanceNo" autoFocus>
+                                autocomplete="nope" formControlName="clearanceNo">
                             <div class="form-control-feedback" *ngIf="isSubmitted && !clearanceNo.valid">
                                 Clearance No is required
                             </div>
@@ -244,35 +244,42 @@
                         </div>
                     </div>
                     <div class="col-lg-4">
-                        <div class="form-group">
-                            <label class="form-control-label" for="">
-                                Qty Cont
-                            </label>
-                            <input type="number" min="0" class="form-control m-input m-input--square"
-                                placeholder="Enter number"
-                                onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
-                                placeholder="Enter number" autocomplete="nope" formControlName="qtyCont">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Qty Cont
+                                    </label>
+                                    <input type="number" min="0" class="form-control m-input m-input--square"
+                                        placeholder="Enter number"
+                                        onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
+                                        placeholder="Enter number" autocomplete="nope" formControlName="qtyCont">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label" for="">
+                                        Package Qty
+                                    </label>
+                                    <input type="number" min="0" class="form-control m-input m-input--square"
+                                        placeholder="Enter number"
+                                        onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
+                                        placeholder="Enter number" autocomplete="nope" formControlName="pcs">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">
-                                Package Qty
+                                Package Type {{unit.value | json}}
                             </label>
-                            <div class="input-group m-input-group m-input-group--square">
-                                <input type="number" min="0" class="form-control m-input m-input--square"
-                                    placeholder="Enter number"
-                                    onkeypress="return event.charCode == 46 || (event.charCode > 47 && event.charCode < 58)"
-                                    placeholder="Enter number" autocomplete="nope" formControlName="pcs">
-                                <div class="input-group-prepend">
-                                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'unit')"
-                                        [currentActiveItemId]="{ field: 'code', value: unit.value}"
-                                        [selectedDisplayFields]="['unitNameEn']" [dataSources]="units | async"
-                                        [displayFields]="displayFieldUnit" placeholder="Please select"
-                                        (remove)="resetFormControl(unit)">
-                                    </app-combo-grid-virtual-scroll>
-                                </div>
-                            </div>
+                            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'unit')"
+                                [currentActiveItemId]="{ field: 'code', value: unit.value}"
+                                [selectedDisplayFields]="['unitNameEn']" [dataSources]="units | async"
+                                [displayFields]="displayFieldUnit" placeholder="Please select"
+                                (remove)="resetFormControl(unit)">
+                            </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
                 </div>
@@ -308,16 +315,16 @@
                 <div class="row" *ngIf="!!customDeclaration.datetimeCreated">
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Create:</span>
-                        <span
-                            class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeCreated | date:
+                            'dd/MM/yyyy HH:mm:ss'}}</span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{customDeclaration.userCreatedName}}</span>
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5"
                         *ngIf="customDeclaration.userModified; else nousermodified">
                         <span class="m--font-bolder">Modified:</span>
-                        <span
-                            class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                        <span class="m--font-brand m--margin-left-5">{{customDeclaration.datetimeModified | date:
+                            'dd/MM/yyyy HH:mm:ss'}}</span>
                         <span class="m--font-bolder m--margin-left-5">by</span>
                         <span class="m--font-brand m--margin-left-5">{{customDeclaration.userModifieddName}}</span>
                     </div>
@@ -340,41 +347,11 @@
                     </div>
                     <div class="col-md-4 m--margin-top-10 m--margin-bottom-5">
                         <span class="m--font-bolder">Convert time:</span>
-                        <span
-                            class="m--font-brand m--margin-left-5">{{ customDeclaration.convertTime | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+                        <span class="m--font-brand m--margin-left-5">{{ customDeclaration.convertTime | date:
+                            'dd/MM/yyyy HH:mm:ss'}}</span>
                     </div>
                 </div>
             </div>
         </div>
     </form>
-    <!-- <div class="form-actions m--align-right">
-        <button type="" class="btn btn-brand  m-btn--icon m-btn--uppercase"
-            *ngIf="customDeclaration.permission.allowUpdate  && customDeclaration.jobNo === null"
-            (click)="saveCustomClearance()">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save
-                </span>
-            </span>
-        </button>
-        <button type="" class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="saveAndConvert()"
-            *ngIf="customDeclaration.permission.allowUpdate && customDeclaration.jobNo === null">
-            <span>
-                <i class="la la la-save"></i>
-                <span>
-                    save and convert
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-cancel  m-btn--icon m-btn--uppercase"
-            routerLink="/home/operation/custom-clearance">
-            <span>
-                <i class="la la-ban"></i>
-                <span>
-                    cancel
-                </span>
-            </span>
-        </button>
-    </div> -->
 </div>
