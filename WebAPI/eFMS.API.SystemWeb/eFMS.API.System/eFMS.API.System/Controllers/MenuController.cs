@@ -54,7 +54,5 @@ namespace eFMS.API.System.Controllers
             List<CommonData> result = menuService.GetListService();
             return Ok(result);
         }
-
-
     }
 }

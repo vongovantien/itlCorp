@@ -182,7 +182,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
                     this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
-
+                    console.log('type', this.settlementPayment.settlement.settlementType)
+                    if(this.settlementPayment.settlement.settlementType === 'DIRECT'){
+                        this.requestSurchargeListComponent.isDirectSettlement = true;
+                    }
+                    if(this.settlementPayment.settlement.settlementType === 'EXISTING'){
+                        this.requestSurchargeListComponent.isExistingSettlement = true;
+                    }
                     // if (this.requestSurchargeListComponent.groupShipments.length) {
                     //     this.requestSurchargeListComponent.openAllCharge.next(true);
                     // }

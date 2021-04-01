@@ -35,7 +35,8 @@ export class SettlementPayment {
     reasonReject: string = null;
     payee: string = null;
     payeeName: string = null;
-
+    settlementType: string = null;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

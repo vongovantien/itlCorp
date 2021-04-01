@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -22,6 +23,8 @@ namespace eFMS.API.System.DL.Services
     {
         private IContextBase<SysUserPermission> userpermissionRepository;
         private IContextBase<SysUserPermissionGeneral> permissionGeneralRepository;
+        private readonly IContextBase<SysUser> sysUserRepo;
+        private readonly IContextBase<SysUserLevel> sysUserLevelRepo;
         private readonly ICurrentUser currentUser;
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
@@ -31,11 +34,15 @@ namespace eFMS.API.System.DL.Services
             IMapper mapper,
             IContextBase<SysUserPermission> userpermissionRepo,
             ICurrentUser icurrentUser,
-            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo) : base(repository, cacheService, mapper)
+            IContextBase<SysUserPermissionGeneral> permissionGeneralRepo,
+            IContextBase<SysUser> sysUser,
+            IContextBase<SysUserLevel> sysUserLevel) : base(repository, cacheService, mapper)
         {
             userpermissionRepository = userpermissionRepo;
             permissionGeneralRepository = permissionGeneralRepo;
             currentUser = icurrentUser;
+            sysUserRepo = sysUser;
+            sysUserLevelRepo = sysUserLevel;
         }
 
         //public SysMenuService(IContextBase<SysMenu> repository, IMapper mapper,
