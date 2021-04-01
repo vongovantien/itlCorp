@@ -2995,6 +2995,11 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.Mawb = model.MblNo;
                             hbl.OceanVoyNo = model.FlightVesselName + " - " + model.VoyNo;
 
+                            // date of issue
+                            if (shipment.TransactionType.Contains("SE"))
+                            {
+                                hbl.IssueHbldate = model.Etd;
+                            }
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         csTransactionDetailRepo.SubmitChanges();
