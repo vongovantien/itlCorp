@@ -275,12 +275,54 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpPost]
         [Route("GetExistsCharge")]
-        public IActionResult GetExistsCharge([FromQuery]ExistsChargeCriteria criteria)
+        public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            return Ok(data);
+            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.Type, x.ClearanceNo });
+            List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
+            foreach (var item in dataGroups)
+            {
+                var shipment = new ShipmentSettlement();
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.JobId, item.Key.MBL, item.Key.HBL);
+                shipment.JobId = item.Key.JobId;
+                shipment.MBL = item.Key.MBL;
+                shipment.HBL = item.Key.HBL;
+                shipment.ChargeSettlements = item.ToList();
+                shipment.HblId = item.Key.Hblid;
+                shipment.Type = item.Key.Type;
+                shipment.AdvanceNo = advanceLst == null ? null : advanceLst.FirstOrDefault();
+                shipment.AdvanceNoList = advanceLst;
+                shipment.CustomNo = item.Key.ClearanceNo;
+                shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
+                shipment.TotalNetAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
+                shipment.TotalAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);
+                shipment.TotalAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);
+                shipment.TotalNetVND = item.Sum(x => x.AmountVnd ?? 0);
+                shipment.TotalVATVND = item.Sum(x => x.VatAmountVnd ?? 0);
+                shipment.TotalNetUSD = item.Sum(x => x.AmountUSD ?? 0);
+                shipment.TotalVATUSD = item.Sum(x => x.VatAmountUSD ?? 0);
+                shipment.TotalVND = shipment.TotalNetVND + shipment.TotalVATVND;
+                shipmentSettlement.Add(shipment);
+            }
+            var _totalNetVND = shipmentSettlement.Sum(x => x.TotalNetVND);
+            var _totalVATVND = shipmentSettlement.Sum(x => x.TotalVATVND);
+            var _totalNetUSD = shipmentSettlement.Sum(x => x.TotalNetUSD);
+            var _totalVATUSD = shipmentSettlement.Sum(x => x.TotalVATUSD);
+            var _totalVND = _totalNetVND + _totalVATVND;
+            var _totalUSD = _totalNetUSD + _totalVATUSD;
+            var _totalShipment = dataGroups.Count();
+            var _totalCharges = data.Select(x => x.ChargeId).Count();
+            var total = new
+            {
+                TotalShipment = _totalShipment,
+                TotalCharges = _totalCharges,
+                TotalVNDStr = string.Format("{0} = {1} + {2}", _totalVND.ToString("#,##0"), _totalNetVND.ToString("#,##0"), _totalVATVND.ToString("#,##0")),
+                TotalUSDStr = string.Format("{0} = {1} + {2}", _totalUSD.ToString("##0.00"), _totalNetUSD.ToString("##0.00"), _totalVATUSD.ToString("##0.00"))
+            };
+            var result = new { shipmentSettlement, total };
+            return Ok(result);
         }
 
         /// <summary>
@@ -777,6 +819,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("CopyCharges")]
+        [Authorize]
         public IActionResult CopyCharges(ShipmentsCopyCriteria criteria)
         {
             var data = acctSettlementPaymentService.CopyChargeFromSettlementOldToSettlementNew(criteria);
@@ -913,6 +956,32 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetPartnerForSettlement")]
+        public IActionResult GetPartnerForSettlement(ExistsChargeCriteria criteria)
+        {
+            var result = acctSettlementPaymentService.GetPartnerForSettlement(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("CheckSoaCDNoteIsSynced")]
+        public IActionResult CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria)
+        {
+            var result = acctSettlementPaymentService.CheckSoaCDNoteIsSynced(criteria);
             return Ok(result);
         }
     }

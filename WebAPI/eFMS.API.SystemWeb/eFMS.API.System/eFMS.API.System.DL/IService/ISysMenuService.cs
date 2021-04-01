@@ -6,6 +6,7 @@ using eFMS.API.System.Service.Models;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.System.DL.IService
 {

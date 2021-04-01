@@ -88,5 +88,11 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState DenySettlePayments(List<Guid> Ids);
 
         bool CheckValidateDeleteSettle(string settlementNo);
+
+        IQueryable<CatPartner> GetPartnerForSettlement(ExistsChargeCriteria criteria);
+
+        string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
+
+        List<string> GetListAdvanceNoForShipment(string jobId, string mbl, string hbl);
     }
 }

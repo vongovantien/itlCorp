@@ -703,6 +703,20 @@
              <param name="settlementNoList"></param>
              <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPartnerForSettlement(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+            <summary>
+            
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckSoaCDNoteIsSynced(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+            <summary>
+            
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.

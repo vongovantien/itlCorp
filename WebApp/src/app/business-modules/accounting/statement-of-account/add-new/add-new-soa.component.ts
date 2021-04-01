@@ -207,8 +207,8 @@ export class StatementOfAccountAddnewComponent extends AppList {
     }
 
     calculatorReceivable(surcharges: any[]) {
-        const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
-        this._accountRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+        /*const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
+        this._accountRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();*/
     }
 
     selectJobId(charge: SoaCharge) {

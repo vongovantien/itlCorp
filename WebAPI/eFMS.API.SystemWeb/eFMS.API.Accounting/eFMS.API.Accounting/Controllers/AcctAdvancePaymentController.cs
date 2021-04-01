@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -186,11 +187,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 // Tính công nợ
                 CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -210,8 +211,8 @@ namespace eFMS.API.Accounting.Controllers
         [Route("CheckShipmentsExistInAdvancePament")]
         public IActionResult CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria)
         {
-            var data = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
-            ResultHandle result = new ResultHandle { Status = data, Message = data ? "Exists" : "Not exists" };
+            List<ShipmentExistedInAdvanceModel> data = acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(criteria);
+            ResultHandle result = new ResultHandle { Status = data.Count > 0 ? true : false, Message = data.Count > 0 ? "Exists" : "Not exists", Data = data };
             return Ok(result);
         }
 
@@ -255,11 +256,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
                 CalculatorReceivableAdvancePayment(advanceRequests);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -388,11 +389,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
+            /*if (hs.Success)
             {
                 // Tính công nợ
                 CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }
+            }*/ //[31/03/2021]
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -571,7 +572,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 
                 // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+               // CalculatorReceivableAdvancePayment(model.AdvanceRequests); [31/03/2021]
                 
                 return Ok(result);
             }

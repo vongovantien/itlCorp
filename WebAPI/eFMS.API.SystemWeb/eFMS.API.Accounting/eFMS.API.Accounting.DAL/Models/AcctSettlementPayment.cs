@@ -29,5 +29,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
         public string Payee { get; set; }
+        public string SettlementType { get; set; }
     }
 }

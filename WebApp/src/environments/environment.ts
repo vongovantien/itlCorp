@@ -8,7 +8,11 @@ export const environment = {
                 // ACCOUNTING: "localhost:44368",
                 DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
                 // DOCUMENTATION: "localhost:44366",
+<<<<<<< HEAD
                 // CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
+=======
+                //CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
+>>>>>>> feature/sprint24-30-03-2021
                 CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",
                 // OPERATION: "localhost:44365"

@@ -151,7 +151,7 @@ namespace eFMS.API.Documentation.DL.Services
             //Chỉ lấy ra những phí Credit(BUY) & Payer (chưa bị lock)
             var surcharge = surCharge.Get(x =>
                     (x.Type == DocumentConstants.CHARGE_BUY_TYPE || (x.PayerId != null && x.CreditNo != null))
-                && (x.PayerId == partner || x.PaymentObjectId == partner)
+                && (!string.IsNullOrEmpty(partner) ? (x.PayerId == partner || x.PaymentObjectId == partner) : false)
             );
 
             var transactions = DataContext.Get(x => x.IsLocked == false && services.Contains(x.TransactionType));
