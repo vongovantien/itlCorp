@@ -254,7 +254,7 @@
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="issueHbldate" (remove)="resetFormControl(issueHbldate)"
                                         calendar
-                                        [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate" />
+                                        [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate" (datesUpdated)="updateOnboardStatus()"/>
                                 </div>
                             </div>
                         </div>

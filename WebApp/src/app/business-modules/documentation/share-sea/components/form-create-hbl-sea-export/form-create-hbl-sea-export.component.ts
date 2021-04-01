@@ -555,6 +555,16 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.formCreate.patchValue(formData);
 
     }
+
+    updateOnboardStatus(){
+        if(!!this.issueHbldate.value && !!this.formCreate.controls['onBoardStatus'].value){
+            let onBoardStatus = this.formCreate.controls['onBoardStatus'].value.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
+            if(onBoardStatus.length >1){
+                onBoardStatus = onBoardStatus[1].split(',').map(item => item.trim());
+                this.formCreate.controls['onBoardStatus'].setValue(this.setDefaultOnboard(onBoardStatus[0], onBoardStatus[1], this.issueHbldate.value.startDate));
+            }
+        }
+    }
 }
 
 interface IBookingNoteSyncFormHBL {
