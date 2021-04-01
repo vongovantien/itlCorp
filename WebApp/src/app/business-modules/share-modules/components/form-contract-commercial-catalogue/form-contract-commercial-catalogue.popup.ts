@@ -619,7 +619,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.selectedContract.id = this.idContract;
         }
         this.selectedContract.currencyId = !!this.currencyId.value ? !!this.currencyId.value.id ? this.currencyId.value.id : this.currencyId.value : null;
-        this.selectedContract.active = this.statusContract;
+        this.selectedContract.active = this.selectedContract.id !== SystemConstants.EMPTY_GUID ? this.statusContract : false;
         this.selectedContract.saleManId = this.salesmanId.value;
         this.selectedContract.companyId = this.companyId.value;
         this.selectedContract.index = this.indexDetailContract;
@@ -703,18 +703,24 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             this.salesmanCreditLimitPopup.show();
             return;
         }
-        this._catalogueRepo.checkExistedContractActive(id, this.partnerId).pipe(
-            catchError(this.catchError)
-        ).subscribe(
-            (res: boolean) => {
-                if (res === true) {
-                    this.confirmActiveContractPopup.show();
+        if (this.selectedContract.active === false) {
+            this._catalogueRepo.checkExistedContractActive(id, this.partnerId).pipe(
+                catchError(this.catchError)
+            ).subscribe(
+                (res: boolean) => {
+                    if (res === true) {
+                        this.confirmActiveContractPopup.show();
+                    }
+                    else {
+                        this.processActiveInActiveContract(id);
+                    }
                 }
-                else {
-                    this.processActiveInActiveContract(id);
-                }
-            }
-        );
+            );
+        }
+        else {
+            this.processActiveInActiveContract(id);
+        }
+
 
     }
 

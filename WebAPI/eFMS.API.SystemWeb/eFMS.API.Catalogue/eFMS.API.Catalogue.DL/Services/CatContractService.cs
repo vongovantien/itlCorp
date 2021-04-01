@@ -497,7 +497,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             var DataCheckExisted = CheckExistedContractActive(id, partnerId);
-            if(DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false)
+            if(DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false )
             {
                 foreach(var item in DataCheckExisted)
                 {

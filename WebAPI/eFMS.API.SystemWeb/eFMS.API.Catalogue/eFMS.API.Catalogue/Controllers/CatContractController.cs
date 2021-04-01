@@ -167,7 +167,7 @@ namespace eFMS.API.Catalogue.Controllers
                 }
                 else
                 {
-                    if (DataCheck.Where(x=>x.Active == false || x.Active == null).Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.ToLower().Intersect(model.OfficeId).Any()))
+                    if (DataCheck.Where(x=>x.Active == false || x.Active == null).Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any()))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -400,7 +400,7 @@ namespace eFMS.API.Catalogue.Controllers
         public IActionResult CheckExistedContract(Guid id, string partnerId)
         {
             var result = catContractService.CheckExistedContractActive(id, partnerId);
-            bool IsExisted = result.Count() > 0  ? true : false;
+            bool IsExisted = result != null && result.Count() > 0  ? true : false;
             return Ok(IsExisted);
         }
 
