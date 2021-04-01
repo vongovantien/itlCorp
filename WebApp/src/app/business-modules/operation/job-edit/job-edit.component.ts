@@ -299,8 +299,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
-            this.opsTransaction.serviceNo = null;
-            this.opsTransaction.serviceHblId = null;
+            // this.opsTransaction.serviceNo = null;
+            // this.opsTransaction.serviceHblId = null;
         }
     }
 
