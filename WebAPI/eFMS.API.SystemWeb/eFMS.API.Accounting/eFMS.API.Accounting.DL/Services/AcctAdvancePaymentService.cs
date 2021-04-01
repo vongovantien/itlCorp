@@ -3367,49 +3367,7 @@ namespace eFMS.API.Accounting.DL.Services
                             RequesterName = user.Username
                         };
             }
-            ////So sánh bằng
-            //IQueryable<AcctAdvanceRequestModel> queryOps = from req in requestOrder
-            //                                               join ops in opsShipment on req.JobId equals ops.JobNo into ops2
-            //                                               from ops in ops2
-            //                                               join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-            //                                               from adv in adv2
-            //                                               join user in sysUsers on adv.Requester equals user.Id
-            //                                               select new AcctAdvanceRequestModel
-            //                                               {
-            //                                                   Id = req.Id,
-            //                                                   JobId = req.JobId,
-            //                                                   Hbl = req.Hbl,
-            //                                                   Hblid = req.Hblid,
-            //                                                   Mbl = req.Mbl,
-            //                                                   RequestDate = adv.RequestDate,
-            //                                                   Amount = req.Amount,
-            //                                                   AdvanceNo = req.AdvanceNo,
-            //                                                   RequestCurrency = req.RequestCurrency,
-            //                                                   Requester = user.Id,
-            //                                                   RequesterName = user.Username
-            //                                               };
-
-            ////So sánh bằng
-            //IQueryable<AcctAdvanceRequestModel> queryDoc = from req in requestOrder
-            //                                               join doc in docShipment on req.JobId equals doc.JobNo into doc2
-            //                                               from doc in doc2
-            //                                               join adv in DataContext.Get() on req.AdvanceNo equals adv.AdvanceNo into adv2
-            //                                               from adv in adv2
-            //                                               join user in sysUsers on adv.Requester equals user.Id
-            //                                               select new AcctAdvanceRequestModel
-            //                                               {
-            //                                                   Id = req.Id,
-            //                                                   JobId = req.JobId,
-            //                                                   Hbl = req.Hbl,
-            //                                                   Hblid = req.Hblid,
-            //                                                   Mbl = req.Mbl,
-            //                                                   RequestDate = adv.RequestDate,
-            //                                                   Amount = req.Amount,
-            //                                                   AdvanceNo = req.AdvanceNo,
-            //                                                   RequestCurrency = req.RequestCurrency,
-            //                                                   Requester = user.Id,
-            //                                                   RequesterName = user.Username
-            //                                               };
+            
             //IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = queryOps.Union(queryDoc);
             IQueryable<AcctAdvanceRequestModel> mergeAdvRequest = query;
 
