@@ -1317,8 +1317,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                 {
-                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : null;
-                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : null;
+                                    surcharge.PaySyncedFrom = (cdNote.Code == surcharge.CreditNo) ? "CDNOTE" : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (cdNote.Code == surcharge.DebitNo) ? "CDNOTE" : surcharge.SyncedFrom;
                                 }
                                 else
                                 {
@@ -1378,8 +1378,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
                                 {
-                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : null;
-                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : null;
+                                    surcharge.PaySyncedFrom = (soa.Soano == surcharge.PaySoano) ? "SOA" : surcharge.PaySyncedFrom;
+                                    surcharge.SyncedFrom = (soa.Soano == surcharge.Soano) ? "SOA" : surcharge.SyncedFrom;
                                 }
                                 else
                                 {
