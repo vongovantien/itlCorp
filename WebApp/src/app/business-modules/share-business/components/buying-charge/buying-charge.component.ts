@@ -37,7 +37,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
-
+    @Input() showGetChargeStandart: boolean = true; // * show/hide getCharge standart button
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
 
@@ -1145,52 +1145,58 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     }
 
     getRecentlyCharge() {
-        const body: IRecentlyCharge = {
-            hblId: this.hbl.id,
-            jobId: this.shipment.id,
-            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
-            coloaderId: this.shipment.coloaderId,
-            agentId: this.shipment.agentId,
-            chargeType: this.TYPE,
-            customerId: this.hbl.customerId,
-        };
-        this._documentRepo.getRecentlyCharges(body)
-            .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
-            .subscribe(
-                (charges: CsShipmentSurcharge[]) => {
-                    if (!charges.length) {
-                        this._toastService.warning("Not found recently charge");
-                        return;
+        if (!this.shipment.transactionType) {
+            this.getRecentlyChargeOps();
+        }
+        else {
+            const body: IRecentlyCharge = {
+                hblId: this.hbl.id,
+                jobId: this.shipment.id,
+                transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
+                coloaderId: this.shipment.coloaderId,
+                agentId: this.shipment.agentId,
+                chargeType: this.TYPE,
+                customerId: this.hbl.customerId,
+            };
+            this._documentRepo.getRecentlyCharges(body)
+                .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
+                .subscribe(
+                    (charges: CsShipmentSurcharge[]) => {
+                        if (!charges.length) {
+                            this._toastService.warning("Not found recently charge");
+                            return;
+                        }
+                        if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                            charges.forEach(c => {
+                                c.hblno = this.hbl.hwbno || null;
+                                c.mblno = this.getMblNo(this.shipment, this.hbl);
+                                c.jobNo = this.shipment.jobNo || null;
+                                c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
+                            });
+                        }
+                        if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                            charges.forEach(c => {
+                                c.hblno = this.hbl.hwbno || null;
+                                c.mblno = this.getMblNo(this.shipment, this.hbl);
+                                c.jobNo = this.shipment.jobNo || null;
+                                c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+                            });
+                        }
+                        if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
+                            charges.forEach(c => {
+                                c.hblno = this.hbl.hwbno || null;
+                                c.mblno = this.getMblNo(this.shipment, this.hbl);
+                                c.jobNo = this.shipment.jobNo || null;
+                                c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                                this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
+                            });
+                        }
                     }
-                    if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
-                        charges.forEach(c => {
-                            c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.getMblNo(this.shipment, this.hbl);
-                            c.jobNo = this.shipment.jobNo || null;
-                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
-                            this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
-                        });
-                    }
-                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
-                        charges.forEach(c => {
-                            c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.getMblNo(this.shipment, this.hbl);
-                            c.jobNo = this.shipment.jobNo || null;
-                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
-                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
-                        });
-                    }
-                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.OBH) {
-                        charges.forEach(c => {
-                            c.hblno = this.hbl.hwbno || null;
-                            c.mblno = this.getMblNo(this.shipment, this.hbl);
-                            c.jobNo = this.shipment.jobNo || null;
-                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
-                            this._store.dispatch(new fromStore.AddOBHSurchargeAction(c));
-                        });
-                    }
-                }
-            );
+                );
+        }
+
     }
 
     loadDynamicComoGrid(charge: CsShipmentSurcharge, index: number) {
