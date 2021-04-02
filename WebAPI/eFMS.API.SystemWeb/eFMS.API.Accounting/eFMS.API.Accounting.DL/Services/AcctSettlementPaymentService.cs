@@ -1528,6 +1528,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                             x.Id != criteria.SurchargeID
+                            && x.SettlementCode != criteria.SettlementNo
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))

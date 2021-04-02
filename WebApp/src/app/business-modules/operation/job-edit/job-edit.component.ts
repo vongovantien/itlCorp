@@ -93,7 +93,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     this.isDuplicate = false;
                 }
             }),
-            switchMap(() => of(this.jobId))
+            switchMap(() => of(this.jobId)),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe((jobId: string) => {
             if (isUUID(jobId)) {
                 this.tabCharge = 'buying';
@@ -297,8 +298,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
             && (form.productService.indexOf('Sea') > -1 || form.productService === 'Air')) {
             this.isSaveLink = true;
         } else {
-            this.opsTransaction.serviceNo = null;
-            this.opsTransaction.serviceHblId = null;
+            // this.opsTransaction.serviceNo = null;
+            // this.opsTransaction.serviceHblId = null;
         }
     }
 
