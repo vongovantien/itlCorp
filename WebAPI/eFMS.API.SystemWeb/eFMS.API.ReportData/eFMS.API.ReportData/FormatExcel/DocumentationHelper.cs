@@ -2040,7 +2040,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "A/C Voucher No.", //30
                "P/M Voucher No.", //31
                "Service" ,//32
-               "Cd Note" //33
+               "Cd Note", //33,
+               "Creator" //33
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2156,8 +2157,10 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["AF7:AF8"].Merge = true;
             workSheet.Cells["AG7:AG8"].Merge = true;
+            workSheet.Cells["AH7:AH8"].Merge = true;
             workSheet.Cells["AF7"].Value = headers[32]; //Service
             workSheet.Cells["AG7"].Value = headers[33]; //CD NOTE
+            workSheet.Cells["AH7"].Value = headers[34]; //Creator
             //Header table
 
             int rowStart = 9;
