@@ -894,7 +894,7 @@ namespace eFMS.API.Documentation.DL.Services
                             masDetail = masDetail == null ? transaction?.FirstOrDefault() : masDetail;
                         }
                         jobNo = masDetail?.JobNo.ToString();
-                        jobId = masDetail?.Id.ToString();
+                        jobId = masDetail?.jobId.ToString();
                         hblid = null;
                     }
                     else // không có hbl nào -> tìm theo mawb
