@@ -2845,7 +2845,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ChildId)
                     .HasColumnName("ChildID")
-                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");
@@ -2945,6 +2944,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ManagerId)
                     .HasColumnName("ManagerID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OfficeType)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShortName)

@@ -48,6 +48,7 @@ export class Contract {
     isChangeAgrmentType: boolean = false;
     arconfirmed: boolean = false;
     viewDetail: boolean = false;
+    creditUnlimited: boolean = false;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

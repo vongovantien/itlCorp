@@ -47,6 +47,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     ngAfterViewInit() {
+        this.contractList.partnerLocation = this.formCreate.partnerLocation.value;
         combineLatest([
             this._activedRoute.params,
             this._activedRoute.data,

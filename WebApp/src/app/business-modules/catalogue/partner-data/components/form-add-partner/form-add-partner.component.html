@@ -127,7 +127,7 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label class="form-control-label"> Partner Mode </label>
-                        <ng-select (selected)="selectedPartnerMode($event)" [items]="partnerModes" name="partnerMode"
+                        <ng-select (change)="selectedPartnerMode($event)" [items]="partnerModes" name="partnerMode"
                             class="custom" formControlName="partnerMode" placeholder="Select partner mode">
                         </ng-select>
                     </div>

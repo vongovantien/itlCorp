@@ -145,38 +145,29 @@ namespace eFMS.API.Catalogue.Controllers
         private string CheckExistedContract(CatContractModel model)
         {
             string messageDuplicate = string.Empty;
-
-            var sale = model.SaleService.Split(";").ToArray();
-            var dataContract = catContractService.Get(x => x.PartnerId == model.PartnerId).ToList();
-            var arrayOffice = new HashSet<string>(model.OfficeId.Split(';'));
-            var dataCheck = model.Id != Guid.Empty ? dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId) && x.Id != model.Id).ToList() :
-            dataContract.Where(x => (!string.IsNullOrEmpty(x.SaleService) && x.SaleService.Split(";").Any(s => sale.Contains(s))) && (!string.IsNullOrEmpty(x.OfficeId) && x.OfficeId.Split(";").Any(o => arrayOffice.Contains(o))) && (x.SaleManId != model.SaleManId || x.SaleManId == model.SaleManId)).ToList();
-            if (model.Id != Guid.Empty)
+            if (model.Id == Guid.Empty)
             {
-                if (model.ContractType != "Official")
+                if (!string.IsNullOrEmpty(model.ContractNo))
                 {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    if (model.ContractType == "Official")
                     {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                        if (catContractService.Any(x => x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId))
                         {
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
-                    if (dataCheck.Count() > 0)
+                }
+                var DataCheck = catContractService.Get(x => x.PartnerId == model.PartnerId);
+                if(!DataCheck.Any(x=>x.SaleManId == model.SaleManId))
+                {
+                    if(DataCheck.Any(x=>x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any()))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.Id != model.Id && x.PartnerId == model.PartnerId))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-                    if (dataCheck.Count() > 0)
+                    if (DataCheck.Where(x=>x.Active == false || x.Active == null).Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any()))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -184,36 +175,30 @@ namespace eFMS.API.Catalogue.Controllers
             }
             else
             {
-                if (model.ContractType != "Official")
+                if (!string.IsNullOrEmpty(model.ContractNo))
                 {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
+                    if (model.ContractType == "Official")
                     {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
+                        if (catContractService.Any(x => !string.IsNullOrEmpty( x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId && x.Id != model.Id))
                         {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                           return messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
-
-                    if (dataCheck.Count() > 0)
+                }
+                var DataCheck = catContractService.Get(x => x.PartnerId == model.PartnerId);
+                if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
+                {
+                    if (DataCheck.Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any() && x.Id != model.Id))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    if (!string.IsNullOrEmpty(model.ContractNo))
-                    {
-                        if (catContractService.Any(x => x.ContractNo == model.ContractNo && x.PartnerId == model.PartnerId))
-                        {
-                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
-                        }
-                    }
-
-                    if (dataCheck.Count() > 0)
+                    if (DataCheck.Where(x => x.Active == false || x.Active == null).Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any() && x.Id != model.Id))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
-
                 }
             }
             return messageDuplicate;
@@ -409,6 +394,14 @@ namespace eFMS.API.Catalogue.Controllers
                 return BadRequest(result);
             }
             return Ok(result);
+        }
+
+        [HttpGet("CheckExistedContract")]
+        public IActionResult CheckExistedContract(Guid id, string partnerId)
+        {
+            var result = catContractService.CheckExistedContractActive(id, partnerId);
+            bool IsExisted = result != null && result.Count() > 0  ? true : false;
+            return Ok(IsExisted);
         }
 
 
