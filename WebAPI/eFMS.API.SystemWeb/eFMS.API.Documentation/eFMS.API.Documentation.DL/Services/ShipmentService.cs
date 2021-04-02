@@ -2816,6 +2816,7 @@ namespace eFMS.API.Documentation.DL.Services
             var detailLookupPartner = lstPartner.ToLookup(q => q.Id);
             var detailLookupCharge = lstCharge.ToLookup(q => q.Id);
             var dataCustom = customsDeclarationRepo.Get().ToList();
+            var LookupUser = sysUserRepo.Get().ToLookup(x => x.Id);
             List<AccountingPlSheetExportResult> dataList = new List<AccountingPlSheetExportResult>();
             foreach (var charge in dataExportAccountants)
             {
@@ -2925,6 +2926,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.PartnerTaxCode = detailLookupPartner[charge.PartnerId].FirstOrDefault()?.TaxCode;
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
+                data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
                 dataList.Add(data);
             }
             return dataList.AsQueryable();

@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public decimal UnitPrice { get; set; }
         public decimal Quantity { get; set; }
         public string ClearanceNo { get; set; }
+        public string UserCreated { get; set; }
 
 
     }
