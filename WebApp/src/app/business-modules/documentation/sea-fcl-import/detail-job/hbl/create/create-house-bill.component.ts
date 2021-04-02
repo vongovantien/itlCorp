@@ -182,7 +182,6 @@ export class CreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
-            this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
                     mergeMap((res: any) => {

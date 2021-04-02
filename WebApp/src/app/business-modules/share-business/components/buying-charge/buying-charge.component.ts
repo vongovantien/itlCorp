@@ -986,7 +986,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, coloaderPayer);
 
-                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[1]) {
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[1] || c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[4]) {
                             c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
@@ -998,7 +998,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, customerPayer);
 
-                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[1]) {
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[1] || c.chargeCode === ChargeConstants.SELLING_DEFAULT_FCL_IMPORT[4]) {
                             c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
@@ -1013,7 +1013,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, coloaderPayer);
 
-                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_IMPORT[1]) {
+                        if (c.chargeCode === ChargeConstants.BUYING_DEFAULT_LCL_IMPORT[1] || c.chargeCode === ChargeConstants.BUYING_DEFAULT_FCL_IMPORT[4]) {
                             c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
@@ -1025,7 +1025,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     shipmentSurcharges.forEach((c: CsShipmentSurcharge) => {
                         c = this.updatePayer(c, customerPayer);
 
-                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[1]) {
+                        if (c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[1] || c.chargeCode === ChargeConstants.SELLING_DEFAULT_LCL_IMPORT[4]) {
                             c = this.updateUnitSurcharge(c, 'SHIPT');
                             c.quantity = 1;
                         } else {
