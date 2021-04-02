@@ -67,6 +67,10 @@ export class CommercialCreateComponent extends AppForm implements OnInit {
         });
     }
 
+    onChangePartnerLocation($event: string) {
+        this.contractList.partnerLocation = $event;
+    }
+
     gotoList() {
         if (this.type === 'Customer') {
             this._router.navigate([`${RoutingConstants.COMMERCIAL.CUSTOMER}`]);

@@ -1436,7 +1436,15 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.Notify = ReportUltity.ReplaceNullAddressDescription(data.NotifyPartyDescription)?.ToUpper();
                 housebill.PlaceAtReceipt = data.PickupPlace?.ToUpper();// Place of receipt
                 housebill.PlaceDelivery = data.DeliveryPlace?.ToUpper();// Place of Delivery
-                housebill.LocalVessel = data.LocalVoyNo?.ToUpper();
+                // ocean name
+                if (reportType == DocumentConstants.HBLOFLANDING_FBL_FRAME || reportType == DocumentConstants.HBLOFLANDING_FBL_NOFRAME)
+                {
+                    housebill.LocalVessel = data.OceanVoyNo?.ToUpper(); // = mother vessel
+                }
+                else
+                {
+                    housebill.LocalVessel = data.LocalVoyNo?.ToUpper();
+                }
                 housebill.FromSea = string.Empty; //NOT USE
                 housebill.OceanVessel = data.OceanVoyNo?.ToUpper();
                 if (dataPOL != null)

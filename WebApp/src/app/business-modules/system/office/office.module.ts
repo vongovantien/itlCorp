@@ -12,6 +12,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ShareSystemModule } from 'src/app/business-modules/system/share-system.module';
 import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 import { OfficeFormApproveSettingComponent } from './components/form-approve-setting/form-approve-setting-office.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -40,7 +41,8 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         TabsModule.forRoot(),
         ShareSystemModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        NgSelectModule
     ],
     exports: [],
     declarations: [

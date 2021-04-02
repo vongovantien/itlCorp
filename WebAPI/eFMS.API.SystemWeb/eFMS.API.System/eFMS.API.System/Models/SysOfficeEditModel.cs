@@ -39,5 +39,6 @@ namespace eFMS.API.System.Models
         public string Location { get; set; }
         public string BankNameEn { get; set; }
         public string BankNameLocal { get; set; }
+        public string OfficeType { get; set; }
     }
 }
