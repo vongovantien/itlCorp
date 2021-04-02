@@ -646,7 +646,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                                                ShipmentId = opst.Id,
                                                                Type = "OPS",
-                                                               AdvanceNo = advGrp.AdvanceNo
+                                                               AdvanceNo = advGrp.AdvanceNo,
+                                                               IsLocked = opst.IsLocked
                                                            };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -669,12 +670,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                               HblId = cstd.Id,
                                                               ShipmentId = cst.Id,
                                                               Type = "DOC",
-                                                              AdvanceNo = advGrp.AdvanceNo
+                                                              AdvanceNo = advGrp.AdvanceNo,
+                                                              IsLocked = cst.IsLocked
                                                           };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo })
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo, x.IsLocked })
                 .Select(x => new ShipmentSettlement
                 {
                     SettlementNo = x.Key.SettlementNo,
@@ -686,7 +688,8 @@ namespace eFMS.API.Accounting.DL.Services
                     HblId = x.Key.HblId,
                     Type = x.Key.Type,
                     ShipmentId = x.Key.ShipmentId,
-                    AdvanceNo = x.Key.AdvanceNo
+                    AdvanceNo = x.Key.AdvanceNo,
+                    IsLocked = x.Key.IsLocked
                 });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
@@ -719,7 +722,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo,
-                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo)
+                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo),
+                    IsLocked = item.IsLocked
                 });
             }
 
@@ -884,7 +888,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = AdvNo
+                                    AdvanceNo = AdvNo,
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -936,7 +941,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = AdvNo
+                                   AdvanceNo = AdvNo,
+                                   IsLocked = cst.IsLocked
+
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
@@ -1005,7 +1012,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     TypeOfFee = sur.TypeOfFee,
                                     AdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
-                                    TypeService = "OPS"
+                                    TypeService = "OPS",
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1062,7 +1070,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
-                                   TypeService = "DOC"
+                                   TypeService = "DOC",
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();

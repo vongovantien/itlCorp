@@ -19,5 +19,5 @@ export const SearchListSettlePayment = createAction(SettlementPaymentActionTypes
 export const LoadListSettlePayment = createAction(SettlementPaymentActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
 export const LoadListSettlePaymentSuccess = createAction(SettlementPaymentActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
 
-export const LoadDetailSettlePayment = createAction(SettlementPaymentActionTypes.GET_DETAIL);
+export const LoadDetailSettlePayment = createAction(SettlementPaymentActionTypes.GET_DETAIL, props<{ id: string }>());
 export const LoadDetailSettlePaymentSuccess = createAction(SettlementPaymentActionTypes.GET_DETAIL_SUCCESS, props<ISettlementPaymentData>());
