@@ -7,6 +7,7 @@ export interface IOPSTransactionState {
     dataSearch: any;
     isLoading: boolean;
     isLoaded: boolean;
+    pagingData: any;
 };
 
 const initialState: IOPSTransactionState = {
@@ -23,16 +24,18 @@ const initialState: IOPSTransactionState = {
     dataSearch: {},
     isLoaded: false,
     isLoading: false,
+    pagingData: { page: 1, pageSize: 15 }
 };
 
 
 export function opsReducer(state = initialState, action: OPSActions): IOPSTransactionState {
     switch (action.type) {
         case OPSActionTypes.SEARCH_LIST: {
-            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false };
+            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false, pagingData: { page: 1, pageSize: 15 } };
         }
+
         case OPSActionTypes.LOAD_LIST: {
-            return { ...state, isLoading: true, isLoaded: false };
+            return { ...state, isLoading: true, isLoaded: false, pagingData: { page: action.payload.page, pageSize: action.payload.size } };
         }
 
         case OPSActionTypes.LOAD_LIST_SUCCESS: {

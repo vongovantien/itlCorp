@@ -13,7 +13,7 @@ import { AppList } from 'src/app/app.list';
 
 import * as fromShare from './../../share-business/store';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, withLatestFrom, map } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
 import { ShareBussinessInputDailyExportPopupComponent } from '@share-bussiness';
 
@@ -92,15 +92,19 @@ export class AirExportComponent extends AppList {
 
         this._store.select(fromShare.getTransactionDataSearchState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(fromShare.getTransactionListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (criteria: any) => {
-                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
-                        this.dataSearch = criteria;
+                    if (!!criteria && !!Object.keys(criteria.dataSearch).length && criteria.dataSearch.transactionType === this.transactionService) {
+                        this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
                 }
             );

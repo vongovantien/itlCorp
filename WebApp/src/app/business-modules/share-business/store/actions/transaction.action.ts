@@ -27,7 +27,7 @@ export class TransactionSearchListAction implements Action {
 
 export class TransactionLoadListAction implements Action {
     readonly type = TransactionActionTypes.LOAD_LIST;
-    constructor(public payload: any) { }
+    constructor(public payload: CommonInterface.IParamPaging) { }
 }
 
 export class TransactionLoadListSuccessAction implements Action {
