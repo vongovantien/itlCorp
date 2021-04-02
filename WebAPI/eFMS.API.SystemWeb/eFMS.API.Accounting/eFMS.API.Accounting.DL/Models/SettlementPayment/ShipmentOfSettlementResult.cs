@@ -10,5 +10,6 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal Amount { get; set; }
         public string ChargeCurrency { get; set; }
         public string SettlementCurrency { get; set; }
+        public bool? IsLocked { get; set; }
     }
 }

@@ -188,6 +188,7 @@ namespace eFMS.API.Accounting.DL.Common
 
         #region Settlement
         public static readonly string MSG_SETTLE_NOT_ALLOW_DELETE = "MSG_SETTLE_NOT_ALLOW_DELETE";
+        public static readonly string MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK = "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK";
         #endregion
     }
 }

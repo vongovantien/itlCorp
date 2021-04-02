@@ -452,7 +452,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     MBL = ops.Mblno,
                                     Amount = sur.Total,
                                     ChargeCurrency = sur.CurrencyId,
-                                    SettlementCurrency = set.SettlementCurrency
+                                    SettlementCurrency = set.SettlementCurrency,
+                                    IsLocked = ops.IsLocked
                                 };
             var dataDocument = from set in settlement
                                join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
@@ -470,7 +471,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    MBL = cst.Mawb,
                                    Amount = sur.Total,
                                    ChargeCurrency = sur.CurrencyId,
-                                   SettlementCurrency = set.SettlementCurrency
+                                   SettlementCurrency = set.SettlementCurrency,
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             var dataGrp = data.ToList().GroupBy(x => new
@@ -478,7 +480,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.JobId,
                 x.HBL,
                 x.MBL,
-                x.SettlementCurrency
+                x.SettlementCurrency,
+                x.IsLocked
             }
             ).Select(s => new ShipmentOfSettlementResult
             {
@@ -486,7 +489,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Amount = s.Sum(su => su.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL,
-                SettlementCurrency = s.Key.SettlementCurrency
+                SettlementCurrency = s.Key.SettlementCurrency,
+                IsLocked = s.Key.IsLocked
             }
             );
             return dataGrp.ToList();
@@ -4921,6 +4925,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return isValidate;
+        }
+
+        public bool CheckSettlementHaveShipmentLock(string settlementNo)
+        {
+            bool result = false;
+
+
+            return result;
         }
 
         /// <summary>
