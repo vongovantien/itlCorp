@@ -23,5 +23,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string UserCreatedName { get; set; }
         public string UserModifiedName { get; set; }
         public bool? IsRequestApproval { get; set; }
+        public string OfficeIdContract { get; set; }
     }
 }

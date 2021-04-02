@@ -14,7 +14,7 @@ import { ICrystalReport } from '@interfaces';
 import { AdvancePaymentFormCreateComponent } from '../components/form-create-advance-payment/form-create-advance-payment.component';
 import { AdvancePaymentListRequestComponent } from '../components/list-advance-payment-request/list-advance-payment-request.component';
 
-import { catchError, tap, switchMap } from 'rxjs/operators';
+import { catchError, tap, switchMap, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { of } from 'rxjs/internal/observable/of';
 
@@ -52,6 +52,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                 this.advId = !!param.id ? param.id : '';
             }),
             switchMap(() => of(this.advId)),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (advanceId: string) => {
                 if (isUUID(advanceId)) {
