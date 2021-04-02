@@ -1104,6 +1104,46 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         }
     }
 
+    getRecentlyChargeOps() {
+        const body: IRecentlyCharge = {
+            hblId: this.hbl.id,
+            jobId: this.shipment.id,
+            transactionType: this.utility.getTransationType(this.shipment.transactionType ?? 'CL'),  // ! OpsTransaion do not have TransationType
+            coloaderId: this.shipment.coloaderId,
+            agentId: this.shipment.agentId,
+            chargeType: this.TYPE,
+            customerId: this.shipment.customerId,
+        };
+        this._documentRepo.getRecentlyChargesOps(body)
+            .pipe(map((v: any[]) => (v || []).map((i => new CsShipmentSurcharge(i)))))
+            .subscribe(
+                (charges: CsShipmentSurcharge[]) => {
+                    if (!charges.length) {
+                        this._toastService.warning("Not found recently charge");
+                        return;
+                    }
+                    if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
+                        charges.forEach(c => {
+                            c.hblno = this.shipment.hwbno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
+                            c.jobNo = this.shipment.jobNo || null;
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddBuyingSurchargeAction(c));
+                        });
+                    }
+                    if ((this.TYPE as any) === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
+                        charges.forEach(c => {
+                            c.hblno = this.shipment.hwbno || null;
+                            c.mblno = this.getMblNo(this.shipment, this.hbl);
+                            c.jobNo = this.shipment.jobNo || null;
+                            c.exchangeDate = { startDate: new Date, endDate: new Date() };
+                            this._store.dispatch(new fromStore.AddSellingSurchargeAction(c));
+                        });
+                    }
+                }
+            );
+    }
+
     getRecentlyCharge() {
         const body: IRecentlyCharge = {
             hblId: this.hbl.id,

@@ -32,7 +32,12 @@
                                     *ngIf="showSyncOtherCharge">Other</a>
                                 <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
+
                         </div>
+                        <button *ngIf="!shipment.transactionType" (click)="getRecentlyChargeOps()" type="button"
+                            class="btn btn-default">
+                            <i class="la la-download"></i> Get Charge Recently<span class="caret"></span>
+                        </button>
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveBuyingCharge('BUY')"
                                 [disabled]="!allowSaving">
