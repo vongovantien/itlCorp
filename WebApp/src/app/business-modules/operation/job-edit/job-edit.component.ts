@@ -95,7 +95,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                     this.isDuplicate = false;
                 }
             }),
-            switchMap(() => of(this.jobId))
+            switchMap(() => of(this.jobId)),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe((jobId: string) => {
             if (isUUID(jobId)) {
                 this.tabCharge = 'buying';

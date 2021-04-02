@@ -72,12 +72,13 @@
                                                 Shipment Mode
                                             </label>
                                         </div>
-                                        <div class="col-lg-8" *ngIf="shipmentMode.value === 'Internal'" style="text-align: right;">
+                                        <div class="col-lg-8" *ngIf="shipmentMode.value === 'Internal'"
+                                            style="text-align: right;">
                                             <a class="pointer" style="text-decoration: underline;"
-                                                    (click)="getASInfoToLink()">Link Air/Sea </a>&nbsp;&nbsp;
-                                                    <span class="text-warning">{{shipmentInfo}}</span>
+                                                (click)="getASInfoToLink()">Link Air/Sea </a>&nbsp;&nbsp;
+                                            <span class="text-warning">{{shipmentInfo}}</span>
                                         </div>
-                                </div>
+                                    </div>
                                     <ng-select class="custom" [items]="shipmentModes" placeholder="Please select"
                                         [clearable]="false" formControlName="shipmentMode">
                                     </ng-select>
@@ -148,8 +149,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label class="form-control-label">
-                                        Supplier
+                                    <label class="form-control-label" required>
+                                        Supplier/Carrier
                                     </label>
                                     <app-combo-grid-virtual-scroll
                                         (itemSelected)="onSelectDataFormInfo($event, 'supplier')"
@@ -218,7 +219,8 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !salemansId.value}">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !salemansId.value}">
                                     <label class="form-control-label" for="" required>
                                         Salesman
                                     </label>
