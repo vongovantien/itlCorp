@@ -1,4 +1,4 @@
-import { Component, ViewChild, Output, EventEmitter, ComponentRef, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { AccountingRepo, OperationRepo, DocumentationRepo } from 'src/app/shared/repositories';
@@ -59,13 +59,12 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     configCustomDisplayFields: CommonInterface.IComboGridDisplayField[];
 
     initShipments: OperationInteface.IShipment[];
-
+    shipmentExisted: any[];
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccountingRepo,
         private _operationRepo: OperationRepo,
         private _documentationRepo: DocumentationRepo,
-        private _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -221,10 +220,8 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                     } else {
                         this.dataRequest = advRequest;
                         if (!!res.data) {
-                            this.confirmEsixedJobPopup.jobNo = advRequest.jobId;
-                            this.confirmEsixedJobPopup.items = res.data || [];
+                            this.shipmentExisted = [...res.data];
                             this.confirmEsixedJobPopup.show();
-                            this._cd.markForCheck();
                         }
                     }
                 },
