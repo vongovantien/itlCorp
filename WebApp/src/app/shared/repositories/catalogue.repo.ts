@@ -596,6 +596,13 @@ export class CatalogueRepo {
         );
     }
 
+    checkExistedContractActive(id: string, partnerId: string) {
+        return this._api.get(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatContract/CheckExistedContract`, { id: id, partnerId: partnerId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+
 
     createPartner(body: any = {}) {
         // const formData = new FormData();

@@ -5,14 +5,24 @@
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
-                <tr [class.bg-warning]="surcharge.isFromShipment">
+                <tr [class.bg-warning]="surcharge.isFromShipment" [class.bg-locked]="surcharge.isLocked">
                     <td class="table-actions-col">
                         <div class="m-checkbox-list d-flex justify-content-center">
-                            <label class="m-checkbox">
-                                <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
-                                    [(ngModel)]="surcharge.isSelected">
-                                <span></span>
-                            </label>
+                            <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
+                                <label class="m-checkbox">
+                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
+                                        [(ngModel)]="surcharge.isSelected">
+                                    <span></span>
+                                </label>
+                            </ng-container>
+                            <ng-template #lockIconTpl>
+                                <span>
+                                    <button type="button" title="Shipment has been locked"
+                                        class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
+                                        <i class="fa fa-lock font-18" style="font-size:18px"></i>
+                                    </button>
+                                </span>
+                            </ng-template>
                             <ng-container *ngIf="!surcharge.isFromShipment">
                                 <span>
                                     <a (click)="copySurcharge(surcharge)" title="Copy {{surcharge.chargeName}}"

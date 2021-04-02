@@ -19,7 +19,8 @@ export const getSettlementPaymentListState = createSelector(settlementPayment, (
 export const getSettlementPaymentListPagingState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.list?.pagingData);
 export const getSettlementPaymentListLoadingState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.list?.isLoading);
 
-export const getSettlementPaymentDetailState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.settlement);
+export const getSettlementPaymentDetailState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail.settlement);
+export const getSettlementPaymentDetailLoadingState = createSelector(settlementPayment, (state: ISettlementPaymentState) => state.detail?.isLoading);
 
 export const reducers: ActionReducerMap<ISettlementPaymentState> = {
     list: settlePaymentListreducer,

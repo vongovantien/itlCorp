@@ -18,6 +18,8 @@ import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/
 
 import { finalize, catchError, takeUntil, switchMap, tap, pluck } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -52,6 +54,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         private _router: Router,
         private _modalService: BsModalService,
         private _exportRepo: ExportRepo,
+        private _store: Store<ISettlementPaymentState>
     ) {
         super();
 
@@ -67,6 +70,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.getDetailSettlement(this.settlementId);
                 }
             });
+
     }
 
     onChangeCurrency(currency: string) {
@@ -74,6 +78,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     }
 
     getDetailSettlement(settlementId: string) {
+        this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }))
         this._accoutingRepo.getDetailSettlementPayment(settlementId)
             .pipe(
                 catchError(this.catchError),
@@ -84,6 +89,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         return;
                     }
                     this.settlementPayment = res;
+
+                    // * Update Store
+                    this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 
                     this.formCreateSurcharge.form.disable();
                     this.formCreateSurcharge.isDisabled = true;
@@ -116,6 +124,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     }
                 }),
                 switchMap(data => this._accoutingRepo.getInfoApproveSettlement(data.settlement.settlementNo)),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: any) => {
