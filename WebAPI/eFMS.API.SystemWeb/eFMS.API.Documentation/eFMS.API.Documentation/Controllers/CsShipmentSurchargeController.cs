@@ -457,6 +457,19 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// get recently charges
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetRecentlyChargesOps")]
+        [Authorize]
+        public IActionResult GetRecentlyChargesOps(RecentlyChargeCriteria criteria)
+        {
+            var results = csShipmentSurchargeService.GetRecentlyChargesJobOps(criteria);
+            return Ok(results);
+        }
+
         private bool isSurchargeSpecialCase(CsShipmentSurcharge charge)
         {
             return !string.IsNullOrEmpty(charge.Soano)

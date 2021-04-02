@@ -577,6 +577,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetRecentlyChargesOps(eFMS.API.Documentation.DL.Models.RecentlyChargeCriteria)">
+            <summary>
+            get recently charges
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.DownloadExcel">
             <summary>
             download file excel from server

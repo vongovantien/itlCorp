@@ -678,6 +678,72 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return results;
         }
+        public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyChargesJobOps(RecentlyChargeCriteria criteria)
+        {
+            Expression<Func<OpsTransaction, bool>> queryShipmentNearest = x => (x.OfficeId == currentUser.OfficeID
+                                                   && (x.CustomerId == criteria.CustomerId || string.IsNullOrEmpty(criteria.CustomerId))
+                                                   && (x.SupplierId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId)));
+            if (queryShipmentNearest == null) return null;
+            List<Guid> houseIds = new List<Guid>();
+            OpsTransaction shipment = opsTransRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
+
+            if (shipment == null) return null;
+
+            if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
+            {
+                if (criteria.ColoaderId == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
+                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
+
+            }
+            else
+            {
+                if (criteria.CustomerId == null) return null;
+                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
+                houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
+            }
+
+            if (houseIds.Count == 0) return null;
+            IQueryable<CsShipmentSurcharge> csShipmentSurcharge = DataContext.Get(x => houseIds.Contains(x.Hblid) && x.Type == criteria.ChargeType && x.IsFromShipment == true);
+            if (csShipmentSurcharge == null) return null;
+            IQueryable<CsShipmentSurchargeDetailsModel> result = (
+               from surcharge in csShipmentSurcharge
+               join charge in catChargeRepository.Get() on surcharge.ChargeId equals charge.Id
+               join p in partnerRepository.Get() on surcharge.PaymentObjectId equals p.Id into gp
+               from p1 in gp.DefaultIfEmpty()
+               join payer in partnerRepository.Get() on surcharge.PayerId equals payer.Id into gp2
+               from p2 in gp2.DefaultIfEmpty()
+               select new CsShipmentSurchargeDetailsModel
+               {
+                   Type = surcharge.Type,
+                   ChargeId = surcharge.ChargeId,
+                   Quantity = surcharge.Quantity,
+                   QuantityType = surcharge.QuantityType,
+                   UnitId = surcharge.UnitId,
+                   UnitPrice = surcharge.UnitPrice,
+                   CurrencyId = surcharge.CurrencyId,
+                   IncludedVat = surcharge.IncludedVat,
+                   Vatrate = surcharge.Vatrate,
+                   Total = surcharge.Total,
+                   PayerId = surcharge.PayerId,
+                   ObjectBePaid = surcharge.ObjectBePaid,
+                   PaymentObjectId = surcharge.PaymentObjectId,
+                   ExchangeDate = surcharge.ExchangeDate,
+                   Notes = surcharge.Notes,
+                   IsFromShipment = true,
+                   TypeOfFee = surcharge.TypeOfFee,
+                   KickBack = surcharge.KickBack,
+                   PartnerShortName = p1.ShortName,
+                   PartnerName = p1.PartnerNameEn,
+                   ReceiverShortName = p1.ShortName,
+                   ReceiverName = p1.PartnerNameEn,
+                   PayerShortName = p2.ShortName,
+                   PayerName = p2.PartnerNameEn,
+                   ChargeNameEn = charge.ChargeNameEn,
+                   ChargeCode = charge.Code,
+               });
+            return result;
+        }
 
         public IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria)
         {
