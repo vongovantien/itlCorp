@@ -151,7 +151,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             if (model.CsTransactionDetails.Count > 1)
             {
-                parameter.TotalPackages = totalPackage + " PKG(S)";
+                parameter.TotalPackages = totalPackage.ToString();// + " PKG(S)"; CR: 15585 [31/03/2021] 
             }
             else
             {
@@ -243,7 +243,7 @@ namespace eFMS.API.Documentation.DL.Services
                     };
                     instructions.Add(instruction);
                 }
-                parameter.TotalPackages = listConts.Sum(t => t.PackageQuantity)?.ToString() + " PKG(S)";
+                parameter.TotalPackages = listConts.Sum(t => t.PackageQuantity)?.ToString();//+ " PKG(S)"; CR: 15585 [31/03/2021]
                 result = new Crystal
                 {
                     ReportName = "SeaShippingInstructionCont.rpt",

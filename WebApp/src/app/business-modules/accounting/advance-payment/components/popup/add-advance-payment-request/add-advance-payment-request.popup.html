@@ -127,5 +127,6 @@
 <!-- <confirm-popup #existedPopup body="Shipment has existed in another Advance " title="Warning"
     (onSubmit)="existedPopup.hide(); onSubmitShipmentExisted()"></confirm-popup> -->
 
-<shipment-existed-popup #existedPopup (onSubmit)="existedPopup.hide(); onSubmitShipmentExisted()">
+<shipment-existed-popup #existedPopup (onSubmit)="existedPopup.hide(); onSubmitShipmentExisted()"
+    [items]="shipmentExisted" [jobNo]="dataRequest.jobId">
 </shipment-existed-popup>

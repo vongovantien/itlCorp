@@ -130,6 +130,7 @@ export class OfficeDetailsComponent extends AppList {
                 location: this.formAdd.location.value,
                 bankNameEn: this.formAdd.bankName_En.value,
                 bankNameLocal: this.formAdd.bankName_Local.value,
+                officeType: this.formAdd.officeType.value,
             };
             this._systemRepo.updateOffice(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -181,6 +182,7 @@ export class OfficeDetailsComponent extends AppList {
                             this.formData.location = res.data.location;
                             this.selectedOffice = new Office(res.data);
                             this.formAdd.SelectedOffice = new Office(res.data);
+                            this.formAdd.officeType.setValue(res.data.officeType);
 
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;

@@ -1,14 +1,15 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, ChangeDetectionStrategy, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 
 @Component({
     selector: 'shipment-existed-popup',
     templateUrl: './shipment-existed.popup.html',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdvancePaymentShipmentExistedPopupComponent extends PopupBase implements OnInit {
     @Output() onSubmit: EventEmitter<any> = new EventEmitter<any>();
-    items: IShipmentExistedAdvance[] = [];
-    jobNo: string;
+    @Input() items: IShipmentExistedAdvance[] = [];
+    @Input() jobNo: string;
 
     constructor() {
         super();

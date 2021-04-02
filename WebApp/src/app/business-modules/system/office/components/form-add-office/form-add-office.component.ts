@@ -53,6 +53,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     location: AbstractControl;
     bankName_En: AbstractControl;
     bankName_Local: AbstractControl;
+    officeType: AbstractControl;
     SelectedOffice: any = {};
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -63,7 +64,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
     isSubmited: boolean = false;
     @Input() isDetail: boolean = false;
     isCreate: boolean = false;
-
+    officeTypes: string[] = ['Head', 'Branch']
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
@@ -180,7 +181,10 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
             active: [this.status[0]],
             location: [],
             bankName_En: [],
-            bankName_Local: []
+            bankName_Local: [],
+            officeType: ['Branch', Validators.compose([
+                Validators.required
+            ])]
         });
 
         this.code = this.formGroup.controls['code'];
@@ -207,7 +211,7 @@ export class OfficeFormAddComponent extends AppForm implements OnInit {
         this.location = this.formGroup.controls['location'];
         this.bankName_En = this.formGroup.controls['bankName_En'];
         this.bankName_Local = this.formGroup.controls['bankName_Local'];
-
+        this.officeType = this.formGroup.controls['officeType'];
     }
 }
 
