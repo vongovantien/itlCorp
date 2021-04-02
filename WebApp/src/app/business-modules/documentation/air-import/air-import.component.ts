@@ -94,7 +94,7 @@ export class AirImportComponent extends AppList {
             )
             .subscribe(
                 (criteria: any) => {
-                    if (!!criteria && !!Object.keys(criteria).length && criteria.dataSearch.transactionType === this.transactionService) {
+                    if (!!criteria && !!Object.keys(criteria.dataSearch).length && criteria.dataSearch.transactionType === this.transactionService) {
                         this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
