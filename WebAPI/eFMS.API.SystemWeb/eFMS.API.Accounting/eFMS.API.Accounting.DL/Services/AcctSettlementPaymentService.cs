@@ -1285,7 +1285,6 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            //var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
 
             // Data search = jobNo
             criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1319,11 +1318,9 @@ namespace eFMS.API.Accounting.DL.Services
             var clearanceData = customClearanceRepo.Get();
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
-                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo));
-                opsTrans = from ops in opsTrans
-                           join custom in clearanceData on ops.JobNo equals custom.JobNo
-                           select ops;
-
+                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
+                var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x=>x.Key).ToList();
+                opsTrans = opsTrans.Where(x => clearanceDataGroup.Contains(x.JobNo));
             }
             // Data search = creditNo
             criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1352,6 +1349,7 @@ namespace eFMS.API.Accounting.DL.Services
             
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
+            var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
@@ -1364,8 +1362,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
                                 //from advGrp in advGrps.DefaultIfEmpty()
-                                join cl in clearanceData on opst.JobNo equals cl.JobNo into cls
-                                from cl in cls.DefaultIfEmpty()
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
                                 select new ShipmentChargeSettlement
@@ -1401,14 +1397,19 @@ namespace eFMS.API.Accounting.DL.Services
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
-                                    ClearanceNo = cl.ClearanceNo,
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     //AdvanceNo = advGrp.AdvanceNo,
                                     PICName = user.Username
                                 };
-
+            foreach(var item in dataOperation)
+            {
+                if(clearanceDataList[item.JobId].Count() > 0)
+                {
+                    item.ClearanceNo = clearanceDataList[item.JobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[item.JobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                }
+            }
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
                 return dataOperation.ToList();
