@@ -452,7 +452,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     MBL = ops.Mblno,
                                     Amount = sur.Total,
                                     ChargeCurrency = sur.CurrencyId,
-                                    SettlementCurrency = set.SettlementCurrency
+                                    SettlementCurrency = set.SettlementCurrency,
+                                    IsLocked = ops.IsLocked
                                 };
             var dataDocument = from set in settlement
                                join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
@@ -470,7 +471,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    MBL = cst.Mawb,
                                    Amount = sur.Total,
                                    ChargeCurrency = sur.CurrencyId,
-                                   SettlementCurrency = set.SettlementCurrency
+                                   SettlementCurrency = set.SettlementCurrency,
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             var dataGrp = data.ToList().GroupBy(x => new
@@ -478,7 +480,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.JobId,
                 x.HBL,
                 x.MBL,
-                x.SettlementCurrency
+                x.SettlementCurrency,
+                x.IsLocked
             }
             ).Select(s => new ShipmentOfSettlementResult
             {
@@ -486,7 +489,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Amount = s.Sum(su => su.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL,
-                SettlementCurrency = s.Key.SettlementCurrency
+                SettlementCurrency = s.Key.SettlementCurrency,
+                IsLocked = s.Key.IsLocked
             }
             );
             return dataGrp.ToList();
@@ -642,7 +646,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                                                ShipmentId = opst.Id,
                                                                Type = "OPS",
-                                                               AdvanceNo = advGrp.AdvanceNo
+                                                               AdvanceNo = advGrp.AdvanceNo,
+                                                               IsLocked = opst.IsLocked
                                                            };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -665,12 +670,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                               HblId = cstd.Id,
                                                               ShipmentId = cst.Id,
                                                               Type = "DOC",
-                                                              AdvanceNo = advGrp.AdvanceNo
+                                                              AdvanceNo = advGrp.AdvanceNo,
+                                                              IsLocked = cst.IsLocked
                                                           };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo })
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo, x.IsLocked })
                 .Select(x => new ShipmentSettlement
                 {
                     SettlementNo = x.Key.SettlementNo,
@@ -682,7 +688,8 @@ namespace eFMS.API.Accounting.DL.Services
                     HblId = x.Key.HblId,
                     Type = x.Key.Type,
                     ShipmentId = x.Key.ShipmentId,
-                    AdvanceNo = x.Key.AdvanceNo
+                    AdvanceNo = x.Key.AdvanceNo,
+                    IsLocked = x.Key.IsLocked
                 });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
@@ -715,7 +722,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo,
-                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo)
+                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo),
+                    IsLocked = item.IsLocked
                 });
             }
 
@@ -880,7 +888,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = AdvNo
+                                    AdvanceNo = AdvNo,
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -932,7 +941,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = AdvNo
+                                   AdvanceNo = AdvNo,
+                                   IsLocked = cst.IsLocked
+
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
@@ -1001,7 +1012,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     TypeOfFee = sur.TypeOfFee,
                                     AdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
-                                    TypeService = "OPS"
+                                    TypeService = "OPS",
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1058,7 +1070,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
-                                   TypeService = "DOC"
+                                   TypeService = "DOC",
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
@@ -1529,6 +1542,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                             x.Id != criteria.SurchargeID
+                            && x.SettlementCode != criteria.SettlementNo
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
@@ -4922,6 +4936,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return isValidate;
+        }
+
+        public bool CheckSettlementHaveShipmentLock(string settlementNo)
+        {
+            bool result = false;
+
+
+            return result;
         }
 
         /// <summary>

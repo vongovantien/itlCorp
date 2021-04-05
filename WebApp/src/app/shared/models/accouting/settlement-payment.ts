@@ -36,7 +36,7 @@ export class SettlementPayment {
     payee: string = null;
     payeeName: string = null;
     settlementType: string = null;
-    
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -57,5 +57,6 @@ export class SettleRequestsPayment {
     mbl: string = '';
     amount: number = 0;
     settlementCurrency: string = '';
+    isLocked: boolean;
 
 }

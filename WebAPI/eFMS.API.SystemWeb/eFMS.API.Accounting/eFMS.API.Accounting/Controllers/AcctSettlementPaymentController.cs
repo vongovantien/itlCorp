@@ -153,6 +153,13 @@ namespace eFMS.API.Accounting.Controllers
                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+
+            if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Select(x => x.JobId))].Value });
+            }
+
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE,settlementNo].Value });
