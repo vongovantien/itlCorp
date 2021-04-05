@@ -4964,11 +4964,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.soaNo.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom));
                 if (!surchargesFilter.Any())
                 {
                     surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom));
                 }
                 if (surchargesFilter.Any())
                 {
@@ -4979,11 +4979,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.creditNo.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
-                if (surchargesFilter.Any())
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                if (!surchargesFilter.Any())
                 {
                     surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom));
                 }
                 if (surchargesFilter.Any())
                 {

@@ -981,7 +981,12 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria)
         {
             var result = acctSettlementPaymentService.CheckSoaCDNoteIsSynced(criteria);
-            return Ok(result);
+            ResultHandle _result = new ResultHandle { Status = true };
+            if (!string.IsNullOrEmpty(result))
+            {
+                _result = new ResultHandle { Status = false, Message = result };
+            }
+            return Ok(_result);
         }
     }
 }
