@@ -55,5 +55,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public decimal? VatAmountUSD { get; set; }
         public decimal? TotalAmountVnd { get; set; }
         public string PICName { get; set; }
+        public bool? IsLocked { get; set; }
+
     }
 }

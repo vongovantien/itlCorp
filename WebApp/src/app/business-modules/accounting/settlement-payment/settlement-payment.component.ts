@@ -14,7 +14,7 @@ import { RoutingConstants, AccountingConstants, SystemConstants } from '@constan
 import { AppList } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { User, SettlementPayment, PartnerOfAcctManagementResult } from '@models';
+import { User, SettlementPayment, PartnerOfAcctManagementResult, SettleRequestsPayment } from '@models';
 import {
     ConfirmPopupComponent,
     Permission403PopupComponent,
@@ -47,7 +47,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
     settlements: SettlementPayment[] = [];
     selectedSettlement: SettlementPayment;
 
-    customClearances: any[] = [];
+    shipments: SettleRequestsPayment[] = [];
     headerCustomClearance: CommonInterface.IHeaderTable[];
 
     userLogged: User;
@@ -141,7 +141,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     showSurcharge(settlementNo: string, indexsSettle: number) {
         if (!!this.settlements[indexsSettle].settleRequests.length) {
-            this.customClearances = this.settlements[indexsSettle].settleRequests;
+            this.shipments = this.settlements[indexsSettle].settleRequests;
         } else {
             this._progressRef.start();
             this._accoutingRepo.getShipmentOfSettlements(settlementNo)
@@ -151,7 +151,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
                 ).subscribe(
                     (res: any[]) => {
                         if (!!res) {
-                            this.customClearances = res;
+                            this.shipments = res;
                             this.settlements[indexsSettle].settleRequests = res;
                         }
                     },
@@ -162,7 +162,7 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
 
     sortByCustomClearance(sortData: CommonInterface.ISortData): void {
         if (!!sortData.sortField) {
-            this.customClearances = this._sortService.sort(this.customClearances, sortData.sortField, sortData.order);
+            this.shipments = this._sortService.sort(this.shipments, sortData.sortField, sortData.order);
         }
     }
 

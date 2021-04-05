@@ -153,6 +153,13 @@ namespace eFMS.API.Accounting.Controllers
                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+
+            if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Select(x => x.JobId))].Value });
+            }
+
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE,settlementNo].Value });
@@ -280,7 +287,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.Type, x.ClearanceNo });
+            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.ClearanceNo });
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (var item in dataGroups)
             {
@@ -291,7 +298,6 @@ namespace eFMS.API.Accounting.Controllers
                 shipment.HBL = item.Key.HBL;
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
-                shipment.Type = item.Key.Type;
                 shipment.AdvanceNo = advanceLst == null ? null : advanceLst.FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
                 shipment.CustomNo = item.Key.ClearanceNo;

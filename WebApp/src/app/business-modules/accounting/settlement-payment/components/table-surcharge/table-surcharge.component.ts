@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { Surcharge } from 'src/app/shared/models';
+import { ISettlementShipmentGroup } from '../shipment-item/shipment-item.component';
 @Component({
     selector: 'table-surcharge-settlement',
     templateUrl: './table-surcharge.component.html',
@@ -9,7 +10,7 @@ import { Surcharge } from 'src/app/shared/models';
 
 export class SettlementTableSurchargeComponent extends AppList {
 
-    @Input() data: ISettlementGroup = null;
+    @Input() data: ISettlementShipmentGroup = null;
     @Output() onChangeCheckBox: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClickSurcharge: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClickCopySurcharge: EventEmitter<any> = new EventEmitter<any>();
@@ -48,11 +49,6 @@ export class SettlementTableSurchargeComponent extends AppList {
     }
 
     openSurchargeDetail(surcharge: Surcharge, index: number) {
-        // if (surcharge.isFromShipment) {
-        //     return;
-        // } else {
-        //     this.onClickSurcharge.emit(surcharge);
-        // }
         this.onClickSurcharge.emit(surcharge);
 
     }
@@ -71,14 +67,4 @@ export class SettlementTableSurchargeComponent extends AppList {
     copySurcharge(surcharge: Surcharge) {
         this.onClickCopySurcharge.emit(surcharge);
     }
-}
-
-interface ISettlementGroup {
-    chargeSettlements: Surcharge[];
-    currencyShipment: string;
-    hbl: string;
-    mbl: string;
-    jobId: string;
-    settlementNo: string;
-    totalAmount: number;
 }
