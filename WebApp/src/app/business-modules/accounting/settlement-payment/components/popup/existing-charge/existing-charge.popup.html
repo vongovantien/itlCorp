@@ -33,7 +33,7 @@
                                     <div class="col-lg-4">
                                         <div class="form-group"
                                         [ngClass]="{'m-form__group has-danger': isSubmitted && (!this.referenceNo.value || !this.referenceInput.value)}">
-                                            <label>Reference No</label>
+                                            <label required>Reference No</label>
                                             <ng-select formControlName="referenceNo" [items]="referenceNos"
                                                 class="custom" bindLabel="title" bindValue="value">
                                             </ng-select>
@@ -49,7 +49,7 @@
                                             <div class="col-lg-12">
                                                 <div class="form-group"
                                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !this.selectedPartnerData && (this.referenceNo.value !== 'Soa' && this.referenceNo.value !=='CreditNote')}">
-                                                    <label class="font-weight-bold">Partner</label>
+                                                    <label required>Partner</label>
                                                     <app-combo-grid-virtual-scroll
                                                         [currentActiveItemId]="selectedPartner"
                                                         (itemSelected)="onSelectDataFormInfo($event, 'partner')"
@@ -81,7 +81,7 @@
                                                     <label for="">Date</label>
                                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [maxDate]="maxDate"
+                                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                             name="daterange" readonly formControlName="serviceDate" [ranges]="ranges"
                                                             [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
                                                         <span class="m-input-icon__icon m-input-icon__icon--right">

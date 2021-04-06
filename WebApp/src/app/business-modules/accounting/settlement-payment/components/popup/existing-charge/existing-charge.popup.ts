@@ -150,8 +150,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     initFormSearch() {
         this.formSearch = this._fb.group({
-            referenceInput: ['', Validators.required],
-            referenceNo: [this.referenceNos[0],Validators.required],
+            referenceInput: [null, Validators.required],
+            referenceNo: [this.referenceNos[0].value, Validators.required],
             serviceDate: [],
             personInCharge: [],
         });
@@ -170,9 +170,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 (data: CommonInterface.IValueDisplay[]) => {
                     this.initService = data;
                     this.services = (data || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+                    // sort A -> Z theo text services 
+                    this.sortIncreaseServices('text', true);
                     this.selectedServices = this.services;
                 }
             );
+    }
+
+    sortIncreaseServices(sortField: string, order: boolean) {
+        this.services = this._sortService.sort(this.services, sortField, order);
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -203,7 +209,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     mapDataSearch() {
         let _data = [];
-        if (this.referenceInput) {
+        if (!!this.referenceInput.value) {
             if (this.referenceInput.value.length > 0) {
                 const _keyword = this.referenceInput.value.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
                 _data = _keyword;
@@ -211,7 +217,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }
         return _data;
     }
-
 
 
     checkUncheckAllCharge(hblId: string) {
@@ -241,6 +246,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.resetData();
         this.resetPartner();
         this.state = 'new';
+        this.isSubmitted = false;
+        this.serviceDate.setValue(null);
+        this.personInCharge.setValue(null);
         this.hide();
     }
 
@@ -344,10 +352,18 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
+    checkInputReference(){
+        if(!!this.referenceInput.value){
+            this.referenceInput.setValue(this.referenceInput.value.trim());
+            if(this.referenceInput.value.length === 0){
+                this.referenceInput.setValue(null);
+            }
+        }
+    }
     // Get List Charges
     searchCharge() {
-
         this.isSubmitted = true;
+        this.checkInputReference();
         let soaNo = [], cdNote = [], jobNo = [], hblNo = [], mblNo = [], customNo = [];
         if (!!this.referenceNo) {
             switch (this.referenceNo.value) {
@@ -385,14 +401,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             personInCharge: !this.personInCharge.value ? this.personInCharges.map((item: any) => item.id).join(';') : this.personInCharge.value.join(';'),
         };
         this.isSoaCDNoteSelected();
-        if (!this.selectedPartnerData && (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value)) {
-            if (!this.referenceInput.value) {
-                return;
-            }
+        if (!this.referenceInput.value) {
+            return;
+        }
+        if (this.isSOACDNote) {
             this.searchWithSOAOrCDNote(body);
-            // if(this.configPartner.dataSource.length === 0){
-            //     this._toastService.warning('There is no partner data to search, please recheck data!');
-            // }  
         } else {
             if (!this.selectedPartnerData) {
                 return
@@ -403,7 +416,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     (res: any = {}) => {
                         if (!!res && res.status === false) {
                             this._toastService.error(res.message);
-                            return;
+                            this.isSubmitted = false;
+                            return of(false);
                         }
                         if (!!res) {
                             this.shipments = res.shipmentSettlement;
@@ -422,34 +436,67 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     searchWithSOAOrCDNote(body: any) {
-        this._accoutingRepo.getPartnerForSettlement(body)
-            .pipe(
-                catchError(this.catchError), finalize(() => this.isLoading = false),
-                concatMap((res) => {
-                    if (!res) {
+        if (!this.selectedPartnerData) {
+            this._accoutingRepo.getPartnerForSettlement(body)
+                .pipe(
+                    catchError(this.catchError), finalize(() => this.isLoading = false),
+                    concatMap((res) => {
+                        if (!res) {
+                            this.isSubmitted = false;
+                            return of(false);
+                        }
+                        if (res.length > 1) {
+                            this._toastService.warning('Please Select Partner!');
+                            this.isSubmitted = false;
+                            return of(false);
+                        }
+                        this.selectedPartnerData = res[0];
+                        this.selectedPartner = { field: 'id', value: res[0].id };
+                        body.partnerId = this.selectedPartnerData.id;
+                        if (!!res.length) {
+                            return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
+                                catchError((err, caught) => this.catchError),
+                                concatMap((rs: any) => {
+                                    if (!rs.status) {
+                                        this._toastService.error(rs.message);
+                                        this.isSubmitted = false;
+                                        return of(false);
+                                    } else {
+                                        return this._accoutingRepo.getExistingCharge(body);
+                                    }
+                                })
+                            );
+                        }
+                    }))
+                .subscribe(
+                    (res: IGetExistsCharge) => {
+                        if (!!res) {
+                            this.orgChargeShipment = cloneDeep(res);
+                            this.shipments = res.shipmentSettlement;
+                            this.total = res.total;
+                            this.totalAmountVnd = this.total.totalVNDStr;
+                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
+                            });
+                            this.checkedAllCharges();
+                            this.isSubmitted = false;
+                        }
+                    }
+                );
+        } else{
+            this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
+                catchError((err, caught) => this.catchError),
+                concatMap((rs: any) => {
+                    if (!rs.status) {
+                        console.log('mess', rs)
+                        this._toastService.error(rs.message);
+                        this.isSubmitted = false;
                         return of(false);
+                    } else {
+                        return this._accoutingRepo.getExistingCharge(body);
                     }
-                    if (res.length > 1) {
-                        this._toastService.warning('Please Select Partner!');
-                        return of(false);
-                    }
-                    this.selectedPartnerData = res[0];
-                    this.selectedPartner = { field: 'id', value: res[0].id };
-                    body.partnerId = this.selectedPartnerData.id;
-                    if (!!res.length) {
-                        return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                            catchError((err, caught) => this.catchError),
-                            concatMap((rs: any) => {
-                                if (!!rs) {
-                                    this._toastService.error(rs);
-                                    return;
-                                } else {
-                                    return this._accoutingRepo.getExistingCharge(body);
-                                }
-                            })
-                        );
-                    }
-                }))
+                })
+            )
             .subscribe(
                 (res: IGetExistsCharge) => {
                     if (!!res) {
@@ -465,6 +512,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     }
                 }
             );
+        }
     }
 
     checkedAllCharges() {
@@ -518,7 +566,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
         this.resetData();
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
-
+        this.serviceDate.setValue(null);
+        this.personInCharge.setValue(null);
         this.resetFormShipmentInput();
     }
 
@@ -534,7 +583,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     resetFormShipmentInput() {
-        this.referenceNo.setValue(null);
+        this.referenceNo.setValue(this.referenceNos[0].value);
         this.referenceInput.setValue(null);
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
     }

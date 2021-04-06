@@ -287,7 +287,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.ClearanceNo });
+            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (var item in dataGroups)
             {
@@ -300,7 +300,7 @@ namespace eFMS.API.Accounting.Controllers
                 shipment.HblId = item.Key.Hblid;
                 shipment.AdvanceNo = advanceLst == null ? null : advanceLst.FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
-                shipment.CustomNo = item.Key.ClearanceNo;
+                shipment.CustomNo = item.Select(x => x.ClearanceNo).FirstOrDefault();
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
                 shipment.TotalNetAmountVND = item.Where(x => x.CurrencyId == AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
                 shipment.TotalAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.Total);
@@ -988,7 +988,12 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria)
         {
             var result = acctSettlementPaymentService.CheckSoaCDNoteIsSynced(criteria);
-            return Ok(result);
+            ResultHandle _result = new ResultHandle { Status = true };
+            if (!string.IsNullOrEmpty(result))
+            {
+                _result = new ResultHandle { Status = false, Message = result };
+            }
+            return Ok(_result);
         }
     }
 }
