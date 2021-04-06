@@ -197,9 +197,9 @@ namespace eFMS.API.Catalogue.Controllers
                 }
                 else
                 {
-                    if (DataCheck.Where(x => x.Active == false || x.Active == null).Any(x => LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+                    if (DataCheck.Where(x => x.Active == false || x.Active == null).Any(x => ( LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
                     {
-                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]); 
                     }
                 }
             }
