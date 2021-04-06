@@ -452,7 +452,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     MBL = ops.Mblno,
                                     Amount = sur.Total,
                                     ChargeCurrency = sur.CurrencyId,
-                                    SettlementCurrency = set.SettlementCurrency
+                                    SettlementCurrency = set.SettlementCurrency,
+                                    IsLocked = ops.IsLocked
                                 };
             var dataDocument = from set in settlement
                                join sur in surcharge on set.SettlementNo equals sur.SettlementCode into sc
@@ -470,7 +471,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    MBL = cst.Mawb,
                                    Amount = sur.Total,
                                    ChargeCurrency = sur.CurrencyId,
-                                   SettlementCurrency = set.SettlementCurrency
+                                   SettlementCurrency = set.SettlementCurrency,
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             var dataGrp = data.ToList().GroupBy(x => new
@@ -478,7 +480,8 @@ namespace eFMS.API.Accounting.DL.Services
                 x.JobId,
                 x.HBL,
                 x.MBL,
-                x.SettlementCurrency
+                x.SettlementCurrency,
+                x.IsLocked
             }
             ).Select(s => new ShipmentOfSettlementResult
             {
@@ -486,7 +489,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Amount = s.Sum(su => su.Amount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
                 HBL = s.Key.HBL,
                 MBL = s.Key.MBL,
-                SettlementCurrency = s.Key.SettlementCurrency
+                SettlementCurrency = s.Key.SettlementCurrency,
+                IsLocked = s.Key.IsLocked
             }
             );
             return dataGrp.ToList();
@@ -642,7 +646,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                // TotalAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settle.SettlementCurrency),
                                                                ShipmentId = opst.Id,
                                                                Type = "OPS",
-                                                               AdvanceNo = advGrp.AdvanceNo
+                                                               AdvanceNo = advGrp.AdvanceNo,
+                                                               IsLocked = opst.IsLocked
                                                            };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -665,12 +670,13 @@ namespace eFMS.API.Accounting.DL.Services
                                                               HblId = cstd.Id,
                                                               ShipmentId = cst.Id,
                                                               Type = "DOC",
-                                                              AdvanceNo = advGrp.AdvanceNo
+                                                              AdvanceNo = advGrp.AdvanceNo,
+                                                              IsLocked = cst.IsLocked
                                                           };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo })
+                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo, x.IsLocked })
                 .Select(x => new ShipmentSettlement
                 {
                     SettlementNo = x.Key.SettlementNo,
@@ -682,7 +688,8 @@ namespace eFMS.API.Accounting.DL.Services
                     HblId = x.Key.HblId,
                     Type = x.Key.Type,
                     ShipmentId = x.Key.ShipmentId,
-                    AdvanceNo = x.Key.AdvanceNo
+                    AdvanceNo = x.Key.AdvanceNo,
+                    IsLocked = x.Key.IsLocked
                 });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
@@ -715,7 +722,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo,
-                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo)
+                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo),
+                    IsLocked = item.IsLocked
                 });
             }
 
@@ -880,7 +888,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = AdvNo
+                                    AdvanceNo = AdvNo,
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -932,7 +941,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = AdvNo
+                                   AdvanceNo = AdvNo,
+                                   IsLocked = cst.IsLocked
+
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
@@ -1001,7 +1012,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     TypeOfFee = sur.TypeOfFee,
                                     AdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
-                                    TypeService = "OPS"
+                                    TypeService = "OPS",
+                                    IsLocked = opst.IsLocked
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1058,7 +1070,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
-                                   TypeService = "DOC"
+                                   TypeService = "DOC",
+                                   IsLocked = cst.IsLocked
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
@@ -1285,7 +1298,6 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            //var advanceRequests = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && x.Requester == criteria.requester);
 
             // Data search = jobNo
             criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1319,11 +1331,9 @@ namespace eFMS.API.Accounting.DL.Services
             var clearanceData = customClearanceRepo.Get();
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
-                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo));
-                opsTrans = from ops in opsTrans
-                           join custom in clearanceData on ops.JobNo equals custom.JobNo
-                           select ops;
-
+                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
+                var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x=>x.Key).ToList();
+                opsTrans = opsTrans.Where(x => clearanceDataGroup.Contains(x.JobNo));
             }
             // Data search = creditNo
             criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1352,6 +1362,7 @@ namespace eFMS.API.Accounting.DL.Services
             
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
+            var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
@@ -1364,8 +1375,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
                                 //from advGrp in advGrps.DefaultIfEmpty()
-                                join cl in clearanceData on opst.JobNo equals cl.JobNo into cls
-                                from cl in cls.DefaultIfEmpty()
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
                                 select new ShipmentChargeSettlement
@@ -1401,14 +1410,19 @@ namespace eFMS.API.Accounting.DL.Services
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
-                                    ClearanceNo = cl.ClearanceNo,
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     //AdvanceNo = advGrp.AdvanceNo,
                                     PICName = user.Username
                                 };
-
+            foreach(var item in dataOperation)
+            {
+                if(clearanceDataList[item.JobId].Count() > 0)
+                {
+                    item.ClearanceNo = clearanceDataList[item.JobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[item.JobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                }
+            }
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
                 return dataOperation.ToList();
@@ -1528,6 +1542,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surChargeExists = csShipmentSurchargeRepo.Get(x =>
                             x.Id != criteria.SurchargeID
+                            && x.SettlementCode != criteria.SettlementNo
                             && x.ChargeId == criteria.ChargeID
                             && x.Hblid == criteria.HBLID
                             && (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_BUY ? x.PaymentObjectId == criteria.Partner : (criteria.TypeCharge == AccountingConstants.TYPE_CHARGE_OBH ? x.PayerId == criteria.Partner : true))
@@ -4923,6 +4938,14 @@ namespace eFMS.API.Accounting.DL.Services
             return isValidate;
         }
 
+        public bool CheckSettlementHaveShipmentLock(string settlementNo)
+        {
+            bool result = false;
+
+
+            return result;
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -4964,11 +4987,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.soaNo.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom));
                 if (!surchargesFilter.Any())
                 {
                     surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("SOA"));
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom));
                 }
                 if (surchargesFilter.Any())
                 {
@@ -4979,11 +5002,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.creditNo.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
-                if (surchargesFilter.Any())
+                                                    && !string.IsNullOrEmpty(x.PaySyncedFrom));
+                if (!surchargesFilter.Any())
                 {
                     surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type != AccountingConstants.TYPE_CHARGE_OBH
-                                                    && !string.IsNullOrEmpty(x.SyncedFrom) && x.PaySyncedFrom.Equals("CDNOTE"));
+                                                    && !string.IsNullOrEmpty(x.SyncedFrom));
                 }
                 if (surchargesFilter.Any())
                 {

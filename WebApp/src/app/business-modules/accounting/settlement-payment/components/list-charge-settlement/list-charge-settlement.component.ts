@@ -24,6 +24,8 @@ import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-
 
 import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject } from 'rxjs';
+import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState } from '../store';
+import { Store } from '@ngrx/store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -35,7 +37,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     @Output() onChange: EventEmitter<any> = new EventEmitter<any>();
-    
+
     get readonly(): boolean {
         return this._readonly;
     }
@@ -81,6 +83,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         private _toastService: ToastrService,
         private _documenRepo: DocumentationRepo,
         private _dataService: DataService,
+        private _store: Store<ISettlementPaymentState>
     ) {
         super();
     }
@@ -109,6 +112,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.selectedSurcharge = this.surcharges[0];
 
         this.subscriptionDuplicateChargeState();
+
+        this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
     }
 
     showExistingCharge() {
@@ -130,12 +135,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.surcharges.forEach(x => x.isSelected = false);
         console.log('surcharge', this.surcharges)
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
-        if(this.existingChargePopup.selectedCharge.length > 0){
+        if (this.existingChargePopup.selectedCharge.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
-        }else{
-            if(this.surcharges.length > 0){
+        } else {
+            if (this.surcharges.length > 0) {
                 this.isDirectSettlement = true;
                 this.isExistingSettlement = false;
                 this.isShowButtonCopyCharge = true;
@@ -202,7 +207,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.formChargePopup.calculateTotalAmount();
 
             this.formChargePopup.isFromshipment = surcharge.isFromShipment;
-
+            /*
+                Phí hiện trường của lô lock thì logic không cho edit các field giống phí chứng từ.
+            */
+            this.formChargePopup.isLocked = surcharge.isLocked;
             this.formChargePopup.show();
         }
     }

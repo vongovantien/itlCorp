@@ -1,5 +1,7 @@
 import { TransactionActions, TransactionActionTypes } from "../actions";
 import { CsTransaction } from "src/app/shared/models";
+import { on } from "cluster";
+import { createReducer } from "@ngrx/store";
 
 export interface ITransactionProfit {
     hblid: string;
@@ -23,6 +25,7 @@ export interface ITransactionState {
     isLoading: boolean;
     isLoaded: boolean;
     dataSearch: any;
+    pagingData: any;
 }
 
 export const initState: ITransactionState = {
@@ -31,17 +34,18 @@ export const initState: ITransactionState = {
     cstransactions: [],
     isLoading: false,
     isLoaded: false,
-    dataSearch: {}
+    dataSearch: {},
+    pagingData: { page: 1, pageSize: 15 }
 };
 
 
 export function TransactionReducer(state = initState, action: TransactionActions): ITransactionState {
     switch (action.type) {
         case TransactionActionTypes.SEARCH_LIST: {
-            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false };
+            return { ...state, dataSearch: action.payload, isLoading: true, isLoaded: false, pagingData: { page: 1, pageSize: 15 } };
         }
         case TransactionActionTypes.LOAD_LIST: {
-            return { ...state, isLoading: true, isLoaded: false };
+            return { ...state, isLoading: true, isLoaded: false, pagingData: { page: action.payload.page, pageSize: action.payload.size } };
         }
 
         case TransactionActionTypes.LOAD_LIST_SUCCESS: {

@@ -440,6 +440,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             hbl: !!this.selectedShipmentData ? this.selectedShipmentData.hbl : (!!this.dataShipmentFromExistingCharge.hbl ? this.dataShipmentFromExistingCharge.hbl : null),
             mbl: !!this.selectedShipmentData ? this.selectedShipmentData.mbl : (!!this.dataShipmentFromExistingCharge.mbl ? this.dataShipmentFromExistingCharge.mbl : null),
             settlementCode: this.settlementCode,
+            isLocked: this.isLocked
         });
 
         if (!!this.selectedCharge && this.selectedCharge.type === 'CREDIT') {

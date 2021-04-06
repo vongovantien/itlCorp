@@ -11,7 +11,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
 
 
@@ -88,15 +88,19 @@ export class JobManagementComponent extends AppList implements OnInit {
 
         this._store.select(fromOperationStore.getOperationTransationDataSearch)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(fromOperationStore.getOperationTransationPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (criteria: any) => {
-                    if (!!criteria && !!Object.keys(criteria).length) {
-                        this.dataSearch = criteria;
+                    if (!!criteria && !!Object.keys(criteria.dataSearch).length) {
+                        this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
                 }
             );

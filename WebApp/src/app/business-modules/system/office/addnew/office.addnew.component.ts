@@ -58,7 +58,7 @@ export class OfficeAddNewComponent extends AppPage {
                 location: this.formAdd.location.value,
                 bankNameEn: this.formAdd.bankName_En.value,
                 bankNameLocal: this.formAdd.bankName_Local.value,
-
+                officeType: this.formAdd.officeType.value,
             };
             this._systemRepo.addNewOffice(body)
                 .pipe(
@@ -104,4 +104,5 @@ interface IOfficeAdd {
     location: string;
     bankNameEn: string;
     bankNameLocal: string;
+    officeType: string;
 }

@@ -40,5 +40,6 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public decimal? Balance { get; set; }
         public List<ShipmentChargeSettlement> ChargeSettlements { get; set; }
         public List<SysImage> Files { get; set; }
+        public bool? IsLocked { get; set; }
     }
 }

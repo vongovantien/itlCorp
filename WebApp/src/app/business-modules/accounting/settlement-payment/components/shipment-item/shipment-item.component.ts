@@ -96,4 +96,5 @@ export interface ISettlementShipmentGroup {
     type: string;
     isSelected?: boolean;
     files: SysImage[];
+    isLocked: boolean;
 }
