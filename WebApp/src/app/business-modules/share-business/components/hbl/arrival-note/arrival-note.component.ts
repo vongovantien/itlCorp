@@ -290,4 +290,5 @@ export interface IArrivalFreightChargeDefault {
     userDefault: string;
     csArrivalFrieghtChargeDefaults: ArrivalFreightCharge[];
     type: any;
+    hblId?: string;
 }
