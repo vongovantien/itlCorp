@@ -58,6 +58,7 @@
         public const string HOUSEAIRWAYBILLLASTEST_HAWB_FRAME = "HAWB_FRAME";
 
         public const string CODE_ITL = "ITL7939";
+        public const string NO_HOUSE = "N/H";
 
         public static readonly string CURRENT_STATUS_CANCELED = "Canceled";
 

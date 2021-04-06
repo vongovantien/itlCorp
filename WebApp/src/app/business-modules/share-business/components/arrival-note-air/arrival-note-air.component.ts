@@ -92,7 +92,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             }
         );
 
-        this._activedRoute.params
+        this.subscription = this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {
@@ -207,9 +207,6 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
                     this.hblArrivalNote.arrivalFirstNotice = { startDate: new Date(), endDate: new Date() };
                 }
             });
-
-
-
     }
 
     addCharge() {
@@ -375,6 +372,7 @@ export class ShareBusinessArrivalNoteAirComponent extends AppList implements OnI
             transactionType: CommonEnum.TransactionTypeEnum.AirImport,
             csArrivalFrieghtChargeDefaults: this.hblArrivalNote.csArrivalFrieghtCharges,
             type: CommonEnum.TransactionTypeEnum.AirImport,
+            hblId: this.hblid
         };
 
         this._progressRef.start();
