@@ -304,7 +304,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     openCopySurcharge(surcharge: Surcharge) {
-        if (this.STATE !== 'WRITE') { return; }
+        if (this.STATE !== 'WRITE' || surcharge.isLocked) { return; }
         this.formChargePopup.selectedSurcharge = surcharge;
         this.openSurchargeDetail(surcharge, null, 'copy');
     }

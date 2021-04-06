@@ -23,20 +23,24 @@
                                     </button>
                                 </span>
                             </ng-template>
-                            <ng-container *ngIf="!surcharge.isFromShipment">
-                                <span>
-                                    <a (click)="copySurcharge(surcharge)" title="Copy {{surcharge.chargeName}}"
-                                        class="pointer">
-                                        <i class="la la-copy"></i>
-                                    </a>
-                                </span>
+                            <ng-container *ngIf="!surcharge.isLocked">
+                                <ng-container *ngIf="!surcharge.isFromShipment">
+                                    <span>
+                                        <a (click)="copySurcharge(surcharge)" title="Copy {{surcharge.chargeName}}"
+                                            class="pointer">
+                                            <i class="la la-copy"></i>
+                                        </a>
+                                    </span>
+                                </ng-container>
                             </ng-container>
                         </div>
                     </td>
-                    <td class="text-primary pointer text-underline" (click)="openSurchargeDetail(surcharge, i)">
+                    <td [class.text-underline]="!surcharge.isLocked" class="text-primary pointer"
+                        (click)="openSurchargeDetail(surcharge, i)">
                         {{surcharge.chargeCode}}
                     </td>
-                    <td class="text-primary pointer text-underline" (click)="openSurchargeDetail(surcharge, i)">
+                    <td [class.text-underline]="!surcharge.isLocked" class="text-primary pointer"
+                        (click)="openSurchargeDetail(surcharge, i)">
                         {{surcharge.chargeName}}
                     </td>
                     <td>{{surcharge.quantity}}</td>
