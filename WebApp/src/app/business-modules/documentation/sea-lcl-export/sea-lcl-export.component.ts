@@ -10,7 +10,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import * as fromShare from './../../share-business/store';
 import { AppList } from 'src/app/app.list';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { takeUntil, finalize, catchError } from 'rxjs/operators';
+import { takeUntil, finalize, catchError, withLatestFrom, map } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
 @Component({
     selector: 'app-sea-lcl-export',
@@ -87,15 +87,19 @@ export class SeaLCLExportComponent extends AppList {
 
         this._store.select(fromShare.getTransactionDataSearchState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(fromShare.getTransactionListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (criteria: any) => {
-                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
-                        this.dataSearch = criteria;
+                    if (!!criteria && !!Object.keys(criteria.dataSearch).length && criteria.dataSearch.transactionType === this.transactionService) {
+                        this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
                 }
             );

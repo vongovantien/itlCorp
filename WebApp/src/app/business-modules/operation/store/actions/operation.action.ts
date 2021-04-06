@@ -19,7 +19,7 @@ export class OPSTransactionSearchListAction implements Action {
 }
 export class OPSTransactionLoadListAction implements Action {
     readonly type = OPSActionTypes.LOAD_LIST;
-    constructor(public payload: any) { }
+    constructor(public payload: CommonInterface.IParamPaging) { }
 }
 export class OPSTransactionLoadListSuccessAction implements Action {
     readonly type = OPSActionTypes.LOAD_LIST_SUCCESS;

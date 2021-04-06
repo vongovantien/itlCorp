@@ -12,6 +12,7 @@ export const getOperationTransationState = createSelector(OperationState, (state
 export const getOperationTransationListShipment = createSelector(OperationState, (state: IOperationState) => state && state.transaction.opsTransations);
 export const getOperationTransationDataSearch = createSelector(OperationState, (state: IOperationState) => state && state.transaction.dataSearch);
 export const getOperationTransationLoadingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction.isLoading);
+export const getOperationTransationPagingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction.pagingData);
 
 export const reducers: ActionReducerMap<IOperationState> = {
     transaction: opsReducer,
