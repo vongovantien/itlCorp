@@ -477,8 +477,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             case 'customer':
                 this.customerId.setValue(data.id);
                 this.customerName = data.shortName;
-                this.shipperId.setValue(data.id);
-                
+
                 this._catalogueRepo.getSalemanIdByPartnerId(data.id, this.jobId).subscribe((res: any) => {
                     if (!!res) {
                         if (!!res.salemanId) {

@@ -36,6 +36,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         ICsTransactionDetailService houseBills;
 
@@ -55,7 +56,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService houseBill,
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysCompany> sysCompany,
-            IContextBase<SysUserLevel> userlevelRepo
+            IContextBase<SysUserLevel> userlevelRepo,
+            ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -73,6 +75,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepo = sysOffice;
             companyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
+            currencyExchangeService = currencyExchange;
         }
 
         #region Arrival
@@ -242,6 +245,19 @@ namespace eFMS.API.Documentation.DL.Services
                 item.TransactionType = model.TransactionType;
                 item.UserCreated = item.UserModified = currentUser.UserID;
 
+                // Nếu đang tạo hbl thì tỷ giá theo ngày tạo hbl.
+                if(item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && !string.IsNullOrEmpty(model.HblId))
+                {
+                    CsTransactionDetail hbl = detailTransactionRepository.Get(x => x.Id.ToString() == model.HblId)?.FirstOrDefault();
+                    if(hbl != null)
+                    {
+                        item.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, hbl.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+                    else
+                    {
+                        item.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, DateTime.Now, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+                }
                 freightChargeDefaultRepository.Add(item, false);
             }
             HandleState hs = freightChargeDefaultRepository.SubmitChanges();

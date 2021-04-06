@@ -79,7 +79,7 @@ export class ShareBusinessArrivalNoteComponent extends AppList {
     }
 
     ngOnInit() {
-        this._activedRoute.params
+        this.subscription = this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
                 map((p: Params) => {

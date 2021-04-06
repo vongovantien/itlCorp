@@ -80,7 +80,7 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     subscriptionParamURLChange() {
-        combineLatest([
+        this.subscription = combineLatest([
             this.route.params,
             this.route.queryParams
         ]).pipe(
@@ -121,19 +121,21 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
     }
 
     updateData(lstMasterContainers: any[]) {
-        let sumCbm = 0;
-        let sumPackages = 0;
-        let sumContainers = 0;
-        let sumNetWeight = 0;
-        let sumGrossWeight = 0;
+        let dataSum = {
+            sumCbm: 0,
+            sumPackages: 0,
+            sumContainers: 0,
+            sumNetWeight: 0,
+            sumGrossWeight: 0
+        }
         let containerDescription = '';
 
         lstMasterContainers.forEach(x => {
-            sumCbm = sumCbm + x.cbm;
-            sumPackages = sumPackages + x.packageQuantity;
-            sumContainers = sumContainers + x.quantity;
-            sumNetWeight = sumNetWeight + x.nw;
-            sumGrossWeight = sumGrossWeight + x.gw;
+            dataSum.sumCbm = dataSum.sumCbm + x.cbm;
+            dataSum.sumPackages = dataSum.sumPackages + x.packageQuantity;
+            dataSum.sumContainers = dataSum.sumContainers + x.quantity;
+            dataSum.sumNetWeight = dataSum.sumNetWeight + x.nw;
+            dataSum.sumGrossWeight = dataSum.sumGrossWeight + x.gw;
         });
         const contData = [];
         for (const item of Object.keys(_groupBy(lstMasterContainers, 'containerTypeName'))) {
@@ -152,12 +154,18 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         }
         containerDescription = containerDescription.replace(/;$/, "");
 
-        this.editForm.formEdit.controls['sumCbm'].setValue(sumCbm === 0 ? null : sumCbm);
-        this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
-        this.editForm.formEdit.controls['sumContainers'].setValue(sumContainers === 0 ? null : sumContainers);
-        this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
-        this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
+        ['sumCbm', 'sumPackages', 'sumNetWeight', 'sumGrossWeight'].forEach(c => {
+            if (dataSum[c] !== 0) {
+                this.editForm.formEdit.controls[c].setValue(dataSum[c]);
+            }
+        })
+        // this.editForm.formEdit.controls['sumCbm'].setValue(sumCbm === 0 ? null : sumCbm);
+        // this.editForm.formEdit.controls['sumPackages'].setValue(sumPackages === 0 ? null : sumPackages);
+        // this.editForm.formEdit.controls['sumNetWeight'].setValue(sumNetWeight === 0 ? null : sumNetWeight);
+        // this.editForm.formEdit.controls['sumGrossWeight'].setValue(sumGrossWeight === 0 ? null : sumGrossWeight);
+
         this.editForm.formEdit.controls['containerDescription'].setValue(containerDescription);
+        this.editForm.formEdit.controls['sumContainers'].setValue(dataSum.sumContainers === 0 ? null : dataSum.sumContainers);
     }
 
     getListContainersOfJob() {
