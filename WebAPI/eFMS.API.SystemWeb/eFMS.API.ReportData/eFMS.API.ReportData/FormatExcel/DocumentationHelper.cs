@@ -3962,8 +3962,15 @@ namespace eFMS.API.ReportData.FormatExcel
                     var _statement = string.Format("F{0}-E{0}", startRow);
                     excel.SetFormula("GrossBefore", _statement);
                     // Rate of com
-                    _statement = string.Format("IF(C{0}=0,0,I{0}/C{0})", startRow);
-                    excel.SetFormula("RateOfCom", _statement);
+                    if (item.TransactionType.Contains('S'))
+                    {
+                        _statement = string.Format("IF({1}=0,0,I{0}/{1})", startRow, item.ContQty);
+                        excel.SetFormula("RateOfCom", _statement);
+                    }
+                    else
+                    {
+                        excel.SetData("RateOfCom", null);
+                    }
                     // Com Amount
                     excel.SetData("ComAmount", item.ComAmount);
                     // Gross profit after commission
@@ -3996,6 +4003,19 @@ namespace eFMS.API.ReportData.FormatExcel
                     startRow += 1;
                 }
 
+                // Footer
+                excel.SetData("BeneficiaryName", resultData.BeneficiaryName);
+                excel.SetData("BankAccount", resultData.BankAccountNo);
+                excel.SetData("BankVia", resultData.BankName);
+                excel.SetData("Taxcode", resultData.TaxCode);
+                // Prepared by
+                excel.SetData("CurrentUser", resultData.PreparedBy);
+                // Verified by
+                excel.SetData("ManagerDep", resultData.VerifiedBy);
+                // Approved by
+                excel.SetData("ManOffice", resultData.ApprovedBy);
+                // Cross-checked by
+                excel.SetData("HeadAccountant", resultData.CrossCheckedBy);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -4298,7 +4318,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[startRow, 2].Value = resultData.CustomerName;
                     workSheet.Cells[startRow, 3].Value = shipment.MBLNo;
                     workSheet.Cells[startRow, 4].Value = shipment.HBLNo;
-                    workSheet.Cells[startRow, 5].Value = shipment.BuyingRate - shipment.SellingRate;
+                    workSheet.Cells[startRow, 5].Value = shipment.SellingRate - shipment.BuyingRate;
                     workSheet.Cells[startRow, 5].Style.Numberformat.Format = formatNumber;
                     startRow++;
                 }

@@ -32,6 +32,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal SellingRate { get; set; }
         public decimal ComAmount { get; set; }
         public string TransactionType { get; set; }
+        public int? ContQty { get; set; }
         public string PackageContainer { get; set; }
     }
 }

@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
         readonly IContextBase<CatDepartment> departmentRepository;
+        private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
         public ShipmentService(IContextBase<CsTransaction> repository, IMapper mapper,
@@ -65,7 +66,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodity> catCommodity,
             IContextBase<CatCommodityGroup> catCommodityGroup,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<CatDepartment> departmentRepo) : base(repository, mapper)
+            IContextBase<CatDepartment> departmentRepo,
+            IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -87,6 +89,7 @@ namespace eFMS.API.Documentation.DL.Services
             catCommodityRepo = catCommodity;
             catCommodityGroupRepo = catCommodityGroup;
             departmentRepository = departmentRepo;
+            csMawbcontainerRepo = csMawbcontainer;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -4128,17 +4131,18 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// Get total Commission
+        /// Get total Commission with partner id
         /// </summary>
         /// <param name="hblid"></param>
         /// <returns></returns>
-        private decimal GetCommissionAmount(Guid hblid, string currency)
+        private decimal GetCommissionAmount(Guid hblid, string currency, string partnerId)
         {
             decimal com = 0;
             var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
             var charges = surCharge.Get(x => (x.Type == DocumentConstants.CHARGE_BUY_TYPE
                                            || x.Type == DocumentConstants.CHARGE_SELL_TYPE)
-                                           && x.Hblid == hblid);
+                                           && x.Hblid == hblid
+                                           && x.PaymentObjectId == partnerId);
             if (charges != null)
             {
                 foreach (var charge in charges)
@@ -4228,7 +4232,7 @@ namespace eFMS.API.Documentation.DL.Services
                             PortCode = string.Empty,
                             BuyingRate = GetBuyingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
                             SellingRate = GetSellingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
-                            ComAmount = GetCommissionAmount(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency)
+                            ComAmount = GetCommissionAmount(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency, criteria.Beneficiary)
                         });
                     }
                 }
@@ -4248,9 +4252,11 @@ namespace eFMS.API.Documentation.DL.Services
                 var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
                 var listcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
                                            || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
+                var containerLst = csMawbcontainerRepo.Get().ToLookup(x => x.Hblid);
                 foreach (var item in dataShipment)
                 {
                     var charges = listcharge[(Guid)item.HblId];
+                    var containerData = containerLst[(Guid)item.HblId];
                     var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
                     if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
                     {
@@ -4263,14 +4269,19 @@ namespace eFMS.API.Documentation.DL.Services
                             CustomSheet = string.Empty,
                             ChargeWeight = item.ChargeWeight,
                             TransactionType = item.TransactionType,
+                            ContQty = item.TransactionType.Contains('S') ? containerData.Sum(x => x.Quantity ?? 0) : 0,
                             PackageContainer = item.PackageContainer,
                             PortCode = GetPortCode((Guid)item.HblId, item.TransactionType),
                             BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
                             SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
-                            ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency)
+                            ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency, criteria.Beneficiary)
                         });
                     }
                 }
+            }
+            if (commissionData.Details.Count() == 0)
+            {
+                return null;
             }
             // Get header
             var listOrder = commissionData.Details.OrderBy(x => x.ServiceDate);
@@ -4287,8 +4298,8 @@ namespace eFMS.API.Documentation.DL.Services
                 forMonth = string.Format("{0} - {1}", startMonth?.ToString("MMM yyyy"), endMonth?.ToString("MMM yyyy"));
             }
             commissionData.ForMonth = forMonth;
-            commissionData.CustomerName = isOPSReport ? catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.ShortName
-                                                        : catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
+            commissionData.CustomerName = isOPSReport ? string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.ShortName))
+                                                        : string.Join("; ", catPartnerRepo.Get(x => criteria.CustomerId.ToUpper().Contains(x.Id.ToUpper())).Select(x => x.PartnerNameEn));
             commissionData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
             if (!string.IsNullOrEmpty(criteria.Beneficiary))

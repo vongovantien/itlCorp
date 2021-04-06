@@ -26,7 +26,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && (!customerActive || customerActive.length === 0))}">
+                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && (!customer.value || customer.value.length === 0))}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
@@ -38,10 +38,10 @@
                             (remove)="resetFormControl(customer)">
                         </app-combo-grid-virtual-scroll> -->
                         <ng-select formControlName="customer" [items]="customers | async" [(ngModel)]="customerActive"
-                            [virtualScroll]='true' [clearable]='true' class="custom"
+                            [virtualScroll]='true' [multiple]='true' [clearable]='true' class="custom"
                             bindLabel="taxCodeAbbrName" bindValue="id">
                         </ng-select>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && (!customerActive || customerActive.length === 0)">
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && (!customer.value || customer.value.length === 0)">
                             Please select customer
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                         </ng-select>
                     </div>
                     <div class="form-group" *ngIf="isCommissionIncentive"
-                            [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !partnerAccount)}">
+                            [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !this.partnerAccount.value)}">
                         <label class="form-control-label" required>
                             Beneficiary
                         </label>
@@ -80,7 +80,7 @@
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerAccount)"
                             placeholder="Select Beneficiary">
                         </app-combo-grid-virtual-scroll>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !partnerAccount">
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !this.partnerAccount.value">
                             Please select beneficiary!
                         </div>
                     </div>
