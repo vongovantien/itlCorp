@@ -4774,7 +4774,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             bool isValidate = true;
 
-            if(csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo && 
+            if(csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo  
+            && x.IsFromShipment == false && 
             (!string.IsNullOrEmpty(x.Soano) 
             || !string.IsNullOrEmpty(x.PaySoano) 
             || !string.IsNullOrEmpty(x.VoucherId)

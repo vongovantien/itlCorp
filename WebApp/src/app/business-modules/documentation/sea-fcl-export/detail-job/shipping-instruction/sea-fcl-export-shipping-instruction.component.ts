@@ -58,7 +58,8 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
                         this._documentRepo.getListHouseBillOfJob({ jobId: this.jobId }),
                         this._documentRepo.getShippingInstruction(jobId)
                     ]);
-                })
+                }),
+                takeUntil(this.ngUnsubscribe)
             ).subscribe(
                 (res) => {
                     if (!!res) {

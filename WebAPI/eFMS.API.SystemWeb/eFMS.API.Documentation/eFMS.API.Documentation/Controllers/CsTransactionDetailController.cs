@@ -193,7 +193,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if(hblId == null)
                 {
-                    if (data.Any(x => x.Hwbno == hwbno && x.Hwbno != null))
+                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno && x.Hwbno != null))
                     {
                         existedHwbNo = true;
                     }

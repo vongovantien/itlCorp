@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.DL.Services
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IContextBase<SysImage> sysImageRepository;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         ICsTransactionDetailService houseBills;
 
@@ -65,6 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserLevel> userlevelRepo,
             IOptions<WebUrl> url,
             IContextBase<SysImage> sysImageRepo
+            ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -84,6 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             webUrl = url;
             sysImageRepository = sysImageRepo;
+            currencyExchangeService = currencyExchange;
         }
 
         #region Arrival
@@ -253,6 +256,19 @@ namespace eFMS.API.Documentation.DL.Services
                 item.TransactionType = model.TransactionType;
                 item.UserCreated = item.UserModified = currentUser.UserID;
 
+                // Nếu đang tạo hbl thì tỷ giá theo ngày tạo hbl.
+                if(item.CurrencyId != DocumentConstants.CURRENCY_LOCAL && !string.IsNullOrEmpty(model.HblId))
+                {
+                    CsTransactionDetail hbl = detailTransactionRepository.Get(x => x.Id.ToString() == model.HblId)?.FirstOrDefault();
+                    if(hbl != null)
+                    {
+                        item.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, hbl.DatetimeCreated, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+                    else
+                    {
+                        item.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, DateTime.Now, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
+                }
                 freightChargeDefaultRepository.Add(item, false);
             }
             HandleState hs = freightChargeDefaultRepository.SubmitChanges();
