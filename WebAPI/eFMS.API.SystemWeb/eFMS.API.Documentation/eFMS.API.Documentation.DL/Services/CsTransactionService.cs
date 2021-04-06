@@ -3041,6 +3041,20 @@ namespace eFMS.API.Documentation.DL.Services
                             if (shipment.TransactionType.Contains("E"))
                             {
                                 hbl.IssueHbldate = model.Etd;
+                                var _onBoardStatus = hbl.OnBoardStatus.Split('\n');
+                                var status = string.Empty;
+                                foreach (var st in _onBoardStatus)
+                                {
+                                    if (DateTime.TryParse(st, out DateTime result))
+                                    {
+                                        status += model.Etd?.ToString("MMM dd, yyyy");
+                                    }
+                                    else
+                                    {
+                                        status += (st + "\n");
+                                    }
+                                }
+                                hbl.OnBoardStatus = status;
                             }
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
