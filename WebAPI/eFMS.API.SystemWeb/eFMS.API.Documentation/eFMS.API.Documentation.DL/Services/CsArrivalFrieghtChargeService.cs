@@ -65,7 +65,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysUserLevel> userlevelRepo,
             IOptions<WebUrl> url,
-            IContextBase<SysImage> sysImageRepo
+            IContextBase<SysImage> sysImageRepo,
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
