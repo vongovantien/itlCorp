@@ -1062,6 +1062,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc.Add(objInfoCreatorPartner?.Email);
                 lstCc.Add(objInfoCreator?.Email);
                 lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
                 resultSendEmail = SendMail.Send(subject, body, listEmailViewModel.ListAccountant, null, lstCc, lstBCc);
             }
             else
