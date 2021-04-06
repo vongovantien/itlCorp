@@ -146,6 +146,7 @@ namespace eFMS.API.Catalogue.Controllers
         {
             string messageDuplicate = string.Empty;
             int LengthService = model.SaleService.Split(";").ToArray().Length;
+            int LengthOffice= model.OfficeId.Split(";").ToArray().Length;
             if (model.Id == Guid.Empty)
             {
                 if (!string.IsNullOrEmpty(model.ContractNo))
@@ -161,14 +162,14 @@ namespace eFMS.API.Catalogue.Controllers
                 var DataCheck = catContractService.Get(x => x.PartnerId == model.PartnerId);
                 if(!DataCheck.Any(x=>x.SaleManId == model.SaleManId))
                 {
-                    if(DataCheck.Any(x=> LengthService == 1 ? x.SaleService.Equals(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any()))
+                    if(DataCheck.Any(x=> ( LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && ( LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) ) )
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    if (DataCheck.Where(x=>x.Active == false || x.Active == null).Any(x => x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any()))
+                    if (DataCheck.Where(x=>x.Active == false || x.Active == null).Any(x => ( LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -189,14 +190,14 @@ namespace eFMS.API.Catalogue.Controllers
                 var DataCheck = catContractService.Get(x => x.PartnerId == model.PartnerId);
                 if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
                 {
-                    if (DataCheck.Any(x => LengthService == 1 ? x.SaleService.Equals(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any() && x.Id != model.Id))
+                    if (DataCheck.Any(x => ( LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    if (DataCheck.Where(x => x.Active == false || x.Active == null).Any(x => LengthService == 1 ? x.SaleService.Equals(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && x.OfficeId.Intersect(model.OfficeId).Any() && x.Id != model.Id))
+                    if (DataCheck.Where(x => x.Active == false || x.Active == null).Any(x => LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any() && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
