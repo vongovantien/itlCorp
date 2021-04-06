@@ -522,15 +522,15 @@ namespace eFMS.API.Accounting.DL.Services
                         //Đối với phí OBH thì OriginalAmount sẽ là thành tiền sau thuế (thành tiến trước thuế + tiền thuế), OriginalAmount3 gán bằng 0
                         decimal _amount = 0;
                         //CR: 15500
-                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        if (charge.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _amount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
                         }
-                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        else if (charge.CurrencyCode == AccountingConstants.CURRENCY_USD)
                         {
                             _amount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
                         }
-                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        else if (charge.CurrencyCode == surcharge.CurrencyId)
                         {
                             _amount = surcharge.Total;
                         }
@@ -817,15 +817,15 @@ namespace eFMS.API.Accounting.DL.Services
                         //Đối với phí OBH thì OriginalAmount sẽ là thành tiền sau thuế (thành tiến trước thuế + tiền thuế), OriginalAmount3 gán bằng 0
                         decimal _amount = 0;
                         //CR: 15500
-                        if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL)
+                        if (charge.CurrencyCode == AccountingConstants.CURRENCY_LOCAL)
                         {
                             _amount = (surcharge.AmountVnd + surcharge.VatAmountVnd) ?? 0;
                         }
-                        else if (sync.CurrencyCode0 == AccountingConstants.CURRENCY_USD)
+                        else if (charge.CurrencyCode == AccountingConstants.CURRENCY_USD)
                         {
                             _amount = (surcharge.AmountUsd + surcharge.VatAmountUsd) ?? 0;
                         }
-                        else if (sync.CurrencyCode0 == surcharge.CurrencyId)
+                        else if (charge.CurrencyCode == surcharge.CurrencyId)
                         {
                             _amount = surcharge.Total;
                         }

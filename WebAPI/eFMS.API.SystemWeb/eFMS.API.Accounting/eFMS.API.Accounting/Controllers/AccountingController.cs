@@ -586,13 +586,6 @@ namespace eFMS.API.Accounting.Controllers
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
 
-                    //Debit Note / Invoice >> Send mail & Notification đến creator, current user & Department Accountant
-                    accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
-                    accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
-                    //Credit Note >> Send mail & Notification đến creator, current user & Department Accountant
-                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
-                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
-
                     //List<Guid> ids = requests.Where(w =>
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())
                     //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
@@ -707,6 +700,17 @@ namespace eFMS.API.Accounting.Controllers
                             result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
                             return BadRequest(result);
                         }
+                        else
+                        {
+                            // Sync & Update thành công >> Send Mail & Push Notification
+
+                            //Debit Note / Invoice >> Send mail & Notification đến creator, current user & Department Accountant
+                            accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
+                            accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
+                            //Credit Note >> Send mail & Notification đến creator, current user & Department Accountant
+                            accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
+                            accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
+                        }
                         return Ok(result);
                     }
                     else
@@ -764,13 +768,6 @@ namespace eFMS.API.Accounting.Controllers
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     
-                    //SOA >> Send mail & Notification đến creator, current user & Department Accountant
-                    accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
-                    accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
-                    //SOA >> Send mail & Notification đến creator, current user & Department Accountant
-                    accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
-                    accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
-
                     //List<int> ids = requests.Where(w => 
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
                     //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
@@ -884,6 +881,17 @@ namespace eFMS.API.Accounting.Controllers
                         {
                             result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
                             return BadRequest(result);
+                        }
+                        else
+                        {
+                            // Sync & Update thành công >> Send Mail & Push Notification
+
+                            //SOA >> Send mail & Notification đến creator, current user & Department Accountant
+                            accountingService.SendMailAndPushNotificationDebitToAccountant(listAdd_NVHD);
+                            accountingService.SendMailAndPushNotificationDebitToAccountant(listUpdate_NVHD);
+                            //SOA >> Send mail & Notification đến creator, current user & Department Accountant
+                            accountingService.SendMailAndPushNotificationToAccountant(listAdd_NVCP);
+                            accountingService.SendMailAndPushNotificationToAccountant(listUpdate_NVCP);
                         }
                         return Ok(result);
                     }
