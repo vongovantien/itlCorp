@@ -582,6 +582,20 @@ namespace eFMS.API.Documentation.DL.Services
                     job.DatetimeModified = DateTime.Now;
                     job.UserModified = currentUser.UserID;
                     hs = DataContext.Update(job, x => x.Id == jobId);
+
+                    if (hs.Success)
+                    {
+                        var houseBills = csTransactionDetailRepo.Get(x => x.JobId == jobId);
+                        foreach (var houseBill in houseBills)
+                        {
+                            //Xóa Job >> Xóa tất cả các phí của Job [Andy - 15611 - 06/04/2021]
+                            var surcharges = csShipmentSurchargeRepo.Get(x => x.Hblid == houseBill.Id);
+                            foreach (var surcharge in surcharges)
+                            {
+                                csShipmentSurchargeRepo.Delete(x => x.Id == surcharge.Id);
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception ex)
