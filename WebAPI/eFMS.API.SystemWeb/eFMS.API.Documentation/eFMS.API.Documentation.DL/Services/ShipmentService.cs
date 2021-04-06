@@ -4262,6 +4262,8 @@ namespace eFMS.API.Documentation.DL.Services
                             MBLNo = string.Empty,
                             CustomSheet = string.Empty,
                             ChargeWeight = item.ChargeWeight,
+                            TransactionType = item.TransactionType,
+                            PackageContainer = item.PackageContainer,
                             PortCode = GetPortCode((Guid)item.HblId, item.TransactionType),
                             BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
                             SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),

@@ -3947,45 +3947,52 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.SetDataTable();
                     excel.SetData("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
                     excel.SetData("HBLNo", item.HBLNo);
-                    excel.SetData("ChargeWeight", item.ChargeWeight);
+                    if (item.TransactionType.Contains('A'))
+                    {
+                        excel.SetData("ChargeWeight", item.ChargeWeight);
+                    }
+                    else
+                    {
+                        excel.SetData("ChargeWeight", item.PackageContainer);
+                    }
                     excel.SetData("PortCode", item.PortCode);
                     excel.SetData("BuyingRate", item.BuyingRate);
                     excel.SetData("SellingRate", item.SellingRate);
                     // Gross profit before commission
                     var _statement = string.Format("F{0}-E{0}", startRow);
-                    excel.SetData("GrossBefore", _statement);
+                    excel.SetFormula("GrossBefore", _statement);
                     // Rate of com
                     _statement = string.Format("IF(C{0}=0,0,I{0}/C{0})", startRow);
-                    excel.SetData("RateOfCom", _statement);
+                    excel.SetFormula("RateOfCom", _statement);
                     // Com Amount
                     excel.SetData("ComAmount", item.ComAmount);
                     // Gross profit after commission
                     _statement = string.Format("G{0}-I{0}", startRow);
-                    excel.SetData("GrossAfter", _statement);
+                    excel.SetFormula("GrossAfter", _statement);
                     // Commission cap
                     _statement = string.Format("J{0}*(40%/60%)", startRow);
-                    excel.SetData("ComCap", _statement);
+                    excel.SetFormula("ComCap", _statement);
                     // %Com
                     _statement = string.Format("IF(J{0}=0,0,I{0}/(J{0}/60%))", startRow);
-                    excel.SetData("ComPercent", _statement);
+                    excel.SetFormula("ComPercent", _statement);
                     // VND
                     _statement = string.Format("I{0}*N10", startRow);
-                    excel.SetData("AmountVND", _statement);
+                    excel.SetFormula("AmountVND", _statement);
                     // Com over cap
                     _statement = string.Format("IF(I{0}-K{0}<0,0,(I{0}-K{0})*N10)", startRow);
-                    excel.SetData("ComOverCap", _statement);
+                    excel.SetFormula("ComOverCap", _statement);
                     // CIT charged on overcap
                     _statement = string.Format("N{0}*25%", startRow);
-                    excel.SetData("CITCharged", _statement);
+                    excel.SetFormula("CITCharged", _statement);
                     // Entitled COM
                     _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
-                    excel.SetData("EntitledCom", _statement);
+                    excel.SetFormula("EntitledCom", _statement);
                     // PIT (30%)
                     _statement = string.Format("P{0}*10%", startRow);
-                    excel.SetData("PIT", _statement);
+                    excel.SetFormula("PIT", _statement);
                     // Net due to customers
                     _statement = string.Format("P{0}-Q{0}", startRow);
-                    excel.SetData("Net", _statement);
+                    excel.SetFormula("Net", _statement);
                     startRow += 1;
                 }
 

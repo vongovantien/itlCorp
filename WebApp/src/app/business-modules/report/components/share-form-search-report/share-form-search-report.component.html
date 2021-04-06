@@ -69,8 +69,9 @@
                             bindLabel="id" bindValue="id">
                         </ng-select>
                     </div>
-                    <div class="form-group" *ngIf="isCommissionIncentive">
-                        <label class="form-control-label" for="">
+                    <div class="form-group" *ngIf="isCommissionIncentive"
+                            [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !partnerAccount)}">
+                        <label class="form-control-label" required>
                             Beneficiary
                         </label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acPartner')"
@@ -79,6 +80,9 @@
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerAccount)"
                             placeholder="Select Beneficiary">
                         </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !partnerAccount">
+                            Please select beneficiary!
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
