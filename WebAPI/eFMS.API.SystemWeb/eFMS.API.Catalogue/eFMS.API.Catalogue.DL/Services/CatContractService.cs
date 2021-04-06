@@ -110,7 +110,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     saleman.CompanyNameVn = company.BunameVn;
                 }
                 var officeIds = saleman.OfficeId?.Split(";").ToList();
-                if(officeIds != null)
+                if (officeIds != null)
                 {
                     if (officeIds.Count() > 0)
                     {
@@ -120,7 +120,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         }
                     }
                 }
-                if(saleman.OfficeNameAbbr != null)
+                if (saleman.OfficeNameAbbr != null)
                 {
                     if (saleman.OfficeNameAbbr.Length > 0)
                     {
@@ -252,7 +252,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     ClearCache();
                     Get();
                 }
-             
+
             }
             return hs;
         }
@@ -374,7 +374,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
                 }
-               
+
             }
             return hsPartner;
         }
@@ -497,9 +497,9 @@ namespace eFMS.API.Catalogue.DL.Services
             var isUpdateDone = new HandleState();
             var objUpdate = DataContext.First(x => x.Id == id);
             var DataCheckExisted = CheckExistedContractActive(id, partnerId);
-            if(DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false )
+            if (DataCheckExisted != null && DataCheckExisted.Count() > 0 && objUpdate.Active == false)
             {
-                foreach(var item in DataCheckExisted)
+                foreach (var item in DataCheckExisted)
                 {
                     item.UserModified = currentUser.UserID;
                     item.DatetimeModified = DateTime.Now;
@@ -543,7 +543,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return isUpdateDone;
         }
 
-        public IQueryable<CatContract> CheckExistedContractActive(Guid id , string partnerId)
+        public IQueryable<CatContract> CheckExistedContractActive(Guid id, string partnerId)
         {
             var contract = DataContext.Get(x => x.Id == id).FirstOrDefault();
             var ContractActive = DataContext.Where(x => x.Active == true && x.PartnerId == partnerId);
@@ -553,7 +553,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 return ContractActive;
             }
-            return null ;
+            return null;
         }
 
         public HandleState Import(List<CatContractImportModel> data)
@@ -940,9 +940,9 @@ namespace eFMS.API.Catalogue.DL.Services
             ListEmailViewModel EmailModel = new ListEmailViewModel();
             var arrayOffice = OfficeId.Split(";").ToArray();
             int lengthOffice = arrayOffice.Length;
- 
-            var DataHeadOffice = sysOfficeRepository.Get(x => x.OfficeType == "Head" && arrayOffice.Contains(x.Id.ToString().ToLower()) ).FirstOrDefault();
-            var DataBranchOffice = sysOfficeRepository.Get(x => x.OfficeType == "Branch" && arrayOffice.Contains(x.Id.ToString().ToLower())).Select(t=>t.Id).ToList();
+
+            var DataHeadOffice = sysOfficeRepository.Get(x => x.OfficeType == "Head" && arrayOffice.Contains(x.Id.ToString().ToLower())).FirstOrDefault();
+            var DataBranchOffice = sysOfficeRepository.Get(x => x.OfficeType == "Branch" && arrayOffice.Contains(x.Id.ToString().ToLower())).Select(t => t.Id).ToList();
 
             if (lengthOffice == 1)
             {
@@ -968,13 +968,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstAR = listEmailAR.Split(";").ToList();
 
                 // list mail cc Accountant, AR
-                var listEmailCCAcountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid) x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAcountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
 
-                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid) x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAR = listEmailCCAR?.Split(";").ToList();
             }
-            EmailModel.ListAccountant = lstAccountant?.Where(t=> !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListAccountant = lstAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
             EmailModel.ListCCAccountant = lstCCAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             EmailModel.ListAR = lstAR?.Where(t => !string.IsNullOrEmpty(t)).ToList();
@@ -1021,8 +1021,8 @@ namespace eFMS.API.Catalogue.DL.Services
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
             string urlToSend = string.Empty;
             string UrlClone = string.Copy(ApiUrl.Value.Url);
-            List<string> lstCc = new List<string>{};
-            List<string> lstTo = new List<string>{};
+            List<string> lstCc = new List<string> { };
+            List<string> lstTo = new List<string> { };
             bool resultSendEmail = false;
             if (type == "active")
             {
@@ -1061,6 +1061,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
                 lstCc.Add(objInfoCreator?.Email);
+                lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
                 resultSendEmail = SendMail.Send(subject, body, listEmailViewModel.ListAccountant, null, lstCc, lstBCc);
             }
             else
@@ -1101,12 +1102,12 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc.AddRange(listEmailViewModel.ListCCAR);
 
                 }
-
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
                 lstCc.Add(objInfoModified?.Email);
                 lstCc.Add(objInfoCreator?.Email);
-                
+                lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
                 resultSendEmail = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
             }
 
@@ -1180,11 +1181,15 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
             List<string> lstCC = new List<string>();
 
+
             lstTo.Add(salesmanObj?.Email);
             lstCC.Add(salesmanObj?.Email);
             lstCC.Add(userCreatedObj?.Email);
+            lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
             //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
-            bool result = SendMail.Send(subject, body, lstTo, null, lstCC, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
                 SentUser = SendMail._emailFrom,
@@ -1279,8 +1284,11 @@ namespace eFMS.API.Catalogue.DL.Services
 
             urlToSend = UrlClone.Replace("Catalogue", "");
             body = body.Replace("[logoEFMS]", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+
             lstCc.Add(objInfoCreator?.Email);
             lstCc.Add(objInfoSaleman?.Email);
+            lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
+
             bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
@@ -1378,7 +1386,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 var hs = new HandleState();
                 ImageHelper.CreateDirectoryFile(string.Empty, model.PartnerId);
                 List<SysImage> resultUrls = new List<SysImage>();
-                fileName = model.Files.FileName.Replace("+","_");
+                fileName = model.Files.FileName.Replace("+", "_");
                 string objectId = model.PartnerId;
                 await ImageHelper.SaveFile(fileName, string.Empty, objectId, model.Files);
                 string urlImage = path + "/files/" + objectId + "/" + fileName;
