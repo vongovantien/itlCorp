@@ -1316,6 +1316,25 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             return null;
         }
+        public Stream GenerateShipmentOverviewFCLExcel(ExportShipmentOverviewFCL overview, string fileName)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         public void BinddingDataShipmentOverview(ExcelWorksheet workSheet, List<ExportShipmentOverview> overview, GeneralReportCriteria criteria)
         {
