@@ -97,8 +97,8 @@
                     </div>
                 </ng-container>
 
-                <div class="table-wrapper table-scrollable" *ngIf="TYPE === 'LIST'">
-                    <table class="table table-brand table-hover dataTable table-striped">
+                <div class="table-horizontal" *ngIf="TYPE === 'LIST'">
+                    <table class="table table-brand table-hover table-striped">
                         <thead app-table-header [headers]="headers" (onClick)="sortSurcharge($event)">
                             <th class="m--w-50 first">
                                 <label class="m-checkbox">
