@@ -66,10 +66,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
             { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
         ];
+
     }
 
     sortLocal(sort: string): void {
         this.contracts = this._sortService.sort(this.contracts, sort, this.order);
+    }
+    ngAfterViewInit() {
+        this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
     }
 
     gotoCreateContract() {
