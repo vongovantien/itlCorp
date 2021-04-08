@@ -69,7 +69,6 @@ export class AppComponent {
         ).pipe(
             filter((event) => event instanceof NavigationEnd),
             tap((event: NavigationEnd) => {
-                console.log(event);
                 gtag('config', environment.GOOGLE_ANALYTICS_ID, { 'page_path': event.urlAfterRedirects });
             }),
             map(() => this._activatedRoute),
