@@ -17,6 +17,7 @@ using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
@@ -36,13 +37,16 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IActionFuncLogService actionFuncLogService;
         private readonly ICurrentUser currentUser;
         private readonly BravoLoginModel loginInfo;
+        private readonly ISysImageService sysFileService;
 
         public AccountingController(
             IStringLocalizer<LanguageSub> localizer,
             IAccountingService service,
             IOptions<ESBUrl> appSettings,
             IActionFuncLogService actionFuncLog,
-            ICurrentUser currUser
+            ICurrentUser currUser,
+            ISysImageService SysImageService
+
             )
         {
             stringLocalizer = localizer;
@@ -55,6 +59,8 @@ namespace eFMS.API.Accounting.Controllers
                 UserName = "bravo",
                 Password = "br@vopro"
             };
+
+            sysFileService = SysImageService;
         }
 
         #region -- Test API --
@@ -1167,6 +1173,45 @@ namespace eFMS.API.Accounting.Controllers
         {
             var result = accountingService.CheckVoucherSynced(id);
             return Ok(result);
+        }
+
+        [HttpPut("UploadAttachedFiles/{folder}/{id}")]
+        [Authorize]
+        public async Task<IActionResult> UploadFiles(List<IFormFile> files, Guid id, string folder, string child = null)
+        {
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = files,
+                FolderName = folder,
+                Id = id,
+                Child = child
+
+            };
+            HandleState hs = await sysFileService.UploadFiles(model);
+            if (hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true});
+            }
+            return BadRequest(hs);
+        }
+
+        [HttpGet("GetAttachedFiles/{folder}/{id}")]
+        public IActionResult GetFiles(string folder, Guid id, string child = null)
+        {
+            List<SysImageModel> result = sysFileService.Get(x => x.Folder == folder && x.ObjectId == id.ToString() && x.ChildId == child).ToList();
+            return Ok(result);
+        }
+
+        [HttpDelete("DeleteAttachedFile/{folder}/{id}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteAttachedFile(string folder, Guid id)
+        {
+            HandleState hs = await sysFileService.DeleteFile(folder,id);
+            if(hs.Success)
+            {
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
+            }
+            return BadRequest(hs);
         }
     }     
 }

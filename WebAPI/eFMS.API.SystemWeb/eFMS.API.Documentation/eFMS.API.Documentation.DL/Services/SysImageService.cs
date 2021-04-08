@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -41,7 +42,8 @@ namespace eFMS.API.Documentation.DL.Services
             var result = DataContext.Delete(x => x.Id == id);
             if (result.Success)
             {
-                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                string fileName = Path.GetFileName(item.Url);
+                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + fileName, "Shipment");
             }
             return result;
         }

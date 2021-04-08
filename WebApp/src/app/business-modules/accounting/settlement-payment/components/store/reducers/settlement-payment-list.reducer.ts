@@ -19,7 +19,7 @@ export const initialState: SettlePaymentListState = {
     pagingData: { page: 1, pageSize: 15 }
 };
 
-const settlementPaymentReducer = createReducer(
+const settlementPaymentListReducer = createReducer(
     initialState,
     on(Types.SearchListSettlePayment, (state: SettlePaymentListState, payload: any) => ({
         ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
@@ -36,6 +36,6 @@ const settlementPaymentReducer = createReducer(
     )
 );
 
-export function reducer(state: any | undefined, action: Action) {
-    return settlementPaymentReducer(state, action);
+export function settlePaymentListreducer(state: any | undefined, action: Action) {
+    return settlementPaymentListReducer(state, action);
 };

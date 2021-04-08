@@ -60,6 +60,9 @@
             <tab heading="Authorize Letter" (selectTab)="onSelectTab('AUTHORIZE')">
                 <hbl-delivery-order [isAir]="true"></hbl-delivery-order>
             </tab>
+            <tab heading="Proof Of Delivery" (selectTab)="onSelectTab('PROOF')">
+                <hbl-proof-of-delivery></hbl-proof-of-delivery>
+            </tab>
         </tabset>
     </div>
 </div>

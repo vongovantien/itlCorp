@@ -38,6 +38,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<SysActionFuncLogModel, SysActionFuncLog>();
             CreateMap<CatContractModel, CatContract>();
             CreateMap<AcctReceipt, AcctReceiptModel>().ReverseMap();
+            CreateMap<SysImage, SysImageModel>().ReverseMap();
+
         }
     }
 }

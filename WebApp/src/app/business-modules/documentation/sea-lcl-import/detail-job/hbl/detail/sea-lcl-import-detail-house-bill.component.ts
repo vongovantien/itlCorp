@@ -20,7 +20,8 @@ import isUUID from 'validator/lib/isUUID';
 enum HBL_TAB {
     DETAIL = 'DETAIL',
     ARRIVAL = 'ARRIVAL',
-    DELIVERY = 'DELIVERY'
+    DELIVERY = 'DELIVERY',
+    PROOF = 'PROOF'
 }
 
 @Component({
@@ -118,6 +119,11 @@ export class SeaLCLImportDetailHouseBillComponent extends SeaLCLImportCreateHous
                 } else {
                     return;
                 }
+                break;
+            }
+            // * Update Proof Of Delivery.
+            case HBL_TAB.PROOF: {
+                this.proofOfDeliveryComponent.saveProofOfDelivery();
                 break;
             }
             default:

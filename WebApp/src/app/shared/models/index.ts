@@ -88,7 +88,7 @@ export * from './system/lock-shipment-setting';
 export * from './system/flow-setting';
 export * from './system/employee';
 export { SysNotification, SysUserNotification, SysUserNotificationModel } from './system/sysUserNotification';
-
+export * from './system/sysimage';
 
 export * from './report/crystal.model';
 

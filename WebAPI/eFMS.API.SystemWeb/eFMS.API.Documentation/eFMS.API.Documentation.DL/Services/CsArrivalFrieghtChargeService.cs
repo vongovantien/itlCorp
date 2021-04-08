@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using eFMS.API.Catalogue.DL.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
@@ -12,9 +15,11 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -36,6 +41,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
+        private readonly IOptions<WebUrl> webUrl;
+        private readonly IContextBase<SysImage> sysImageRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
         ICsTransactionDetailService houseBills;
@@ -57,6 +64,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysUserLevel> userlevelRepo,
+            IOptions<WebUrl> url,
+            IContextBase<SysImage> sysImageRepo,
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
         {
@@ -75,6 +84,8 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepo = sysOffice;
             companyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
+            webUrl = url;
+            sysImageRepository = sysImageRepo;
             currencyExchangeService = currencyExchange;
         }
 
@@ -705,6 +716,20 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
+        public ProofOfDeliveryViewModel GetProofOfDelivery(Guid hblId)
+        {
+            ProofOfDeliveryViewModel result = new ProofOfDeliveryViewModel
+            {
+                HblId = hblId
+            };
+            var data = detailTransactionRepository.Get(x => x.Id == hblId)?.FirstOrDefault();
+            result.DeliveryDate = data?.DeliveryDate;
+            result.ReferenceNo = data?.ReferenceNoProof;
+            result.Note = data?.Note;
+            result.DeliveryPerson = data?.DeliveryPerson;
+            return result;
+        }
+
         public CsDeliveryOrderDefaultModel GetDeliveryOrderDefault(string transactionType, string userDefault)
         {
             CsDeliveryOrderDefaultModel result = null;
@@ -768,6 +793,90 @@ namespace eFMS.API.Documentation.DL.Services
             var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HBLID);
             return result;
         }
+
+        public HandleState UpdateProofOfDelivery(ProofOfDeliveryViewModel model)
+        {
+            var detailTransaction = detailTransactionRepository.First(x => x.Id == model.HblId);
+            if (detailTransaction == null) return new HandleState(stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value);
+            detailTransaction.ReferenceNoProof = model.ReferenceNo;
+            detailTransaction.DeliveryDate = model.DeliveryDate;
+            detailTransaction.DeliveryPerson = model.DeliveryPerson;
+            detailTransaction.Note = model.Note;
+            var result = detailTransactionRepository.Update(detailTransaction, x => x.Id == model.HblId);
+            return result;
+        }
+
+        public SysImage GetFileProofOfDelivery(Guid hblId)
+        {
+            var result = sysImageRepository.Get(x => x.ObjectId == hblId.ToString()).OrderByDescending(x => x.DateTimeCreated).FirstOrDefault();
+            return result;
+        }
+
+        public async Task<ResultHandle> UploadProofOfDeliveryFile(ProofDeliveryFileUploadModel model)
+        {
+            return await WriteFile(model);
+        }
+
+        private async Task<ResultHandle> WriteFile(ProofDeliveryFileUploadModel model)
+        {
+            string fileName = "";
+            //string folderName = "images";
+            string path = this.webUrl.Value.Url;
+            try
+            {
+                var list = new List<SysImage>();
+                /* Kiểm tra các thư mục có tồn tại */
+                var hs = new HandleState();
+                ImageHelper.CreateDirectoryFile(model.FolderName, model.HblId.ToString());
+                List<SysImage> resultUrls = new List<SysImage>();
+                fileName = model.Files.FileName.Contains("+") ? model.Files.FileName.Replace("+", "_") : model.Files.FileName;
+                string objectId = model.HblId.ToString();
+                await ImageHelper.SaveFile(fileName, model.FolderName, objectId, model.Files);
+                string urlImage = path + "/" + model.FolderName + "/files/" + objectId + "/" + fileName;
+                var sysImage = new SysImage
+                {
+                    Id = Guid.NewGuid(),
+                    Url = urlImage,
+                    Name = fileName,
+                    Folder = model.FolderName ?? "Shipment",
+                    ObjectId = model.HblId.ToString(),
+                    UserCreated = currentUser.UserName, //admin.
+                    UserModified = currentUser.UserName,
+                    DateTimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now
+                };
+                resultUrls.Add(sysImage);
+                if (!sysImageRepository.Any(x => x.ObjectId == objectId && x.Url == urlImage))
+                {
+                    list.Add(sysImage);
+                }
+
+                if (list.Count > 0)
+                {
+                    hs = await sysImageRepository.AddAsync(list);
+                }
+                return new ResultHandle { Data = resultUrls, Status = hs.Success, Message = hs.Message?.ToString() };
+
+            }
+            catch (Exception ex)
+            {
+                return new ResultHandle { Data = null, Status = false, Message = ex.Message };
+            }
+        }
+
+
+        public async Task<HandleState> DeleteFilePOD(Guid id)
+        {
+            var item = sysImageRepository.Get(x => x.Id == id).FirstOrDefault();
+            if (item == null) return new HandleState("Not found data");
+            var result = sysImageRepository.Delete(x => x.Id == id);
+            if (result.Success)
+            {
+                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, "Shipment");
+            }
+            return result;
+        }
+
 
         public Crystal PreviewDeliveryOrder(Guid hblid)
         {

@@ -9,7 +9,7 @@ export const environment = {
                 DOCUMENTATION: "test.api-efms.itlvn.com/Documentation",
                 // DOCUMENTATION: "localhost:44366",
                 CATALOGUE: "test.api-efms.itlvn.com/Catalogue",
-                // CATALOGUE: "localhost:44361",
+                //CATALOGUE: "localhost:44361",
                 OPERATION: "test.api-efms.itlvn.com/Operation",
                 // OPERATION: "localhost:44365"
                 SYSTEM: "test.api-efms.itlvn.com/System",
@@ -26,10 +26,8 @@ export const environment = {
                 EXPORT_CRYSTAL: "http://test.api-efms.itlvn.com/ReportPreview/ExportCrystal.aspx",
                 PARTNER_API: "test.api-efms.itlvn.com/partner"
         },
-
         AUTHORIZATION:
         {
                 requireHttps: false
         },
 };
-

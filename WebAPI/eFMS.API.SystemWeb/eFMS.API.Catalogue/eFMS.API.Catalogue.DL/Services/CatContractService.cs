@@ -9,6 +9,7 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.IdentityServer.DL.IService;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
@@ -40,6 +41,8 @@ namespace eFMS.API.Catalogue.DL.Services
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IOptions<WebUrl> webUrl;
         private readonly IOptions<ApiUrl> ApiUrl;
+        readonly IUserPermissionService permissionService;
+
 
 
         public CatContractService(
@@ -58,6 +61,7 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<OpsTransaction> opsRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IUserPermissionService perService,
             ICacheServiceBase<CatContract> cacheService, IOptions<WebUrl> url, IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -75,6 +79,7 @@ namespace eFMS.API.Catalogue.DL.Services
             ApiUrl = apiurl;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
             userlevelRepository = userlevelRepo;
+            permissionService = perService;
 
         }
 
@@ -148,16 +153,8 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             PermissionRange rangeSearch = 0;
+            rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
 
-
-            if (partnerType == "Customer" || partnerType == "Agent")
-            {
-                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            }
-            else
-            {
-                rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            }
             switch (rangeSearch)
             {
                 case PermissionRange.None:
@@ -457,6 +454,29 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var result = DataContext.First(x => x.Id == id);
             CatContractModel data = mapper.Map<CatContractModel>(result);
+            string PartnerType = catPartnerRepository.Get(x => x.Id == result.PartnerId).Select(t => t.PartnerType).FirstOrDefault();
+
+            ICurrentUser _user = null;
+            switch (PartnerType)
+            {
+                case "Customer":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialCustomer);
+                    break;
+                case "Agent":
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.commercialAgent);
+                    break;
+                default:
+                    _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catPartnerdata);//Set default
+                    break;
+            }
+            var specialActions = _user.UserMenuPermission.SpecialActions;
+            if (specialActions.Count > 0)
+            {
+                if (specialActions.FirstOrDefault(x => x.Action == "DetailAgreement")?.IsAllow == true || result.UserCreated == currentUser.UserID || result.SaleManId == currentUser.UserID)
+                {
+                    data.ViewDetail = true;
+                }
+            }
             if (data != null)
             {
                 data.UserCreatedName = sysUserRepository.Get(x => x.Id == result.UserCreated).Select(t => t.Username).FirstOrDefault();
@@ -1042,6 +1062,8 @@ namespace eFMS.API.Catalogue.DL.Services
             var contract = DataContext.Get(x => x.Id == new Guid(contractId)).FirstOrDefault();
             string employeeId = sysUserRepository.Get(x => x.Id == contract.SaleManId).Select(t => t.EmployeeId).FirstOrDefault();
             var salesmanObj = sysEmployeeRepository.Get(e => e.Id == employeeId)?.FirstOrDefault();
+            string employeeIdUserCreated = sysUserRepository.Get(x => x.Id == contract.UserCreated).Select(t => t.EmployeeId).FirstOrDefault();
+            var userCreatedObj = sysEmployeeRepository.Get(e => e.Id == employeeIdUserCreated)?.FirstOrDefault();
             string urlToSend = string.Empty;
             contract.SaleService = GetContractServicesName(contract.SaleService);
 
@@ -1088,7 +1110,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstTo = new List<string>();
 
             lstTo.Add(salesmanObj?.Email);
-
+            lstTo.Add(userCreatedObj?.Email);
             //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
             bool result = SendMail.Send(subject, body, lstTo, null, null, lstCc);
             var logSendMail = new SysSentEmailHistory
@@ -1324,7 +1346,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var result = sysImageRepository.Delete(x => x.Id == id);
             if (result.Success)
             {
-                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                var hs = await ImageHelper.DeleteFile(item.ObjectId + "\\" + item.Name, string.Empty);
             }
             return result;
         }
