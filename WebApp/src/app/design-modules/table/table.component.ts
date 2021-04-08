@@ -7,7 +7,7 @@ import { JobConstants } from '@constants';
 @Component({
     selector: 'app-design-table',
     templateUrl: './table.component.html',
-    styleUrls: ['./table.component.sass']
+    styleUrls: ['./table.component.scss']
 })
 export class TableComponent implements OnInit {
 
