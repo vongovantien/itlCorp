@@ -557,6 +557,23 @@ table.dataTable {
     }
 }
 
+.table-horizontal {
+    overflow: auto;
+    th {
+        position: -webkit-sticky !important;
+        position: sticky !important;
+        top: 0;
+        z-index: 2;
+    }
+    &:focus {
+        border: none;
+        outline: none;
+    }
+    &:nth-child(1) {
+        max-height: 50em;
+    }
+}
+
 .tatable__pager-size {
     max-width: 190px;
 }
