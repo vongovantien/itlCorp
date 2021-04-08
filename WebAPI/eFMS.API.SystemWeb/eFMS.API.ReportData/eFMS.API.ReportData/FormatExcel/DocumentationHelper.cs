@@ -1316,7 +1316,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             return null;
         }
-        public Stream GenerateShipmentOverviewFCLExcel(ExportShipmentOverviewFCL overview, string fileName)
+        public Stream GenerateShipmentOverviewFCLExcell(List<ExportShipmentOverviewFCL> overviews, GeneralReportCriteria criteria, string fileName)
         {
             try
             {
@@ -1327,7 +1327,128 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
-                
+                excel.SetData("FromDate", "From " + Convert.ToDateTime( criteria.ServiceDateFrom).ToShortDateString() + " To " + Convert.ToDateTime(criteria.ServiceDateTo).ToShortDateString());
+
+                int j = 0;
+                int startRow = 11;
+                excel.StartDetailTable = startRow;
+                excel.SetData("sumCont20", overviews.Select(t => t.Cont20).Sum());
+                excel.SetData("sumCont40", overviews.Select(t => t.Cont40).Sum());
+                excel.SetData("sumCont40HC", overviews.Select(t => t.Cont40HC).Sum());
+                excel.SetData("sumcont45", overviews.Select(t => t.Cont45).Sum());
+                excel.SetData("sumGW", overviews.Select(t => t.GW).Sum());
+                excel.SetData("sumCW", overviews.Select(t => t.CW).Sum());
+                excel.SetData("sumCBM", overviews.Select(t => t.CBM).Sum());
+
+                // total revenue
+                excel.SetData("sumSellFreight", overviews.Select(t => t.TotalSellFreight).Sum());
+                excel.SetData("sumSellTerminal", overviews.Select(t => t.TotalSellTerminal).Sum());
+                excel.SetData("sumSellBillFee", overviews.Select(t => t.TotalSellBillFee).Sum());
+                excel.SetData("sumSellSealFee", overviews.Select(t => t.TotalSellContainerSealFee).Sum());
+                excel.SetData("sumSellRelease", overviews.Select(t => t.TotalSellTelexRelease).Sum());
+                excel.SetData("sumSellAutomated", overviews.Select(t => t.TotalSellAutomated).Sum());
+                excel.SetData("sumSellVGM", overviews.Select(t => t.TotalSellVGM).Sum());
+                excel.SetData("sumSellBookingFee", overviews.Select(t => t.TotalSellBookingFee).Sum());
+                excel.SetData("sumSellOther", overviews.Select(t => t.TotalSellOthers).Sum());
+                excel.SetData("sumSellTotal", overviews.Select(t => t.TotalSell).Sum());
+
+                // total costing
+                excel.SetData("sumBuyFreight", overviews.Select(t => t.TotalBuyFreight).Sum());
+                excel.SetData("sumBuyTerminal", overviews.Select(t => t.TotalBuyTerminal).Sum());
+                excel.SetData("sumBuyBillFee", overviews.Select(t => t.TotalBuyBillFee).Sum());
+                excel.SetData("sumBuySealFee", overviews.Select(t => t.TotalBuyContainerSealFee).Sum());
+                excel.SetData("sumBuyRelease", overviews.Select(t => t.TotalBuyTelexRelease).Sum());
+                excel.SetData("sumBuyAutomated", overviews.Select(t => t.TotalBuyAutomated).Sum());
+                excel.SetData("sumBuyVGM", overviews.Select(t => t.TotalBuyVGM).Sum());
+                excel.SetData("sumBuyBookingFee", overviews.Select(t => t.TotalBuyBookingFee).Sum());
+                excel.SetData("sumBuyOther", overviews.Select(t => t.TotalBuyOthers).Sum());
+                excel.SetData("sumBuyTotal", overviews.Select(t => t.TotalBuy).Sum());
+
+                excel.SetData("sumProfit", overviews.Select(t => t.Profit).Sum());
+                excel.SetData("sumObhP", overviews.Select(t => t.AmountOBH).Sum());
+                excel.SetData("sumObhR", overviews.Select(t => t.AmountOBH).Sum());
+
+                foreach (var item in overviews)
+                {
+                    excel.SetDataTable();
+                    excel.SetData("no", j + 1);
+                    excel.SetData("referenceNo", item.BKRefNo);
+                    excel.SetData("service", item.ServiceName);
+                    excel.SetData("jobNo", item.JobNo);
+                    excel.SetData("etd", item.etd?.ToString("dd/MM/yyyy"));
+                    excel.SetData("eta", item.eta?.ToString("dd/MM/yyyy"));
+                    excel.SetData("vessel", item.FlightNo);
+                    excel.SetData("mbl", item.MblMawb);
+                    excel.SetData("hbl", item.HblHawb);
+                    excel.SetData("polpod", item.PolPod);
+                    excel.SetData("destination", item.FinalDestination);
+                    excel.SetData("carrier", item.Carrier);
+                    excel.SetData("agent", item.Agent);
+                    excel.SetData("shipper", item.Shipper);
+                    excel.SetData("shipper", item.Shipper);
+                    excel.SetData("consignee", item.Consignee);
+                    excel.SetData("shipmentType", item.ShipmentType);
+                    excel.SetData("saleman", item.Salesman);
+                    excel.SetData("noinationparty", item.AgentName);
+
+                    excel.SetData("qty", item.QTy);
+                    excel.SetData("cont20", item.Cont20);
+                    excel.SetData("cont40", item.Cont40);
+                    excel.SetData("cont40HC", item.Cont40HC);
+                    excel.SetData("cont45", item.Cont45);
+                    excel.SetData("gw", item.GW);
+                    excel.SetData("cw", item.CW);
+                    excel.SetData("cbm", item.CBM);
+                    excel.SetData("sellFreight", item.TotalSellFreight);
+                    excel.SetData("sellTerminal", item.TotalSellTerminal);
+                    excel.SetData("sellBillFee", item.TotalSellBillFee);
+                    excel.SetData("sellSealFee", item.TotalSellContainerSealFee);
+                    excel.SetData("sellRelease", item.TotalSellTelexRelease);
+                    excel.SetData("sellAutomated", item.TotalSellAutomated);
+                    excel.SetData("sellVGM", item.TotalSellVGM);
+                    excel.SetData("sellBookingFee", item.TotalSellBookingFee);
+                    excel.SetData("sellOther", item.TotalSellOthers);
+                    excel.SetData("totalSell", item.TotalSell);
+
+                    excel.SetData("buyFreight", item.TotalBuyFreight);
+                    excel.SetData("buyTerminal", item.TotalBuyTerminal);
+                    excel.SetData("buyBillFee", item.TotalBuyBillFee);
+                    excel.SetData("buySealFee", item.TotalBuyContainerSealFee);
+                    excel.SetData("buyRelease", item.TotalBuyTelexRelease);
+                    excel.SetData("buyAutomated", item.TotalBuyAutomated);
+                    excel.SetData("buyVGM", item.TotalBuyVGM);
+                    excel.SetData("buyBookingFee", item.TotalBuyBookingFee);
+                    excel.SetData("buyOther", item.TotalBuyOthers);
+                    excel.SetData("totalBuy", item.TotalBuy);
+                    excel.SetData("profit", item.Profit);
+                    excel.SetData("obhp", item.AmountOBH);
+                    excel.SetData("obhr", item.AmountOBH);
+
+                    excel.Worksheet.Cells[j + startRow, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 31].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 32].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 33].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 34].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 35].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 36].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 37].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 38].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 39].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 40].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 41].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 42].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 43].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 44].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 45].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 46].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 47].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 48].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    j++;
+                }
+
                 return excel.ExcelStream();
             }
             catch (Exception ex)

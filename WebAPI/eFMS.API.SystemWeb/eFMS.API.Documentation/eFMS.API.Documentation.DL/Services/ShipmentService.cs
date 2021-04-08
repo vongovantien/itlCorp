@@ -1882,6 +1882,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
                 data.BKRefNo = item.BookingNo;
                 data.ReferenceNo = item.ReferenceNo;
+                data.FinalDestination = item.FinalDestination;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();

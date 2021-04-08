@@ -67,5 +67,7 @@ namespace eFMS.API.ReportData.Models
         public decimal? TotalCustomSell { get; set; }
         public decimal? TotalCustomBuy { get; set; }
         public string ReferenceNo { get; set; }
+        public string FinalDestination { get; set; }
+
     }
 }

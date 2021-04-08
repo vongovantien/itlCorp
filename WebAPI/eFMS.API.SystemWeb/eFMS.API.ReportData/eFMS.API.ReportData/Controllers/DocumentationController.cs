@@ -326,6 +326,46 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// Export Shipment Overview
+        /// </summary>
+        /// <param name="criteria">Id of shipment</param>
+        /// <returns></returns>
+        [Route("ExportShipmentOverviewFCL")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataShipmentOverviewFCLUrl);
+
+            #region -- Ghi Log Report --
+            var reportLogModel = new SysReportLogModel
+            {
+                ReportName = ResourceConsts.Shipment_Overview,
+                ObjectParameter = JsonConvert.SerializeObject(criteria),
+                Type = ResourceConsts.Export_Excel
+            };
+            var responseFromAddReportLog = await HttpServiceExtension.PostAPI(reportLogModel, aPis.HostStaging + Urls.Documentation.AddReportLogUrl, accessToken);
+            #endregion -- Ghi Log Report --
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<ExportShipmentOverviewFCL>>();
+            if (dataObjects.Result == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+
+            var stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment Overview - FCL.xlsx");
+
+            if (stream == null)
+            {
+                return new FileHelper().ExportExcel(new MemoryStream(), "");
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview FCL.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
         /// Export Standard General Report
         /// </summary>
         /// <param name="criteria"></param>

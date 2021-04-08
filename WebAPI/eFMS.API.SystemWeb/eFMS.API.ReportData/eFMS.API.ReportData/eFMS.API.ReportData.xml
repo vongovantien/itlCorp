@@ -286,6 +286,13 @@
             <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverviewFCL(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Export Shipment Overview
+            </summary>
+            <param name="criteria">Id of shipment</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportStandardGeneralReport(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Export Standard General Report
