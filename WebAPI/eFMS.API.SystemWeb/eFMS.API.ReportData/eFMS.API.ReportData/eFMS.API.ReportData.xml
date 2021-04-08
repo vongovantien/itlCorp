@@ -513,7 +513,7 @@
             <returns></returns>
             
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
             Generate Commission Ops Report Excel
             </summary>
@@ -523,15 +523,13 @@
             <returns></returns>
             
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPRReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
             Generate Commission Services Report Excel
             </summary>
-            <param name="listData"></param>
-            <param name="criteria"></param>
-            <param name="stream"></param>
+            <param name="resultData"></param>
+            <param name="fileName"></param>
             <returns></returns>
-            
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateIncentiveReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
             <summary>
@@ -548,30 +546,6 @@
             Set Image and Company Info to Excel
             </summary>
             <param name="workSheet">excel sheet</param>
-        </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPROpsReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
-            <summary>
-            Binding Commission Ops Report
-            </summary>
-            <param name="workSheet"></param>
-            <param name="resultData"></param>
-            <param name="criteria"></param>
-        </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
-            <summary>
-            Bind data to Commission PR Report
-            </summary>
-            <param name="resultData"></param>
-            <param name="fileName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
-            <summary>
-            Bind data to Commission Report
-            </summary>
-            <param name="workSheet"></param>
-            <param name="resultData"></param>
-            <param name="criteria"></param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataIncentiveReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
             <summary>
@@ -626,6 +600,7 @@
             </summary>
             <param name="name">name of cell to set value</param>
             <param name="value">value set to cell</param>
+            <param name="numberFormat"></param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.String,System.String,System.String)">
             <summary>
@@ -634,6 +609,13 @@
             <param name="name">name of cell to set value</param>
             <param name="_formular">formula string set to cell</param>
             <param name="numberFormat">format number set to cell</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.AddressOfCell(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetGroupsTable">
             <summary>

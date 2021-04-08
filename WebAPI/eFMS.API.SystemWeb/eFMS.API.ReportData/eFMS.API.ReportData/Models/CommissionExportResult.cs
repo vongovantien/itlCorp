@@ -25,6 +25,7 @@ namespace eFMS.API.ReportData.Models
         public string MBLNo { get; set; }
         public string HBLNo { get; set; }
         public string JobId { get; set; }
+        public string CustomerName { get; set; }
         public string CustomSheet { get; set; }
         public decimal? ChargeWeight { get; set; }
         public string PortCode { get; set; }
