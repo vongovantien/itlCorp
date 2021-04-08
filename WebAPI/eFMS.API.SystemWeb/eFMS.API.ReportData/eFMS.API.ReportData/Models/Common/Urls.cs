@@ -59,6 +59,8 @@
             public const string NeutralHawbExportUrl = "/Documentation/api/v1/en-US/CsTransactionDetail/NeutralHawbExport";
             public const string AirwayBillExportUrl = "/Documentation/api/v1/en-US/CsAirWayBill/AirwayBillExport?jobId=";
             public const string GetDataShipmentOverviewUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverview";
+            public const string GetDataShipmentOverviewFCLUrl = "/Documentation/api/v1/en-US/Shipment/GetDataExportShipmentOverviewFCL";
+
             public const string GetDataSummaryOfCostsIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfCostsIncurred";
             public const string GetDataSummaryOfRevenueIncurredUrl = "/Documentation/api/v1/en-US/Shipment/GetDataSummaryOfRevenueIncurred";
             public const string GetDataSummaryOfCostsPartnerUrl = "/Documentation/api/v1/en-US/Shipment/GetDataCostsByPartner";

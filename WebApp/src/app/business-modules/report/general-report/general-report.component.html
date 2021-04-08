@@ -1,6 +1,7 @@
 <app-sub-header></app-sub-header>
 <div class="m-content">
-    <share-report-form-search [isGeneralReport]="true" (onGeneralSearch)="onSearchGeneralReport($event)"></share-report-form-search>
+    <share-report-form-search [isGeneralReport]="true" (onGeneralSearch)="onSearchGeneralReport($event)">
+    </share-report-form-search>
     <div class="m-portlet">
         <div class="m-portlet__body">
             <div class="form-actions">
@@ -17,6 +18,8 @@
                                         Report</a></li>
                                 <li role="menuitem"><a (click)="exportShipmentOverview()"
                                         class="dropdown-item pointer">Shipment Overview</a></li>
+                                <li role="menuitem"><a (click)="exportShipmentOverviewFCL()"
+                                        class="dropdown-item pointer">Shipment Overview FCL</a></li>
                             </ul>
                         </div>
                     </div>
