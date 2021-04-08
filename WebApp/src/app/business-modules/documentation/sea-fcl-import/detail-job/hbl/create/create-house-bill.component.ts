@@ -27,6 +27,7 @@ import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
 import _groupBy from 'lodash/groupBy';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -47,6 +48,7 @@ export class CreateHouseBillComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string = '';
     selectedHbl: any = {}; // TODO model.
@@ -180,6 +182,7 @@ export class CreateHouseBillComponent extends AppForm {
 
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
+            this._progressRef.start();
             this._documentationRepo.createHousebill(body)
                 .pipe(
                     mergeMap((res: any) => {
@@ -195,14 +198,23 @@ export class CreateHouseBillComponent extends AppForm {
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
 
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
 
-                        return forkJoin([arrival, delivery]);
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        return forkJoin([arrival, delivery, proof]);
                     }),
 
                     catchError(this.catchError),
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
         }

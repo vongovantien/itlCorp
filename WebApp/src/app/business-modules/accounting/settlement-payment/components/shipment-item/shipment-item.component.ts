@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from '@angular/core';
-import { AppList } from 'src/app/app.list';
 import { ReportPreviewComponent } from '@common';
+import { SysImage } from '@models';
+import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 @Component({
     selector: 'shipment-item',
@@ -8,46 +9,38 @@ import { ReportPreviewComponent } from '@common';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SettlementShipmentItemComponent extends AppList {
+export class SettlementShipmentItemComponent {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
+    @ViewChild(SettlementShipmentAttachFilePopupComponent) shipmentAttachFilePopup: SettlementShipmentAttachFilePopupComponent;
 
     @Output() onCheck: EventEmitter<any> = new EventEmitter<any>();
     @Output() onClick: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlUSD: EventEmitter<any> = new EventEmitter<any>();
     @Output() onPrintPlVND: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onViewFiles: EventEmitter<any> = new EventEmitter<any>();
 
     @Input() data: ISettlementShipmentGroup = null;
 
-    headers: CommonInterface.IHeaderTable[];
-
     initCheckbox: boolean = false;
+    isCheckAll: boolean = false;
 
     constructor(
     ) {
-        super();
+
     }
 
     ngOnInit() {
-        this.headers = [
-            { title: 'Charge Name', field: 'jobId', },
-            { title: 'Qty', field: 'jobId', },
-            { title: 'Unit Price', field: 'jobId', },
-            { title: 'Currency', field: 'jobId', },
-            { title: 'VAT', field: 'jobId', },
-            { title: 'Amount', field: 'jobId', },
-            { title: 'Payer', field: 'jobId', },
-            { title: 'OBH Partner', field: 'jobId', },
-            { title: 'Invoice No', field: 'jobId', },
-            { title: 'Series No', field: 'jobId', },
-            { title: 'Inv Date', field: 'jobId', },
-            { title: 'Custom No', field: 'jobId', },
-            { title: 'Cont No', field: 'jobId', },
-            { title: 'Note', field: 'jobId', },
-        ];
     }
 
-    showPaymentManagement($event: Event, data: any): any {
-        this.onClick.emit({ event: $event, data: data });
+    showPaymentManagement($event: Event): any {
+        /* 
+        * prevent collapse/expand within accordion-head
+        */
+        $event.stopPropagation();
+        $event.preventDefault();
+        this.onClick.emit();
+
+        return false;
     }
 
     checkUncheckAllRequest($event: Event) {
@@ -62,22 +55,31 @@ export class SettlementShipmentItemComponent extends AppList {
         this.onCheck.emit(this.isCheckAll);
 
         return false;
-
     }
 
-    previewPLsheet($event, currency: string) {
+    previewPLsheet($event: Event, currency: string) {
         $event.stopPropagation();
         $event.preventDefault();
+
         if (currency === 'VND') {
-            this.onPrintPlVND.emit(this.data);
-            return;
+            this.onPrintPlVND.emit();
+            return false;
         }
-        this.onPrintPlUSD.emit(this.data);
+        this.onPrintPlUSD.emit();
+        return false;
     }
 
+    showShipmentAttachFile($event: Event) {
+        $event.stopPropagation();
+        $event.preventDefault();
+
+        this.onViewFiles.emit();
+
+        return false;
+    }
 }
 
-interface ISettlementShipmentGroup {
+export interface ISettlementShipmentGroup {
     advanceAmount: number;
     advanceNo: string;
     balance: number;
@@ -92,4 +94,6 @@ interface ISettlementShipmentGroup {
     shipmentId: string;
     totalAmount: number;
     type: string;
+    isSelected?: boolean;
+    files: SysImage[];
 }

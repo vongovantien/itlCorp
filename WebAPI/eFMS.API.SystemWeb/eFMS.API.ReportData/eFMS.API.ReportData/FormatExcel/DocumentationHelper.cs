@@ -1370,7 +1370,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "P.O/INV#",
                 "B.K/REF NO",
                 "COMMODITY",
-                "SERVICE MODE",
+                "REFERENCE NO",
                 "P/M TERM",
                 "SHIPMENT NOTES",
                 "CREATED"
@@ -1644,7 +1644,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j + addressStartContent, 51].Value = item.POINV;
                 workSheet.Cells[j + addressStartContent, 52].Value = item.BKRefNo;
                 workSheet.Cells[j + addressStartContent, 53].Value = item.Commodity;
-                workSheet.Cells[j + addressStartContent, 54].Value = item.ServiceMode;
+                workSheet.Cells[j + addressStartContent, 54].Value = item.ReferenceNo;
                 //workSheet.Cells[i + addressStartContent, 53].Value = item.ShipmentType;
                 workSheet.Cells[j + addressStartContent, 55].Value = item.PMTerm;
                 workSheet.Cells[j + addressStartContent, 56].Value = item.ShipmentNotes;

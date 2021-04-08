@@ -46,5 +46,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public int? Cont45 { get; set; }
         public string ProductService { get; set; }
         public short? PackageType { get; set; }
+        public string BookingNo { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

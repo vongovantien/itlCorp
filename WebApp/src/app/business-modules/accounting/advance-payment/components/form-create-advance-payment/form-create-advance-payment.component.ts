@@ -1,14 +1,14 @@
 import { Component, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
 import { User, Currency, Partner } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
-import { AppForm } from 'src/app/app.form';
+import { AppForm } from '@app';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 
-import { Observable } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { CommonEnum } from '@enums';
 import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -163,12 +163,19 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     onChangePaymentMethod(method: string) {
-        if (method === 'Bank' && !this.payee.value) {
-            this.bankAccountName.setValue(this.userLogged.nameVn || null);
-            this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
-            this.bankName.setValue(this.userLogged.bankName || null);
-        } else if (!!this.selectedPayee) {
-            this.setBankInfoForPayee(this.selectedPayee);
+        if (method === 'Bank') {
+            if (!this.payee.value) {
+                this.bankAccountName.setValue(this.userLogged.nameVn || null);
+                this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
+                this.bankName.setValue(this.userLogged.bankName || null);
+            } else if (!!this.selectedPayee) {
+                this.setBankInfoForPayee(this.selectedPayee);
+            }
+        }
+        else {
+            this.bankAccountName.setValue(null);
+            this.bankAccountNo.setValue(null);
+            this.bankName.setValue(null);
         }
     }
 

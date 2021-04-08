@@ -1,3 +1,5 @@
+import { SettlementPayment } from './../../../../shared/models/accouting/settlement-payment';
+import { ISettlementPaymentState } from './../components/store/reducers/index';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -5,7 +7,7 @@ import { formatDate } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { AppPage } from '@app';
-import { Surcharge } from '@models';
+import { Surcharge, SysImage } from '@models';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { ReportPreviewComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -19,6 +21,8 @@ import { SettlementFormCreateComponent } from '../components/form-create-settlem
 
 import { catchError, pluck } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
+import { Store } from '@ngrx/store';
+import { LoadDetailSettlePaymentSuccess } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -35,13 +39,16 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementCode: string = '';
     settlementPayment: ISettlementPaymentData;
 
+    attachFiles: SysImage[] = [];
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _exportRepo: ExportRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _store: Store<ISettlementPaymentState>
     ) {
         super();
     }
@@ -138,6 +145,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         return;
                     }
                     this.settlementPayment = res;
+                    this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
+
                     switch (this.settlementPayment.settlement.statusApproval) {
                         case 'New':
                         case 'Denied':
@@ -270,6 +279,6 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 export interface ISettlementPaymentData {
     chargeGrpSettlement: any;
     chargeNoGrpSettlement: Surcharge[];
-    settlement: any;
+    settlement: SettlementPayment;
 }
 

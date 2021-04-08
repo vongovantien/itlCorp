@@ -26,6 +26,7 @@ import * as fromShareBussiness from './../../../../../share-business/store';
 import { catchError, takeUntil, mergeMap, skip } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 import isUUID from 'validator/lib/isUUID';
+import { ShareBusinessProofOfDelieveyComponent } from 'src/app/business-modules/share-business/components/hbl/proof-of-delivery/proof-of-delivery.component';
 
 enum HBL_TAB {
     DETAIL = 'DETAIL',
@@ -45,6 +46,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessArrivalNoteComponent, { static: true, }) arrivalNoteComponent: ShareBusinessArrivalNoteComponent;
     @ViewChild(ShareBusinessDeliveryOrderComponent, { static: true }) deliveryComponent: ShareBusinessDeliveryOrderComponent;
+    @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
 
     jobId: string = '';
     selectedHbl: CsTransactionDetail;
@@ -196,15 +198,26 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
                         };
                         this.deliveryComponent.deliveryOrder.hblid = res.data;
                         const delivery = this._documentationRepo.updateDeliveryOrderInfo(Object.assign({}, this.deliveryComponent.deliveryOrder, printedDate));
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
 
-                        this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${res.data}`]);
+                        const deliveryDate = {
+                            deliveryDate: !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate && !!this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate ? formatDate(this.proofOfDeliveryComponent.proofOfDelievey.deliveryDate.startDate, 'yyyy-MM-dd', 'en') : null,
+                        };
 
-                        return forkJoin([arrival, delivery]);
+                        this.proofOfDeliveryComponent.proofOfDelievey.hblid = res.data;
+                        const proof = this._documentationRepo.updateProofOfDelivery(Object.assign({}, this.proofOfDeliveryComponent.proofOfDelievey, deliveryDate));
+
+                        //this.proofOfDeliveryComponent.saveProofOfDelivery();
+                        return forkJoin([arrival, delivery, proof]);
                     }),
 
                     catchError(this.catchError),
                 ).subscribe((result) => {
                     this._toastService.success(result[0].message, '');
+                    if (result[2].status && this.proofOfDeliveryComponent.fileList !== null && this.proofOfDeliveryComponent.fileList.length !== 0 && Object.keys(this.proofOfDeliveryComponent.files).length === 0) {
+                        this.proofOfDeliveryComponent.uploadFilePOD();
+                    }
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}/hbl/${this.arrivalNoteComponent.hblArrivalNote.hblid}`]);
                 }
                 );
         }

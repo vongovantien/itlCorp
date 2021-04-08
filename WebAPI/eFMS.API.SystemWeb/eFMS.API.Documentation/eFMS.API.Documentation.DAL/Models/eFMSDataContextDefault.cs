@@ -244,6 +244,9 @@ namespace eFMS.API.Documentation.Service.Models
             {
                 entity.ToTable("acctAdvancePayment");
 
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctAdvancePayment");
+
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
@@ -280,7 +283,11 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
-                
+
+                entity.Property(e => e.Payee)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.PaymentMethod)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -655,6 +662,9 @@ namespace eFMS.API.Documentation.Service.Models
             modelBuilder.Entity<AcctSettlementPayment>(entity =>
             {
                 entity.ToTable("acctSettlementPayment");
+
+                entity.HasIndex(e => e.DatetimeCreated)
+                    .HasName("Idx_DatetimeCreated_acctSettlementPayment");
 
                 entity.Property(e => e.Id)
                     .HasColumnName("ID")
@@ -2584,9 +2594,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
-                
+
+                entity.Property(e => e.PodDescription).HasMaxLength(150);
+
                 entity.Property(e => e.Pol).HasColumnName("POL");
-                
+
+                entity.Property(e => e.PolDescription).HasMaxLength(150);
+
                 entity.Property(e => e.Pono)
                     .HasColumnName("PONo")
                     .HasMaxLength(1600);
@@ -2712,9 +2726,13 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("DCLRCUS")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DeliveryOrderNo).HasMaxLength(100);
 
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryPerson).HasMaxLength(250);
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
@@ -2907,6 +2925,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(250);
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
+
+                entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
 

@@ -1420,7 +1420,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.SalesOffice = OfficeSaleman != Guid.Empty && OfficeSaleman != null ? LookupOffice[(Guid)OfficeSaleman].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.Creator = item.TransactionType == "CL" ? LookupUser[item.PersonInCharge].Select(t => t.Username).FirstOrDefault() : LookupUser[item.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.POINV = item.Pono;
-                data.BKRefNo = item.JobNo;
                 data.Commodity = item.Commodity;
                 data.ProductService = item.ProductService;
                 data.ServiceMode = string.Empty;//chua co thong tin
@@ -1432,6 +1431,8 @@ namespace eFMS.API.Documentation.DL.Services
                 string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.PackageQty.ToString() + " " + Code;
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
+                data.BKRefNo = item.BookingNo;
+                data.ReferenceNo = item.ReferenceNo;
                 lstShipment.Add(data);
             }
             return lstShipment.AsQueryable();

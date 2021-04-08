@@ -575,7 +575,7 @@ namespace eFMS.API.Documentation.DL.Services
                     Contact = employeeContact,
                     CompanyName = company != null ? (company.BunameVn ?? string.Empty) : string.Empty,
                     CompanyAddress1 = company != null ? (company.AddressVn ?? string.Empty) : string.Empty,
-                    CurrDecimalNo = 2,
+                    CurrDecimalNo = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? 0 : 2,
                     ReportBy = employeeContact,
                     Director = string.Empty,
                     ChiefAccountant = string.Empty,
