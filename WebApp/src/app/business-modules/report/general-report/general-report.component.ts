@@ -112,6 +112,27 @@ export class GeneralReportComponent extends AppList {
         }
     }
 
+    exportShipmentOverviewFCL() {
+        if (this.dataList.length === 0) {
+            this._toastService.warning('No Data To View, Please Re-Apply Report');
+            return;
+        } else {
+            this.isClickSubMenu = false;
+            this._progressRef.start();
+            this._exportRepo.exportShipmentOverviewFCL(this.dataSearch)
+                .pipe(
+                    catchError(this.catchError),
+                    finalize(() => this._progressRef.complete())
+                )
+                .subscribe(
+                    (response: ArrayBuffer) => {
+                        const fileName = "Export ShipmentOverview FCL.xlsx";
+                        this.downLoadFile(response, "application/ms-excel", fileName);
+                    },
+                );
+        }
+    }
+
     exportStandard() {
         if (this.dataList.length === 0) {
             this._toastService.warning('No Data To View, Please Re-Apply Report');
