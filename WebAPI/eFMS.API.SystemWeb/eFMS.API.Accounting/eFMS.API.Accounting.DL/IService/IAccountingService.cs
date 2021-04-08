@@ -15,21 +15,21 @@ namespace eFMS.API.Accounting.DL.IService
         List<BravoSettlementModel> GetListSettlementToSyncBravo(List<Guid> Ids);
         List<SyncModel> GetListCdNoteToSync(List<Guid> ids);
         List<SyncCreditModel> GetListCdNoteCreditToSync(List<RequestGuidTypeListModel> models);
-        List<SyncModel> GetListSoaToSync(List<int> ids);
-        List<SyncCreditModel> GetListSoaCreditToSync(List<RequestIntTypeListModel> models);
+        List<SyncModel> GetListSoaToSync(List<string> ids);
+        List<SyncCreditModel> GetListSoaCreditToSync(List<RequestStringTypeListModel> models);
         List<PaymentModel> GetListInvoicePaymentToSync(List<Guid> ids);
-        List<PaymentModel> GetListObhPaymentToSync(List<int> ids);
+        List<PaymentModel> GetListObhPaymentToSync(List<string> ids);
         HandleState SyncListAdvanceToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListSettlementToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListVoucherToBravo(List<Guid> ids, out List<Guid> data);
         HandleState SyncListCdNoteToAccountant(List<Guid> ids);
-        HandleState SyncListSoaToAccountant(List<int> ids);
+        HandleState SyncListSoaToAccountant(List<string> ids);
         void SendMailAndPushNotificationToAccountant(List<SyncCreditModel> syncCreditModels);
         void SendMailAndPushNotificationDebitToAccountant(List<SyncModel> syncModels);
         List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids);
         HandleState SyncListReceiptToAccountant(List<Guid> ids);
         bool CheckCdNoteSynced(Guid idCdNote);
-        bool CheckSoaSynced(int idSoa);
+        bool CheckSoaSynced(string idSoa);
         bool CheckVoucherSynced(Guid idVoucher);
     }
 }

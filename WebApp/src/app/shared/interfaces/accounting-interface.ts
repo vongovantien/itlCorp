@@ -31,8 +31,8 @@ namespace AccountingInterface {
         action: string;
     }
 
-    export interface IRequestInt {
-        id: number;
+    export interface IRequestString {
+        id: string;
         action: string;
     }
 
@@ -41,7 +41,7 @@ namespace AccountingInterface {
         paymentMethod: string;
     }
 
-    export interface IRequestIntType extends IRequestInt {
+    export interface IRequestStringType extends IRequestString {
         type: string;
         paymentMethod: string;
     }
