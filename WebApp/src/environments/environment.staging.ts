@@ -20,6 +20,8 @@ export const environment = {
     AUTHORIZATION:
     {
         requireHttps: false
-    }
+    },
+    GOOGLE_ANALYTICS_ID: 'G-PMWVSS1EYP',
+
 }
 
