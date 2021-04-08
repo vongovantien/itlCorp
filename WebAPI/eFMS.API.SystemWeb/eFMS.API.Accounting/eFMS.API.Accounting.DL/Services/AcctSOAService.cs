@@ -108,7 +108,7 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var userCurrent = currentUser.UserID;
-
+                model.Id = Guid.NewGuid().ToString();
                 model.Status = AccountingConstants.STATUS_SOA_NEW;
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.UserCreated = model.UserModified = userCurrent;
@@ -337,14 +337,14 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public bool CheckUpdatePermission(string soaNo)
+        public bool CheckUpdatePermission(string soaId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None)
                 return false;
 
-            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            var detail = DataContext.Get(x => x.Id == soaId)?.FirstOrDefault();
             if (detail == null) return false;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
@@ -362,14 +362,14 @@ namespace eFMS.API.Accounting.DL.Services
             return true;
         }
 
-        public bool CheckDeletePermission(string soaNo)
+        public bool CheckDeletePermission(string soaId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None)
                 return false;
 
-            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            var detail = DataContext.Get(x => x.Id == soaId)?.FirstOrDefault();
             if (detail == null) return false;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
@@ -387,29 +387,29 @@ namespace eFMS.API.Accounting.DL.Services
             return true;
         }
 
-        public HandleState DeleteSOA(string soaNo)
+        public HandleState DeleteSOA(string soaId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
             if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
-            var soa = DataContext.Get(x => x.Soano == soaNo).FirstOrDefault();
+            var soa = DataContext.Get(x => x.Id == soaId).FirstOrDefault();
             if (soa == null)
             {
-                string message = "Not found SOA " + soaNo;
+                string message = "Not found SOA";
                 return new HandleState((object)message);
             }
 
             if (soa.SyncStatus == "Synced")
             {
-                string message = string.Format("Not allow delete. SOA {0} have been synchronized", soaNo);
+                string message = string.Format("Not allow delete. SOA {0} have been synchronized", soa.Soano);
                 return new HandleState((object)message);
             }
 
             //Clear Charge of SOA
-            var hsClearCharge = ClearSoaCharge(soaNo, soa.Type, "DeleteSoa");
+            var hsClearCharge = ClearSoaCharge(soa.Soano, soa.Type, "DeleteSoa");
 
-            var hs = DataContext.Delete(x => x.Soano == soaNo);
+            var hs = DataContext.Delete(x => x.Id == soaId);
             return hs;
         }
 
@@ -1768,14 +1768,14 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion -- Get List & Paging SOA By Criteria --
 
         #region -- Details Soa --
-        public bool CheckDetailPermission(string soaNo)
+        public bool CheckDetailPermission(string soaId)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
             if (permissionRange == PermissionRange.None)
                 return false;
 
-            var detail = DataContext.Get(x => x.Soano == soaNo)?.FirstOrDefault();
+            var detail = DataContext.Get(x => x.Id == soaId)?.FirstOrDefault();
             if (detail == null) return false;
 
             BaseUpdateModel baseModel = new BaseUpdateModel
@@ -2903,7 +2903,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Preview --
 
-        public List<Guid> GetSurchargeIdBySoaId(int soaId)
+        public List<Guid> GetSurchargeIdBySoaId(string soaId)
         {
             var soaNo = Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
             var surchargeIds = csShipmentSurchargeRepo.Get(x => x.PaySoano == soaNo || x.Soano == soaNo).Select(s => s.Id).ToList();

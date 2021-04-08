@@ -693,7 +693,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: DEBIT</param>
         /// <returns></returns>
-        public List<SyncModel> GetListSoaToSync(List<int> ids)
+        public List<SyncModel> GetListSoaToSync(List<string> ids)
         {
             List<SyncModel> data = new List<SyncModel>();
             if (ids == null || ids.Count() == 0) return data;
@@ -860,7 +860,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="Ids">List Id of soa</param>
         /// <param name="type">Type: CREDIT</param>
         /// <returns></returns>
-        public List<SyncCreditModel> GetListSoaCreditToSync(List<RequestIntTypeListModel> models)
+        public List<SyncCreditModel> GetListSoaCreditToSync(List<RequestStringTypeListModel> models)
         {
             List<SyncCreditModel> data = new List<SyncCreditModel>();
             if (models == null || models.Count() == 0) return data;
@@ -1028,7 +1028,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public List<PaymentModel> GetListObhPaymentToSync(List<int> ids)
+        public List<PaymentModel> GetListObhPaymentToSync(List<string> ids)
         {
             List<PaymentModel> data = new List<PaymentModel>();
             if (ids == null || ids.Count() == 0) return data;
@@ -1350,7 +1350,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState SyncListSoaToAccountant(List<int> ids)
+        public HandleState SyncListSoaToAccountant(List<string> ids)
         {
             var soas = soaRepository.Get(x => ids.Contains(x.Id));
             if (soas == null) return new HandleState((object)"Không tìm thấy soa");
@@ -1887,7 +1887,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == int.Parse(syncCreditModel.Stt)).FirstOrDefault();
+                        var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -1968,7 +1968,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == int.Parse(syncModel.Stt)).FirstOrDefault();
+                        var soa = soaRepository.Get(x => x.Id == syncModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -2315,7 +2315,7 @@ namespace eFMS.API.Accounting.DL.Services
             return false;
         }
 
-        public bool CheckSoaSynced(int idSoa)
+        public bool CheckSoaSynced(string idSoa)
         {
             var soa = soaRepository.Get(x => x.Id == idSoa).FirstOrDefault();
             if (soa != null)
