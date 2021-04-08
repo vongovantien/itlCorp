@@ -207,45 +207,48 @@
                                             </tr>
                                             <tr class="collapse-panel-row" app-table-collapse-row [id]="'collapse' + i"
                                                 [parentId]="'#adv-payment-list-table'">
-                                                <table class="table table-secondary dataTable">
-                                                    <thead app-table-header [headers]="headerGroupRequest"
-                                                        (onClick)="sortByCollapse($event)">
-                                                    </thead>
-                                                    <tbody>
-                                                        <ng-container
-                                                            *ngIf="!(isLoading | async)  && !!groupRequest.length">
-                                                            <tr class=""
-                                                                *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
-                                                                <td>{{request.jobId}}</td>
-                                                                <td>{{request.customNo}}</td>
-                                                                <td>{{request.hbl}}</td>
-                                                                <td>{{request.amount | number :'.0-2'}}</td>
-                                                                <td>{{request.requestCurrency}}</td>
-                                                                <td [ngSwitch]="request.statusPayment">
-                                                                    <ng-container
-                                                                        *ngIf="advancePayment.statusApproval === 'Done' else empty">
-                                                                        <div class="text-success"
-                                                                            *ngSwitchCase="'Settled'">
-                                                                            {{request.statusPayment}}
-                                                                        </div>
-                                                                        <div class="text-danger"
-                                                                            *ngSwitchCase="'NotSettled'">
-                                                                            Not Settled
-                                                                        </div>
-                                                                        <div class="text-danger"
-                                                                            *ngSwitchCase="'PartialSettlement'">
-                                                                            Partial Settlement
-                                                                        </div>
-                                                                    </ng-container>
-                                                                    <ng-template #empty>-</ng-template>
-                                                                </td>
+                                                <div class="table-horizontal" style="max-height:500px">
+                                                    <table class="table table-secondary">
+                                                        <thead app-table-header [headers]="headerGroupRequest"
+                                                            (onClick)="sortByCollapse($event)">
+                                                        </thead>
+                                                        <tbody>
+                                                            <ng-container
+                                                                *ngIf="!(isLoading | async)  && !!groupRequest.length">
+                                                                <tr class=""
+                                                                    *ngFor="let request of groupRequest; let j = index; trackBy: trackByFn">
+                                                                    <td>{{request.jobId}}</td>
+                                                                    <td>{{request.customNo}}</td>
+                                                                    <td>{{request.hbl}}</td>
+                                                                    <td>{{request.amount | number :'.0-2'}}</td>
+                                                                    <td>{{request.requestCurrency}}</td>
+                                                                    <td [ngSwitch]="request.statusPayment">
+                                                                        <ng-container
+                                                                            *ngIf="advancePayment.statusApproval === 'Done' else empty">
+                                                                            <div class="text-success"
+                                                                                *ngSwitchCase="'Settled'">
+                                                                                {{request.statusPayment}}
+                                                                            </div>
+                                                                            <div class="text-danger"
+                                                                                *ngSwitchCase="'NotSettled'">
+                                                                                Not Settled
+                                                                            </div>
+                                                                            <div class="text-danger"
+                                                                                *ngSwitchCase="'PartialSettlement'">
+                                                                                Partial Settlement
+                                                                            </div>
+                                                                        </ng-container>
+                                                                        <ng-template #empty>-</ng-template>
+                                                                    </td>
+                                                                </tr>
+                                                            </ng-container>
+                                                            <tr *ngIf="!(isLoading | async) && !groupRequest.length"
+                                                                app-table-none-record>
                                                             </tr>
-                                                        </ng-container>
-                                                        <tr *ngIf="!(isLoading | async) && !groupRequest.length"
-                                                            app-table-none-record>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+
                                             </tr>
                                         </ng-container>
 
