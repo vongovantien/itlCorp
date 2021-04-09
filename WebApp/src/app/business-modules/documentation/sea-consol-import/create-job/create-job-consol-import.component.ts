@@ -72,6 +72,8 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
 
             personIncharge: form.personIncharge,
             coloaderId: form.coloader,
+            polDescription: form.polDescription,
+            podDescription: form.podDescription,
 
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,
@@ -107,7 +109,11 @@ export class SeaConsolImportCreateJobComponent extends AppForm {
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formCreateComponent.formCreate.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
+        if (!this.formCreateComponent.formCreate.valid
+            || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
+            || (!!this.formCreateComponent.polDescription.value && !this.formCreateComponent.pol.value)
+            || (!this.formCreateComponent.podDescription.value)
+        ) {
             valid = false;
         }
         return valid;

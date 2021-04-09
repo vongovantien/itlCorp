@@ -107,7 +107,8 @@
                         <label class="form-control-label" for="">
                             Internal Reference
                         </label>
-                        <input #focusInput type="text" name="internalReferenceNo" class="form-control" minlength="3"
+                        <input #focusInput type="text" name="internalReferenceNo"
+                            [attr.disabled]="isDisabled === true ? 'disabeld' : null" class="form-control" minlength="3"
                             formControlName="internalReferenceNo" />
                         <div class="form-control-feedback" *ngIf="isSubmitted && 
                                 ((internalReferenceNo.errors | equalError: 'maxlength' )|| (internalReferenceNo.errors | equalError: 'minlength'))
