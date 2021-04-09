@@ -209,7 +209,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = data;
             return Ok(result);
         }
-
+        /// <summary>
+        /// Get data for export shipment overview
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportShipmentOverviewFCL")]
+        public IActionResult GetDataExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataGeneralExportShipmentOverviewFCL(criteria);
+            var result = data;
+            return Ok(result);
+        }
         /// <summary>
         /// Get data for export accounting P/L
         /// </summary>

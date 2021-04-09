@@ -14,6 +14,9 @@ export class TableComponent implements OnInit {
     countries: Observable<Partner[]>;
     displayFieldCity: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_CITY_PROVINCE;
     selectedCountry: any = null;
+    selectedCountryFreeText: any = null;
+    countryText: string = " country 2ways binding text";
+
     constructor
         (
             private _catalogueRepo: CatalogueRepo

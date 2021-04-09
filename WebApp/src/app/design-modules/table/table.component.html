@@ -10,11 +10,22 @@
             </div>
         </div>
         <div class="m-portlet__body">
-            <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
-                [currentActiveItemId]="{ field: 'id', value: selectedCountry}" [selectedDisplayFields]="['name_EN']"
-                [dataSources]="countries | async" [displayFields]="displayFieldCity" placeholder="Select city"
-                [size]="15">
-            </app-combo-grid-virtual-scroll>
+            <div class="form-group">
+                <label for="">Basic Vitual Combogrid</label>
+                <!-- <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                    [currentActiveItemId]="{ field: 'id', value: selectedCountry}" [selectedDisplayFields]="['name_EN']"
+                    [dataSources]="countries | async" [displayFields]="displayFieldCity" placeholder="Select city">
+                </app-combo-grid-virtual-scroll> -->
+            </div>
+            <div class="form-group">
+                <label for="">Allow Editing {{countryText}}</label>
+                <app-combo-grid-virtual-scroll (itemSelected)="selectedCountryFreeText = $event?.id"
+                    [currentActiveItemId]="{ field: 'id', value: selectedCountryFreeText}"
+                    [selectedDisplayFields]="['name_EN']" [dataSources]="countries | async"
+                    [displayFields]="displayFieldCity" placeholder="Select city" allowFreeText
+                    [(displaySelectedStr)]="countryText">
+                </app-combo-grid-virtual-scroll>
+            </div>
         </div>
     </div>
 
