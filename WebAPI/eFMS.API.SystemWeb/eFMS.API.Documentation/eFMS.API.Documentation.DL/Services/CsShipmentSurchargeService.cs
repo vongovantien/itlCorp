@@ -685,6 +685,8 @@ namespace eFMS.API.Documentation.DL.Services
                                                    && (x.SupplierId == criteria.ColoaderId || string.IsNullOrEmpty(criteria.ColoaderId)));
             if (queryShipmentNearest == null) return null;
             List<Guid> houseIds = new List<Guid>();
+            queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
+
             OpsTransaction shipment = opsTransRepository.Get(queryShipmentNearest)?.OrderByDescending(x => x.DatetimeCreated).FirstOrDefault();
 
             if (shipment == null) return null;
@@ -692,14 +694,11 @@ namespace eFMS.API.Documentation.DL.Services
             if (criteria.ChargeType == DocumentConstants.CHARGE_BUY_TYPE)
             {
                 if (criteria.ColoaderId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId); // kHác với lô hiện tại
                 houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.SupplierId == criteria.ColoaderId).Select(x => x.Hblid).ToList();
-
             }
             else
             {
                 if (criteria.CustomerId == null) return null;
-                queryShipmentNearest = queryShipmentNearest.And(x => x.Id != criteria.JobId);
                 houseIds = opsTransRepository.Get(x => x.Id == shipment.Id  && x.CustomerId == criteria.CustomerId).Select(x => x.Hblid).ToList();
             }
 
