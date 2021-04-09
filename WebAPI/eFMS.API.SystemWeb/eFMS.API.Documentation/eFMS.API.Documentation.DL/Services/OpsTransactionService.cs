@@ -785,6 +785,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Mblno = model.Mblid,
                 Hwbno = model.Hblid,
                 SumContainers = model.QtyCont,
+                SumPackages = model.Pcs,
                 ServiceDate = model.ClearanceDate,
                 SumGrossWeight = model.GrossWeight,
                 SumNetWeight = model.NetWeight,
@@ -834,7 +835,7 @@ namespace eFMS.API.Documentation.DL.Services
             var unit = unitRepository.Get(x => x.Code == model.UnitCode).FirstOrDefault();
             if (unit != null)
             {
-                opsTransaction.SumPackages = model.Pcs;
+               
                 opsTransaction.PackageTypeId = unit.Id;
             }
             var commodity = commodityRepository.Get(x => x.Code == model.CommodityCode).FirstOrDefault();
