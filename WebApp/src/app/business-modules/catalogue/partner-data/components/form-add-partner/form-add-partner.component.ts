@@ -384,7 +384,6 @@ export class FormAddPartnerComponent extends AppForm {
             this.isDisabledInternalCode = true;
         }
         this.isDisabled = this.partnerAccountRef != null && !this.isUpdate ? true : false;
-        console.log(this.isDisabled);
         this.activePartner = this.active.value;
     }
 
