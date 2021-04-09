@@ -3,23 +3,21 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
-import { AppForm } from 'src/app/app.form';
-import { Customer } from 'src/app/shared/models/catalogue/customer.model';
-import { DocumentationRepo, SystemRepo } from 'src/app/shared/repositories';
-import { CommonEnum } from 'src/app/shared/enums/common.enum';
-import { PortIndex } from 'src/app/shared/models/catalogue/port-index.model';
-import { User, csBookingNote, CsTransaction } from 'src/app/shared/models';
+import { AppForm } from '@app';
+import { Customer, PortIndex, User, csBookingNote, CsTransaction } from '@models';
+import { DocumentationRepo, SystemRepo } from '@repositories';
+import { CommonEnum } from '@enums';
+import { FormValidators } from '@validators';
+import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
+import { AppComboGridComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { DataService } from '@services';
 
 import { takeUntil, skip, distinctUntilChanged, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import * as fromShare from './../../../../share-business/store';
 import { GetCatalogueAgentAction, GetCatalogueCarrierAction, getCatalogueCarrierState, getCatalogueAgentState, GetCataloguePortAction, getCataloguePortState, } from '@store';
-import { FormValidators } from '@validators';
-import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
-import { AppComboGridComponent } from '@common';
-import { InjectViewContainerRefDirective } from '@directives';
-import { DataService } from '@services';
 @Component({
     selector: 'app-form-create-sea-export',
     templateUrl: './form-create-sea-export.component.html'
@@ -50,6 +48,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
     pol: AbstractControl;
     pod: AbstractControl;
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
 
     agent: AbstractControl;
     agentName: string = null;
@@ -129,7 +129,6 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                             });
                             this.supplierName = res.supplierName;
                             this.agentName = res.agentName;
-                            console.log(res);
                             this.formGroup.patchValue({
                                 jobID: res.jobNo,
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
@@ -152,7 +151,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
                                 personalIncharge: res.personIncharge,
                                 notes: res.notes,
-                                pono: res.pono
+                                pono: res.pono,
+                                podDescription: !!res.podDescription ? res.podDescription : res.podName,
+                                polDescription: !!res.polDescription ? res.polDescription : res.polName,
                             });
 
                             this.currentFormValue = this.formGroup.getRawValue(); // For CanDeactivate.
@@ -179,6 +180,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             notes: [],
             term: [this.termTypes[1]],
             bookingNo: [],
+            polDescription: [null, Validators.required],
+            podDescription: [],
 
             coloader: [null, Validators.required],
             pol: [null, Validators.required],
@@ -206,6 +209,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         this.pol = this.formGroup.controls["pol"];
         this.pod = this.formGroup.controls["pod"];
         this.agent = this.formGroup.controls["agent"];
+
+        this.polDescription = this.formGroup.controls['polDescription'];
+        this.podDescription = this.formGroup.controls['podDescription'];
 
         this.formGroup.controls['etd'].valueChanges
             .pipe(
@@ -243,9 +249,11 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+                this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'agent':
                 this.agentName = data.shortName;

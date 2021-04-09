@@ -70,7 +70,8 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
 
             personIncharge: this.formCreateComponent.personIncharge.value,
             coloaderId: form.coloader,
-
+            polDescription: form.polDescription,
+            podDescription: form.podDescription,
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,
             grossWeight: this.shipmentGoodSummaryComponent.gw,
@@ -91,6 +92,8 @@ export class SeaLCLImportCreateJobComponent extends AppForm implements OnInit {
         if (
             !this.formCreateComponent.formCreate.valid
             || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
+            || (!!this.formCreateComponent.polDescription.value && !this.formCreateComponent.pol.value)
+            || (!this.formCreateComponent.podDescription.value)
         ) {
             valid = false;
         }
