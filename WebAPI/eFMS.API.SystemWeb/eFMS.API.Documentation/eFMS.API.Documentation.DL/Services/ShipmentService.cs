@@ -1905,7 +1905,16 @@ namespace eFMS.API.Documentation.DL.Services
             var usersData = sysUserRepo.Get().ToLookup(u => u.Id);
             var chargeGroups = catChargeGroupRepo.Get().ToLookup(u => u.Id);
             var chargesData = surCharge.Get().ToLookup(u => u.Hblid);
-            var freightChargeId = catChargeGroupRepo.Get(x => x.Name.Contains("Freight"))?.Select(x => x.Id).FirstOrDefault();
+            var freightChargeId = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("FREIGHT"))?.Select(x => x.Id).FirstOrDefault();
+            var terminalHandling = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("TERMINAL HANDLING"))?.Select(x => x.Id).FirstOrDefault();
+            var billFee = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("BILL FEE"))?.Select(x => x.Id).FirstOrDefault();
+            var telexRelease = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("TELEX RELEASE"))?.Select(x => x.Id).FirstOrDefault();
+            var cfsCharge = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("CFS"))?.Select(x => x.Id).FirstOrDefault();
+            var securityCharge = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("SECURITY"))?.Select(x => x.Id).FirstOrDefault();
+            var autoManCharge = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("AUTOMATED MANIFEST"))?.Select(x => x.Id).FirstOrDefault();
+            var vgmCharge = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("VGM ADMIN"))?.Select(x => x.Id).FirstOrDefault();
+            var lclBookingFee = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("LCL BOOKING FEE"))?.Select(x => x.Id).FirstOrDefault();
+
             foreach (var shipment in shipments)
             {
                 var data = new GeneralExportShipmentOverviewFCLResult();
