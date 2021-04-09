@@ -513,47 +513,27 @@
             <returns></returns>
             
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
-            Generate Commission Ops Report Excel
+            Bind Commission Ops Report Excel
             </summary>
-            <param name="listData"></param>
-            <param name="criteria"></param>
-            <param name="stream"></param>
-            <returns></returns>
-            
+            <param name="resultData"></param>
+            <param name="fileName"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
-            Generate Commission Services Report Excel
+            Bind Commission Services Report Excel
             </summary>
             <param name="resultData"></param>
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateIncentiveReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
-            <summary>
-            Generate Incentive Services Report Excel
-            </summary>
-            <param name="listData"></param>
-            <param name="criteria"></param>
-            <param name="stream"></param>
-            <returns></returns>
-            
-        </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.SetImgAndCompanyInfo(OfficeOpenXml.ExcelWorksheet)">
-            <summary>
-            Set Image and Company Info to Excel
-            </summary>
-            <param name="workSheet">excel sheet</param>
-        </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataIncentiveReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataIncentiveReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
             Bind data to Incentive Report
             </summary>
-            <param name="workSheet"></param>
             <param name="resultData"></param>
-            <param name="criteria"></param>
+            <param name="fileName"></param>
         </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.Worksheet">
             <summary>Excel Worksheet</summary>
@@ -604,15 +584,22 @@
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.String,System.String,System.String)">
             <summary>
-            Set formula for cell
+            Set formula for one cell
             </summary>
             <param name="name">name of cell to set value</param>
             <param name="_formular">formula string set to cell</param>
             <param name="numberFormat">format number set to cell</param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.AddressOfCell(System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.IsExistName(System.String)">
             <summary>
-            
+            Check if exist key on excel
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.AddressOfKey(System.String)">
+            <summary>
+            Get address of cell by name
             </summary>
             <param name="name"></param>
             <returns></returns>
