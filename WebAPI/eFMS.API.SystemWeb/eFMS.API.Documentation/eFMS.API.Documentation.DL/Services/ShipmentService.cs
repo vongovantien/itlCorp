@@ -4214,26 +4214,33 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="hblid"></param>
         /// <returns></returns>
-        private decimal GetSellingRateNoCom(Guid hblid, string currency)
+        private decimal GetSellingRateNoCom(Guid hblid, string currency, string exceptId = null)
         {
             decimal revenue = 0;
             var chargeComId = catChargeGroupRepo.Get(x => x.Name.ToUpper() == "COM")?.Select(x => x.Id).FirstOrDefault();
-            Expression<Func<CsShipmentSurcharge, bool>> query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE
-                                                                && x.Hblid == hblid
-                                                                && (x.KickBack == false || x.KickBack == null)
-                                                                && x.ChargeGroup != chargeComId;
+            Expression<Func<CsShipmentSurcharge, bool>> query;
+            if(!string.IsNullOrEmpty(exceptId))
+            {
+                query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
+                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+            }
+            else
+            {
+                query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE
+                             && x.Hblid == hblid
+                             && (x.KickBack == false || x.KickBack == null)
+                             && x.ChargeGroup != chargeComId
+                             && (x.PaymentObjectId != exceptId || string.IsNullOrEmpty(exceptId));
+            }
             var sellingCharges = surCharge.Get(query);
             if (sellingCharges != null)
             {
                 foreach (var charge in sellingCharges)
                 {
-                    if (catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() == 0)
-                    {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
-                        //revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
-                        revenue += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Selling trước thuế
-                    }
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
+                    //revenue += charge.Quantity * charge.UnitPrice * rate ?? 0;
+                    revenue += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Selling trước thuế
                 }
             }
             return revenue;
@@ -4244,26 +4251,34 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="hblid"></param>
         /// <returns></returns>
-        private decimal GetBuyingRateNoCom(Guid hblid, string currency)
+        private decimal GetBuyingRateNoCom(Guid hblid, string currency, string exceptId = null)
         {
             decimal cost = 0;
             var chargeComId = catChargeGroupRepo.Get(x => x.Name.ToUpper() == "COM")?.Select(x => x.Id).FirstOrDefault();
-            Expression<Func<CsShipmentSurcharge, bool>> query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
-                                                                && x.Hblid == hblid
-                                                                && (x.KickBack == false || x.KickBack == null)
-                                                                && x.ChargeGroup != chargeComId;
+            Expression<Func<CsShipmentSurcharge, bool>> query;
+            if (!string.IsNullOrEmpty(exceptId))
+            {
+                query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid
+                             && !((x.KickBack == true || x.ChargeGroup != chargeComId) && x.PaymentObjectId == exceptId);
+            }
+            else
+            {
+                query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
+                             && (x.KickBack == false || x.KickBack == null)
+                             && x.ChargeGroup != chargeComId;
+            }
             var buyingCharges = surCharge.Get(query);
             if (buyingCharges != null)
             {
                 foreach (var charge in buyingCharges)
                 {
-                    if (catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() == 0)
-                    {
-                        //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
-                        //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
-                        //cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Buying trước thuế
-                        cost += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Phí Buying trước thuế
-                    }
+                    //if (catChargeRepo.Where(c => c.Id == charge.ChargeId && c.ChargeGroup == chargeComId).Count() == 0)
+                    //{
+                    //Tỉ giá quy đổi theo ngày FinalExchangeRate, nếu FinalExchangeRate là null thì quy đổi theo ngày ExchangeDate
+                    //var rate = charge.CurrencyId == currency ? 1 : currencyExchangeService.CurrencyExchangeRateConvert(charge.FinalExchangeRate, charge.ExchangeDate, charge.CurrencyId, currency);
+                    //cost += charge.Quantity * charge.UnitPrice * rate ?? 0; // Phí Buying trước thuế
+                    cost += (currency == DocumentConstants.CURRENCY_LOCAL ? (charge.AmountVnd ?? 0) : (charge.AmountUsd ?? 0)); // Phí Buying trước thuế
+                    //}
                 }
             }
             return cost;
@@ -4375,8 +4390,8 @@ namespace eFMS.API.Documentation.DL.Services
                                                                                   : string.Join(';', customsDeclaration[item.Select(x => x.JobNo).FirstOrDefault()].Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
                             ChargeWeight = 0,
                             PortCode = string.Empty,
-                            BuyingRate = GetBuyingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
-                            SellingRate = GetSellingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
+                            BuyingRate = GetBuyingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency, criteria.Beneficiary),
+                            SellingRate = GetSellingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency, criteria.Beneficiary),
                             ComAmount = GetCommissionAmount(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency, criteria.Beneficiary)
                         });
                     }
@@ -4417,8 +4432,8 @@ namespace eFMS.API.Documentation.DL.Services
                             ContQty = item.TransactionType.Contains('S') ? containerData.Sum(x => x.Quantity ?? 0) : 0,
                             PackageContainer = item.PackageContainer,
                             PortCode = GetPortCode((Guid)item.HblId, item.TransactionType),
-                            BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
-                            SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                            BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency, criteria.Beneficiary),
+                            SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency, criteria.Beneficiary),
                             ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency, criteria.Beneficiary)
                         });
                     }
