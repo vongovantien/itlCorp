@@ -5,6 +5,9 @@ import cloneDeep from 'lodash/cloneDeep';
 import { ListKeyManager, FocusKeyManager } from '@angular/cdk/a11y';
 import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
 import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
+import { BsDropdownDirective } from 'ngx-bootstrap';
+
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
     templateUrl: './combo-grid-virtual-scroll.component.html',
@@ -24,18 +27,29 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     @Input() placeholder: string = '';
     @Input() size: number = 25;
     @Input() clearable: boolean = true;
+    @Input() set allowFreeText(val: any) {
+        this._allowEditing = coerceBooleanProperty(val);
+    }
+    private _allowEditing: boolean = false;
 
+    get allowEditing(): boolean {
+        return this._allowEditing;
+
+    }
+
+    @Input() displaySelectedStr: string = '';
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
+    @Output() displaySelectedStrChange: EventEmitter<string> = new EventEmitter<string>();
 
     @ViewChild('inputSearch') inputSearch: ElementRef;
-    @ViewChild('clkSearch', { static: true }) inputPlaceholder: ElementRef;
+    @ViewChild('clkSearch') inputPlaceholder: ElementRef;
     @ViewChildren(AppCombogridItemComponent) items: QueryList<AppCombogridItemComponent>;
+    @ViewChild(BsDropdownDirective) dropdown: BsDropdownDirective;
 
     currentItemSelected: any = null;
     CurrentActiveItemIdObj: { field: string, value: any, hardValue: any } = null;
     indexSelected: number = -1;
-    displaySelectedStr: string = '';
     ConstDataSources: any[] = [];
     DataSources: any[] = [];
     DisplayFields: { field: string, label: string }[] = [];
@@ -55,6 +69,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     onKeydownEnterHandler(event: KeyboardEvent) {
         if (this.isFocusSearch) {
             this.inputPlaceholder.nativeElement.click();
+            if (this._allowEditing && this.dropdown) {
+                this.dropdown.hide();
+            }
         }
     }
 
@@ -123,6 +140,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         }
         if (!!changes.loading && typeof changes.loading.currentValue === 'boolean') {
             this.loading = changes.loading.currentValue;
+        }
+        if (!!changes.displaySelectedStr) {
+            this.displaySelectedStr = changes.displaySelectedStr.currentValue;
         }
     }
 
@@ -204,6 +224,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         // this.displaySelectedStr = null;
         this.setCurrentActiveItemId({ value: null });
         this.remove.emit();
+        this.displaySelectedStrChange.emit(null);
     }
 
     emitSelected(item: any, index: number) {
@@ -238,6 +259,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                 this.displaySelectedStr = dataItem;
             });
         }
+        this.displaySelectedStrChange.emit(this.displaySelectedStr);
     }
 
     clickSearch() {
