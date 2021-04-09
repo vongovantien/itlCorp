@@ -7,7 +7,7 @@ export class SOA {
     currency: string = '';
     datetimeCreated: string = '';
     datetimeModified: string = '';
-    id: number = 0;
+    id: string = '';
     note: string = '';
     soaformDate: string = '';
     soano: string = '';

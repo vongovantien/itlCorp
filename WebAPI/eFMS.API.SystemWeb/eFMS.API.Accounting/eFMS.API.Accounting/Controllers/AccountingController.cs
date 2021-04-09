@@ -179,7 +179,7 @@ namespace eFMS.API.Accounting.Controllers
 
         [HttpPost("GetListObhPaymentToSync")]
         [Authorize]
-        public async Task<IActionResult> GetListObhPaymentToSync(List<RequestIntListModel> request)
+        public async Task<IActionResult> GetListObhPaymentToSync(List<RequestStringListModel> request)
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
@@ -193,10 +193,10 @@ namespace eFMS.API.Accounting.Controllers
                 if (loginResponse.Success == "1")
                 {
                     // 2. Get Data To Sync.
-                    List<int> ids = request.Select(x => x.Id).ToList();
+                    List<string> ids = request.Select(x => x.Id).ToList();
 
-                    List<int> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
-                    List<int> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+                    List<string> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    List<string> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
 
                     List<PaymentModel> listAdd = accountingService.GetListObhPaymentToSync(idsAdd);
                     List<PaymentModel> listUpdate = accountingService.GetListObhPaymentToSync(idsUpdate);
@@ -742,7 +742,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPut("SyncListSoaToAccountant")]
         [Authorize]
-        public async Task<IActionResult> SyncListSoaToAccountant(List<RequestIntTypeListModel> requests)
+        public async Task<IActionResult> SyncListSoaToAccountant(List<RequestStringTypeListModel> requests)
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
@@ -758,10 +758,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     // 2. Get Data To Sync.                    
 
-                    List<int> IdsAdd_NVHD = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
-                    List<int> IdsUpdate_NVHD = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
-                    List<RequestIntTypeListModel> IdsAdd_NVCP = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
-                    List<RequestIntTypeListModel> IdsUpdate_NVCP = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+                    List<string> IdsAdd_NVHD = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
+                    List<string> IdsUpdate_NVHD = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
+                    List<RequestStringTypeListModel> IdsAdd_NVCP = requests.Where(x => x.Action == ACTION.ADD && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
+                    List<RequestStringTypeListModel> IdsUpdate_NVCP = requests.Where(x => x.Action == ACTION.UPDATE && x.Type?.ToUpper() == AccountingConstants.ACCOUNTANT_TYPE_CREDIT).ToList();
                     
                     List<SyncModel> listAdd_NVHD = accountingService.GetListSoaToSync(IdsAdd_NVHD);
                     List<SyncModel> listUpdate_NVHD = accountingService.GetListSoaToSync(IdsUpdate_NVHD);
@@ -774,10 +774,10 @@ namespace eFMS.API.Accounting.Controllers
                     List<SyncCreditModel> listAdd_NVCP_DiffCurrLocal = listAdd_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     List<SyncCreditModel> listUpdate_NVCP_DiffCurrLocal = listUpdate_NVCP.Where(x => x.CurrencyCode != AccountingConstants.CURRENCY_LOCAL || x.Details.Any(w => w.CurrencyCode != AccountingConstants.CURRENCY_LOCAL)).ToList();
                     
-                    //List<int> ids = requests.Where(w => 
+                    //List<string> ids = requests.Where(w => 
                     //   !listAdd_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString()) 
                     //&& !listUpdate_NVCP_DiffCurrLocal.Select(se => se.Stt).Contains(w.Id.ToString())).Select(x => x.Id).ToList();
-                    List<int> ids = requests.Select(x => x.Id).ToList();
+                    List<string> ids = requests.Select(x => x.Id).ToList();
 
                     HttpResponseMessage resAdd_NVHD = new HttpResponseMessage();
                     HttpResponseMessage resUpdate_NVHD = new HttpResponseMessage();
@@ -936,9 +936,9 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut("GetListSOADebit")]
-        public IActionResult GetListSOADebit(List<RequestIntTypeListModel> request)
+        public IActionResult GetListSOADebit(List<RequestStringTypeListModel> request)
         {
-            List<int> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
+            List<string> Ids = request.Where(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT).Select(x => x.Id).ToList();
             List<SyncModel> list = (Ids.Count > 0) ? accountingService.GetListSoaToSync(Ids) : new List<SyncModel>();
             return Ok(list);
         }
@@ -1162,7 +1162,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("CheckSoaSynced/{id}")]
-        public IActionResult CheckSoaSynced(int id)
+        public IActionResult CheckSoaSynced(string id)
         {
             var result = accountingService.CheckSoaSynced(id);
             return Ok(result);

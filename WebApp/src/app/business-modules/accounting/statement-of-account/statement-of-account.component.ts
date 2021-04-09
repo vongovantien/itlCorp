@@ -58,11 +58,7 @@ export class StatementOfAccountComponent extends AppList {
             { title: "Status", field: "status", sortable: true },
             { title: "Issue Date", field: "datetimeCreated", sortable: true },
             { title: "Issue Person", field: "userCreated", sortable: true },
-            {
-                title: "Modified Date",
-                field: "datetimeModified",
-                sortable: true
-            },
+            { title: "Modified Date", field: "datetimeModified", sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
         ];
@@ -74,7 +70,7 @@ export class StatementOfAccountComponent extends AppList {
 
     prepareDeleteSOA(soaItem: SOA) {
         this._accoutingRepo
-            .checkAllowDeleteSOA(soaItem.soano)
+            .checkAllowDeleteSOA(soaItem.id)
             .subscribe((value: boolean) => {
                 if (value) {
                     this.selectedSOA = new SOA(soaItem);
@@ -89,7 +85,7 @@ export class StatementOfAccountComponent extends AppList {
     onConfirmDeleteSOA() {
         this._progressRef.start();
         this._accoutingRepo
-            .deleteSOA(this.selectedSOA.soano)
+            .deleteSOA(this.selectedSOA.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
@@ -139,9 +135,9 @@ export class StatementOfAccountComponent extends AppList {
         this.SOAs = this._sortService.sort(this.SOAs, sort, this.order);
     }
 
-    viewDetail(soano: string, currency: string) {
+    viewDetail(soaId: string, soano: string, currency: string) {
         this._accoutingRepo
-            .checkAllowGetDetailSOA(soano)
+            .checkAllowGetDetailSOA(soaId)
             .subscribe((value: boolean) => {
                 if (value) {
                     this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
