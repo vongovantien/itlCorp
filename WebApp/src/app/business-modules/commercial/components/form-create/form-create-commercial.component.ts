@@ -165,7 +165,6 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     }
 
     onRemove() {
-        this.isDisabled = true;
         this.parentName = null;
         if (!this.parentId.value) {
             this.isDisabled = true;
