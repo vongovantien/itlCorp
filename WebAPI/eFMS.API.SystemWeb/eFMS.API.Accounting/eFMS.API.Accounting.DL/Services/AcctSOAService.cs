@@ -571,7 +571,7 @@ namespace eFMS.API.Accounting.DL.Services
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra dòng cuối cùng của table acctSOA
-            var rowLast = DataContext.Get().LastOrDefault();
+            var rowLast = DataContext.Get().OrderByDescending(o => o.Soano).LastOrDefault();
             if (rowLast == null)
             {
                 stt = "00001";
