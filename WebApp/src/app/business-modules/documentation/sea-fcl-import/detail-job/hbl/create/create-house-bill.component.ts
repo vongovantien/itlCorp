@@ -180,6 +180,8 @@ export class CreateHouseBillComponent extends AppForm {
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_FCL_IMPORT}/${this.jobId}/hbl`]);
     }
 
+
+
     createHbl(body: any) {
         if (this.formHouseBill.formGroup.valid) {
             this._documentationRepo.createHousebill(body)

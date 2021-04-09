@@ -98,11 +98,12 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted &&((formCreate.errors | equalError:'invalidPort') || (!!polDescription.value && !pol.value))}">
                             <label>Port of Loading (POL)</label>
-                            <app-combo-grid-virtual-scroll allowFreeText [(displaySelectedStr)]="polDescription.value"
+                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr]="polDescription.value"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"
-                                (remove)="resetFormControl(pol); resetFormControl(polDescription)">
+                                (remove)="resetFormControl(pol); resetFormControl(polDescription)"
+                                (displaySelectedStrChange)="podDescription.setValue($event)">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && !!polDescription.value && !pol.value">
@@ -118,12 +119,13 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || !podDescription.value)}">
                             <label required>Port of Destination (POD)</label>
-                            <app-combo-grid-virtual-scroll allowFreeText [(displaySelectedStr)]="podDescription.value"
+                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr)="podDescription.value"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"
                                 (remove)="resetFormControl(pod);resetFormControl(podDescription)"
-                                placeholder="Please select POD">
+                                placeholder="Please select POD"
+                                (displaySelectedStrChange)="podDescription.setValue($event)">
                             </app-combo-grid-virtual-scroll>
 
                         </div>
