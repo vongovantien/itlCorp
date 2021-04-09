@@ -722,12 +722,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo,
-<<<<<<< HEAD
-                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo),
-                    IsLocked = item.IsLocked
-=======
+                    IsLocked = item.IsLocked,
                     Files = new List<SysImage>()
->>>>>>> prod/8-4-2021-sprint23
                 });
             }
 
