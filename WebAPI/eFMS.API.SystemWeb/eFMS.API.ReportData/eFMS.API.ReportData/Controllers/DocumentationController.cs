@@ -628,7 +628,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             else
             {
-                stream = new DocumentationHelper().GenerateCommissionPRReportExcel(dataObjects.Result, criteria, null);
+                stream = new DocumentationHelper().BinddingDataCommissionPRReport(dataObjects.Result, "Commission-PR.xlsx");
             }
 
             if (stream == null)

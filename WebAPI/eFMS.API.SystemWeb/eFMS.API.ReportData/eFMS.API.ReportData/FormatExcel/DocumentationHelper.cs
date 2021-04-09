@@ -3920,6 +3920,84 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
+        /// Bind data to Commission PR Report
+        /// </summary>
+        /// <param name="resultData"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream BinddingDataCommissionPRReport(CommissionExportResult resultData, string fileName)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                excel.SetData("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper());
+                excel.SetData("{CUSTOMER}", "CUSTOMER: " + resultData.CustomerName.ToUpper());
+                excel.SetData("ExchangeRate", resultData.ExchangeRate);
+                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
+                int startRow = 14;
+                excel.StartDetailTable = startRow;
+                foreach (var item in listDetail)
+                {
+                    excel.SetDataTable();
+                    excel.SetData("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
+                    excel.SetData("HBLNo", item.HBLNo);
+                    excel.SetData("ChargeWeight", item.ChargeWeight);
+                    excel.SetData("PortCode", item.PortCode);
+                    excel.SetData("BuyingRate", item.BuyingRate);
+                    excel.SetData("SellingRate", item.SellingRate);
+                    // Gross profit before commission
+                    var _statement = string.Format("F{0}-E{0}", startRow);
+                    excel.SetData("GrossBefore", _statement);
+                    // Rate of com
+                    _statement = string.Format("IF(C{0}=0,0,I{0}/C{0})", startRow);
+                    excel.SetData("RateOfCom", _statement);
+                    // Com Amount
+                    excel.SetData("ComAmount", item.ComAmount);
+                    // Gross profit after commission
+                    _statement = string.Format("G{0}-I{0}", startRow);
+                    excel.SetData("GrossAfter", _statement);
+                    // Commission cap
+                    _statement = string.Format("J{0}*(40%/60%)", startRow);
+                    excel.SetData("ComCap", _statement);
+                    // %Com
+                    _statement = string.Format("IF(J{0}=0,0,I{0}/(J{0}/60%))", startRow);
+                    excel.SetData("ComPercent", _statement);
+                    // VND
+                    _statement = string.Format("I{0}*N10", startRow);
+                    excel.SetData("AmountVND", _statement);
+                    // Com over cap
+                    _statement = string.Format("IF(I{0}-K{0}<0,0,(I{0}-K{0})*N10)", startRow);
+                    excel.SetData("ComOverCap", _statement);
+                    // CIT charged on overcap
+                    _statement = string.Format("N{0}*25%", startRow);
+                    excel.SetData("CITCharged", _statement);
+                    // Entitled COM
+                    _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
+                    excel.SetData("EntitledCom", _statement);
+                    // PIT (30%)
+                    _statement = string.Format("P{0}*10%", startRow);
+                    excel.SetData("PIT", _statement);
+                    // Net due to customers
+                    _statement = string.Format("P{0}-Q{0}", startRow);
+                    excel.SetData("Net", _statement);
+                    startRow += 1;
+                }
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Bind data to Commission Report
         /// </summary>
         /// <param name="workSheet"></param>

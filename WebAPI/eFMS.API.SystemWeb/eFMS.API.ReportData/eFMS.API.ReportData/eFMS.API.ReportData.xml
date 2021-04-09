@@ -557,6 +557,14 @@
             <param name="resultData"></param>
             <param name="criteria"></param>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
+            <summary>
+            Bind data to Commission PR Report
+            </summary>
+            <param name="resultData"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BinddingDataCommissionPRReport(OfficeOpenXml.ExcelWorksheet,eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria)">
             <summary>
             Bind data to Commission Report
@@ -618,6 +626,14 @@
             </summary>
             <param name="name">name of cell to set value</param>
             <param name="value">value set to cell</param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.String,System.String,System.String)">
+            <summary>
+            Set formula for cell
+            </summary>
+            <param name="name">name of cell to set value</param>
+            <param name="_formular">formula string set to cell</param>
+            <param name="numberFormat">format number set to cell</param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetGroupsTable">
             <summary>

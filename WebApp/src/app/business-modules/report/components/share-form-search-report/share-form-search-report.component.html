@@ -38,7 +38,7 @@
                             (remove)="resetFormControl(customer)">
                         </app-combo-grid-virtual-scroll> -->
                         <ng-select formControlName="customer" [items]="customers | async" [(ngModel)]="customerActive"
-                            [virtualScroll]='true' [multiple]='!isCommissionIncentive' [clearable]='true' class="custom"
+                            [virtualScroll]='true' [clearable]='true' class="custom"
                             bindLabel="taxCodeAbbrName" bindValue="id">
                         </ng-select>
                         <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && (!customerActive || customerActive.length === 0)">

@@ -4193,7 +4193,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return null;
                 }
-                var dataShipmentOps = QueryDataOperation(criteria);
+                var dataShipmentOps = GetDataGeneralReport(criteria).AsQueryable(); //QueryDataOperation(criteria);
                 if (!string.IsNullOrEmpty(criteria.CustomNo))
                 {
                     dataShipmentOps = from ops in dataShipmentOps
@@ -4212,7 +4212,7 @@ namespace eFMS.API.Documentation.DL.Services
                                            || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
                 foreach (var item in data)
                 {
-                    var charges = listcharge[item.Select(x => x.Hblid).FirstOrDefault()];
+                    var charges = listcharge[item.Select(x => (Guid)x.HblId).FirstOrDefault()];
                     var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
                     if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
                     {
@@ -4226,9 +4226,9 @@ namespace eFMS.API.Documentation.DL.Services
                                                                                   : string.Join(';', customsDeclarationRepo.Get(c => c.JobNo == item.Select(x => x.JobNo).FirstOrDefault()).Where(c => criteria.CustomNo.Contains(c.ClearanceNo)).Select(c => c.ClearanceNo).ToArray()),
                             ChargeWeight = 0,
                             PortCode = string.Empty,
-                            BuyingRate = GetBuyingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
-                            SellingRate = GetSellingRateNoCom(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency),
-                            ComAmount = GetCommissionAmount(item.Select(x => x.Hblid).FirstOrDefault(), criteria.Currency)
+                            BuyingRate = GetBuyingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
+                            SellingRate = GetSellingRateNoCom(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency),
+                            ComAmount = GetCommissionAmount(item.Select(x => (Guid)x.HblId).FirstOrDefault(), criteria.Currency)
                         });
                     }
                 }
@@ -4239,7 +4239,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return null;
                 }
-                var dataShipment = QueryDataDocumentation(criteria);
+                var dataShipment = GetDataGeneralReport(criteria);
                 if (dataShipment.Count() == 0)
                 {
                     return null;
@@ -4257,12 +4257,12 @@ namespace eFMS.API.Documentation.DL.Services
                         commissionData.Details.Add(new CommissionDetail()
                         {
                             ServiceDate = item.ServiceDate,
-                            JobId = item.JobId,
-                            HBLNo = item.Hawb,
+                            JobId = item.JobNo,
+                            HBLNo = item.HwbNo,
                             MBLNo = string.Empty,
                             CustomSheet = string.Empty,
                             ChargeWeight = item.ChargeWeight,
-                            PortCode = GetPortCode((Guid)item.HblId, item.Service),
+                            PortCode = GetPortCode((Guid)item.HblId, item.TransactionType),
                             BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
                             SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
                             ComAmount = GetCommissionAmount((Guid)item.HblId, criteria.Currency)

@@ -117,6 +117,29 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
+        /// Set formula for cell
+        /// </summary>
+        /// <param name="name">name of cell to set value</param>
+        /// <param name="_formular">formula string set to cell</param>
+        /// <param name="numberFormat">format number set to cell</param>
+        public void SetFormula(string name, string _formular, string numberFormat = null)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault().ToString();
+                Worksheet.Cells[address].Formula = _formular;
+                if (!string.IsNullOrEmpty(numberFormat))
+                {
+                    Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
+                }
+            }
+        }
+
+        /// <summary>
         /// Set Group Headers/Footers Of Table (use if have multigroup)
         /// </summary>
         public void SetGroupsTable()
