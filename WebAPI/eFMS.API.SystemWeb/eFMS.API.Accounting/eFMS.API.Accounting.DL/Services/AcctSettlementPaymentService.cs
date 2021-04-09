@@ -2073,7 +2073,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.Consignee = _consigneeName;
             result.Consigner = _consignerName;
             result.ContainerQty = _containerQty;
-            result.CustomsId = !string.IsNullOrEmpty(firstCharge.ClearanceNo) ? firstCharge.ClearanceNo : GetCustomNoOldOfShipment(_jobId);
+            result.CustomsId = firstCharge.ClearanceNo;
             result.HBL = _hbl;
             result.MBL = _mbl;
             result.StlCSName = string.Empty;
@@ -2114,13 +2114,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.CBM = _cbm;
             return result;
         }
-
-        private string GetCustomNoOldOfShipment(string jobNo)
-        {
-            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
-            return customNos.FirstOrDefault() ?? string.Empty;
-        }
-
+        
         public List<AscSettlementPaymentRequestReport> GetSettlementPaymentRequestReportBySettlementNo(string settlementNo)
         {
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();

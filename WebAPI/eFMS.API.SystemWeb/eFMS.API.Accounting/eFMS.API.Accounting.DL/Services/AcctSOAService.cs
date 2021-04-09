@@ -699,17 +699,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #endregion -- Get Rate Exchange --
-
-        private string GetTopClearanceNoByJobNo(string JobNo)
-        {
-            var custom = customsDeclarationRepo.Get();
-            var clearanceNo = custom.Where(x => x.JobNo != null && x.JobNo == JobNo)
-                .OrderBy(x => x.JobNo)
-                .OrderByDescending(x => x.ClearanceDate)
-                .FirstOrDefault()?.ClearanceNo;
-            return clearanceNo;
-        }
-
+        
         #region -- Get List Charges Shipment By Criteria --
 
         private IQueryable<ChargeShipmentModel> GetChargeForIssueSoaByCriteria(ChargeShipmentCriteria criteria)
@@ -1064,7 +1054,7 @@ namespace eFMS.API.Accounting.DL.Services
                         _serviceDate = ops.ServiceDate;
                         var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
                         _pic = user?.Username;
-                        _customNo = customsDeclarationRepo.Get(x => x.JobNo == ops.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                        _customNo = surcharge.ClearanceNo;
                     }
                 }
                 else
@@ -1478,7 +1468,7 @@ namespace eFMS.API.Accounting.DL.Services
                         _serviceDate = ops.ServiceDate;
                         var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
                         _pic = user?.Username;
-                        _customNo = customsDeclarationRepo.Get(x => x.JobNo == ops.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                        _customNo = surcharge.ClearanceNo;
                     }
                 }
                 else
@@ -1892,7 +1882,7 @@ namespace eFMS.API.Accounting.DL.Services
                             _serviceDate = ops.ServiceDate;
                             var user = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault();
                             _pic = user?.Username;
-                            _customNo = customsDeclarationRepo.Get(x => x.JobNo == ops.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                            _customNo = surcharge.ClearanceNo;
                         }
                     }
                     else
@@ -2498,7 +2488,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _grossWeight = opst?.SumGrossWeight;
                     _chargeWeight = opst?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
-                    _customNo = customsDeclarationRepo.Get().Where(x => x.JobNo == opst.JobNo).OrderByDescending(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo;
+                    _customNo = sur.ClearanceNo;
                 }
                 else
                 {
