@@ -33,6 +33,23 @@
        <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
      </Reference>
    </ItemGroup>
+   <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\Commission-OPS-VND.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\Commission-PR.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\Incentive.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\PHIEU-CAN-ACS-Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\PHIEU-CAN-NCTS-ALS-Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>
