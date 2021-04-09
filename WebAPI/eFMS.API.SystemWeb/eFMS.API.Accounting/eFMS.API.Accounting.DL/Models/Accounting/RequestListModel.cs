@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models.Accounting
 {
@@ -10,9 +8,9 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public ACTION Action { get; set; }
     }
 
-    public class RequestIntListModel
+    public class RequestStringListModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public ACTION Action { get; set; }
     }
 
@@ -24,9 +22,9 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string PaymentMethod { get; set; }
     }
 
-    public class RequestIntTypeListModel
+    public class RequestStringTypeListModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Type { get; set; }
         public ACTION Action { get; set; }
         public string PaymentMethod { get; set; }

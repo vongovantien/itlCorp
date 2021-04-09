@@ -82,7 +82,7 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            var isAllowUpdate = acctSOAService.CheckUpdatePermission(model.Soano);
+            var isAllowUpdate = acctSOAService.CheckUpdatePermission(model.Id);
             if(isAllowUpdate == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -107,45 +107,45 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Check allow delete SOA
         /// </summary>
-        /// <param name="soaNo">SOA No of SOA</param>
+        /// <param name="soaId">Id of SOA</param>
         /// <returns></returns>
-        [HttpGet("CheckAllowDelete/{soaNo}")]
-        public IActionResult CheckAllowDelete(string soaNo)
+        [HttpGet("CheckAllowDelete/{soaId}")]
+        public IActionResult CheckAllowDelete(string soaId)
         {
-            var result = acctSOAService.CheckDeletePermission(soaNo);
+            var result = acctSOAService.CheckDeletePermission(soaId);
             return Ok(result);
         }
 
         /// <summary>
         /// Check allow detail SOA
         /// </summary>
-        /// <param name="soaNo">SOA No of SOA</param>
+        /// <param name="soaId">Id of SOA</param>
         /// <returns></returns>
-        [HttpGet("CheckAllowDetail/{soaNo}")]
-        public IActionResult CheckAllowDetail(string soaNo)
+        [HttpGet("CheckAllowDetail/{soaId}")]
+        public IActionResult CheckAllowDetail(string soaId)
         {
-            var result = acctSOAService.CheckDetailPermission(soaNo);
+            var result = acctSOAService.CheckDetailPermission(soaId);
             return Ok(result);
         }
 
         /// <summary>
         /// delete an existed item
         /// </summary>
-        /// <param name="soaNo">soaNo of existed item that want to delete</param>
+        /// <param name="soaId">Id of existed item that want to delete</param>
         /// <returns></returns>
         [Authorize]
         [HttpDelete]
-        [Route("Delete")]
-        public IActionResult Delete(string soaNo)
+        [Route("Delete/{soaId}")]
+        public IActionResult Delete(string soaId)
         {
             currentUser.Action = "DeleteSoaPayment";
 
-            var isAllowDelete = acctSOAService.CheckDeletePermission(soaNo);
+            var isAllowDelete = acctSOAService.CheckDeletePermission(soaId);
             if (isAllowDelete == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            var hs = acctSOAService.DeleteSOA(soaNo);
+            var hs = acctSOAService.DeleteSOA(soaId);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -201,7 +201,8 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetBySoaNoAndCurrencyLocal(string soaNo, string currencyLocal)
         {
-            var isAllowViewDetail = acctSOAService.CheckDetailPermission(soaNo);
+            var id = acctSOAService.Get(x => x.Soano == soaNo).FirstOrDefault()?.Id;
+            var isAllowViewDetail = acctSOAService.CheckDetailPermission(id);
             if (isAllowViewDetail == false)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });

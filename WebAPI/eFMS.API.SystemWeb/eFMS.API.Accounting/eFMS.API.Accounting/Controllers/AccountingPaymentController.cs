@@ -410,7 +410,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 if (acctPayment != null && acctPayment.Type == "OBH")
                 {
-                    surchargeIds = acctSOAService.GetSurchargeIdBySoaId(Int32.Parse(acctPayment.RefId));                
+                    surchargeIds = acctSOAService.GetSurchargeIdBySoaId(acctPayment.RefId);                
                 }
             }
 

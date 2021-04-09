@@ -449,7 +449,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private HandleState UpdateExtendDateOBH(ExtendDateUpdatedModel model)
         {
-            int id = Convert.ToInt32(model.RefId);
+            string id = model.RefId;
             var soa = soaRepository.Get(x => x.Id == id).FirstOrDefault();
             soa.PaymentExtendDays = model.NumberDaysExtend;
             soa.PaymentNote = model.Note;
@@ -540,7 +540,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private AcctSoa UpdateSOAPaymentStatus(AccAccountingPayment item)
         {
-            var soa = soaRepository.Get(x => x.Id == Convert.ToInt32(item.RefId)).FirstOrDefault();
+            var soa = soaRepository.Get(x => x.Id == item.RefId).FirstOrDefault();
             var totalPaid = DataContext.Get(x => x.RefId == item.RefId && x.Id != item.Id).Sum(x => x.PaymentAmount);
             if (totalPaid == 0)
             {
@@ -712,7 +712,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public ExtendDateUpdatedModel GetOBHSOAExtendedDate(string id)
         {
-            var soa = soaRepository.Get(x => x.Id == Convert.ToInt32(id)).FirstOrDefault();
+            var soa = soaRepository.Get(x => x.Id == id).FirstOrDefault();
             if (soa == null) return null;
             return new ExtendDateUpdatedModel { RefId = id,
                 Note = soa.PaymentNote,
@@ -728,7 +728,7 @@ namespace eFMS.API.Accounting.DL.Services
             var groups = list.GroupBy(x => x.RefId);
             foreach (var group in groups)
             {
-                AcctSoa refSOA = soaRepository.Get(x => x.Id == Convert.ToInt32(group.Key)).FirstOrDefault();
+                AcctSoa refSOA = soaRepository.Get(x => x.Id == group.Key).FirstOrDefault();
                 IQueryable<CsShipmentSurcharge> surcharges = surchargeRepository.Get(x => x.Soano == refSOA.Soano && x.Type == AccountingConstants.TYPE_CHARGE_OBH);
                 IQueryable<AccAccountingPayment> existedPayments = DataContext.Get(x => x.RefId == refSOA.Id.ToString());
 

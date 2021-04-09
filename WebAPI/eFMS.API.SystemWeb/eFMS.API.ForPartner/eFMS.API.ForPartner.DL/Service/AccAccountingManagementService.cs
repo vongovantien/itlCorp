@@ -1219,9 +1219,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private HandleState RejectSoa(string id, string reason)
         {
-            var _id = 0;
-            int.TryParse(id, out _id);
-            var soa = acctSOARepository.Get(x => x.Id == _id).FirstOrDefault();
+            var soa = acctSOARepository.Get(x => x.Id == id).FirstOrDefault();
             if (soa == null) return new HandleState((object)"Không tìm thấy SOA");
 
             IQueryable<CsShipmentSurcharge> surcharges = null;

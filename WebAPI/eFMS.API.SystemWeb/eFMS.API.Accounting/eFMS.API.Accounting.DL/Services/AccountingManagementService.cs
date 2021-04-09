@@ -1642,14 +1642,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion --- DETAIL ---
 
-        #region --- EXPORT ---
-        private string GetCustomNoOldOfShipment(string jobNo)
-        {
-            var LookupCustomDeclaration = customsDeclarationRepo.Get().ToLookup(x => x.JobNo);
-            var customNos = LookupCustomDeclaration[jobNo].OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo).FirstOrDefault();
-            return customNos;
-        }
-
+        #region --- EXPORT ---        
         public List<AccountingManagementExport> GetDataAcctMngtExport(AccAccountingManagementCriteria criteria)
         {
             var query = ExpressionQuery(criteria);

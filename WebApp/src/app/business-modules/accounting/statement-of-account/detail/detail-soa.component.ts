@@ -332,8 +332,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     sendSoaToAccountant() {
-        const soaSyncIds: AccountingInterface.IRequestIntType[] = [];
-        const soaId: AccountingInterface.IRequestIntType = {
+        const soaSyncIds: AccountingInterface.IRequestStringType[] = [];
+        const soaId: AccountingInterface.IRequestStringType = {
             id: this.soa.id,
             type: this.soa.type,
             action: this.soa.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',

@@ -10,7 +10,7 @@ namespace eFMS.API.Accounting.DL.Models
 
     public class RejectSoaModel
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Reason { get; set; }
     }
 }

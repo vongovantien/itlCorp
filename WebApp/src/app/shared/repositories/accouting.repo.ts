@@ -33,8 +33,8 @@ export class AccountingRepo {
         }
     }
 
-    deleteSOA(soaNO: string) {
-        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/delete`, { soaNo: soaNO })
+    deleteSOA(soaId: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/delete/${soaId}`)
             .pipe(
                 map((data: any) => data)
             );
@@ -379,14 +379,14 @@ export class AccountingRepo {
         );
     }
 
-    checkAllowDeleteSOA(soaNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDelete/${soaNo}`).pipe(
+    checkAllowDeleteSOA(soaId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDelete/${soaId}`).pipe(
             map((data: any) => data)
         );
     }
 
-    checkAllowGetDetailSOA(soaNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDetail/${soaNo}`).pipe(
+    checkAllowGetDetailSOA(soaId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/CheckAllowDetail/${soaId}`).pipe(
             map((data: any) => data)
         );
     }
