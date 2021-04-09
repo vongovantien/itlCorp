@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from 'src/app/app.form';
@@ -56,12 +56,14 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
 
     isExistedTaxcode: boolean = false;
     @Input() isUpdate: boolean = false;
+    @Output() partnerLocationString: EventEmitter<string> = new EventEmitter<string>();
     isBranchSub: boolean;
     parentName: string = '';
     provinceIdName: string;
     countryIdName: string;
     countryShippingIdName: string;
     provinceShippingIdName: string;
+    partnerId: string = '';
     //
     @ViewChild('focusInput') internalReferenceRef: ElementRef;
 
@@ -137,6 +139,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             provinceId: [],
             parentId: [],
             partnerLocation: [null, Validators.required],
+            bankAccountName: []
         });
 
         this.partnerNameEn = this.formGroup.controls["partnerNameEn"];
@@ -158,6 +161,15 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
         this.addressEn = this.formGroup.controls["addressEn"];
         this.addressVn = this.formGroup.controls["addressVn"];
         this.partnerLocation = this.formGroup.controls["partnerLocation"];
+        this.isDisabled = this.parentId != null && !this.isUpdate ? true : false;
+    }
+
+    onRemove() {
+        this.isDisabled = true;
+        this.parentName = null;
+        if (!this.parentId.value) {
+            this.isDisabled = true;
+        }
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -165,6 +177,12 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
             case 'acRef':
                 this.parentName = data.shortName;
                 this.parentId.setValue(data.id);
+                if (!!this.parentId.value && this.isUpdate && this.parentId.value !== this.partnerId) {
+                    this.isDisabled = false;
+                }
+                else {
+                    this.isDisabled = true;
+                }
                 break;
             case 'shippping-country':
                 this.countryShippingIdName = data.nameEn;
@@ -309,6 +327,9 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
                     }
                 );
         }
+    }
+    selectedPartnerLocation(value: any) {
+        this.partnerLocationString.emit(value);
     }
 
 }

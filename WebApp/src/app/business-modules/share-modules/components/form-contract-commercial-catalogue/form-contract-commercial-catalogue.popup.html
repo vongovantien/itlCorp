@@ -164,11 +164,20 @@
                                 </ng-select>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-2">
                             <div class="form-group">
                                 <label>Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="currencyId" placeholder="Select Currency">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label>Credit Currency</label>
+                                <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
+                                    class="custom" formControlName="creditCurrency"
+                                    placeholder="Select Credit Currency">
                                 </ng-select>
                             </div>
                         </div>
@@ -330,12 +339,31 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Credit Rate</label>
-                                        <input min="0" disabled type="number" class="form-control"
-                                            formControlName="creditRate" numeric [decimals]="digitDecimal"
-                                            autoFormatCurrency>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Credit Unlimited
+                                                </label>
+                                                <div>
+                                                    <label class="m-checkbox m-checkbox--bold">
+                                                        <input type="checkbox" formControlName="creditUnlimited"
+                                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-8">
+                                            <div class="form-group">
+                                                <label>Credit Rate</label>
+                                                <input min="0" disabled type="number" class="form-control"
+                                                    formControlName="creditRate" numeric [decimals]="digitDecimal"
+                                                    autoFormatCurrency>
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                             </ng-container>
                         </div>
@@ -459,4 +487,9 @@
 
 <confirm-popup [body]="confirmChangeAgreementTypeText" [labelConfirm]="'Yes'"
     (onSubmit)="onSubmitChangeAgreementType()">
+</confirm-popup>
+
+<confirm-popup #confirmActive
+    [body]="'There are Other Agreement that same service, If Agreement is actived, Those Agreement will be Inactive. Are You Sure Active this agreement?'"
+    [labelConfirm]="'OK'" (onSubmit)="onSubmitActiveContract()">
 </confirm-popup>

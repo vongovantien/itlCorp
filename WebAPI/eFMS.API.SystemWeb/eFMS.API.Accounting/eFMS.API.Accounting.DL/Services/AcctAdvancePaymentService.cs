@@ -195,7 +195,7 @@ namespace eFMS.API.Accounting.DL.Services
             var permissionRangeRequester = GetPermissionRangeOfRequester();
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
-            var queryDefault = ExpressionQueryDefault(criteria); 
+            var queryDefault = ExpressionQueryDefault(criteria);
             var advancePayments = DataContext.Get().Where(queryDefault);
 
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
@@ -333,14 +333,14 @@ namespace eFMS.API.Accounting.DL.Services
         {
             Expression<Func<AcctAdvancePayment, bool>> query = q => true;
             if ((criteria.ReferenceNos == null || criteria.ReferenceNos.Count == 0)
-                && criteria.RequestDateFrom == null 
+                && criteria.RequestDateFrom == null
                 && criteria.RequestDateTo == null
-                && criteria.AdvanceModifiedDateFrom == null 
+                && criteria.AdvanceModifiedDateFrom == null
                 && criteria.AdvanceModifiedDateTo == null
                 && (string.IsNullOrEmpty(criteria.PaymentMethod) || criteria.PaymentMethod == "All")
                 && (string.IsNullOrEmpty(criteria.StatusApproval) || criteria.StatusApproval == "All")
                 && (string.IsNullOrEmpty(criteria.StatusPayment) || criteria.StatusPayment == "All")
-                && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All") )
+                && (string.IsNullOrEmpty(criteria.CurrencyID) || criteria.CurrencyID == "All"))
             {
                 var maxDate = (DataContext.Get().Max(x => x.DatetimeModified) ?? DateTime.Now).AddDays(1).Date;
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
@@ -358,7 +358,7 @@ namespace eFMS.API.Accounting.DL.Services
             advancePayments = QueryWithAdvanceRequest(advancePayments, criteria);
             advancePayments = advancePayments.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             return advancePayments;
-        } 
+        }
 
         private IQueryable<AcctAdvancePaymentResult> TakeAdvances(IQueryable<AcctAdvancePayment> advancePayments)
         {
@@ -460,7 +460,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ReasonReject = s.Key.ReasonReject,
                 PayeeName = s.Key.PayeeName
             });
-            
+
             return data;
         }
 
@@ -470,7 +470,7 @@ namespace eFMS.API.Accounting.DL.Services
             var result = TakeAdvances(advancePayments);
             return result;
         }
-        
+
         public string GetAdvanceStatusPayment(List<string> statusPayments)
         {
             var totalRequestAdvance = statusPayments.Count();
@@ -809,32 +809,52 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="HBL"></param>
         /// <param name="MBL"></param>
         /// <returns>true: đã tồn tại; false: chưa tồn tại</returns>
-        public bool CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria)
+        public List<ShipmentExistedInAdvanceModel> CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria)
         {
             try
             {
-                var result = false;
-                //Check trường hợp Add new advance payment
-                if (string.IsNullOrEmpty(criteria.AdvanceNo))
+                List<ShipmentExistedInAdvanceModel> result = new List<ShipmentExistedInAdvanceModel>();
+                var query = from adr in acctAdvanceRequestRepo.Get()
+                            join adv in DataContext.Get() on adr.AdvanceNo equals adv.AdvanceNo into adrgrps
+                            from advgrp in adrgrps.DefaultIfEmpty()
+                            join u in sysUserRepo.Get() on advgrp.Requester equals u.Id
+                            where adr.JobId == criteria.JobId
+                            && adr.Hbl == criteria.HBL
+                            && adr.Mbl == criteria.MBL
+                            select new { adr.AdvanceNo, adr.Amount, advgrp.RequestDate, u.Username, adr.Hblid,advgrp.AdvanceCurrency,advgrp.StatusApproval };
+
+                if (query != null && query.Count() > 0)
                 {
-                    result = acctAdvanceRequestRepo.Get().Any(x =>
-                      x.JobId == criteria.JobId
-                   && x.Hbl == criteria.HBL
-                   && x.Mbl == criteria.MBL);
+                    if (!string.IsNullOrEmpty(criteria.AdvanceNo))
+                    {
+                        query = query.Where(x => x.AdvanceNo != criteria.AdvanceNo);
+                    }
+
+                    result = query.Select(x => new
+                    {
+                        x.AdvanceNo,
+                        x.RequestDate,
+                        Requester = x.Username,
+                        x.Amount,
+                        HBL = x.Hblid,
+                        x.AdvanceCurrency,
+                        x.StatusApproval
+                    }).GroupBy(x => new { x.AdvanceNo, x.HBL, x.Requester, x.AdvanceCurrency,x.RequestDate, x.StatusApproval }).Select(x => new ShipmentExistedInAdvanceModel
+                    {
+                        AdvanceNo =  x.Key.AdvanceNo,
+                        TotalAmount = x.Sum(i => i.Amount),
+                        RequestDate = x.Key.RequestDate,
+                        Requester = x.Key.Requester,
+                        Currency = x.Key.AdvanceCurrency,
+                        StatusApproval = x.Key.StatusApproval
+                    }).OrderBy(x => x.RequestDate).ToList();
                 }
-                else //Check trường hợp Update advance payment
-                {
-                    result = acctAdvanceRequestRepo.Get().Any(x =>
-                      x.JobId == criteria.JobId
-                   && x.Hbl == criteria.HBL
-                   && x.Mbl == criteria.MBL
-                   && x.AdvanceNo != criteria.AdvanceNo);
-                }
+
                 return result;
             }
             catch (Exception ex)
             {
-                return false;
+                return new List<ShipmentExistedInAdvanceModel>();
             }
         }
 
@@ -2358,7 +2378,7 @@ namespace eFMS.API.Accounting.DL.Services
                 HandleState resultAddNotificationCredit = new HandleState(false);
                 HandleState resultAddNotificationPayement = new HandleState(false);
                 HandleState resultAddNotificationExpiredDate = new HandleState(false);
-                var lstCustomer = agreements.Select(t => t.Customers.Select(z=>z).ToList()).FirstOrDefault();
+                var lstCustomer = agreements.Select(t => t.Customers.Select(z => z).ToList()).FirstOrDefault();
                 var dataPartner = catPartnerRepo.Get(x => lstCustomer.Contains(x.Id)).ToList();
                 foreach (var item in agreements)
                 {
@@ -2369,14 +2389,14 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (var partner in dataPartner)
                         {
                             descriptions.Add(string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> is over credit limit with "
-                            + item.CreditRate + " Please check it soon ")) ;
+                            + item.CreditRate + " Please check it soon "));
                         }
                         // Add Notification
                         resultAddNotificationCredit = AddNotifications(descriptions, agreements.ToList());
                     }
 
                     // payment term
-                    if(accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.Office.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day > 0))
+                    if (accAccountReceivableRepository.Any(x => item.OfficeId.Contains(x.Office.ToString()) && item.SaleService.Contains(x.Service) && item.PartnerId == x.PartnerId && x.Over30Day > 0))
                     {
                         List<string> descriptions = new List<string>();
                         foreach (var partner in dataPartner)
@@ -2408,13 +2428,13 @@ namespace eFMS.API.Accounting.DL.Services
                         List<string> descriptions = new List<string>();
                         foreach (var partner in dataPartner)
                         {
-                            descriptions.Add( string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> is over Expired Date with"
+                            descriptions.Add(string.Format(@"<b style='color:#3966b6'>" + partner.ShortName + "</b> is over Expired Date with"
                             + item.ExpiredDate + " Please check it soon "));
                         }
                         resultAddNotificationPayement = AddNotifications(descriptions, agreements.ToList());
                     }
                 }
-                if(resultAddNotificationCredit.Success || resultAddNotificationPayement.Success || resultAddNotificationExpiredDate.Success)
+                if (resultAddNotificationCredit.Success || resultAddNotificationPayement.Success || resultAddNotificationExpiredDate.Success)
                 {
                     return true;
                 }
@@ -2422,7 +2442,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                throw ex; 
+                throw ex;
             }
         }
 
@@ -2479,7 +2499,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     foreach (var item in lstJob)
                     {
-                        if(item.isCheckedCreditRate == true || item.isCheckedPaymentTerm == true || item.isCheckedExpiredDate == true)
+                        if (item.isCheckedCreditRate == true || item.isCheckedPaymentTerm == true || item.isCheckedExpiredDate == true)
                         {
                             CatContract agreement = new CatContract();
                             if (item.TransactionType == "CL")
@@ -2499,14 +2519,14 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                 }
-                var result  = mapper.Map<List<CatContractModel>>(agreements);
+                var result = mapper.Map<List<CatContractModel>>(agreements);
                 result.ForEach(x => x.Customers = listCustomer);
                 //SendNotificationAccountReceivable(result);
                 return result;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw ex; 
+                throw ex;
             }
         }
 
@@ -2542,7 +2562,7 @@ namespace eFMS.API.Accounting.DL.Services
                 List<SysUserNotification> userNotifications = new List<SysUserNotification>();
                 foreach (var item in users)
                 {
-                    foreach(var noti in notifications)
+                    foreach (var noti in notifications)
                     {
                         SysUserNotification userNotify = new SysUserNotification
                         {
@@ -2557,7 +2577,7 @@ namespace eFMS.API.Accounting.DL.Services
                         };
                         userNotifications.Add(userNotify);
                     }
-                   
+
                 }
                 HandleState hsSysUserNotification = sysUserNotifyRepository.Add(userNotifications, false);
                 notificationRepository.SubmitChanges();
@@ -3302,7 +3322,7 @@ namespace eFMS.API.Accounting.DL.Services
             var request = from ar in acctAdvanceRequestRepo.Get()
                           join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
                           where ar.JobId == jobId
-                          select new { ar.AdvanceNo, ar.Hbl, ar.Amount,ar.RequestCurrency,ar.JobId,ar.Hblid,ar.Mbl };
+                          select new { ar.AdvanceNo, ar.Hbl, ar.Amount, ar.RequestCurrency, ar.JobId, ar.Hblid, ar.Mbl };
 
             IQueryable<OpsTransaction> opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
             IQueryable<CsTransaction> docShipment = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);

@@ -47,6 +47,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
     }
 
     ngAfterViewInit() {
+        this.contractList.partnerLocation = this.formCreate.partnerLocation.value;
         combineLatest([
             this._activedRoute.params,
             this._activedRoute.data,
@@ -71,6 +72,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 if (res.partnerId) {
                     this.partnerId = res.partnerId;
                     this.partnerList.parentId = this.partnerId;
+                    this.formCommercialComponent.partnerId = this.partnerId;
 
                     this.getDetailCustomer(this.partnerId);
                     this.partnerEmailList.getEmailPartner(this.partnerId);
@@ -154,8 +156,15 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
             provinceId: partner.provinceId,
             provinceShippingId: partner.provinceShippingId,
             partnerLocation: partner.partnerLocation,
-            parentId: this.isAddSubPartner ? partner.id : partner.parentId
+            parentId: this.isAddSubPartner ? partner.id : partner.parentId,
+            bankAccountName: partner.bankAccountName
         });
+        if (this.formCommercialComponent.partnerId !== partner.parentId) {
+            this.formCommercialComponent.isDisabled = false;
+        }
+        else {
+            this.formCommercialComponent.isDisabled = true;
+        }
     }
 
     getListContract(partneId: string) {
@@ -219,13 +228,14 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         modelAdd.coLoaderCode = this.partner.coLoaderCode;
         modelAdd.website = this.partner.website;
         modelAdd.bankAccountNo = this.partner.bankAccountNo;
-        modelAdd.bankAccountName = this.partner.bankAccountName;
+        //modelAdd.bankAccountName = this.partner.bankAccountName;
         modelAdd.bankAccountAddress = this.partner.bankAccountAddress;
         modelAdd.note = this.partner.note;
         modelAdd.public = this.partner.public;
         modelAdd.workPlaceId = this.partner.workPlaceId;
         modelAdd.partnerMode = this.partner.partnerMode;
         modelAdd.partnerLocation = this.formCreate.partnerLocation.value;
+
 
         console.log(modelAdd);
         this.updatePartner(modelAdd);

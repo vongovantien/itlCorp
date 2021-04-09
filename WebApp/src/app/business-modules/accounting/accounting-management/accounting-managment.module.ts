@@ -32,6 +32,7 @@ import { AccountingManagementImportVatInvoiceComponent } from './vat/import/acco
 import { ShareAccountingModule } from '../share-accouting.module';
 import { DeactivateGuardService } from '@core';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
+import { AccountingManagementSelectPartnerCombinePopupComponent } from './components/popup/select-partner-combine/select-partner-combine.popup';
 
 const routing: Routes = [
     {
@@ -123,7 +124,8 @@ const maskConfig: Partial<IConfig> = {
         AccountingManagementCreateVoucherComponent,
         AccountingManagementFormCreateVoucherComponent,
         AccountingManagementDetailVoucherComponent,
-        AccountingManagementImportVatInvoiceComponent
+        AccountingManagementImportVatInvoiceComponent,
+        AccountingManagementSelectPartnerCombinePopupComponent
     ],
 
     exports: [],

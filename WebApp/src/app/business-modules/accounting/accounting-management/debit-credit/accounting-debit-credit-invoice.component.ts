@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store';
 
 import { DocumentationRepo, AccountingRepo } from '@repositories';
 import { SortService } from '@services';
-import { PartnerOfAcctManagementResult, CDNoteViewModel } from '@models';
+import { PartnerOfAcctManagementResult, CDNoteViewModel, CombineBillingCriteria, Crystal } from '@models';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { AccountingConstants, RoutingConstants } from '@constants';
 
@@ -18,6 +18,8 @@ import { AccountingDetailCdNoteComponent } from '../components/popup/detail-cd-n
 
 import { catchError, finalize, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { AccountingManagementSelectPartnerCombinePopupComponent } from '../components/popup/select-partner-combine/select-partner-combine.popup';
+import { ReportPreviewComponent } from '@common';
 
 
 
@@ -31,12 +33,15 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
 
     @ViewChild(AccountingDetailCdNoteComponent) cdNoteDetailPopupComponent: AccountingDetailCdNoteComponent;
     @ViewChild(AccountingManagementSelectPartnerPopupComponent) selectPartnerPopup: AccountingManagementSelectPartnerPopupComponent;
+    @ViewChild(AccountingManagementSelectPartnerCombinePopupComponent) selectPartnerCombinePopup: AccountingManagementSelectPartnerCombinePopupComponent;
+    @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
 
     selectedTab: TAB = 'CDI';
     cdNotes: CDNoteViewModel[] = [];
 
     menuSpecialPermission: Observable<any[]>;
     selectedIssueType: string;
+    cdNoteCombine: CombineBillingCriteria[] = [];
 
     constructor(
         private _router: Router,
@@ -138,6 +143,11 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
 
     issueVatInvoice() {
+        const existCdNoteIssued = this.cdNotes.filter(x => x.isSelected && x.status !== 'New');
+        if (!!existCdNoteIssued.length) {
+            this._toastService.warning("An existing cd note has been issued, please check it");
+            return;
+        }
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
         if (!!cdNotes.length) {
             this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.INVOICE);
@@ -145,6 +155,11 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
     }
 
     issueVoucher() {
+        const existCdNoteIssued = this.cdNotes.filter(x => x.isSelected && x.status !== 'New');
+        if (!!existCdNoteIssued.length) {
+            this._toastService.warning("An existing cd note has been issued, please check it");
+            return;
+        }
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected && x.status === 'New');
         if (!!cdNotes.length) {
             this.searchRef(cdNotes.map(x => x.referenceNo), AccountingConstants.ISSUE_TYPE.VOUCHER);
@@ -212,5 +227,47 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         }
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNTING_MANAGEMENT}/voucher/new`]);
 
+    }
+
+    previewCombine(currency: string) {
+        const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected);
+        if (!!cdNotes.length) {
+            this.cdNoteCombine = cdNotes.map(i => new CombineBillingCriteria({ cdNoteCode: i.referenceNo, partnerId: i.partnerId, partnerName: i.partnerName, currencyCombine: currency })).filter((g, i, arr) => arr.findIndex(t => t.cdNoteCode === g.cdNoteCode) === i); // Distinct CdNote Code;
+            const partners: CombineBillingCriteria[] = this.cdNoteCombine.filter((g, i, arr) => arr.findIndex(t => t.partnerId === g.partnerId) === i); //Distinct PartnerId           
+            if (partners.length > 1) {
+                this.selectPartnerCombinePopup.listPartners = partners;
+                this.selectPartnerCombinePopup.selectedPartner = null;
+                this.selectPartnerCombinePopup.show();
+            } else {
+                const combineCriteria = this.cdNoteCombine.filter(x => x.partnerId == partners[0].partnerId);
+                this.previewCombineBilling(combineCriteria);
+            }
+        } else {
+            this._toastService.warning("Please select CD Note to preview");
+        }
+    }
+
+    onSelectPartnerCombine(partner: CombineBillingCriteria) {
+        const combineCriteria = this.cdNoteCombine.filter(x => x.partnerId == partner.partnerId);
+        this.previewCombineBilling(combineCriteria);
+    }
+
+    previewCombineBilling(combineCriteria: CombineBillingCriteria[]) {
+        this._progressRef.start();
+        this._documentationRepo.previewCombineBilling(combineCriteria)
+            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: Crystal) => {
+                    if (res != null) {
+                        this.dataReport = res;
+                        setTimeout(() => {
+                            this.previewPopup.frm.nativeElement.submit();
+                            this.previewPopup.show();
+                        }, 1000);
+                    } else {
+                        this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
     }
 }

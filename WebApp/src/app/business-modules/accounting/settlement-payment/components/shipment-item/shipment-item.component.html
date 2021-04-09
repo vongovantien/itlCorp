@@ -4,12 +4,22 @@
             <a class="m--margin-right-10">
                 <i class="la la-angle-double-down"></i>
             </a>
-            <a (click)="checkUncheckAllRequest($event)">
-                <label class="m-checkbox m-checkbox--bold">
-                    <input type="checkbox" [(ngModel)]="isCheckAll">
-                    <span></span>
-                </label>
-            </a>
+            <ng-container *ngIf="!data.isLocked;else lockIconTpl">
+                <a (click)="checkUncheckAllRequest($event)">
+                    <label class="m-checkbox m-checkbox--bold">
+                        <input type="checkbox" [(ngModel)]="isCheckAll">
+                        <span></span>
+                    </label>
+                </a>
+            </ng-container>
+            <ng-template #lockIconTpl>
+                <span>
+                    <button type="button" title="Shipment has been locked"
+                        class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only" style="height: 22px">
+                        <i class="fa fa-lock font-18" style="font-size:18px"></i>
+                    </button>
+                </span>
+            </ng-template>
             <a class="dropdown m-dropdown m-dropdown--inline">
                 <i class="la la-file-text" data-toggle="dropdown"></i>
                 <div class="dropdown-menu">
@@ -95,4 +105,16 @@
             </ng-container>
         </a>
     </div>
+    <ng-container *ngIf="data.isLocked">
+        <div class="stamp" style="
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-top: 44px solid #fcb34c;
+    border-left: 53px solid transparent;
+    right: 0;
+    top: 0">
+        </div>
+        <i class="la la-lock text-white" style="position: absolute;top:3px; right:0;"></i>
+    </ng-container>
 </div>

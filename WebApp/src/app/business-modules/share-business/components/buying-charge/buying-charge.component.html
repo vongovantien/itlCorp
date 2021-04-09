@@ -27,11 +27,13 @@
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item pointer" (click)="getStandardCharge()">Standard</a>
+                                <a class="dropdown-item pointer" *ngIf="showGetChargeStandart"
+                                    (click)="getStandardCharge()">Standard</a>
                                 <a class="dropdown-item pointer" (click)="getOtherCharge()"
                                     *ngIf="showSyncOtherCharge">Other</a>
                                 <a class="dropdown-item pointer" (click)="getRecentlyCharge()">Recently</a>
                             </div>
+
                         </div>
                         <ng-container *ngIf="(permissionShipments | async)?.allowUpdateCharge">
                             <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveBuyingCharge('BUY')"

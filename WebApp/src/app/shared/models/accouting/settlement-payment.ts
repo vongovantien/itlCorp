@@ -35,6 +35,7 @@ export class SettlementPayment {
     reasonReject: string = null;
     payee: string = null;
     payeeName: string = null;
+    settlementType: string = null;
 
     constructor(object?: any) {
         const self = this;
@@ -56,5 +57,6 @@ export class SettleRequestsPayment {
     mbl: string = '';
     amount: number = 0;
     settlementCurrency: string = '';
+    isLocked: boolean;
 
 }

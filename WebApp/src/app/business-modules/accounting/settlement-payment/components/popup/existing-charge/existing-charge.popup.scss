@@ -1,0 +1,20 @@
+:host /deep/ {
+    .existing-charge-popup {
+       .item-shipment-wrapper{
+           max-height: 500px;
+           overflow-y: scroll;
+       }
+       .table-scrollable{
+        .table {
+            tr {
+                th,
+                td {
+                    &.table-actions-col {
+                        min-width: 50px;
+                    }
+                }
+            }
+        }
+       }
+    }
+}

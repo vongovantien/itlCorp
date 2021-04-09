@@ -65,7 +65,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
 
 
     ngAfterViewInit() {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
         ]).pipe(
@@ -251,7 +251,8 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         return of(200);
                     }
                     return of(201);
-                })
+                }),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe((value: number) => {
                 if (value === 403) {

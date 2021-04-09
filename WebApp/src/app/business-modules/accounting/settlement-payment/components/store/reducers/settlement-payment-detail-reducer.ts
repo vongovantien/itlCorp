@@ -15,8 +15,11 @@ export const initialState: SettlePaymentDetailState = {
 
 const reducer = createReducer(
     initialState,
+    on(Actions.LoadDetailSettlePayment, (state: SettlePaymentDetailState) => ({
+        ...state, isLoading: true, isLoaded: false
+    })),
     on(Actions.LoadDetailSettlePaymentSuccess, (state: SettlePaymentDetailState, payload: ISettlementPaymentData) => ({
-        ...state, settlement: payload
+        ...state, settlement: payload, isLoading: false, isLoaded: true
     }))
 );
 

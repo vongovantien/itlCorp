@@ -22,7 +22,7 @@ import { SettlementFormCreateComponent } from '../components/form-create-settlem
 import { catchError, pluck } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
-import { LoadDetailSettlePaymentSuccess } from '../components/store';
+import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment } from '../components/store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -55,7 +55,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
 
     ngOnInit() {
-        this._activedRouter.params
+        this.subscription = this._activedRouter.params
             .pipe(pluck('id'))
             .subscribe((id: string) => {
                 if (!!id && isUUID(id)) {
@@ -133,6 +133,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     }
 
     getDetailSettlement(settlementId: string, typeCharge: string) {
+        this._store.dispatch(LoadDetailSettlePayment({ id: settlementId }));
         this._accoutingRepo.getDetailSettlementPayment(settlementId)
             .pipe(
                 catchError(this.catchError),
@@ -145,6 +146,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         return;
                     }
                     this.settlementPayment = res;
+
+                    // * Update store.
                     this._store.dispatch(LoadDetailSettlePaymentSuccess(this.settlementPayment));
 
                     switch (this.settlementPayment.settlement.statusApproval) {
@@ -182,7 +185,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.requestSurchargeListComponent.TYPE = typeCharge; // ? GROUP/LIST
                     this.requestSurchargeListComponent.STATE = 'WRITE'; //  ? READ/WRITE
                     this.requestSurchargeListComponent.isShowButtonCopyCharge = false;
-
+                    if (this.settlementPayment.settlement.settlementType === 'DIRECT') {
+                        this.requestSurchargeListComponent.isDirectSettlement = true;
+                    }
+                    if (this.settlementPayment.settlement.settlementType === 'EXISTING') {
+                        this.requestSurchargeListComponent.isExistingSettlement = true;
+                    }
                     // if (this.requestSurchargeListComponent.groupShipments.length) {
                     //     this.requestSurchargeListComponent.openAllCharge.next(true);
                     // }

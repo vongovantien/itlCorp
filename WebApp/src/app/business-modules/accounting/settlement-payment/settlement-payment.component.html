@@ -166,28 +166,38 @@
                                                             (onClick)="sortByCustomClearance($event)">
                                                         </thead>
                                                         <tbody>
-                                                            <ng-container *ngIf="!!customClearances.length">
-                                                                <tr *ngFor="let clearance of customClearances; let j = index; trackBy: trackByFn"
+                                                            <ng-container *ngIf="!!shipments.length">
+                                                                <tr *ngFor="let item of shipments; let j = index; trackBy: trackByFn"
                                                                     class="">
                                                                     <td>
-                                                                        <span>{{clearance.jobId}}</span>
+                                                                        <span>
+                                                                            {{item.jobId}}
+                                                                            <span>
+                                                                                <button type="button"
+                                                                                    *ngIf="item.isLocked"
+                                                                                    title="Shipment has been locked"
+                                                                                    class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
+                                                                                    <i class="fa fa-lock font-18"
+                                                                                        style="font-size:18px"></i>
+                                                                                </button>
+                                                                            </span>
+                                                                        </span>
                                                                     </td>
                                                                     <td>
-                                                                        <span>{{clearance.mbl}}</span>
+                                                                        <span>{{item.mbl}}</span>
                                                                     </td>
                                                                     <td>
-                                                                        <span>{{clearance.hbl}}</span>
+                                                                        <span>{{item.hbl}}</span>
                                                                     </td>
                                                                     <td>
-                                                                        <span>{{clearance.amount | number:
-                                                                            '.0-3'}}</span>
+                                                                        <span>{{item.amount | number: '.0-3'}}</span>
                                                                     </td>
                                                                     <td>
-                                                                        <span>{{clearance.settlementCurrency}}</span>
+                                                                        <span>{{item.settlementCurrency}}</span>
                                                                     </td>
                                                                 </tr>
                                                             </ng-container>
-                                                            <tr *ngIf="!customClearances.length" app-table-none-record
+                                                            <tr *ngIf="!shipments.length" app-table-none-record
                                                                 [colspan]="headerCustomClearance.length">
                                                             </tr>
                                                         </tbody>

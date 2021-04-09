@@ -5,6 +5,7 @@ using eFMS.API.Documentation.DL.Models.Criteria;
 using ITL.NetCore.Common;
 using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Connection.BL;
+using System;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -21,6 +22,7 @@ namespace eFMS.API.Documentation.DL.IService
         List<GeneralReportResult> GetDataGeneralReport(GeneralReportCriteria criteria,int page,int size, out int rowCount);
         List<GeneralReportResult> QueryDataGeneralReport(GeneralReportCriteria criteria);
         IQueryable<GeneralExportShipmentOverviewResult> GetDataGeneralExportShipmentOverview(GeneralReportCriteria criteria);
+        IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewFCL(GeneralReportCriteria criteria);
         IQueryable<AccountingPlSheetExportResult> GetDataAccountingPLSheet(GeneralReportCriteria criteria);
         List<JobProfitAnalysisExportResult> GetDataJobProfitAnalysis(GeneralReportCriteria criteria);
         List<SummaryOfCostsIncurredExportResult> GetDataSummaryOfCostsIncurred(GeneralReportCriteria criteria);
@@ -30,5 +32,6 @@ namespace eFMS.API.Documentation.DL.IService
         CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId);
         SummaryOfRevenueModel GetDataCostsByPartner(GeneralReportCriteria criteria);
         HandleState LockShipmentList(List<string> JobIds);
+        List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id);
     }
 }

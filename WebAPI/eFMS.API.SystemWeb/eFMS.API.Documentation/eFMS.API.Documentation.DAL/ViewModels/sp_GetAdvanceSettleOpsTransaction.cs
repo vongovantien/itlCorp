@@ -17,5 +17,11 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string AdvanceCurrency { get; set; }
         public string AdvanceStatusApproval { get; set; }
         public string AdvRequester { get; set; }
+        public string AdvanceSyncStatus { get; set; }
+        public string SettlementSyncStatus { get; set; }
+        public string AdvanceVoucherNo { get; set; }
+        public string SettlementVoucherNo { get; set; }
+        public DateTime? AdvanceVoucherDate { get; set; }
+        public DateTime? SettlementVoucherDate { get; set; }
     }
 }

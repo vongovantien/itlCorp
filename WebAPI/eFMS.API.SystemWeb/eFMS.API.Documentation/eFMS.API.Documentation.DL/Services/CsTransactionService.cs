@@ -55,6 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> accAdvanceRequestRepository;
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
+        private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
 
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
@@ -90,6 +91,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvanceRequest> accAdvanceRequestRepo,
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
+            IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -122,7 +124,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAdvancePaymentRepository = accAdvancePaymentRepo;
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
-
+            shippingInstructionServiceRepo = shippingInstruction;
         }
 
         #region -- INSERT & UPDATE --
@@ -2148,6 +2150,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>();
             List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
+            var siDetail = shippingInstructionServiceRepo.Get(x => x.JobId == model.Id).FirstOrDefault();
 
             try
             {
@@ -2258,6 +2261,13 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                 }
 
+                // Bill Instruction
+                if(siDetail != null)
+                {
+                    siDetail.JobId = transaction.Id;
+                    siDetail.IssuedUser = transaction.UserCreated;
+                }
+
                 HandleState hsTrans = transactionRepository.Add(transaction);
                 if (hsTrans.Success)
                 {
@@ -2289,6 +2299,12 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         HandleState hsFreighcharges = freighchargesRepository.Add(freightCharges, false);
                         freighchargesRepository.SubmitChanges();
+                    }
+
+                    if(siDetail != null)
+                    {
+                        HandleState hsBillSI = shippingInstructionServiceRepo.Add(siDetail, false);
+                        shippingInstructionServiceRepo.SubmitChanges();
                     }
                     if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
                     {
@@ -3000,15 +3016,46 @@ namespace eFMS.API.Documentation.DL.Services
                             hbl.UserModified = currentUser.UserID;
                             hbl.DatetimeModified = DateTime.Now;
 
-                            hbl.Eta = model.Eta;
-                            hbl.Etd = model.Etd;
-                            hbl.Pod = model.Pod;
-                            hbl.Pol = model.Pol;
+                            if (model.Eta != null)
+                            {
+                                hbl.Eta = model.Eta;
+                            }
+                            if (model.Etd != null)
+                            {
+                                hbl.Etd = model.Etd;
+                            }
+                            if (model.Pod != null)
+                            {
+                                hbl.Pod = model.Pod;
+                            }
+                            if (model.Pol != null)
+                            {
+                                hbl.Pol = model.Pol;
+                            }
 
                             hbl.CustomsBookingNo = model.BookingNo;
                             hbl.Mawb = model.MblNo;
                             hbl.OceanVoyNo = model.FlightVesselName + " - " + model.VoyNo;
 
+                            // date of issue
+                            if (shipment.TransactionType.Contains("E"))
+                            {
+                                hbl.IssueHbldate = model.Etd;
+                                var _onBoardStatus = hbl.OnBoardStatus.Split('\n');
+                                var status = string.Empty;
+                                foreach (var st in _onBoardStatus)
+                                {
+                                    if (DateTime.TryParse(st, out DateTime result))
+                                    {
+                                        status += model.Etd?.ToString("MMM dd, yyyy");
+                                    }
+                                    else
+                                    {
+                                        status += (st + "\n");
+                                    }
+                                }
+                                hbl.OnBoardStatus = status;
+                            }
                             csTransactionDetailRepo.Update(hbl, x => x.Id == hbl.Id, false);
                         }
                         csTransactionDetailRepo.SubmitChanges();

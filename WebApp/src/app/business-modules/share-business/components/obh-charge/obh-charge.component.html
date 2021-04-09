@@ -21,7 +21,8 @@
             <div class="col-md-8" *ngIf="(isLocked | async) === false">
                 <ng-container *ngIf="(permissionShipments | async).allowUpdateCharge">
                     <div class="m--align-right c-button-actions">
-                        <div class="dropdown m-dropdown m-dropdown--inline" *ngIf="allowSaving">
+                        <div class="dropdown m-dropdown m-dropdown--inline"
+                            *ngIf="allowSaving && !!shipment.transactionType">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
                                 <i class="la la-download"></i> Get Charge<span class="caret"></span>
                             </button>
@@ -79,12 +80,8 @@
                                 <div class="form-group col-md-12 dropdown-partner" dropdown [tooltip]="charge.payerName"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.payerName ||charge.paymentObjectId === charge.payerId )}">
                                     <ng-container *ngIf="!!charge.creditNo                                         
-                                        || !!charge.debitNo 
                                         || !!charge.settlementCode
-                                        || !!charge.soano
                                         || !!charge.paySoano
-                                        || !!charge.voucherId
-                                        || !!charge.voucherIddate
                                         || !!charge.voucherIdre
                                         || !!charge.voucherIdreDate
                                         || !charge.isFromShipment || (isLocked | async) === true;else  payerCharge">

@@ -32,7 +32,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState AddAdvancePayment(AcctAdvancePaymentModel model);
 
         // Kiểm tra lô hàng (JobId, HBL, MBL) đã được add trong advance payment nào hay chưa?
-        bool CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
+        List<ShipmentExistedInAdvanceModel> CheckShipmentsExistInAdvancePayment(ShipmentAdvancePaymentCriteria criteria);
 
         HandleState DeleteAdvancePayment(string advanceNo);
 

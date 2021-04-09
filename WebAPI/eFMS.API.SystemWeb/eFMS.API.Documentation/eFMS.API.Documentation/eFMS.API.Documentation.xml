@@ -110,6 +110,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.AcctCDNoteController.PreviewCombineBilling(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.Criteria.CombineBillingCriteria})">
+            <summary>
+            Preview Combine Billing CD Note
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Documentation.Controllers.CsAirWayBillController">
             <summary>
             
@@ -564,6 +571,13 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetRecentlyCharges(eFMS.API.Documentation.DL.Models.RecentlyChargeCriteria)">
+            <summary>
+            get recently charges
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.GetRecentlyChargesOps(eFMS.API.Documentation.DL.Models.RecentlyChargeCriteria)">
             <summary>
             get recently charges
             </summary>
@@ -1101,6 +1115,13 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportShipmentOverview(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Get data for export shipment overview
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportShipmentOverviewFCL(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Get data for export shipment overview
             </summary>

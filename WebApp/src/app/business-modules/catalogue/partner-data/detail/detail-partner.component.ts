@@ -50,7 +50,7 @@ export class PartnerDetailComponent extends AppList {
     @ViewChild(CommercialBranchSubListComponent) listSubPartner: CommercialBranchSubListComponent;
     @ViewChild(CommercialEmailListComponent) partnerEmailList: CommercialEmailListComponent;
     @ViewChild(UserCreatePopupComponent) userCreatePopup: UserCreatePopupComponent;
-    
+
     public originRoute: string = null;
     contracts: Contract[] = [];
     selectedContract: Contract = new Contract();
@@ -183,6 +183,7 @@ export class PartnerDetailComponent extends AppList {
                             this.getSubListPartner(this.partner.id);
                         }
                         this.formPartnerComponent.activePartner = this.partner.active;
+
                         this.userCreatePopup.partnerId = this.partner.id;
                     }
                 }

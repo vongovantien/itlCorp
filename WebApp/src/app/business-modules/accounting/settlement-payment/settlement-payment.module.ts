@@ -37,6 +37,7 @@ import { reducers } from './components/store';
 import { SettlementPaymentsPopupComponent } from './components/popup/settlement-payments/settlement-payments.popup';
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { SettlePaymentEffect } from './components/store/effects/settlement-payment.effect';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 import { SettlementAttachFileListComponent } from './components/attach-file/attach-file-list-settlement.component';
 import { SettlementShipmentAttachFilePopupComponent } from './components/popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
@@ -94,6 +95,11 @@ const customCurrencyMaskConfig = {
     nullable: true
 };
 
+const maskConfig: Partial<IConfig> = {
+    validation: false,
+    showMaskTyped: true,
+    dropSpecialCharacters: false
+};
 @NgModule({
     imports: [
         SharedModule,
@@ -112,6 +118,7 @@ const customCurrencyMaskConfig = {
         StoreModule.forFeature('settlement-payment', reducers),
         EffectsModule.forFeature([SettlePaymentEffect]),
         ShareModulesModule,
+        NgxMaskModule.forRoot(maskConfig),
         TabsModule
     ],
     exports: [],

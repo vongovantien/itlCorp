@@ -6,6 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 import { CustomDeclaration, AdvancePaymentRequest } from 'src/app/shared/models';
 import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { InjectViewContainerRefDirective } from '@directives';
+import { AdvancePaymentShipmentExistedPopupComponent } from '../shipment-existed/shipment-existed.popup';
 
 @Component({
     selector: 'adv-payment-add-popup',
@@ -18,7 +19,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     @Output() onUpdate: EventEmitter<any> = new EventEmitter<any>();
 
     @ViewChild(InjectViewContainerRefDirective) confirmContainerRef: InjectViewContainerRefDirective;
-    @ViewChild('existedPopup') confirmEsixedJobPopup: ConfirmPopupComponent;
+    @ViewChild(AdvancePaymentShipmentExistedPopupComponent) confirmEsixedJobPopup: AdvancePaymentShipmentExistedPopupComponent;
 
     action: string = 'create';
 
@@ -58,7 +59,7 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
     configCustomDisplayFields: CommonInterface.IComboGridDisplayField[];
 
     initShipments: OperationInteface.IShipment[];
-
+    shipmentExisted: any[];
     constructor(
         private _fb: FormBuilder,
         private _accoutingRepo: AccountingRepo,
@@ -218,16 +219,10 @@ export class AdvancePaymentAddRequestPopupComponent extends PopupBase {
                         this.resetForm();
                     } else {
                         this.dataRequest = advRequest;
-
-                        // ! Bỏ bô gọi API, render dynamic không show được
-                        // this.showPopupDynamicRender(ConfirmPopupComponent, this.confirmContainerRef.viewContainerRef, {
-                        //     body: 'Shipment has existed in another Advance !',
-                        //     title: 'Warning'
-                        // }, () => {
-                        //     this.onSubmitShipmentExisted();
-                        // })
-
-                        this.confirmEsixedJobPopup.show();
+                        if (!!res.data) {
+                            this.shipmentExisted = [...res.data];
+                            this.confirmEsixedJobPopup.show();
+                        }
                     }
                 },
             );

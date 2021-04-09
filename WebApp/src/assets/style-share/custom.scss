@@ -368,6 +368,16 @@ a {
                     background-color: #f2dedf;
                 }
             }
+            &.bg-warning {
+                background: rgb(255, 242, 204) !important;
+                .fixed-side {
+                    background: rgb(255, 242, 204) !important;
+                }
+                .e--combogrid_icon,
+                .e--combogrid_icon__clear {
+                    background: rgb(255, 242, 204) !important;
+                }
+            }
         }
         & + tbody {
             border-top: 0;
@@ -1386,4 +1396,12 @@ button {
             }
         }
     }
+}
+
+.bg-warning {
+    background: rgb(255, 242, 204) !important;
+}
+
+.bg-locked {
+    background: rgb(217, 217, 217) !important;
 }

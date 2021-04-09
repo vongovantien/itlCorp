@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -208,7 +209,18 @@ namespace eFMS.API.Documentation.Controllers
             var result = data;
             return Ok(result);
         }
-
+        /// <summary>
+        /// Get data for export shipment overview
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportShipmentOverviewFCL")]
+        public IActionResult GetDataExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        {
+            var data = shipmentService.GetDataGeneralExportShipmentOverviewFCL(criteria);
+            var result = data;
+            return Ok(result);
+        }
         /// <summary>
         /// Get data for export accounting P/L
         /// </summary>
@@ -307,6 +319,13 @@ namespace eFMS.API.Documentation.Controllers
         {
             var data = shipmentService.GetIncentiveReport(criteria, userId);
             return Ok(data);
+        }
+
+        [HttpGet("AdvanceSettlement")]
+        public IActionResult opsAdvanceSettlements(Guid JobID)
+        {
+            var job = shipmentService.GetAdvanceSettlements(JobID);
+            return Ok(job);
         }
     }
 }

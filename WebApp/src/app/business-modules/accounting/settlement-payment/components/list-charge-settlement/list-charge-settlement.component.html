@@ -4,7 +4,7 @@
             <div>
                 <ng-container *ngIf="!!STATE && STATE === 'WRITE'">
                     <button type="button" class="btn btn-info  m-btn--icon m-btn--uppercase m--margin-right-10"
-                        (click)="showCreateCharge()">
+                        (click)="showCreateCharge()" *ngIf="!isExistingSettlement">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -13,7 +13,7 @@
                         </span>
                     </button>
                     <button type="button" class="btn btn-warning  m-btn--icon m-btn--uppercase m--margin-right-10"
-                        (click)="showExistingCharge()">
+                        (click)="showExistingCharge()" *ngIf="!isDirectSettlement">
                         <span>
                             <i class="la la-plus"></i>
                             <span>
@@ -87,10 +87,10 @@
                             </table-surcharge-settlement>
                         </accordion-group>
                     </accordion>
-                    <div class="table-wrapper" *ngIf="!isLoading && !groupShipments.length">
+                    <div class="table-wrapper" *ngIf="!(isLoading | async) && !groupShipments.length">
                         <table class="table table-brand table-hover dataTable table-striped">
                             <tbody class="tbody-group">
-                                <tr *ngIf="!isLoading && !groupShipments.length" app-table-none-record
+                                <tr *ngIf="!(isLoading | async) && !groupShipments.length" app-table-none-record
                                     [colspan]="headers.length + 2"></tr>
                             </tbody>
                         </table>
@@ -113,25 +113,28 @@
                                 *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
                                 <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
                                     [class.bg-warning]="surcharge.isFromShipment"
-                                    [class.invalid-row]="surcharge.isDuplicate">
+                                    [class.invalid-row]="surcharge.isDuplicate" [class.bg-locked]="surcharge.isLocked">
                                     <td class=" table-actions-col">
-                                        <div class="table-actions">
-                                            <label class="m-checkbox">
+                                        <div class="table-actions" [class.d-flex]="surcharge.isLocked">
+                                            <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
                                                 <input type="checkbox" (change)="onChangeCheckBoxCharge()"
                                                     value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
                                                 <span></span>
                                             </label>
-                                            <ng-container *ngIf="!readonly">
-                                                <span [class.m--margin-right-20]="surcharge.isFromShipment">
-                                                    <ng-container *ngIf="!surcharge.isFromShipment">
-                                                        <a (click)="openCopySurcharge(surcharge)" title="Copy"
-                                                            class="pointer">
-                                                            <i class="la la-copy"></i>
-                                                        </a>
-                                                    </ng-container>
-                                                </span>
+                                            <ng-container *ngIf="!surcharge.isLocked;else locktpl">
+                                                <ng-container *ngIf="!readonly">
+                                                    <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                        <ng-container *ngIf="!surcharge.isFromShipment">
+                                                            <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                                class="pointer">
+                                                                <i class="la la-copy"></i>
+                                                            </a>
+                                                        </ng-container>
+                                                    </span>
+                                                </ng-container>
                                             </ng-container>
-                                            <span class="dropdown m-dropdown m-dropdown--inline">
+
+                                            <span class="dropdown m-dropdown m-dropdown--inline m-0">
                                                 <i class="la la-file-text" data-toggle="dropdown"></i>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item pointer"
@@ -142,18 +145,35 @@
                                                         VND</a>
                                                 </div>
                                             </span>
+                                            <ng-template #locktpl>
+                                                <span class="d-block" style="width:25px"></span>
+                                            </ng-template>
+                                            <ng-template #lockIconTpl>
+                                                <span>
+                                                    <button type="button" title="Shipment has been locked"
+                                                        class="btn btn-fault btn-sm  m-btn--icon m-btn--icon-only">
+                                                        <i class="fa fa-lock font-18" style="font-size:18px"></i>
+                                                    </button>
+                                                </span>
+                                            </ng-template>
                                         </div>
                                     </td>
-                                    <td class="text-underline">
-                                        <a (click)="updateChargeWithJob(surcharge,i)" class="pointer">
+                                    <td [class.text-underline]="!surcharge.isLocked">
+                                        <a (click)="updateChargeWithJob(surcharge,i)" class="pointer"
+                                            *ngIf="!surcharge.isLocked; else lockShipmentTpl">
                                             {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                         </a>
+                                        <ng-template #lockShipmentTpl>
+                                            <a class="pointer">
+                                                {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
+                                            </a>
+                                        </ng-template>
                                     </td>
-                                    <td class="text-primary pointer text-underline"
+                                    <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')">
                                         {{surcharge.chargeCode}}
                                     </td>
-                                    <td class="text-primary pointer text-underline"
+                                    <td [class.text-underline]="STATE === 'WRITE'" class="text-primary pointer"
                                         (click)="openSurchargeDetail(surcharge, i, 'update')">
                                         {{surcharge.chargeName}}
                                     </td>
@@ -177,8 +197,9 @@
                                         (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
                             </ng-container>
-                            <tr *ngIf="!isLoading && !surcharges.length" app-table-none-record
+                            <tr *ngIf="!(isLoading | async) && !surcharges.length" app-table-none-record
                                 [colspan]="headers.length + 2"></tr>
+                            <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                         </tbody>
                     </table>
                 </div>

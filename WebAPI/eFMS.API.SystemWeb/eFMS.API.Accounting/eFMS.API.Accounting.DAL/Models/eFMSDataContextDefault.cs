@@ -842,6 +842,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(11)
                     .IsUnicode(false);
 
+                entity.Property(e => e.SettlementType)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.StatusApproval)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -2301,9 +2305,13 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("DCLRCUS")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DeliveryOrderNo).HasMaxLength(100);
 
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryPerson).HasMaxLength(250);
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
@@ -2496,6 +2504,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(250);
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
+
+                entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
 

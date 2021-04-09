@@ -781,6 +781,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankName).HasMaxLength(200);
+
                 entity.Property(e => e.BillingEmail).IsUnicode(false);
 
                 entity.Property(e => e.BillingPhone).IsUnicode(false);
@@ -1594,6 +1596,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.PayerAcctManagementId).HasColumnName("PayerAcctManagementID");
+
                 entity.Property(e => e.PayerId)
                     .HasColumnName("PayerID")
                     .HasMaxLength(50)
@@ -1947,9 +1951,13 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnName("DCLRCUS")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.DeliveryDate).HasColumnType("datetime");
+
                 entity.Property(e => e.DeliveryOrderNo).HasMaxLength(100);
 
                 entity.Property(e => e.DeliveryOrderPrintedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeliveryPerson).HasMaxLength(250);
 
                 entity.Property(e => e.DeliveryPlace).HasMaxLength(500);
 
@@ -2142,6 +2150,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(250);
 
                 entity.Property(e => e.ReferenceNo).HasMaxLength(200);
+
+                entity.Property(e => e.ReferenceNoProof).HasMaxLength(200);
 
                 entity.Property(e => e.Remark).HasMaxLength(500);
 
@@ -2835,7 +2845,6 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.ChildId)
                     .HasColumnName("ChildID")
-                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");
@@ -2935,6 +2944,10 @@ namespace eFMS.API.Catalogue.Service.Models
                 entity.Property(e => e.ManagerId)
                     .HasColumnName("ManagerID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OfficeType)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShortName)

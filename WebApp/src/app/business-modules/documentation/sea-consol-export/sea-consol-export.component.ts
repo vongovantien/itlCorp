@@ -9,10 +9,10 @@ import { CommonEnum } from '@enums';
 import { SortService } from '@services';
 import { DocumentationRepo } from '@repositories';
 import { InfoPopupComponent, ConfirmPopupComponent, Permission403PopupComponent } from '@common';
-import { IShareBussinessState, getTransationLoading, getTransactionListShipment, TransactionLoadListAction, getTransactionDataSearchState } from '@share-bussiness';
+import * as fromShare from '@share-bussiness';
 
 import { AppList } from 'src/app/app.list';
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, withLatestFrom, map } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
 
 
@@ -49,7 +49,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
         private _sortService: SortService,
         private _documentRepo: DocumentationRepo,
         private _ngProgessService: NgProgress,
-        private _store: Store<IShareBussinessState>
+        private _store: Store<fromShare.IShareBussinessState>
     ) {
         super();
 
@@ -58,7 +58,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
         this.requestList = this.requestSearchShipment;
         this.requestSort = this.sortShipment;
 
-        this.isLoading = this._store.select(getTransationLoading);
+        this.isLoading = this._store.select(fromShare.getTransationLoading);
 
     }
 
@@ -91,24 +91,28 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
 
         this.getShipments();
 
-        this._store.select(getTransactionDataSearchState)
+        this._store.select(fromShare.getTransactionDataSearchState)
             .pipe(
-                takeUntil(this.ngUnsubscribe)
+                withLatestFrom(this._store.select(fromShare.getTransactionListPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
             )
             .subscribe(
                 (criteria: any) => {
-                    if (!!criteria && !!Object.keys(criteria).length && criteria.transactionType === this.transactionService) {
-                        this.dataSearch = criteria;
+                    if (!!criteria && !!Object.keys(criteria.dataSearch).length && criteria.dataSearch.transactionType === this.transactionService) {
+                        this.dataSearch = criteria.dataSearch;
                     } else {
                         this.dataSearch = this.defaultDataSearch;
                     }
+                    this.page = criteria.page;
+                    this.pageSize = criteria.pageSize;
                     this.requestSearchShipment();
                 }
             );
     }
 
     getShipments() {
-        this._store.select(getTransactionListShipment)
+        this._store.select(fromShare.getTransactionListShipment)
             .pipe(
                 takeUntil(this.ngUnsubscribe),
             )
@@ -162,7 +166,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
     }
 
     requestSearchShipment() {
-        this._store.dispatch(new TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     prepareDeleteShipment(item) {
@@ -203,7 +207,7 @@ export class SeaConsolExportComponent extends AppList implements OnInit {
                     if (res.status) {
                         this._toastService.success(res.message);
 
-                        this._store.dispatch(new TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                        this._store.dispatch(new fromShare.TransactionLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
                     } else {
                         this._toastService.error(res.message);
                     }

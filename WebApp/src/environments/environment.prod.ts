@@ -18,5 +18,6 @@ export const environment = {
   AUTHORIZATION:
   {
     requireHttps: true
-  }
+  },
+  GOOGLE_ANALYTICS_ID: 'UA-192958167-1',
 };

@@ -1029,6 +1029,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    getRecentlyChargesOps(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsShipmentSurcharge/GetRecentlyChargesOps`, body).pipe(
+            map((data: any) => data)
+        );
+    }
     pagingInvoiceAndCDNotes(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/Paging`, body, {
             page: '' + page,
@@ -1120,7 +1125,7 @@ export class DocumentationRepo {
     }
 
     getListAdvanceSettlement(jobId: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/AdvanceSettlement`, { jobId: jobId });
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/Shipment/AdvanceSettlement`, { jobId: jobId });
     }
 
     previewOPSCdNote(body: any) {
@@ -1131,6 +1136,12 @@ export class DocumentationRepo {
 
     lockShipmentList(body: any) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/LockShipmentList`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    previewCombineBilling(body: any) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/AcctCDNote/PreviewCombineBilling`, body).pipe(
             map((data: any) => data)
         );
     }

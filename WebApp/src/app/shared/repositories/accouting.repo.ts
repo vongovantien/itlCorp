@@ -230,7 +230,7 @@ export class AccountingRepo {
 
 
     getExistingCharge(body: any = {}) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body).pipe(
             map((data: any) => data)
         );
     }
@@ -816,6 +816,18 @@ export class AccountingRepo {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/DenySettlePayments`, Ids);
     }
 
+    getPartnerForSettlement(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetPartnerForSettlement`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkSoaCDNoteIsSynced(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/CheckSoaCDNoteIsSynced`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+    
     uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });

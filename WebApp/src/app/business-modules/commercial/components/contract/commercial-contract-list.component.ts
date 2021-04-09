@@ -34,14 +34,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
     contract: Contract = new Contract();
 
     type: string = '';
+    partnerLocation: string = null;
 
     constructor(private _router: Router,
         private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
-        protected _activeRoute: ActivatedRoute,
-        private _store: Store<IAppState>
+        protected _activeRoute: ActivatedRoute
 
     ) {
         super();
@@ -66,10 +66,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
             { title: 'Company', field: 'companyNameAbbr', sortable: true },
             { title: 'AR Confirmed', field: 'arconfirmed', sortable: true },
         ];
+
     }
 
     sortLocal(sort: string): void {
         this.contracts = this._sortService.sort(this.contracts, sort, this.order);
+    }
+    ngAfterViewInit() {
+        this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
     }
 
     gotoCreateContract() {
@@ -128,7 +132,14 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
         this.formContractPopup.effectiveDate.setValue(null);
-
+        this.formContractPopup.partnerLocation = this.partnerLocation;
+        console.log(this.formContractPopup.partnerLocation);
+        if (this.partnerLocation === "Domestic") {
+            this.formContractPopup.creditCurrency.setValue('VND');
+        }
+        if (this.partnerLocation === "Oversea") {
+            this.formContractPopup.creditCurrency.setValue('USD');
+        }
         this.formContractPopup.show();
 
     }
@@ -237,8 +248,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         if (!!this.selectedContract && !this.formContractPopup.isCreateNewCommercial) {
             this.getListContract(this.partnerId);
         } else {
-            const checkUpdate = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && x.index !== data.index);
-            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
+            const checkUpdate = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && data.contractType === x.contractType && x.index !== data.index);
+            const objCheckContract = !!this.selectedContract.contractNo && this.contracts.length >= 1 ? data.contractType === "Official" && this.contracts.some(x => x.contractNo === this.selectedContract.contractNo) : null;
             if (this.indexlstContract !== null) {
                 if (!checkUpdate) {
                     this.contracts[this.indexlstContract] = this.selectedContract;
@@ -247,20 +258,20 @@ export class CommercialContractListComponent extends AppList implements OnInit {
                 } else {
                     this.contracts[this.indexlstContract] = this.contract;
                     this.contracts = [...this.contracts];
-                    this._toastService.error('Duplicate service,office,salesman!');
+                    this._toastService.error('Duplicate service , Agreement Type, office ,salesman!');
                 }
             } else {
                 if (objCheckContract && objCheckContract != null) {
                     this.formContractPopup.isDuplicateContract = true;
                     this._toastService.error('Contract no has been existed!');
                 } else {
-                    const check = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId));
+                    const check = this.contracts.some(x => data.saleService.includes(x.saleService) && data.officeId.includes(x.officeId) && data.contractType == x.contractType);
                     if (!check) {
                         this.contracts = [...this.contracts, data];
                         this.formContractPopup.isDuplicateContract = false;
                         this.formContractPopup.hide();
                     } else {
-                        this._toastService.error('Duplicate service,office,salesman!');
+                        this._toastService.error('Duplicate service , Agreement Type , office !');
                     }
                 }
             }
