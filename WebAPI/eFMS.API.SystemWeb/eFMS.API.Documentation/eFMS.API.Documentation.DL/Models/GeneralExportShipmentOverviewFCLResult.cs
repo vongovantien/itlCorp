@@ -21,5 +21,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalBuyVGM { get; set; }
         public decimal? TotalBuyBookingFee { get; set; }
         public string FinalDestination { get; set; }
+        public string NotifyParty { get; set; }
     }
 }

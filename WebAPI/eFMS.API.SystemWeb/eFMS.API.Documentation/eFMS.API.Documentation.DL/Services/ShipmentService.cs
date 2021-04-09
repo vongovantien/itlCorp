@@ -1888,6 +1888,65 @@ namespace eFMS.API.Documentation.DL.Services
             return lstShipment.AsQueryable();
         }
 
+        /// <summary>
+        /// Get data for shipment overview LCL
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public IQueryable<GeneralExportShipmentOverviewFCLResult> GetDataGeneralExportShipmentOverviewLCL(GeneralReportCriteria criteria)
+        {
+            IQueryable<GeneralExportShipmentOverviewResult> list;
+            List<GeneralExportShipmentOverviewFCLResult> lstShipment = new List<GeneralExportShipmentOverviewFCLResult>();
+            var dataShipment = GetDataGeneralReport(criteria);
+            if (!dataShipment.Any()) return null;
+            var shipments = dataShipment.OrderBy(x => x.JobNo).ThenBy(x => x.ServiceDate);
+            var placesData = catPlaceRepo.Get().ToLookup(x => x.Id);
+            var partnersData = catPartnerRepo.Get().ToLookup(x => x.Id);
+            var usersData = sysUserRepo.Get().ToLookup(u => u.Id);
+            var chargeGroups = catChargeGroupRepo.Get().ToLookup(u => u.Id);
+            var chargesData = surCharge.Get().ToLookup(u => u.Hblid);
+            var freightChargeId = catChargeGroupRepo.Get(x => x.Name.Contains("Freight"))?.Select(x => x.Id).FirstOrDefault();
+            foreach (var shipment in shipments)
+            {
+                var data = new GeneralExportShipmentOverviewFCLResult();
+                data.ReferenceNo = shipment.ReferenceNo;
+                data.ServiceName = CustomData.Services.Where(x => x.Value == shipment.TransactionType).Select(x => x.DisplayName).FirstOrDefault();
+                data.JobNo = shipment.JobNo;
+                data.etd = shipment.Etd;
+                data.eta = shipment.Eta;
+                data.FlightNo = shipment.FlightNo;
+                data.MblMawb = shipment.Mawb;
+                data.HblHawb = shipment.HwbNo;
+                data.PolPod = placesData[(Guid)shipment.Pol]?.Select(x => x.Code).FirstOrDefault() + "/" + placesData[(Guid)shipment.Pod]?.Select(x => x.Code).FirstOrDefault();
+                data.FinalDestination = shipment.FinalDestination;
+                data.Carrier = partnersData[shipment.ColoaderId]?.Select(x=>x.ShortName).FirstOrDefault();
+                data.AgentName = partnersData[shipment.AgentId]?.Select(x => x.PartnerNameEn).FirstOrDefault();
+                data.Shipper = shipment.ShipperDescription?.Split('\n').FirstOrDefault();
+                data.Consignee = shipment.ConsigneeDescription?.Split('\n').FirstOrDefault();
+                data.ShipmentType = shipment.ShipmentType;
+                data.Salesman = usersData[shipment.SalemanId]?.Select(x => x.Username).FirstOrDefault();
+                data.NotifyParty = shipment.NotifyPartyDescription?.Split('\n').FirstOrDefault();
+                data.PackageQty = shipment.PackageQty;
+                data.Cont20 = shipment.Cont20;
+                data.Cont40 = (shipment.Cont40 ?? 0) - (shipment.Cont40HC ?? 0);
+                data.Cont40HC = shipment.Cont40HC;
+                data.Cont45 = shipment.Cont45;
+                data.GW = shipment.GrossWeight;
+                data.CW = shipment.ChargeWeight;
+                data.CBM = shipment.Cbm;
+                if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
+                {
+                    data.TotalSellFreight = chargesData[(Guid)shipment.HblId].Where(x => x.ChargeGroup == freightChargeId)?.Sum(x => (x.AmountVnd ?? 0)) ?? 0;
+
+                }
+                else
+                {
+                    data.TotalSellFreight = chargesData[(Guid)shipment.HblId].Where(x => x.ChargeGroup == freightChargeId)?.Sum(x => (x.AmountVnd ?? 0)) ?? 0;
+                }
+            }
+            return null;
+        }
+
         private string GetCustomNoOldOfShipment(string jobNo)
         {
             var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);

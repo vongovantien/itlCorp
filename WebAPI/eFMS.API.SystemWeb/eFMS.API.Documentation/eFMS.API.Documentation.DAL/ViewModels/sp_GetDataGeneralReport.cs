@@ -49,5 +49,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string BookingNo { get; set; }
         public string ReferenceNo { get; set; }
         public string FinalDestination { get; set; }
+        public string NotifyPartyID { get; set; }
+        public string NotifyPartyDescription { get; set; }
     }
 }
