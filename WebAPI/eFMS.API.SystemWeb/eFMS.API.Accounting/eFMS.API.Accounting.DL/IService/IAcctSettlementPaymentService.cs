@@ -93,6 +93,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
-        List<string> GetListAdvanceNoForShipment(string jobId, string mbl, string hbl);
+        List<string> GetListAdvanceNoForShipment(Guid hblId);
     }
 }

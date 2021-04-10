@@ -11,6 +11,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public CatPartnerGroupEnum PartnerGroup { get; set; }
         public string PartnerType { get; set; }
         public string Id { get; set; }
+        public string ExceptId { get; set; }
         public string PartnerNameVn { get; set; }
         public string PartnerNameEn { get; set; }
         public string ShortName { get; set; }
