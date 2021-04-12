@@ -1338,7 +1338,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                             }
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics")
+                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" )
                         {
                             if (charge.KickBack == true)
                             {
@@ -1391,10 +1391,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
-                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0 && data.TotalBuyOthers > data.TotalCustomBuy)
-                {
-                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
-                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --
