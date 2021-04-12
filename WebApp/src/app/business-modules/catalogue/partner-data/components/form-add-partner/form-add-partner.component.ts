@@ -263,6 +263,13 @@ export class FormAddPartnerComponent extends AppForm {
 
     }
 
+    onRemove() {
+        this.parentName = null;
+        if (!this.partnerAccountRef.value) {
+            this.isDisabled = true;
+        }
+    }
+
     initForm() {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
