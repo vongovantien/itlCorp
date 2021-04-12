@@ -147,6 +147,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.UserCreated = partner.UserCreated;
                                         entity.ContractService = GetContractServicesName(item.SaleService);
                                         entity.ContractNo = item.ContractNo;
+                                        entity.OfficeIdContract = item.OfficeId;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
@@ -403,12 +404,19 @@ namespace eFMS.API.Catalogue.DL.Services
             if (partner.ContractType == "Cash")
             {
                 lstTo = listEmailViewModel.ListAccountant;
-                lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                if(listEmailViewModel.ListCCAccountant != null)
+                {
+                    lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                }
             }
             else
             {
                 lstTo = listEmailViewModel.ListAR;
-                lstCc.AddRange(listEmailViewModel.ListCCAR);
+                if(listEmailViewModel.ListCCAR != null)
+                {
+                    lstCc.AddRange(listEmailViewModel.ListCCAR);
+
+                }
 
             }
 

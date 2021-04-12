@@ -403,6 +403,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
                     modelPartner.UserCreatedContract = entity.UserCreated;
+                    modelPartner.OfficeIdContract = entity.OfficeId;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -1165,12 +1166,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (partner.ContractType == "Cash")
                 {
                     lstTo = listEmailViewModel.ListAccountant;
-                    lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                    if(listEmailViewModel.ListAccountant != null)
+                    {
+                        lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                    }
                 }
                 else
                 {
                     lstTo = listEmailViewModel.ListAR;
-                    lstCc.AddRange(listEmailViewModel.ListCCAR);
+                    if(listEmailViewModel.ListCCAR != null)
+                    {
+                        lstCc.AddRange(listEmailViewModel.ListCCAR);
+                    }
 
                 }
                 lstCc.Add(objInfoSalesman?.Email);
