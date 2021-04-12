@@ -2449,6 +2449,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart + 2, 1].Value = "Print date: " + DateTime.Now.ToString("dd MMM, yyyy HH:ss tt") + ", by: " + listData[0].UserExport;
         }
 
+        #region -- GENERAL REPORT --
+        #region -- STANDARD REPORT --
         /// <summary>
         /// Generate Standard General Report Excel
         /// </summary>
@@ -2609,6 +2611,111 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[1, 1, startRow, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[1, 1, startRow, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
+        #endregion
+
+        #region -- EXPORT SHIPMENT OVERVIEW LCL
+        /// <summary>
+        /// Binding data to export shipment overview LCL
+        /// </summary>
+        /// <param name="shipments"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream BidingGeneralLCLExport(List<ExportShipmentOverviewFCL> shipments, GeneralReportCriteria criteria, string fileName)
+        {
+            try
+            {
+                FileInfo f = new FileInfo(Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                var _fromDate = "From: " + criteria.ServiceDateFrom?.ToString("dd/MM/yyyy") + " To: " + criteria.ServiceDateTo?.ToString("dd/MM/yyyy");
+                excel.SetData("FromDate", _fromDate);
+                // Start of Table
+                var startOfDetail = 11;
+                excel.StartDetailTable = startOfDetail;
+                // Get format currency
+                var formatCurrency = criteria.Currency == CURRENCY_LOCAL ? _formatVNDNew : _formatNew;
+                for (int i = 0; i < shipments.Count(); i++)
+                {
+                    var shipment = shipments[i];
+                    excel.SetDataTable();
+                    excel.SetData("Order", i + 1);
+                    excel.SetData("FlexId", shipment.ReferenceNo);
+                    excel.SetData("Service", shipment.ServiceName);
+                    excel.SetData("JobNo", shipment.JobNo);
+                    excel.SetData("ETD", shipment.etd?.ToString("dd/MM/yyyy"));
+                    excel.SetData("ETA", shipment.eta?.ToString("dd/MM/yyyy"));
+                    excel.SetData("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
+                    excel.SetData("MBL", shipment.MblMawb);
+                    excel.SetData("HBL", shipment.HblHawb);
+                    excel.SetData("Port", shipment.PolPod);
+                    excel.SetData("FinalDestination", shipment.FinalDestination);
+                    excel.SetData("Carrier", shipment.Carrier); // Coloader
+                    excel.SetData("Agent", shipment.AgentName);
+                    excel.SetData("Shipper", shipment.Shipper);
+                    excel.SetData("Consignee", shipment.Consignee);
+                    excel.SetData("ShipmentType", shipment.ShipmentType);
+                    excel.SetData("Salesman", shipment.Salesman);
+                    excel.SetData("NotifyParty", shipment.NotifyParty);
+                    excel.SetData("QTy", shipment.QTy);
+                    excel.SetData("Cont20", shipment.Cont20);
+                    excel.SetData("Cont40", shipment.Cont40);
+                    excel.SetData("Cont40HC", shipment.Cont40HC);
+                    excel.SetData("Cont45", shipment.Cont45);
+                    excel.SetData("GW", shipment.GW);
+                    excel.SetData("CW", shipment.CW);
+                    excel.SetData("CBM", shipment.CBM);
+                    var _startTotal = excel.AddressOfKey("SellFreight").Address;
+                    var _endTotal = excel.AddressOfKey("SellOthers").Address;
+                    var _profitStart = excel.AddressOfKey("TotalSelling").Address;
+                    var _profitEnd = excel.AddressOfKey("TotalBuying").Address;
+                    excel.SetData("SellFreight", shipment.TotalSellFreight, formatCurrency);
+                    excel.SetData("SellTerminal", shipment.TotalSellTerminal, formatCurrency);
+                    excel.SetData("SellBillFee", shipment.TotalSellBillFee, formatCurrency);
+                    excel.SetData("SellTelexRelease", shipment.TotalSellTelexRelease, formatCurrency);
+                    excel.SetData("SellCFSFee", shipment.TotalSellCFSFee, formatCurrency);
+                    excel.SetData("SellEBSFee", shipment.TotalSellEBSFee, formatCurrency);
+                    excel.SetData("SellAutomated", shipment.TotalSellAutomated, formatCurrency);
+                    excel.SetData("SellVGM", shipment.TotalSellVGM, formatCurrency);
+                    excel.SetData("SellBookingFee", shipment.TotalSellBookingFee, formatCurrency);
+                    excel.SetData("SellOthers", shipment.TotalSellOthers, formatCurrency);
+                    excel.SetFormula("TotalSelling", string.Format("SUM({0}:{1})", _startTotal, _endTotal), formatCurrency);
+                    _startTotal = excel.AddressOfKey("BuyFreight").Address;
+                    _endTotal = excel.AddressOfKey("BuyOthers").Address;
+                    excel.SetData("BuyFreight", shipment.TotalBuyFreight, formatCurrency);
+                    excel.SetData("BuyTerminal", shipment.TotalBuyTerminal, formatCurrency);
+                    excel.SetData("BuyBillFee", shipment.TotalBuyBillFee, formatCurrency);
+                    excel.SetData("BuyTelexRelease", shipment.TotalBuyTelexRelease, formatCurrency);
+                    excel.SetData("BuyCFSFee", shipment.TotalBuyCFSFee, formatCurrency);
+                    excel.SetData("BuyEBSFee", shipment.TotalBuyEBSFee, formatCurrency);
+                    excel.SetData("BuyAutomated", shipment.TotalBuyAutomated, formatCurrency);
+                    excel.SetData("BuyVGM", shipment.TotalBuyVGM, formatCurrency);
+                    excel.SetData("BuyOthers", shipment.TotalBuyOthers, formatCurrency);
+                    excel.SetFormula("TotalBuying", string.Format("SUM({0}:{1})", _startTotal, _endTotal), formatCurrency);
+                    excel.SetFormula("Profit", string.Format("{0}-{1}", _profitStart, _profitEnd), formatCurrency);
+                    excel.SetData("OBH", shipment.AmountOBH, formatCurrency);
+                }
+
+                var lastRow = startOfDetail + shipments.Count();
+                while (excel.IsExistName("Total"))
+                {
+                    var _addressTotal = excel.AddressOfKey("Total");
+                    var _statement = string.Format("SUM({0}{1}:{0}{2})", _addressTotal.ColumnLetter, startOfDetail, lastRow - 1);
+                    excel.SetFormula("Total", _statement, formatCurrency);
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        #endregion
+        #endregion
+
         #region Summary Cost
         public Stream GenerateSummaryOfCostsIncurredExcel(List<SummaryOfCostsIncurredModel> lst, GeneralReportCriteria criteria, Stream stream = null)
         {

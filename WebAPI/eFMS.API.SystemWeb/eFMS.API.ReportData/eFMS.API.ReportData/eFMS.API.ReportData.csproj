@@ -33,6 +33,11 @@
        <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
      </Reference>
    </ItemGroup>
+   <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\Shipment-Overview-LCL.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+   </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <TypeScriptTarget>ES3</TypeScriptTarget>

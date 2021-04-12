@@ -329,14 +329,17 @@ namespace eFMS.API.ReportData.Controllers
         /// Export Shipment Overview
         /// </summary>
         /// <param name="criteria">Id of shipment</param>
+        /// <param name="reportType">Type of report: FCL or LCL</param>
         /// <returns></returns>
-        [Route("ExportShipmentOverviewFCL")]
+        [Route("ExportShipmentOverviewWithType")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ExportShipmentOverviewFCL(GeneralReportCriteria criteria)
+        public async Task<IActionResult> ExportShipmentOverviewWithType(GeneralReportCriteria criteria, string reportType)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataShipmentOverviewFCLUrl);
+            // Get data source
+            var urlData = reportType == "FCL" ? Urls.Documentation.GetDataShipmentOverviewFCLUrl : Urls.Documentation.GetDataShipmentOverviewLCLUrl; // FCL or LCL
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + urlData);
 
             #region -- Ghi Log Report --
             var reportLogModel = new SysReportLogModel
@@ -354,13 +357,23 @@ namespace eFMS.API.ReportData.Controllers
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
 
-            var stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment Overview - FCL.xlsx");
+            Stream stream;
+            if (reportType == "FCL")
+            {
+               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment Overview - FCL.xlsx");
+            }
+            else
+            {
+                stream = new DocumentationHelper().BidingGeneralLCLExport(dataObjects.Result, criteria, "Shipment-Overview-LCL.xlsx");
+            }
 
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Shipment Overview FCL.xlsx");
+
+            var downloadName = reportType == "FCL" ? "Shipment Overview FCL.xlsx" : "Shipment Overview-LCL.xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, downloadName);
 
             return fileContent;
         }

@@ -1128,6 +1128,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportShipmentOverviewLCL(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
+            <summary>
+            Get data for export shipment overview LCL
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataExportAccountingPlSheet(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Get data for export accounting P/L

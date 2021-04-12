@@ -208,8 +208,8 @@ export class ExportRepo {
         );
     }
 
-    exportShipmentOverviewFCL(searchObject: any = {}) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewFCL`, searchObject).pipe(
+    exportShipmentOverviewWithType(searchObject: any = {}, reportType: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewWithType`, searchObject, {reportType: reportType}).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

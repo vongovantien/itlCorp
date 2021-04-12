@@ -63,57 +63,145 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="name">name of cell to set value</param>
         /// <param name="value">value set to cell</param>
+        /// <param name="numberFormat">Format number(flexible)</param>
         public void SetData(string name, object value, string numberFormat = null)
         {
             name = string.Format("{{{0}}}", name);
-            var result = from cell in Worksheet.Cells[StartRow, StartCol, EndRow, EndCol]
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
                          where cell.Value != null && cell.Value?.ToString().Contains(name) == true
                          select cell;
             if (result.Count() > 0)
             {
-                var address = result.FirstOrDefault().ToString();
+                var address = result.ToList();
                 if (value == null)
                 {
-                    Worksheet.Cells[address].Value = string.Empty;
+                    foreach (var ad in address)
+                    {
+                        Worksheet.Cells[ad.ToString()].Value = string.Empty;
+                    }
                 }
                 else
                 {
                     if (value.ToString().Contains("\n"))
                     {
-                        if (Worksheet.Cells[address].Style.WrapText)
+                        foreach (var ad in address)
                         {
-                            Worksheet.Cells[address].Value = value;
-                        }
-                        else
-                        {
-                            var splitString = value.ToString().Split('\n');
-                            int i = 0;
-                            for (int strIndex = 0; strIndex < splitString.Length; strIndex++)
+                            if (Worksheet.Cells[ad.ToString()].Style.WrapText)
                             {
-                                var addressVal = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(address, -i, 0), 0, 0);
-                                if (Worksheet.Cells[addressVal].Style.WrapText)
+                                Worksheet.Cells[ad.ToString()].Value = value;
+                            }
+                            else
+                            {
+                                var splitString = value.ToString().Split('\n');
+                                int i = 0;
+                                for (int strIndex = 0; strIndex < splitString.Length; strIndex++)
                                 {
-                                    Worksheet.Cells[addressVal].Value = string.Join("", splitString.Skip(strIndex).Take(splitString.Length - strIndex));
-                                    strIndex = splitString.Length;
+                                    var addressVal = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(ad.ToString(), -i, 0), 0, 0);
+                                    if (Worksheet.Cells[addressVal].Style.WrapText)
+                                    {
+                                        Worksheet.Cells[addressVal].Value = string.Join("", splitString.Skip(strIndex).Take(splitString.Length - strIndex));
+                                        strIndex = splitString.Length;
+                                    }
+                                    else
+                                    {
+                                        Worksheet.Cells[addressVal].Value = splitString[strIndex];
+                                    }
+                                    i++;
                                 }
-                                else
-                                {
-                                    Worksheet.Cells[addressVal].Value = splitString[strIndex];
-                                }
-                                i++;
                             }
                         }
                     }
                     else
                     {
-                        Worksheet.Cells[address].Value = value;
+                        foreach (var ad in address)
+                        {
+                            Worksheet.Cells[ad.ToString()].Value = value;
+                        }
                     }
+                    if (!string.IsNullOrEmpty(numberFormat))
+                    {
+                        foreach (var ad in address)
+                        {
+                            Worksheet.Cells[ad.ToString()].Style.Numberformat.Format = numberFormat;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set formula for one cell
+        /// </summary>
+        /// <param name="name">name of cell to set value</param>
+        /// <param name="_formular">formula string set to cell</param>
+        /// <param name="numberFormat">format number set to cell</param>
+        public void SetFormula(string name, string _formular, string numberFormat = null)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault()?.ToString();
+                if (address != null)
+                {
+                    Worksheet.Cells[address].Formula = _formular;
                     if (!string.IsNullOrEmpty(numberFormat))
                     {
                         Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if exist key on excel
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public bool IsExistName(string name)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault();
+                if (address != null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Get address of cell by name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public CellAddress AddressOfKey(string name)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault();
+                if (address != null)
+                {
+                    var _cell = new CellAddress();
+                    _cell.Address = address.ToString();
+                    _cell.Row = address.Start.Row;
+                    _cell.Column = address.Start.Column;
+                    _cell.ColumnLetter = ExcelCellAddress.GetColumnLetter(address.Start.Column);
+                    return _cell;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -167,5 +255,20 @@ namespace eFMS.API.ReportData.FormatExcel
             PackageExcel.Save();
             return PackageExcel.Stream;
         }
+    }
+
+    /// <summary>
+    /// Cell Address Class
+    /// </summary>
+    public class CellAddress
+    {
+        /// <summary> Address of cell </summary>
+        public string Address { get; set; }
+        /// <summary> Row address of cell </summary>
+        public int Row { get; set; }
+        /// <summary> Column address of cell </summary>
+        public int Column { get; set; }
+        /// <summary> Column Letter address of cell </summary>
+        public string ColumnLetter { get; set; }
     }
 }
