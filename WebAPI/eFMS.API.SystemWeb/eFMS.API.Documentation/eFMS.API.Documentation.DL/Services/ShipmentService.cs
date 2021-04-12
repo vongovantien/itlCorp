@@ -1168,7 +1168,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CBM = item.Cbm;
 
                 data.Cont20 = item.Cont20 ?? 0;
-                data.Cont40 = item.Cont40 ?? 0 ;
+                data.Cont40 = item.Cont40 ?? 0;
                 data.Cont40HC = item.Cont40HC ?? 0;
                 data.Cont45 = item.Cont45 ?? 0;
 
@@ -1284,22 +1284,14 @@ namespace eFMS.API.Documentation.DL.Services
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
-                            if (charge.KickBack == true)
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountFreight = 0;
+                                _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
-                                }
-                                else
-                                {
-                                    _totalBuyAmountFreight += charge.AmountVnd;
-                                }
+                                _totalBuyAmountFreight += charge.AmountVnd;
                             }
-
                         }
                         if (ChargeGroupModel?.Name == "Trucking")
                         {
@@ -1322,39 +1314,28 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (ChargeGroupModel?.Name == "Handling")
                         {
-                            if (charge.KickBack == true)
+
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountHandling = 0;
+                                _totalBuyAmountHandling += charge.AmountUsd;
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountHandling += charge.AmountUsd;
-                                }
-                                else
-                                {
-                                    _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
-                                }
+                                _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
                             }
+
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics" )
+                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics")
                         {
-                            if (charge.KickBack == true)
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountOther = 0;
+                                _totalBuyAmountOther += charge.AmountUsd;
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountOther += charge.AmountUsd;
-                                }
-                                else
-                                {
-                                    _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                                }
+                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
                             }
+
                         }
                         if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
