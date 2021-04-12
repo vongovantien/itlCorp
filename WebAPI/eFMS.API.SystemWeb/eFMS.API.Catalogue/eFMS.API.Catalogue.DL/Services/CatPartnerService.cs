@@ -147,6 +147,7 @@ namespace eFMS.API.Catalogue.DL.Services
                                         entity.UserCreated = partner.UserCreated;
                                         entity.ContractService = GetContractServicesName(item.SaleService);
                                         entity.ContractNo = item.ContractNo;
+                                        entity.OfficeIdContract = item.OfficeId;
                                         SendMailRequestApproval(entity);
                                     }
                                 }
@@ -294,36 +295,39 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (lengthOffice == 1)
             {
-                var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailAccountant = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
                 lstAccountant = listEmailAccountant?.Split(";").ToList();
 
-                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailAR = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
                 lstAR = listEmailAR?.Split(";").ToList();
 
-                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                var DataHeadOfficeAR = officeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
+
+                var listEmailCCAR = DataHeadOfficeAR == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id)?.Select(t => t.Email).FirstOrDefault();
                 lstCCAR = listEmailCCAR?.Split(";").ToList();
             }
             else if (lengthOffice > 1)
             {
+
                 // list mail to Accountant, AR
                 var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
                 lstAccountant = listEmailAccountant?.Split(";").ToList();
 
-                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                var listEmailAR = DataHeadOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
                 lstAR = listEmailAR?.Split(";").ToList();
 
                 // list mail cc Accountant, AR
-                var listEmailCCAcountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAcountant = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
 
-                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAR = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAR = listEmailCCAR?.Split(";").ToList();
             }
-            EmailModel.ListAccountant = lstAccountant.Where(t => !string.IsNullOrEmpty(t)).ToList();
-            EmailModel.ListCCAccountant = lstCCAccountant.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListAccountant = lstAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListCCAccountant = lstCCAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
-            EmailModel.ListAR = lstAR.Where(t => !string.IsNullOrEmpty(t)).ToList();
-            EmailModel.ListCCAR = lstCCAR.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListAR = lstAR?.Where(t => !string.IsNullOrEmpty(t)).ToList();
+            EmailModel.ListCCAR = lstCCAR?.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             return EmailModel;
         }
@@ -400,12 +404,19 @@ namespace eFMS.API.Catalogue.DL.Services
             if (partner.ContractType == "Cash")
             {
                 lstTo = listEmailViewModel.ListAccountant;
-                lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                if(listEmailViewModel.ListCCAccountant != null)
+                {
+                    lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                }
             }
             else
             {
                 lstTo = listEmailViewModel.ListAR;
-                lstCc.AddRange(listEmailViewModel.ListCCAR);
+                if(listEmailViewModel.ListCCAR != null)
+                {
+                    lstCc.AddRange(listEmailViewModel.ListCCAR);
+
+                }
 
             }
 
