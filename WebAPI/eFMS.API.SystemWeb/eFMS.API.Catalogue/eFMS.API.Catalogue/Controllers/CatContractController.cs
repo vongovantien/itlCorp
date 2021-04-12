@@ -153,7 +153,7 @@ namespace eFMS.API.Catalogue.Controllers
                 {
                     if (model.ContractType == "Official")
                     {
-                        if (catContractService.Any(x => x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId))
+                        if (catContractService.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId))
                         {
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
