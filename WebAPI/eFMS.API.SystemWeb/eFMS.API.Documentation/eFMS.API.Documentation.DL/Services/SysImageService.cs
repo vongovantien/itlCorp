@@ -50,12 +50,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         public async Task<HandleState> DeleteFileTempPreAlert(Guid jobId)
         {
-            var item = DataContext.Get(x => x.ObjectId == jobId.ToString() && x.IsTemp == true ).FirstOrDefault();
-            if (item == null) return new HandleState("Not have file temp");
-            var result = DataContext.Delete(x => x.ObjectId == jobId.ToString() && x.IsTemp == true);
-            if (result.Success)
+            HandleState result = new HandleState();
+            SysImage item = DataContext.Get(x => x.ObjectId == jobId.ToString() && x.IsTemp == true ).FirstOrDefault();
+            if(item != null)
             {
-                var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                result = DataContext.Delete(x => x.ObjectId == jobId.ToString() && x.IsTemp == true);
+                if (result.Success)
+                {
+                    var hs = await ImageHelper.DeleteFile(item.Name, item.ObjectId);
+                }
+                return result;
             }
             return result;
         }
