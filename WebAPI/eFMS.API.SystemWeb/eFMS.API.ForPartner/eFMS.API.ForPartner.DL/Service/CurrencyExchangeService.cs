@@ -231,9 +231,16 @@ namespace eFMS.API.ForPartner.DL.Service
             else
             {
                 decimal exchangeRate = 0;
-                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_BUY && surcharge.KickBack == true && surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD && currencyConvert == ForPartnerConstants.CURRENCY_LOCAL)
+                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_BUY && surcharge.KickBack == true)
                 {
-                    exchangeRate = kickBackExcRate;
+                    if (surcharge.CurrencyId == ForPartnerConstants.CURRENCY_USD && currencyConvert == ForPartnerConstants.CURRENCY_LOCAL)
+                    {
+                        exchangeRate = kickBackExcRate;
+                    }
+                    if (surcharge.CurrencyId == ForPartnerConstants.CURRENCY_LOCAL && currencyConvert == ForPartnerConstants.CURRENCY_USD)
+                    {
+                        exchangeRate = 1 / kickBackExcRate;
+                    }
                 }
                 else
                 {

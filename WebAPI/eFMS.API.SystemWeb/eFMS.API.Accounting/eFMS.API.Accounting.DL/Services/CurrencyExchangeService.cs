@@ -229,9 +229,16 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 decimal exchangeRate = 0;
-                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY && surcharge.KickBack == true && surcharge.CurrencyId == AccountingConstants.CURRENCY_USD && currencyConvert == AccountingConstants.CURRENCY_LOCAL)
+                if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY && surcharge.KickBack == true)
                 {
-                    exchangeRate = kickBackExcRate;
+                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD && currencyConvert == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        exchangeRate = kickBackExcRate;
+                    }
+                    if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL && currencyConvert == AccountingConstants.CURRENCY_USD)
+                    {
+                        exchangeRate = 1 / kickBackExcRate;
+                    }
                 }
                 else
                 {
