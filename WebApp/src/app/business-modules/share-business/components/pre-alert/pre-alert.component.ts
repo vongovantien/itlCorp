@@ -97,7 +97,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     ngOnInit(): void {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRouter.params,
             this._activedRouter.data,
         ]).pipe(
@@ -363,6 +363,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         ))
                     )
                 }),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res) => {
@@ -384,7 +385,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     sendMail() {
         this.attachFileUpload();
-        console.log(this.attachedFile);
 
         const emailContent: EmailContent = {
             from: this.from.value,
@@ -406,8 +406,11 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                     return of(err);
                 }),
                 retryWhen(errors => errors.pipe(
-                    delayWhen(val => timer(1000)), take(5)
+                    delayWhen(val => timer(1000)),
+                    take(5),
                 )),
+                map(err => err),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: CommonInterface.IResult) => {
