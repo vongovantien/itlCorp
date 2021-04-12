@@ -263,6 +263,13 @@ export class FormAddPartnerComponent extends AppForm {
 
     }
 
+    onRemove() {
+        this.parentName = null;
+        if (!this.partnerAccountRef.value) {
+            this.isDisabled = true;
+        }
+    }
+
     initForm() {
         this.partnerForm = this._fb.group({
             partnerAccountNo: [{ value: null, disabled: true }],
@@ -383,7 +390,7 @@ export class FormAddPartnerComponent extends AppForm {
             this.partnerLocation.setValue('Domestic');
             this.isDisabledInternalCode = true;
         }
-
+        this.isDisabled = this.partnerAccountRef != null && !this.isUpdate ? true : false;
         this.activePartner = this.active.value;
     }
 
@@ -392,6 +399,12 @@ export class FormAddPartnerComponent extends AppForm {
             case 'acRef':
                 this.parentName = data.shortName;
                 this.partnerAccountRef.setValue(data.id);
+                if (!!this.partnerAccountRef.value && this.isUpdate && this.partnerAccountRef.value !== this.partnerAccountRef) {
+                    this.isDisabled = false;
+                }
+                else {
+                    this.isDisabled = true;
+                }
                 break;
             case 'shippping-country':
                 this.countryShippingIdName = data.nameEn;
@@ -421,6 +434,8 @@ export class FormAddPartnerComponent extends AppForm {
     }
 
     setFormData(partner: Partner) {
+
+
         this.countryShippingIdName = partner.countryShippingName;
         this.countryIdName = partner.countryName;
         this.shippingProvinceName = partner.provinceShippingName;
@@ -509,7 +524,12 @@ export class FormAddPartnerComponent extends AppForm {
             creditPayment: partner.creditPayment,
             bankName: partner.bankName
         });
-
+        if (this.partnerAccountRef.value !== partner.parentId) {
+            this.isDisabled = false;
+        }
+        else {
+            this.isDisabled = true;
+        }
     }
 
     getPartnerGroupActives(arg0: string[]): any {

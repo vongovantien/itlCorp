@@ -196,9 +196,7 @@ export class ShareFormSearchReportComponent extends AppForm {
                 endDate: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0),
             }],
             dateType: [this.dateTypeList[0].id],
-            customer: this.isCommissionIncentive ? [null, Validators.compose([
-                FormValidators.required,
-            ])] : [],
+            customer: this.isCommissionIncentive ? [null, Validators.required] : [],
             carrier: [],
             agent: [],
             service: [this.serviceActive],
@@ -212,7 +210,9 @@ export class ShareFormSearchReportComponent extends AppForm {
             staffType: staffTypeInit,
             pol: [],
             pod: [],
-            partnerAccount: [],
+            partnerAccount: [null, Validators.compose([
+                FormValidators.required,
+            ])],
             exchangeRate: 20000,
             typeReport: this.isGeneralReport ? [] : [this.typeReportActive[0].id]
         });
@@ -647,7 +647,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
-        if (this.isCommissionIncentive && (!this.customerActive || this.customerActive.length === 0)) {
+        if (this.isCommissionIncentive && (!this.customer.value || !this.partnerAccount.value)) {
             return;
         }
         if (this.isGeneralReport) {
@@ -718,7 +718,7 @@ export class ShareFormSearchReportComponent extends AppForm {
             serviceDateTo: this.dateType.value === "ServiceDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             createdDateFrom: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             createdDateTo: this.dateType.value === "CreatedDate" ? formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.toString() : null,
+            customerId: this.customerActive != null && this.customerActive.length > 0 ? this.customerActive.join(";") : null,
             service: this.mapObject(this.serviceActive, this.serviceList),
             currency: this.typeReport.value === this.typeComReportList[1].id ? "VND" : "USD",
             jobId: this.mapShipment('JOBID'),

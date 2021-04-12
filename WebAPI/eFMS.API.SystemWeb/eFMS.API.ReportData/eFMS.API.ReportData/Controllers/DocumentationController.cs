@@ -677,11 +677,11 @@ namespace eFMS.API.ReportData.Controllers
             Stream stream;
             if (rptType == "OPS")
             {
-                stream = new DocumentationHelper().GenerateCommissionPROpsReportExcel(dataObjects.Result, criteria, null);
+                stream = new DocumentationHelper().BindingDataCommissionPROpsReport(dataObjects.Result, "Commission-OPS-VND.xlsx");
             }
             else
             {
-                stream = new DocumentationHelper().GenerateCommissionPRReportExcel(dataObjects.Result, criteria, null);
+                stream = new DocumentationHelper().BindingDataCommissionPRReport(dataObjects.Result, "Commission-PR.xlsx"); // truyền data và tên file
             }
 
             if (stream == null)
@@ -715,7 +715,7 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");
             }
-            var stream = new DocumentationHelper().GenerateIncentiveReportExcel(dataObjects.Result, criteria, null);
+            var stream = new DocumentationHelper().BindingDataIncentiveReport(dataObjects.Result, "Incentive.xlsx");
             if (stream == null)
             {
                 return new FileHelper().ExportExcel(new MemoryStream(), "");

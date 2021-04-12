@@ -5,14 +5,13 @@ namespace eFMS.API.Accounting.Service.Models
 {
     public partial class AcctSoa
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Soano { get; set; }
         public DateTime? SoaformDate { get; set; }
         public DateTime? SoatoDate { get; set; }
         public string DateType { get; set; }
         public string Currency { get; set; }
         public int? TotalShipment { get; set; }
-        public int? TotalCharge { get; set; }
         public decimal? CreditAmount { get; set; }
         public decimal? DebitAmount { get; set; }
         public string Status { get; set; }
@@ -20,7 +19,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string Customer { get; set; }
         public string Type { get; set; }
         public bool? Obh { get; set; }
-        public string StaffType { get; set; }
         public string CreatorShipment { get; set; }
         public string ServiceTypeId { get; set; }
         public short? CommodityGroupId { get; set; }
@@ -40,6 +38,8 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
+        public string StaffType { get; set; }
+        public int? TotalCharge { get; set; }
         public decimal? ExcRateUsdToLocal { get; set; }
     }
 }

@@ -80,6 +80,8 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
             agentId: form.agent,
             coloaderId: form.coloader,
             paymentTerm: form.term,
+            polDescription: form.polDescription,
+            podDescription: form.podDescription,
 
             // * containers summary
             commodity: this.shipmentGoodSummaryComponent.commodities,
@@ -99,7 +101,11 @@ export class SeaConsolExportCreateJobComponent extends AppForm implements OnInit
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)) {
+        if (!this.formCreateComponent.formGroup.valid
+            || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
+            || (!!this.formCreateComponent.podDescription.value && !this.formCreateComponent.pod.value)
+            || (!this.formCreateComponent.polDescription.value)
+        ) {
             valid = false;
         }
         return valid;

@@ -412,7 +412,7 @@ namespace eFMS.API.Accounting.DL.Services
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
                            PayeeName = partnerGrp.ShortName
-                       };           
+                       };
             return data;
         }
 
@@ -722,11 +722,39 @@ namespace eFMS.API.Accounting.DL.Services
                     AdvanceAmount = advInfo.AdvanceAmount,
                     Balance = NumberHelper.RoundNumber((advInfo.TotalAmount - advInfo.AdvanceAmount) ?? 0, roundDecimal),
                     CustomNo = advInfo.CustomNo,
-                    Files = GetShipmentAttachFile(item.SettlementNo,item.HblId, advInfo.AdvanceNo, advInfo.CustomNo),
-                    IsLocked = item.IsLocked
+                    IsLocked = item.IsLocked,
+                    Files = new List<SysImage>()
                 });
             }
 
+            IQueryable<SysImage> FileInShipmentSettlement = sysImageRepository.Get(x => x.Folder == "Settlement"
+            && x.ObjectId == settleCurrent.Id.ToString() 
+            && !string.IsNullOrEmpty(x.ChildId));
+
+            if (FileInShipmentSettlement.Count() > 0)
+            {
+                List<string> hblIds = FileInShipmentSettlement.Select(x => x.ChildId.Substring(0, x.ChildId.IndexOf("/"))).ToList();
+                var shipmentSettlementHasFile = shipmentSettlement.Where(x => hblIds.Contains(x.HblId.ToString()));
+
+                if (shipmentSettlementHasFile.Count() == 0)
+                {
+                    return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
+                }
+                foreach (ShipmentSettlement item in shipmentSettlementHasFile)
+                {
+                    string folderChild = string.Format("{0}/", item.HblId.ToString());
+                    if (!string.IsNullOrEmpty(item.AdvanceNo))
+                    {
+                        folderChild += item.AdvanceNo + "/";
+                    }
+                    if (!string.IsNullOrEmpty(item.CustomNo))
+                    {
+                        folderChild += item.CustomNo + "/";
+                    }
+
+                    item.Files = FileInShipmentSettlement.Where(x => x.ChildId == folderChild).ToList();
+                }
+            }
             return shipmentSettlement.OrderByDescending(x => x.JobId).ToList();
         }
 
@@ -1090,7 +1118,7 @@ namespace eFMS.API.Accounting.DL.Services
                        join ad in advance on req.AdvanceNo equals ad.AdvanceNo into ad2
                        from ad in ad2.DefaultIfEmpty()
                        where
-                            //ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                       //ad.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                        req.JobId == jobId
                        && req.Mbl == mbl
                        && req.Hbl == hbl
@@ -1153,7 +1181,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 where
-                                        //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                     //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                                      opst.JobNo == jobId
                                      && opst.Hwbno == hbl
                                      && opst.Mblno == mbl
@@ -1175,7 +1203,7 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
-                                       //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
+                                    //settle.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE
                                     cst.JobNo == jobId
                                     && cstd.Hwbno == hbl
                                     && cst.Mawb == mbl
@@ -1634,7 +1662,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.SettlementCode = settlement.SettlementNo;
                                 charge.UserModified = userCurrent;
                                 charge.DatetimeModified = DateTime.Now;
-                                
+
                                 _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, settlement.SettlementCurrency);
 
                                 csShipmentSurchargeRepo.Update(charge, x => x.Id == charge.Id);
@@ -1673,7 +1701,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                                 charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
                                 charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                                charge.VatAmountVnd =amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                                 charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                                 charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                                 #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
@@ -1731,7 +1759,7 @@ namespace eFMS.API.Accounting.DL.Services
             amount = NumberHelper.RoundNumber(amount, roundDecimal);
             return amount;
         }
-        
+
         public HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
@@ -1757,7 +1785,7 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.UserCreated = settlementCurrent.UserCreated;
 
                 settlement.DatetimeModified = DateTime.Now;
-                settlement.UserModified = userCurrent;                
+                settlement.UserModified = userCurrent;
                 settlement.GroupId = settlementCurrent.GroupId;
                 settlement.DepartmentId = settlementCurrent.DepartmentId;
                 settlement.OfficeId = settlementCurrent.OfficeId;
@@ -1822,7 +1850,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.SettlementCode = settlement.SettlementNo;
                                 charge.UserModified = userCurrent;
                                 charge.DatetimeModified = DateTime.Now;
-                                
+
                                 _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, settlement.SettlementCurrency);
 
                                 csShipmentSurchargeRepo.Update(charge, x => x.Id == charge.Id);
@@ -2073,7 +2101,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.Consignee = _consigneeName;
             result.Consigner = _consignerName;
             result.ContainerQty = _containerQty;
-            result.CustomsId = !string.IsNullOrEmpty(firstCharge.ClearanceNo) ? firstCharge.ClearanceNo : GetCustomNoOldOfShipment(_jobId);
+            result.CustomsId = firstCharge.ClearanceNo;
             result.HBL = _hbl;
             result.MBL = _mbl;
             result.StlCSName = string.Empty;
@@ -2113,12 +2141,6 @@ namespace eFMS.API.Accounting.DL.Services
             result.PSC = _psc;
             result.CBM = _cbm;
             return result;
-        }
-
-        private string GetCustomNoOldOfShipment(string jobNo)
-        {
-            var customNos = customsDeclarationRepo.Get(x => x.JobNo == jobNo).OrderBy(o => o.DatetimeModified).Select(s => s.ClearanceNo);
-            return customNos.FirstOrDefault() ?? string.Empty;
         }
 
         public List<AscSettlementPaymentRequestReport> GetSettlementPaymentRequestReportBySettlementNo(string settlementNo)
@@ -2202,7 +2224,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
-                //.GroupBy(x => new { x.SettlementCode, x.JobNo, x.Hblno, x.Mblno, x.CurrencyId, x.Hblid, x.Type, x.AdvanceNo });
+            //.GroupBy(x => new { x.SettlementCode, x.JobNo, x.Hblno, x.Mblno, x.CurrencyId, x.Hblid, x.Type, x.AdvanceNo });
             var data = new List<AscSettlementPaymentRequestReport>();
             foreach (var surcharge in surcharges)
             {
@@ -4437,7 +4459,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid,s.AdvanceNo,s.ClearanceNo}).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4920,17 +4942,17 @@ namespace eFMS.API.Accounting.DL.Services
         {
             bool isValidate = true;
 
-            if(csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo  
-            && x.IsFromShipment == false && 
-            (!string.IsNullOrEmpty(x.Soano) 
-            || !string.IsNullOrEmpty(x.PaySoano) 
-            || !string.IsNullOrEmpty(x.VoucherId)
-            || !string.IsNullOrEmpty(x.VoucherIdre)
-            || !string.IsNullOrEmpty(x.CreditNo)
-            || !string.IsNullOrEmpty(x.DebitNo)
-            || x.AcctManagementId != null
-            || x.PayerAcctManagementId != null
-            )
+            if (csShipmentSurchargeRepo.Any(x => x.SettlementCode == settlementNo
+             && x.IsFromShipment == false &&
+             (!string.IsNullOrEmpty(x.Soano)
+             || !string.IsNullOrEmpty(x.PaySoano)
+             || !string.IsNullOrEmpty(x.VoucherId)
+             || !string.IsNullOrEmpty(x.VoucherIdre)
+             || !string.IsNullOrEmpty(x.CreditNo)
+             || !string.IsNullOrEmpty(x.DebitNo)
+             || x.AcctManagementId != null
+             || x.PayerAcctManagementId != null
+             )
             ))
             {
                 isValidate = false;

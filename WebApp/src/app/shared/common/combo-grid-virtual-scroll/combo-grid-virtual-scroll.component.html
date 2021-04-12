@@ -1,18 +1,34 @@
 <div class="dropdown e--combogrid" [class.show]="!showAngledownIcon" dropdown #dropdown="bs-dropdown"
     (clickOutside)="keyword = ''; showAngledownIcon = false" [insideClick]="true">
-    <input #clkSearch (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
-        [disabled]="Disabled" type="text" readonly [value]="displaySelectedStr == '' ? null : displaySelectedStr"
-        [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
-        [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
-        (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
+    <ng-container *ngIf="allowEditing;else readOnlyTpl">
+        <input #clkSearch class="form-control m-input m-input--square dropdown-toggle pos-rel" [disabled]="Disabled"
+            type="text" [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
+            [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
+            (focus)="onFocusInputPlaceholder($event)" [ngModel]="displaySelectedStr"
+            (ngModelChange)="displaySelectedStrChange.emit($event)">
+    </ng-container>
+    <ng-template #readOnlyTpl>
+        <input #clkSearch (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
+            [disabled]="Disabled" type="text" readonly [value]="displaySelectedStr == '' ? null : displaySelectedStr"
+            [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
+            [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
+            (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
+    </ng-template>
     <ng-container>
         <div class="e--combogrid_icon">
-            <ng-container *ngIf="!Disabled">
-                <span class="e--combogrid_icon__dropdown"
-                    (click)="clkSearch.click(); showAngledownIcon = !showAngledownIcon">
+            <ng-container *ngIf="allowEditing;else readOnlyIconDropdownTpl">
+                <span
+                    (click)="isFocusSearch = true;dropdown.show();clickSearch(); showAngledownIcon = !showAngledownIcon"
+                    class="e--combogrid_icon__dropdown" dropdownToggle>
                     <i class="fa fa-angle-down" aria-hidden="true"></i>
                 </span>
             </ng-container>
+            <ng-template #readOnlyIconDropdownTpl>
+                <span class="e--combogrid_icon__dropdown"
+                    (click)="isFocusSearch = true;dropdown.show();clickSearch(); showAngledownIcon = !showAngledownIcon">
+                    <i class="fa fa-angle-down" aria-hidden="true"></i>
+                </span>
+            </ng-template>
             <ng-container *ngIf="clearable">
                 <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
                     *ngIf="!!displaySelectedStr && !Disabled">

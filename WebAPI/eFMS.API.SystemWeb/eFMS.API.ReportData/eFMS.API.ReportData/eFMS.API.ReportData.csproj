@@ -35,6 +35,19 @@
    </ItemGroup>
    <ItemGroup>
      <None Update="FormatExcel\TemplateExport\Shipment-Overview-LCL.xlsx">
+     <None Update="FormatExcel\TemplateExport\Commission-OPS-VND.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\Commission-PR.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\Incentive.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\PHIEU-CAN-ACS-Template.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\PHIEU-CAN-NCTS-ALS-Template.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
    </ItemGroup>

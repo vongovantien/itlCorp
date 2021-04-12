@@ -31,7 +31,7 @@ namespace eFMS.API.ReportData.FormatExcel
         private object _groupRowValue;
         /// <summary>Values of detail copied</summary>
         private object _detailRowValue;
-
+        
         /// <summary>
         /// Init for excel file to export
         /// </summary>
@@ -118,6 +118,35 @@ namespace eFMS.API.ReportData.FormatExcel
                             Worksheet.Cells[ad.ToString()].Value = value;
                         }
                     }
+                    if (!string.IsNullOrEmpty(numberFormat))
+                    {
+                        foreach (var ad in address)
+                        {
+                            Worksheet.Cells[ad.ToString()].Style.Numberformat.Format = numberFormat;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set formula for one cell
+        /// </summary>
+        /// <param name="name">name of cell to set value</param>
+        /// <param name="_formular">formula string set to cell</param>
+        /// <param name="numberFormat">format number set to cell</param>
+        public void SetFormula(string name, string _formular, string numberFormat = null)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault()?.ToString();
+                if (address != null)
+                {
+                    Worksheet.Cells[address].Formula = _formular;
                     if (!string.IsNullOrEmpty(numberFormat))
                     {
                         foreach (var ad in address)

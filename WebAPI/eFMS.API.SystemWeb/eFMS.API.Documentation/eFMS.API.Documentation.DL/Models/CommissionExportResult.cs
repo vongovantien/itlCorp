@@ -25,11 +25,15 @@ namespace eFMS.API.Documentation.DL.Models
         public string MBLNo { get; set; }
         public string HBLNo { get; set; }
         public string JobId { get; set; }
+        public string CustomerName { get; set; }
         public string CustomSheet { get; set; }
         public decimal? ChargeWeight { get; set; }
         public string PortCode { get; set; }
         public decimal BuyingRate { get; set; }
         public decimal SellingRate { get; set; }
         public decimal ComAmount { get; set; }
+        public string TransactionType { get; set; }
+        public int? ContQty { get; set; }
+        public string PackageContainer { get; set; }
     }
 }

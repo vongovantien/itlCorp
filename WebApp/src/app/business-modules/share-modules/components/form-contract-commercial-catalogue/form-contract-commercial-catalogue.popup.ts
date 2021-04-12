@@ -392,7 +392,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         if (this.formGroup.valid) {
             const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.contractNo.value && x.contractType === "Official" && x.index !== this.selectedContract.index) : null;
             if (objCheckContract) {
-                this.contractNo.setValue(null);
+                //this.contractNo.setValue(null);
                 this.isDuplicateContract = true;
                 this._toastService.error('Contract no has been existed!');
                 return;

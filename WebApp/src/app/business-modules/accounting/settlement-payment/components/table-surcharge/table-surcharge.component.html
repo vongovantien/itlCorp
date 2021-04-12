@@ -5,7 +5,8 @@
         </thead>
         <tbody class="tbody-group">
             <ng-container *ngFor="let surcharge of data.chargeSettlements; let i = index; trackBy: trackByFn">
-                <tr [class.bg-warning]="surcharge.isFromShipment" [class.bg-locked]="surcharge.isLocked">
+                <tr [class.bg-warning]="surcharge.isFromShipment"
+                    [class.bg-locked]="!surcharge.isFromShipment && surcharge.isLocked">
                     <td class="table-actions-col">
                         <div class="m-checkbox-list d-flex justify-content-center">
                             <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">

@@ -59,6 +59,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
 
     pol: AbstractControl;
     pod: AbstractControl;
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
 
     coloader: AbstractControl;
     supplierName: string = null;
@@ -137,7 +139,10 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                                 pol: this.fclImportDetail.pol,
                                 agentId: this.fclImportDetail.agentId,
                                 coloader: this.fclImportDetail.coloaderId,
-                                deliveryPlace: this.fclImportDetail.deliveryPlace
+                                deliveryPlace: this.fclImportDetail.deliveryPlace,
+
+                                podDescription: !!this.fclImportDetail.podDescription ? this.fclImportDetail.podDescription : res.podName,
+                                polDescription: !!this.fclImportDetail.polDescription ? this.fclImportDetail.polDescription : res.polName,
                             });
 
                             this.currentFormValue = this.formCreate.getRawValue(); // * For Candeactivate
@@ -163,6 +168,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             voyNo: [],
             pono: [],
             mawb: [],
+            podDescription: [null, Validators.required],
+            polDescription: [],
             // * select
             mbltype: [null],
             shipmentType: [this.shipmentTypes[0], Validators.required],
@@ -190,6 +197,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.pod = this.formCreate.controls["pod"];
         this.coloader = this.formCreate.controls["coloader"];
         this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
+        this.polDescription = this.formCreate.controls["polDescription"];
+        this.podDescription = this.formCreate.controls["podDescription"];
 
         if (this.service === 'fcl') {
             this.typeOfService.setValue(this.serviceTypes[0]);
@@ -236,7 +245,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, key: string | any) {
         switch (key) {
             case 'supplier':
-                this.supplierName = data.shortName; 
+                this.supplierName = data.shortName;
                 this.coloader.setValue(data.id);
                 break;
             case 'agent':
@@ -245,9 +254,11 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                 break;
             case 'port-loading':
                 this.pol.setValue(data.id);
+                this.polDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'port-destination':
                 this.pod.setValue(data.id);
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'port-delivery':
                 this.deliveryPlace.setValue(data.id);

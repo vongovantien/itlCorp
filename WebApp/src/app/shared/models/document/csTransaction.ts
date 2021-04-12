@@ -100,7 +100,8 @@ export class CsTransaction extends BaseModel {
     mawbShipper: string = null;
     airlineInfo: string = null;
     isHawb: boolean = false;
-
+    polDescription: string = null;
+    podDescription: string = null;
     constructor(object?: any) {
         super();
         const self = this;

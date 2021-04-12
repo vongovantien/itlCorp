@@ -11,7 +11,7 @@
             <param name="requests"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListSoaToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestIntTypeListModel})">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListSoaToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestStringTypeListModel})">
             <summary>
             Sync list SOA to Accountant
             </summary>
@@ -25,7 +25,7 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListSOADebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestIntTypeListModel})">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.GetListSOADebit(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestStringTypeListModel})">
             <summary>
             Func Test (Get List SOA Debit)
             </summary>
@@ -748,21 +748,21 @@
             <summary>
             Check allow delete SOA
             </summary>
-            <param name="soaNo">SOA No of SOA</param>
+            <param name="soaId">Id of SOA</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.CheckAllowDetail(System.String)">
             <summary>
             Check allow detail SOA
             </summary>
-            <param name="soaNo">SOA No of SOA</param>
+            <param name="soaId">Id of SOA</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Delete(System.String)">
             <summary>
             delete an existed item
             </summary>
-            <param name="soaNo">soaNo of existed item that want to delete</param>
+            <param name="soaId">Id of existed item that want to delete</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctSOACriteria,System.Int32,System.Int32)">

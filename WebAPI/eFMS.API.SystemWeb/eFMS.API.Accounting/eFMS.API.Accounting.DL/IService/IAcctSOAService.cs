@@ -17,7 +17,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState UpdateSOA(AcctSoaModel model);
 
-        HandleState DeleteSOA(string soaNo);
+        HandleState DeleteSOA(string soaId);
 
         //HandleState UpdateSOASurCharge(string soaNo);
 
@@ -45,11 +45,11 @@ namespace eFMS.API.Accounting.DL.IService
 
         IQueryable<AcctSOAResult> QueryData(AcctSOACriteria criteria);
 
-        bool CheckDetailPermission(string soaNo);
+        bool CheckDetailPermission(string soaId);
 
-        bool CheckDeletePermission(string soaNo);
+        bool CheckDeletePermission(string soaId);
 
-        bool CheckUpdatePermission(string soaNo);
+        bool CheckUpdatePermission(string soaId);
 
         IQueryable<ExportImportBravoFromSOAResult> GetDataExportImportBravoFromSOA(string soaNo);
 
@@ -61,7 +61,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         Crystal PreviewAccountStatementFull(string soaNo);
 
-        List<Guid> GetSurchargeIdBySoaId(int soaId);
+        List<Guid> GetSurchargeIdBySoaId(string soaId);
 
         HandleState RejectSoaCredit(RejectSoaModel model);
     }
