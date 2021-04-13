@@ -119,7 +119,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || !podDescription.value)}">
                             <label required>Port of Destination (POD)</label>
-                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr)="podDescription.value"
+                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr]="podDescription.value"
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"

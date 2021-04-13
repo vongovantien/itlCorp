@@ -165,6 +165,7 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
         else {
             this.formCommercialComponent.isDisabled = true;
         }
+        this.contractList.partnerLocation = partner.partnerLocation;
     }
 
     getListContract(partneId: string) {

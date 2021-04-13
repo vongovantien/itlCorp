@@ -257,6 +257,76 @@ namespace eFMS.API.Catalogue.DL.Services
             return hs;
         }
 
+        public string CheckExistedContract(CatContractModel model)
+        {
+            ClearCache();
+            Get();
+            string messageDuplicate = string.Empty;
+            int LengthService = model.SaleService.Split(";").ToArray().Length;
+            int LengthOffice = model.OfficeId.Split(";").ToArray().Length;
+            if (model.Id == Guid.Empty)
+            {
+                if (!string.IsNullOrEmpty(model.ContractNo))
+                {
+                    if (model.ContractType == "Official")
+                    {
+                        if (DataContext.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId))
+                        {
+                            messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                            return messageDuplicate;
+                        }
+                    }
+                }
+                var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+                if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
+                {
+                    if (DataCheck.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    }
+                }
+                else
+                {
+                    var data = DataCheck.Where(x => x.Active == false || x.Active == null);
+                    if (data.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    }
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(model.ContractNo))
+                {
+                    if (model.ContractType == "Official")
+                    {
+                        if (DataContext.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                        {
+                            return messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
+                        }
+                    }
+                }
+                var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+                if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
+                {
+                    if (DataCheck.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    }
+                }
+                else
+                {
+                    var data = DataCheck.Where(x => x.Active == false || x.Active == null);
+                    if (data.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
+                    {
+                        messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
+                    }
+                }
+            }
+            return messageDuplicate;
+        }
+
+
         private string GetContractServicesName(string ContractService)
         {
             string ContractServicesName = string.Empty;
@@ -333,6 +403,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     modelPartner.ContractNo = entity.ContractNo;
                     modelPartner.SalesmanId = entity.SaleManId;
                     modelPartner.UserCreatedContract = entity.UserCreated;
+                    modelPartner.OfficeIdContract = entity.OfficeId;
                     ClearCache();
                     Get();
                     SendMailActiveSuccess(modelPartner, string.Empty);
@@ -946,15 +1017,15 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (lengthOffice == 1)
             {
-                var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailAccountant = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
                 lstAccountant = listEmailAccountant?.Split(";").ToList();
 
-                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailAR = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
                 lstAR = listEmailAR?.Split(";").ToList();
 
                 var DataHeadOfficeAR = sysOfficeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
 
-                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id)?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAR = DataHeadOfficeAR == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id)?.Select(t => t.Email).FirstOrDefault();
                 lstCCAR = listEmailCCAR?.Split(";").ToList();
             }
             else if (lengthOffice > 1)
@@ -964,14 +1035,14 @@ namespace eFMS.API.Catalogue.DL.Services
                 var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
                 lstAccountant = listEmailAccountant?.Split(";").ToList();
 
-                var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
-                lstAR = listEmailAR.Split(";").ToList();
+                var listEmailAR = DataHeadOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
+                lstAR = listEmailAR?.Split(";").ToList();
 
                 // list mail cc Accountant, AR
-                var listEmailCCAcountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAcountant = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
 
-                var listEmailCCAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
+                var listEmailCCAR = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
                 lstCCAR = listEmailCCAR?.Split(";").ToList();
             }
             EmailModel.ListAccountant = lstAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
@@ -1095,12 +1166,18 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (partner.ContractType == "Cash")
                 {
                     lstTo = listEmailViewModel.ListAccountant;
-                    lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                    if(listEmailViewModel.ListAccountant != null)
+                    {
+                        lstCc.AddRange(listEmailViewModel.ListCCAccountant);
+                    }
                 }
                 else
                 {
                     lstTo = listEmailViewModel.ListAR;
-                    lstCc.AddRange(listEmailViewModel.ListCCAR);
+                    if(listEmailViewModel.ListCCAR != null)
+                    {
+                        lstCc.AddRange(listEmailViewModel.ListCCAR);
+                    }
 
                 }
                 lstCc.Add(objInfoSalesman?.Email);
