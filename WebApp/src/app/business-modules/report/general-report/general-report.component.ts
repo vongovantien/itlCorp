@@ -112,21 +112,21 @@ export class GeneralReportComponent extends AppList {
         }
     }
 
-    exportShipmentOverviewFCL() {
+    exportShipmentOverviewWithType(reportType: string) {
         if (this.dataList.length === 0) {
             this._toastService.warning('No Data To View, Please Re-Apply Report');
             return;
         } else {
             this.isClickSubMenu = false;
             this._progressRef.start();
-            this._exportRepo.exportShipmentOverviewFCL(this.dataSearch)
+            this._exportRepo.exportShipmentOverviewWithType(this.dataSearch, reportType)
                 .pipe(
                     catchError(this.catchError),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
                     (response: ArrayBuffer) => {
-                        const fileName = "Export ShipmentOverview FCL.xlsx";
+                        const fileName = reportType == 'FCL' ? "Export ShipmentOverview FCL.xlsx" : "Shipment Overview-LCL.xlsx";
                         this.downLoadFile(response, "application/ms-excel", fileName);
                     },
                 );

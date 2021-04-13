@@ -63,7 +63,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// </summary>
         /// <param name="name">name of cell to set value</param>
         /// <param name="value">value set to cell</param>
-        /// <param name="numberFormat"></param>
+        /// <param name="numberFormat">Format number(flexible)</param>
         public void SetData(string name, object value, string numberFormat = null)
         {
             name = string.Format("{{{0}}}", name);
@@ -149,6 +149,35 @@ namespace eFMS.API.ReportData.FormatExcel
                     Worksheet.Cells[address].Formula = _formular;
                     if (!string.IsNullOrEmpty(numberFormat))
                     {
+                        foreach (var ad in address)
+                        {
+                            Worksheet.Cells[ad.ToString()].Style.Numberformat.Format = numberFormat;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Set formula for one cell
+        /// </summary>
+        /// <param name="name">name of cell to set value</param>
+        /// <param name="_formular">formula string set to cell</param>
+        /// <param name="numberFormat">format number set to cell</param>
+        public void SetFormula(string name, string _formular, string numberFormat = null)
+        {
+            name = string.Format("{{{0}}}", name);
+            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                         select cell;
+            if (result.Count() > 0)
+            {
+                var address = result.FirstOrDefault()?.ToString();
+                if (address != null)
+                {
+                    Worksheet.Cells[address].Formula = _formular;
+                    if (!string.IsNullOrEmpty(numberFormat))
+                    {
                         Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
                     }
                 }
@@ -194,6 +223,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 if (address != null)
                 {
                     var _cell = new CellAddress();
+                    _cell.Address = address.ToString();
                     _cell.Row = address.Start.Row;
                     _cell.Column = address.Start.Column;
                     _cell.ColumnLetter = ExcelCellAddress.GetColumnLetter(address.Start.Column);
@@ -256,10 +286,18 @@ namespace eFMS.API.ReportData.FormatExcel
         }
     }
 
+    /// <summary>
+    /// Cell Address Class
+    /// </summary>
     public class CellAddress
     {
+        /// <summary> Address of cell </summary>
+        public string Address { get; set; }
+        /// <summary> Row address of cell </summary>
         public int Row { get; set; }
+        /// <summary> Column address of cell </summary>
         public int Column { get; set; }
+        /// <summary> Column Letter address of cell </summary>
         public string ColumnLetter { get; set; }
     }
 }
