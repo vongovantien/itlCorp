@@ -33,23 +33,11 @@ export class SettlementShipmentItemComponent {
     }
 
     showPaymentManagement($event: Event): any {
-        /* 
-        * prevent collapse/expand within accordion-head
-        */
-        $event.stopPropagation();
-        $event.preventDefault();
         this.onClick.emit();
-
         return false;
     }
 
     checkUncheckAllRequest($event: Event) {
-        /* 
-         * prevent collapse/expand within accordion-head
-         */
-        $event.stopPropagation();
-        $event.preventDefault();
-
         this.initCheckbox = !this.initCheckbox;
         this.isCheckAll = this.initCheckbox;
         this.onCheck.emit(this.isCheckAll);
@@ -58,9 +46,6 @@ export class SettlementShipmentItemComponent {
     }
 
     previewPLsheet($event: Event, currency: string) {
-        $event.stopPropagation();
-        $event.preventDefault();
-
         if (currency === 'VND') {
             this.onPrintPlVND.emit();
             return false;
@@ -70,11 +55,7 @@ export class SettlementShipmentItemComponent {
     }
 
     showShipmentAttachFile($event: Event) {
-        $event.stopPropagation();
-        $event.preventDefault();
-
         this.onViewFiles.emit();
-
         return false;
     }
 }

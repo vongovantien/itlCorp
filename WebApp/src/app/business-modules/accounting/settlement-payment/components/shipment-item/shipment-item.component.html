@@ -5,7 +5,7 @@
                 <i class="la la-angle-double-down"></i>
             </a>
             <ng-container *ngIf="!data.isLocked;else lockIconTpl">
-                <a (click)="checkUncheckAllRequest($event)">
+                <a ClickStopPropagation (click)="checkUncheckAllRequest($event)">
                     <label class="m-checkbox m-checkbox--bold">
                         <input type="checkbox" [(ngModel)]="isCheckAll">
                         <span></span>
@@ -23,8 +23,10 @@
             <a class="dropdown m-dropdown m-dropdown--inline">
                 <i class="la la-file-text" data-toggle="dropdown"></i>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item pointer" (click)="previewPLsheet($event,'USD')">Preview PL with USD</a>
-                    <a class="dropdown-item pointer" (click)="previewPLsheet($event,'VND')">Preview PL with VND</a>
+                    <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'USD')">Preview
+                        PL with USD</a>
+                    <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'VND')">Preview
+                        PL with VND</a>
                 </div>
             </a>
         </div>
@@ -58,7 +60,8 @@
     </div>
 
     <div class="col-lg-2">
-        <a (click)="showPaymentManagement($event, data)" class="text-underline text-primary">Payment
+        <a ClickStopPropagation (click)="showPaymentManagement($event, data)"
+            class="text-underline text-primary">Payment
             Management</a>
     </div>
     <div class="col-lg-2">
@@ -97,7 +100,7 @@
         </div>
     </div>
     <div class="col-lg-2">
-        <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)">
+        <a class="font-20" title="Attach files" (click)="showShipmentAttachFile($event)" ClickStopPropagation>
             <i class="flaticon-folder-1"></i>
             <ng-container *ngIf="data?.files?.length > 0">
                 <span
