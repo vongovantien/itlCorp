@@ -286,11 +286,12 @@
             <param name="criteria">Id of shipment</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverviewFCL(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportShipmentOverviewWithType(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.String)">
             <summary>
             Export Shipment Overview
             </summary>
             <param name="criteria">Id of shipment</param>
+            <param name="reportType">Type of report: FCL or LCL</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportStandardGeneralReport(eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria)">
@@ -520,6 +521,15 @@
             <returns></returns>
             
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BidingGeneralLCLExport(System.Collections.Generic.List{eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL},eFMS.API.ReportData.Models.Criteria.GeneralReportCriteria,System.String)">
+            <summary>
+            Binding data to export shipment overview LCL
+            </summary>
+            <param name="shipments"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
             Bind Commission Ops Report Excel
@@ -587,7 +597,7 @@
             </summary>
             <param name="name">name of cell to set value</param>
             <param name="value">value set to cell</param>
-            <param name="numberFormat"></param>
+            <param name="numberFormat">Format number(flexible)</param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.String,System.String,System.String)">
             <summary>
@@ -626,6 +636,23 @@
             Save excel and return file stream
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:eFMS.API.ReportData.FormatExcel.CellAddress">
+            <summary>
+            Cell Address Class
+            </summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.CellAddress.Address">
+            <summary> Address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.CellAddress.Row">
+            <summary> Row address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.CellAddress.Column">
+            <summary> Column address of cell </summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.CellAddress.ColumnLetter">
+            <summary> Column Letter address of cell </summary>
         </member>
         <member name="T:eFMS.API.ReportData.Helpers.FileHelper">
             <summary>
