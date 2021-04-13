@@ -8,8 +8,10 @@
                 "files": [
                     "/favicon.ico",
                     "/*.css",
+                    "/*.js",
                     "/*.woff",
-                    "/*.woff2"
+                    "/*.woff2",
+                    "index.html"
                 ]
             }
         },
