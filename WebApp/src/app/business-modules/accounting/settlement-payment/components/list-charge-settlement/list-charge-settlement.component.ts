@@ -23,8 +23,8 @@ import { SettlementChargeFromShipmentPopupComponent } from '../popup/charge-from
 import { SettlementShipmentAttachFilePopupComponent } from './../popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 import cloneDeep from 'lodash/cloneDeep';
-import { BehaviorSubject } from 'rxjs';
-import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState } from '../store';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 import { Store } from '@ngrx/store';
 @Component({
     selector: 'settle-payment-list-charge',
@@ -78,6 +78,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     requester: string = '';
     selectedGroupShipmentIndex: number;
 
+    detailSettlement: Observable<any>;
+
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
@@ -114,6 +116,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.subscriptionDuplicateChargeState();
 
         this.isLoading = this._store.select(getSettlementPaymentDetailLoadingState);
+        this.detailSettlement = this._store.select(getSettlementPaymentDetailState)
     }
 
     showExistingCharge() {
@@ -133,7 +136,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
         this.surcharges = [...this.surcharges, ...surcharge];
         this.surcharges.forEach(x => x.isSelected = false);
-        console.log('surcharge', this.surcharges)
+
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
         if (this.existingChargePopup.selectedCharge.length > 0) {
             this.isExistingSettlement = true;
@@ -290,12 +293,32 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     checkUncheckAllCharge() {
         for (const charge of this.surcharges) {
-            charge.isSelected = this.isCheckAll;
+            if (this.isCheckAll) {
+                if (charge.isFromShipment) {
+                    charge.isSelected = true;
+                }
+                if (!charge.isFromShipment && !charge.isLocked) {
+                    charge.isSelected = true;
+                }
+            } else {
+                charge.isSelected = this.isCheckAll;
+            }
         }
     }
 
+    isFromShipmentLocked = (charge: Surcharge) => {
+        let isSelected;
+        if (charge.isFromShipment) {
+            isSelected = true;
+        }
+        if (!charge.isFromShipment && !charge.isLocked) {
+            isSelected = true;
+        }
+        return isSelected
+    }
+
     onChangeCheckBoxCharge() {
-        this.isCheckAll = this.surcharges.every((item: Surcharge) => item.isSelected);
+        this.isCheckAll = this.surcharges.filter(x => x.isFromShipment || (!x.isFromShipment && !x.isLocked)).every((item: Surcharge) => item.isSelected)
     }
 
     showPaymentManagement(surcharge: Surcharge) {
