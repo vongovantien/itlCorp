@@ -40,6 +40,10 @@ namespace eFMSWindowService
                     var result = db.Database.SqlQuery<int>("[dbo].[sp_GetShipmentToAutoLock]").FirstOrDefault();
                     FileHelper.WriteToFile("AutoLockShipment", DateTime.Now + " - Total number of affected rows: " + result);
                 }
+                if (_timer.Interval != 24 * 60 * 60 * 1000)
+                {
+                    _timer.Interval = 24 * 60 * 60 * 1000;
+                }
             }
             catch (Exception ex)
             {
