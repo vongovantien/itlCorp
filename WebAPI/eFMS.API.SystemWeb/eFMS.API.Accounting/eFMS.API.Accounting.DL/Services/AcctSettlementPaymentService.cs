@@ -1391,7 +1391,7 @@ namespace eFMS.API.Accounting.DL.Services
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
             var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
-            var dataOperation = from sur in surcharge
+            var dataOperation = (from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
                                 join u in unit on sur.UnitId equals u.Id into u2
@@ -1443,20 +1443,21 @@ namespace eFMS.API.Accounting.DL.Services
                                     IsFromShipment = sur.IsFromShipment,
                                     //AdvanceNo = advGrp.AdvanceNo,
                                     PICName = user.Username
-                                };
-            foreach(var item in dataOperation)
+                                }).ToList();
+            for (int i = 0; i < dataOperation.Count(); i++)
             {
-                if(clearanceDataList[item.JobId].Count() > 0)
+                var jobId = dataOperation[i].JobId;
+                if (clearanceDataList[jobId].Count() > 0)
                 {
-                    item.ClearanceNo = clearanceDataList[item.JobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[item.JobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                    dataOperation[i].ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
                 }
             }
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
-                return dataOperation.ToList();
+                return dataOperation;
             }
 
-            var dataDocument = from sur in surcharge
+            var dataDocument = (from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
                                from cc in cc2.DefaultIfEmpty()
                                join u in unit on sur.UnitId equals u.Id into u2
@@ -1510,7 +1511,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    IsFromShipment = sur.IsFromShipment,
                                    //AdvanceNo = advGrp.AdvanceNo,
                                    PICName = user.Username
-                               };
+                               }).ToList();
 
             var data = dataDocument.Union(dataOperation);
             return data.ToList();
@@ -5007,7 +5008,7 @@ namespace eFMS.API.Accounting.DL.Services
                      || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId))
                 );
             string message = string.Empty;
-            if (criteria.soaNo.Count() > 0)
+            if (criteria.soaNo?.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.soaNo.Contains(x.PaySoano) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                     && !string.IsNullOrEmpty(x.PaySyncedFrom));
@@ -5022,7 +5023,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 
             }
-            if (criteria.creditNo.Count() > 0)
+            if (criteria.creditNo?.Count() > 0)
             {
                 var surchargesFilter = surcharges.Where(x => criteria.creditNo.Contains(x.CreditNo) && x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                     && !string.IsNullOrEmpty(x.PaySyncedFrom));
@@ -5046,9 +5047,9 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="mbl"></param>
         /// <param name="hbl"></param>
         /// <returns></returns>
-        public List<string> GetListAdvanceNoForShipment(string jobId, string mbl, string hbl)
+        public List<string> GetListAdvanceNoForShipment(Guid hblId)
         {
-            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.JobId == jobId && x.Mbl == mbl && x.Hbl == hbl).ToLookup(x=>x.AdvanceNo);
+            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).ToLookup(x => x.AdvanceNo);
             if(advanceRequest != null && advanceRequest.Count() > 0)
             {
                 var advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceRequest.Any(a => a.Key.Contains(x.AdvanceNo)));

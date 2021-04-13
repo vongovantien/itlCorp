@@ -226,9 +226,16 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 decimal exchangeRate = 0;
-                if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD && currencyConvert == DocumentConstants.CURRENCY_LOCAL)
+                if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true)
                 {
-                    exchangeRate = kickBackExcRate;
+                    if (surcharge.CurrencyId == DocumentConstants.CURRENCY_USD && currencyConvert == DocumentConstants.CURRENCY_LOCAL)
+                    {
+                        exchangeRate = kickBackExcRate;
+                    }
+                    if (surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL && currencyConvert == DocumentConstants.CURRENCY_USD)
+                    {
+                        exchangeRate = 1 / kickBackExcRate;
+                    }
                 }
                 else
                 {

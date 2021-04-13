@@ -261,7 +261,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.hbl = surcharge.hbl;
             shipment.hblId = surcharge.hblid;
             shipment.advanceNo = surcharge.advanceNo;
-            shipment.advanceNoList.push(surcharge.advanceNo);
             shipment.customNo = surcharge.clearanceNo;
             shipment.chargeSettlements = surcharges.map((surcharge: Surcharge) => new Surcharge(surcharge));
             shipment.totalNetAmount = surcharges.filter((charge: Surcharge) => charge.currencyId === 'USD').reduce((net: number, charge: Surcharge) => net += charge.netAmount, 0);
@@ -280,11 +279,22 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.total.totalCharges = surcharges.length;
 
             this.orgChargeShipment = { shipmentSettlement: cloneDeep(this.shipments), total: cloneDeep(this.total) };
+            this.getAdvnaceList(surcharge.hblid);
             this.checkedAllCharges();
         }
     }
 
-
+    getAdvnaceList(hblId: string){
+        this._accoutingRepo.getListAdvanceNoForShipment(hblId)
+        .pipe(catchError(this.catchError), finalize(() => {
+        }))
+        .subscribe(
+            (res: any[]) => {
+                console.log('res', res)
+                this.shipments.map(x=> x.advanceNoList = res);
+            },
+        );
+    }
 
     updateExchangeRateForCharges() {
         this.shipments.forEach((shipment: any) =>

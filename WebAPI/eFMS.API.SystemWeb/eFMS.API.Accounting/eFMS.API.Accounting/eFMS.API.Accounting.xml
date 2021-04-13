@@ -705,16 +705,23 @@
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetPartnerForSettlement(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
             <summary>
-            
+            Get partners map from soa or cd note (from shipment and type = credit)
             </summary>
             <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.CheckSoaCDNoteIsSynced(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
             <summary>
-            
+            Check if soa or cd note existed synced charges
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid)">
+            <summary>
+            Get List AdvanceNo For Shipment
+            </summary>
+            <param name="hblId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">

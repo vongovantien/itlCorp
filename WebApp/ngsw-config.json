@@ -10,7 +10,8 @@
                     "/*.css",
                     "/*.js",
                     "/*.woff",
-                    "/*.woff2"
+                    "/*.woff2",
+                    "index.html"
                 ]
             }
         },
@@ -19,14 +20,18 @@
             "installMode": "lazy",
             "updateMode": "prefetch",
             "resources": {
-                "files": ["/assets/**"]
+                "files": [
+                    "/assets/**"
+                ]
             }
         }
     ],
     "dataGroups": [
         {
             "name": "api-performance",
-            "urls": ["**/api/v1/en-US/CatCurrency/getAllByQuery"],
+            "urls": [
+                "**/api/v1/en-US/CatCurrency/getAllByQuery"
+            ],
             "cacheConfig": {
                 "strategy": "performance",
                 "maxSize": 500,

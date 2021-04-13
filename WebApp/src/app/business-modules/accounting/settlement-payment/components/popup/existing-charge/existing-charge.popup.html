@@ -83,7 +83,8 @@
                                                             <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                                             name="daterange" readonly formControlName="serviceDate" [ranges]="ranges"
-                                                            [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY" />
+                                                            [alwaysShowCalendars]="true" placeholder="DD/MM/YYYY"
+                                                            [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate" calendar/>
                                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                                             <span>
                                                                 <i class="la la-calendar"></i>

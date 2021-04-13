@@ -2000,9 +2000,9 @@ namespace eFMS.API.Catalogue.DL.Services
             IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
                                 && (x.Active == criteria.Active || criteria.Active == null)
                                 && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
-            if (!string.IsNullOrEmpty(criteria.Id))
+            if (!string.IsNullOrEmpty(criteria.ExceptId))
             {
-                data = data.Where(x => x.ParentId != criteria.Id);
+                data = data.Where(x => x.ParentId != criteria.ExceptId);
             }
             if (data == null) return null;
 

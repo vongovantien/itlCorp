@@ -1288,22 +1288,14 @@ namespace eFMS.API.Documentation.DL.Services
                         // tinh total phi chargeGroup freight
                         if (ChargeGroupModel?.Name == "Freight")
                         {
-                            if (charge.KickBack == true)
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountFreight = 0;
+                                _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountFreight += charge.AmountUsd; // Phí Selling trước thuế
-                                }
-                                else
-                                {
-                                    _totalBuyAmountFreight += charge.AmountVnd;
-                                }
+                                _totalBuyAmountFreight += charge.AmountVnd;
                             }
-
                         }
                         if (ChargeGroupModel?.Name == "Trucking")
                         {
@@ -1326,39 +1318,28 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                         if (ChargeGroupModel?.Name == "Handling")
                         {
-                            if (charge.KickBack == true)
+
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountHandling = 0;
+                                _totalBuyAmountHandling += charge.AmountUsd;
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountHandling += charge.AmountUsd;
-                                }
-                                else
-                                {
-                                    _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
-                                }
+                                _totalBuyAmountHandling += charge.AmountVnd; // Phí Selling trước thuế
                             }
+
                         }
                         if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight" && ChargeGroupModel?.Name != "Com" && ChargeGroupModel?.Name != "Logistics")
                         {
-                            if (charge.KickBack == true)
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
-                                _totalBuyAmountOther = 0;
+                                _totalBuyAmountOther += charge.AmountUsd;
                             }
                             else
                             {
-                                if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                                {
-                                    _totalBuyAmountOther += charge.AmountUsd;
-                                }
-                                else
-                                {
-                                    _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                                }
+                                _totalBuyAmountOther += charge.AmountVnd; // Phí Selling trước thuế
                             }
+
                         }
                         if (charge.KickBack == true || ChargeGroupModel?.Name == "Com")
                         {
@@ -1395,10 +1376,6 @@ namespace eFMS.API.Documentation.DL.Services
                 data.TotalBuyOthers = _totalBuyAmountOther;
                 data.TotalBuyKB = _totalBuyAmountKB;
                 data.TotalCustomBuy = _totalBuyCustom;
-                if (data.TotalBuyOthers > 0 && data.TotalCustomBuy > 0 && data.TotalBuyOthers > data.TotalCustomBuy)
-                {
-                    data.TotalBuyOthers = data.TotalBuyOthers - data.TotalCustomBuy;
-                }
                 data.TotalBuy = data.TotalBuyFreight + data.TotalBuyTrucking + data.TotalBuyHandling + data.TotalBuyOthers + data.TotalBuyKB + data.TotalCustomBuy;
                 data.Profit = data.TotalSell - data.TotalBuy;
                 #endregion -- Phí Buying trước thuế --

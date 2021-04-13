@@ -292,7 +292,7 @@ namespace eFMS.API.Accounting.Controllers
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
-                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.JobId, item.Key.MBL, item.Key.HBL);
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
@@ -966,7 +966,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Get partners map from soa or cd note (from shipment and type = credit)
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -979,7 +979,7 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Check if soa or cd note existed synced charges
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -993,6 +993,19 @@ namespace eFMS.API.Accounting.Controllers
             {
                 _result = new ResultHandle { Status = false, Message = result };
             }
+            return Ok(_result);
+        }
+
+        /// <summary>
+        /// Get List AdvanceNo For Shipment
+        /// </summary>
+        /// <param name="hblId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetListAdvanceNoForShipment")]
+        public IActionResult GetListAdvanceNoForShipment(Guid hblId)
+        {
+            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId);
             return Ok(_result);
         }
     }
