@@ -26,6 +26,9 @@
                                 <label for="">Status Approval</label>
                                 <ng-select formControlName="statusApproval" [items]="statusApprovals" class="custom"
                                     bindLabel="title" bindValue="value" placeholder="All">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <div class="text-{{item.value | classStatusApproval}}"> {{item.value}} </div>
+                                    </ng-template>
                                 </ng-select>
                             </div>
                         </div>

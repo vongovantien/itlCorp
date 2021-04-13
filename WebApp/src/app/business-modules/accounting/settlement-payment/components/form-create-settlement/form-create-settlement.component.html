@@ -82,7 +82,8 @@
                     <label class="form-control-label">
                         Status Approval:
                     </label>
-                    <input type="text" class="form-control m-input m-input--square text-info"
+                    <input type="text"
+                        class="form-control m-input m-input--square text-{{statusApproval.value | classStatusApproval}}"
                         placeholder="Status Approval" formControlName="statusApproval" readonly>
                 </div>
             </div>

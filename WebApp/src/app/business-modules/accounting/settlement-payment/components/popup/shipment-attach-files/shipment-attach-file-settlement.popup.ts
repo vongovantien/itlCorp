@@ -1,4 +1,3 @@
-import { ChangeDetectorRef } from '@angular/core';
 import { getSettlementPaymentDetailState } from './../../store/reducers/index';
 import { AccountingRepo } from '@repositories';
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
@@ -41,7 +40,6 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _store: Store<ISettlementPaymentState>,
-        private _cd: ChangeDetectorRef
     ) {
         super();
     }
