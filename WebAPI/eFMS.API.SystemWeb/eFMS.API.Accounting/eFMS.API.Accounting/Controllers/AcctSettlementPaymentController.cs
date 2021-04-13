@@ -157,7 +157,7 @@ namespace eFMS.API.Accounting.Controllers
 
             if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Select(x => x.JobId))].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
             }
 
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
@@ -529,8 +529,11 @@ namespace eFMS.API.Accounting.Controllers
 
                 foreach (var item in model.ShipmentCharge)
                 {
-                    // Check Job Is Locked
-                    var isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
+                    bool isLockedJob = false;
+                    if (item.IsFromShipment == false) // Check lô hàng khóa chỉ lô của hiện trường
+                    {
+                        isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
+                    }
                     if (isLockedJob)
                     {
                         ResultHandle _result = new ResultHandle { Status = false, Message = item.JobId + " have been locked. You not allow save and send request." };
