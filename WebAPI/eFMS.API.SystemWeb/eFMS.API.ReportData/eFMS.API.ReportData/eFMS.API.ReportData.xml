@@ -529,7 +529,6 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateCommissionPROpsReportExcel(eFMS.API.ReportData.Models.CommissionExportResult,eFMS.API.ReportData.Models.Criteria.CommissionReportCriteria,System.IO.Stream)">
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.BindingDataCommissionPROpsReport(eFMS.API.ReportData.Models.CommissionExportResult,System.String)">
             <summary>
             Bind Commission Ops Report Excel

@@ -30,15 +30,20 @@
                             </span>
                         </span>
                     </button>
-                    <button type="button" class="btn btn-danger   m-btn--icon m-btn--uppercase"
-                        (click)="deleteShipmentItem()">
-                        <span>
-                            <i class="la la-trash"></i>
+                    <ng-container *ngIf="((detailSettlement | async)?.settlement?.statusApproval === 'New' 
+                    || (detailSettlement | async)?.settlement?.statusApproval === 'Done')
+                    && (detailSettlement | async)?.settlement?.isRequester">
+                        <button type="button" class="btn btn-danger   m-btn--icon m-btn--uppercase"
+                            (click)="deleteShipmentItem()">
                             <span>
-                                Delete
+                                <i class="la la-trash"></i>
+                                <span>
+                                    Delete
+                                </span>
                             </span>
-                        </span>
-                    </button>
+                        </button>
+                    </ng-container>
+
                 </ng-container>
             </div>
             <div class="m-checkbox-list">
@@ -112,27 +117,52 @@
                             <ng-container
                                 *ngFor="let surcharge of surcharges | filter: keyword:['jobId', 'hbl', 'mbl', 'chargeName', 'payer', 'obhPartnerName']; let i = index; trackBy: trackByFn">
                                 <tr class="" [class.selected-row]="i === selectedIndexSurcharge"
-                                    [class.bg-warning]="surcharge.isFromShipment"
+                                    [class.bg-warning]="!surcharge.isDuplicate && surcharge.isFromShipment"
                                     [class.invalid-row]="surcharge.isDuplicate" [class.bg-locked]="surcharge.isLocked">
                                     <td class=" table-actions-col">
                                         <div class="table-actions" [class.d-flex]="surcharge.isLocked">
-                                            <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                <input type="checkbox" (change)="onChangeCheckBoxCharge()"
-                                                    value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
-                                                <span></span>
-                                            </label>
-                                            <ng-container *ngIf="!surcharge.isLocked;else locktpl">
-                                                <ng-container *ngIf="!readonly">
-                                                    <span [class.m--margin-right-20]="surcharge.isFromShipment">
-                                                        <ng-container *ngIf="!surcharge.isFromShipment">
-                                                            <a (click)="openCopySurcharge(surcharge)" title="Copy"
-                                                                class="pointer">
-                                                                <i class="la la-copy"></i>
-                                                            </a>
-                                                        </ng-container>
-                                                    </span>
+                                            <!-- Phí chứng từ -->
+                                            <ng-container *ngIf="surcharge.isFromShipment;else chargeFromShipmentTpl">
+                                                <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
+                                                </ng-container>
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                        value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                                    <span></span>
+                                                </label>
+                                                <ng-container *ngIf="!surcharge.isLocked">
+                                                    <ng-container *ngIf="!readonly">
+                                                        <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                            <ng-container *ngIf="!surcharge.isFromShipment">
+                                                                <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                                    class="pointer">
+                                                                    <i class="la la-copy"></i>
+                                                                </a>
+                                                            </ng-container>
+                                                        </span>
+                                                    </ng-container>
                                                 </ng-container>
                                             </ng-container>
+                                            <!-- Phí hiện trường -->
+                                            <ng-template #chargeFromShipmentTpl>
+                                                <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
+                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                        value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                                    <span></span>
+                                                </label>
+                                                <ng-container *ngIf="!surcharge.isLocked;else locktpl">
+                                                    <ng-container *ngIf="!readonly">
+                                                        <span [class.m--margin-right-20]="surcharge.isFromShipment">
+                                                            <ng-container *ngIf="!surcharge.isFromShipment">
+                                                                <a (click)="openCopySurcharge(surcharge)" title="Copy"
+                                                                    class="pointer">
+                                                                    <i class="la la-copy"></i>
+                                                                </a>
+                                                            </ng-container>
+                                                        </span>
+                                                    </ng-container>
+                                                </ng-container>
+                                            </ng-template>
 
                                             <span class="dropdown m-dropdown m-dropdown--inline m-0">
                                                 <i class="la la-file-text" data-toggle="dropdown"></i>
@@ -209,6 +239,7 @@
 </div>
 
 <payment-management-popup></payment-management-popup>
+
 <shipment-attach-file (onChange)="onChangeShipmentGroupAttachFile($event)" [readOnly]="readonly"></shipment-attach-file>
 
 <ng-container *ngIf="!readonly">

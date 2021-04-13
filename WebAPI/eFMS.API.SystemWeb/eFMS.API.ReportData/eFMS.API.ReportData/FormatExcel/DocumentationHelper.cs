@@ -2660,7 +2660,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.SetData("ShipmentType", shipment.ShipmentType);
                     excel.SetData("Salesman", shipment.Salesman);
                     excel.SetData("NotifyParty", shipment.NotifyParty);
-                    excel.SetData("QTy", shipment.QTy);
+                    excel.SetData("QTy", shipment.PackageQty);
                     excel.SetData("Cont20", shipment.Cont20);
                     excel.SetData("Cont40", shipment.Cont40);
                     excel.SetData("Cont40HC", shipment.Cont40HC);
