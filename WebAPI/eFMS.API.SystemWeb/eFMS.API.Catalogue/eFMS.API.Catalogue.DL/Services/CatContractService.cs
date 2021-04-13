@@ -1267,7 +1267,7 @@ namespace eFMS.API.Catalogue.DL.Services
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
             //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
-            bool result = SendMail.Send(subject, body, lstTo, lstCC, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo,null, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
                 SentUser = SendMail._emailFrom,
@@ -1393,7 +1393,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 "andy.hoa@itlvn.com",
                 "cara.oanh@itlvn.com",
                 //"lynne.loc@itlvn.com",
-                "samuel.an@logtechub.com",
+                "samuel.an@itlvn.com",
                 //"kenny.thuong@itlvn.com",
             };
             return lstCc;
