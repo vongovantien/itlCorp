@@ -987,6 +987,7 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
+            var userRepo = sysUserRepo.Get();
 
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -998,6 +999,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                join user in userRepo on opst.UserCreated equals user.Id into sysUser
+                                from user in sysUser.DefaultIfEmpty()
                                 where
                                      sur.SettlementCode == settlementNo
                                 select new ShipmentChargeSettlement
@@ -1041,7 +1044,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     AdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
                                     TypeService = "OPS",
-                                    IsLocked = opst.IsLocked
+                                    IsLocked = opst.IsLocked,
+                                    PICName = user.Username
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1056,6 +1060,8 @@ namespace eFMS.API.Accounting.DL.Services
                                //from cstd in cstd2.DefaultIfEmpty()
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
+                               join user in userRepo on cst.UserCreated equals user.Id into sysUser
+                               from user in sysUser.DefaultIfEmpty()
                                where
                                     sur.SettlementCode == settlementNo
                                select new ShipmentChargeSettlement
@@ -1099,7 +1105,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    AdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
                                    TypeService = "DOC",
-                                   IsLocked = cst.IsLocked
+                                   IsLocked = cst.IsLocked,
+                                   PICName = user.Username
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();

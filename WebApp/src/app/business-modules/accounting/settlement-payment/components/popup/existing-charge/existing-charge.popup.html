@@ -206,7 +206,7 @@
                                         [placeholder]="'Advance No...'" (change)="setAdvanceToSurcharge(shipment, shipment.advanceNo)">
                                     </ng-select>
                             </div>
-                            <div class="col-2"><span class="font-weight-bold">PIC:</span>:
+                            <div class="col-2"><span class="font-weight-bold">PIC:</span>
                                 <span class="text-success">{{shipment.chargeSettlements[0].picName}}</span>
                             </div>
                         </div>
@@ -228,7 +228,8 @@
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
                                                     <input type="checkbox"
-                                                        value="{{charge}}" [(ngModel)]="charge.isSelected" [disabled]="isSOACDNote">
+                                                        value="{{charge}}" [(ngModel)]="charge.isSelected" [disabled]="isSOACDNote"
+                                                        (change)="onChangeCheckBoxCharge(shipment.hblId)">
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -240,28 +241,28 @@
                                         </td>
                                         <td>{{charge.chargeCode}}</td>
                                         <td>{{charge.chargeName}}</td>
-                                        <td>{{charge.netAmount| number:'1.3-3'}}</td>
-                                        <td>{{charge.vatrate| number:'1.3-3'}}</td>
-                                        <td>{{charge.total | number:'1.3-3'}}</td>
+                                        <td class="text-right">{{charge.netAmount| number:'1.3-3'}}</td>
+                                        <td class="text-right">{{charge.vatrate| number:'1.3-3'}}</td>
+                                        <td class="text-right">{{charge.total | number:'1.3-3'}}</td>
                                         <td>{{charge.currencyId}}</td>
-                                        <td>{{charge.finalExchangeRate | number:'1.3-3'}}</td>
+                                        <td class="text-right">{{charge.finalExchangeRate | number:'1.3-3'}}</td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="number" class="form-control" [(ngModel)]="charge.amountVnd"
-                                                    min="0" numeric [decimals]="digitDecimal" autoFormatCurrency>
+                                                <input type="number" class="form-control text-right" [(ngModel)]="charge.amountVnd" name="amount"
+                                                    min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (blur)="onBlurAmountCharge($event, charge.hblid)">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="number" class="form-control"
+                                                <input type="number" class="form-control text-right" name="vat"
                                                     [(ngModel)]="charge.vatAmountVnd" numeric
-                                                    [decimals]="digitDecimal" autoFormatCurrency>
+                                                    [decimals]="digitDecimal" autoFormatCurrency (blur)="onBlurAmountCharge($event, charge.hblid)">
                                             </div>
                                         </td>
-                                        <td>{{charge.amountVnd + charge.vatAmountVnd | number:'1.0-3'}}</td>
+                                        <td class="text-right">{{charge.amountVnd + charge.vatAmountVnd | number:'1.0-3'}}</td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
+                                                <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo" name="invoiceNo"
                                                 (blur)="onBlurAnyCharge($event, charge.hblid)">
                                             </div>
                                         </td>
@@ -273,13 +274,13 @@
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.seriesNo"
+                                                <input type="text" class="form-control" [(ngModel)]="charge.seriesNo" name="seriesNo"
                                                 (blur)="onBlurAnyCharge($event, charge.hblid)">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.notes"
+                                                <input type="text" class="form-control" [(ngModel)]="charge.notes" name="notes"
                                                 (blur)="onBlurAnyCharge($event, charge.hblid)">
                                             </div>
                                         </td>
@@ -289,14 +290,14 @@
                                         <td class="table-actions-col"></td>
                                         <td>TOTAL</td>
                                         <td></td>
-                                        <td class="text-center">{{shipment.totalNetAmount | number:'1.2-3'}}$|{{shipment.totalNetAmountVND | number:'1.0-3'}}đ</td>
+                                        <td class="text-right">{{shipment.totalNetAmount | number:'1.2-3'}}$|{{shipment.totalNetAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
-                                        <td class="text-center">{{shipment.totalAmount | number:'1.2-3'}}$|{{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
+                                        <td class="text-right">{{shipment.totalAmount | number:'1.2-3'}}$|{{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
                                         <td></td>
-                                        <td>{{shipment.totalNetVND | number:'1.0-3'}}</td>
-                                        <td>{{shipment.totalVATVND | number:'1.0-3'}}</td>
-                                        <td>{{shipment.totalVND | number:'1.0-3'}}</td>
+                                        <td class="text-right">{{shipment.totalNetVND | number:'1.0-3'}}</td>
+                                        <td class="text-right">{{shipment.totalVATVND | number:'1.0-3'}}</td>
+                                        <td class="text-right">{{shipment.totalVND | number:'1.0-3'}}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>

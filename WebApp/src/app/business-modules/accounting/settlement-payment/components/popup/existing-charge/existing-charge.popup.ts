@@ -229,6 +229,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             );
     }
 
+    onChangeCheckBoxCharge(hblId: string) {
+        this.shipments.filter((shipment: ShipmentChargeSettlement) => shipment.hblId === hblId).map((shipment: ShipmentChargeSettlement) => {
+            shipment.isSelected = shipment.chargeSettlements.every((item: Surcharge) => item.isSelected)
+        });
+    }
+
     isSoaCDNoteSelected() {
         if (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value) {
             this.isSOACDNote = true;
@@ -354,6 +360,23 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 }
             });
         });
+    }
+
+    onBlurAmountCharge(event: any, hblId: string){
+        if(event.target.name === 'amount'){
+            this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
+                shipment.totalNetVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
+                shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
+            });
+            this.getTotalAmountVND();
+        }
+        if(event.target.name === 'vat'){
+            this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
+                shipment.totalVATVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.vatAmountVnd, 0);
+                shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
+            });
+            this.getTotalAmountVND();
+        }
     }
 
     setAdvanceToSurcharge(shipment: any, advanceNo: string) {
