@@ -73,7 +73,9 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.contracts = this._sortService.sort(this.contracts, sort, this.order);
     }
     ngAfterViewInit() {
-        this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
+        if (this.type === 'Agent') {
+            this.formContractPopup.contractTypes = this.formContractPopup.contractTypes.filter(x => x !== 'Cash');
+        }
     }
 
     gotoCreateContract() {
