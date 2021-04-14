@@ -360,7 +360,7 @@ namespace eFMS.API.ReportData.Controllers
             Stream stream;
             if (reportType == "FCL")
             {
-               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment Overview - FCL.xlsx");
+               stream = new DocumentationHelper().GenerateShipmentOverviewFCLExcell(dataObjects.Result, criteria, "Shipment-Overview-FCL.xlsx");
             }
             else
             {
