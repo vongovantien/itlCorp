@@ -910,7 +910,7 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion -- Search by Creator/PersonInCharge of Job / Salesman of Housebill --
 
             #region -- Search by ChargeId --
-            if (!string.IsNullOrEmpty(criteria.StrCharges))
+            if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var chargeIds = criteria.StrCharges.Split(',').Where(x => x.ToString() != string.Empty).ToList();
                 if (chargeIds.Count > 0 && surcharges != null)
@@ -1372,7 +1372,7 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion -- CD Note --
 
             #region -- Search by ChargeId --
-            if (!string.IsNullOrEmpty(criteria.StrCharges))
+            if (!string.IsNullOrEmpty(criteria.StrCharges) && criteria.StrCharges != "All")
             {
                 var chargeIds = criteria.StrCharges.Split(',').Where(x => x.ToString() != string.Empty).ToList();
                 if (chargeIds.Count > 0 && surcharges != null)
