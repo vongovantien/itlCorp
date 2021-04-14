@@ -103,7 +103,7 @@
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"
                                 (remove)="resetFormControl(pol); resetFormControl(polDescription)"
-                                (displaySelectedStrChange)="podDescription.setValue($event)">
+                                (displaySelectedStrChange)="polDescription.setValue($event)">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && !!polDescription.value && !pol.value">

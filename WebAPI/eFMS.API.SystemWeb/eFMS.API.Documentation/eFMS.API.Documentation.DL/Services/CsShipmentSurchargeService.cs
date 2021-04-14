@@ -740,6 +740,7 @@ namespace eFMS.API.Documentation.DL.Services
                    PayerName = p2.PartnerNameEn,
                    ChargeNameEn = charge.ChargeNameEn,
                    ChargeCode = charge.Code,
+                   ChargeGroup = surcharge.ChargeGroup
                });
             return result;
         }
@@ -824,6 +825,8 @@ namespace eFMS.API.Documentation.DL.Services
 
                     ChargeNameEn = charge.ChargeNameEn,
                     ChargeCode = charge.Code,
+                    ChargeGroup = surcharge.ChargeGroup
+
                 });
             return result;
         }
