@@ -111,8 +111,10 @@
     </div>
 </div>
 
+<ng-container *ngIf="state === 'update'">
+    <adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)"
+        (onUpdate)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
+</ng-container>
 
-<adv-payment-add-popup (onRequest)="onRequestAdvancePaymentChange($event)"
-    (onUpdate)="onUpdateRequestAdvancePayment($event)"></adv-payment-add-popup>
 
 <ng-template inject></ng-template>

@@ -188,9 +188,9 @@
                                             </ng-template>
                                         </div>
                                     </td>
-                                    <td [class.text-underline]="!surcharge.isLocked">
+                                    <td [class.text-underline]="!surcharge.isLocked || surcharge.isFromShipment">
                                         <a (click)="updateChargeWithJob(surcharge,i)" class="pointer"
-                                            *ngIf="!surcharge.isLocked; else lockShipmentTpl">
+                                            *ngIf="!surcharge.isLocked || surcharge.isFromShipment; else lockShipmentTpl">
                                             {{surcharge.jobId}} - {{surcharge.hbl}} - {{surcharge.mbl}}
                                         </a>
                                         <ng-template #lockShipmentTpl>
