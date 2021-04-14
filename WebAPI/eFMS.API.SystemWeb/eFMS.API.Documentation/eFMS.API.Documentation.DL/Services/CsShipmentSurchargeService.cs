@@ -516,6 +516,19 @@ namespace eFMS.API.Documentation.DL.Services
                     var surcharge = DataContext.Get(x => x.Id == item.Id).FirstOrDefault();
                     if (surcharge != null)
                     {
+                        if (string.IsNullOrEmpty(surcharge.SettlementCode))
+                        {
+                            if (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                            {
+                                if (surcharge.PayerAcctManagementId == null 
+                                    || string.IsNullOrEmpty(surcharge.PaySoano) 
+                                    || string.IsNullOrEmpty(surcharge.CreditNo))
+                                {
+                                    surcharge.PayerId = item.PayerId;
+                                }
+                            }
+                        }
+
                         //Chỉ cập nhật và tính lại giá trị Amount cho các charge chưa issue Settlement, Voucher, Invoice, SOA, CDNote
                         if (string.IsNullOrEmpty(surcharge.SettlementCode)
                             && (surcharge.AcctManagementId == Guid.Empty || surcharge.AcctManagementId == null)
@@ -524,7 +537,6 @@ namespace eFMS.API.Documentation.DL.Services
                             && (string.IsNullOrEmpty(surcharge.DebitNo) && string.IsNullOrEmpty(surcharge.CreditNo)))
                         {
                             surcharge.PaymentObjectId = item.PaymentObjectId;
-                            surcharge.PayerId = item.PayerId;
                             surcharge.ChargeId = item.ChargeId;
                             surcharge.ChargeGroup = item.ChargeGroup;
                             surcharge.Quantity = item.Quantity;
