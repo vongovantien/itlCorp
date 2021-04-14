@@ -229,6 +229,12 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             );
     }
 
+    onChangeCheckBoxCharge(hblId: string) {
+        this.shipments.filter((shipment: ShipmentChargeSettlement) => shipment.hblId === hblId).map((shipment: ShipmentChargeSettlement) => {
+            shipment.isSelected = shipment.chargeSettlements.every((item: Surcharge) => item.isSelected)
+        });
+    }
+
     isSoaCDNoteSelected() {
         if (this.referenceNo.value === this.referenceNos[0].value || this.referenceNo.value === this.referenceNos[1].value) {
             this.isSOACDNote = true;

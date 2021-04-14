@@ -228,7 +228,8 @@
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
                                                     <input type="checkbox"
-                                                        value="{{charge}}" [(ngModel)]="charge.isSelected" [disabled]="isSOACDNote">
+                                                        value="{{charge}}" [(ngModel)]="charge.isSelected" [disabled]="isSOACDNote"
+                                                        (change)="onChangeCheckBoxCharge(shipment.hblId)">
                                                     <span></span>
                                                 </label>
                                             </div>
