@@ -272,7 +272,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
+                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Form - eFMS.xlsx`);
                 },
             );
     }

@@ -147,7 +147,9 @@
                                                 <td class="text-right">{{advancePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{advancePayment.advanceCurrency}}</td>
                                                 <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
-                                                <td><span class="text-info">{{advancePayment.payeeName}}</span></td>
+                                                <td><span class="text-info"
+                                                        style="min-width: 200px; white-space:initial">{{advancePayment.payeeName}}</span>
+                                                </td>
                                                 <td>{{advancePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.deadlinePayment | date: 'dd/MM/yyyy'}}</td>
                                                 <td>{{advancePayment.datetimeModified | date: 'dd/MM/yyyy'}}</td>
@@ -185,7 +187,8 @@
                                                         {{advancePayment.paymentMethodName}}
                                                     </div>
                                                 </td>
-                                                <td>{{advancePayment.advanceNote}}</td>
+                                                <td style="min-width: 300px;white-space: initial;">
+                                                    {{advancePayment.advanceNote}}</td>
                                                 <td>{{advancePayment.voucherNo}}</td>
                                                 <td>{{advancePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td class="text-info">

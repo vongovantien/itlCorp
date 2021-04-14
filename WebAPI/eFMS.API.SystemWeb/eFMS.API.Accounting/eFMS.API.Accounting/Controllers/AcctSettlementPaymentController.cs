@@ -529,16 +529,19 @@ namespace eFMS.API.Accounting.Controllers
 
                 foreach (var item in model.ShipmentCharge)
                 {
-                    bool isLockedJob = false;
-                    if (item.IsFromShipment == false) // Check lô hàng khóa chỉ lô của hiện trường
-                    {
-                        isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
-                    }
-                    if (isLockedJob)
-                    {
-                        ResultHandle _result = new ResultHandle { Status = false, Message = item.JobId + " have been locked. You not allow save and send request." };
-                        return BadRequest(_result);
-                    }
+                    // Check lô hàng khóa chỉ lô của hiện trường
+                    //bool isLockedJob = false;
+                    //if (item.IsFromShipment == false) // Check lô hàng khóa chỉ lô của hiện trường
+                    //{
+                    //    isLockedJob = acctSettlementPaymentService.CheckIsLockedShipment(item.JobId);
+                    //}
+                    //if (isLockedJob)
+                    //{
+                    //    ResultHandle _result = new ResultHandle { Status = false, Message = item.JobId + " have been locked. You not allow save and send request." };
+                    //    return BadRequest(_result);
+                    //}
+
+                    // TODO: ĐÃ RÀNG CHỈNH SỬA TRÊN CLIENT CHECK THAY ĐỔI GIÁ, TOTAL AMOUNT => CẦN VERIFY DƯỚI BE
 
                     var shipment = new CheckDuplicateShipmentSettlementCriteria
                     {

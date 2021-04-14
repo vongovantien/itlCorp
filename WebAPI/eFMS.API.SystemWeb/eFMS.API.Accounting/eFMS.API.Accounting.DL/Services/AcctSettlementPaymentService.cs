@@ -2224,12 +2224,12 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var settle = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             //Quy đổi tỉ giá theo ngày Request Date, nếu không có thì lấy exchange rate mới nhất
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
-            if (currencyExchange.Count == 0)
-            {
-                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }
+            //var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settle.RequestDate.Value.Date).ToList();
+            //if (currencyExchange.Count == 0)
+            //{
+            //    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+            //    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            //}
 
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
             //.GroupBy(x => new { x.SettlementCode, x.JobNo, x.Hblno, x.Mblno, x.CurrencyId, x.Hblid, x.Type, x.AdvanceNo });
@@ -2260,7 +2260,15 @@ namespace eFMS.API.Accounting.DL.Services
                 item.HBL = _hbl;
                 item.Description = catChargeRepo.Get(x => x.Id == surcharge.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 item.InvoiceNo = surcharge.InvoiceNo ?? string.Empty;
-                item.Amount = surcharge.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, surcharge.CurrencyId, currency) + _decimalNumber;
+                // item.Amount = surcharge.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, surcharge.CurrencyId, currency) + _decimalNumber;
+                if (currency == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    item.Amount = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0);
+                }
+                else
+                {
+                    item.Amount = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0);
+                }
                 item.Debt = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false;
                 item.Currency = string.Empty;
                 item.Note = surcharge.Notes;
@@ -4541,7 +4549,15 @@ namespace eFMS.API.Accounting.DL.Services
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                 infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 //Quy đổi theo currency của Settlement
-                infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
+                // infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
+                if(settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
+                }
+                else
+                {
+                    infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
+                }
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                 infoShipmentCharge.ChargeNote = sur.Notes;
                 string _chargeType = string.Empty;

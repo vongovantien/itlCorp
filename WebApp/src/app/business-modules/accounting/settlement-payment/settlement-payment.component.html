@@ -125,7 +125,8 @@
                                                 <td class="text-right">{{settlePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{settlePayment.settlementCurrency}}</td>
                                                 <td class="text-info">{{settlePayment.requesterName}}</td>
-                                                <td class="text-info">{{settlePayment.payeeName}}</td>
+                                                <td class="text-info" style="min-width: 200px; white-space:initial">
+                                                    {{settlePayment.payeeName}}</td>
                                                 <td>{{settlePayment.requestDate | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngSwitch]="settlePayment.statusApprovalName">
                                                     <div *ngSwitchCase="'New'" class="text-danger">
@@ -143,7 +144,8 @@
                                                     {{settlePayment.voucherNo}}
                                                 </td>
                                                 <td>{{settlePayment.voucherDate | date: 'dd/MM/yyyy'}}</td>
-                                                <td>{{settlePayment.note}}</td>
+                                                <td style="min-width: 300px; white-space:initial">
+                                                    {{settlePayment.note}}</td>
                                                 <td class="text-info">
                                                     {{settlePayment.lastSyncDate | date: 'dd/MM/yyyy'}}
                                                 </td>

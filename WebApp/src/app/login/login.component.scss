@@ -89,7 +89,7 @@
 
     //== Login Area
     .m-login__wrapper-2 {
-        width: 50%;
+        // width: 50%;
         padding: 0px 30px;
         display: table-cell;
         vertical-align: middle;
@@ -247,57 +247,3 @@
         overflow-x: scroll;
     }
 }
-
-// :host /deep/ {
-//     .ui-select-container {
-//         .ui-select-match {
-//             .form-control {
-//                 &,
-//                 &:focus {
-//                     background-color: #3d4963;
-//                     border-color: #3d4963;
-//                     color: #77829d;
-//                     font-size: 16px;
-//                     line-height: 1;
-//                 }
-//             }
-//         }
-//         .form-control {
-//             &,
-//             &:focus {
-//                 height: 42px;
-//                 padding: 12px 20px;
-//                 background-color: #3d4963;
-//                 border-color: #3d4963;
-//                 color: #77829d;
-//                 font-size: 16px;
-//                 line-height: 1;
-//             }
-//             &::placeholder {
-//                 color: #77829d;
-//             }
-//         }
-//         .ui-select-placeholder {
-//             height: 42px;
-//             padding: 12px 20px;
-//             color: #77829d !important;
-//             font-size: 16px;
-//             line-height: 1;
-//         }
-//         .dropdown-menu {
-//             border-radius: 0;
-//             background-color: #4a5d87;
-//         }
-//         .ui-select-choices .ui-select-choices-row .dropdown-item {
-//             padding: 6px 15px;
-//             color: #fff;
-//             font-family: inherit;
-//             font-size: 14px;
-//             font-weight: 300;
-//         }
-//         .ui-select-choices .ui-select-choices-row.active > a {
-//             color: #fff;
-//             background-color: #3966b6;
-//         }
-//     }
-// }

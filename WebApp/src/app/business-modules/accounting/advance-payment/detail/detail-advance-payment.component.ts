@@ -223,7 +223,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
 
     exportAdvPayment(lang: string) {
         this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
-            .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx'); });
+            .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`); });
     }
 
     getInfoApprove(advanceNo: string) {
