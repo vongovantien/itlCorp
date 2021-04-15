@@ -55,6 +55,9 @@
      <None Update="FormatExcel\TemplateExport\PHIEU-CAN-NCTS-ALS-Template.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
+     <None Update="FormatExcel\TemplateExport\ShipmentOverviewLCL.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
    </ItemGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">

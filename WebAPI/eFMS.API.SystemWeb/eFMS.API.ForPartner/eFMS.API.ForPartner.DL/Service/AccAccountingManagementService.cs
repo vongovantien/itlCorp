@@ -45,6 +45,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly IContextBase<AcctReceipt> receiptRepository;
         private readonly IContextBase<SysCompany> companyRepository;
+        private readonly IContextBase<CatContract> catContractRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -67,7 +68,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<AcctReceipt> receiptRepo,
-            IContextBase<SysCompany> companyRepo
+            IContextBase<SysCompany> companyRepo,
+            IContextBase<CatContract> catContractRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -88,6 +90,7 @@ namespace eFMS.API.ForPartner.DL.Service
             sysUserNotificationRepository = sysUsernotifyRepo;
             receiptRepository = receiptRepo;
             companyRepository = companyRepo;
+            catContractRepository = catContractRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -215,6 +218,9 @@ namespace eFMS.API.ForPartner.DL.Service
                 if (invoiceDebit != null)
                 {
                     decimal _totalAmountInvoiceDebit = 0;
+                    decimal _totalAmountVndInvoiceDebit = 0;
+                    decimal _totalAmountUsdInvoiceDebit = 0;
+
                     foreach (var debitCharge in debitCharges)
                     {
                         CsShipmentSurcharge surchargeDebit = surchargesLookupId[debitCharge.ChargeId].FirstOrDefault();
@@ -250,11 +256,21 @@ namespace eFMS.API.ForPartner.DL.Service
                         debitChargesUpdate.Add(surchargeDebit);
 
                         _totalAmountInvoiceDebit += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeDebit, invoiceDebit.Currency);
+                        _totalAmountVndInvoiceDebit += (surchargeDebit.AmountVnd + surchargeDebit.VatAmountVnd) ?? 0;
+                        _totalAmountUsdInvoiceDebit += (surchargeDebit.AmountUsd + surchargeDebit.VatAmountUsd) ?? 0;
                     }
 
                     invoiceDebit.TotalAmount = invoiceDebit.UnpaidAmount = _totalAmountInvoiceDebit;
-                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
+
+                    //Task: 15631 - Andy - 14/04/2021
+                    invoiceDebit.TotalAmountVnd = invoiceDebit.UnpaidAmountVnd = _totalAmountVndInvoiceDebit;
+                    invoiceDebit.TotalAmountUsd = invoiceDebit.UnpaidAmountUsd = _totalAmountUsdInvoiceDebit;
+
+                    var _transactionTypes = debitChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();                    
                     invoiceDebit.ServiceType = string.Join(";", _transactionTypes);
+
+                    //Task: 15631 - Andy - 14/04/2021
+                    invoiceDebit.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceDebit.PartnerId, invoiceDebit.PaymentTerm, _transactionTypes, invoiceDebit.Date, invoiceDebit.ConfirmBillingDate);
                 }
 
                 if (invoicesObh != null)
@@ -262,6 +278,9 @@ namespace eFMS.API.ForPartner.DL.Service
                     foreach (var invoiceObh in invoicesObh)
                     {
                         decimal _totalAmountInvoiceObh = 0;
+                        decimal _totalAmountVndInvoiceObh = 0;
+                        decimal _totalAmountUsdInvoiceObh = 0;
+
                         //Cập nhật số RefNo cho phí OBH
                         var _obhCharges = obhCharges.Where(x => x.ReferenceNo == invoiceObh.ReferenceNo);
                         foreach (var obhCharge in _obhCharges)
@@ -298,11 +317,21 @@ namespace eFMS.API.ForPartner.DL.Service
                             obhChargesUpdate.Add(surchargeObh);
 
                             _totalAmountInvoiceObh += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeObh, invoiceDebit.Currency);
+                            _totalAmountVndInvoiceObh += (surchargeObh.AmountVnd + surchargeObh.VatAmountVnd) ?? 0;
+                            _totalAmountUsdInvoiceObh += (surchargeObh.AmountUsd + surchargeObh.VatAmountUsd) ?? 0;
                         }
 
                         invoiceObh.TotalAmount = invoiceObh.UnpaidAmount = _totalAmountInvoiceObh;
+
+                        //Task: 15631 - Andy - 14/04/2021
+                        invoiceObh.TotalAmountVnd = invoiceObh.UnpaidAmountVnd = _totalAmountVndInvoiceObh;
+                        invoiceObh.TotalAmountUsd = invoiceObh.UnpaidAmountUsd = _totalAmountUsdInvoiceObh;
+
                         var _transactionTypes = obhChargesUpdate.Select(s => s.TransactionType).Distinct().ToList();
                         invoiceObh.ServiceType = string.Join(";", _transactionTypes);
+
+                        //Task: 15631 - Andy - 14/04/2021
+                        invoiceObh.PaymentDueDate = GetDueDateIssueAcctMngt(invoiceObh.PartnerId, invoiceObh.PaymentTerm, _transactionTypes, invoiceObh.Date, invoiceObh.ConfirmBillingDate);
                     }
                 }
 
@@ -365,6 +394,47 @@ namespace eFMS.API.ForPartner.DL.Service
                 WriteLogInsertInvoice(false, model.InvoiceNo,invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, ex.ToString());
                 return new HandleState((object)ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Get Due Date dựa vào Contract Partner Invoice
+        /// Task: 15631 - Andy - 14/04/2021
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <param name="paymentTerm"></param>
+        /// <param name="serviceTypes"></param>
+        /// <param name="invoiceDate">Ngày Invoice</param>
+        /// <param name="billingDate">Ngày Billing</param>
+        /// <returns></returns>
+        private DateTime? GetDueDateIssueAcctMngt(string partnerId, decimal? paymentTerm, List<string> serviceTypes, DateTime? invoiceDate, DateTime? billingDate)
+        {
+            DateTime? dueDate = null;
+            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
+            if (contractPartner == null)
+            {
+                var acRefPartner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault()?.ParentId;
+                contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == acRefPartner && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
+            }
+
+            if (contractPartner != null)
+            {
+                //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
+                if (contractPartner.BaseOn == "Invoice Date")
+                {
+                    dueDate = invoiceDate.HasValue ? invoiceDate.Value.AddDays((double)(paymentTerm ?? 0)) : invoiceDate;
+                }
+                //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
+                if (contractPartner.BaseOn == "Billing Date")
+                {
+                    dueDate = billingDate.HasValue ? billingDate.Value.AddDays((double)(paymentTerm ?? 0)) : billingDate;
+                }
+            }
+            else
+            {
+                //Nếu Partner không có contract thì lấy Invoice Date của Invoice
+                dueDate = invoiceDate;
+            }
+            return dueDate;
         }
 
         private sp_UpdateChargeInvoiceUpdate UpdateSurchargeForInvoice(List<ChargeInvoiceUpdateTable> surcharges)

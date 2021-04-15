@@ -1933,56 +1933,75 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CW = shipment.ChargeWeight;
                 data.CBM = shipment.Cbm;
                 var surChargesShipment = chargesData[(Guid)shipment.HblId];
+                data.TotalBuy = 0;
+                data.TotalSell = 0;
+                data.Profit = 0;
                 if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                 {
                     #region -- currency = VND
                     var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
                     if (_freightCharges?.Count() > 0)
                     {
-                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyFreight;
+                        data.TotalSell += data.TotalSellFreight;
                     }
                     var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
                     if (_terminalHandlingCharges?.Count() > 0)
                     {
-                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyTerminal;
+                        data.TotalSell += data.TotalSellTerminal;
                     }
                     var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
                     if (_billFeeCharges?.Count() > 0)
                     {
-                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyBillFee;
+                        data.TotalSell += data.TotalSellBillFee;
                     }
                     var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
                     if (_telexReleaseCharges?.Count() > 0)
                     {
-                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyTelexRelease;
+                        data.TotalSell += data.TotalSellTelexRelease;
                     }
                     var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
                     if (_cfsCharges?.Count() > 0)
                     {
-                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyCFSFee;
+                        data.TotalSell += data.TotalSellCFSFee;
                     }
                     var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
                     if (_securityCharges?.Count() > 0)
                     {
-                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyEBSFee;
+                        data.TotalSell += data.TotalSellEBSFee;
                     }
                     var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
                     if (_autoManCharges?.Count() > 0)
                     {
-                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyAutomated;
+                        data.TotalSell += data.TotalSellAutomated;
                     }
                     var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
                     if (_vgmCharges?.Count() > 0)
                     {
-                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountVnd ?? 0));
-                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyVGM;
+                        data.TotalSell += data.TotalSellVGM;
                     }
                     var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
                     if (_lclBookingFeeCharges?.Count() > 0)
@@ -2000,6 +2019,9 @@ namespace eFMS.API.Documentation.DL.Services
                     data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
                     _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
                     data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                    data.TotalBuy += data.TotalBuyOthers;
+                    data.TotalSell += data.TotalSellOthers;
+                    data.Profit = data.TotalSell - data.TotalBuy;
                     #endregion
                 }
                 else
@@ -2008,50 +2030,66 @@ namespace eFMS.API.Documentation.DL.Services
                     var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
                     if (_freightCharges?.Count() > 0)
                     {
-                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellFreight = _freightCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyFreight;
+                        data.TotalSell += data.TotalSellFreight;
                     }
                     var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
                     if (_terminalHandlingCharges?.Count() > 0)
                     {
-                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellTerminal = _terminalHandlingCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyTerminal;
+                        data.TotalSell += data.TotalSellTerminal;
                     }
                     var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
                     if (_billFeeCharges?.Count() > 0)
                     {
-                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellBillFee = _billFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyBillFee;
+                        data.TotalSell += data.TotalSellBillFee;
                     }
                     var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
                     if (_telexReleaseCharges?.Count() > 0)
                     {
-                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellTelexRelease = _telexReleaseCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyTelexRelease;
+                        data.TotalSell += data.TotalSellTelexRelease;
                     }
                     var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
                     if (_cfsCharges?.Count() > 0)
                     {
-                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellCFSFee = _cfsCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyCFSFee;
+                        data.TotalSell += data.TotalSellCFSFee;
                     }
                     var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
                     if (_securityCharges?.Count() > 0)
                     {
-                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellEBSFee = _securityCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyEBSFee;
+                        data.TotalSell += data.TotalSellEBSFee;
                     }
                     var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
                     if (_autoManCharges?.Count() > 0)
                     {
-                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellAutomated = _autoManCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyAutomated;
+                        data.TotalSell += data.TotalSellAutomated;
                     }
                     var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
                     if (_vgmCharges?.Count() > 0)
                     {
-                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE).Sum(x => (x.AmountUsd ?? 0));
-                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE).Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuyVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellVGM = _vgmCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyVGM;
+                        data.TotalSell += data.TotalSellVGM;
                     }
                     var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
                     if (_lclBookingFeeCharges?.Count() > 0)
@@ -2069,6 +2107,9 @@ namespace eFMS.API.Documentation.DL.Services
                     data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
                     _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
                     data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                    data.TotalBuy += data.TotalBuyOthers;
+                    data.TotalSell += data.TotalSellOthers;
+                    data.Profit = data.TotalSell - data.TotalBuy;
                     #endregion
                 }
                 #region -- Phí OBH sau thuế --

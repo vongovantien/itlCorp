@@ -364,7 +364,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             else
             {
-                stream = new DocumentationHelper().BidingGeneralLCLExport(dataObjects.Result, criteria, "Shipment-Overview-LCL.xlsx");
+                stream = new DocumentationHelper().BidingGeneralLCLExport(dataObjects.Result, criteria, "ShipmentOverviewLCL.xlsx");
             }
 
             if (stream == null)
