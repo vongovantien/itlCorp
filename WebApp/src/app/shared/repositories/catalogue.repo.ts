@@ -1233,6 +1233,16 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getIncoterm(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Query`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     //
     getPotentialCustomerListPaging(page: number, size: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Paging`, body, {

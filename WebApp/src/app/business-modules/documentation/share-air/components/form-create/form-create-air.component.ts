@@ -4,7 +4,7 @@ import { Store, ActionsSubject } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { CommonEnum } from '@enums';
-import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehouse } from '@models';
+import { User, Unit, Customer, PortIndex, DIM, CsTransaction, Commodity, Warehouse, Incoterm } from '@models';
 import { FormValidators } from '@validators';
 import { AppForm } from '@app';
 import {
@@ -61,6 +61,11 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     warehouseId: AbstractControl;
     paymentTerm: AbstractControl; // * Payment Method
     serviceDate: AbstractControl;
+    ata: AbstractControl;
+    atd: AbstractControl;
+
+    incotermId: AbstractControl;
+
     flightDate: AbstractControl;
     commodity: AbstractControl;
     packageType: AbstractControl;
@@ -78,6 +83,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     commodities: Observable<Commodity[]>;
     listUsers: Observable<User[]>;
     warehouses: Warehouse[];
+    incoterms: Observable<Incoterm[]>;
     // ? initWarehouses: Warehouse[];
     initCarriers: Customer[];
 
@@ -170,6 +176,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 }
             }
         );
+        this.incoterms = this._catalogueRepo.getIncoterm({});
 
         this.initForm();
         this.getUserLogged();
@@ -205,6 +212,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                                 flightDate: !!res.flightDate ? { startDate: new Date(res.flightDate), endDate: new Date(res.flightDate) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
+                                ata: !!res.ata ? { startDate: new Date(res.ata), endDate: new Date(res.ata) } : null,
+                                atd: !!res.atd ? { startDate: new Date(res.atd), endDate: new Date(res.atd) } : null,
 
                                 commodity: !!res.commodity ? res.commodity.split(",") : [],
                                 packageType: +res.packageType, // * Unit
@@ -277,8 +286,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             warehouseId: [],
             airlineInfo: [],
 
-            isHawb: [false]
-
+            isHawb: [false],
+            incotermId: [],
+            ata: [],
+            atd: []
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD, FormValidators.compareGW_CW] });
 
         this.mawb = this.formGroup.controls["mawb"];
@@ -302,7 +313,10 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
         this.personalIncharge = this.formGroup.controls["personIncharge"];
         //
         this.airlineInfo = this.formGroup.controls["airlineInfo"];
+        this.ata = this.formGroup.controls["ata"];
+        this.atd = this.formGroup.controls["atd"];
 
+        this.incotermId = this.formGroup.controls["incotermId"];
         // * Handle etdchange.
         if (this.type !== 'import') {
             this.formGroup.controls['etd'].valueChanges

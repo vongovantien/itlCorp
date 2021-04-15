@@ -14,6 +14,9 @@ export class CsTransaction extends BaseModel {
     typeOfService: string = null;
     etd: any = null;
     eta: any = null;
+    ata: any = null;
+    atd: any = null;
+    incotermId: string = null;
     serviceDate: any = null;
     mbltype: string = null;
     coloaderId: string = null; // supplier
