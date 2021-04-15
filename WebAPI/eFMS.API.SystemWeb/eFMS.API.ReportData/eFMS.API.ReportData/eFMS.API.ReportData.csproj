@@ -37,9 +37,6 @@
      <None Update="FormatExcel\TemplateExport\Shipment-Overview-FCL.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
-     <None Update="FormatExcel\TemplateExport\Shipment-Overview-LCL.xlsx">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     </None>
      <None Update="FormatExcel\TemplateExport\Commission-OPS-VND.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
