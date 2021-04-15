@@ -311,11 +311,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this._toastService.warning(`None of charges are selected, Please recheck again! `);
             return;
         } else {
-            const exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
+            
             this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
                 shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                     .map((charge: Surcharge) => {
+                        let exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
                         if (charge.currencyId === 'USD') {
+                            if(!!charge.kickBack && charge.kickBack === true){
+                                exchangeRate = charge.finalExchangeRate;
+                            }
                             charge.amountVnd = Math.round(charge.netAmount * exchangeRate);
                             charge.vatAmountVnd = charge.vatrate < 0 ? Math.round(charge.vatrate * exchangeRate) : Math.round(charge.amountVnd * (charge.vatrate / 100));
                             charge.finalExchangeRate = Number(exchangeRate);
