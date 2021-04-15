@@ -88,13 +88,13 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             { title: 'No', field: 'no', sortable: true, width: 50 },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
-            { title: 'Org NetAmount', field: 'unitName', sortable: true },
+            { title: 'Org Net Amount', field: 'unitName', sortable: true },
             { title: 'VAT', field: 'unitPrice', sortable: true },
             { title: 'Org Amount', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Exc Rate', field: 'total', sortable: true },
-            { title: 'VND NetAmount', field: 'settlementCode', sortable: true },
-            { title: 'VAT VNDAmount', field: 'total', sortable: true },
+            { title: 'VND Net Amount', field: 'settlementCode', sortable: true },
+            { title: 'VAT VND Amount', field: 'total', sortable: true },
             { title: 'VND Amount', field: 'total', sortable: true },
             { title: 'Invoice No', field: 'total', sortable: true },
             { title: 'Invoice Date', field: 'total', sortable: true },
@@ -316,8 +316,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                     .map((charge: Surcharge) => {
                         if (charge.currencyId === 'USD') {
-                            charge.amountVnd = Number(charge.netAmount * exchangeRate);
-                            charge.vatAmountVnd = charge.vatrate < 0 ? Number(charge.vatrate * exchangeRate) : (charge.amountVnd * (charge.vatrate / 100));
+                            charge.amountVnd = Math.round(charge.netAmount * exchangeRate);
+                            charge.vatAmountVnd = charge.vatrate < 0 ? Math.round(charge.vatrate * exchangeRate) : Math.round(charge.amountVnd * (charge.vatrate / 100));
                             charge.finalExchangeRate = Number(exchangeRate);
                         }
                     });
@@ -345,7 +345,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             vatAmountVND += shipment.chargeSettlements.reduce((vat: number, charge: Surcharge) => vat += charge.vatAmountVnd, 0);
         });
         totalAmountVnd = vatAmountVND + netAmountVND;
-        this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' : ' + netAmountVND.toLocaleString() + '+' + vatAmountVND.toLocaleString());
+        this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' = ' + netAmountVND.toLocaleString() + ' + ' + vatAmountVND.toLocaleString());
     }
 
     onBlurAnyCharge(e: any, hblId: string) {

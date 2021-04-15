@@ -191,13 +191,13 @@
                     <div class="m--margin-top-20">
                         <ng-container *ngFor="let shipment of shipments; let j = index; trackBy:trackByFn">
                         <div class="row d-flex align-items-center alert-block__heading">
-                            <div class="col-2"><span class="font-weight-bold">Job:</span><span>{{shipment.jobId}}</span>
+                            <div class="col-2"><span class="font-weight-bold">Job: </span><span>{{shipment.jobId}}</span>
                             </div>
-                            <div class="col-2"><span class="font-weight-bold">HBL:</span><span>{{shipment.hbl}}</span>
+                            <div class="col-2"><span class="font-weight-bold">HBL: </span><span>{{shipment.hbl}}</span>
                             </div>
-                            <div class="col-2"><span class="font-weight-bold">MBL:</span><span>{{shipment.mbl}}</span>
+                            <div class="col-2"><span class="font-weight-bold">MBL: </span><span>{{shipment.mbl}}</span>
                             </div>
-                            <div class="col-2"><span class="font-weight-bold">Custom No:</span>
+                            <div class="col-2"><span class="font-weight-bold">Custom No: </span>
                                 <span>{{shipment.customNo}}</span>
                             </div>
                             <div class="col-2">
@@ -206,7 +206,7 @@
                                         [placeholder]="'Advance No...'" (change)="setAdvanceToSurcharge(shipment, shipment.advanceNo)">
                                     </ng-select>
                             </div>
-                            <div class="col-2"><span class="font-weight-bold">PIC:</span>
+                            <div class="col-2"><span class="font-weight-bold">PIC: </span>
                                 <span class="text-success">{{shipment.chargeSettlements[0].picName}}</span>
                             </div>
                         </div>
@@ -290,9 +290,9 @@
                                         <td class="table-actions-col"></td>
                                         <td>TOTAL</td>
                                         <td></td>
-                                        <td class="text-right">{{shipment.totalNetAmount | number:'1.2-3'}}$|{{shipment.totalNetAmountVND | number:'1.0-3'}}đ</td>
+                                        <td class="text-right">{{shipment.totalNetAmount | number:'1.2-3'}}$ | {{shipment.totalNetAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
-                                        <td class="text-right">{{shipment.totalAmount | number:'1.2-3'}}$|{{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
+                                        <td class="text-right">{{shipment.totalAmount | number:'1.2-3'}}$ | {{shipment.totalAmountVND | number:'1.0-3'}}đ</td>
                                         <td></td>
                                         <td></td>
                                         <td class="text-right">{{shipment.totalNetVND | number:'1.0-3'}}</td>

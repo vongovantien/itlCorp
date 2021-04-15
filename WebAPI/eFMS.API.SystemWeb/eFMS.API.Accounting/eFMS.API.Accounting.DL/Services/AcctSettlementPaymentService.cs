@@ -902,8 +902,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     UnitName = u.UnitNameEn,
                                     UnitPrice = sur.UnitPrice,
                                     CurrencyId = sur.CurrencyId,
+                                    FinalExchangeRate = sur.FinalExchangeRate,
+                                    NetAmount = sur.NetAmount,
                                     Vatrate = sur.Vatrate,
                                     Total = sur.Total,
+                                    AmountVnd = sur.AmountVnd,
+                                    VatAmountVnd = sur.VatAmountVnd,
+                                    AmountUSD = sur.AmountUsd,
+                                    VatAmountUSD = sur.VatAmountUsd,
                                     PayerId = sur.PayerId,
                                     Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
@@ -955,8 +961,14 @@ namespace eFMS.API.Accounting.DL.Services
                                    UnitName = u.UnitNameEn,
                                    UnitPrice = sur.UnitPrice,
                                    CurrencyId = sur.CurrencyId,
+                                   FinalExchangeRate = sur.FinalExchangeRate,
+                                   NetAmount = sur.NetAmount,
                                    Vatrate = sur.Vatrate,
                                    Total = sur.Total,
+                                   AmountVnd = sur.AmountVnd,
+                                   VatAmountVnd = sur.VatAmountVnd,
+                                   AmountUSD = sur.AmountUsd,
+                                   VatAmountUSD = sur.VatAmountUsd,
                                    PayerId = sur.PayerId,
                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
@@ -971,7 +983,6 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = AdvNo,
                                    IsLocked = cst.IsLocked
-
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
