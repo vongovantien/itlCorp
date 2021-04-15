@@ -590,21 +590,24 @@
             </summary>
             <param name="fileName"></param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.String,System.Object,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetData(System.Collections.Generic.Dictionary{System.String,System.Object})">
             <summary>
             Set data for cell
             </summary>
-            <param name="name">name of cell to set value</param>
-            <param name="value">value set to cell</param>
-            <param name="numberFormat">Format number(flexible)</param>
+            <param name="nameList">List name of cell to set value</param>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.String,System.String,System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormatCell(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Set string format for cell
+            </summary>
+            <param name="nameList"></param>
+            <param name="numberFormat"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.SetFormula(System.Collections.Generic.Dictionary{System.String,System.String})">
             <summary>
             Set formula for one cell
             </summary>
-            <param name="name">name of cell to set value</param>
-            <param name="_formular">formula string set to cell</param>
-            <param name="numberFormat">format number set to cell</param>
+            <param name="nameList">Licst name of cell to set value</param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.IsExistName(System.String)">
             <summary>

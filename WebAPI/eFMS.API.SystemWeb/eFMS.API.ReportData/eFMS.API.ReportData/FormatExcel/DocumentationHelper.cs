@@ -1245,14 +1245,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
-                excel.SetData("MawbNo", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
-                excel.SetData("FlightNo", airwayBillExport.FlightNo);
-                excel.SetData("FlightDate", airwayBillExport.FlightDate);
-                excel.SetData("Route", airwayBillExport.Route);
-                excel.SetData("POL", airwayBillExport.AolCode);
-                excel.SetData("POD", airwayBillExport.AodCode);
-                excel.SetData("Shipper", airwayBillExport.Shipper);
-                excel.SetData("Consignee", airwayBillExport.Consignee);
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("MawbNo", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
+                listKeyData.Add("FlightNo", airwayBillExport.FlightNo);
+                listKeyData.Add("FlightDate", airwayBillExport.FlightDate);
+                listKeyData.Add("Route", airwayBillExport.Route);
+                listKeyData.Add("POL", airwayBillExport.AolCode);
+                listKeyData.Add("POD", airwayBillExport.AodCode);
+                listKeyData.Add("Shipper", airwayBillExport.Shipper);
+                listKeyData.Add("Consignee", airwayBillExport.Consignee);
+                excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -1278,14 +1280,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
-                excel.SetData("Shipper", airwayBillExport.Shipper);
-                excel.SetData("Consignee", airwayBillExport.Consignee);
-                excel.SetData("MAWB", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
-                excel.SetData("FlightNo", airwayBillExport.FlightNo);
-                excel.SetData("Route", airwayBillExport.Route);
-                excel.SetData("POL", airwayBillExport.AolCode);
-                excel.SetData("POD", airwayBillExport.AodCode);
-                excel.SetData("PackageUnit", airwayBillExport.PackageUnit);
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("Shipper", airwayBillExport.Shipper);
+                listKeyData.Add("Consignee", airwayBillExport.Consignee);
+                listKeyData.Add("MAWB", airwayBillExport.MawbNo1 + airwayBillExport.MawbNo3);
+                listKeyData.Add("FlightNo", airwayBillExport.FlightNo);
+                listKeyData.Add("Route", airwayBillExport.Route);
+                listKeyData.Add("POL", airwayBillExport.AolCode);
+                listKeyData.Add("POD", airwayBillExport.AodCode);
+                listKeyData.Add("PackageUnit", airwayBillExport.PackageUnit);
+                excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -1327,102 +1331,105 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
-                excel.SetData("FromDate", "From " + Convert.ToDateTime( criteria.ServiceDateFrom).ToShortDateString() + " To " + Convert.ToDateTime(criteria.ServiceDateTo).ToShortDateString());
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("FromDate", "From " + Convert.ToDateTime( criteria.ServiceDateFrom).ToShortDateString() + " To " + Convert.ToDateTime(criteria.ServiceDateTo).ToShortDateString());
 
                 int j = 0;
                 int startRow = 11;
                 excel.StartDetailTable = startRow;
-                excel.SetData("sumCont20", overviews.Select(t => t.Cont20).Sum());
-                excel.SetData("sumCont40", overviews.Select(t => t.Cont40).Sum());
-                excel.SetData("sumCont40HC", overviews.Select(t => t.Cont40HC).Sum());
-                excel.SetData("sumcont45", overviews.Select(t => t.Cont45).Sum());
-                excel.SetData("sumGW", overviews.Select(t => t.GW).Sum());
-                excel.SetData("sumCW", overviews.Select(t => t.CW).Sum());
-                excel.SetData("sumCBM", overviews.Select(t => t.CBM).Sum());
+                listKeyData.Add("sumCont20", overviews.Select(t => t.Cont20).Sum());
+                listKeyData.Add("sumCont40", overviews.Select(t => t.Cont40).Sum());
+                listKeyData.Add("sumCont40HC", overviews.Select(t => t.Cont40HC).Sum());
+                listKeyData.Add("sumcont45", overviews.Select(t => t.Cont45).Sum());
+                listKeyData.Add("sumGW", overviews.Select(t => t.GW).Sum());
+                listKeyData.Add("sumCW", overviews.Select(t => t.CW).Sum());
+                listKeyData.Add("sumCBM", overviews.Select(t => t.CBM).Sum());
 
                 // total revenue
-                excel.SetData("sumSellFreight", overviews.Select(t => t.TotalSellFreight).Sum());
-                excel.SetData("sumSellTerminal", overviews.Select(t => t.TotalSellTerminal).Sum());
-                excel.SetData("sumSellBillFee", overviews.Select(t => t.TotalSellBillFee).Sum());
-                excel.SetData("sumSellSealFee", overviews.Select(t => t.TotalSellContainerSealFee).Sum());
-                excel.SetData("sumSellRelease", overviews.Select(t => t.TotalSellTelexRelease).Sum());
-                excel.SetData("sumSellAutomated", overviews.Select(t => t.TotalSellAutomated).Sum());
-                excel.SetData("sumSellVGM", overviews.Select(t => t.TotalSellVGM).Sum());
-                excel.SetData("sumSellBookingFee", overviews.Select(t => t.TotalSellBookingFee).Sum());
-                excel.SetData("sumSellOther", overviews.Select(t => t.TotalSellOthers).Sum());
-                excel.SetData("sumSellTotal", overviews.Select(t => t.TotalSell).Sum());
+                listKeyData.Add("sumSellFreight", overviews.Select(t => t.TotalSellFreight).Sum());
+                listKeyData.Add("sumSellTerminal", overviews.Select(t => t.TotalSellTerminal).Sum());
+                listKeyData.Add("sumSellBillFee", overviews.Select(t => t.TotalSellBillFee).Sum());
+                listKeyData.Add("sumSellSealFee", overviews.Select(t => t.TotalSellContainerSealFee).Sum());
+                listKeyData.Add("sumSellRelease", overviews.Select(t => t.TotalSellTelexRelease).Sum());
+                listKeyData.Add("sumSellAutomated", overviews.Select(t => t.TotalSellAutomated).Sum());
+                listKeyData.Add("sumSellVGM", overviews.Select(t => t.TotalSellVGM).Sum());
+                listKeyData.Add("sumSellBookingFee", overviews.Select(t => t.TotalSellBookingFee).Sum());
+                listKeyData.Add("sumSellOther", overviews.Select(t => t.TotalSellOthers).Sum());
+                listKeyData.Add("sumSellTotal", overviews.Select(t => t.TotalSell).Sum());
 
                 // total costing
-                excel.SetData("sumBuyFreight", overviews.Select(t => t.TotalBuyFreight).Sum());
-                excel.SetData("sumBuyTerminal", overviews.Select(t => t.TotalBuyTerminal).Sum());
-                excel.SetData("sumBuyBillFee", overviews.Select(t => t.TotalBuyBillFee).Sum());
-                excel.SetData("sumBuySealFee", overviews.Select(t => t.TotalBuyContainerSealFee).Sum());
-                excel.SetData("sumBuyRelease", overviews.Select(t => t.TotalBuyTelexRelease).Sum());
-                excel.SetData("sumBuyAutomated", overviews.Select(t => t.TotalBuyAutomated).Sum());
-                excel.SetData("sumBuyVGM", overviews.Select(t => t.TotalBuyVGM).Sum());
-                excel.SetData("sumBuyBookingFee", overviews.Select(t => t.TotalBuyBookingFee).Sum());
-                excel.SetData("sumBuyOther", overviews.Select(t => t.TotalBuyOthers).Sum());
-                excel.SetData("sumBuyTotal", overviews.Select(t => t.TotalBuy).Sum());
+                listKeyData.Add("sumBuyFreight", overviews.Select(t => t.TotalBuyFreight).Sum());
+                listKeyData.Add("sumBuyTerminal", overviews.Select(t => t.TotalBuyTerminal).Sum());
+                listKeyData.Add("sumBuyBillFee", overviews.Select(t => t.TotalBuyBillFee).Sum());
+                listKeyData.Add("sumBuySealFee", overviews.Select(t => t.TotalBuyContainerSealFee).Sum());
+                listKeyData.Add("sumBuyRelease", overviews.Select(t => t.TotalBuyTelexRelease).Sum());
+                listKeyData.Add("sumBuyAutomated", overviews.Select(t => t.TotalBuyAutomated).Sum());
+                listKeyData.Add("sumBuyVGM", overviews.Select(t => t.TotalBuyVGM).Sum());
+                listKeyData.Add("sumBuyBookingFee", overviews.Select(t => t.TotalBuyBookingFee).Sum());
+                listKeyData.Add("sumBuyOther", overviews.Select(t => t.TotalBuyOthers).Sum());
+                listKeyData.Add("sumBuyTotal", overviews.Select(t => t.TotalBuy).Sum());
 
-                excel.SetData("sumProfit", overviews.Select(t => t.Profit).Sum());
-                excel.SetData("sumObhP", overviews.Select(t => t.AmountOBH).Sum());
-                excel.SetData("sumObhR", overviews.Select(t => t.AmountOBH).Sum());
+                listKeyData.Add("sumProfit", overviews.Select(t => t.Profit).Sum());
+                listKeyData.Add("sumObhP", overviews.Select(t => t.AmountOBH).Sum());
+                listKeyData.Add("sumObhR", overviews.Select(t => t.AmountOBH).Sum());
+                excel.SetData(listKeyData);
 
                 foreach (var item in overviews)
                 {
                     excel.SetDataTable();
-                    excel.SetData("no", j + 1);
-                    excel.SetData("referenceNo", item.BKRefNo);
-                    excel.SetData("service", item.ServiceName);
-                    excel.SetData("jobNo", item.JobNo);
-                    excel.SetData("etd", item.etd?.ToString("dd/MM/yyyy"));
-                    excel.SetData("eta", item.eta?.ToString("dd/MM/yyyy"));
-                    excel.SetData("vessel", item.FlightNo);
-                    excel.SetData("mbl", item.MblMawb);
-                    excel.SetData("hbl", item.HblHawb);
-                    excel.SetData("polpod", item.PolPod);
-                    excel.SetData("destination", item.FinalDestination);
-                    excel.SetData("carrier", item.Carrier);
-                    excel.SetData("agent", item.Agent);
-                    excel.SetData("shipper", item.Shipper);
-                    excel.SetData("shipper", item.Shipper);
-                    excel.SetData("consignee", item.Consignee);
-                    excel.SetData("shipmentType", item.ShipmentType);
-                    excel.SetData("saleman", item.Salesman);
-                    excel.SetData("noinationparty", item.AgentName);
+                    listKeyData = new Dictionary<string, object>();
+                    listKeyData.Add("no", j + 1);
+                    listKeyData.Add("referenceNo", item.BKRefNo);
+                    listKeyData.Add("service", item.ServiceName);
+                    listKeyData.Add("jobNo", item.JobNo);
+                    listKeyData.Add("etd", item.etd?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("eta", item.eta?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("vessel", item.FlightNo);
+                    listKeyData.Add("mbl", item.MblMawb);
+                    listKeyData.Add("hbl", item.HblHawb);
+                    listKeyData.Add("polpod", item.PolPod);
+                    listKeyData.Add("destination", item.FinalDestination);
+                    listKeyData.Add("carrier", item.Carrier);
+                    listKeyData.Add("agent", item.Agent);
+                    listKeyData.Add("shipper", item.Shipper);
+                    listKeyData.Add("consignee", item.Consignee);
+                    listKeyData.Add("shipmentType", item.ShipmentType);
+                    listKeyData.Add("saleman", item.Salesman);
+                    listKeyData.Add("noinationparty", item.AgentName);
 
-                    excel.SetData("qty", item.QTy);
-                    excel.SetData("cont20", item.Cont20);
-                    excel.SetData("cont40", item.Cont40);
-                    excel.SetData("cont40HC", item.Cont40HC);
-                    excel.SetData("cont45", item.Cont45);
-                    excel.SetData("gw", item.GW);
-                    excel.SetData("cw", item.CW);
-                    excel.SetData("cbm", item.CBM);
-                    excel.SetData("sellFreight", item.TotalSellFreight);
-                    excel.SetData("sellTerminal", item.TotalSellTerminal);
-                    excel.SetData("sellBillFee", item.TotalSellBillFee);
-                    excel.SetData("sellSealFee", item.TotalSellContainerSealFee);
-                    excel.SetData("sellRelease", item.TotalSellTelexRelease);
-                    excel.SetData("sellAutomated", item.TotalSellAutomated);
-                    excel.SetData("sellVGM", item.TotalSellVGM);
-                    excel.SetData("sellBookingFee", item.TotalSellBookingFee);
-                    excel.SetData("sellOther", item.TotalSellOthers);
-                    excel.SetData("totalSell", item.TotalSell);
+                    listKeyData.Add("qty", item.QTy);
+                    listKeyData.Add("cont20", item.Cont20);
+                    listKeyData.Add("cont40", item.Cont40);
+                    listKeyData.Add("cont40HC", item.Cont40HC);
+                    listKeyData.Add("cont45", item.Cont45);
+                    listKeyData.Add("gw", item.GW);
+                    listKeyData.Add("cw", item.CW);
+                    listKeyData.Add("cbm", item.CBM);
+                    listKeyData.Add("sellFreight", item.TotalSellFreight);
+                    listKeyData.Add("sellTerminal", item.TotalSellTerminal);
+                    listKeyData.Add("sellBillFee", item.TotalSellBillFee);
+                    listKeyData.Add("sellSealFee", item.TotalSellContainerSealFee);
+                    listKeyData.Add("sellRelease", item.TotalSellTelexRelease);
+                    listKeyData.Add("sellAutomated", item.TotalSellAutomated);
+                    listKeyData.Add("sellVGM", item.TotalSellVGM);
+                    listKeyData.Add("sellBookingFee", item.TotalSellBookingFee);
+                    listKeyData.Add("sellOther", item.TotalSellOthers);
+                    listKeyData.Add("totalSell", item.TotalSell);
 
-                    excel.SetData("buyFreight", item.TotalBuyFreight);
-                    excel.SetData("buyTerminal", item.TotalBuyTerminal);
-                    excel.SetData("buyBillFee", item.TotalBuyBillFee);
-                    excel.SetData("buySealFee", item.TotalBuyContainerSealFee);
-                    excel.SetData("buyRelease", item.TotalBuyTelexRelease);
-                    excel.SetData("buyAutomated", item.TotalBuyAutomated);
-                    excel.SetData("buyVGM", item.TotalBuyVGM);
-                    excel.SetData("buyBookingFee", item.TotalBuyBookingFee);
-                    excel.SetData("buyOther", item.TotalBuyOthers);
-                    excel.SetData("totalBuy", item.TotalBuy);
-                    excel.SetData("profit", item.Profit);
-                    excel.SetData("obhp", item.AmountOBH);
-                    excel.SetData("obhr", item.AmountOBH);
+                    listKeyData.Add("buyFreight", item.TotalBuyFreight);
+                    listKeyData.Add("buyTerminal", item.TotalBuyTerminal);
+                    listKeyData.Add("buyBillFee", item.TotalBuyBillFee);
+                    listKeyData.Add("buySealFee", item.TotalBuyContainerSealFee);
+                    listKeyData.Add("buyRelease", item.TotalBuyTelexRelease);
+                    listKeyData.Add("buyAutomated", item.TotalBuyAutomated);
+                    listKeyData.Add("buyVGM", item.TotalBuyVGM);
+                    listKeyData.Add("buyBookingFee", item.TotalBuyBookingFee);
+                    listKeyData.Add("buyOther", item.TotalBuyOthers);
+                    listKeyData.Add("totalBuy", item.TotalBuy);
+                    listKeyData.Add("profit", item.Profit);
+                    listKeyData.Add("obhp", item.AmountOBH);
+                    listKeyData.Add("obhr", item.AmountOBH);
+                    excel.SetData(listKeyData);
 
                     excel.Worksheet.Cells[j + startRow, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
@@ -2631,81 +2638,116 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path);
+                var listKey = new Dictionary<string, object>();
                 var _fromDate = "From: " + criteria.ServiceDateFrom?.ToString("dd/MM/yyyy") + " To: " + criteria.ServiceDateTo?.ToString("dd/MM/yyyy");
-                excel.SetData("FromDate", _fromDate);
+                listKey.Add("FromDate", _fromDate);
+                excel.SetData(listKey);
+                // Get format currency
+                var formatCurrency = criteria.Currency == CURRENCY_LOCAL ? _formatVNDNew : _formatNew;
+                var formatCell = new List<string>
+                {
+                    "SellFreight",
+                    "SellTerminal",
+                    "SellBillFee",
+                    "SellTelexRelease",
+                    "SellCFSFee",
+                    "SellEBSFee",
+                    "SellAutomated",
+                    "SellVGM",
+                    "SellBookingFee",
+                    "SellOthers",
+                    "TotalSelling",
+                    "BuyFreight",
+                    "BuyTerminal",
+                    "BuyBillFee",
+                    "BuyTelexRelease",
+                    "BuyCFSFee",
+                    "BuyEBSFee",
+                    "BuyAutomated",
+                    "BuyVGM",
+                    "BuyOthers",
+                    "TotalBuying",
+                    "Profit",
+                    "OBHP",
+                    "OBHR",
+                };
+                excel.SetFormatCell(formatCell, formatCurrency);
                 // Start of Table
                 var startOfDetail = 11;
                 excel.StartDetailTable = startOfDetail;
-                // Get format currency
-                var formatCurrency = criteria.Currency == CURRENCY_LOCAL ? _formatVNDNew : _formatNew;
-                for (int i = 0; i < shipments.Count(); i++)
+                
+                int i = 0;
+                while (i < shipments.Count())
                 {
+                    listKey = new Dictionary<string, object>();
                     var shipment = shipments[i];
                     excel.SetDataTable();
-                    excel.SetData("Order", i + 1);
-                    excel.SetData("FlexId", shipment.ReferenceNo);
-                    excel.SetData("Service", shipment.ServiceName);
-                    excel.SetData("JobNo", shipment.JobNo);
-                    excel.SetData("ETD", shipment.etd?.ToString("dd/MM/yyyy"));
-                    excel.SetData("ETA", shipment.eta?.ToString("dd/MM/yyyy"));
-                    excel.SetData("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
-                    excel.SetData("MBL", shipment.MblMawb);
-                    excel.SetData("HBL", shipment.HblHawb);
-                    excel.SetData("Port", shipment.PolPod);
-                    excel.SetData("FinalDestination", shipment.FinalDestination);
-                    excel.SetData("Carrier", shipment.Carrier); // Coloader
-                    excel.SetData("Agent", shipment.AgentName);
-                    excel.SetData("Shipper", shipment.Shipper);
-                    excel.SetData("Consignee", shipment.Consignee);
-                    excel.SetData("ShipmentType", shipment.ShipmentType);
-                    excel.SetData("Salesman", shipment.Salesman);
-                    excel.SetData("NotifyParty", shipment.NotifyParty);
-                    excel.SetData("QTy", shipment.PackageQty);
-                    excel.SetData("Cont20", shipment.Cont20);
-                    excel.SetData("Cont40", shipment.Cont40);
-                    excel.SetData("Cont40HC", shipment.Cont40HC);
-                    excel.SetData("Cont45", shipment.Cont45);
-                    excel.SetData("GW", shipment.GW);
-                    excel.SetData("CW", shipment.CW);
-                    excel.SetData("CBM", shipment.CBM);
-                    var _startTotal = excel.AddressOfKey("SellFreight").Address;
-                    var _endTotal = excel.AddressOfKey("SellOthers").Address;
-                    var _profitStart = excel.AddressOfKey("TotalSelling").Address;
-                    var _profitEnd = excel.AddressOfKey("TotalBuying").Address;
-                    excel.SetData("SellFreight", shipment.TotalSellFreight, formatCurrency);
-                    excel.SetData("SellTerminal", shipment.TotalSellTerminal, formatCurrency);
-                    excel.SetData("SellBillFee", shipment.TotalSellBillFee, formatCurrency);
-                    excel.SetData("SellTelexRelease", shipment.TotalSellTelexRelease, formatCurrency);
-                    excel.SetData("SellCFSFee", shipment.TotalSellCFSFee, formatCurrency);
-                    excel.SetData("SellEBSFee", shipment.TotalSellEBSFee, formatCurrency);
-                    excel.SetData("SellAutomated", shipment.TotalSellAutomated, formatCurrency);
-                    excel.SetData("SellVGM", shipment.TotalSellVGM, formatCurrency);
-                    excel.SetData("SellBookingFee", shipment.TotalSellBookingFee, formatCurrency);
-                    excel.SetData("SellOthers", shipment.TotalSellOthers, formatCurrency);
-                    excel.SetFormula("TotalSelling", string.Format("SUM({0}:{1})", _startTotal, _endTotal), formatCurrency);
-                    _startTotal = excel.AddressOfKey("BuyFreight").Address;
-                    _endTotal = excel.AddressOfKey("BuyOthers").Address;
-                    excel.SetData("BuyFreight", shipment.TotalBuyFreight, formatCurrency);
-                    excel.SetData("BuyTerminal", shipment.TotalBuyTerminal, formatCurrency);
-                    excel.SetData("BuyBillFee", shipment.TotalBuyBillFee, formatCurrency);
-                    excel.SetData("BuyTelexRelease", shipment.TotalBuyTelexRelease, formatCurrency);
-                    excel.SetData("BuyCFSFee", shipment.TotalBuyCFSFee, formatCurrency);
-                    excel.SetData("BuyEBSFee", shipment.TotalBuyEBSFee, formatCurrency);
-                    excel.SetData("BuyAutomated", shipment.TotalBuyAutomated, formatCurrency);
-                    excel.SetData("BuyVGM", shipment.TotalBuyVGM, formatCurrency);
-                    excel.SetData("BuyOthers", shipment.TotalBuyOthers, formatCurrency);
-                    excel.SetFormula("TotalBuying", string.Format("SUM({0}:{1})", _startTotal, _endTotal), formatCurrency);
-                    excel.SetFormula("Profit", string.Format("{0}-{1}", _profitStart, _profitEnd), formatCurrency);
-                    excel.SetData("OBH", shipment.AmountOBH, formatCurrency);
+                    listKey.Add("Order", i + 1);
+                    listKey.Add("FlexId", shipment.ReferenceNo);
+                    listKey.Add("Service", shipment.ServiceName);
+                    listKey.Add("JobNo", shipment.JobNo);
+                    listKey.Add("ETD", shipment.etd?.ToString("dd/MM/yyyy"));
+                    listKey.Add("ETA", shipment.eta?.ToString("dd/MM/yyyy"));
+                    listKey.Add("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
+                    listKey.Add("MBL", shipment.MblMawb);
+                    listKey.Add("HBL", shipment.HblHawb);
+                    listKey.Add("Port", shipment.PolPod);
+                    listKey.Add("FinalDestination", shipment.FinalDestination);
+                    listKey.Add("Carrier", shipment.Carrier); // Coloader
+                    listKey.Add("Agent", shipment.AgentName);
+                    listKey.Add("Shipper", shipment.Shipper);
+                    listKey.Add("Consignee", shipment.Consignee);
+                    listKey.Add("ShipmentType", shipment.ShipmentType);
+                    listKey.Add("Salesman", shipment.Salesman);
+                    listKey.Add("NotifyParty", shipment.NotifyParty);
+                    listKey.Add("QTy", shipment.PackageQty);
+                    listKey.Add("Cont20", shipment.Cont20);
+                    listKey.Add("Cont40", shipment.Cont40);
+                    listKey.Add("Cont40HC", shipment.Cont40HC);
+                    listKey.Add("Cont45", shipment.Cont45);
+                    listKey.Add("GW", shipment.GW);
+                    listKey.Add("CW", shipment.CW);
+                    listKey.Add("CBM", shipment.CBM);
+                    listKey.Add("SellFreight", shipment.TotalSellFreight);
+                    listKey.Add("SellTerminal", shipment.TotalSellTerminal);
+                    listKey.Add("SellBillFee", shipment.TotalSellBillFee);
+                    listKey.Add("SellTelexRelease", shipment.TotalSellTelexRelease);
+                    listKey.Add("SellCFSFee", shipment.TotalSellCFSFee);
+                    listKey.Add("SellEBSFee", shipment.TotalSellEBSFee);
+                    listKey.Add("SellAutomated", shipment.TotalSellAutomated);
+                    listKey.Add("SellVGM", shipment.TotalSellVGM);
+                    listKey.Add("SellBookingFee", shipment.TotalSellBookingFee);
+                    listKey.Add("SellOthers", shipment.TotalSellOthers);
+                    listKey.Add("TotalSelling", shipment.TotalSell);
+                    listKey.Add("BuyFreight", shipment.TotalBuyFreight);
+                    listKey.Add("BuyTerminal", shipment.TotalBuyTerminal);
+                    listKey.Add("BuyBillFee", shipment.TotalBuyBillFee);
+                    listKey.Add("BuyTelexRelease", shipment.TotalBuyTelexRelease);
+                    listKey.Add("BuyCFSFee", shipment.TotalBuyCFSFee);
+                    listKey.Add("BuyEBSFee", shipment.TotalBuyEBSFee);
+                    listKey.Add("BuyAutomated", shipment.TotalBuyAutomated);
+                    listKey.Add("BuyVGM", shipment.TotalBuyVGM);
+                    listKey.Add("BuyOthers", shipment.TotalBuyOthers);
+                    listKey.Add("TotalBuying", shipment.TotalBuy);
+                    listKey.Add("Profit", shipment.Profit);
+                    listKey.Add("OBHP", shipment.AmountOBH);
+                    listKey.Add("OBHR", shipment.AmountOBH);
+                    excel.SetData(listKey);
+                    i++;
                 }
 
                 var lastRow = startOfDetail + shipments.Count();
-                while (excel.IsExistName("Total"))
+                var listKeyFormula = new Dictionary<string, string>();
+                i = 1;               
+                while (excel.IsExistName(string.Format("{0}{1}", "Total", i)))
                 {
-                    var _addressTotal = excel.AddressOfKey("Total");
+                    var totalFormat = string.Format("{0}{1}", "Total", i);
+                    var _addressTotal = excel.AddressOfKey(totalFormat);
                     var _statement = string.Format("SUM({0}{1}:{0}{2})", _addressTotal.ColumnLetter, startOfDetail, lastRow - 1);
-                    excel.SetFormula("Total", _statement, formatCurrency);
+                    listKeyFormula.Add(totalFormat, _statement);
+                    i++;
                 }
+                excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -3833,8 +3875,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path); // Create workbook excel
-                excel.SetData("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
-                excel.SetData("ExchangeRate", resultData.ExchangeRate);
+                var listKeyData = new Dictionary<string, object>();
+                var listKeyFormula = new Dictionary<string, string>();
+                listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
+                listKeyData.Add("ExchangeRate", resultData.ExchangeRate);
+                excel.SetData(listKeyData);
                 var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
                 var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
 
@@ -3845,66 +3890,77 @@ namespace eFMS.API.ReportData.FormatExcel
                 foreach (var item in listDetail)
                 {
                     excel.SetDataTable(); // start create template of row detail
-                    excel.SetData("ServiceDate", item.ServiceDate?.ToString(formatMonth));
-                    excel.SetData("Customer", item.CustomerName);
-                    excel.SetData("JobNo", item.JobId);
-                    excel.SetData("CustomSheet", item.CustomSheet);
-                    excel.SetData("BuyingRate", item.BuyingRate);
-                    excel.SetData("SellingRate", item.SellingRate);
+                    listKeyData = new Dictionary<string, object>();
+                    listKeyFormula = new Dictionary<string, string>();
+                    listKeyData.Add("ServiceDate", item.ServiceDate?.ToString(formatMonth));
+                    listKeyData.Add("Customer", item.CustomerName);
+                    listKeyData.Add("JobNo", item.JobId);
+                    listKeyData.Add("CustomSheet", item.CustomSheet);
+                    listKeyData.Add("BuyingRate", item.BuyingRate);
+                    listKeyData.Add("SellingRate", item.SellingRate);
                     // Gross profit before commission
                     _statement = string.Format("G{0}-F{0}", startRow);
-                    excel.SetFormula("GrossBefore", _statement);
+                    listKeyFormula.Add("GrossBefore", _statement);
                     // Com Amount
-                    excel.SetData("ComAmount", item.ComAmount);
+                    listKeyData.Add("ComAmount", item.ComAmount);
                     // Gross profit after commission
                     _statement = string.Format("H{0}-J{0}", startRow);
-                    excel.SetFormula("GrossAfter", _statement);
+                    listKeyFormula.Add("GrossAfter", _statement);
                     // Commission cap
                     _statement = string.Format("K{0}*(40%/60%)", startRow);
-                    excel.SetFormula("ComCap", _statement);
+                    listKeyFormula.Add("ComCap", _statement);
                     // %Com
                     _statement = string.Format("IF(K{0}=0,0,J{0}/(K{0}/60%))", startRow);
-                    excel.SetFormula("ComPercent", _statement);
+                    listKeyFormula.Add("ComPercent", _statement);
                     // VND
                     _statement = string.Format("IF(O10=0,0,J{0}*O10/O10)", startRow);
-                    excel.SetFormula("AmountVND", _statement);
+                    listKeyFormula.Add("AmountVND", _statement);
                     // Com over cap
                     _statement = string.Format("IF(J{0}-L{0}<0,0,1)", startRow);
-                    excel.SetFormula("ComOverCap", _statement);
+                    listKeyFormula.Add("ComOverCap", _statement);
                     // CIT charged on overcap
                     _statement = string.Format("O{0}*25%", startRow);
-                    excel.SetFormula("CITCharged", _statement);
+                    listKeyFormula.Add("CITCharged", _statement);
                     // Entitled COM
                     _statement = string.Format("ROUND(N{0}-P{0},0)", startRow);
-                    excel.SetFormula("EntitledCom", _statement);
+                    listKeyFormula.Add("EntitledCom", _statement);
                     // PIT (30%)
                     _statement = string.Format("Q{0}*30%", startRow);
-                    excel.SetFormula("PIT", _statement);
+                    listKeyFormula.Add("PIT", _statement);
                     // Net due to customers
                     _statement = string.Format("Q{0}-R{0}", startRow);
-                    excel.SetFormula("Net", _statement);
+                    listKeyFormula.Add("Net", _statement);
+                    excel.SetData(listKeyData);
+                    excel.SetFormula(listKeyFormula);
                     startRow += 1;
                 }
                 // TOTAL
                 string lastCol = string.Empty;
-                while(excel.IsExistName("Total")) // Set formula for row of total
+                int i = 1;
+                while (excel.IsExistName(string.Format("{0}{1}", "Total", i)))
                 {
-                    var _addressTotal = excel.AddressOfKey("Total");
+                    var totalFormat = string.Format("{0}{1}", "Total", i);
+                    var _addressTotal = excel.AddressOfKey(totalFormat);
                     _statement = string.Format("SUM({0}13:{0}{1})", _addressTotal.ColumnLetter, startRow - 1);
                     lastCol = _addressTotal.ColumnLetter;
-                    excel.SetFormula("Total", _statement);
+                    listKeyFormula.Add(totalFormat, _statement);
+                    i++;
                 }
                 // Footer
                 _statement = string.Format("+{0}{1}", lastCol, startRow);
-                excel.SetFormula("Amount", _statement);
-                excel.SetData("BeneficiaryName", resultData.BeneficiaryName);
-                excel.SetData("BankAccount", resultData.BankAccountNo);
-                excel.SetData("BankVia", resultData.BankName);
-                excel.SetData("Taxcode", resultData.TaxCode);
+                listKeyFormula.Add("Amount", _statement);
+
+                listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("BeneficiaryName", resultData.BeneficiaryName);
+                listKeyData.Add("BankAccount", resultData.BankAccountNo);
+                listKeyData.Add("BankVia", resultData.BankName);
+                listKeyData.Add("Taxcode", resultData.TaxCode);
                 // Prepared by
-                excel.SetData("CurrentUser", resultData.PreparedBy);
+                listKeyData.Add("CurrentUser", resultData.PreparedBy);
                 // Verified by
-                excel.SetData("ManagerDep", resultData.VerifiedBy);
+                listKeyData.Add("ManagerDep", resultData.VerifiedBy);
+                excel.SetData(listKeyData);
+                excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -3930,9 +3986,12 @@ namespace eFMS.API.ReportData.FormatExcel
                     return null;
                 }
                 var excel = new ExcelExport(path); // Create workbook excel
-                excel.SetData("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
-                excel.SetData("CUSTOMER", "CUSTOMER: " + resultData.CustomerName.ToUpper());
-                excel.SetData("ExchangeRate", resultData.ExchangeRate);
+                var listKeyData = new Dictionary<string, object>();
+                var listKeyFormula = new Dictionary<string, string>();
+                listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
+                listKeyData.Add("CUSTOMER", "CUSTOMER: " + resultData.CustomerName.ToUpper());
+                listKeyData.Add("ExchangeRate", resultData.ExchangeRate);
+                excel.SetData(listKeyData);
                 var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
                 int startRow = 14;
                 excel.StartDetailTable = startRow;  // Set start of detail row of table
@@ -3942,101 +4001,112 @@ namespace eFMS.API.ReportData.FormatExcel
                 foreach (var item in listDetail)
                 {
                     excel.SetDataTable(); // start create template of row detail
-                    excel.SetData("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
-                    excel.SetData("HBLNo", item.HBLNo);
+                    listKeyData = new Dictionary<string, object>();
+                    listKeyFormula = new Dictionary<string, string>();
+                    listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
+                    listKeyData.Add("HBLNo", item.HBLNo);
                     if (item.TransactionType.Contains('A'))
                     {
                         _chargeWeight += (item.ChargeWeight ?? 0);
-                        excel.SetData("ChargeWeight", item.ChargeWeight);
+                        listKeyData.Add("ChargeWeight", item.ChargeWeight);
                     }
                     else
                     {
                         _contQty += (item.ContQty ?? 0);
-                        excel.SetData("ChargeWeight", item.PackageContainer);
+                        listKeyData.Add("ChargeWeight", item.PackageContainer);
                     }
-                    excel.SetData("PortCode", item.PortCode);
-                    excel.SetData("BuyingRate", item.BuyingRate);
-                    excel.SetData("SellingRate", item.SellingRate);
+                    listKeyData.Add("PortCode", item.PortCode);
+                    listKeyData.Add("BuyingRate", item.BuyingRate);
+                    listKeyData.Add("SellingRate", item.SellingRate);
                     // Gross profit before commission
                     _statement = string.Format("F{0}-E{0}", startRow);
-                    excel.SetFormula("GrossBefore", _statement);
+                    listKeyFormula.Add("GrossBefore", _statement);
                     // Rate of com
                     if (item.TransactionType.Contains('S'))
                     {
                         _statement = string.Format("IF({1}=0,0,I{0}/{1})", startRow, item.ContQty); // Set formula for cell
-                        excel.SetFormula("RateOfCom", _statement);
+                        listKeyFormula.Add("RateOfCom", _statement);
                     }
                     else
                     {
-                        excel.SetData("RateOfCom", null);
+                        listKeyData.Add("RateOfCom", null);
                     }
                     // Com Amount
-                    excel.SetData("ComAmount", item.ComAmount);
+                    listKeyData.Add("ComAmount", item.ComAmount);
                     // Gross profit after commission
                     _statement = string.Format("G{0}-I{0}", startRow);
-                    excel.SetFormula("GrossAfter", _statement);
+                    listKeyFormula.Add("GrossAfter", _statement);
                     // Commission cap
                     _statement = string.Format("J{0}*(40%/60%)", startRow);
-                    excel.SetFormula("ComCap", _statement);
+                    listKeyFormula.Add("ComCap", _statement);
                     // %Com
                     _statement = string.Format("IF(J{0}=0,0,I{0}/(J{0}/60%))", startRow);
-                    excel.SetFormula("ComPercent", _statement);
+                    listKeyFormula.Add("ComPercent", _statement);
                     // VND
                     _statement = string.Format("I{0}*N10", startRow);
-                    excel.SetFormula("AmountVND", _statement);
+                    listKeyFormula.Add("AmountVND", _statement);
                     // Com over cap
                     _statement = string.Format("IF(I{0}-K{0}<0,0,(I{0}-K{0})*N10)", startRow);
-                    excel.SetFormula("ComOverCap", _statement);
+                    listKeyFormula.Add("ComOverCap", _statement);
                     // CIT charged on overcap
                     _statement = string.Format("N{0}*25%", startRow);
-                    excel.SetFormula("CITCharged", _statement);
+                    listKeyFormula.Add("CITCharged", _statement);
                     // Entitled COM
                     _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
-                    excel.SetFormula("EntitledCom", _statement);
+                    listKeyFormula.Add("EntitledCom", _statement);
                     // PIT (30%)
                     _statement = string.Format("P{0}*10%", startRow);
-                    excel.SetFormula("PIT", _statement);
+                    listKeyFormula.Add("PIT", _statement);
                     // Net due to customers
                     _statement = string.Format("P{0}-Q{0}", startRow);
-                    excel.SetFormula("Net", _statement);
+                    listKeyFormula.Add("Net", _statement);
+                    excel.SetData(listKeyData);
+                    excel.SetFormula(listKeyFormula);
                     startRow += 1;
                 }
                 // TOTAL
+                listKeyData = new Dictionary<string, object>();
+                listKeyFormula = new Dictionary<string, string>();
                 if (_chargeWeight == 0 || _contQty == 0)
                 {
                     if (_chargeWeight > 0)
                     {
-                        excel.SetData("TotalCW", _chargeWeight); // Total CW
+                        listKeyData.Add("TotalCW", _chargeWeight); // Total CW
                     }
                     else
                     {
-                        excel.SetData("TotalCW", _contQty); // Total CW
+                        listKeyData.Add("TotalCW", _contQty); // Total CW
                     }
                 }
 
                 string lastCol = string.Empty;
-                while (excel.IsExistName("Total")) // Set formula for row of total
+                int i = 1;
+                while (excel.IsExistName(string.Format("{0}{1}", "Total", i)))
                 {
-                    var _addressTotal = excel.AddressOfKey("Total");
+                    var totalFormat = string.Format("{0}{1}", "Total", i);
+                    var _addressTotal = excel.AddressOfKey(totalFormat);
                     _statement = string.Format("SUM({0}14:{0}{1})", _addressTotal.ColumnLetter, startRow - 1);
                     lastCol = _addressTotal.ColumnLetter;
-                    excel.SetFormula("Total", _statement);
+                    listKeyFormula.Add(totalFormat, _statement);
+                    i++;
                 }
                 // Footer
                 _statement = string.Format("+{0}{1}", lastCol, startRow);
-                excel.SetFormula("Amount", _statement);
-                excel.SetData("BeneficiaryName", resultData.BeneficiaryName);
-                excel.SetData("BankAccount", resultData.BankAccountNo);
-                excel.SetData("BankVia", resultData.BankName);
-                excel.SetData("Taxcode", resultData.TaxCode);
+                listKeyFormula.Add("Amount", _statement);
+                excel.SetFormula(listKeyFormula);
+                listKeyData.Add("BeneficiaryName", resultData.BeneficiaryName);
+                listKeyData.Add("BankAccount", resultData.BankAccountNo);
+                listKeyData.Add("BankVia", resultData.BankName);
+                listKeyData.Add("Taxcode", resultData.TaxCode);
                 // Prepared by
-                excel.SetData("CurrentUser", resultData.PreparedBy);
+                listKeyData.Add("CurrentUser", resultData.PreparedBy);
                 // Verified by
-                excel.SetData("ManagerDep", resultData.VerifiedBy);
+                listKeyData.Add("ManagerDep", resultData.VerifiedBy);
                 // Approved by
-                excel.SetData("ManOffice", resultData.ApprovedBy);
+                listKeyData.Add("ManOffice", resultData.ApprovedBy);
                 // Cross-checked by
-                excel.SetData("HeadAccountant", resultData.CrossCheckedBy);
+                listKeyData.Add("HeadAccountant", resultData.CrossCheckedBy);
+                excel.SetData(listKeyData);
                 return excel.ExcelStream();
             }
             catch (Exception ex)
@@ -4060,8 +4130,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     return null;
                 }
-                var excel = new ExcelExport(path); // Create workbook excel
-                excel.SetData("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
+                var excel = new ExcelExport(path); // Create workbook excel]
+                var listKeyData = new Dictionary<string, object>();
+                var listKeyFormula = new Dictionary<string, string>();
+                listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
+                excel.SetData(listKeyData);
 
                 var monthGrp = resultData.Details.GroupBy(x => x.ServiceDate?.Month).OrderBy(x => x.Key).Select(x => x.Key);
                 var startRow = 4;
@@ -4071,9 +4144,10 @@ namespace eFMS.API.ReportData.FormatExcel
                     var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
                     if (shipmentGrp.Count() > 0)
                     {
+                        listKeyData = new Dictionary<string, object>();
                         var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");
                         excel.SetGroupsTable();
-                        excel.SetData("ServiceDate", month);
+                        listKeyData.Add("ServiceDate", month);
                         startRow++;
                     }
                     else
@@ -4084,25 +4158,29 @@ namespace eFMS.API.ReportData.FormatExcel
                     foreach (var shipment in shipmentGrp)
                     {
                         excel.SetDataTable();
-                        excel.SetData("JobId", shipment.JobId);
-                        excel.SetData("CustomerName", shipment.CustomerName);
-                        excel.SetData("MBL", shipment.MBLNo);
-                        excel.SetData("HBL", shipment.HBLNo);
-                        excel.SetData("Profit", shipment.SellingRate - shipment.BuyingRate);
+                        listKeyData.Add("JobId", shipment.JobId);
+                        listKeyData.Add("CustomerName", shipment.CustomerName);
+                        listKeyData.Add("MBL", shipment.MBLNo);
+                        listKeyData.Add("HBL", shipment.HBLNo);
+                        listKeyData.Add("Profit", shipment.SellingRate - shipment.BuyingRate);
+                        excel.SetData(listKeyData);
                         startRow++;
                     }
                 }
                 var rowTotal = startRow - 1;
+                listKeyData = new Dictionary<string, object>();
                 var _statement = string.Format("SUM(E5:E{0})", rowTotal);
-                excel.SetFormula("TotalUSD", _statement); // Total USD
+                listKeyFormula.Add("TotalUSD", _statement); // Total USD
                 _statement = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate);
-                excel.SetData("DeNghi", _statement);
-                _statement = string.Format("E{0}*0.1*{1}", startRow, resultData.ExchangeRate);              
-                excel.SetFormula("TotalAmount", _statement); // Total De nghi thanh toan
+                listKeyData.Add("DeNghi", _statement);
+                _statement = string.Format("E{0}*0.1*{1}", startRow, resultData.ExchangeRate);
+                listKeyFormula.Add("TotalAmount", _statement); // Total De nghi thanh toan
                 // Prepared by
-                excel.SetData("CurrentUser", resultData.PreparedBy);
+                listKeyData.Add("CurrentUser", resultData.PreparedBy);
                 // Verified by
-                excel.SetData("ManagerDep", resultData.VerifiedBy);
+                listKeyData.Add("ManagerDep", resultData.VerifiedBy);
+                excel.SetData(listKeyData);
+                excel.SetFormula(listKeyFormula);
                 return excel.ExcelStream();
             }
             catch (Exception ex)

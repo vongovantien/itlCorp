@@ -1,5 +1,6 @@
 ﻿using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -61,34 +62,30 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <summary>
         /// Set data for cell
         /// </summary>
-        /// <param name="name">name of cell to set value</param>
-        /// <param name="value">value set to cell</param>
-        /// <param name="numberFormat">Format number(flexible)</param>
-        public void SetData(string name, object value, string numberFormat = null)
+        /// <param name="nameList">List name of cell to set value</param>
+        public void SetData(Dictionary<string, object> nameList)
         {
-            name = string.Format("{{{0}}}", name);
-            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
-                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
-                         select cell;
-            if (result.Count() > 0)
+            foreach (var _name in nameList)
             {
-                var address = result.ToList();
-                if (value == null)
+                var name = string.Format("{{{0}}}", _name.Key);
+                var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                             where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                             select cell;
+                if (result.Count() > 0)
                 {
-                    foreach (var ad in address)
+                    var address = result.FirstOrDefault().ToString();
+                    var value = _name.Value;
+                    if (value == null)
                     {
-                        Worksheet.Cells[ad.ToString()].Value = string.Empty;
+                        Worksheet.Cells[address].Value = string.Empty;
                     }
-                }
-                else
-                {
-                    if (value.ToString().Contains("\n"))
+                    else
                     {
-                        foreach (var ad in address)
+                        if (value.ToString().Contains("\n"))
                         {
-                            if (Worksheet.Cells[ad.ToString()].Style.WrapText)
+                            if (Worksheet.Cells[address].Style.WrapText)
                             {
-                                Worksheet.Cells[ad.ToString()].Value = value;
+                                Worksheet.Cells[address].Value = value;
                             }
                             else
                             {
@@ -96,7 +93,7 @@ namespace eFMS.API.ReportData.FormatExcel
                                 int i = 0;
                                 for (int strIndex = 0; strIndex < splitString.Length; strIndex++)
                                 {
-                                    var addressVal = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(ad.ToString(), -i, 0), 0, 0);
+                                    var addressVal = ExcelCellBase.TranslateFromR1C1(ExcelCellBase.TranslateToR1C1(address, -i, 0), 0, 0);
                                     if (Worksheet.Cells[addressVal].Style.WrapText)
                                     {
                                         Worksheet.Cells[addressVal].Value = string.Join("", splitString.Skip(strIndex).Take(splitString.Length - strIndex));
@@ -110,19 +107,9 @@ namespace eFMS.API.ReportData.FormatExcel
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        foreach (var ad in address)
+                        else
                         {
-                            Worksheet.Cells[ad.ToString()].Value = value;
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(numberFormat))
-                    {
-                        foreach (var ad in address)
-                        {
-                            Worksheet.Cells[ad.ToString()].Style.Numberformat.Format = numberFormat;
+                            Worksheet.Cells[address].Value = value;
                         }
                     }
                 }
@@ -130,26 +117,45 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
+        /// Set string format for cell
+        /// </summary>
+        /// <param name="nameList"></param>
+        /// <param name="numberFormat"></param>
+        public void SetFormatCell(List<string> nameList, string numberFormat)
+        {
+            foreach (var _name in nameList)
+            {
+                var name = string.Format("{{{0}}}", _name);
+                var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                             where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                             select cell;
+                if (result.Count() > 0)
+                {
+                    var address = result.FirstOrDefault().ToString();
+                    Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
+                }
+            }
+        }
+
+        /// <summary>
         /// Set formula for one cell
         /// </summary>
-        /// <param name="name">name of cell to set value</param>
-        /// <param name="_formular">formula string set to cell</param>
-        /// <param name="numberFormat">format number set to cell</param>
-        public void SetFormula(string name, string _formular, string numberFormat = null)
+        /// <param name="nameList">Licst name of cell to set value</param>
+        public void SetFormula(Dictionary<string, string> nameList)
         {
-            name = string.Format("{{{0}}}", name);
-            var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
-                         where cell.Value != null && cell.Value?.ToString().Contains(name) == true
-                         select cell;
-            if (result.Count() > 0)
+            foreach (var _name in nameList)
             {
-                var address = result.FirstOrDefault()?.ToString();
-                if (address != null)
+                var name = string.Format("{{{0}}}", _name.Key);
+                var result = from cell in Worksheet.Cells[StartRow, StartCol, Worksheet.Dimension.End.Row, EndCol]
+                             where cell.Value != null && cell.Value?.ToString().Contains(name) == true
+                             select cell;
+                if (result.Count() > 0)
                 {
-                    Worksheet.Cells[address].Formula = _formular;
-                    if (!string.IsNullOrEmpty(numberFormat))
+                    var address = result.FirstOrDefault()?.ToString();
+                    if (address != null)
                     {
-                        Worksheet.Cells[address].Style.Numberformat.Format = numberFormat;
+                        var _formular = _name.Value;
+                        Worksheet.Cells[address].Formula = _formular;
                     }
                 }
             }
