@@ -11,6 +11,7 @@ import { of } from 'rxjs';
 import { formatCurrency, formatDate } from '@angular/common';
 import { getMenuUserPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -127,16 +128,18 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        this.isLoadingShipmentGrid = true;
-        this._catalogue.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoadingShipmentGrid = false;
-            }))
-            .subscribe(
-                (dataPartner: any) => {
-                    this.getPartnerData(dataPartner);
-                },
-            );
+        const customersFromService = this._catalogue.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.getPartnerData(customersFromService.data);
+            return;
+        }
+        this._catalogue.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this._catalogue.customersSource$.next({ data }); // * Update service.
+                this.getPartnerData(data);
+
+            }
+        );
     }
 
     getPartnerData(data: any) {
@@ -290,16 +293,16 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }
     }
 
-    getAdvnaceList(hblId: string){
+    getAdvnaceList(hblId: string) {
         this._accoutingRepo.getListAdvanceNoForShipment(hblId)
-        .pipe(catchError(this.catchError), finalize(() => {
-        }))
-        .subscribe(
-            (res: any[]) => {
-                console.log('res', res)
-                this.shipments.map(x=> x.advanceNoList = res);
-            },
-        );
+            .pipe(catchError(this.catchError), finalize(() => {
+            }))
+            .subscribe(
+                (res: any[]) => {
+                    console.log('res', res)
+                    this.shipments.map(x => x.advanceNoList = res);
+                },
+            );
     }
 
     updateExchangeRateForCharges() {
@@ -362,15 +365,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
-    onBlurAmountCharge(event: any, hblId: string){
-        if(event.target.name === 'amount'){
+    onBlurAmountCharge(event: any, hblId: string) {
+        if (event.target.name === 'amount') {
             this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
                 shipment.totalNetVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
                 shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             });
             this.getTotalAmountVND();
         }
-        if(event.target.name === 'vat'){
+        if (event.target.name === 'vat') {
             this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
                 shipment.totalVATVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.vatAmountVnd, 0);
                 shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
@@ -385,10 +388,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
-    checkInputReference(){
-        if(!!this.referenceInput.value){
+    checkInputReference() {
+        if (!!this.referenceInput.value) {
             this.referenceInput.setValue(this.referenceInput.value.trim());
-            if(this.referenceInput.value.length === 0){
+            if (this.referenceInput.value.length === 0) {
                 this.referenceInput.setValue(null);
             }
         }
@@ -516,7 +519,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                         }
                     }
                 );
-        } else{
+        } else {
             this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
                 catchError((err, caught) => this.catchError),
                 concatMap((rs: any) => {
@@ -530,21 +533,21 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     }
                 })
             )
-            .subscribe(
-                (res: IGetExistsCharge) => {
-                    if (!!res) {
-                        this.orgChargeShipment = cloneDeep(res);
-                        this.shipments = res.shipmentSettlement;
-                        this.total = res.total;
-                        this.totalAmountVnd = this.total.totalVNDStr;
-                        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                            this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
-                        });
-                        this.checkedAllCharges();
-                        this.isSubmitted = false;
+                .subscribe(
+                    (res: IGetExistsCharge) => {
+                        if (!!res) {
+                            this.orgChargeShipment = cloneDeep(res);
+                            this.shipments = res.shipmentSettlement;
+                            this.total = res.total;
+                            this.totalAmountVnd = this.total.totalVNDStr;
+                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
+                            });
+                            this.checkedAllCharges();
+                            this.isSubmitted = false;
+                        }
                     }
-                }
-            );
+                );
         }
     }
 
