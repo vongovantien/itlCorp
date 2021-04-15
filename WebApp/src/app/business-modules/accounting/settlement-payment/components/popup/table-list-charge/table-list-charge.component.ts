@@ -611,7 +611,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 || !charge.unitId
                 || charge.unitPrice === null
                 || charge.quantity < 0
-                || charge.unitPrice < 0
+                // || charge.unitPrice < 0
                 || charge.vatrate > 100
                 || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && !charge.obhId
 

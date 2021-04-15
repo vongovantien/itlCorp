@@ -250,7 +250,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         let valid: boolean = true;
         for (const charge of this.charges) {
             if (this.checkSpecialCaseCharge(charge)) {
-                break;
+                valid = true;
+                continue;
             }
             if (
                 !charge.paymentObjectId
@@ -262,7 +263,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                 || !charge.payerName
                 || charge.unitPrice === null
                 || charge.quantity === null
-                || charge.unitPrice < 0
+                // || charge.unitPrice < 0 // ? Cho phép nhập âm nh8
+                || +charge.unitPrice === 0
                 || charge.quantity < 0
                 || charge.vatrate > 100
                 || charge.paymentObjectId === charge.payerId
