@@ -887,7 +887,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         if (surcharge.PaySyncedFrom == "VOUCHER")
                         {
-                            _syncedFromBy = surcharge.VoucherId;
+                            _syncedFromBy = surcharge.VoucherIdre;
                         }
                     }
                     fe.SyncedFromBy = _syncedFromBy;
