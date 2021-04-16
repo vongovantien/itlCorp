@@ -169,6 +169,8 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             originCountryId: form.country,
             pol: form.pol,
             pod: form.pod,
+            polDescription: form.polDescription,
+            podDescription: form.podDescription,
             forwardingAgentId: form.forwardingAgent,
             goodsDeliveryId: form.goodsDelivery,
 

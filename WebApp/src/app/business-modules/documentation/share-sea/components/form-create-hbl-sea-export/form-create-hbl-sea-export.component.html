@@ -130,29 +130,38 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !pol.value}">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && (!pol.value || !polDescription.value)}">
                         <label required>Port of Loading (POL)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
-                            [currentActiveItemId]="{ field: 'id', value: pol.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol)"
-                            placeholder="Select port">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol);resetFormControl(polDescription)"
+                            placeholder="Select port" allowFreeText [displaySelectedStr]="polDescription.value"
+                            (displaySelectedStrChange)="polDescription.setValue($event)">
                         </app-combo-grid-virtual-scroll>
+                        <div class="form-control-feedback"
+                                *ngIf="isSubmitted && !!polDescription.value && !pol.value">
+                                Please select Port of Discharge
+                            </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || (formCreate.errors | equalError:'invalidPort')) }">
+                        [ngClass]="{'m-form__group has-danger': isSubmitted && 
+                        ((formCreate.errors | equalError:'invalidPort') || (!podDescription.value || !pod.value)) }">
                         <label required>Port of Discharge (POD)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
-                            [currentActiveItemId]="{ field: 'id', value: pod.value}"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod)"
-                            placeholder="Please select port">
+                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod);resetFormControl(podDescription)"
+                            placeholder="Please select port" allowFreeText [displaySelectedStr]="podDescription.value"
+                            (displaySelectedStrChange)="podDescription.setValue($event)">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
                             *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">Port of
                             Discharge must be different from Port of Loading
+                        </div>
+                        <div class="form-control-feedback"
+                                *ngIf="isSubmitted && !!podDescription.value && !pod.value">
+                                Please select Port of Discharge
                         </div>
                     </div>
                 </div>
