@@ -44,7 +44,7 @@
                 <div class="form-group">
                     <label>Payee:</label>
                     <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
-                        (itemSelected)="payee.setValue($event.id)" [dataSources]="customers | async" [displayFields]="[
+                        (itemSelected)="payee.setValue($event.id)" [dataSources]="customers" [displayFields]="[
                         { field: 'shortName', label: 'Name ABBR' },
                         { field: 'partnerNameEn', label: 'Name EN' },
                         { field: 'taxCode', label: 'Tax Code' }]" [selectedDisplayFields]="['shortName']"

@@ -133,16 +133,6 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             );
     }
 
-    getInfoApproveSettlement(settlementNo: string) {
-        this._accoutingRepo.getInfoApproveSettlement(settlementNo)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (res: any) => {
-                    this.approveInfo = res;
-                },
-            );
-    }
-
     showModalApprove() {
         this.showPopupDynamicRender(ConfirmPopupComponent, this.containerRef.viewContainerRef, {
             body: 'Do you want to approve this settlement payment ?',

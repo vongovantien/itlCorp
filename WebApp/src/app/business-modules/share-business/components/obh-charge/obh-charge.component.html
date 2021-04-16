@@ -78,7 +78,7 @@
                             </ng-container>
                             <td>
                                 <div class="form-group col-md-12 dropdown-partner" dropdown [tooltip]="charge.payerName"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.payerName ||charge.paymentObjectId === charge.payerId )}">
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.payerShortName ||charge.paymentObjectId === charge.payerId )}">
                                     <ng-container *ngIf="!!charge.creditNo                                         
                                         || !!charge.settlementCode
                                         || !!charge.paySoano
@@ -93,7 +93,7 @@
                                             [(ngModel)]="charge.payerShortName" placeholder="Partner Name"
                                             [disabled]="isShowLoadingPartner ? 'disabled': null">
                                         <combo-grid-icon (onDelete)="charge.payerId = null; 
-                                            charge.payerShortName = null" [showDelete]="!!charge.payerName 
+                                            charge.payerShortName = null;charge.payerName = null" [showDelete]="!!charge.payerName 
                                         && !charge.soano 
                                         && !charge.paySoano
                                         && !charge.creditNo
@@ -101,7 +101,7 @@
                                         && !charge.settlementCode
                                         && !charge.voucherId
                                         && !charge.voucherIddate
-                                        && !charge.voucherIdre
+                                        && !charge.voucherIdre 
                                         && !charge.voucherIdreDate">
                                         </combo-grid-icon>
                                         <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
@@ -294,7 +294,7 @@
                                     <ng-template #unitPrice>
                                         <input type="text" class="form-control" [(ngModel)]="charge.unitPrice"
                                             (ngModelChange)="onChangeDataUpdateTotal(charge)" placeholder="Unit Price"
-                                            autoFormatCurrency numeric [decimals]="digitDecimal">
+                                            autoFormatCurrency>
                                     </ng-template>
                                 </div>
                             </td>
