@@ -1252,11 +1252,20 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 DataContext.Update(voucher, x => x.Id == id, false);
 
-                                //Update SyncedFrom equal VOUCHER by Id of Voucher
-                                var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id);
+                                //Update SyncedFrom or PaySyncedFrom equal VOUCHER by Id of Voucher
+                                var surcharges = SurchargeRepository.Get(x => x.AcctManagementId == voucher.Id || x.PayerAcctManagementId == voucher.Id);
                                 foreach (var surcharge in surcharges)
                                 {
-                                    surcharge.SyncedFrom = "VOUCHER";
+                                    if (surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                                    {
+                                        //Charge OBH sẽ lưu vào PaySyncedFrom
+                                        surcharge.PaySyncedFrom = "VOUCHER";
+                                    }
+                                    else
+                                    {
+                                        //Charge BUY/SELL sẽ lưu vào PaySyncedFrom
+                                        surcharge.SyncedFrom = "VOUCHER";
+                                    }
                                     surcharge.UserModified = currentUser.UserID;
                                     surcharge.DatetimeModified = DateTime.Now;
                                     var hsUpdateSurcharge = SurchargeRepository.Update(surcharge, x => x.Id == surcharge.Id, false);
