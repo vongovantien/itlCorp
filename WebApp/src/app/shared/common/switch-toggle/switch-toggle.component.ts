@@ -25,18 +25,14 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
     ]
 })
 export class SwitchToggleComponent implements ControlValueAccessor {
-
-    private toggle: boolean = false; // * internal state
-
     @Input() class: string = 'success';
     @Input() size: string = "md";
     @Input() disabled: boolean = null;
     @Output() toggleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    private onChange: Function = (v: boolean) => {
-    };
-    private onTouch: Function = () => {
-    };
+    private toggle: boolean = false; // * internal state
+    private onChange: Function = (v: boolean) => { };
+    private onTouch: Function = () => { };
 
     constructor() { }
 
