@@ -493,8 +493,7 @@
                             CBM:&nbsp;
                             <span class="text-primary">{{totalCBM}}</span>
                             <span>
-                                <app-switch size="sm" [toggle]="formCreate.controls['showDim'].value"
-                                    (toggleChange)="formCreate.controls['showDim'].setValue($event)"></app-switch>
+                                <app-switch size="sm" formControlName="showDim"></app-switch>
                             </span>
                             <span class="pointer" (click)="isCollapsed = !isCollapsed">
                                 <i class="la la-angle-double-down" aria-hidden="true"></i>
