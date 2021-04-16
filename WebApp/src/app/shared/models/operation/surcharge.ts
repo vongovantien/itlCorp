@@ -60,6 +60,7 @@ export class Surcharge {
     totalAmountVnd: number = 0;
     picName: string = '';
     isLocked: boolean = false;
+    kickBack: boolean = false;
     // * Custom
     obhId: string = null;
     isDuplicate: boolean = false;

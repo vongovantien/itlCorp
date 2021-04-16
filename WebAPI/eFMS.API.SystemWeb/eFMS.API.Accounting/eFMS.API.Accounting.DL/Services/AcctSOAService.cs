@@ -728,18 +728,20 @@ namespace eFMS.API.Accounting.DL.Services
             #region -- Search by Customer --
             if (!string.IsNullOrEmpty(criteria.CustomerID))
             {
-                //Get charge by: Customer, loại phí, phí chưa sync, phí chưa issue SOA
+                //Get charge by: Customer, loại phí, phí chưa sync, phí chưa issue SOA, phí chưa issue Voucher/Vat Invoice [15633 - Andy - 15/04/2021]
                 surcharges = csShipmentSurchargeRepo.Get(x => x.Type == typeCharge
                                                              && x.PaymentObjectId == criteria.CustomerID
                                                              && string.IsNullOrEmpty(x.SyncedFrom)
-                                                             && (x.Type == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                                                             && (x.Type == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano))
+                                                             && x.AcctManagementId == null);
                 if (criteria.IsOBH) //**
                 {
                     //SELL ~ PaymentObjectID, SOANo
                     obhSurcharges = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? x.PaymentObjectId : x.PayerId) == criteria.CustomerID
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom))
-                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano)));
+                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.Soano) : string.IsNullOrEmpty(x.PaySoano))
+                                                                  && (x.PayerId == criteria.CustomerID ? x.PayerAcctManagementId : x.AcctManagementId) == null );
                 }
             }
             #endregion -- Search by Customer --
@@ -1142,16 +1144,18 @@ namespace eFMS.API.Accounting.DL.Services
             #region -- Search by Customer --
             if (!string.IsNullOrEmpty(criteria.CustomerID))
             {
-                //Get charge by: Customer, loại phí
+                //Get charge by: Customer, loại phí, phí chưa sync, phí chưa issue Voucher/Vat Invoice [15633 - Andy - 15/04/2021]
                 surcharges = csShipmentSurchargeRepo.Get(x => x.Type == typeCharge
                                                              && x.PaymentObjectId == criteria.CustomerID
-                                                             && string.IsNullOrEmpty(x.SyncedFrom));
+                                                             && string.IsNullOrEmpty(x.SyncedFrom)
+                                                             && x.AcctManagementId == null);
                 if (criteria.IsOBH) //**
                 {
                     //SELL ~ PaymentObjectID, SOANo
                     obhSurcharges = csShipmentSurchargeRepo.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                                                   && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? x.PaymentObjectId : x.PayerId) == criteria.CustomerID
-                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom)));
+                                                                  && (typeCharge == AccountingConstants.TYPE_CHARGE_SELL ? string.IsNullOrEmpty(x.SyncedFrom) : string.IsNullOrEmpty(x.PaySyncedFrom))
+                                                                  && (x.PayerId == criteria.CustomerID ? x.PayerAcctManagementId : x.AcctManagementId) == null );
                 }
             }
             #endregion -- Search by Customer --

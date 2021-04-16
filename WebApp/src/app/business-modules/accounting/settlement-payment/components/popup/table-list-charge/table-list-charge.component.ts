@@ -211,13 +211,17 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     }
 
     getPartner() {
-        this._catalogueRepo.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (partners: Partner[]) => {
-                    this.listPartner = partners;
-                }
-            );
+        const customersFromService = this._catalogueRepo.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.listPartner = customersFromService.data;
+            return;
+        }
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this._catalogueRepo.customersSource$.next({ data }); // * Update service.
+                this.listPartner = data;
+            }
+        );
     }
 
     getUnits() {
@@ -611,7 +615,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 || !charge.unitId
                 || charge.unitPrice === null
                 || charge.quantity < 0
-                || charge.unitPrice < 0
+                // || charge.unitPrice < 0
                 || charge.vatrate > 100
                 || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && !charge.obhId
 

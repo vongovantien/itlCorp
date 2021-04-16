@@ -34,26 +34,25 @@ export class SettlementFormChargePopupComponent extends PopupBase {
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
-        displayFields: [],
+        displayFields: [
+            { field: 'jobId', label: 'Job ID' },
+            { field: 'mbl', label: 'MBL' },
+            { field: 'hbl', label: 'HBL' },
+        ],
         dataSource: [],
-        selectedDisplayFields: [],
+        selectedDisplayFields: ['jobId', `mbl`, 'hbl'],
     };
     selectedShipment: Partial<CommonInterface.IComboGridData> = {};
     selectedShipmentData: OperationInteface.IShipment;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
-        displayFields: [],
+        displayFields: [
+            { field: 'shortName', label: 'Name' },
+            { field: 'partnerNameEn', label: 'Customer Name' },
+        ],
         dataSource: [],
-        selectedDisplayFields: [],
+        selectedDisplayFields: ['shortName'],
     };
-
-    configPayer: CommonInterface.IComboGirdConfig = {
-        placeholder: 'Please select',
-        displayFields: [],
-        dataSource: [],
-        selectedDisplayFields: [],
-    };
-
 
     selectedPayer: Partial<CommonInterface.IComboGridData> = {};
     selectedPayerData: any;
@@ -350,34 +349,28 @@ export class SettlementFormChargePopupComponent extends PopupBase {
             .subscribe(
                 (res: any[]) => {
                     this.configShipment.dataSource = res;
-                    this.configShipment.displayFields = [
-                        { field: 'jobId', label: 'Job ID' },
-                        { field: 'mbl', label: 'MBL' },
-                        { field: 'hbl', label: 'HBL' },
-                    ];
-                    this.configShipment.selectedDisplayFields = ['jobId', `mbl`, 'hbl'];
                 }
             );
     }
 
     getPartner() {
+        const customersFromService = this._catalogueRepo.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.getPartnerData(customersFromService.data)
+            return;
+        }
         this._catalogueRepo.getListPartner(null, null, { active: true })
             .pipe(catchError(this.catchError))
             .subscribe(
-                (dataPartner: any) => {
-                    this.getPartnerData(dataPartner);
+                (data: any) => {
+                    this.getPartnerData(data);
+                    this._catalogueRepo.customersSource$.next({ data })
                 },
             );
     }
 
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
-        this.configPartner.displayFields = [
-            { field: 'shortName', label: 'Name' },
-            { field: 'partnerNameEn', label: 'Customer Name' },
-        ];
-        this.configPartner.selectedDisplayFields = ['shortName'];
-
     }
 
     getUnit() {

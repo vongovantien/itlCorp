@@ -2738,8 +2738,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 var lastRow = startOfDetail + shipments.Count();
                 var listKeyFormula = new Dictionary<string, string>();
-                i = 1;               
-                while (excel.IsExistName(string.Format("{0}{1}", "Total", i)))
+                i = 1;
+                while (i <= 31)
                 {
                     var totalFormat = string.Format("{0}{1}", "Total", i);
                     var _addressTotal = excel.AddressOfKey(totalFormat);
