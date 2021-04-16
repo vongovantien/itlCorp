@@ -131,6 +131,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         foreach (CsShipmentSurcharge item in charges)
                         {
+                            // Do voucher chỉ issue đầu CREDIT payer của phí OBH
                             if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
                             {
                                 item.PayerAcctManagementId = null;
@@ -886,7 +887,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         if (surcharge.PaySyncedFrom == "VOUCHER")
                         {
-                            _syncedFromBy = surcharge.VoucherId;
+                            _syncedFromBy = surcharge.VoucherIdre;
                         }
                     }
                     fe.SyncedFromBy = _syncedFromBy;

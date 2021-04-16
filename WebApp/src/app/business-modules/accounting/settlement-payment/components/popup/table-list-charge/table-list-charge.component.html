@@ -144,11 +144,10 @@
                                         </td>
                                         <td>
                                             <div class="form-group "
-                                                [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null || (!!charge.unitPrice && charge.unitPrice < 0)}">
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted && charge.unitPrice === null}">
                                                 <input type="number" class="form-control" [(ngModel)]="charge.unitPrice"
                                                     (ngModelChange)="calculateTotal(charge.vatrate,charge.quantity,$event, charge)"
-                                                    placeholder="Unit Price" min="0" numeric [decimals]="digitDecimal"
-                                                    autoFormatCurrency>
+                                                    placeholder="Unit Price" autoFormatCurrency>
                                             </div>
                                         </td>
                                         <td class="disabled">
