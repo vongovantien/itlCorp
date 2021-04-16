@@ -213,6 +213,7 @@
                                     <td>{{surcharge.currencyId}}</td>
                                     <td>{{surcharge.vatrate}}</td>
                                     <td>{{surcharge.total | number: '.0-3'}}</td>
+                                    <td>{{surcharge.amountVnd + surcharge.vatAmountVnd| number: '.0-3'}}</td>
                                     <td>{{surcharge.payer }}</td>
                                     <td>{{surcharge.obhPartnerName }}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
