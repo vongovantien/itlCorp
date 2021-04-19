@@ -4465,8 +4465,7 @@ namespace eFMS.API.Documentation.DL.Services
                 query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE
                              && x.Hblid == hblid
                              && (x.KickBack == false || x.KickBack == null)
-                             && x.ChargeGroup != chargeComId
-                             && (x.PaymentObjectId != exceptId || string.IsNullOrEmpty(exceptId));
+                             && x.ChargeGroup != chargeComId;
             }
             var sellingCharges = surCharge.Get(query);
             if (sellingCharges != null)
@@ -4499,7 +4498,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                query = x => x.Type == DocumentConstants.CHARGE_SELL_TYPE && x.Hblid == hblid
+                query = x => x.Type == DocumentConstants.CHARGE_BUY_TYPE && x.Hblid == hblid
                              && (x.KickBack == false || x.KickBack == null)
                              && x.ChargeGroup != chargeComId;
             }
@@ -4612,8 +4611,8 @@ namespace eFMS.API.Documentation.DL.Services
                 foreach (var item in data)
                 {
                     var charges = listcharge[item.Select(x => (Guid)x.HblId).FirstOrDefault()];
-                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
-                    if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
+                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id && x.PaymentObjectId == criteria.Beneficiary).Any() && c.ChargeGroup == chargeComId).Count() > 0;
+                    if (charges.Where(x => x.KickBack == true && x.PaymentObjectId == criteria.Beneficiary).Any() || charges.Where(x => x.ChargeGroup == chargeComId && x.PaymentObjectId == criteria.Beneficiary).Any() || chargeHasCom)
                     {
                         commissionData.Details.Add(new CommissionDetail()
                         {
@@ -4653,15 +4652,15 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var charges = listcharge[(Guid)item.HblId];
                     var containerData = containerLst[(Guid)item.HblId];
-                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
-                    if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
+                    var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id && x.PaymentObjectId == criteria.Beneficiary).Any() && c.ChargeGroup == chargeComId).Count() > 0;
+                    if ((charges.Where(x => x.KickBack == true && x.PaymentObjectId == criteria.Beneficiary).Any() || charges.Where(x => x.ChargeGroup == chargeComId && x.PaymentObjectId == criteria.Beneficiary).Any() || chargeHasCom))
                     {
                         commissionData.Details.Add(new CommissionDetail()
                         {
                             ServiceDate = item.ServiceDate,
                             JobId = item.JobNo,
                             HBLNo = item.HwbNo,
-                            MBLNo = string.Empty,
+                            MBLNo = item.Mawb,
                             CustomSheet = string.Empty,
                             ChargeWeight = item.ChargeWeight,
                             TransactionType = item.TransactionType,
@@ -4742,14 +4741,14 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// Get data Incentive Report
+        /// Get data Incentive Report (not require Beneficiary)
         /// </summary>
         /// <param name="criteria">data search</param>
         /// <param name="userId">current user</param>
         /// <returns></returns>
         public CommissionExportResult GetIncentiveReport(CommissionReportCriteria criteria, string userId)
         {
-            CommissionExportResult commissionData = new CommissionExportResult();
+            CommissionExportResult incentiveData = new CommissionExportResult();
             var dataShipment = GetDataGeneralReport(criteria).AsQueryable();
             // Get detail
             if (string.IsNullOrEmpty(criteria.Service) || criteria.Service.Contains(TermData.CustomLogistic))
@@ -4765,40 +4764,35 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            commissionData.Details = new List<CommissionDetail>();
+            incentiveData.Details = new List<CommissionDetail>();
             var chargeComId = catChargeGroupRepo.Get(x => x.Name == "Com")?.Select(x => x.Id).FirstOrDefault();
             var listcharge = surCharge.Get(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE
                                        || x.Type == DocumentConstants.CHARGE_SELL_TYPE).ToLookup(x => x.Hblid);
             var partnerList = catPartnerRepo.Get().ToLookup(x => x.Id);
             foreach (var item in dataShipment)
             {
-                var charges = listcharge[(Guid)item.HblId];
-                var chargeHasCom = catChargeRepo.Where(c => charges.Where(x => x.ChargeId == c.Id).Any() && c.ChargeGroup == chargeComId).Count() > 0;
-                if (charges.Where(x => x.KickBack == true).Any() || charges.Where(x => x.ChargeGroup == chargeComId).Any() || chargeHasCom)
+                incentiveData.Details.Add(new CommissionDetail()
                 {
-                    commissionData.Details.Add(new CommissionDetail()
-                    {
-                        ServiceDate = item.ServiceDate,
-                        JobId = item.JobNo,
-                        HBLNo = item.HwbNo,
-                        MBLNo = item.Mawb,
-                        CustomerName = partnerList[item.CustomerId].FirstOrDefault().ShortName,
-                        CustomSheet = string.Empty,
-                        ChargeWeight = 0,
-                        PortCode = string.Empty,
-                        BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
-                        SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
-                        ComAmount = 0
-                    });
-                }
+                    ServiceDate = item.ServiceDate,
+                    JobId = item.JobNo,
+                    HBLNo = item.HwbNo,
+                    MBLNo = item.Mawb,
+                    CustomerName = partnerList[item.CustomerId].FirstOrDefault().ShortName,
+                    CustomSheet = string.Empty,
+                    ChargeWeight = 0,
+                    PortCode = string.Empty,
+                    BuyingRate = GetBuyingRateNoCom((Guid)item.HblId, criteria.Currency),
+                    SellingRate = GetSellingRateNoCom((Guid)item.HblId, criteria.Currency),
+                    ComAmount = 0
+                });
             }
-            if (commissionData.Details.Count() == 0)
+            if (incentiveData.Details.Count() == 0)
             {
                 return null;
             }
             // Get header
             var forMonth = string.Empty;
-            var listOrder = commissionData.Details.OrderBy(x => x.ServiceDate);
+            var listOrder = incentiveData.Details.OrderBy(x => x.ServiceDate);
             if (listOrder.Select(x => x.ServiceDate?.Year).Distinct().Count() == 1)
             {
                 var startMonth = listOrder.Select(x => x.ServiceDate).FirstOrDefault();
@@ -4811,17 +4805,17 @@ namespace eFMS.API.Documentation.DL.Services
                 var endMonth = listOrder.Select(x => x.ServiceDate).LastOrDefault();
                 forMonth = string.Format("{0} - {1}", startMonth?.ToString("MMM, yyyy"), endMonth?.ToString("MMM, yyyy"));
             }
-            commissionData.ForMonth = forMonth;
-            commissionData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
-            commissionData.ExchangeRate = criteria.ExchangeRate;
+            incentiveData.ForMonth = forMonth;
+            incentiveData.CustomerName = catPartnerRepo.Get(x => x.Id == criteria.CustomerId).FirstOrDefault()?.PartnerNameEn;
+            incentiveData.ExchangeRate = criteria.ExchangeRate;
             // Partner info
             if (!string.IsNullOrEmpty(criteria.Beneficiary))
             {
                 var beneficiaryInfo = catPartnerRepo.Get(x => x.Id == criteria.Beneficiary)?.FirstOrDefault();
-                commissionData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
-                commissionData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
-                commissionData.BankName = beneficiaryInfo?.BankAccountName;
-                commissionData.TaxCode = beneficiaryInfo?.TaxCode;
+                incentiveData.BeneficiaryName = beneficiaryInfo?.PartnerNameVn;
+                incentiveData.BankAccountNo = beneficiaryInfo?.BankAccountNo;
+                incentiveData.BankName = beneficiaryInfo?.BankAccountName;
+                incentiveData.TaxCode = beneficiaryInfo?.TaxCode;
             }
             // get current user
             if (string.IsNullOrEmpty(userId))
@@ -4830,7 +4824,7 @@ namespace eFMS.API.Documentation.DL.Services
             }
             var curUser = sysUserLevelRepo.Get(x => x.UserId == userId)?.FirstOrDefault();
             var preparedById = sysUserRepo.Get(x => x.Id == userId).FirstOrDefault()?.EmployeeId;
-            commissionData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;
+            incentiveData.PreparedBy = sysEmployeeRepo.Get(x => x.Id == preparedById).FirstOrDefault()?.EmployeeNameEn;
             var managers = GetDeptManager(curUser?.CompanyId, curUser?.OfficeId, curUser?.DepartmentId)?.FirstOrDefault();
             // Get Department manager
             string _employeeIdDeptManager = sysUserRepo.Get(x => x.Id == managers).FirstOrDefault()?.EmployeeId;
@@ -4839,9 +4833,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 _managerDept = sysEmployeeRepo.Get(x => x.Id == _employeeIdDeptManager).FirstOrDefault()?.EmployeeNameVn;
             }
-            commissionData.VerifiedBy = _managerDept;
+            incentiveData.VerifiedBy = _managerDept;
 
-            return commissionData;
+            return incentiveData;
         }
 
         public List<ShipmentAdvanceSettlementModel> GetAdvanceSettlements(Guid Id)
