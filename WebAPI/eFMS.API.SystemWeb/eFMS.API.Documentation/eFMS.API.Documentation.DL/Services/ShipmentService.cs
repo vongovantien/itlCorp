@@ -1878,19 +1878,20 @@ namespace eFMS.API.Documentation.DL.Services
             List<GeneralExportShipmentOverviewFCLResult> lstShipment = new List<GeneralExportShipmentOverviewFCLResult>();
             var dataShipment = GetDataGeneralReport(criteria);
             if (!dataShipment.Any()) return null;
-            var shipments = dataShipment.OrderBy(x => x.JobNo).ThenBy(x => x.ServiceDate);
+            var shipments = dataShipment.OrderBy(x => x.TransactionType).ThenBy(x => x.JobNo);
             var placesData = catPlaceRepo.Get().ToLookup(x => x.Id);
             var partnersData = catPartnerRepo.Get().ToLookup(x => x.Id);
             var usersData = sysUserRepo.Get().ToLookup(u => u.Id);
             var chargesData = surCharge.Get().ToLookup(u => u.Hblid);
+            // Get id charges with filter
             var freightChargeId = catChargeGroupRepo.Get(x => x.Name.ToUpper().Contains("FREIGHT"))?.Select(x => x.Id).FirstOrDefault();
-            var terminalHandling = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TERMINAL HANDLING"))?.Select(x => x.Id).ToList();
+            var terminalHandling = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TERMINAL HANDLING") || x.ChargeNameEn.ToUpper().Contains("THC"))?.Select(x => x.Id).ToList();
             var billFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("BILL FEE"))?.Select(x => x.Id).ToList();
             var telexRelease = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TELEX RELEASE"))?.Select(x => x.Id).ToList();
             var cfsCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("CFS"))?.Select(x => x.Id).ToList();
             var securityCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("SECURITY"))?.Select(x => x.Id).ToList();
             var autoManCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("AUTOMATED MANIFEST"))?.Select(x => x.Id).ToList();
-            var vgmCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("VGM ADMIN"))?.Select(x => x.Id).ToList();
+            var vgmCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("VGM"))?.Select(x => x.Id).ToList();
             var lclBookingFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("LCL BOOKING FEE"))?.Select(x => x.Id).ToList();
 
             foreach (var shipment in shipments)
