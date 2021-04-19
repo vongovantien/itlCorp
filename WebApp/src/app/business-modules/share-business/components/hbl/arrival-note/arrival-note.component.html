@@ -97,13 +97,13 @@
                                                 {{charge.notes}}
                                             </td>
                                             <td class="text-center">
-                                                <app-switch [(toggle)]="charge.isShow"></app-switch>
+                                                <app-switch [(ngModel)]="charge.isShow"></app-switch>
                                             </td>
                                             <td class="text-center">
-                                                <app-switch [(toggle)]="charge.isFull"></app-switch>
+                                                <app-switch [(ngModel)]="charge.isFull"></app-switch>
                                             </td>
                                             <td class="text-center">
-                                                <app-switch [(toggle)]="charge.isTick"></app-switch>
+                                                <app-switch [(ngModel)]="charge.isTick"></app-switch>
                                             </td>
                                         </tr>
                                     </ng-container>

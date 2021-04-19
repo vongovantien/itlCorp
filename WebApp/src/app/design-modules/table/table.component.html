@@ -23,7 +23,7 @@
                     [currentActiveItemId]="{ field: 'id', value: selectedCountryFreeText}"
                     [selectedDisplayFields]="['name_EN']" [dataSources]="countries | async"
                     [displayFields]="displayFieldCity" placeholder="Select city" allowFreeText
-                    [(displaySelectedStr)]="countryText">
+                    [(ngModel)]="countryText">
                 </app-combo-grid-virtual-scroll>
             </div>
         </div>
