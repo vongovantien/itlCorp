@@ -23,5 +23,6 @@ namespace eFMS.API.Documentation.DL.Models
         public Guid? DebitCharge { get; set; }
         public bool IsSynced { get; set; }
         public string SyncedFromBy { get; set; }
+        public string VatPartnerShortName { get; set; }
     }
 }

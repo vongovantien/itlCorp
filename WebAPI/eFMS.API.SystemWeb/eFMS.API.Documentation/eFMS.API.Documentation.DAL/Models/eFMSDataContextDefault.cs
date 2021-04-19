@@ -3479,18 +3479,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
-
-                entity.HasOne(d => d.AssignToNavigation)
-                    .WithMany(p => p.SysAuthorizationAssignToNavigation)
-                    .HasForeignKey(d => d.AssignTo)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysAuthorization_AssignedUser");
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.SysAuthorizationUser)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_sysAuthorization_sysUser");
             });
 
             modelBuilder.Entity<SysCompany>(entity =>

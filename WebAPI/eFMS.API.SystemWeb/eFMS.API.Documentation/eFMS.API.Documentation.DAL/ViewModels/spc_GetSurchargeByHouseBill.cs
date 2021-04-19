@@ -80,6 +80,9 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string PaySyncedFrom { get; set; }
         public string SyncedFrom { get; set; }
         public string ReferenceNo { get; set; }
+        public string VatPartnerId { get; set; }
+        public string VatPartnerShortName { get; set; }
+
 
     }
 }
