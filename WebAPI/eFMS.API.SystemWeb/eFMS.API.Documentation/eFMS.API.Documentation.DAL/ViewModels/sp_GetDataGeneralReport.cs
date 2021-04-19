@@ -52,5 +52,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string NotifyPartyID { get; set; }
         public string NotifyPartyDescription { get; set; }
         public string PackageContainer { get; set; }
+        public string ServiceType { get; set; }
     }
 }
