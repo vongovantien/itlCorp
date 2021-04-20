@@ -1,0 +1,90 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog c-modal-fullscreen" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Get {{type === 'customer' ? "Customer's" : 'Agency'}} Debit</h5>
+                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form" [formGroup]="formSearch">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="form-group">
+                                <label for="form-control-label">Search Option</label>
+                                <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom">
+                                </ng-select>
+                            </div>
+                            <div class="form-group">
+                                <label for="form-control-label">Reference No</label>
+                                <textarea cols="30" rows="7" class="form-control" formControlName="referenceNo">
+                                </textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-7">
+                            <div class="form-group">
+                                <label for="form-control-label" required>Partner Name</label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                    [selectedDisplayFields]="['shortName']" [dataSources]="customers |async"
+                                    [displayFields]="displayFilesPartners" [height]="150" placeholder="Select Partner">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label class="form-control-label" for="">
+                                                Date
+                                            </label>
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd [autoApply]="true"
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
+                                                [alwaysShowCalendars]="true" formControlName="date" name="daterange"
+                                                placeholder="From date - to date" readonly />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label for="form-control-label">Date Type</label>
+                                            <ng-select [items]="dateTypeList" formControlName="dateType" class="custom">
+                                            </ng-select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="form-group">
+                                <label for="form-control-label">Service</label>
+                                <ng-select [items]="services" formControlName="service" bindLabel='text' class="custom">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer m--align-right">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="onApply()">
+                    <span>
+                        <i class="la la-save"></i>
+                        <span>
+                            Apply
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="reset()">
+                    <span>
+                        <i class="la la-refresh"></i>
+                        <span>
+                            Reset
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

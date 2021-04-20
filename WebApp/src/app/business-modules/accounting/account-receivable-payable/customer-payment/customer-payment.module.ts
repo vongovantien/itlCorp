@@ -17,6 +17,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { CustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
+import { ModalModule } from 'ngx-bootstrap';
 
 const routing: Routes = [
     {
@@ -38,6 +40,7 @@ const routing: Routes = [
         ARCustomerPaymentFormCreateReceiptComponent,
         ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,
+        CustomerAgentDebitPopupComponent
     ],
     imports: [
         SharedModule,
@@ -45,6 +48,7 @@ const routing: Routes = [
         TabsModule.forRoot(),
         NgSelectModule,
         NgxDaterangepickerMd,
+        ModalModule.forRoot(),
         StoreModule.forFeature('customer-payment', reducers),
         EffectsModule.forFeature(effects),
         NgxCurrencyModule.forRoot({

@@ -15,6 +15,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 
 import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
 import { Observable } from 'rxjs';
+import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
@@ -22,6 +23,8 @@ import { Observable } from 'rxjs';
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
+    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
+
 
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
@@ -122,6 +125,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
+    getDebit() {
+        this.debitPopup.show();
+        this.debitPopup.type = 'customer';
+    }
     getInvoiceList() {
         this.isSubmitted = true;
         if (!this.formSearchInvoice.valid) {
