@@ -196,18 +196,6 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label>ATA</label>
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
-                                    formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
-                                    (remove)="resetFormControl(ata)" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
                             <label>ATD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
@@ -218,6 +206,19 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>ATA</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
+                                    (remove)="resetFormControl(ata)" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="col-md-4">
 
                         <div class="form-group">
