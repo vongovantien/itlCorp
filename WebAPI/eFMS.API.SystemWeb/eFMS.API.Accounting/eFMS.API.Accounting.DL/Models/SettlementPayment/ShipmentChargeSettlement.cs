@@ -57,6 +57,7 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public string PICName { get; set; }
         public bool? IsLocked { get; set; }
         public bool? KickBack { get; set; }
+        public string VatPartnerShortName { get; set; }
         public string VatPartnerId { get; set; }
     }
 }

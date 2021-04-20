@@ -38,6 +38,7 @@ export class SettlementTableSurchargeComponent extends AppList {
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Inv Date', field: 'invoiceDate', sortable: true },
+            { title: 'Vat Partner', field: 'vatPartnerShortName', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true, width: 200 },

@@ -877,6 +877,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
+                                join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                                from vatPgrp in vatPgrps.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
                                 //from opst in opst2.DefaultIfEmpty()
                                 where
@@ -924,7 +926,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     TypeOfFee = sur.TypeOfFee,
                                     AdvanceNo = AdvNo,
                                     IsLocked = opst.IsLocked,
-                                    KickBack = sur.KickBack
+                                    KickBack = sur.KickBack,
+                                    VatPartnerId = sur.VatPartnerId,
+                                    VatPartnerShortName = vatPgrp.ShortName
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -935,6 +939,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from par in par2.DefaultIfEmpty()
                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                from pae in pae2.DefaultIfEmpty()
+                               join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                               from vatPgrp in vatPgrps.DefaultIfEmpty()
                                join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
                                //from cstd in cstd2.DefaultIfEmpty()
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
@@ -984,7 +990,9 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = AdvNo,
                                    IsLocked = cst.IsLocked,
-                                   KickBack = sur.KickBack
+                                   KickBack = sur.KickBack,
+                                   VatPartnerId = sur.VatPartnerId,
+                                   VatPartnerShortName = vatPgrp.ShortName
                                };
             var data = dataOperation.Union(dataDocument);
             return data.ToList();
@@ -997,6 +1005,7 @@ namespace eFMS.API.Accounting.DL.Services
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
+            var vatPartners = catPartnerRepo.Get();
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
@@ -1011,6 +1020,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
+                                join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                                from vatPgrp in vatPgrps.DefaultIfEmpty()
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
@@ -1059,7 +1070,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     TypeService = "OPS",
                                     IsLocked = opst.IsLocked,
                                     PICName = user.Username,
-                                    KickBack = sur.KickBack
+                                    KickBack = sur.KickBack,
+                                    VatPartnerId = sur.VatPartnerId,
+                                    VatPartnerShortName = vatPgrp.ShortName
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1070,6 +1083,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from par in par2.DefaultIfEmpty()
                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                from pae in pae2.DefaultIfEmpty()
+                               join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                               from vatPgrp in vatPgrps.DefaultIfEmpty()
                                join cstd in csTransD on sur.Hblid equals cstd.Id //into cstd2
                                //from cstd in cstd2.DefaultIfEmpty()
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
@@ -1121,7 +1136,10 @@ namespace eFMS.API.Accounting.DL.Services
                                    TypeService = "DOC",
                                    IsLocked = cst.IsLocked,
                                    PICName = user.Username,
-                                   KickBack = sur.KickBack
+                                   KickBack = sur.KickBack,
+                                   VatPartnerId = sur.VatPartnerId,
+                                   VatPartnerShortName = vatPgrp.ShortName
+
                                };
             var data = dataOperation.Union(dataDocument);
             data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
@@ -1682,6 +1700,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                                         : (charge.Type == AccountingConstants.TYPE_CHARGE_BUY && charge.KickBack == true) ? kickBackExcRate : exchangeRate;
                                     charge.AmountVnd = chargeSettlementCurrentToAddCsShipmentSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                                     charge.VatAmountVnd = chargeSettlementCurrentToAddCsShipmentSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                                    charge.VatPartnerId = chargeSettlementCurrentToAddCsShipmentSurcharge.VatPartnerId; // Đối tượng trên đầu hóa đơn
                                 }
 
                                 charge.SettlementCode = settlement.SettlementNo;
@@ -1983,6 +2002,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     sceneCharge.PaymentObjectId = item.PaymentObjectId;
                                     sceneCharge.Type = item.Type;
                                     sceneCharge.ChargeGroup = item.ChargeGroup;
+                                    sceneCharge.VatPartnerId = item.VatPartnerId;
 
                                     sceneCharge.ClearanceNo = item.ClearanceNo;
                                     sceneCharge.AdvanceNo = item.AdvanceNo;

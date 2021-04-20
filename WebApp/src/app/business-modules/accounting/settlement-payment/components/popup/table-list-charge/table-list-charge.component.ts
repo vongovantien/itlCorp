@@ -340,6 +340,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
 
                 break;
+            case 'vat-partner':
+
+                break;
             default:
                 break;
         }
