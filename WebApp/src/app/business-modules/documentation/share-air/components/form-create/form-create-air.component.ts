@@ -176,7 +176,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 }
             }
         );
-        this.incoterms = this._catalogueRepo.getIncoterm({});
+        const service = this.type === 'import' ? 'AI' : 'AE';
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [service] });
 
         this.initForm();
         this.getUserLogged();
