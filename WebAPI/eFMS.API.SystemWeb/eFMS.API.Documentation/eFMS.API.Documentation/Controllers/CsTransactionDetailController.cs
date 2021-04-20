@@ -193,7 +193,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if(hblId == null)
                 {
-                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno && x.Hwbno != null))
+                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null))
                     {
                         existedHwbNo = true;
                     }
@@ -209,7 +209,7 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         return Ok(false);
                     }
-                    if (data.Any(x => x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
+                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
                     {
                         existedHwbNo = true;
                     }
