@@ -47,8 +47,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string TransactionType { get; set; }
         public string CurrentStatus { get; set; }
         public DateTime? LockedDate { get; set; }
-        public DateTime? LastDateUnLocked { get; set; }
-        public string UnLockedLog { get; set; }
         public bool? IsLocked { get; set; }
         public DateTime? FlightDate { get; set; }
         public decimal? Hwconstant { get; set; }
@@ -64,11 +62,16 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public DateTime? LastDateUnLocked { get; set; }
         public string LockedUser { get; set; }
+        public string UnLockedLog { get; set; }
         public bool? IsHawb { get; set; }
         public string AirlineInfo { get; set; }
         public string PolDescription { get; set; }
         public string PodDescription { get; set; }
+        public Guid? IncotermId { get; set; }
+        public DateTime? Ata { get; set; }
+        public DateTime? Atd { get; set; }
 
         public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
     }
