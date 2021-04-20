@@ -923,5 +923,22 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return results;
         }
+
+        #region -- Get Customers Debit --
+        private List<CustomerDebitCreditModel> GetDebitForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
+        {
+            return null;
+        }
+
+        private List<CustomerDebitCreditModel> GetObhForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
+        {
+            return null;
+        }
+
+        private List<CustomerDebitCreditModel> GetCreditForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
+        {
+            return null;
+        }
+        #endregion -- Get Customers Debit --
     }
 }
