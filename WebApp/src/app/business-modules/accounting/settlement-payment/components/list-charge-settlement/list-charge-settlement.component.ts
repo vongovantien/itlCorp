@@ -132,22 +132,26 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any) {
-        this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
-        this.surcharges = [...this.surcharges, ...surcharge];
-        this.surcharges.forEach(x => x.isSelected = false);
+    onRequestSurcharge(surcharge: Surcharge[]) {
+        if (surcharge[0].isFromShipment) {
+            this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        } else {
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        }
 
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
+        if (this.tableListChargePopup.charges.length > 0) {
+            this.isDirectSettlement = true;
+            this.isExistingSettlement = false;
+            this.isShowButtonCopyCharge = true;
+        }
         if (this.existingChargePopup.selectedCharge.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
-        } else {
-            if (this.surcharges.length > 0) {
-                this.isDirectSettlement = true;
-                this.isExistingSettlement = false;
-                this.isShowButtonCopyCharge = true;
-            }
         }
         this.onChange.emit(true);
     }
