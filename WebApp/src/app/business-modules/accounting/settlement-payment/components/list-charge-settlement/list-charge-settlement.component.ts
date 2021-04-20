@@ -152,6 +152,16 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
+            this.groupShipments.forEach((groupItem: any) => {
+                if (groupItem.hblId === surcharge[0].hblid) {
+                    groupItem.chargeSettlements.map((charge: Surcharge) => {
+                        const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                        charge.amountVnd = chargeInList.amountVnd;
+                        charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                    })
+                    groupItem.totalAmount = groupItem.chargeSettlements.reduce((net: number, charge: Surcharge) => net += (charge.amountVnd + charge.vatAmountVnd), 0);
+                }
+            })
         }
         this.onChange.emit(true);
     }
