@@ -3880,7 +3880,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
                 listKeyData.Add("ExchangeRate", resultData.ExchangeRate);
                 excel.SetData(listKeyData);
-                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
+                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate?.ToString("MMM-yyyy")).ThenBy(x=>x.CustomerName).ThenBy(x => x.HBLNo);
                 var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
 
                 var formatMonth = years.Count() > 1 ? "MMM-yyyy" : "MMM";
@@ -4004,14 +4004,29 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData = new Dictionary<string, object>();
                     listKeyFormula = new Dictionary<string, string>();
                     listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
-                    listKeyData.Add("HBLNo", item.HBLNo);
                     if (item.TransactionType.Contains('A'))
                     {
+                        if (string.IsNullOrEmpty(item.HBLNo) || item.HBLNo.Contains("N/H"))
+                        {
+                            if (!string.IsNullOrEmpty(item.MBLNo))
+                            {
+                                listKeyData.Add("HBLNo", item.MBLNo);
+                            }
+                            else
+                            {
+                                listKeyData.Add("HBLNo", item.JobId);
+                            }
+                        }
+                        else
+                        {
+                            listKeyData.Add("HBLNo", item.HBLNo);
+                        }
                         _chargeWeight += (item.ChargeWeight ?? 0);
                         listKeyData.Add("ChargeWeight", item.ChargeWeight);
                     }
                     else
                     {
+                        listKeyData.Add("HBLNo", item.JobId);
                         _contQty += (item.ContQty ?? 0);
                         listKeyData.Add("ChargeWeight", item.PackageContainer);
                     }
@@ -4055,7 +4070,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
                     listKeyFormula.Add("EntitledCom", _statement);
                     // PIT (30%)
-                    _statement = string.Format("P{0}*10%", startRow);
+                    _statement = string.Format("ROUND(P{0}*10%, 0)", startRow);
                     listKeyFormula.Add("PIT", _statement);
                     // Net due to customers
                     _statement = string.Format("P{0}-Q{0}", startRow);
@@ -4141,13 +4156,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 foreach (var mon in monthGrp)
                 {
-                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
+                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.CustomerName).ThenBy(x=>x.JobId);
                     if (shipmentGrp.Count() > 0)
                     {
                         listKeyData = new Dictionary<string, object>();
                         var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");
                         excel.SetGroupsTable();
                         listKeyData.Add("ServiceDate", month);
+                        excel.SetData(listKeyData);
                         startRow++;
                     }
                     else
@@ -4158,6 +4174,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     foreach (var shipment in shipmentGrp)
                     {
                         excel.SetDataTable();
+                        listKeyData = new Dictionary<string, object>();
                         listKeyData.Add("JobId", shipment.JobId);
                         listKeyData.Add("CustomerName", shipment.CustomerName);
                         listKeyData.Add("MBL", shipment.MBLNo);
@@ -4171,7 +4188,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData = new Dictionary<string, object>();
                 var _statement = string.Format("SUM(E5:E{0})", rowTotal);
                 listKeyFormula.Add("TotalUSD", _statement); // Total USD
-                _statement = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate);
+                _statement = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate.ToString("#,##0"));
                 listKeyData.Add("DeNghi", _statement);
                 _statement = string.Format("E{0}*0.1*{1}", startRow, resultData.ExchangeRate);
                 listKeyFormula.Add("TotalAmount", _statement); // Total De nghi thanh toan

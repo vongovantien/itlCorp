@@ -343,8 +343,7 @@
                                 <div class="form-group">
                                     <label>No HAWB</label>
                                     <div>
-                                        <app-switch size="md" [toggle]="formGroup.controls['isHawb'].value"
-                                            (toggleChange)="formGroup.controls['isHawb'].setValue($event)"></app-switch>
+                                        <app-switch size="md" formControlName="isHawb"></app-switch>
                                     </div>
 
                                 </div>

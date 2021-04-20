@@ -13,6 +13,7 @@ import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, skip, takeUntil } from 'rxjs/operators';
 
 import * as fromStore from '../../store';
+import { SortService } from '@services';
 
 
 @Component({
@@ -39,7 +40,8 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
         private _catalogueRepo: CatalogueRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        private sortService: SortService
 
     ) {
         super(_actionStoreSubject, _store, _activedRoute);
@@ -152,9 +154,12 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         this.containerDetail = '';
         this.containerDescription = '';
 
-        containers.forEach((c: Container) => {
-            this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
-        });
+        if (!!containers) {
+            const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
+            containerLst.forEach((c: Container) => {
+                this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
+            });
+        }
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
             cont: container.description || '',
