@@ -1419,8 +1419,6 @@ namespace eFMS.API.Documentation.DL.Services
             string _pkgsConts = string.Empty;
             if (data != null)
             {
-                var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
-                var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
                 var dataATTN = catPartnerRepo.Get(x => x.Id == data.AlsoNotifyPartyId).FirstOrDefault();
                 var dataConsignee = catPartnerRepo.Get(x => x.Id == data.ConsigneeId).FirstOrDefault();
                 var dataShipper = catPartnerRepo.Get(x => x.Id == data.ShipperId).FirstOrDefault();
@@ -1447,15 +1445,27 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 housebill.FromSea = string.Empty; //NOT USE
                 housebill.OceanVessel = data.OceanVoyNo?.ToUpper();
-                if (dataPOL != null)
+                // POL
+                if (string.IsNullOrEmpty(data.PolDescription))
                 {
-                    housebill.DepartureAirport = dataPOL?.NameEn?.ToUpper(); //POL
+                    var dataPOL = catPlaceRepo.Get(x => x.Id == data.Pol).FirstOrDefault();
+                    housebill.DepartureAirport = dataPOL?.NameEn?.ToUpper();
                     housebill.DepartureAirport = housebill.DepartureAirport?.ToUpper();
                 }
-                if (dataPOD != null)
+                else
                 {
-                    housebill.PortofDischarge = dataPOD?.NameEn?.ToUpper(); //POD
+                    housebill.DepartureAirport = data.PolDescription.ToUpper();
+                }
+                // POD
+                if (string.IsNullOrEmpty(data.PodDescription))
+                {
+                    var dataPOD = catPlaceRepo.Get(x => x.Id == data.Pod).FirstOrDefault();
+                    housebill.PortofDischarge = dataPOD?.NameEn?.ToUpper();
                     housebill.PortofDischarge = housebill.PortofDischarge?.ToUpper();
+                }
+                else
+                {
+                    housebill.PortofDischarge = data.PodDescription.ToUpper();
                 }
                 housebill.TranShipmentTo = data.FinalDestinationPlace?.ToUpper(); //Final Destination
                 housebill.GoodsDelivery = data.GoodsDeliveryDescription?.ToUpper(); //Good delivery
@@ -1474,6 +1484,11 @@ namespace eFMS.API.Documentation.DL.Services
                             hbConstainers += (cont.Quantity + " x " + contUnit.UnitNameEn + (!cont.Equals(contLast) ? " & " : string.Empty));
                         }
                         markNo += cont.ContainerNo + ((contUnit != null) ? "/" + contUnit.UnitNameEn : string.Empty) + (!string.IsNullOrEmpty(cont.SealNo) ? "/" + cont.SealNo : string.Empty) + "\r\n";
+                    }
+                    conts = conts.OrderBy(x => x.ContainerNo);
+                    contLast = conts.Last();
+                    foreach (var cont in conts)
+                    {
                         _grossWeightConts += string.Format("{0:n3}", cont.Gw) + " KGS" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         _cbmConts += string.Format("{0:n3}", cont.Cbm) + " CBM" + (!cont.Equals(contLast) ? "\r\n" : string.Empty);
                         var packageUnit = catUnitRepo.Get(x => x.Id == cont.PackageTypeId).FirstOrDefault();

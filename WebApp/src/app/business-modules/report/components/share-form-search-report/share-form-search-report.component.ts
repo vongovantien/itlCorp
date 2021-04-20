@@ -647,7 +647,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
-        if (this.isCommissionIncentive && (!this.customer.value || !this.partnerAccount.value)) {
+        if (this.isCommissionIncentive && (!this.customer.value || (!this.partnerAccount.value && this.typeReport.value !== this.typeComReportList[2].id))) {
             return;
         }
         if (this.isGeneralReport) {

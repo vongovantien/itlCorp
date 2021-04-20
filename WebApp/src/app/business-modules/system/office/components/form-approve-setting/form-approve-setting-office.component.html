@@ -121,15 +121,15 @@
                 <div class="col-lg-12 d-flex">
                     <label class="col-lg-3 col-form-label"> Credit Limit </label>
                     <div class="col-lg-4">
-                        <app-switch [(toggle)]="accountReceivable.creditLimit"></app-switch>
+                        <app-switch [(ngModel)]="accountReceivable.creditLimit"></app-switch>
                     </div>
                     <label class="col-lg-3 col-form-label"> Over Payment Term </label>
                     <div class="col-lg-4">
-                        <app-switch [(toggle)]="accountReceivable.overPaymentTerm"></app-switch>
+                        <app-switch [(ngModel)]="accountReceivable.overPaymentTerm"></app-switch>
                     </div>
                     <label class="col-lg-3 col-form-label"> Expired Agreement </label>
                     <div class="col-lg-4">
-                        <app-switch [(toggle)]="accountReceivable.expiredAgreement"></app-switch>
+                        <app-switch [(ngModel)]="accountReceivable.expiredAgreement"></app-switch>
                     </div>
                 </div>
 
@@ -160,7 +160,8 @@
                             {{service.serviceType | serviceName}}
                         </div>
                         <div class="col-lg-3">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockDate}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockDate}">
                                 <select [(ngModel)]="service.lockDate" class="form-control">
                                     <option [value]="null" disabled>Please select</option>
                                     <option *ngFor="let date of dates" [value]="date">
@@ -171,7 +172,8 @@
                         </div>
 
                         <div class="col-lg-3">
-                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockAfterUnlocking}">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !service.lockAfterUnlocking}">
                                 <select [(ngModel)]="service.lockAfterUnlocking" class="form-control">
                                     <option *ngFor="let date of dates" [value]="date">
                                         {{date}}
@@ -182,7 +184,7 @@
 
                         </div>
                         <div class="col-lg-3 text-center">
-                            <app-switch [(toggle)]="service.isApply"></app-switch>
+                            <app-switch [(ngModel)]="service.isApply"></app-switch>
                         </div>
                     </div>
                 </ng-container>

@@ -154,7 +154,7 @@
                                                 <div class="col  d-flex align-items-center">
                                                     {{permission.menuName}}</div>
                                                 <div class="col text-center">
-                                                    <app-switch [(toggle)]="permission.access">
+                                                    <app-switch [(ngModel)]="permission.access">
                                                     </app-switch>
                                                 </div>
                                                 <div class="col ">
@@ -189,12 +189,12 @@
                                                     </select>
                                                 </div>
                                                 <div class="col text-center">
-                                                    <app-switch [(toggle)]="permission.import"
+                                                    <app-switch [(ngModel)]="permission.import"
                                                         [disabled]="!permission.access">
                                                     </app-switch>
                                                 </div>
                                                 <div class="col text-center">
-                                                    <app-switch [(toggle)]="permission.export"
+                                                    <app-switch [(ngModel)]="permission.export"
                                                         [disabled]="!permission.access">
                                                     </app-switch>
                                                 </div>
@@ -225,7 +225,7 @@
                                                 <ul class="list-unstyled list-permission-special d-flex flex-wrap ">
                                                     <li *ngFor="let action of permission.permissionSpecialActions">
                                                         <div class="d-flex " style="width: 135px">
-                                                            <app-switch [(toggle)]="action.isAllow" [size]="'sm'">
+                                                            <app-switch [(ngModel)]="action.isAllow" [size]="'sm'">
                                                             </app-switch>
                                                             <div class="d-flex permission-special-item-name">
                                                                 {{action.nameEn}}

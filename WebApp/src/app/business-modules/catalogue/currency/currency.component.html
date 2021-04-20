@@ -64,7 +64,7 @@
                                 <td> <span>{{currency.id}}</span></td>
                                 <td> <span>{{currency.currencyName}}</span> </td>
                                 <td>
-                                    <app-switch disabled [(toggle)]="currency.isDefault" size="sm"></app-switch>
+                                    <app-switch disabled [(ngModel)]="currency.isDefault" size="sm"></app-switch>
                                 </td>
                                 <td [ngClass]="currency.active ? 'text-success' : 'text-danger'">
                                     {{currency.active ? 'Active' : 'Inactive'}}</td>

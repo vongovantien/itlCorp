@@ -2214,7 +2214,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (model.TransactionType == "SFE" || model.TransactionType == "SLE" || model.TransactionType == "SCE")
                         {
-                            string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
+                            CatPlace pod = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault();
+
+                            string podCode = pod?.Code;
+                            
                             if (string.IsNullOrEmpty(podCode))
                             {
                                 item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -2223,6 +2226,21 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
                                 hawbSeaExportCurrent = item.Hwbno;
+                            }
+
+                            if (model.Etd != null && model.Pol != null)
+                            {
+                                CatPlace pol = catPlaceRepo.Get(x => x.Id == model.Pol)?.FirstOrDefault();
+                                string polName = pol?.NameEn;
+                                string polCountryName = string.Empty;
+
+                                CatCountry country = catCountryRepo.Get(c => c.Id == pol.CountryId)?.FirstOrDefault();
+                                if (country != null)
+                                {
+                                    polCountryName = country.NameEn;
+                                }
+                                item.OnBoardStatus = SetDefaultOnboard(polName, polCountryName, model.Etd);
+                                item.IssueHbldate = model.Etd;
                             }
                         }
                         else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
@@ -2371,6 +2389,20 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
 
+        }
+
+        private string SetDefaultOnboard(string polName, string country,DateTime? etd)
+        {
+            string value = string.Empty;
+            if (etd != null && etd.HasValue)
+            {
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName,country, DateTime.Now.ToString("MMM dd, yyyy"));
+            }
+            else
+            {
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}", polName, country);
+            }
+            return value;
         }
 
         public string GetMaxHAWB()

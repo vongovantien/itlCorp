@@ -2,15 +2,14 @@
     (clickOutside)="keyword = ''; showAngledownIcon = false" [insideClick]="true">
     <ng-container *ngIf="allowEditing;else readOnlyTpl">
         <input #clkSearch class="form-control m-input m-input--square dropdown-toggle pos-rel" [disabled]="Disabled"
-            type="text" [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
+            type="text" [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
             [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
-            (focus)="onFocusInputPlaceholder($event)" [ngModel]="displaySelectedStr"
-            (ngModelChange)="displaySelectedStrChange.emit($event)">
+            (focus)="onFocusInputPlaceholder($event)" [(ngModel)]="displayStringValue">
     </ng-container>
     <ng-template #readOnlyTpl>
         <input #clkSearch (click)="clickSearch()" class="form-control m-input m-input--square dropdown-toggle pos-rel"
-            [disabled]="Disabled" type="text" readonly [value]="displaySelectedStr == '' ? null : displaySelectedStr"
-            [tooltip]="isTooltip ? (displaySelectedStr == '' ? null : displaySelectedStr) : ''"
+            [disabled]="Disabled" type="text" readonly [value]="displayStringValue == '' ? null : displayStringValue"
+            [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
             [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
             (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
     </ng-template>
@@ -31,7 +30,7 @@
             </ng-template>
             <ng-container *ngIf="clearable">
                 <span class="e--combogrid_icon__clear" (click)="removeCurrenActiveItem()"
-                    *ngIf="!!displaySelectedStr && !Disabled">
+                    *ngIf="!!displayStringValue && !Disabled">
                     <i class="la la-times" aria-hidden="true"></i>
                 </span>
             </ng-container>

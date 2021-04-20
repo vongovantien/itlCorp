@@ -60,7 +60,7 @@
                                 <td>{{item.officeNameAbbr}}</td>
                                 <td>{{item.companyNameEn}}</td>
                                 <td>
-                                    <app-switch disabled [(toggle)]="item.arconfirmed" size="sm"></app-switch>
+                                    <app-switch disabled [(ngModel)]="item.arconfirmed" size="sm"></app-switch>
                                 </td>
                             </tr>
                         </ng-container>

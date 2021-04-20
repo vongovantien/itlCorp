@@ -12,7 +12,7 @@
     <div class="m-portlet__body">
         <tabset class="custom-class-tab">
             <tab heading="Shipment Detail" (selectTab)="onSelectTab('shipment')" [active]="selectedTab === 'SHIPMENT'">
-                <app-form-create-air>
+                <app-form-create-air type='import'>
                     <div class="row m--margin-top-20" *ngIf="!!shipmentDetail">
                         <div class="col-md-4">
                             <span>Created: {{shipmentDetail.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}} by </span>
