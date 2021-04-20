@@ -20,9 +20,9 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? PaymentTerm { get; set; }
         public DateTime? DueDate { get; set; }
         public string PaymentStatus { get; set; }
-        public Guid DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         public string DepartmentName { get; set; }
-        public Guid OfficeId { get; set; }
+        public Guid? OfficeId { get; set; }
         public string OfficeName { get; set; }
     }
 }

@@ -247,5 +247,11 @@ namespace eFMS.API.Accounting.Controllers
 
             return valid;
         }
+
+        [HttpPost("Test")]
+        public IActionResult Test(CustomerDebitCreditCriteria criteria)
+        {
+            return Ok(acctReceiptService.Test(criteria));
+        }
     }
 }
