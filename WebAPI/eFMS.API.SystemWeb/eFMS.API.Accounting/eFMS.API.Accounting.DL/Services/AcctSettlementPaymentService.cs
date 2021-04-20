@@ -807,8 +807,8 @@ namespace eFMS.API.Accounting.DL.Services
                 result.AdvanceAmount = advData.ToList().Sum(x => x.AdvAmount);
 
 
-                // Tính total amount của settlement theo adv đó.
-                IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.AdvanceNo == advNo && x.Mblno == _mbl && x.Hblid == _hbl);
+                // Tính total amount của settlement theo adv đó. => bổ sung search theo SettlementCode update get existing charge
+                IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo && x.AdvanceNo == advNo && x.Mblno == _mbl && x.Hblid == _hbl);
                 //result.TotalAmount = surChargeToCalculateAmount.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
                 if (_settleCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
