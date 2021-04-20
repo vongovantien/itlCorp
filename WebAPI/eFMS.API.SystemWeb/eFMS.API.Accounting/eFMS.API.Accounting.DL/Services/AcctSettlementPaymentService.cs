@@ -3867,19 +3867,19 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail đề nghị Approve
         private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            //var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
 
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            /*var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }
+            }*/
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -3892,11 +3892,13 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = String.Join("; ", listJobId.ToList());
 
-            var totalAmount = surcharge
+            /*var totalAmount = surcharges
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);*/
 
+            decimal totalAmount = settlement.Amount ?? 0; //19-04-2021 - Andy
+            
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
@@ -3989,19 +3991,19 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail Approved
         private bool SendMailApproved(string settlementNo, DateTime approvedDate)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            //var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
 
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            /*var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }
+            }*/
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -4014,11 +4016,13 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = String.Join("; ", listJobId.ToList());
 
-            var totalAmount = surcharge
+            /*var totalAmount = surcharges
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);*/
 
+            decimal totalAmount = settlement.Amount ?? 0; //19-04-2021 - Andy
+            
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
@@ -4092,19 +4096,19 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail Deny Approve
         private bool SendMailDeniedApproval(string settlementNo, string comment, DateTime DeniedDate)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            //var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
 
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
 
             //Quy đổi tỉ giá theo ngày Request Date
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
+            /*var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
             if (currencyExchange.Count == 0)
             {
                 DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
                 currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }
+            }*/
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -4117,11 +4121,13 @@ namespace eFMS.API.Accounting.DL.Services
             string jobIds = string.Empty;
             jobIds = string.Join("; ", listJobId.ToList());
 
-            var totalAmount = surcharge
+            /*var totalAmount = surcharges
                 .Where(x => x.SettlementCode == settlementNo)
                 .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);
+            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);*/
 
+            decimal totalAmount = settlement.Amount ?? 0; //19-04-2021 - Andy
+            
             //Lấy ra list AdvanceNo dựa vào Shipment(JobId,MBL,HBL)
             string advanceNos = string.Empty;
             var listAdvanceNo = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).Select(s => s.AdvanceNo).Distinct();
