@@ -608,6 +608,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
 
+                entity.Property(e => e.NetOff).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Note).HasMaxLength(500);
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
