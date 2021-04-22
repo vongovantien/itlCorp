@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace eFMS.API.Accounting.DL.Models.Receipt
 {
@@ -24,5 +22,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string DepartmentName { get; set; }
         public Guid? OfficeId { get; set; }
         public string OfficeName { get; set; }
+        public Guid? CompanyId { get; set; }
     }
 }

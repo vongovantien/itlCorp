@@ -283,6 +283,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.DepartmentId = currentUser.DepartmentId;
                 model.CompanyId = currentUser.CompanyID;
+                model.NetOff = false;
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
@@ -430,6 +431,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.SyncStatus = cdNote.SyncStatus;
                 entity.ReasonReject = cdNote.ReasonReject;
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
+                entity.NetOff = cdNote.NetOff;
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
                 
