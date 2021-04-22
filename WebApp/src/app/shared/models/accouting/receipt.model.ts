@@ -89,4 +89,29 @@ export class ReceiptModel extends Receipt {
         }
     }
 }
+export class ReceiptCreditDebitModel {
+    refNo: string;
+    type: string;
+    invoiceNo: string;
+    invoiceDate: Date;
+    partnerId: string;
+    partnerName: string;
+    taxCode: string;
+    amount: number;
+    unpaidAmount: number;
+    unpaidAmountVnd: number;
+    unpaidAmountUsd: number;
+    paymentTerm: number;
+    dueDate: Date;
+    paymentStatus: string;
+    departmentId: string;
+    departmentName: string;
+    officeId: string;
+    officeName: string;
+    companyId: string;
+
+    jobId?: string;
+    mbl?: string;
+    hbl?: string;
+}
 
