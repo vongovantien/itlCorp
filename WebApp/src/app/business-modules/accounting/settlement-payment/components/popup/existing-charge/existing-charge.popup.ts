@@ -45,7 +45,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     selectedVatPartner: Partial<CommonInterface.IComboGridData> = {};
     selectedVatPartnerData: any;
-    listPartner: Partner[] =[];
     listVatPartner: Partner[] =[];
 
     configShipment: CommonInterface.IComboGirdConfig = {
@@ -123,6 +122,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.referenceNos = this.getRefCombobox();
         this.initFormSearch();
         this.getPartner();
+        this.getVatpartnerDataSource();
         this.getProductService();
 
         this._store.select(getMenuUserPermissionState)
@@ -178,11 +178,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.selectedSurcharge = charge;
         this.selectedIndexCharge = index;
         const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
-
         this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
         if (!!this.componentRef) {
             this.componentRef.instance.headers = this.headerPartner;
-            this.componentRef.instance.data = this.listPartner;
+            this.componentRef.instance.data = this.listVatPartner;
             this.componentRef.instance.fields = ['shortName', 'taxCode', 'partnerNameEn'];
             this.componentRef.instance.active = charge.paymentObjectId;
 

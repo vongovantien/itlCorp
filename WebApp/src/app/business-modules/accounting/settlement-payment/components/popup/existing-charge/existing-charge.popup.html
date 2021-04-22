@@ -273,23 +273,16 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown>
+                                            <div class="form-group col-md-12 dropdown-partner" dropdown>
                                                 <input type="text" class="dropdown-toggle form-control" dropdownToggle
                                                     readonly placeholder="Vat Partner" [(ngModel)]="charge.vatPartnerShortName" 
                                                     (click)="loadDynamicComoGrid(charge,i)">
                                                     <ng-container>
-                                                        <div class="e--combogrid_icon">
-                                                            <span class="e--combogrid_icon__dropdown">
-                                                                <i class="fa fa-angle-down" aria-hidden="true"></i>
-                                                            </span>
-                                                        </div>
-                                                        <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
-                                                            <app-combo-grid [headers]="headerPartner" [data]="listVatPartner"
-                                                                [fields]="['taxCode','partnerNameEn']"
-                                                                [active]="charge.vatPartnerId"
-                                                                (onClick)="onSelectPartner($event, charge)">
-                                                            </app-combo-grid>
-                                                        </div>
+                                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                                (click)="onSelectPartner($event, charge)"></a>
+                                                            </div>
+                                                        <ng-template #container></ng-template>
                                                     </ng-container>
                                                 </div>
                                         </td>
