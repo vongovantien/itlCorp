@@ -122,7 +122,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.referenceNos = this.getRefCombobox();
         this.initFormSearch();
         this.getPartner();
-        this.getVatpartnerDataSource();
         this.getProductService();
 
         this._store.select(getMenuUserPermissionState)
@@ -149,6 +148,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         const customersFromService = this._catalogue.getCurrentCustomerSource();
         if (!!customersFromService.data.length) {
             this.getPartnerData(customersFromService.data);
+            this.listVatPartner = customersFromService.data;
             return;
         }
         this._catalogue.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
