@@ -86,6 +86,8 @@ export class CsShipmentSurcharge {
     paySoano: string = null;
     unitCode: string = null;
     chargeGroup: string = null;
+    vatPartnerId: string = null;
+    vatPartnerShortName: string = null;
 
     // * Custom
     duplicateCharge: boolean = false;
