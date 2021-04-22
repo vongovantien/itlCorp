@@ -779,6 +779,11 @@ namespace eFMS.API.Accounting.DL.Services
                 var receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
                 if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
 
+                if(receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DRAFT)
+                {
+                    return new HandleState((object)"Trạng thái của phiếu thu không hợp lệ");
+                }
+
                 receiptModel.Status = AccountingConstants.RECEIPT_STATUS_CANCEL;
                 receiptModel.GroupId = currentUser.GroupId;
                 receiptModel.DepartmentId = currentUser.DepartmentId;
