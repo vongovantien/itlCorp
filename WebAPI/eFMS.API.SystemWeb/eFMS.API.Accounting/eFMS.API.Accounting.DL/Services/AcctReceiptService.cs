@@ -1376,7 +1376,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentStatus = se.Invoice.PaymentStatus,
                 DepartmentId = se.Invoice.DepartmentId,
                 OfficeId = se.Invoice.OfficeId,
-                CompanyId = se.Invoice.CompanyId
+                CompanyId = se.Invoice.CompanyId,
+                RefIds = new List<string> { se.Invoice.Id.ToString() }
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1406,7 +1407,8 @@ namespace eFMS.API.Accounting.DL.Services
                                DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = inv.CompanyId
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds
                            };
             return joinData;
         }
@@ -1447,7 +1449,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
-                CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault()
+                CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
+                RefIds = se.Invoice.Select(s => s.Id.ToString()).ToList()
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1477,7 +1480,8 @@ namespace eFMS.API.Accounting.DL.Services
                                DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = inv.CompanyId
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds
                            };
             return joinData;
         }
@@ -1517,7 +1521,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentStatus = null,
                 DepartmentId = se.Soa.DepartmentId,
                 OfficeId = se.Soa.OfficeId,
-                CompanyId = se.Soa.CompanyId
+                CompanyId = se.Soa.CompanyId,
+                RefIds = new List<string> { se.Soa.Id }
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1547,7 +1552,9 @@ namespace eFMS.API.Accounting.DL.Services
                                DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = inv.CompanyId
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               CreditType = "SOA"
                            };
             return joinData;
         }
@@ -1587,7 +1594,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentStatus = null,
                 DepartmentId = se.CreditNote.DepartmentId,
                 OfficeId = se.CreditNote.OfficeId,
-                CompanyId = se.CreditNote.CompanyId
+                CompanyId = se.CreditNote.CompanyId,
+                RefIds = new List<string> { se.CreditNote.Id.ToString() }
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1617,7 +1625,9 @@ namespace eFMS.API.Accounting.DL.Services
                                DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = inv.CompanyId
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               CreditType = "CREDITNOTE"
                            };
             return joinData;
         }
