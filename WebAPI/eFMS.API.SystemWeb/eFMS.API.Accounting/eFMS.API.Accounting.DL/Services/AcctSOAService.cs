@@ -192,6 +192,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
                 soa.Soano = model.Soano = CreateSoaNo();
+                soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
                 if (hs.Success && surchargesSoa != null)
@@ -233,6 +234,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.LastSyncDate = soaCurrent.LastSyncDate;
                 soa.ReasonReject = soaCurrent.ReasonReject;
                 soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
+                soa.NetOff = soaCurrent.NetOff;
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
