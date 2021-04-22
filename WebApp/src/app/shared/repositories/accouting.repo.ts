@@ -751,6 +751,12 @@ export class AccountingRepo {
             );
         }
     }
+    getDataIssueCustomerPayment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueCustomerPayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkAllowDeleteCusPayment(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${id}`).pipe(
             map((data: any) => data)
@@ -827,7 +833,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    
+
     uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });

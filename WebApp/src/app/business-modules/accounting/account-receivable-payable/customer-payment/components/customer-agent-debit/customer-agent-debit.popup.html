@@ -1,5 +1,5 @@
 <div class="modal fade" role="dialog" bsModal #popup="bs-modal">
-    <div class="modal-dialog c-modal-fullscreen" role="document">
+    <div class="modal-dialog c-modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Get {{type === 'customer' ? "Customer's" : 'Agency'}} Debit</h5>
@@ -11,7 +11,8 @@
                 <div class="form" [formGroup]="formSearch">
                     <div class="row">
                         <div class="col-lg-5">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !partnerId.value}">
                                 <label for="form-control-label">Search Option</label>
                                 <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom">
                                 </ng-select>
@@ -22,17 +23,19 @@
                                 </textarea>
                             </div>
                         </div>
+
                         <div class="col-lg-7">
-                            <div class="form-group">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !partnerId.value}">
                                 <label for="form-control-label" required>Partner Name</label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                <app-combo-grid-virtual-scroll>(itemSelected)="onSelectDataFormInfo($event)"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="customers |async"
-                                    [displayFields]="displayFilesPartners" [height]="150" placeholder="Select Partner">
+                                    [displayFields]="displayFilesPartners" [height]="150" placeholder="Select Partner"
+                                    (remove)="clearData()">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                             <div class="form-group">
                                 <div class="row">
-
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label class="form-control-label" for="">
@@ -58,12 +61,14 @@
                             </div>
                             <div class="form-group">
                                 <label for="form-control-label">Service</label>
-                                <ng-select [items]="services" formControlName="service" bindLabel='text' class="custom">
+                                <ng-select [items]="services" (change)="selelectedService($event)"
+                                    formControlName="service" multiple="true" bindLabel='text' class="custom">
                                 </ng-select>
                             </div>
                         </div>
                     </div>
                 </div>
+
 
             </div>
 
@@ -85,6 +90,99 @@
                     </span>
                 </button>
             </div>
+            <div class="m-portlet">
+                <div class="m-portlet__body">
+                    <div class="table-wrapper" id="">
+                        <table class="table table-striped table-brand dataTable">
+                            <thead app-table-header [headers]="headers"
+                                (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                <th class="m--w-50 first">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" name="" [checked]="checkAll"
+                                            (change)="checkAll=!checkAll; checkAllChange()">
+                                        <span></span>
+                                    </label>
+                                </th>
+                            </thead>
+                            <tbody>
+                                <ng-container *ngIf="!!listDebit.length">
+                                    <tr *ngFor="let debit of listDebit;let i = index;">
+                                        <td class="table-actions-col">
+                                            <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.refNo}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.type}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.invoiceNo}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.taxCode}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.partnerName}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.amount | number}} {{debit.currencyId}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.unpaidVnd | number}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.unpaidUsd | number}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.invoiceDate | date :'dd/MM/yyyy'}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.paymentTerm}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.dueDate | date: 'dd/MM/yyyy'}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.paymentStatus}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.departmentName}} </span>
+                                        </td>
+                                        <td>
+                                            <span>{{debit.officeName}} </span>
+                                        </td>
+                                    </tr>
+                                    <tr class="font-weight-bold">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>Total</td>
+                                        <td>{{totalAmount | number}} {{listDebit[0].currencyId}}</td>
+                                        <td>{{totalUnpaid | number}} {{listDebit[0].currencyId}}</td>
+                                        <td>{{totalUnpaidVnd | number}}</td>
+                                        <td>{{totalUnpaidUsd | number}}</td>
+
+                                    </tr>
+                                </ng-container>
+                                <tr app-table-none-record *ngIf="!listDebit.length"></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
