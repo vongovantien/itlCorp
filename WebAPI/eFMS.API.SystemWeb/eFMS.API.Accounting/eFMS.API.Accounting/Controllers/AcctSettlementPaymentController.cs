@@ -879,6 +879,20 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Get data for General Preview
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GeneralSettlementPaymentExport")]
+        [Authorize]
+        public IActionResult GeneralSettlementPaymentExport(Guid settlementId)
+        {
+            var result = acctSettlementPaymentService.GetGeneralSettlementExport(settlementId);
+            return Ok(result);
+        }
+
+        /// <summary>
         ///Settlement export List within Shipment.
         /// </summary>
         /// <param name="settlementNoList"></param>
