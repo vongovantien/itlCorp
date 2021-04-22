@@ -69,7 +69,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string AirlineInfo { get; set; }
         public string PolDescription { get; set; }
         public string PodDescription { get; set; }
-        
-        public virtual ICollection<CsTransactionDetail> CsTransactionDetail { get; set; }
+        public Guid? IncotermId { get; set; }
+        public DateTime? Ata { get; set; }
+        public DateTime? Atd { get; set; }
     }
 }
