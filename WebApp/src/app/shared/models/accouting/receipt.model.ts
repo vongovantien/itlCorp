@@ -109,6 +109,13 @@ export class ReceiptCreditDebitModel {
     officeId: string;
     officeName: string;
     companyId: string;
+    currencyId: string;
+
+    notes: string;
+    paidAmountUsd: number;
+    paidAmountUVnd: number;
+    balanceAmountUsd: number;
+    balanceAmountVnd: number;
 
     jobId?: string;
     mbl?: string;

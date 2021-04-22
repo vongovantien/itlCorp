@@ -5,6 +5,7 @@ import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
 import { ReceiptDebitListState } from "../../store/reducers";
 import { takeUntil } from "rxjs/operators";
+import { ReceiptCreditDebitModel } from "@models";
 
 @Component({
     selector: 'customer-payment-receipt-debit-list',
@@ -13,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
 
-    debitList$: Observable<any>;
+    debitList$: Observable<ReceiptCreditDebitModel[]>;
 
     constructor(
         private _store: Store<IReceiptState>
