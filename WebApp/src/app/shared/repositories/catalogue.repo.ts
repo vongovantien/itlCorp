@@ -1,15 +1,22 @@
 import { Injectable } from "@angular/core";
 import { ApiService } from "../services";
 import { environment } from "src/environments/environment";
-import { throwError } from "rxjs";
+import { throwError, BehaviorSubject } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 
 @Injectable({ providedIn: 'root' })
 export class CatalogueRepo {
+    customersSource$ = new BehaviorSubject({ data: [] });
+
+    customers$ = this.customersSource$.asObservable();
 
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService, private _httpClient: HttpClient) {
+    }
+
+    getCurrentCustomerSource() {
+        return this.customersSource$.value;
     }
 
     getCurrencyBy(data: any = {}) {
@@ -1233,6 +1240,16 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getIncoterm(body?: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatIncoterm/Query`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => {
+                return data;
+            })
+        );
+    }
+
     //
     getPotentialCustomerListPaging(page: number, size: number, body: any = {}) {
         return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatPotential/Paging`, body, {

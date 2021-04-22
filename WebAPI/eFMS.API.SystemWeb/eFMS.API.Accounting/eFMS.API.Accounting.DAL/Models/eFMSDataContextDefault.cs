@@ -180,6 +180,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.PaidAmountUsd)
+                    .HasColumnName("PaidAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PaidAmountVnd)
+                    .HasColumnName("PaidAmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PartnerId)
                     .IsRequired()
                     .HasColumnName("PartnerID")
@@ -216,11 +224,27 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.TotalAmountUsd)
+                    .HasColumnName("TotalAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.TotalAmountVnd)
+                    .HasColumnName("TotalAmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.TotalExchangeRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UnpaidAmountUsd)
+                    .HasColumnName("UnpaidAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.UnpaidAmountVnd)
+                    .HasColumnName("UnpaidAmountVND")
+                    .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
@@ -1458,6 +1482,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.BankAccountNo)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.Property(e => e.BankName).HasMaxLength(200);
 
                 entity.Property(e => e.BillingEmail).IsUnicode(false);
 

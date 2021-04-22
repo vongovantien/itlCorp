@@ -52,8 +52,7 @@
                             <div class="form-group row" *ngIf="commodityGroup.id">
                                 <label class="col-lg-4 col-form-label form-control-label"> Active </label>
                                 <div class="col-lg-8">
-                                    <app-switch [(toggle)]="commodityGroupActive.value"
-                                        (toggleChange)="commodityGroupActive.setValue($event)">
+                                    <app-switch formControlName="commodityGroupActive">
                                     </app-switch>
                                 </div>
                             </div>

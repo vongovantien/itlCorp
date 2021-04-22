@@ -4,8 +4,8 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from '@app';
-import { Customer, PortIndex, User, csBookingNote, CsTransaction } from '@models';
-import { DocumentationRepo, SystemRepo } from '@repositories';
+import { Customer, PortIndex, User, csBookingNote, CsTransaction, Incoterm } from '@models';
+import { DocumentationRepo, SystemRepo, CatalogueRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 import { JobConstants, SystemConstants, ChargeConstants } from '@constants';
@@ -35,12 +35,16 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     formGroup: FormGroup;
     etd: AbstractControl;
     eta: AbstractControl;
+    ata: AbstractControl;
+    atd: AbstractControl;
+
     mawb: AbstractControl;
     mbltype: AbstractControl;
     shipmentType: AbstractControl;
     typeOfService: AbstractControl;
     personalIncharge: AbstractControl;
     term: AbstractControl;
+    incotermId: AbstractControl;
     serviceDate: AbstractControl;
 
     coloader: AbstractControl; // Supplier/Vendor(Coloader).
@@ -59,6 +63,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
     csBookingNotes: csBookingNote[] = [];
+    incoterms: Observable<Incoterm[]>;
+
 
     displayFieldsSupplier: CommonInterface.IComboGridDisplayField[] = [
         { field: 'shortName', label: 'Name Abbr' },
@@ -89,7 +95,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         private _store: Store<fromShare.IShareBussinessState>,
         private _route: ActivatedRoute,
         private _systemRepo: SystemRepo,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _catalogueRepo: CatalogueRepo
+
     ) {
         super();
     }
@@ -105,6 +113,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.listUsers = this._systemRepo.getListSystemUser();
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
 
         this.getUserLogged();
 
@@ -125,6 +134,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                     res.etd = null;
                                     res.mawb = null;
                                     res.eta = null;
+                                    res.serviceDate = null
                                 }
                             });
                             this.supplierName = res.supplierName;
@@ -134,11 +144,14 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                 etd: !!res.etd ? { startDate: new Date(res.etd), endDate: new Date(res.etd) } : null,
                                 eta: !!res.eta ? { startDate: new Date(res.eta), endDate: new Date(res.eta) } : null,
                                 serviceDate: !!res.serviceDate ? { startDate: new Date(res.serviceDate), endDate: new Date(res.serviceDate) } : null,
+                                ata: !!res.ata ? { startDate: new Date(res.ata), endDate: new Date(res.ata) } : null,
+                                atd: !!res.atd ? { startDate: new Date(res.atd), endDate: new Date(res.atd) } : null,
 
                                 mbltype: res.mbltype,
                                 typeOfService: res.typeOfService,
                                 term: res.paymentTerm,
                                 shipmentType: res.shipmentType,
+                                incotermId: res.incotermId,
 
                                 coloader: res.coloaderId,
                                 bookingNo: res.bookingNo,
@@ -154,6 +167,8 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                 pono: res.pono,
                                 podDescription: !!res.podDescription ? res.podDescription : res.podName,
                                 polDescription: !!res.polDescription ? res.polDescription : res.polName,
+
+
                             });
 
                             this.currentFormValue = this.formGroup.getRawValue(); // For CanDeactivate.
@@ -171,6 +186,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
             etd: [null, Validators.required], // * Date
             eta: [], // * Date
+            ata: [],
+            atd: [],
+
             serviceDate: [],
 
             mawb: [],
@@ -192,6 +210,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             shipmentType: [this.shipmentTypes[0], Validators.required], // * select
             typeOfService: [null, Validators.required], // * select
             personalIncharge: [],  // * select
+            incotermId: []
         }, { validator: [FormValidators.comparePort, FormValidators.compareETA_ETD] });
 
         this.etd = this.formGroup.controls["etd"];
@@ -212,7 +231,9 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
         this.polDescription = this.formGroup.controls['polDescription'];
         this.podDescription = this.formGroup.controls['podDescription'];
-
+        this.ata = this.formGroup.controls['ata'];
+        this.atd = this.formGroup.controls['atd'];
+        this.incotermId = this.formGroup.controls['incotermId'];
         this.formGroup.controls['etd'].valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -232,6 +253,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                     this.formGroup.controls["serviceDate"].setValue(null);
                 }
             });
+
     }
 
     getUserLogged() {

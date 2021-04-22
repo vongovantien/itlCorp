@@ -16,7 +16,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string CustomerMode { get; set; }
         public string CustomerCode { get; set; }
         public string CustomerName { get; set; }
-        public string CurrencyCode { get => "VND"; set => CurrencyCode = value; }
+        public string CurrencyCode { get; set; } = "VND";
         public decimal ExchangeRate { get; set; }
         public string Description0 { get; set; }
         public string LocalBranchCode { get; set; }

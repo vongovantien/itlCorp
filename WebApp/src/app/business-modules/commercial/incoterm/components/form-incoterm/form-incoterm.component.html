@@ -44,7 +44,7 @@
                     <div class="form-group">
                         <label>Active</label>
                         <div class="m-checkbox-inline">
-                            <app-switch [toggle]="active.value" (toggleChange)="active.setValue($event)"></app-switch>
+                            <app-switch formControlName="active"></app-switch>
                         </div>
                     </div>
                 </div>

@@ -1,15 +1,13 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
 
 import { AppForm } from '@app';
 import { User, Currency, Customer } from '@models';
-import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { catchError, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 @Component({
     selector: 'settle-payment-form-create',
@@ -34,14 +32,13 @@ export class SettlementFormCreateComponent extends AppForm {
     statusApproval: AbstractControl;
     payee: AbstractControl;
 
-    currencyList: Currency[];
+    currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     methods: CommonInterface.ICommonTitleValue[];
 
-    customers: Observable<Customer[]>;
+    customers: any;
 
     constructor(
         private _fb: FormBuilder,
-        private _store: Store<IAppState>,
         private _systemRepo: SystemRepo,
         private _catalogueRepo: CatalogueRepo
     ) {
@@ -49,12 +46,9 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     ngOnInit() {
-        this._store.dispatch(new GetCatalogueCurrencyAction());
-
         this.initFormSettlement();
         this.initBasicData();
         this.getUserLogged();
-        this.getCurrency();
         this.getSystemUser();
         this.getCustomer();
 
@@ -67,7 +61,7 @@ export class SettlementFormCreateComponent extends AppForm {
             'requestDate': [{ startDate: new Date(), endDate: new Date() }, Validators.required],
             'paymentMethod': [],
             'amount': [{ value: null, disabled: true }],
-            'currency': [],
+            'currency': ['VND'],
             'note': [],
             'statusApproval': ['New'],
             'payee': []
@@ -98,17 +92,6 @@ export class SettlementFormCreateComponent extends AppForm {
         this.requester.setValue(this.userLogged.id);
     }
 
-    getCurrency() {
-        this._store.select(getCatalogueCurrencyState)
-            .pipe(catchError(this.catchError))
-            .subscribe(
-                (data: any) => {
-                    this.currencyList = data || [];
-                    this.currency.setValue("VND");
-                },
-            );
-    }
-
     getSystemUser() {
         this.users = this._systemRepo.getListSystemUser({ active: true });
     }
@@ -127,6 +110,16 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getCustomer() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        const customersFromService = this._catalogueRepo.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.customers = customersFromService.data;
+            return;
+        }
+        this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this._catalogueRepo.customersSource$.next({ data }); // * Update service.
+                this.customers = data;
+            }
+        );
     }
 }

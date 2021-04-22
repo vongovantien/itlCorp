@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy, HostListener } from '@angular/core';
-import { AppPage } from 'src/app/app.base';
+import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChanges, AfterViewInit, ElementRef, ViewChild, QueryList, ViewChildren, ChangeDetectionStrategy, HostListener, forwardRef, ChangeDetectorRef } from '@angular/core';
 
 import cloneDeep from 'lodash/cloneDeep';
 import { ListKeyManager, FocusKeyManager } from '@angular/cdk/a11y';
@@ -7,14 +6,22 @@ import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
 import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { BsDropdownDirective } from 'ngx-bootstrap';
+import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 @Component({
     selector: 'app-combo-grid-virtual-scroll',
     templateUrl: './combo-grid-virtual-scroll.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
-})
-export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, OnChanges, AfterViewInit {
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            multi: true,
+            useExisting: forwardRef(() => ComboGridVirtualScrollComponent),
+        }
+    ]
 
+})
+export class ComboGridVirtualScrollComponent implements OnInit, OnChanges, AfterViewInit, ControlValueAccessor {
     @Input() dataSources: any[];
     @Input() displayFields: { field: string, label: string }[];
     @Input() searchFields: any[];
@@ -34,13 +41,10 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
 
     get allowEditing(): boolean {
         return this._allowEditing;
-
     }
 
-    @Input() displaySelectedStr: string = '';
     @Output() itemSelected = new EventEmitter<any>();
     @Output() remove = new EventEmitter<any>();
-    @Output() displaySelectedStrChange: EventEmitter<string> = new EventEmitter<string>();
 
     @ViewChild('inputSearch') inputSearch: ElementRef;
     @ViewChild('clkSearch') inputPlaceholder: ElementRef;
@@ -58,12 +62,15 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     Disabled: boolean = false;
     searchKeys: string[] = [];
     showAngledownIcon: boolean = false;
-
     keyboardEventsManager: ListKeyManager<any>;
-
     isFocusSearch: boolean = false;
+    keyword: string = '';
 
     private keyManager: FocusKeyManager<AppCombogridItemComponent>;
+    public displaySelectedStr: string = ''; // * public for set value direct
+    private onChange: Function = (v: string) => { };
+    private onTouch: Function = () => { };
+    private timeout: NodeJS.Timeout;
 
     @HostListener('keydown.Enter', ['$event'])
     onKeydownEnterHandler(event: KeyboardEvent) {
@@ -76,9 +83,11 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
     }
 
     constructor(
+        private cdf: ChangeDetectorRef
     ) {
-        super();
     }
+
+    ngOnInit() { }
 
     ngAfterViewInit() {
         this.keyManager = new FocusKeyManager(this.items).withWrap();
@@ -141,9 +150,9 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         if (!!changes.loading && typeof changes.loading.currentValue === 'boolean') {
             this.loading = changes.loading.currentValue;
         }
-        if (!!changes.displaySelectedStr) {
-            this.displaySelectedStr = changes.displaySelectedStr.currentValue;
-        }
+        // if (!!changes.displaySelectedStr) {
+        //     this.displaySelectedStr = changes.displaySelectedStr.currentValue;
+        // }
     }
 
     setDataSource(data: any[]) {
@@ -224,7 +233,7 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
         // this.displaySelectedStr = null;
         this.setCurrentActiveItemId({ value: null });
         this.remove.emit();
-        this.displaySelectedStrChange.emit(null);
+        // this.displaySelectedStrChange.emit(null);
     }
 
     emitSelected(item: any, index: number) {
@@ -259,16 +268,58 @@ export class ComboGridVirtualScrollComponent extends AppPage implements OnInit, 
                 this.displaySelectedStr = dataItem;
             });
         }
-        this.displaySelectedStrChange.emit(this.displaySelectedStr);
+        // this.displaySelectedStrChange.emit(this.displayStringValue);
     }
 
     clickSearch() {
         if (this.inputSearch) {
-            setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
+            this.timeout = setTimeout(() => this.inputSearch.nativeElement.focus(), 0);
         }
     }
 
     onFocusInputPlaceholder(e) {
         this.isFocusSearch = true;
     }
+
+    trackByFn(index: number, item: any) {
+        return !!item.id ? item.id : !!item.code ? item.code : index;
+    }
+
+    set displayStringValue(val: string) {
+        if (val !== undefined) {
+            this.displaySelectedStr = val;
+            this.onChange(val);
+            this.onTouch(val);
+        }
+    }
+
+    get displayStringValue() {
+        return this.displaySelectedStr;
+    }
+
+    public writeValue(value: any) {
+        this.displayStringValue = value;
+
+        // ! Check this out https://github.com/angular/angular/issues/10816
+        this.cdf.markForCheck();
+    }
+
+    public registerOnChange(fn: Function): void {
+        this.onChange = fn;
+    }
+
+    public registerOnTouched(fn: Function): void {
+        this.onTouch = fn
+    }
+
+    public setDisabledState?(isDisabled: boolean): void {
+        this.setDisabled(isDisabled);
+    }
+
+    ngOnDestroy(): void {
+        if (this.timeout) {
+            clearTimeout(this.timeout);
+        }
+    }
+
 }

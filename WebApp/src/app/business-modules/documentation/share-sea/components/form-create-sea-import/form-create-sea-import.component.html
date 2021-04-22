@@ -98,12 +98,12 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted &&((formCreate.errors | equalError:'invalidPort') || (!!polDescription.value && !pol.value))}">
                             <label>Port of Loading (POL)</label>
-                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr]="polDescription.value"
+                            <app-combo-grid-virtual-scroll allowFreeText
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-loading')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"
                                 (remove)="resetFormControl(pol); resetFormControl(polDescription)"
-                                (displaySelectedStrChange)="polDescription.setValue($event)">
+                                formControlName="polDescription">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && !!polDescription.value && !pol.value">
@@ -119,13 +119,12 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isSubmitted && (!pod.value || !podDescription.value)}">
                             <label required>Port of Destination (POD)</label>
-                            <app-combo-grid-virtual-scroll allowFreeText [displaySelectedStr]="podDescription.value"
+                            <app-combo-grid-virtual-scroll allowFreeText
                                 (itemSelected)="onSelectDataFormInfo($event, 'port-destination')"
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldsPort" [height]="200"
                                 (remove)="resetFormControl(pod);resetFormControl(podDescription)"
-                                placeholder="Please select POD"
-                                (displaySelectedStrChange)="podDescription.setValue($event)">
+                                placeholder="Please select POD" formControlName="podDescription">
                             </app-combo-grid-virtual-scroll>
 
                         </div>
@@ -191,6 +190,41 @@
                                 </option>
                             </select>
                         </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>ATD</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="atd" calendar [allowRemove]="!!atd.value && !!atd.value.startDate"
+                                    (remove)="resetFormControl(atd)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>ATA</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
+                                    (remove)="resetFormControl(ata)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="form-group">
+                            <label>Incoterm</label>
+                            <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                            </ng-select>
+                        </div>
+
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">

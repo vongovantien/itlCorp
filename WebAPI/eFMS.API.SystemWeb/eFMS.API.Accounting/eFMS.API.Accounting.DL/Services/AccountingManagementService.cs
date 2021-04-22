@@ -131,6 +131,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         foreach (CsShipmentSurcharge item in charges)
                         {
+                            // Do voucher chỉ issue đầu CREDIT payer của phí OBH
                             if (item.Type == AccountingConstants.TYPE_CHARGE_OBH)
                             {
                                 item.PayerAcctManagementId = null;
@@ -886,7 +887,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         if (surcharge.PaySyncedFrom == "VOUCHER")
                         {
-                            _syncedFromBy = surcharge.VoucherId;
+                            _syncedFromBy = surcharge.VoucherIdre;
                         }
                     }
                     fe.SyncedFromBy = _syncedFromBy;
@@ -1053,16 +1054,20 @@ namespace eFMS.API.Accounting.DL.Services
                 model.OfficeId = currentUser.OfficeID;
                 model.CompanyId = currentUser.CompanyID;
 
-                DateTime? dueDate = null;
+                /*DateTime? dueDate = null;
                 if (model.Date.HasValue)
                 {
                     dueDate = model.Date.Value.AddDays(30 + (double)(model.PaymentTerm ?? 0));
                 }
-                model.PaymentDueDate = dueDate;
+                model.PaymentDueDate = dueDate;*/
+
                 model.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
 
                 List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
                 model.ServiceType = GetTransactionType(jobNoGrouped);
+
+                //Task: 15631 - Andy - 14/04/2021
+                model.PaymentDueDate = GetDueDateIssueAcctMngt(model.PartnerId, model.PaymentTerm, model.ServiceType, model.Date, model.ConfirmBillingDate);
 
                 AccAccountingManagement accounting = mapper.Map<AccAccountingManagement>(model);
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
@@ -1073,6 +1078,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         List<ChargeOfAccountingManagementModel> chargesOfAcct = model.Charges;
                         decimal _totalAmount = 0;
+                        decimal _totalAmountVnd = 0;
+                        decimal _totalAmountUsd = 0;
                         foreach (ChargeOfAccountingManagementModel chargeOfAcct in chargesOfAcct)
                         {
                             CsShipmentSurcharge charge = surchargeRepo.Get(x => x.Id == chargeOfAcct.SurchargeId).FirstOrDefault();
@@ -1144,6 +1151,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, accounting.Currency);
+                            _totalAmountVnd += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
+                            _totalAmountUsd += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
                         // Cập nhật Settlement: VoucherNo, VoucherDate
                         if (accounting.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE)
@@ -1164,6 +1173,10 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
+
+                        //Task: 15631 - Andy - 14/04/2021
+                        accounting.TotalAmountVnd = accounting.UnpaidAmountVnd = _totalAmountVnd;
+                        accounting.TotalAmountUsd = accounting.UnpaidAmountUsd = _totalAmountUsd;
 
                         HandleState hs = DataContext.Add(accounting, false);
 
@@ -1214,16 +1227,19 @@ namespace eFMS.API.Accounting.DL.Services
                     accounting.PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                 }
 
-                DateTime? dueDate = null;
+                /*DateTime? dueDate = null;
                 if (accounting.Date.HasValue)
                 {
                     dueDate = accounting.Date.Value.AddDays(30 + (double)(accounting.PaymentTerm ?? 0));
                 }
-                accounting.PaymentDueDate = dueDate;
+                accounting.PaymentDueDate = dueDate;*/
 
                 // Cập nhật lại service
                 List<string> jobNoGrouped = model.Charges.GroupBy(x => x.JobNo, (x) => new { jobNo = x.JobNo }).Select(x => x.Key).ToList();
                 accounting.ServiceType = GetTransactionType(jobNoGrouped);
+
+                //Task: 15631 - Andy - 14/04/2021
+                model.PaymentDueDate = GetDueDateIssueAcctMngt(accounting.PartnerId, accounting.PaymentTerm, accounting.ServiceType, accounting.Date, acctCurrent.ConfirmBillingDate);
 
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -1280,6 +1296,8 @@ namespace eFMS.API.Accounting.DL.Services
                         //Update lại
                         var chargesOfAcctUpdate = model.Charges;
                         decimal _totalAmount = 0;
+                        decimal _totalAmountVnd = 0;
+                        decimal _totalAmountUsd = 0;
                         decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
                         foreach (var chargeOfAcct in chargesOfAcctUpdate)
@@ -1350,6 +1368,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, accounting.Currency);
+                            _totalAmountVnd += (charge.AmountVnd + charge.VatAmountVnd) ?? 0;
+                            _totalAmountUsd += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
 
                         // Cập nhật Settlement: VoucherNo, VoucherDate
@@ -1371,6 +1391,16 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
+                        
+                        //Task: 15631 - Andy - 14/04/2021
+                        accounting.TotalAmountVnd = accounting.UnpaidAmountVnd = _totalAmountVnd;
+                        accounting.TotalAmountUsd = accounting.UnpaidAmountUsd = _totalAmountUsd;
+
+                        //***
+                        accounting.PaidAmount = acctCurrent.PaidAmount;
+                        accounting.PaidAmountVnd = acctCurrent.PaidAmountVnd;
+                        accounting.PaidAmountUsd = acctCurrent.PaidAmountUsd;
+
                         var hs = DataContext.Update(accounting, x => x.Id == accounting.Id);
                         surchargeRepo.SubmitChanges();
                         soaRepo.SubmitChanges();
@@ -1394,6 +1424,53 @@ namespace eFMS.API.Accounting.DL.Services
                 var hs = new HandleState(ex.Message);
                 return hs;
             }
+        }
+
+        /// <summary>
+        /// Get Due Date dựa vào Contract Partner Invoice
+        /// Task: 15631 - Andy - 14/04/2021
+        /// </summary>
+        /// <param name="partnerId"></param>
+        /// <param name="paymentTerm"></param>
+        /// <param name="serviceType"></param>
+        /// <param name="invoiceDate">Ngày Invoice</param>
+        /// <param name="billingDate">Ngày Billing</param>
+        /// <returns></returns>
+        private DateTime? GetDueDateIssueAcctMngt(string partnerId, decimal? paymentTerm, string serviceType, DateTime? invoiceDate, DateTime? billingDate)
+        {
+            List<string> serviceTypes = new List<string>();
+            if (!string.IsNullOrEmpty(serviceType))
+            {
+                serviceTypes = serviceType.Split(';').ToList();
+            }
+
+            DateTime? dueDate = null;
+            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a)) ).FirstOrDefault();
+            if (contractPartner == null)
+            {
+                var acRefPartner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault()?.ParentId;
+                contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == acRefPartner && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
+            }
+
+            if (contractPartner != null)
+            {
+                //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
+                if (contractPartner.BaseOn == "Invoice Date")
+                {
+                    dueDate = invoiceDate.HasValue ? invoiceDate.Value.AddDays((double)(paymentTerm ?? 0)) : invoiceDate;
+                }
+                //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
+                if (contractPartner.BaseOn == "Billing Date")
+                {
+                    dueDate = billingDate.HasValue ? billingDate.Value.AddDays((double)(paymentTerm ?? 0)) : billingDate;
+                }
+            }
+            else
+            {
+                //Nếu Partner không có contract thì lấy Invoice Date của Invoice
+                dueDate = invoiceDate;
+            }
+            return dueDate;
         }
 
         private void UpdateStatusSOA(AcctSoa soa, string typeAcctMngt)

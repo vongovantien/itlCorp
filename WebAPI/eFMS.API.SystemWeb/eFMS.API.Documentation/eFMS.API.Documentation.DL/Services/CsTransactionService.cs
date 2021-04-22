@@ -1035,36 +1035,49 @@ namespace eFMS.API.Documentation.DL.Services
                 case PermissionRange.All:
                     break;
                 case PermissionRange.Owner:
+                    var jobsInHouseLevOwn = csTransactionDetailRepo.Get(y => y.SaleManId == currentUser.UserID).Select(s => s.JobId).ToList();
                     masterBills = masterBills.Where(x => x.PersonIncharge == currentUser.UserID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                || jobsInHouseLevOwn.Any(jobId => jobId == x.Id)
+                                                );
 
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
+                    var jobsInHouseLevGrp = csTransactionDetailRepo.Get(y => y.SaleManId == currentUser.UserID || dataUserLevel.Contains(y.SaleManId)).Select(s => s.JobId).ToList();
                     masterBills = masterBills.Where(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
-                                                || csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevel.Contains(t.SaleManId))
+                                                || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevel.Contains(t.SaleManId))
+                                                || jobsInHouseLevGrp.Any(jobId => jobId == x.Id)
                                                 );
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
+                    var jobsInHouseLevDept = csTransactionDetailRepo.Get(y => y.SaleManId == currentUser.UserID || dataUserLevelDepartment.Contains(y.SaleManId)).Select(s => s.JobId).ToList();
                     masterBills = masterBills.Where(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
-                                                || csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevelDepartment.Contains(t.SaleManId))
+                                                || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                //|| csTransactionDetailRepo.Any(t => t.JobId.Equals(x.Id) && dataUserLevelDepartment.Contains(t.SaleManId))
+                                                || jobsInHouseLevDept.Any(jobId => jobId == x.Id)
                                                 );
                     break;
                 case PermissionRange.Office:
+                    var jobsInHouseLevOfi = csTransactionDetailRepo.Get(y => y.SaleManId == currentUser.UserID).Select(s => s.JobId).ToList();
                     masterBills = masterBills.Where(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                || jobsInHouseLevOfi.Any(jobId => jobId == x.Id)
+                                                );
                     break;
                 case PermissionRange.Company:
+                    var jobsInHouseLevCom = csTransactionDetailRepo.Get(y => y.SaleManId == currentUser.UserID).Select(s => s.JobId).ToList();
                     masterBills = masterBills.Where(x => x.CompanyId == currentUser.CompanyID
                                                 || authorizeUserIds.Contains(x.PersonIncharge)
-                                                || x.UserCreated == currentUser.UserID || csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id)));
+                                                || x.UserCreated == currentUser.UserID //|| csTransactionDetailRepo.Any(y => y.SaleManId == currentUser.UserID && y.JobId.Equals(x.Id))
+                                                || jobsInHouseLevCom.Any(jobId => jobId == x.Id)
+                                                );
                     break;
             }
             if (masterBills == null)
@@ -2201,7 +2214,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (model.TransactionType == "SFE" || model.TransactionType == "SLE" || model.TransactionType == "SCE")
                         {
-                            string podCode = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault()?.Code;
+                            CatPlace pod = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault();
+
+                            string podCode = pod?.Code;
+                            
                             if (string.IsNullOrEmpty(podCode))
                             {
                                 item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -2210,6 +2226,21 @@ namespace eFMS.API.Documentation.DL.Services
                             {
                                 item.Hwbno = GenerateHBLNoSeaExport(podCode, hawbSeaExportCurrent);
                                 hawbSeaExportCurrent = item.Hwbno;
+                            }
+
+                            if (model.Etd != null && model.Pol != null)
+                            {
+                                CatPlace pol = catPlaceRepo.Get(x => x.Id == model.Pol)?.FirstOrDefault();
+                                string polName = pol?.NameEn;
+                                string polCountryName = string.Empty;
+
+                                CatCountry country = catCountryRepo.Get(c => c.Id == pol.CountryId)?.FirstOrDefault();
+                                if (country != null)
+                                {
+                                    polCountryName = country.NameEn;
+                                }
+                                item.OnBoardStatus = SetDefaultOnboard(polName, polCountryName, model.Etd);
+                                item.IssueHbldate = model.Etd;
                             }
                         }
                         else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
@@ -2358,6 +2389,20 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
 
+        }
+
+        private string SetDefaultOnboard(string polName, string country,DateTime? etd)
+        {
+            string value = string.Empty;
+            if (etd != null && etd.HasValue)
+            {
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName,country, DateTime.Now.ToString("MMM dd, yyyy"));
+            }
+            else
+            {
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}", polName, country);
+            }
+            return value;
         }
 
         public string GetMaxHAWB()

@@ -11,6 +11,7 @@ import { of } from 'rxjs';
 import { formatCurrency, formatDate } from '@angular/common';
 import { getMenuUserPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -88,13 +89,13 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             { title: 'No', field: 'no', sortable: true, width: 50 },
             { title: 'Charge Code', field: 'chargeCode', sortable: true },
             { title: 'Charge Name', field: 'chargeName', sortable: true },
-            { title: 'Org NetAmount', field: 'unitName', sortable: true },
+            { title: 'Org Net Amount', field: 'unitName', sortable: true },
             { title: 'VAT', field: 'unitPrice', sortable: true },
             { title: 'Org Amount', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Exc Rate', field: 'total', sortable: true },
-            { title: 'VND NetAmount', field: 'settlementCode', sortable: true },
-            { title: 'VAT VNDAmount', field: 'total', sortable: true },
+            { title: 'VND Net Amount', field: 'settlementCode', sortable: true },
+            { title: 'VAT VND Amount', field: 'total', sortable: true },
             { title: 'VND Amount', field: 'total', sortable: true },
             { title: 'Invoice No', field: 'total', sortable: true },
             { title: 'Invoice Date', field: 'total', sortable: true },
@@ -127,21 +128,24 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     getPartner() {
-        this.isLoadingShipmentGrid = true;
-        this._catalogue.getListPartner(null, null, { active: true })
-            .pipe(catchError(this.catchError), finalize(() => {
-                this.isLoadingShipmentGrid = false;
-            }))
-            .subscribe(
-                (dataPartner: any) => {
-                    this.getPartnerData(dataPartner);
-                },
-            );
+        const customersFromService = this._catalogue.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.getPartnerData(customersFromService.data);
+            return;
+        }
+        this._catalogue.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this._catalogue.customersSource$.next({ data }); // * Update service.
+                this.getPartnerData(data);
+
+            }
+        );
     }
 
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
+            { field: 'taxCode', label: 'Tax Code' },
             { field: 'shortName', label: 'Name' },
             { field: 'partnerNameEn', label: 'Customer Name' },
         ];
@@ -280,7 +284,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             this.shipments = [...this.shipments, shipment];
             this.total.totalUSDStr = formatCurrency(this.shipments[0].totalNetUSD + this.shipments[0].totalVATUSD, 'en', '') + ' = ' + formatCurrency(this.shipments[0].totalNetUSD, 'en', '') + ' + ' + formatCurrency(this.shipments[0].totalVATUSD, 'en', '');
-            this.totalAmountVnd = (this.shipments[0].totalVND).toLocaleString() + ' = ' + this.shipments[0].totalNetVND.toLocaleString() + ' + ' + this.shipments[0].totalVATVND.toLocaleString();
+            this.totalAmountVnd = this.formatNumberCurrency(this.shipments[0].totalVND) + ' = ' + this.formatNumberCurrency(this.shipments[0].totalNetVND) + ' + ' + this.formatNumberCurrency(this.shipments[0].totalVATVND);
             this.total.totalShipment = 1;
             this.total.totalCharges = surcharges.length;
 
@@ -290,16 +294,23 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }
     }
 
-    getAdvnaceList(hblId: string){
-        this._accoutingRepo.getListAdvanceNoForShipment(hblId)
-        .pipe(catchError(this.catchError), finalize(() => {
-        }))
-        .subscribe(
-            (res: any[]) => {
-                console.log('res', res)
-                this.shipments.map(x=> x.advanceNoList = res);
-            },
+    formatNumberCurrency(input: number) {
+        return input.toLocaleString(
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            { minimumFractionDigits: 0 }
         );
+    }
+
+    getAdvnaceList(hblId: string) {
+        this._accoutingRepo.getListAdvanceNoForShipment(hblId)
+            .pipe(catchError(this.catchError), finalize(() => {
+            }))
+            .subscribe(
+                (res: any[]) => {
+                    console.log('res', res)
+                    this.shipments.map(x => x.advanceNoList = res);
+                },
+            );
     }
 
     updateExchangeRateForCharges() {
@@ -311,13 +322,17 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this._toastService.warning(`None of charges are selected, Please recheck again! `);
             return;
         } else {
-            const exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
+            
             this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
                 shipment.chargeSettlements.filter((charge: Surcharge) => charge.isSelected)
                     .map((charge: Surcharge) => {
+                        let exchangeRate = !this.exchangeRateInput ? 1 : this.exchangeRateInput;
                         if (charge.currencyId === 'USD') {
-                            charge.amountVnd = Number(charge.netAmount * exchangeRate);
-                            charge.vatAmountVnd = charge.vatrate < 0 ? Number(charge.vatrate * exchangeRate) : (charge.amountVnd * (charge.vatrate / 100));
+                            if(!!charge.kickBack && charge.kickBack === true){
+                                exchangeRate = charge.finalExchangeRate;
+                            }
+                            charge.amountVnd = Math.round(charge.netAmount * exchangeRate);
+                            charge.vatAmountVnd = charge.vatrate < 0 ? Math.round(charge.vatrate * exchangeRate) : Math.round(charge.amountVnd * (charge.vatrate / 100));
                             charge.finalExchangeRate = Number(exchangeRate);
                         }
                     });
@@ -345,7 +360,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             vatAmountVND += shipment.chargeSettlements.reduce((vat: number, charge: Surcharge) => vat += charge.vatAmountVnd, 0);
         });
         totalAmountVnd = vatAmountVND + netAmountVND;
-        this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' : ' + netAmountVND.toLocaleString() + '+' + vatAmountVND.toLocaleString());
+        this.totalAmountVnd = (this.formatNumberCurrency(totalAmountVnd) + ' = ' + this.formatNumberCurrency(netAmountVND) + ' + ' + this.formatNumberCurrency(vatAmountVND));
     }
 
     onBlurAnyCharge(e: any, hblId: string) {
@@ -362,15 +377,15 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
-    onBlurAmountCharge(event: any, hblId: string){
-        if(event.target.name === 'amount'){
+    onBlurAmountCharge(event: any, hblId: string) {
+        if (event.target.name === 'amount') {
             this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
                 shipment.totalNetVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.amountVnd, 0);
                 shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             });
             this.getTotalAmountVND();
         }
-        if(event.target.name === 'vat'){
+        if (event.target.name === 'vat') {
             this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
                 shipment.totalVATVND = shipment.chargeSettlements.reduce((net: number, charge: Surcharge) => net += charge.vatAmountVnd, 0);
                 shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
@@ -385,10 +400,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         });
     }
 
-    checkInputReference(){
-        if(!!this.referenceInput.value){
+    checkInputReference() {
+        if (!!this.referenceInput.value) {
             this.referenceInput.setValue(this.referenceInput.value.trim());
-            if(this.referenceInput.value.length === 0){
+            if (this.referenceInput.value.length === 0) {
                 this.referenceInput.setValue(null);
             }
         }
@@ -516,7 +531,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                         }
                     }
                 );
-        } else{
+        } else {
             this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
                 catchError((err, caught) => this.catchError),
                 concatMap((rs: any) => {
@@ -530,21 +545,21 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                     }
                 })
             )
-            .subscribe(
-                (res: IGetExistsCharge) => {
-                    if (!!res) {
-                        this.orgChargeShipment = cloneDeep(res);
-                        this.shipments = res.shipmentSettlement;
-                        this.total = res.total;
-                        this.totalAmountVnd = this.total.totalVNDStr;
-                        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                            this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
-                        });
-                        this.checkedAllCharges();
-                        this.isSubmitted = false;
+                .subscribe(
+                    (res: IGetExistsCharge) => {
+                        if (!!res) {
+                            this.orgChargeShipment = cloneDeep(res);
+                            this.shipments = res.shipmentSettlement;
+                            this.total = res.total;
+                            this.totalAmountVnd = this.total.totalVNDStr;
+                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
+                            });
+                            this.checkedAllCharges();
+                            this.isSubmitted = false;
+                        }
                     }
-                }
-            );
+                );
         }
     }
 
