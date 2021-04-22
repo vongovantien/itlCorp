@@ -374,7 +374,8 @@
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && charge.duplicateInvoice && charge.duplicateCharge}">
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                        placeholder="Invoice No" (ngModelChange)="isDuplicateInvoice = false"
+                                        placeholder="Invoice No"
+                                        (ngModelChange)="onChangeInvoiceNo(charge,$event); isDuplicateInvoice = false"
                                         [disabled]="!!charge.debitNo 
                                         || !!charge.creditNo 
                                         || !!charge.settlementCode
@@ -425,12 +426,34 @@
                                                 [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                                 placeholder="Please Select" readonly [autoApply]="true"
                                                 [singleDatePicker]="true" [alwaysShowCalendars]="true"
-                                                [(ngModel)]="charge.invoiceDate" />
-                                            <span class="m-input-icon__icon m-input-icon__icon--right">
-                                                <span>
-                                                    <i class="la la-calendar"></i>
-                                                </span>
-                                            </span>
+                                                [(ngModel)]="charge.invoiceDate" calendar />
+                                        </div>
+                                    </ng-template>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="form-group "
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && charge.vatPartnerId === null }">
+                                    <ng-container *ngIf="!!charge.creditNo 
+                                            || !!charge.settlementCode
+                                            || !!charge.voucherId
+                                            || !!charge.voucherIddate
+                                            || !!charge.paySoano
+                                            || !charge.isFromShipment 
+                                            || (isLocked | async) === true ;else vatPartnerTemplate">
+                                        <input type="text" class="dropdown-toggle form-control" disabled
+                                            [(ngModel)]="charge.vatPartnerShortName">
+                                    </ng-container>
+                                    <ng-template #vatPartnerTemplate>
+                                        <div class="list-master-unit">
+                                            <app-combo-grid-virtual-scroll
+                                                [currentActiveItemId]="{field: 'id', value: charge.vatPartnerId}"
+                                                (itemSelected)="onSelectDataFormInfo($event, 'vat-partner', charge)"
+                                                [selectedDisplayFields]="['shortName']" [dataSources]="listPartner"
+                                                [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
+                                                (remove)="charge.vatPartnerId = null" placeholder="Vat Partner"
+                                                [clearable]="false" size="15">
+                                            </app-combo-grid-virtual-scroll>
                                         </div>
                                     </ng-template>
                                 </div>

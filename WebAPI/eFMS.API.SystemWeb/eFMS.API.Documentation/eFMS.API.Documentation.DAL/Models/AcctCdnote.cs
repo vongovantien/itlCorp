@@ -54,6 +54,9 @@ namespace eFMS.API.Documentation.Service.Models
         public string ReasonReject { get; set; }
         public string Note { get; set; }
         public decimal? ExcRateUsdToLocal { get; set; }
+<<<<<<< HEAD
         public bool? NetOff { get; set; }
+=======
+>>>>>>> dev
     }
 }

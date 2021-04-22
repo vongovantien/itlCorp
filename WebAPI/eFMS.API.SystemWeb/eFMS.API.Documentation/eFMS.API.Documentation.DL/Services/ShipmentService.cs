@@ -1930,7 +1930,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.NotifyParty = shipment.NotifyPartyDescription?.Split('\n').FirstOrDefault();
                 data.PackageQty = shipment.PackageQty;
                 data.Cont20 = shipment.Cont20 ?? 0;
-                data.Cont40 = (shipment.Cont40 ?? 0) - (shipment.Cont40HC ?? 0);
+                data.Cont40 = shipment.Cont40 ?? 0;
                 data.Cont40HC = shipment.Cont40HC ?? 0;
                 data.Cont45 = shipment.Cont45 ?? 0;
                 data.GW = shipment.GrossWeight;

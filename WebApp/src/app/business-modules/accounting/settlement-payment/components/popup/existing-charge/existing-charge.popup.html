@@ -263,25 +263,37 @@
                                         <td>
                                             <div class="form-group">
                                                 <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo" name="invoiceNo"
-                                                (blur)="onBlurAnyCharge($event, charge.hblid)">
+                                                (ngModelChange)="onChangeInvoiceNo(charge,$event)">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
                                                     <input type="text" mask="d0/M0/0000" class="form-control" name="invoiceDate"
-                                                     [(ngModel)]="charge.invoiceDate" (blur)="onBlurAnyCharge($event, charge.hblid)"/>
+                                                     [(ngModel)]="charge.invoiceDate"/>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group col-md-12 dropdown-partner" dropdown>
+                                                <input type="text" class="dropdown-toggle form-control" dropdownToggle
+                                                    readonly placeholder="Vat Partner" [(ngModel)]="charge.vatPartnerShortName" 
+                                                    (click)="loadDynamicComoGrid(charge,i)">
+                                                    <ng-container>
+                                                        <div class="d-flex justify-content-end dropdown-partner__header">
+                                                            <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                                (click)="onSelectPartner($event, charge)"></a>
+                                                            </div>
+                                                        <ng-template #container></ng-template>
+                                                    </ng-container>
+                                                </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" [(ngModel)]="charge.seriesNo" name="seriesNo">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.seriesNo" name="seriesNo"
-                                                (blur)="onBlurAnyCharge($event, charge.hblid)">
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.notes" name="notes"
-                                                (blur)="onBlurAnyCharge($event, charge.hblid)">
+                                                <input type="text" class="form-control" [(ngModel)]="charge.notes" name="notes">
                                             </div>
                                         </td>
                                     </tr>
@@ -317,7 +329,7 @@
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
                             <button class="btn btn-primary  m-btn--icon m-btn--uppercase m--margin-right-10"
-                                title="Save" (click)="submit()">
+                                title="Save" (click)="submit()" *ngIf="allowUpdate">
                                 <span>
                                     <i class="la la-save"></i>
                                     <span *ngIf="state === 'new'">
