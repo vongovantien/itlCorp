@@ -1,9 +1,9 @@
-import { Component, Output, EventEmitter, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, Output, EventEmitter, ChangeDetectorRef, ViewContainerRef, QueryList, ViewChildren } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, concatMap, finalize, skip, switchMap, takeUntil } from 'rxjs/operators';
 import { SortService } from '@services';
 import { AccountingRepo, DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
-import { Surcharge } from '@models';
+import { Partner, Surcharge } from '@models';
 import { ToastrService } from 'ngx-toastr';
 import cloneDeep from 'lodash/cloneDeep';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -12,6 +12,7 @@ import { formatCurrency, formatDate } from '@angular/common';
 import { getMenuUserPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { CommonEnum } from '@enums';
+import { AppComboGridComponent } from '@common';
 
 @Component({
     selector: 'existing-charge-popup',
@@ -21,8 +22,10 @@ import { CommonEnum } from '@enums';
 
 export class SettlementExistingChargePopupComponent extends PopupBase {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-
+    @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
+    
     headers: CommonInterface.IHeaderTable[];
+    headerPartner: CommonInterface.IHeaderTable[] = [];
     formSearch: FormGroup;
     referenceNo: AbstractControl;
     referenceInput: AbstractControl;
@@ -39,6 +42,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     };
     selectedPartner: Partial<CommonInterface.IComboGridData> = {};
     selectedPartnerData: any;
+
+    selectedVatPartner: Partial<CommonInterface.IComboGridData> = {};
+    selectedVatPartnerData: any;
+    listVatPartner: Partner[] =[];
 
     configShipment: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -66,8 +73,11 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
 
     numberOfShipment: string = '0/0';
     state: string = 'new';
+    allowUpdate: boolean = false;
     searchCondition: any[] = ['SOA', 'Credit Note', 'JOB No', 'HBL/HAWB', 'MBL/MAWB', 'Custom No'];
     personInCharges: any[] = [];
+    selectedSurcharge: Surcharge;
+    selectedIndexCharge: number = -1;
 
     constructor(
         private _catalogue: CatalogueRepo,
@@ -94,14 +104,21 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             { title: 'Org Amount', field: 'unitPrice', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Exc Rate', field: 'total', sortable: true },
-            { title: 'VND Net Amount', field: 'settlementCode', sortable: true },
-            { title: 'VAT VND Amount', field: 'total', sortable: true },
-            { title: 'VND Amount', field: 'total', sortable: true },
-            { title: 'Invoice No', field: 'total', sortable: true },
-            { title: 'Invoice Date', field: 'total', sortable: true },
-            { title: 'Serial No', field: 'total', sortable: true },
-            { title: 'Note', field: 'total', sortable: true },
+            { title: 'VND Net Amount', field: 'amountVnd', sortable: true },
+            { title: 'VAT VND Amount', field: 'vatAmountVnd', sortable: true },
+            { title: 'VND Amount', field: '', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'VAT Partner', field: '', sortable: true, width: 250 },
+            { title: 'Serial No', field: 'seriesNo', sortable: true },
+            { title: 'Note', field: 'notes', sortable: true },
         ];
+
+        this.headerPartner = [
+            { title: 'TaxCode', field: 'taxCode' },
+            { title: 'Partner Name', field: 'partnerNameEn' },
+        ];
+
         this.referenceNos = this.getRefCombobox();
         this.initFormSearch();
         this.getPartner();
@@ -131,15 +148,65 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         const customersFromService = this._catalogue.getCurrentCustomerSource();
         if (!!customersFromService.data.length) {
             this.getPartnerData(customersFromService.data);
+            this.listVatPartner = customersFromService.data;
             return;
         }
         this._catalogue.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
             (data) => {
                 this._catalogue.customersSource$.next({ data }); // * Update service.
                 this.getPartnerData(data);
-
+                this.listVatPartner = data;
             }
         );
+    }
+
+    getVatpartnerDataSource(){
+        const customersFromService = this._catalogue.getCurrentCustomerSource();
+        if (!!customersFromService.data.length) {
+            this.listVatPartner = customersFromService.data;
+            return;
+        }
+        this._catalogue.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL).subscribe(
+            (data) => {
+                this._catalogue.customersSource$.next({ data }); // * Update service.
+                this.listVatPartner = data;
+            }
+        );
+    }
+
+    loadDynamicComoGrid(charge: Surcharge, index: number) {
+        this.selectedSurcharge = charge;
+        this.selectedIndexCharge = index;
+        const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
+        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
+        if (!!this.componentRef) {
+            this.componentRef.instance.headers = this.headerPartner;
+            this.componentRef.instance.data = this.listVatPartner;
+            this.componentRef.instance.fields = ['shortName', 'taxCode', 'partnerNameEn'];
+            this.componentRef.instance.active = charge.paymentObjectId;
+
+            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<Partner>).onClick.subscribe(
+                (v: Partner) => {
+                    this.onSelectPartner(v, this.selectedSurcharge);
+                    this.subscription.unsubscribe();
+
+                    containerRef.clear();
+                });
+            ((this.componentRef.instance) as AppComboGridComponent<Partner>).clickOutSide
+                .pipe(skip(1))
+                .subscribe(
+                    () => {
+                        containerRef.clear();
+                    }
+                );
+        }
+    }
+
+    onSelectPartner(partnerData: any, chargeItem: Surcharge) {
+        if (!!partnerData) {
+            chargeItem.vatPartnerId = partnerData.id;
+            chargeItem.vatPartnerShortName = partnerData.shortName;
+        }
     }
 
     getPartnerData(data: any) {
@@ -307,7 +374,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             }))
             .subscribe(
                 (res: any[]) => {
-                    console.log('res', res)
                     this.shipments.map(x => x.advanceNoList = res);
                 },
             );
@@ -363,19 +429,19 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.totalAmountVnd = (this.formatNumberCurrency(totalAmountVnd) + ' = ' + this.formatNumberCurrency(netAmountVND) + ' + ' + this.formatNumberCurrency(vatAmountVND));
     }
 
-    onBlurAnyCharge(e: any, hblId: string) {
-        this.updateForChargerByFieldName(e.target.name, e.target.value, hblId);
-    }
+    // onBlurAnyCharge(e: any, hblId: string) {
+    //     this.updateForChargerByFieldName(e.target.name, e.target.value, hblId);
+    // }
 
-    updateForChargerByFieldName(field: string, value: string, hblId: string) {
-        this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
-            shipment.chargeSettlements.forEach(ele => {
-                if (ele[field] === null || ele[field] === "") {
-                    ele[field] = value;
-                }
-            });
-        });
-    }
+    // updateForChargerByFieldName(field: string, value: string, hblId: string) {
+    //     this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
+    //         shipment.chargeSettlements.forEach(ele => {
+    //             if (ele[field] === null || ele[field] === "") {
+    //                 ele[field] = value;
+    //             }
+    //         });
+    //     });
+    // }
 
     onBlurAmountCharge(event: any, hblId: string) {
         if (event.target.name === 'amount') {
@@ -475,6 +541,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                                 this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
                             });
                             this.checkedAllCharges();
+                            this.getVatpartnerDataSource();
                             this.orgChargeShipment = cloneDeep(res);
                             this.isSubmitted = false;
                         }
@@ -527,6 +594,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                                 this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
                             });
                             this.checkedAllCharges();
+                            this.getVatpartnerDataSource();
                             this.isSubmitted = false;
                         }
                     }
@@ -556,6 +624,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                                 this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
                             });
                             this.checkedAllCharges();
+                            this.getVatpartnerDataSource();
                             this.isSubmitted = false;
                         }
                     }
@@ -604,6 +673,23 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.selectedCharge = [];
             this.closePopup();
         }
+    }
+
+    onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
+        if (!!invNo) {
+            const payeeId = chargeItem.type === 'OBH' ? chargeItem.payerId : chargeItem.paymentObjectId;
+            const partner = this.getPartnerById(payeeId);
+            chargeItem.vatPartnerId = partner.id;
+            chargeItem.vatPartnerShortName = partner.shortName;
+        }else{
+            chargeItem.vatPartnerId = null;
+            chargeItem.vatPartnerShortName = null;
+        }
+    }
+
+    getPartnerById(id: string) {
+        const partner: Partner = this.listVatPartner.find((p: Partner) => p.id === id);
+        return partner || null;
     }
 
     reset() {

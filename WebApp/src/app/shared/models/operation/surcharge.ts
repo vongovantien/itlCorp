@@ -61,6 +61,9 @@ export class Surcharge {
     picName: string = '';
     isLocked: boolean = false;
     kickBack: boolean = false;
+    vatPartnerId: string = null;
+    vatPartnerShortName: string = null;
+
     // * Custom
     obhId: string = null;
     isDuplicate: boolean = false;
