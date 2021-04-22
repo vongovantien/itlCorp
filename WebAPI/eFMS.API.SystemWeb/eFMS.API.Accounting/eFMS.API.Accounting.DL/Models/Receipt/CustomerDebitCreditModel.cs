@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string PartnerId { get; set; }
         public string PartnerName { get; set; }
         public string TaxCode { get; set; }
+        public string CurrencyId { get; set; }
         public decimal? Amount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? UnpaidVnd { get; set; }
