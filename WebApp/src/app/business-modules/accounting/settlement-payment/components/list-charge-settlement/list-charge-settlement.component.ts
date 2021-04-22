@@ -26,6 +26,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 import { Store } from '@ngrx/store';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -121,6 +122,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     showExistingCharge() {
+        this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
         this.existingChargePopup.show();
     }
 
@@ -347,6 +349,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.copyChargePopup.show();
     }
 
+    checkAllowUpdateExistingCharge() {
+        const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        const allowUpdate = this.STATE === 'WRITE' &&  userLogged.id === this.requester;
+        return allowUpdate;
+    }
+
     updateChargeWithJob(charge: Surcharge, index?: number) {
         if (this.STATE !== 'WRITE') { return; }
         this.selectedIndexSurcharge = index;
@@ -360,6 +368,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             // this.listChargeFromShipmentPopup.show();
             this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
             this.existingChargePopup.state = 'update';
+            this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
             this.existingChargePopup.show();
         } else {
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);

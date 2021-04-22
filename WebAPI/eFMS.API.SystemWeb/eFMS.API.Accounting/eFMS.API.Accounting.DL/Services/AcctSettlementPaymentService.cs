@@ -1400,7 +1400,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
                 clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
-                var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x=>x.Key).ToList();
+                var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x => x.Key).ToList();
                 opsTrans = opsTrans.Where(x => clearanceDataGroup.Contains(x.JobNo));
             }
             // Data search = creditNo
@@ -1427,11 +1427,82 @@ namespace eFMS.API.Accounting.DL.Services
                 opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
                 csTransD = csTransD.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
-            
+
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
             var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
             var dataOperation = (from sur in surcharge
+                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
+                                 from cc in cc2.DefaultIfEmpty()
+                                 join u in unit on sur.UnitId equals u.Id into u2
+                                 from u in u2.DefaultIfEmpty()
+                                 join par in payer on sur.PayerId equals par.Id into par2
+                                 from par in par2.DefaultIfEmpty()
+                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                                 from pae in pae2.DefaultIfEmpty()
+                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
+                                 join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                                 from vatPgrp in vatPgrps.DefaultIfEmpty()
+                                     //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                     //from advGrp in advGrps.DefaultIfEmpty()
+                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
+                                 from user in sysUser.DefaultIfEmpty()
+                                 select new ShipmentChargeSettlement
+                                 {
+                                     Id = sur.Id,
+                                     JobId = opst.JobNo,
+                                     MBL = opst.Mblno,
+                                     HBL = opst.Hwbno,
+                                     Hblid = sur.Hblid,
+                                     Type = sur.Type,
+                                     //SettlementCode = sur.SettlementCode,
+                                     ChargeId = sur.ChargeId,
+                                     ChargeCode = cc.Code,
+                                     ChargeName = cc.ChargeNameEn,
+                                     Quantity = sur.Quantity,
+                                     UnitId = sur.UnitId,
+                                     UnitName = u.UnitNameEn,
+                                     UnitPrice = sur.UnitPrice,
+                                     CurrencyId = sur.CurrencyId,
+                                     FinalExchangeRate = sur.FinalExchangeRate,
+                                     NetAmount = sur.NetAmount,
+                                     Vatrate = sur.Vatrate,
+                                     Total = sur.Total,
+                                     AmountVnd = sur.AmountVnd,
+                                     VatAmountVnd = sur.VatAmountVnd,
+                                     TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
+                                     AmountUSD = sur.AmountUsd,
+                                     VatAmountUSD = sur.VatAmountUsd,
+                                     PayerId = sur.PayerId,
+                                     Payer = par.ShortName,
+                                     PaymentObjectId = sur.PaymentObjectId,
+                                     OBHPartnerName = pae.ShortName,
+                                     InvoiceNo = sur.InvoiceNo,
+                                     SeriesNo = sur.SeriesNo,
+                                     InvoiceDate = sur.InvoiceDate,
+                                     ContNo = sur.ContNo,
+                                     Notes = sur.Notes,
+                                     IsFromShipment = sur.IsFromShipment,
+                                     //AdvanceNo = advGrp.AdvanceNo,
+                                     PICName = user.Username,
+                                     KickBack = sur.KickBack,
+                                     VatPartnerId = sur.VatPartnerId,
+                                     VatPartnerShortName = vatPgrp.ShortName
+                                 }).ToList();
+            for (int i = 0; i < dataOperation.Count(); i++)
+            {
+                var jobId = dataOperation[i].JobId;
+                if (clearanceDataList[jobId].Count() > 0)
+                {
+                    dataOperation[i].ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                }
+            }
+            if (criteria.customNos != null && criteria.customNos.Count() > 0)
+            {
+                return dataOperation;
+            }
+
+            var dataDocument = (from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
                                 join u in unit on sur.UnitId equals u.Id into u2
@@ -1440,17 +1511,20 @@ namespace eFMS.API.Accounting.DL.Services
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
-                                join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                //from advGrp in advGrps.DefaultIfEmpty()
-                                join user in userRepo on opst.UserCreated equals user.Id into sysUser
+                                join cstd in csTransD on sur.Hblid equals cstd.Id
+                                join cst in csTrans on cstd.JobId equals cst.Id
+                                join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+                                from vatPgrp in vatPgrps.DefaultIfEmpty()
+                                    //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+                                    //from advGrp in advGrps.DefaultIfEmpty()
+                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
-                                    JobId = opst.JobNo,
-                                    MBL = opst.Mblno,
-                                    HBL = opst.Hwbno,
+                                    JobId = cst.JobNo,
+                                    MBL = cst.Mawb,
+                                    HBL = cstd.Hwbno,
                                     Hblid = sur.Hblid,
                                     Type = sur.Type,
                                     //SettlementCode = sur.SettlementCode,
@@ -1478,82 +1552,16 @@ namespace eFMS.API.Accounting.DL.Services
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
+                                    ClearanceNo = sur.ClearanceNo,
                                     ContNo = sur.ContNo,
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     //AdvanceNo = advGrp.AdvanceNo,
                                     PICName = user.Username,
-                                    KickBack = sur.KickBack
+                                    KickBack = sur.KickBack,
+                                    VatPartnerId = sur.VatPartnerId,
+                                    VatPartnerShortName = vatPgrp.ShortName
                                 }).ToList();
-            for (int i = 0; i < dataOperation.Count(); i++)
-            {
-                var jobId = dataOperation[i].JobId;
-                if (clearanceDataList[jobId].Count() > 0)
-                {
-                    dataOperation[i].ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
-                }
-            }
-            if (criteria.customNos != null && criteria.customNos.Count() > 0)
-            {
-                return dataOperation;
-            }
-
-            var dataDocument = (from sur in surcharge
-                               join cc in charge on sur.ChargeId equals cc.Id into cc2
-                               from cc in cc2.DefaultIfEmpty()
-                               join u in unit on sur.UnitId equals u.Id into u2
-                               from u in u2.DefaultIfEmpty()
-                               join par in payer on sur.PayerId equals par.Id into par2
-                               from par in par2.DefaultIfEmpty()
-                               join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                               from pae in pae2.DefaultIfEmpty()
-                               join cstd in csTransD on sur.Hblid equals cstd.Id
-                               join cst in csTrans on cstd.JobId equals cst.Id
-                               //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                               //from advGrp in advGrps.DefaultIfEmpty()
-                               join user in userRepo on cst.UserCreated equals user.Id into sysUser
-                               from user in sysUser.DefaultIfEmpty()
-                               select new ShipmentChargeSettlement
-                               {
-                                   Id = sur.Id,
-                                   JobId = cst.JobNo,
-                                   MBL = cst.Mawb,
-                                   HBL = cstd.Hwbno,
-                                   Hblid = sur.Hblid,
-                                   Type = sur.Type,
-                                   //SettlementCode = sur.SettlementCode,
-                                   ChargeId = sur.ChargeId,
-                                   ChargeCode = cc.Code,
-                                   ChargeName = cc.ChargeNameEn,
-                                   Quantity = sur.Quantity,
-                                   UnitId = sur.UnitId,
-                                   UnitName = u.UnitNameEn,
-                                   UnitPrice = sur.UnitPrice,
-                                   CurrencyId = sur.CurrencyId,
-                                   FinalExchangeRate = sur.FinalExchangeRate,
-                                   NetAmount = sur.NetAmount,
-                                   Vatrate = sur.Vatrate,
-                                   Total = sur.Total,
-                                   AmountVnd = sur.AmountVnd,
-                                   VatAmountVnd = sur.VatAmountVnd,
-                                   TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
-                                   AmountUSD = sur.AmountUsd,
-                                   VatAmountUSD = sur.VatAmountUsd,
-                                   PayerId = sur.PayerId,
-                                   Payer = par.ShortName,
-                                   PaymentObjectId = sur.PaymentObjectId,
-                                   OBHPartnerName = pae.ShortName,
-                                   InvoiceNo = sur.InvoiceNo,
-                                   SeriesNo = sur.SeriesNo,
-                                   InvoiceDate = sur.InvoiceDate,
-                                   ClearanceNo = sur.ClearanceNo,
-                                   ContNo = sur.ContNo,
-                                   Notes = sur.Notes,
-                                   IsFromShipment = sur.IsFromShipment,
-                                   //AdvanceNo = advGrp.AdvanceNo,
-                                   PICName = user.Username,
-                                   KickBack = sur.KickBack
-                               }).ToList();
 
             var data = dataDocument.Union(dataOperation);
             return data.ToList();
@@ -1886,6 +1894,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 charge.SeriesNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.SeriesNo;
                                 charge.InvoiceNo = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceNo;
                                 charge.InvoiceDate = chargeSettlementCurrentToUpdateCsShipmentSurcharge.InvoiceDate;
+                                charge.VatPartnerId = chargeSettlementCurrentToUpdateCsShipmentSurcharge.VatPartnerId;
                                 charge.FinalExchangeRate = charge.FinalExchangeRate == exchangeRate ? charge.FinalExchangeRate
                                                                                                         : (charge.Type == AccountingConstants.TYPE_CHARGE_BUY && charge.KickBack == true) ? kickBackExcRate : exchangeRate;
                                 charge.AmountVnd = chargeSettlementCurrentToUpdateCsShipmentSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
