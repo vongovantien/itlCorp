@@ -213,6 +213,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     getPartnerData(data: any) {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
+            { field: 'taxCode', label: 'Tax Code' },
             { field: 'shortName', label: 'Name' },
             { field: 'partnerNameEn', label: 'Customer Name' },
         ];
@@ -351,7 +352,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             this.shipments = [...this.shipments, shipment];
             this.total.totalUSDStr = formatCurrency(this.shipments[0].totalNetUSD + this.shipments[0].totalVATUSD, 'en', '') + ' = ' + formatCurrency(this.shipments[0].totalNetUSD, 'en', '') + ' + ' + formatCurrency(this.shipments[0].totalVATUSD, 'en', '');
-            this.totalAmountVnd = (this.shipments[0].totalVND).toLocaleString() + ' = ' + this.shipments[0].totalNetVND.toLocaleString() + ' + ' + this.shipments[0].totalVATVND.toLocaleString();
+            this.totalAmountVnd = this.formatNumberCurrency(this.shipments[0].totalVND) + ' = ' + this.formatNumberCurrency(this.shipments[0].totalNetVND) + ' + ' + this.formatNumberCurrency(this.shipments[0].totalVATVND);
             this.total.totalShipment = 1;
             this.total.totalCharges = surcharges.length;
 
@@ -359,6 +360,13 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.getAdvnaceList(surcharge.hblid);
             this.checkedAllCharges();
         }
+    }
+
+    formatNumberCurrency(input: number) {
+        return input.toLocaleString(
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            { minimumFractionDigits: 0 }
+        );
     }
 
     getAdvnaceList(hblId: string) {
@@ -419,7 +427,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             vatAmountVND += shipment.chargeSettlements.reduce((vat: number, charge: Surcharge) => vat += charge.vatAmountVnd, 0);
         });
         totalAmountVnd = vatAmountVND + netAmountVND;
-        this.totalAmountVnd = (totalAmountVnd.toLocaleString() + ' = ' + netAmountVND.toLocaleString() + ' + ' + vatAmountVND.toLocaleString());
+        this.totalAmountVnd = (this.formatNumberCurrency(totalAmountVnd) + ' = ' + this.formatNumberCurrency(netAmountVND) + ' + ' + this.formatNumberCurrency(vatAmountVND));
     }
 
     // onBlurAnyCharge(e: any, hblId: string) {

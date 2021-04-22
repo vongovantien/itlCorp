@@ -103,6 +103,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'total', sortable: true },
+            { title: 'Amount VND', field: '', sortable: true },
             { title: 'Payee', field: 'payer', sortable: true },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
@@ -135,22 +136,36 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any) {
-        this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
-        this.surcharges = [...this.surcharges, ...surcharge];
-        this.surcharges.forEach(x => x.isSelected = false);
+    onRequestSurcharge(surcharge: Surcharge[]) {
+        if (surcharge[0].isFromShipment) {
+            this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        } else {
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        }
 
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
+        if (this.tableListChargePopup.charges.length > 0) {
+            this.isDirectSettlement = true;
+            this.isExistingSettlement = false;
+            this.isShowButtonCopyCharge = true;
+        }
         if (this.existingChargePopup.selectedCharge.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
-        } else {
-            if (this.surcharges.length > 0) {
-                this.isDirectSettlement = true;
-                this.isExistingSettlement = false;
-                this.isShowButtonCopyCharge = true;
-            }
+            this.groupShipments.forEach((groupItem: any) => {
+                if (groupItem.hblId === surcharge[0].hblid) {
+                    groupItem.chargeSettlements.map((charge: Surcharge) => {
+                        const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                        charge.amountVnd = chargeInList.amountVnd;
+                        charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                    })
+                    groupItem.totalAmount = groupItem.chargeSettlements.reduce((net: number, charge: Surcharge) => net += (charge.amountVnd + charge.vatAmountVnd), 0);
+                }
+            })
         }
         this.onChange.emit(true);
     }
@@ -343,6 +358,15 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         }
 
         this.selectedIndexSurcharge = null;
+        if (this.isExistingSettlement === true) {
+            this.groupShipments.forEach((groupItem: any) => {
+                groupItem.chargeSettlements.map((charge: Surcharge) => {
+                    const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                    charge.amountVnd = chargeInList.amountVnd;
+                    charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                })
+            })
+        }
     }
 
     showCopyCharge() {
