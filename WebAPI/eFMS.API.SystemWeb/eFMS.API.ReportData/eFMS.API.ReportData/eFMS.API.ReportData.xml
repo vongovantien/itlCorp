@@ -404,6 +404,12 @@
             Accountant
             </summary>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetSettleExcelFolder">
+            <summary>
+            Get folder contain settlement payment template excel
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
             <summary>
             Generate advance payment excel

@@ -3228,8 +3228,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     listKeyData.Add("Description", string.Format("{0} cho {1}", settlementExport.Note, settlementExport.PayeeName));
                 }
+                else
+                {
+                    listKeyData.Add("Description", null);
+                }
                 listKeyData.Add("BankName", "Bank (Tên Ngân hàng): " + settlementExport.BankName);
-                listKeyData.Add("BankAccountNo", "Acc No (số TK): VND" + settlementExport.BankAccountNo);
+                listKeyData.Add("BankAccountNo", "Acc No (số TK): " + settlementExport.BankAccountNo);
                 listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.BeneficiaryName);
                 excel.SetData(listKeyData);
                 //Set format amount
