@@ -763,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
                 advance.OfficeId = currentUser.OfficeID;
                 advance.CompanyId = currentUser.CompanyID;
                 
-                //Quy đổi tỉ giá USD to Local dựa vào ngày Request
+                //Quy đổi tỉ giá USD to Local dựa vào ngày Request - Andy - 23/04/2021
                 var _excRateUsdToLocal = currencyExchangeService.CurrencyExchangeRateConvert(null, advance.RequestDate, AccountingConstants.CURRENCY_USD, AccountingConstants.CURRENCY_LOCAL);
                 advance.ExcRateUsdToLocal = _excRateUsdToLocal;
 
@@ -782,6 +782,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                 item.UserCreated = item.UserModified = userCurrent;
                                 item.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                //Andy - 23/04/2021
+                                #region -- Tính AmountUsd, AmountVnd --
                                 if (item.RequestCurrency == AccountingConstants.CURRENCY_LOCAL)
                                 {
                                     item.AmountVnd = NumberHelper.RoundNumber(item.Amount ?? 0, 0);
@@ -792,6 +794,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.AmountVnd = NumberHelper.RoundNumber((item.Amount * advance.ExcRateUsdToLocal) ?? 0, 0);
                                     item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                 }
+                                #endregion -- Tính AmountUsd, AmountVnd --
                                 var hsAddRequest = acctAdvanceRequestRepo.Add(item);
                             }
                         }
@@ -1151,6 +1154,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                                     item.UserCreated = item.UserModified = userCurrent;
                                     item.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                    //Andy - 23/04/2021
+                                    #region -- Tính AmountUsd, AmountVnd --
                                     if (item.RequestCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         item.AmountVnd = NumberHelper.RoundNumber(item.Amount ?? 0, 0);
@@ -1161,6 +1166,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         item.AmountVnd = NumberHelper.RoundNumber((item.Amount * advance.ExcRateUsdToLocal) ?? 0, 0);
                                         item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                     }
+                                    #endregion -- Tính AmountUsd, AmountVnd --
                                     var hsRequestNew = acctAdvanceRequestRepo.Add(item);
                                 }
                             }
@@ -1172,6 +1178,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     item.DatetimeModified = today;
                                     item.UserModified = userCurrent;
+                                    //Andy - 23/04/2021
+                                    #region -- Tính AmountUsd, AmountVnd --
                                     if (item.RequestCurrency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         item.AmountVnd = NumberHelper.RoundNumber(item.Amount ?? 0, 0);
@@ -1182,6 +1190,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         item.AmountVnd = NumberHelper.RoundNumber((item.Amount * advance.ExcRateUsdToLocal) ?? 0, 0);
                                         item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                     }
+                                    #endregion -- Tính AmountUsd, AmountVnd --
                                     var hsRequestUpdate = acctAdvanceRequestRepo.Update(item, x => x.Id == item.Id);
                                 }
                             }
