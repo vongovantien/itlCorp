@@ -174,6 +174,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         currency: this.settlementPayment.settlement.settlementCurrency,
                         payee: this.settlementPayment.settlement.payee
                     });
+                    this.formCreateSurcharge.getBeneficiaryInfo();
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
@@ -273,6 +274,23 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .subscribe(
                 (response: ArrayBuffer) => {
                     this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Form - eFMS.xlsx`);
+                },
+            );
+    }
+
+    exportGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+            return;
+        }
+
+        this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
                 },
             );
     }

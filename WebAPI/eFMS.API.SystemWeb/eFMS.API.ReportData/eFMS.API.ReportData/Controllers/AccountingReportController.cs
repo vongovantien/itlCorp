@@ -280,6 +280,29 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export General Preview in Settlement detail
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns></returns>
+        [Route("ExportGeneralSettlementPayment")]
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GeneralSettlementPaymentExport + "?settlementId=" + settlementId, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<InfoSettlementExport>();
+
+            var stream = new AccountingHelper().GenerateExportGeneralSettlementPayment(dataObjects.Result, "Settlement-General-Preview.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement General Preview - eFMS.xlsx");
+
+            return fileContent;
+        }
+
         /// Export detail SOA
         /// </summary>
         /// <param name="soaNo">soaNo of SOA</param>

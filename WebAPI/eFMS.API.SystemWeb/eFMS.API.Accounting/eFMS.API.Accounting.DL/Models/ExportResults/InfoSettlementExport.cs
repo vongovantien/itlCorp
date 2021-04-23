@@ -8,6 +8,8 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? RequestDate { get; set; }
         public string Department { get; set; }
         public string SettlementNo { get; set; }
+        public decimal? SettlementAmount { get; set; }
+        public string SettlementCurrency { get; set; }
         public string Manager { get; set; }
         public string Accountant { get; set; }     
         public bool IsRequesterApproved { get; set; }
@@ -15,5 +17,11 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public bool IsAccountantApproved { get; set; }
         public bool IsBODApproved { get; set; }
         public string ContactOffice { get; set; }
+        public string BeneficiaryName { get; set; }
+        public string BankAccountNo { get; set; }
+        public string BankName { get; set; }
+        public string PayeeName { get; set; }
+        public string AmountInWords { get; set; }
+        public string Note { get; set; }
     }
 }

@@ -57,6 +57,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 const partnerId = this.requestSurchargeListComponent.surcharges[0].type === 'OBH' ? this.requestSurchargeListComponent.surcharges[0].payerId
                     : this.requestSurchargeListComponent.surcharges[0].paymentObjectId;
                 this.formCreateSurcharge.payee.setValue(partnerId);
+                this.formCreateSurcharge.getBeneficiaryInfo();
             }
         }
     }
