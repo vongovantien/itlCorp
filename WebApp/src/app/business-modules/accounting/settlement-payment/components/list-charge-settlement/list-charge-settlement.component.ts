@@ -167,7 +167,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 }
             })
         }
-        this.onChange.emit(true);
+        if (surcharge[0].isFromShipment) {
+            this.onChange.emit(true);
+        }
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
