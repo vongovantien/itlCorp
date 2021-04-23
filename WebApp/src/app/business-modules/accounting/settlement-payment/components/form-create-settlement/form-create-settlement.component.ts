@@ -137,7 +137,7 @@ export class SettlementFormCreateComponent extends AppForm {
         if (this.paymentMethod.value === this.methods[1] && !!this.payee.value) {
             const beneficiary = this.getPartnerById(this.payee.value);
             if (!!beneficiary) {
-                this.beneficiaryName.setValue(beneficiary.partnerNameVn);
+                this.beneficiaryName.setValue(beneficiary.partnerNameEn);
                 this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                 if (beneficiary.bankName?.trim().length > 0) {
                     this.bankName.setValue(beneficiary.bankName);

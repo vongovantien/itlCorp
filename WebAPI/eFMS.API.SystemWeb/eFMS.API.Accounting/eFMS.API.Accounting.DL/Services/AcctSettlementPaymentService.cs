@@ -2162,9 +2162,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             //CR: Sum _gw, _nw, _psc, _cbm theo Masterbill [28/12/2020 - Alex]
             //Settlement có nhiều Job thì sum all các job đó
-            foreach (var surcharge in surcharges)
+            //Groupby HBLID
+            var hblIds = surcharges.GroupBy(g => g.Hblid).Select(s => s.Key).ToList();
+            foreach (var hblId in hblIds)
             {
-                var _opsTrans = opsTransactionRepo.Where(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
+                var _opsTrans = opsTransactionRepo.Where(x => x.Hblid == hblId).FirstOrDefault();
                 if (_opsTrans != null)
                 {
                     _gw += _opsTrans.SumGrossWeight;
@@ -2174,7 +2176,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
+                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == hblId).FirstOrDefault();
                     //_gw += csTransDetail?.GrossWeight;
                     //_nw += csTransDetail?.NetWeight;
                     //_psc += csTransDetail?.PackageQty;
@@ -4889,7 +4891,6 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            string _beneficiaryName = string.Empty;
             string _bankAccountNo = string.Empty;
             string _bankName = string.Empty;
             string _payeeName = string.Empty;
@@ -4899,7 +4900,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var payeeInfo = catPartnerRepo.Get(x => x.Id == settlementPayment.Payee).FirstOrDefault();
                 if (payeeInfo != null)
                 {
-                    _beneficiaryName = payeeInfo.PartnerNameVn;
                     _bankAccountNo = payeeInfo.BankAccountNo;
                     _bankName = string.IsNullOrEmpty(payeeInfo.BankName?.Trim()) ? payeeInfo.BankAccountName : payeeInfo.BankName;
                     _payeeName = payeeInfo.PartnerNameEn;
@@ -4917,6 +4917,7 @@ namespace eFMS.API.Accounting.DL.Services
                 SettlementNo = settlementPayment.SettlementNo,
                 SettlementAmount = settlementPayment.Amount,
                 SettlementCurrency = settlementPayment.SettlementCurrency,
+                PaymentMethod = Common.CustomData.PaymentMethod.Where(x => x.Value == settlementPayment.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 AmountInWords = _inWords,
                 Manager = _manager,
                 Accountant = _accountant,
@@ -4924,7 +4925,6 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                BeneficiaryName = _beneficiaryName,
                 BankAccountNo = _bankAccountNo,
                 BankName = _bankName,
                 PayeeName = _payeeName,

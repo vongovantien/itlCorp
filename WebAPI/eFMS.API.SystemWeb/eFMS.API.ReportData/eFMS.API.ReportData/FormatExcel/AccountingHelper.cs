@@ -3224,17 +3224,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("RequestDate", settlementExport.RequestDate);
                 listKeyData.Add("Requester", settlementExport.Requester);
                 listKeyData.Add("Department", settlementExport.Department);
-                if (!string.IsNullOrEmpty(settlementExport.Note?.Trim()))
-                {
-                    listKeyData.Add("Description", string.Format("{0} cho {1}", settlementExport.Note, settlementExport.PayeeName));
-                }
-                else
-                {
-                    listKeyData.Add("Description", null);
-                }
+                listKeyData.Add("PayeeName", settlementExport.PayeeName);
+                listKeyData.Add("PaymentMethod", settlementExport.PaymentMethod);
                 listKeyData.Add("BankName", "Bank (Tên Ngân hàng): " + settlementExport.BankName);
                 listKeyData.Add("BankAccountNo", "Acc No (số TK): " + settlementExport.BankAccountNo);
-                listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.BeneficiaryName);
+                listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.PayeeName);
                 excel.SetData(listKeyData);
                 //Set format amount
                 var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
@@ -3256,10 +3250,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyFormat.Add("SettlementAmountTotalUSD");
                     excel.SetFormatCell(listKeyFormat, formatAmountUSD);
                 }
-
                 // footer
                 listKeyData = new Dictionary<string, object>();
-                listKeyData.Add("Note", settlementExport.Note);
                 listKeyData.Add("SettlementAmount", settlementExport.SettlementAmount);
                 listKeyData.Add("SettlementAmountVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
                 listKeyData.Add("SettlementAmountSumVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
@@ -3269,9 +3261,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("SettlementAmountSumUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
                 listKeyData.Add("SettlementAmountTotalUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
 
-                listKeyData.Add("AmountInWord", settlementExport.AmountInWords);
+                listKeyData.Add("AmountInWord", "In word (Thành tiền): " + settlementExport.AmountInWords);
                 listKeyData.Add("Requester", settlementExport.Requester);
-                listKeyData.Add("Manager", settlementExport.Manager);
                 excel.SetData(listKeyData);
 
                 excel.SetData(listKeyData);

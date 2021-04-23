@@ -388,6 +388,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -449,6 +451,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.AmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.AmountVnd).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.CustomNo).HasMaxLength(100);
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
@@ -472,6 +478,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Mbl)
                     .HasColumnName("MBL")
                     .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ReferenceNo)
+                    .HasMaxLength(100)
                     .IsUnicode(false);
 
                 entity.Property(e => e.RequestCurrency).HasMaxLength(10);
