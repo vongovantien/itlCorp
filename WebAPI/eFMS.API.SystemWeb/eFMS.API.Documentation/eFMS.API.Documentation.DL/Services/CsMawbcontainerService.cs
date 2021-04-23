@@ -107,10 +107,6 @@ namespace eFMS.API.Documentation.DL.Services
                                DatetimeModified = container.DatetimeModified,
                                IsPartOfContainer = container.IsPartOfContainer
                            });
-            if(results.Count() > 0)
-            {
-                results = results.OrderBy(x => x.ContainerNo);
-            }
             return results;
         }
 
