@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.Controllers
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
            IAcctReceiptService acctReceipt)
-        {
+        {   
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
             currentUser = curUser;

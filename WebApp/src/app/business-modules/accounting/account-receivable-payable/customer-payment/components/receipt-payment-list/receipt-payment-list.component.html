@@ -139,7 +139,7 @@
     </div>
 </div>
 
-<ng-template #tableInvoice>
+<!-- <ng-template #tableInvoice>
     <table class="table table-hover table-brand dataTable table-hover">
         <thead app-table-header [headers]="headerReceiptReadonly">
         </thead>
@@ -152,9 +152,7 @@
                         <td>{{invoice.type}}</td>
                         <td class="text-info">{{invoice.partnerName}}</td>
                         <td>{{invoice.taxCode}}</td>
-                        <!-- <td>
-                            {{invoice.unpaidAmount | number: '.0-3'}}
-                        </td> -->
+       
                         <td>
                             {{invoice.paidAmount | number: '.0-3'}}
                         </td>
@@ -189,4 +187,4 @@
             <tr app-table-row-loading *ngIf="isLoading | async"></tr>
         </tbody>
     </table>
-</ng-template>
+</ng-template> -->

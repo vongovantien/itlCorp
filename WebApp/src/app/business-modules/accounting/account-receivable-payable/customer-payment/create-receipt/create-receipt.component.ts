@@ -69,11 +69,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const receiptModel: ReceiptModel = this.getDataForm();
         receiptModel.payments = this.listInvoice.invoices;
 
-        if (receiptModel.payments.some(x => x.type === 'ADV')) {
-            receiptModel.payments.forEach(inv => {
-                inv.receiptExcPaidAmount = inv.paidAmount;
-            });
-        }
+        // if (receiptModel.payments.some(x => x.type === 'ADV')) {
+        //     receiptModel.payments.forEach(inv => {
+        //         inv.receiptExcPaidAmount = inv.paidAmount;
+        //     });
+        // }
 
         this.onSaveDataReceipt(receiptModel, type);
     }
@@ -102,10 +102,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     checkValidateBalance(invoices: ReceiptInvoiceModel[], finalPaid: number = 0, balance: number = 0) {
         let valid: boolean = true;
-        const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
-        if (+paidAmount + balance !== finalPaid) {
-            valid = false;
-        }
+        // const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
+        // if (+paidAmount + balance !== finalPaid) {
+        //     valid = false;
+        // }
 
         return valid;
     }

@@ -27,11 +27,15 @@ export const receiptManagementReducer = createReducer(
         ...state
     })),
     on(ReceiptActions.GetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true })),
-    on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({ ...state, invoices: payload.invoices, isLoading: false })),
-
-    on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: ReceiptCreditDebitModel) => ({
+    on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
-        debit: [...state.debitList, payload]
+        creditList: [...payload.invoices.filter(x => x.type === 'Credit'), ...state.creditList],
+        debitList: [...payload.invoices.filter(x => x.type === 'Debit' || x.type === 'OBH'), ...state.debitList]
+    })),
+
+    on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
+        ...state,
+        debitList: [...state.debitList, payload.data]
     })),
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]

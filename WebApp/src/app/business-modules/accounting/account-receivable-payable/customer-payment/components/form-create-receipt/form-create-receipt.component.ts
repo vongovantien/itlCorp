@@ -49,7 +49,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         private _store: Store<IAppState>,
         private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
-        private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _dataService: DataService
 
@@ -128,6 +127,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     getDebit() {
         this.debitPopup.show();
         this.debitPopup.type = 'customer';
+        this.debitPopup.customerFromReceipt = this.customerId.value;
+        this.debitPopup.dateFromReceipt = this.date.value;
+        this.debitPopup.reset();
+        this.debitPopup.setDefaultValue();
     }
     getInvoiceList() {
         this.isSubmitted = true;
@@ -156,6 +159,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 }
             );
     }
+
+    addToReceipt($event: string) {
+        const partnerId = $event;
+        if (!this.customerId.value) {
+            this.customerId.setValue(partnerId);
+        }
+    }
+
 }
 
 interface IAgreementReceipt {

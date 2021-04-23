@@ -1,15 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { Customer } from '@models';
+import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
-import { DebitCustomer } from 'src/app/shared/models/document/debitCustomer.model';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { IAppState } from '@store';
+import { GetInvoiceListSuccess } from '../../store/actions';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -17,7 +20,7 @@ import { finalize, catchError } from 'rxjs/operators';
 })
 
 export class CustomerAgentDebitPopupComponent extends PopupBase {
-
+    @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
     typeSearch: AbstractControl;
     partnerId: AbstractControl;
     referenceNo: AbstractControl;
@@ -25,12 +28,9 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     dateType: AbstractControl;
     service: AbstractControl;
 
-    type: string = '';
-    totalAmount: number;
-    totalUnpaid: number;
-    totalUnpaidVnd: number;
-    totalUnpaidUsd: number;
-
+    type: string = null;
+    customerFromReceipt: string = null;
+    dateFromReceipt: any = null;
 
 
     formSearch: FormGroup;
@@ -38,7 +38,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     customers: Observable<Customer[]>;
     displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
-    listDebit: DebitCustomer[] = [];
+    listDebit: ReceiptInvoiceModel[] = [];
 
     checkAll = false;
 
@@ -61,7 +61,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
-
+        private _store: Store<IAppState>,
+        private _toastService: ToastrService
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -70,7 +71,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
 
     ngOnInit() {
         this.initForm();
-        this.getCustomer();
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
@@ -88,6 +88,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             { title: 'Bu Handle', field: 'departmentName', sortable: true },
             { title: 'Office', field: 'officeName', sortable: true },
         ];
+        this.getCustomer();
 
     }
     initForm() {
@@ -110,6 +111,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
 
     getCustomer() {
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        console.log(this.customers);
     }
 
     onSelectDataFormInfo(data: any) {
@@ -119,15 +121,14 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     checkAllChange() {
         if (this.checkAll) {
             this.listDebit.forEach(x => {
-                x.isChecked = true;
+                x.isSelected = true;
             });
         } else {
             this.listDebit.forEach(x => {
-                x.isChecked = false;
+                x.isSelected = false;
             });
         }
     }
-
 
     onApply() {
         this.isSubmitted = true;
@@ -148,13 +149,9 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     this._progressRef.complete();
                 })
             ).subscribe(
-                (res: DebitCustomer[]) => {
+                (res: ReceiptInvoiceModel[]) => {
                     if (!!res) {
                         this.listDebit = res || [];
-                        this.totalAmount = this.listDebit.reduce((acc: number, curr: DebitCustomer) => acc += curr.amount, 0);
-                        this.totalUnpaid = this.listDebit.reduce((acc: number, curr: DebitCustomer) => acc += curr.unpaidAmount, 0);
-                        this.totalUnpaidVnd = this.listDebit.reduce((acc: number, curr: DebitCustomer) => acc += curr.unpaidVnd, 0);
-                        this.totalUnpaidUsd = this.listDebit.reduce((acc: number, curr: DebitCustomer) => acc += curr.unpaidUsd, 0);
                     }
                 },
             );
@@ -164,11 +161,38 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     reset() {
         this.formSearch.reset();
         this.listDebit = [];
+        this.service.setValue([this.services[0].id]);
     }
 
     clearData() {
         this.partnerId.setValue(null);
     }
+
+    removeAllChecked() {
+        this.checkAll = false;
+    }
+
+    addToReceipt() {
+        const datatoReceipt = this.listDebit.filter(x => x.isSelected === true);
+        if (datatoReceipt.length === 0) {
+            this._toastService.warning('No data to add receipt!');
+            return;
+        }
+
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+        this.onAddToReceipt.emit(this.partnerId.value);
+        this.hide();
+    }
+
+    setDefaultValue() {
+        if (!!this.dateFromReceipt) {
+            this.date.setValue({ startDate: new Date(this.dateFromReceipt.startDate), endDate: new Date(this.dateFromReceipt.endDate) });
+        }
+        if (!!this.customerFromReceipt) {
+            this.partnerId.setValue(this.customerFromReceipt);
+        }
+    }
+
 
     selelectedService(event: any) {
         if (event.length > 0) {

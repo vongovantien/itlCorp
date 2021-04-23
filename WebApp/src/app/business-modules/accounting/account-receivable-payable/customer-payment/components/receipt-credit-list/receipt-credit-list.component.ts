@@ -5,6 +5,7 @@ import { Store } from "@ngrx/store";
 import { ReceiptCreditListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptCreditDebitModel } from "@models";
+import { map, reduce, takeUntil } from "rxjs/operators";
 
 @Component({
     selector: 'customer-payment-receipt-credit-list',
@@ -34,12 +35,14 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         }
     }
 
+    totalOrgAmount: number;
+
     get type() {
         return this._type;
     }
 
     private _type: string = 'Customer' // Agent
-    creditList$: Observable<ReceiptCreditDebitModel[]>;
+    creditList: Observable<ReceiptCreditDebitModel[]>;
 
     constructor(
         private _store: Store<IReceiptState>
@@ -59,7 +62,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Office', field: '' },
         ];
 
-        this.creditList$ = this._store.select(ReceiptCreditListState);
+        this.creditList = this._store.select(ReceiptCreditListState);
+
 
     }
 }

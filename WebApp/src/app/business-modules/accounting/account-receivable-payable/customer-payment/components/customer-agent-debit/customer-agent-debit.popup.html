@@ -8,68 +8,71 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="form" [formGroup]="formSearch">
-                    <div class="row">
-                        <div class="col-lg-5">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !partnerId.value}">
-                                <label for="form-control-label">Search Option</label>
-                                <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom">
-                                </ng-select>
-                            </div>
-                            <div class="form-group">
-                                <label for="form-control-label">Reference No</label>
-                                <textarea cols="30" rows="7" class="form-control" formControlName="referenceNo">
-                                </textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-7">
-                            <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger': isSubmitted  && !partnerId.value}">
-                                <label for="form-control-label" required>Partner Name</label>
-                                <app-combo-grid-virtual-scroll>(itemSelected)="onSelectDataFormInfo($event)"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="customers |async"
-                                    [displayFields]="displayFilesPartners" [height]="150" placeholder="Select Partner"
-                                    (remove)="clearData()">
-                                </app-combo-grid-virtual-scroll>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label class="form-control-label" for="">
-                                                Date
-                                            </label>
-                                            <input type="text" class="form-control m-input m-input--square"
-                                                ngxDaterangepickerMd [autoApply]="true"
-                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
-                                                [alwaysShowCalendars]="true" formControlName="date" name="daterange"
-                                                placeholder="From date - to date" readonly />
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label for="form-control-label">Date Type</label>
-                                            <ng-select [items]="dateTypeList" formControlName="dateType" class="custom">
-                                            </ng-select>
-                                        </div>
-                                    </div>
+                <div class="m-form m-form--state">
+                    <div class="form" [formGroup]="formSearch">
+                        <div class="row">
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label for="form-control-label">Search Option</label>
+                                    <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom">
+                                    </ng-select>
                                 </div>
-
-
+                                <div class="form-group">
+                                    <label for="form-control-label">Reference No</label>
+                                    <textarea cols="30" rows="5" class="form-control" formControlName="referenceNo">
+                                    </textarea>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="form-control-label">Service</label>
-                                <ng-select [items]="services" (change)="selelectedService($event)"
-                                    formControlName="service" multiple="true" bindLabel='text' class="custom">
-                                </ng-select>
+                            <div class="col-lg-7">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerId.dirty) && !partnerId.valid }">
+                                    <label required>Partner Name</label>
+                                    <app-combo-grid-virtual-scroll
+                                        (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                        [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
+                                        [selectedDisplayFields]="['partnerNameVn']" [dataSources]="customers | async"
+                                        [displayFields]="displayFilesPartners" (remove)="clearData()"
+                                        placeholder="Please select partner">
+                                    </app-combo-grid-virtual-scroll>
+                                </div>
+                                <div class="form-group">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Date
+                                                </label>
+                                                <input type="text" class="form-control m-input m-input--square"
+                                                    ngxDaterangepickerMd [autoApply]="true"
+                                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                    [ranges]="ranges" [alwaysShowCalendars]="true"
+                                                    formControlName="date" name="daterange"
+                                                    placeholder="From date - to date" readonly />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label for="form-control-label">Date Type</label>
+                                                <ng-select [items]="dateTypeList" formControlName="dateType"
+                                                    class="custom">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="form-control-label">Service</label>
+                                    <ng-select [items]="services" (change)="selelectedService($event)"
+                                        formControlName="service" multiple="true" bindLabel='text' class="custom">
+                                    </ng-select>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 </div>
-
-
             </div>
 
             <div class="modal-footer m--align-right">
@@ -110,7 +113,8 @@
                                         <td class="table-actions-col">
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
-                                                    <input type="checkbox">
+                                                    <input type="checkbox" name="" [checked]="debit.isSelected"
+                                                        (change)="debit.isSelected=!debit.isSelected; removeAllChecked();">
                                                     <span></span>
                                                 </label>
                                             </div>
@@ -137,10 +141,10 @@
                                             <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
                                         </td>
                                         <td>
-                                            <span>{{debit.unpaidVnd | number}} </span>
+                                            <span>{{debit.unpaidAmountVnd | number}} </span>
                                         </td>
                                         <td>
-                                            <span>{{debit.unpaidUsd | number}} </span>
+                                            <span>{{debit.unpaidAmountUsd | number}} </span>
                                         </td>
                                         <td>
                                             <span>{{debit.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -168,10 +172,12 @@
                                         <td></td>
                                         <td></td>
                                         <td>Total</td>
-                                        <td>{{totalAmount | number}} {{listDebit[0].currencyId}}</td>
-                                        <td>{{totalUnpaid | number}} {{listDebit[0].currencyId}}</td>
-                                        <td>{{totalUnpaidVnd | number}}</td>
-                                        <td>{{totalUnpaidUsd | number}}</td>
+                                        <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}} USD |
+                                            {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
+                                        <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' | number}} USD |
+                                            {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
+                                        </td>
+
 
                                     </tr>
                                 </ng-container>
@@ -183,6 +189,24 @@
                 </div>
             </div>
 
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="addToReceipt()">
+                    <span>
+                        <i class="la la-download"></i>
+                        <span>
+                            Add To Reciept
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="this.hide()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
         </div>
     </div>
 </div>
