@@ -4891,7 +4891,6 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            string _beneficiaryName = string.Empty;
             string _bankAccountNo = string.Empty;
             string _bankName = string.Empty;
             string _payeeName = string.Empty;
@@ -4901,7 +4900,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var payeeInfo = catPartnerRepo.Get(x => x.Id == settlementPayment.Payee).FirstOrDefault();
                 if (payeeInfo != null)
                 {
-                    _beneficiaryName = payeeInfo.PartnerNameVn;
                     _bankAccountNo = payeeInfo.BankAccountNo;
                     _bankName = string.IsNullOrEmpty(payeeInfo.BankName?.Trim()) ? payeeInfo.BankAccountName : payeeInfo.BankName;
                     _payeeName = payeeInfo.PartnerNameEn;
@@ -4919,6 +4917,7 @@ namespace eFMS.API.Accounting.DL.Services
                 SettlementNo = settlementPayment.SettlementNo,
                 SettlementAmount = settlementPayment.Amount,
                 SettlementCurrency = settlementPayment.SettlementCurrency,
+                PaymentMethod = Common.CustomData.PaymentMethod.Where(x => x.Value == settlementPayment.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 AmountInWords = _inWords,
                 Manager = _manager,
                 Accountant = _accountant,
@@ -4926,7 +4925,6 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                BeneficiaryName = _beneficiaryName,
                 BankAccountNo = _bankAccountNo,
                 BankName = _bankName,
                 PayeeName = _payeeName,
