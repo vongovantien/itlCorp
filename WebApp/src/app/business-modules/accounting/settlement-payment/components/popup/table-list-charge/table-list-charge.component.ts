@@ -91,6 +91,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Serie No', field: 'serieNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'Vat Partner', field: 'vatPartnerId', sortable: true, width: 250 },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
         ];
@@ -339,6 +340,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
 
                 break;
+            case 'vat-partner':
+
+                break;
             default:
                 break;
         }
@@ -409,6 +413,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
                     // * Auto set cstomer for OBH Partner
                     this.onSelectPartnerType(this.partnerType[0], chargeItem, 'obh-type');
+
+
                 }
                 break;
             case 'payer':
@@ -427,6 +433,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             default:
                 break;
         }
+
+        this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
     }
 
     onSelectPartnerType(partnerType: CommonInterface.IValueDisplay, chargeItem: Surcharge, type: string, ) {
@@ -471,6 +479,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
                 break;
         }
+
+        this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
     }
 
     addCharge() {
@@ -582,7 +592,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
             }
         }
-
+        console.log(listChargesToSave);
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
@@ -694,6 +704,23 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         this.advanceNo.reset();
         this.comboGridAdv.displaySelectedStr = '';
         this.advs.length = 0;
+    }
+
+    onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
+        if (invNo) {
+            if (!!chargeItem.chargeId) {
+                switch (chargeItem.type) {
+                    case CommonEnum.SurchargeTypeEnum.OBH:
+                        chargeItem.vatPartnerId = chargeItem.obhId;
+                        break;
+                    case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                        chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
     }
 
 }

@@ -21,7 +21,9 @@ namespace eFMS.API.ReportData.Consts
         public const string Summary_Of_Costs_Incurred = "Summary Of Costs Incurred";
         public const string Summary_Of_Revenue_Incurred = "Summary Of Revenue Incurred";
 
-        //Template folder
+        // Main Template folder
         public static string PathOfTemplateExcel = Path.Combine(Directory.GetCurrentDirectory(), @"FormatExcel\TemplateExport");
+        // Folder contain Settlement Templata
+        public const string SettlementPath = "SettlePayment";
     }
 }

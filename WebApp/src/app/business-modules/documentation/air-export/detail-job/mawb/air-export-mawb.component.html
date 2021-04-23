@@ -500,8 +500,7 @@
                                                     '.0-2'}}</span>
                                             </div>
                                             <div class="col-md-4 text-right">
-                                                <app-switch size="sm" [toggle]="formMAWB.controls['showDim'].value"
-                                                    (toggleChange)="formMAWB.controls['showDim'].setValue($event)">
+                                                <app-switch size="sm" formControlName="showDim">
                                                 </app-switch>
                                                 <a title="Other Charge" (click)="showVolumePopup()"
                                                     class="m--margin-left-10 float-right pointer m--margin-top-10">

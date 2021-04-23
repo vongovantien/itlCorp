@@ -209,7 +209,7 @@
                                             <div class="form-group "
                                                 [ngClass]="{'m-form__group has-danger': isSubmitted && charge.isDuplicate}">
                                                 <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
-                                                    (ngModelChange)="charge.isDuplicate = false">
+                                                    (ngModelChange)="onChangeInvoiceNo(charge,$event); charge.isDuplicate = false">
                                             </div>
                                         </td>
                                         <td>
@@ -228,6 +228,22 @@
                                                         calendar
                                                         [allowRemove]="!!charge.invoiceDate && !!charge.invoiceDate.startDate"
                                                         (remove)="charge.invoiceDate = null" placeholder="DD/MM/YYYY" />
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>                                           
+                                            <div class="form-group "
+                                                [ngClass]="{'m-form__group has-danger': isSubmitted  && charge.vatPartnerId === null }">
+                                                <div class="list-master-unit">
+                                                    <app-combo-grid-virtual-scroll
+                                                        [currentActiveItemId]="{field: 'id', value: charge.vatPartnerId}"
+                                                        (itemSelected)="charge.vatPartnerId = $event.id; charge.vatPartnerShortName = $event.shortName"
+                                                        [selectedDisplayFields]="['shortName']"
+                                                        [dataSources]="listPartner"
+                                                        [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
+                                                        (remove)="charge.vatPartnerId = null" placeholder="Vat Partner"
+                                                        [clearable]="false" size="15">
+                                                    </app-combo-grid-virtual-scroll>
                                                 </div>
                                             </div>
                                         </td>

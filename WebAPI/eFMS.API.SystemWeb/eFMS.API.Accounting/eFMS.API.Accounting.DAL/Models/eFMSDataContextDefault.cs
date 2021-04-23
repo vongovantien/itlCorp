@@ -71,7 +71,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -1964,6 +1964,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Kb)
+                    .HasColumnName("KB")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
@@ -2071,6 +2075,11 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.VatAmountVnd)
                     .HasColumnName("VatAmountVND")
                     .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.VatPartnerId)
+                    .HasColumnName("VatPartnerID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Vatrate)
                     .HasColumnName("VATRate")
@@ -3505,6 +3514,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.ManagerId)
                     .HasColumnName("ManagerID")
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.OfficeType)
+                    .HasMaxLength(20)
                     .IsUnicode(false);
 
                 entity.Property(e => e.ShortName)
