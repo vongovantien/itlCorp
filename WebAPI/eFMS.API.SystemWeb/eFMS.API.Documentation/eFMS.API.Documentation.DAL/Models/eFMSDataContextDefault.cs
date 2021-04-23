@@ -2908,13 +2908,11 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
-
                 entity.Property(e => e.PoinvoiceNo)
                     .HasColumnName("POInvoiceNo")
                     .HasMaxLength(250);
 
                 entity.Property(e => e.Pol).HasColumnName("POL");
-
 
                 entity.Property(e => e.PurchaseOrderNo)
                     .HasMaxLength(50)
