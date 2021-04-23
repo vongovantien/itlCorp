@@ -150,12 +150,12 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check valid data amount: nếu Tổng Paid Amount (không bao gồm ADV) + Balance phiếu thu # Final Paid Amount => Thông báo lỗi
-            var paidAmount = receiptModel.Payments.Where(x => x.Type != "ADV").Select(s => s.PaidAmount + s.InvoiceBalance).Sum();
-            if (paidAmount + receiptModel.Balance != receiptModel.FinalPaidAmount)
-            {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!", Data = receiptModel };
-                return BadRequest(_result);
-            }
+            //var paidAmount = receiptModel.Payments.Where(x => x.Type != "ADV").Select(s => s.PaidAmount + s.InvoiceBalance).Sum();
+            //if (paidAmount + receiptModel.Balance != receiptModel.FinalPaidAmount)
+            //{
+            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!", Data = receiptModel };
+            //    return BadRequest(_result);
+            //}
 
             var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
 

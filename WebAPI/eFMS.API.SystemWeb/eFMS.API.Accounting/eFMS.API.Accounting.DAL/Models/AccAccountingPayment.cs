@@ -31,7 +31,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Note { get; set; }
         public decimal? PaymentAmountVnd { get; set; }
         public decimal? PaymentAmountUsd { get; set; }
-        public Guid? DeptInvoiceId { get; set; }
+        public int? DeptInvoice { get; set; }
         public Guid? OfficeInvoiceId { get; set; }
         public Guid? CompanyInvoiceId { get; set; }
         public decimal? UnpaidPaymentAmountUsd { get; set; }
