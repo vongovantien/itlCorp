@@ -183,12 +183,14 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hs = new HandleState();
             AcctReceipt receipt = DataContext.Get(o => o.Id == id).FirstOrDefault();
-            if (receipt == null)
-            {
-                return hs;
-            }
 
-            hs = DataContext.Delete(x => x.Id == receipt.Id);
+            if (receipt == null) return new HandleState((object)"Not found receipt");
+            if (receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE) return new HandleState((object)"Not allow delete. Receipt has been done");
+            if (receipt.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow delete. Receipt has canceled");
+            if (receipt.Status == AccountingConstants.RECEIPT_STATUS_DRAFT)
+            {
+                hs = DataContext.Delete(x => x.Id == receipt.Id);
+            }
             return hs;
         }
 
@@ -371,11 +373,22 @@ namespace eFMS.API.Accounting.DL.Services
 
         public AcctReceiptModel GetById(Guid id)
         {
-            var receipt = DataContext.Get(x => x.Id == id).FirstOrDefault();
+            AcctReceipt receipt = DataContext.Get(x => x.Id == id).FirstOrDefault();
             if (receipt == null) return new AcctReceiptModel();
-            var result = mapper.Map<AcctReceiptModel>(receipt);
-            var paymentReceipts = new List<ReceiptInvoiceModel>();
-            var acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).ToList().OrderBy(x => x.Type == "ADV");
+
+            AcctReceiptModel result = mapper.Map<AcctReceiptModel>(receipt);
+            List<ReceiptInvoiceModel> paymentReceipts = new List<ReceiptInvoiceModel>();
+            IOrderedEnumerable<AccAccountingPayment> acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id)
+                .ToList()
+                .OrderBy(x => x.Type == "ADV");
+
+            var listPaymentDebit = acctPayments.Where(x => x.Type == "DEBIT").ToList();
+            var listPaymentCredit = acctPayments.Where(x => x.Type == "CREDIT").ToList();
+            //var listOBH = acctPayments.Where(x => x.Type == "OBH").GroupBy(x => new { x.BillingRefNo, x.PaymentAmount, x.paymentAmount }).ToList();
+            var listPaymentAdvance = acctPayments.Where(x => x.Type == "ADV")
+            //List<AccAccountingPayment> payments = new List<AccAccountingPayment>();
+
+            //payments.Add(listPaymentAdvance);
             foreach (var acctPayment in acctPayments)
             {
                 var invoice = acctMngtRepository.Get(x => x.Id.ToString() == acctPayment.RefId).FirstOrDefault();
@@ -384,7 +397,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                 var payment = new ReceiptInvoiceModel();
 
-                //payment.PaymentId = acctPayment.Id;
+                payment.PaymentId = acctPayment.Id;
+                if (payment.Type == "OBH")
+                {
+
+                }
                 //payment.InvoiceId = acctPayment.RefId;
                 //payment.InvoiceNo = acctPayment.BillingRefNo;
                 //payment.SerieNo = invoice?.Serie;
@@ -401,9 +418,6 @@ namespace eFMS.API.Accounting.DL.Services
                 //payment.BillingDate = invoice?.ConfirmBillingDate;
                 //payment.InvoiceDate = invoice?.Date;
                 // payment.Note = acctPayment.Note;
-                //payment.ReceiptExcUnpaidAmount = acctPayment.ReceiptExcUnpaidAmount;
-                //payment.ReceiptExcPaidAmount = acctPayment.ReceiptExcPaidAmount;
-                //payment.ReceiptExcInvoiceBalance = acctPayment.ReceiptExcBalance;
                 paymentReceipts.Add(payment);
             }
             result.Payments = paymentReceipts;
@@ -461,47 +475,137 @@ namespace eFMS.API.Accounting.DL.Services
             return advNo + no;
         }
 
-        private HandleState AddPayments(List<ReceiptInvoiceModel> payments, AcctReceipt receipt)
+        private AccAccountingPayment GeneratePaymentOBH(ReceiptInvoiceModel paymentGroupOBH, AcctReceipt receipt, AccAccountingManagement invTemp)
         {
-            HandleState hs = new HandleState();
-            foreach (var payment in payments)
+            AccAccountingPayment _payment = new AccAccountingPayment();
+
+            _payment.Id = Guid.NewGuid();
+            _payment.ReceiptId = receipt.Id;
+            _payment.RefId = invTemp.Id.ToString(); // ID hóa đơn tạm
+            _payment.BillingRefNo = paymentGroupOBH.RefNo; // Cùng một BillingRefNo
+            _payment.PaymentNo = invTemp.InvoiceNoReal + "_" + receipt.PaymentRefNo;
+            _payment.Type = "OBH";
+            _payment.CurrencyId = receipt.CurrencyId; // Theo currency của phiếu thu
+            _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
+            _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
+            _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
+
+            _payment.PaymentAmountVnd = paymentGroupOBH.PaidAmountVnd;
+            _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd;
+            _payment.BalanceVnd = paymentGroupOBH.UnpaidVnd - paymentGroupOBH.PaidAmountVnd;
+            _payment.BalanceUsd = paymentGroupOBH.UnpaidUsd - paymentGroupOBH.PaidAmountUsd;
+
+            _payment.RefCurrency = invTemp.Currency; // currency của hóa đơn
+            _payment.Note = paymentGroupOBH.Notes; // Cùng một notes
+            _payment.DeptInvoice = paymentGroupOBH.DepartmentId;
+            _payment.OfficeInvoiceId = paymentGroupOBH.OfficeId;
+            _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
+
+            _payment.UserCreated = _payment.UserModified = currentUser.UserID;
+            _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
+            _payment.GroupId = currentUser.GroupId;
+            _payment.DepartmentId = currentUser.DepartmentId;
+            _payment.OfficeId = currentUser.OfficeID;
+            _payment.CompanyId = currentUser.CompanyID;
+
+            return _payment;
+        }
+
+        private List<AccAccountingPayment> GenerateListPaymentOBH(AcctReceipt receipt, List<ReceiptInvoiceModel> paymentOBHGrps)
+        {
+            List<AccAccountingPayment> results = new List<AccAccountingPayment>();
+
+            foreach (ReceiptInvoiceModel paymentOBH in paymentOBHGrps)
             {
-                var _payment = new AccAccountingPayment();
+                // lấy ra tất cả các hóa đơn tạm theo group
+                List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && paymentOBH.RefIds.Contains(x.Id.ToString()))
+                     .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
+                     .ToList(); // xắp xếp theo unpaidAmount
+                foreach (var invTemp in invoicesTemp)
+                {
+                    // Tổng Số tiền amount OBH đã thu trên group.
+                    decimal remainOBHAmountVnd = paymentOBH.PaidAmountVnd ?? 0;
+                    decimal remainOBHAmountUsd = paymentOBH.PaidAmountUsd ?? 0;
+
+                    if (invTemp.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        if (invTemp.UnpaidAmount <= remainOBHAmountVnd && invTemp.UnpaidAmountVnd <= remainOBHAmountVnd)
+                        {
+                            if (remainOBHAmountVnd > 0)
+                            {
+                                // Phát sinh payment
+                                AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd - invTemp.UnpaidAmountVnd; // Số tiền thu 
+                                _paymentOBH.Balance = _paymentOBH.BalanceVnd = _paymentOBH.PaymentAmount - invTemp.UnpaidAmount; // Số tiền còn lại
+
+                                _paymentOBH.PaymentAmountUsd = null;
+                                _paymentOBH.BalanceUsd = null;
+
+                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
+                                results.Add(_paymentOBH);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (invTemp.UnpaidAmount <= remainOBHAmountUsd && invTemp.UnpaidAmountUsd <= remainOBHAmountUsd)
+                        {
+                            if (remainOBHAmountUsd > 0)
+                            {
+                                // Phát sinh payment
+                                AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd - invTemp.UnpaidAmountUsd; // Số tiền thu 
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = _paymentOBH.PaymentAmount - invTemp.UnpaidAmountUsd; // Số tiền còn lại
+
+                                _paymentOBH.PaymentAmountVnd = null;
+                                _paymentOBH.BalanceVnd = null;
+
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
+                                results.Add(_paymentOBH);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        private List<AccAccountingPayment> GenerateListCreditDebitPayment(AcctReceipt receipt, List<ReceiptInvoiceModel> payments)
+        {
+            List<AccAccountingPayment> results = new List<AccAccountingPayment>();
+
+            foreach (ReceiptInvoiceModel payment in payments)
+            {
+                AccAccountingPayment _payment = new AccAccountingPayment();
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
                 _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.InvoiceNo;
-
                 _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
-                switch (payment.Type)
+
+                if (payment.Type == "CREDIT")
                 {
-                    case "DEBIT":
-                        _payment.RefId = acctMngtRepository.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault()?.Id.ToString();
-                        break;
-                    case "OBH":
-                        _payment.RefId = string.Join(",", payment.RefIds.Select(x => x));
-                        break;
-                    case "CREDIT":
-                        _payment.Type = payment.CreditType;
-                        break;
-                    default:
-                        break;
-                }
-                if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _payment.PaymentAmount = payment.PaidAmountVnd;
-                    _payment.Balance = payment.UnpaidAmount - payment.PaidAmountVnd;
+                    _payment.Type = payment.CreditType;
                 }
                 else
                 {
-                    _payment.PaymentAmount = payment.PaidAmountUsd;
-                    _payment.Balance = payment.UnpaidAmount - payment.PaidAmountUsd;
+                    _payment.RefId = string.Join(",", payment.RefIds);
+                }
+                if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    _payment.PaymentAmount = _payment.PaymentAmountVnd = payment.PaidAmountVnd;
+                    _payment.Balance = _payment.BalanceVnd = payment.UnpaidVnd - payment.PaidAmountVnd;
+
+                    _payment.PaymentAmountUsd = _payment.BalanceUsd = null;
+                }
+                else
+                {
+                    _payment.PaymentAmount = _payment.PaymentAmountUsd = payment.PaidAmountUsd;
+                    _payment.Balance = _payment.BalanceUsd = payment.UnpaidUsd - payment.PaidAmountUsd;
+
+                    _payment.PaymentAmountVnd = _payment.BalanceVnd = null;
 
                 }
-                _payment.PaymentAmountVnd = payment.PaidAmountVnd;
-                _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                _payment.BalanceVnd = payment.UnpaidVnd - payment.PaidAmountVnd;
-                _payment.BalanceUsd = payment.UnpaidUsd - payment.PaidAmountUsd;
-
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.Type = payment.Type;               // OBH/DEBIT/CREDIT
@@ -520,15 +624,58 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.OfficeId = currentUser.OfficeID;
                 _payment.CompanyId = currentUser.CompanyID;
 
-                hs = acctPaymentRepository.Add(_payment);
+                results.Add(_payment);
             }
+            return results;
+        }
+
+        private HandleState AddPayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt)
+        {
+            HandleState hs = new HandleState();
+
+            // Lọc ra tất cả các Payment OBH group để generate các payment theo hđ tạm trong group.
+            List<ReceiptInvoiceModel> paymentOBHGrps = listReceiptInvoice.Where(x => x.Type == "OBH").ToList(); 
+            List<AccAccountingPayment> listPaymentOBH = new List<AccAccountingPayment>();
+
+            if (paymentOBHGrps.Count > 0)
+            {
+                listPaymentOBH = GenerateListPaymentOBH(receipt, paymentOBHGrps);
+            }
+
+            List<ReceiptInvoiceModel> paymentDebitAndCredit = listReceiptInvoice.Where(x => x.Type != "OBH").ToList();
+            List<AccAccountingPayment> listPaymentDebitCredit = new List<AccAccountingPayment>();
+
+            if (paymentDebitAndCredit.Count > 0)
+            {
+                listPaymentDebitCredit = GenerateListCreditDebitPayment(receipt, paymentDebitAndCredit);
+            }
+
+            hs = acctPaymentRepository.Add(listPaymentOBH,false);
+            hs = acctPaymentRepository.Add(listPaymentDebitCredit, false);
+
+            hs = acctPaymentRepository.SubmitChanges();
             return hs;
         }
 
-        private HandleState UpdatePayments(List<ReceiptInvoiceModel> payments, AcctReceipt receipt)
+        private HandleState UpdatePayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt)
         {
             HandleState hsUpdate = new HandleState();
-            foreach (var payment in payments)
+
+            // Lọc ra tất cả các Payment OBH group để update các payment theo hđ tạm trong group.
+            List<ReceiptInvoiceModel> paymentOBHGrps = listReceiptInvoice.Where(x => x.Type == "OBH").ToList();
+            foreach (var paymentOBH in paymentOBHGrps)
+            {
+                // Lấy ra tất cả các payment của phiếu OBH.
+                var payments = acctPaymentRepository.Get(x => x.Type == "OBH" && x.ReceiptId == receipt.Id && x.BillingRefNo == paymentOBH.RefNo).ToList();
+                if(payments.Count > 0)
+                {
+                    foreach (var payment in payments)
+                    {
+                        payment
+                    }
+                }
+            }
+            foreach (var payment in listReceiptInvoice)
             {
                 var _payment = acctPaymentRepository.Get(x => x.Id == payment.PaymentId).FirstOrDefault();
                 if (_payment != null)
@@ -617,14 +764,14 @@ namespace eFMS.API.Accounting.DL.Services
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     //Phát sinh payment amount âm
-                    _payment.PaymentAmount = -payment.PaymentAmount; 
+                    _payment.PaymentAmount = -payment.PaymentAmount;
                     _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
-                    
+
 
                     // Tính lại Balance
                     _payment.Balance = invoice.UnpaidAmount - payment.PaymentAmount;
                     _payment.BalanceVnd = invoice.UnpaidAmountVnd - payment.PaymentAmountVnd;
-                  
+
                 }
                 else
                 {
@@ -637,7 +784,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.BalanceUsd = invoice.UnpaidAmountUsd - payment.PaymentAmountUsd;
 
                 }
-                _payment.RefId = payment.RefId; 
+                _payment.RefId = payment.RefId;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.Type = payment.Type;
@@ -709,9 +856,10 @@ namespace eFMS.API.Accounting.DL.Services
                             decimal remainAmountVnd = totalAmountVndPaymentOfInv;
                             foreach (var item in invoicesTemp)
                             {
-            
-                                if(item.Currency == AccountingConstants.CURRENCY_LOCAL) { 
-}
+
+                                if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                {
+                                }
                                 //1. Số tiền còn lại của payment lớn hơn số tiền của invoice
                                 if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
                                 {
@@ -968,7 +1116,7 @@ namespace eFMS.API.Accounting.DL.Services
                             // cấn trừ cho hóa đơn
                             HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id);
                             //TODO: Tính lại công nợ trên hợp đồng
-                            
+
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
