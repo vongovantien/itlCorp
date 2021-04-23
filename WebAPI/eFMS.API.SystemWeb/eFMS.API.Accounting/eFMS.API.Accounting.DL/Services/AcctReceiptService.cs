@@ -423,15 +423,19 @@ namespace eFMS.API.Accounting.DL.Services
             switch (saveAction)
             {
                 case SaveAction.SAVEDRAFT_ADD:
+                    currentUser.Action = "ReceiptSaveDraft";
                     hs = AddDraft(receiptModel);
                     break;
                 case SaveAction.SAVEDRAFT_UPDATE:
+                    currentUser.Action = "ReceiptUpdateDraft";
                     hs = UpdateDraft(receiptModel);
                     break;
                 case SaveAction.SAVEDONE:
+                    currentUser.Action = "ReceiptSaveDone";
                     hs = SaveDone(receiptModel);
                     break;
                 case SaveAction.SAVECANCEL:
+                    currentUser.Action = "ReceiptSaveCabcel";
                     hs = SaveCancel(receiptModel);
                     break;
             }
@@ -686,7 +690,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 item.PaidAmountVnd = totalAmountVndPaymentOfInv;
 
                                 //1. Số tiền còn lại của payment lớn hơn số tiền của invoice
-                                if (remainAmount > 0 && remainAmount >= item.UnpaidAmount) {
+                                if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
+                                {
                                     item.PaidAmount = remainAmount - item.UnpaidAmount;
                                     item.PaidAmountVnd = remainAmountVnd - item.UnpaidAmountVnd;
                                     item.PaidAmountUsd = remainAmountUsd - item.UnpaidAmountUsd;
@@ -729,6 +734,32 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         break;
                     case "CREDIT":
+                        if (payment.Type == "CREDITNOTE")
+                        {
+                            var credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
+                            if (credits != null && credits.Count() > 0)
+                            {
+                                foreach (var item in credits)
+                                {
+                                    item.NetOff = true;
+                                    cdNoteRepository.Update(item, x => x.Id == item.Id, false);
+                                }
+                                cdNoteRepository.SubmitChanges();
+                            }
+                        }
+                        if (payment.Type == "SOA")
+                        {
+                            var soas = soaRepository.Get(x => payment.RefId.Contains(x.Id));
+                            if (soas != null && soas.Count() > 0)
+                            {
+                                foreach (var item in soas)
+                                {
+                                    item.NetOff = true;
+                                    soaRepository.Update(item, x => x.Id == item.Id, false);
+                                }
+                                soaRepository.SubmitChanges();
+                            }
+                        }
                         break;
                     default:
                         break;
