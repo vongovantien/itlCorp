@@ -70,17 +70,18 @@
                         </ng-select>
                     </div>
                     <div class="form-group" *ngIf="isCommissionIncentive"
-                            [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !this.partnerAccount.value)}">
-                        <label class="form-control-label" required>
+                            [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && (typeReport.value !== typeComReportList[2].id && !this.partnerAccount.value))}">
+                        <label class="form-control-label">
                             Beneficiary
                         </label>
+                        <label *ngIf="typeReport.value !== typeComReportList[2].id" required></label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acPartner')"
                             [currentActiveItemId]="{ field: 'id', value: partnerAccount.value}"
                             [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerAccount)"
                             placeholder="Select Beneficiary">
                         </app-combo-grid-virtual-scroll>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !this.partnerAccount.value">
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && (typeReport.value !== typeComReportList[2].id && !this.partnerAccount.value)">
                             Please select beneficiary!
                         </div>
                     </div>
