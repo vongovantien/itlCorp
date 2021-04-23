@@ -2162,9 +2162,11 @@ namespace eFMS.API.Accounting.DL.Services
 
             //CR: Sum _gw, _nw, _psc, _cbm theo Masterbill [28/12/2020 - Alex]
             //Settlement có nhiều Job thì sum all các job đó
-            foreach (var surcharge in surcharges)
+            //Groupby HBLID
+            var hblIds = surcharges.GroupBy(g => g.Hblid).Select(s => s.Key).ToList();
+            foreach (var hblId in hblIds)
             {
-                var _opsTrans = opsTransactionRepo.Where(x => x.Hblid == surcharge.Hblid).FirstOrDefault();
+                var _opsTrans = opsTransactionRepo.Where(x => x.Hblid == hblId).FirstOrDefault();
                 if (_opsTrans != null)
                 {
                     _gw += _opsTrans.SumGrossWeight;
@@ -2174,7 +2176,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == surcharge.Hblid).FirstOrDefault();
+                    var csTranDetail = csTransactionDetailRepo.Get(x => x.Id == hblId).FirstOrDefault();
                     //_gw += csTransDetail?.GrossWeight;
                     //_nw += csTransDetail?.NetWeight;
                     //_psc += csTransDetail?.PackageQty;
