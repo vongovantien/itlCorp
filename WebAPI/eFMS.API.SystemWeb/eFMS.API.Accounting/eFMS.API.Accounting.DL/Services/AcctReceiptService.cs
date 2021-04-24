@@ -382,43 +382,57 @@ namespace eFMS.API.Accounting.DL.Services
                 .ToList()
                 .OrderBy(x => x.Type == "ADV");
 
-            var listPaymentDebit = acctPayments.Where(x => x.Type == "DEBIT").ToList();
-            var listPaymentCredit = acctPayments.Where(x => x.Type == "CREDIT").ToList();
-            //var listOBH = acctPayments.Where(x => x.Type == "OBH").GroupBy(x => new { x.BillingRefNo, x.PaymentAmount, x.paymentAmount }).ToList();
-            var listPaymentAdvance = acctPayments.Where(x => x.Type == "ADV")
-            //List<AccAccountingPayment> payments = new List<AccAccountingPayment>();
-
-            //payments.Add(listPaymentAdvance);
-            foreach (var acctPayment in acctPayments)
+            IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH");
+            if (listOBH.Count() > 0)
             {
-                var invoice = acctMngtRepository.Get(x => x.Id.ToString() == acctPayment.RefId).FirstOrDefault();
-                var partnerId = invoice?.PartnerId;
-                var partner = catPartnerRepository.Get(x => x.Id == partnerId).FirstOrDefault();
-
-                var payment = new ReceiptInvoiceModel();
-
-                payment.PaymentId = acctPayment.Id;
-                if (payment.Type == "OBH")
+                List<ReceiptInvoiceModel> OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.CurrencyId }).Select(s => new ReceiptInvoiceModel
                 {
+                    RefNo = s.Key.BillingRefNo,
+                    Type = "OBH",
+                    InvoiceNo = null,
+                    Amount = s.Sum(x => x.RefAmount),
+                    UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    UnpaidVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
+                    UnpaidUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
+                    PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
+                    Notes = s.FirstOrDefault().Note,
+                    OfficeId = s.FirstOrDefault().OfficeInvoiceId,
+                    OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
+                    CompanyId = s.FirstOrDefault().CompanyInvoiceId,
+                }).ToList();
 
+                paymentReceipts.AddRange(OBHGrp);
+            }
+
+            IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH");
+            if (listDebitCredit.Count() > 0)
+            {
+                foreach (var acctPayment in listDebitCredit)
+                {
+                    CatDepartment dept = departmentRepository.Get(x => x.Id == acctPayment.DeptInvoiceId)?.FirstOrDefault();
+                    SysOffice office = officeRepository.Get(x => x.Id == acctPayment.OfficeInvoiceId)?.FirstOrDefault();
+
+                    ReceiptInvoiceModel payment = new ReceiptInvoiceModel();
+                    payment.PaymentId = acctPayment.Id;
+                    payment.RefNo = acctPayment.BillingRefNo;
+                    payment.InvoiceNo = acctPayment.InvoiceNo;
+                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "CREDIT" : acctPayment.PaymentType;
+                    payment.CreditType = (acctPayment.PaymentType != "DEBIT") ? acctPayment.PaymentType : null;
+                    payment.CurrencyId = acctPayment.CurrencyId;
+                    payment.UnpaidAmount = acctPayment.RefAmount;
+                    payment.UnpaidUsd = acctPayment.UnpaidPaymentAmountUsd;
+                    payment.UnpaidVnd = acctPayment.UnpaidPaymentAmountVnd;
+                    payment.PaidAmountUsd = acctPayment.PaymentAmountUsd;
+                    payment.PaidAmountVnd = acctPayment.PaymentAmountVnd;
+                    payment.Notes = acctPayment.Note;
+                    payment.DepartmentId = acctPayment.DeptInvoiceId;
+                    payment.OfficeId = acctPayment.OfficeInvoiceId;
+                    payment.DepartmentName = dept?.DeptNameAbbr;
+                    payment.OfficeName = office?.ShortName;
+
+                    paymentReceipts.Add(payment);
                 }
-                //payment.InvoiceId = acctPayment.RefId;
-                //payment.InvoiceNo = acctPayment.BillingRefNo;
-                //payment.SerieNo = invoice?.Serie;
-                //payment.Type = acctPayment.Type;
-                //payment.PartnerName = partner?.ShortName;
-                //payment.TaxCode = partner?.TaxCode;
-                //payment.UnpaidAmount = invoice?.UnpaidAmount ?? 0;
-                //payment.Currency = acctPayment.CurrencyId;
-                //payment.PaidAmount = acctPayment.PaymentAmount;
-                //payment.InvoiceBalance = payment.UnpaidAmount - payment.PaidAmount;
-                //payment.RefAmount = acctPayment.RefAmount;
-                //payment.RefCurrency = acctPayment.RefCurrency;
-                //payment.PaymentStatus = invoice?.PaymentStatus;
-                //payment.BillingDate = invoice?.ConfirmBillingDate;
-                //payment.InvoiceDate = invoice?.Date;
-                // payment.Note = acctPayment.Note;
-                paymentReceipts.Add(payment);
             }
             result.Payments = paymentReceipts;
             result.UserNameCreated = sysUserRepository.Where(x => x.Id == result.UserCreated).FirstOrDefault()?.Username;
@@ -426,7 +440,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             result.CustomerName = partnerInfo?.ShortName;
-            result.TaxCode = partnerInfo?.TaxCode;
 
             return result;
         }
@@ -482,8 +495,9 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.Id = Guid.NewGuid();
             _payment.ReceiptId = receipt.Id;
             _payment.RefId = invTemp.Id.ToString(); // ID hóa đơn tạm
-            _payment.BillingRefNo = paymentGroupOBH.RefNo; // Cùng một BillingRefNo
+            _payment.BillingRefNo = paymentGroupOBH.RefNo; // Cùng một BillingRefNo SOA DEBIT /DEBITNOTE
             _payment.PaymentNo = invTemp.InvoiceNoReal + "_" + receipt.PaymentRefNo;
+            _payment.InvoiceNo = null;
             _payment.Type = "OBH";
             _payment.CurrencyId = receipt.CurrencyId; // Theo currency của phiếu thu
             _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
@@ -497,7 +511,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             _payment.RefCurrency = invTemp.Currency; // currency của hóa đơn
             _payment.Note = paymentGroupOBH.Notes; // Cùng một notes
-            _payment.DeptInvoice = paymentGroupOBH.DepartmentId;
+            _payment.RefAmount = paymentGroupOBH.Amount; // Tổng UnpaidAmount của group OBH
+            _payment.DeptInvoiceId = paymentGroupOBH.DepartmentId;
             _payment.OfficeInvoiceId = paymentGroupOBH.OfficeId;
             _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
 
@@ -580,17 +595,16 @@ namespace eFMS.API.Accounting.DL.Services
                 AccAccountingPayment _payment = new AccAccountingPayment();
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
-                _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.InvoiceNo;
+                _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.RefNo;
                 _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                _payment.RefId = string.Join(",", payment.RefIds);
+                _payment.InvoiceNo = payment.InvoiceNo;
 
                 if (payment.Type == "CREDIT")
                 {
                     _payment.Type = payment.CreditType;
                 }
-                else
-                {
-                    _payment.RefId = string.Join(",", payment.RefIds);
-                }
+
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     _payment.PaymentAmount = _payment.PaymentAmountVnd = payment.PaidAmountVnd;
@@ -608,12 +622,13 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
-                _payment.Type = payment.Type;               // OBH/DEBIT/CREDIT
+                _payment.Type = payment.Type;               // OBH/DEBIT
                 _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
                 _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
-                _payment.RefCurrency = payment.CurrencyId;
+                _payment.RefCurrency = payment.CurrencyId; // currency của hóa đơn
+                _payment.RefAmount = payment.Amount; // Số tiền unpaid của hóa đơn
                 _payment.Note = payment.Notes;
-                _payment.DeptInvoice = payment.DepartmentId;
+                _payment.DeptInvoiceId = payment.DepartmentId;
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
 
@@ -634,7 +649,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hs = new HandleState();
 
             // Lọc ra tất cả các Payment OBH group để generate các payment theo hđ tạm trong group.
-            List<ReceiptInvoiceModel> paymentOBHGrps = listReceiptInvoice.Where(x => x.Type == "OBH").ToList(); 
+            List<ReceiptInvoiceModel> paymentOBHGrps = listReceiptInvoice.Where(x => x.Type == "OBH").ToList();
             List<AccAccountingPayment> listPaymentOBH = new List<AccAccountingPayment>();
 
             if (paymentOBHGrps.Count > 0)
@@ -650,7 +665,7 @@ namespace eFMS.API.Accounting.DL.Services
                 listPaymentDebitCredit = GenerateListCreditDebitPayment(receipt, paymentDebitAndCredit);
             }
 
-            hs = acctPaymentRepository.Add(listPaymentOBH,false);
+            hs = acctPaymentRepository.Add(listPaymentOBH, false);
             hs = acctPaymentRepository.Add(listPaymentDebitCredit, false);
 
             hs = acctPaymentRepository.SubmitChanges();
@@ -660,81 +675,6 @@ namespace eFMS.API.Accounting.DL.Services
         private HandleState UpdatePayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt)
         {
             HandleState hsUpdate = new HandleState();
-
-            // Lọc ra tất cả các Payment OBH group để update các payment theo hđ tạm trong group.
-            List<ReceiptInvoiceModel> paymentOBHGrps = listReceiptInvoice.Where(x => x.Type == "OBH").ToList();
-            foreach (var paymentOBH in paymentOBHGrps)
-            {
-                // Lấy ra tất cả các payment của phiếu OBH.
-                var payments = acctPaymentRepository.Get(x => x.Type == "OBH" && x.ReceiptId == receipt.Id && x.BillingRefNo == paymentOBH.RefNo).ToList();
-                if(payments.Count > 0)
-                {
-                    foreach (var payment in payments)
-                    {
-                        payment
-                    }
-                }
-            }
-            foreach (var payment in listReceiptInvoice)
-            {
-                var _payment = acctPaymentRepository.Get(x => x.Id == payment.PaymentId).FirstOrDefault();
-                if (_payment != null)
-                {
-                    _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
-
-                    switch (payment.Type)
-                    {
-                        case "DEBIT":
-                            _payment.RefId = acctMngtRepository.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault()?.Id.ToString();
-                            break;
-                        case "OBH":
-                            _payment.RefId = string.Join(",", payment.RefIds.Select(x => x));
-                            break;
-                        case "CREDIT":
-                            _payment.Type = payment.CreditType;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                    {
-                        _payment.PaymentAmount = payment.PaidAmountVnd;
-                        _payment.Balance = payment.UnpaidAmount - payment.PaidAmountVnd;
-
-                    }
-                    else
-                    {
-                        _payment.PaymentAmount = payment.PaidAmountUsd;
-                        _payment.Balance = payment.UnpaidAmount - payment.PaidAmountUsd;
-
-                    }
-                    _payment.PaymentAmountVnd = payment.PaidAmountVnd;
-                    _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                    _payment.BalanceVnd = payment.UnpaidVnd - payment.PaidAmountVnd;
-                    _payment.BalanceUsd = payment.UnpaidUsd - payment.PaidAmountUsd;
-
-                    _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
-                    _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
-                    _payment.Type = payment.Type;               // OBH/DEBIT/CREDIT
-                    _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
-                    _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
-                    _payment.RefCurrency = payment.CurrencyId;
-                    _payment.Note = payment.Notes;
-                    _payment.DeptInvoice = payment.DepartmentId;
-                    _payment.OfficeInvoiceId = payment.OfficeId;
-                    _payment.CompanyInvoiceId = payment.CompanyId;
-
-
-                    _payment.UserModified = currentUser.UserID;
-                    _payment.DatetimeModified = DateTime.Now;
-                    _payment.GroupId = currentUser.GroupId;
-                    _payment.DepartmentId = currentUser.DepartmentId;
-                    _payment.OfficeId = currentUser.OfficeID;
-                    _payment.CompanyId = currentUser.CompanyID;
-
-                    hsUpdate = acctPaymentRepository.Update(_payment, x => x.Id == _payment.Id);
-                }
-            }
             return hsUpdate;
         }
 
@@ -767,7 +707,6 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.PaymentAmount = -payment.PaymentAmount;
                     _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
 
-
                     // Tính lại Balance
                     _payment.Balance = invoice.UnpaidAmount - payment.PaymentAmount;
                     _payment.BalanceVnd = invoice.UnpaidAmountVnd - payment.PaymentAmountVnd;
@@ -784,6 +723,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.BalanceUsd = invoice.UnpaidAmountUsd - payment.PaymentAmountUsd;
 
                 }
+                _payment.InvoiceNo = payment.InvoiceNo;
                 _payment.RefId = payment.RefId;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
@@ -793,6 +733,10 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.RefAmount = payment.RefAmount;
                 _payment.RefCurrency = payment.RefCurrency;
                 _payment.Note = payment.Note;
+                _payment.DeptInvoiceId = payment.DeptInvoiceId;
+                _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
+                _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
+
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
                 _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
                 _payment.GroupId = currentUser.GroupId;
@@ -805,62 +749,62 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
+        private string GetAndUpdateStatusInvoice(AccAccountingManagement invoice)
+        {
+            string _paymentStatus = invoice.PaymentStatus;
+            if (invoice.UnpaidAmount <= 0)
+            {
+                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+            }
+            if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
+            {
+                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+            }
+
+            return _paymentStatus;
+        }
+
         private HandleState UpdateInvoiceOfPayment(Guid receiptId)
         {
             HandleState hsInvoiceUpdate = new HandleState();
             IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
-            foreach (var payment in payments)
+            foreach (AccAccountingPayment payment in payments)
             {
-                var invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
-                // Tổng thu của invoice bao gôm VND/USD. 
-                decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmount) ?? 0;
-                decimal totalAmountVndPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountVnd) ?? 0;
-                decimal totalAmountUsdPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountUsd) ?? 0;
-
                 switch (payment.Type)
                 {
                     case "DEBIT":
-                        if (invoice != null)
-                        {
-                            invoice.PaidAmount = totalAmountPayment;
-                            invoice.PaidAmountUsd = totalAmountUsdPaymentOfInv;
-                            invoice.PaidAmountVnd = totalAmountVndPaymentOfInv;
+                        // Tổng thu của invoice bao gôm VND/USD. 
+                        AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
-                            invoice.UnpaidAmount = invoice.TotalAmount - totalAmountPayment;
-                            invoice.UnpaidAmountUsd = invoice.TotalAmountUsd - totalAmountUsdPaymentOfInv;
-                            invoice.UnpaidAmountVnd = invoice.TotalAmountUsd - totalAmountVndPaymentOfInv;
+                        decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmount) ?? 0;
+                        decimal totalAmountVndPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountVnd) ?? 0;
+                        decimal totalAmountUsdPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountUsd) ?? 0;
 
-                            var _paymentStatus = invoice.PaymentStatus;
-                            if (invoice.UnpaidAmount <= 0)
-                            {
-                                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                            }
-                            if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
-                            {
-                                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                            }
-                            invoice.PaymentStatus = _paymentStatus;
-                            invoice.UserModified = currentUser.UserID;
-                            invoice.DatetimeModified = DateTime.Now;
+                        invoice.PaidAmount = totalAmountPayment;
+                        invoice.PaidAmountUsd = totalAmountUsdPaymentOfInv;
+                        invoice.PaidAmountVnd = totalAmountVndPaymentOfInv;
 
-                            hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
-                        }
+                        invoice.UnpaidAmount = invoice.TotalAmount - totalAmountPayment;
+                        invoice.UnpaidAmountUsd = invoice.TotalAmountUsd - totalAmountUsdPaymentOfInv;
+                        invoice.UnpaidAmountVnd = invoice.TotalAmountVnd - totalAmountVndPaymentOfInv;
+                        
+                        invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
+                        invoice.UserModified = currentUser.UserID;
+                        invoice.DatetimeModified = DateTime.Now;
+
+                        hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
                         break;
                     case "OBH":
-                        IQueryable<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && payment.RefId.Contains(x.Id.ToString()))
-                            .OrderBy(x => x.UnpaidAmount); // sắp xếp unPaid Amount tăng dần
+                        // Lấy ra từng hóa đơn tạm để cấn trừ
+                        IQueryable<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && x.Id.ToString() == payment.RefId);
                         if (invoicesTemp != null && invoicesTemp.Count() > 0)
                         {
-                            decimal remainAmount = totalAmountPayment; // Số tiền amount còn lại;
-                            decimal remainAmountUsd = totalAmountUsdPaymentOfInv;
-                            decimal remainAmountVnd = totalAmountVndPaymentOfInv;
-                            foreach (var item in invoicesTemp)
+                            decimal remainAmount = payment.PaymentAmount ?? 0; // Số tiền đã thu của hóa đơn;
+                            decimal remainAmountUsd = payment.PaymentAmountUsd ?? 0;
+                            decimal remainAmountVnd = payment.PaymentAmountVnd ?? 0;
+                            foreach (AccAccountingManagement item in invoicesTemp)
                             {
-
-                                if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
-                                {
-                                }
-                                //1. Số tiền còn lại của payment lớn hơn số tiền của invoice
+                                //1. Số tiền còn lại của payment lớn hơn số tiền phải thu của invoice
                                 if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
                                 {
                                     item.PaidAmount = remainAmount - item.UnpaidAmount;
@@ -871,9 +815,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     remainAmountVnd = remainAmountVnd - item.UnpaidAmountVnd ?? 0;
                                     remainAmountUsd = remainAmountUsd - item.UnpaidAmountUsd ?? 0;
 
-                                    item.UnpaidAmount = invoice.TotalAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                    item.UnpaidAmountUsd = invoice.TotalAmountUsd - item.PaidAmountUsd;
-                                    item.UnpaidAmountVnd = invoice.TotalAmountVnd - item.PaidAmountVnd;
+                                    item.UnpaidAmount = item.TotalAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                    item.UnpaidAmountUsd = item.TotalAmountUsd - item.PaidAmountUsd;
+                                    item.UnpaidAmountVnd = item.TotalAmountVnd - item.PaidAmountVnd;
                                 }
                                 else
                                 {
@@ -886,20 +830,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     remainAmount = 0;
                                 }
 
-                                string _paymentStatus = invoice.PaymentStatus;
-                                if (invoice.UnpaidAmount <= 0)
-                                {
-                                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                                }
-                                if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
-                                {
-                                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                                }
-                                invoice.PaymentStatus = _paymentStatus;
-                                invoice.UserModified = currentUser.UserID;
-                                invoice.DatetimeModified = DateTime.Now;
+                                item.PaymentStatus = GetAndUpdateStatusInvoice(item);
+                                item.UserModified = currentUser.UserID;
+                                item.DatetimeModified = DateTime.Now;
 
-                                hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
+                                hsInvoiceUpdate = acctMngtRepository.Update(item, x => x.Id == item.Id);
 
                             }
                         }
@@ -907,7 +842,7 @@ namespace eFMS.API.Accounting.DL.Services
                     case "CREDIT":
                         if (payment.Type == "CREDITNOTE")
                         {
-                            var credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
+                            IQueryable<AcctCdnote> credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
                             if (credits != null && credits.Count() > 0)
                             {
                                 foreach (var item in credits)
@@ -920,7 +855,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         if (payment.Type == "SOA")
                         {
-                            var soas = soaRepository.Get(x => payment.RefId.Contains(x.Id));
+                            IQueryable<AcctSoa> soas = soaRepository.Get(x => payment.RefId.Contains(x.Id));
                             if (soas != null && soas.Count() > 0)
                             {
                                 foreach (var item in soas)
@@ -1031,13 +966,18 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             List<ReceiptInvoiceModel> paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
                             List<ReceiptInvoiceModel> paymentsUpdate = receiptModel.Payments.Where(x => x.PaymentId != Guid.Empty && x.PaymentId != null).ToList();
+                            // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && !paymentsUpdate.Select(se => se.PaymentId)
                             .Contains(x.Id))
                             .Select(s => s.Id)
                             .ToList();
-
+                            List<Guid> paymentsUpdateDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && paymentsUpdate.Select(se => se.PaymentId)
+                            .Contains(x.Id))
+                            .Select(s => s.Id)
+                            .ToList();
                             HandleState hsPaymentAdd = AddPayments(paymentsAdd, receipt);
-                            HandleState hsPaymentUpdate = UpdatePayments(paymentsUpdate, receipt);
+                            HandleState hsPaymentUpdateDelete = DeletePayments(paymentsUpdateDelete);
+                            HandleState hsPaymentUpdate = AddPayments(paymentsUpdate, receipt);
                             HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
 
                             DataContext.SubmitChanges();
@@ -1099,17 +1039,23 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = isAddNew ? DataContext.Add(receipt, false) : DataContext.Update(receipt, x => x.Id == receipt.Id, false);
                         if (hs.Success)
                         {
-                            var paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
-                            var hsPaymentAdd = AddPayments(paymentsAdd, receipt);
+                            List<ReceiptInvoiceModel> paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
+                            HandleState hsPaymentAdd = AddPayments(paymentsAdd, receipt);
                             if (isAddNew == false)
                             {
                                 List<ReceiptInvoiceModel> paymentsUpdate = receiptModel.Payments.Where(x => x.PaymentId != Guid.Empty && x.PaymentId != null).ToList();
                                 List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && !paymentsUpdate
-                                .Select(se => se.PaymentId).Contains(x.Id))
-                                .Select(s => s.Id)
-                                .ToList();
+                                                            .Select(se => se.PaymentId).Contains(x.Id))
+                                                            .Select(s => s.Id)
+                                                            .ToList();
 
-                                HandleState hsPaymentUpdate = UpdatePayments(paymentsUpdate, receipt);
+                                List<Guid> paymentsUpdateDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && paymentsUpdate.Select(se => se.PaymentId)
+                                                                   .Contains(x.Id))
+                                                                   .Select(s => s.Id)
+                                                                   .ToList();
+
+                                HandleState hsPaymentUpdateDelete = DeletePayments(paymentsUpdateDelete);
+                                HandleState hsPaymentUpdate = AddPayments(paymentsUpdate, receipt);
                                 HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
                             }
 

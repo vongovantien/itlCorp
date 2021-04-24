@@ -31,12 +31,13 @@ namespace eFMS.API.Accounting.Service.Models
         public string Note { get; set; }
         public decimal? PaymentAmountVnd { get; set; }
         public decimal? PaymentAmountUsd { get; set; }
-        public int? DeptInvoice { get; set; }
+        public int? DeptInvoiceId { get; set; }
         public Guid? OfficeInvoiceId { get; set; }
         public Guid? CompanyInvoiceId { get; set; }
         public decimal? UnpaidPaymentAmountUsd { get; set; }
         public decimal? UnpaidPaymentAmountVnd { get; set; }
         public decimal? BalanceVnd { get; set; }
         public decimal? BalanceUsd { get; set; }
+        public string InvoiceNo { get; set; }
     }
 }
