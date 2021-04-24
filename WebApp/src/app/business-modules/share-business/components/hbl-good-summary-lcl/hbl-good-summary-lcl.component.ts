@@ -35,6 +35,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     packages: Unit[] = [];
     selectedPackage: any;
     selectedPackageName: string = '';
+    isExport: boolean = false;
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -155,10 +156,16 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         this.containerDescription = '';
 
         if (!!containers) {
-            const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
-            containerLst.forEach((c: Container) => {
-                this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
-            });
+            if (this.isExport) {
+                const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
+                containerLst.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
+                });
+            }else{
+                containers.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+                });
+            }
         }
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({
