@@ -1,18 +1,19 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, takeUntil, mergeMap, concatMap, map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
+import { customerPaymentReceipInvoiceListState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -152,10 +153,31 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 (res: ReceiptInvoiceModel[]) => {
                     if (!!res) {
                         this.listDebit = res || [];
+                        this.filterList();
                     }
                 },
             );
+
+
+            // this._store.select(ReceiptCreditListState).subscribe((res: any) => {
+            //     if (!!res) {
+            //         console.log(res);
+            //     }
+            // })
         }
+    }
+
+    filterList() {
+        this._store.select(ReceiptDebitListState).subscribe((result: any) => {
+            if (!!result) {
+                console.log(result);
+                this.listDebit = this.listDebit.filter(s => //for every object in heroes
+                    result.every(t => { //check if every filter in iteration has the same value or not
+                        var key = Object.keys(t)[0];
+                        return s[key] !== t[key]
+                    }));
+            }
+        })
     }
 
     reset() {

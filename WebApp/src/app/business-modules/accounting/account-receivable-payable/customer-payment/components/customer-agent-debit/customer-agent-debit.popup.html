@@ -177,8 +177,10 @@
                                         <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' | number}} USD |
                                             {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
                                         </td>
-
-
+                                        <td>{{listDebit | sumAmount:'unpaidAmountVnd'| number}}
+                                        </td>
+                                        <td>{{listDebit | sumAmount:'unpaidAmountUsd'| number}}
+                                        </td>
                                     </tr>
                                 </ng-container>
                                 <tr app-table-none-record *ngIf="!listDebit.length"></tr>

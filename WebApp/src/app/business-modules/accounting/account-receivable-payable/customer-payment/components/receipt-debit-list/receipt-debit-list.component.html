@@ -22,10 +22,10 @@
                                 <td>{{item.refNo}}</td>
                                 <td>{{item.type}}</td>
                                 <td>{{item.invoiceNo}}</td>
-                                <td>
+                                <td ALIGN="left">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
-                                <td>
+                                <td ALIGN="left">
                                     {{item.unpaidAmountUsd}}
                                 </td>
                                 <td>
@@ -59,9 +59,11 @@
                             <td>Total</td>
                             <td></td>
                             <td></td>
-                            <td></td>
-                            <td class="text-right">0 USD </td>
-                            <td class="text-right">0 VND</td>
+                            <td class="text-left">{{debitList$ | async | sumAmount:'amount':'USD':'currencyId' |
+                                number}} USD |
+                                {{debitList$ | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
+                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidAmountUsd' | number}} </td>
+                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidAmountVnd' | number}} </td>
                         </tr>
                     </tfoot>
                 </table>
