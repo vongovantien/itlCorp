@@ -47,7 +47,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     remainUsd: number = null;
     remainVnd: number = null;
     typeInvoice: string = null;
-
+    partnerId: string = null;
     constructor(object?: any) {
         super();
         const self = this;

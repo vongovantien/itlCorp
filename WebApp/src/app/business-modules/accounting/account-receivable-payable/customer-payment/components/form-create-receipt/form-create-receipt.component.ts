@@ -129,8 +129,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.debitPopup.type = 'customer';
         this.debitPopup.customerFromReceipt = this.customerId.value;
         this.debitPopup.dateFromReceipt = this.date.value;
-        this.debitPopup.reset();
-        this.debitPopup.setDefaultValue();
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
+        //this.debitPopup.filterList();
     }
     getInvoiceList() {
         this.isSubmitted = true;

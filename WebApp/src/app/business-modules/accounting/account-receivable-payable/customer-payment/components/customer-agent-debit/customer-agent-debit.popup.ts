@@ -1,19 +1,19 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError, takeUntil, mergeMap, concatMap, map } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
-import { GetInvoiceListSuccess } from '../../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
-import { customerPaymentReceipInvoiceListState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -33,16 +33,19 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     customerFromReceipt: string = null;
     dateFromReceipt: any = null;
 
+    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     formSearch: FormGroup;
     searchOptions: string[] = ['Soa', 'Debit Note/Invoice', 'VAT Invoice', 'Job No', 'HBL', 'MBL', 'Customs No'];
-    customers: Observable<Customer[]>;
-    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
+
     listDebit: ReceiptInvoiceModel[] = [];
+    listDebitTemp: ReceiptInvoiceModel[] = [];
+    listCreditInvoice: ReceiptInvoiceModel[] = [];
+    listDebitInvoice: ReceiptInvoiceModel[] = [];
+    customers: Observable<Customer[]>;
 
     checkAll = false;
-
     services: CommonInterface.INg2Select[] = [
         { text: 'All', id: 'All' },
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
@@ -98,7 +101,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             typeSearch: [],
             referenceNo: [],
             date: [],
-            dateType: [],
+            dateType: [this.dateTypeList[0]],
             service: [[this.services[0].id]],
         });
         this.typeSearch = this.formSearch.controls['typeSearch'];
@@ -107,16 +110,17 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.dateType = this.formSearch.controls['dateType'];
         this.service = this.formSearch.controls['service'];
         this.partnerId = this.formSearch.controls['partnerId'];
-
     }
 
     getCustomer() {
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        console.log(this.customers);
     }
 
     onSelectDataFormInfo(data: any) {
         this.partnerId.setValue(data.id);
+        if (this.partnerId.value !== this.customerFromReceipt) {
+            this.listDebit = [];
+        }
     }
 
     checkAllChange() {
@@ -157,19 +161,13 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     }
                 },
             );
-
-
-            // this._store.select(ReceiptCreditListState).subscribe((res: any) => {
-            //     if (!!res) {
-            //         console.log(res);
-            //     }
-            // })
         }
     }
 
     filterList() {
         this._store.select(ReceiptDebitListState).subscribe((result: any) => {
             if (!!result) {
+                this.listDebitInvoice = result || [];
                 this.listDebit = this.listDebit.filter(s =>
                     result.every(t => {
                         var key = Object.keys(t)[0];
@@ -179,6 +177,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         })
         this._store.select(ReceiptCreditListState).subscribe((result: any) => {
             if (!!result) {
+                this.listCreditInvoice = result || [];
                 this.listDebit = this.listDebit.filter(s =>
                     result.every(t => {
                         var key = Object.keys(t)[0];
@@ -186,6 +185,56 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     }));
             }
         })
+    }
+
+    addToReceipt() {
+        const datatoReceipt = this.listDebit.filter(x => x.isSelected === true);
+        const partnerId = this.partnerId.value;
+        if (datatoReceipt.length === 0) {
+            this._toastService.warning('No data to add receipt!');
+            return;
+        }
+
+        if (this.customerFromReceipt !== this.partnerId.value
+            && ((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== partnerId)
+                || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== partnerId)
+            )) {
+            this._store.dispatch(ResetInvoiceList());
+        }
+
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+        this.onAddToReceipt.emit(this.partnerId.value);
+        this.hide();
+    }
+
+    setDefaultValue() {
+        if (this.customerFromReceipt !== this.partnerId.value) {
+            this.listDebit = [];
+        }
+        if (!!this.dateFromReceipt) {
+            this.date.setValue({ startDate: new Date(this.dateFromReceipt.startDate), endDate: new Date(this.dateFromReceipt.endDate) });
+        }
+        if (!!this.customerFromReceipt) {
+            this.partnerId.setValue(this.customerFromReceipt);
+        }
+    }
+
+    selelectedService(event: any) {
+        if (event.length > 0) {
+            if (event[event.length - 1].id === 'All') {
+                this.service.setValue([{ id: 'All', text: 'All' }]);
+            } else {
+                const arrNotIncludeAll = event.filter(x => x.id !== 'All');
+                this.service.setValue(arrNotIncludeAll);
+            }
+        }
+    }
+
+    mapServiceId() {
+        let serviceId = '';
+        const serv = this.services.filter(service => service.id !== 'All');
+        serviceId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
+        return serviceId;
     }
 
     reset() {
@@ -200,46 +249,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
 
     removeAllChecked() {
         this.checkAll = false;
-    }
-
-    addToReceipt() {
-        const datatoReceipt = this.listDebit.filter(x => x.isSelected === true);
-        if (datatoReceipt.length === 0) {
-            this._toastService.warning('No data to add receipt!');
-            return;
-        }
-
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
-        this.onAddToReceipt.emit(this.partnerId.value);
-        this.hide();
-    }
-
-    setDefaultValue() {
-        if (!!this.dateFromReceipt) {
-            this.date.setValue({ startDate: new Date(this.dateFromReceipt.startDate), endDate: new Date(this.dateFromReceipt.endDate) });
-        }
-        if (!!this.customerFromReceipt) {
-            this.partnerId.setValue(this.customerFromReceipt);
-        }
-    }
-
-
-    selelectedService(event: any) {
-        if (event.length > 0) {
-            if (event[event.length - 1].id === 'All') {
-                this.service.setValue([{ id: 'All', text: 'All' }]);
-            } else {
-                const arrNotIncludeAll = event.filter(x => x.id !== 'All'); //
-                this.service.setValue(arrNotIncludeAll);
-            }
-        }
-    }
-
-    mapServiceId() {
-        let serviceId = '';
-        const serv = this.services.filter(service => service.id !== 'All');
-        serviceId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
-        return serviceId;
     }
 
 }
