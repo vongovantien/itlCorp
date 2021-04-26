@@ -170,9 +170,17 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     filterList() {
         this._store.select(ReceiptDebitListState).subscribe((result: any) => {
             if (!!result) {
-                console.log(result);
-                this.listDebit = this.listDebit.filter(s => //for every object in heroes
-                    result.every(t => { //check if every filter in iteration has the same value or not
+                this.listDebit = this.listDebit.filter(s =>
+                    result.every(t => {
+                        var key = Object.keys(t)[0];
+                        return s[key] !== t[key]
+                    }));
+            }
+        })
+        this._store.select(ReceiptCreditListState).subscribe((result: any) => {
+            if (!!result) {
+                this.listDebit = this.listDebit.filter(s =>
+                    result.every(t => {
                         var key = Object.keys(t)[0];
                         return s[key] !== t[key]
                     }));
