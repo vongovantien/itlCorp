@@ -134,33 +134,33 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.debitPopup.reset();
         this.debitPopup.setDefaultValue();
     }
-    getInvoiceList() {
-        this.isSubmitted = true;
-        if (!this.formSearchInvoice.valid) {
-            return;
-        }
-        const body = {
-            customerId: this.customerId.value,
-            agreementId: this.agreementId.value,
-            fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
-        };
+    // getInvoiceList() {
+    //     this.isSubmitted = true;
+    //     if (!this.formSearchInvoice.valid) {
+    //         return;
+    //     }
+    //     const body = {
+    //         customerId: this.customerId.value,
+    //         agreementId: this.agreementId.value,
+    //         fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
+    //         toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
+    //     };
 
-        this._store.dispatch(GetInvoiceList());
-        this._accountingRepo.getInvoiceForReceipt(body)
-            .pipe()
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._store.dispatch(GetInvoiceListSuccess({ invoices: res.data }));
-                        return;
-                    }
+    //     this._store.dispatch(GetInvoiceList());
+    //     this._accountingRepo.getInvoiceForReceipt(body)
+    //         .pipe()
+    //         .subscribe(
+    //             (res: CommonInterface.IResult) => {
+    //                 if (res.status) {
+    //                     this._store.dispatch(GetInvoiceListSuccess({ invoices: res.data }));
+    //                     return;
+    //                 }
 
-                    this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
-                    this._toastService.warning("Not found invoices");
-                }
-            );
-    }
+    //                 this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
+    //                 this._toastService.warning("Not found invoices");
+    //             }
+    //         );
+    // }
 
     addToReceipt($event: string) {
         const partnerId = $event;

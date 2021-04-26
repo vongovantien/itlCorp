@@ -28,7 +28,7 @@
                                     [ngClass]="{'m-form__group has-danger':(isSubmitted || partnerId.dirty) && !partnerId.valid }">
                                     <label required>Partner Name</label>
                                     <app-combo-grid-virtual-scroll
-                                        (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                                        (itemSelected)="onSelectDataFormInfo($event)"
                                         [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
                                         [selectedDisplayFields]="['partnerNameVn']" [dataSources]="customers | async"
                                         [displayFields]="displayFilesPartners" (remove)="clearData()"
