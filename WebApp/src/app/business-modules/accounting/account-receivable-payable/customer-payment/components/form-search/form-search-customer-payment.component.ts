@@ -65,7 +65,6 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: [this.dateTypes[0]],
             currency: ['VND'],
             syncStatus: [this.syncStatuss[0]],
-            status: [this.statuss[0]],
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -74,7 +73,6 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType = this.formSearch.controls['dateType'];
         this.currency = this.formSearch.controls['currency'];
         this.syncStatus = this.formSearch.controls['syncStatus'];
-        this.status = this.formSearch.controls['status'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -99,11 +97,9 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateTo: (!!this.date.value && !!this.date.value.endDate) ? formatDate(this.date.value.endDate, 'yyyy-MM-dd', 'en') : null,
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
-            syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
-            status: this.status.value !== this.statuss[0] ? this.status.value : null,
+            syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null
         };
         this._listReceipt.getCPs(body);
-        // this.onSearch.emit(body);
 
     }
 
@@ -117,10 +113,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType.reset(this.dateTypes[0]);
         this.currency.setValue('VND');
         this.syncStatus.reset(this.syncStatuss[0]);
-        this.status.reset(this.statuss[0]);
         this._listReceipt.getCPs({});
-
-        // this.onSearch.emit(<any>{});
     }
 
 }
@@ -133,5 +126,4 @@ interface IAcctReceiptCriteria {
     dateType: string;
     currency: string;
     syncStatus: string;
-    status: string;
 }

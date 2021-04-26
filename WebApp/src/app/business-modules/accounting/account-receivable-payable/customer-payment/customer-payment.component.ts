@@ -48,7 +48,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     ngOnInit() {
         this.headers = [
-            { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
+            { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },

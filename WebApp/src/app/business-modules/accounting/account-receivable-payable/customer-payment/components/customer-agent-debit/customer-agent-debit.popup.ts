@@ -41,7 +41,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
 
     listDebit: ReceiptInvoiceModel[] = [];
-    listDebitTemp: ReceiptInvoiceModel[] = [];
     listCreditInvoice: ReceiptInvoiceModel[] = [];
     listDebitInvoice: ReceiptInvoiceModel[] = [];
     customers: Observable<Customer[]>;
@@ -99,7 +98,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     initForm() {
         this.formSearch = this._fb.group({
             partnerId: [null, Validators.required],
-            typeSearch: [],
+            typeSearch: [this.searchOptions[1]],
             referenceNo: [],
             date: [],
             dateType: [this.dateTypeList[0]],
@@ -146,7 +145,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
                 dateType: this.dateType.value,
-                service: this.service.value[0].id === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
+                service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
             };
             this._progressRef.start();
             this._accountingRepo.getDataIssueCustomerPayment(body).pipe(
@@ -185,7 +184,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                         return s[key] !== t[key]
                     }));
             }
-        })
+        });
+
     }
 
     addToReceipt() {
