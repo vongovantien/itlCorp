@@ -213,8 +213,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.configPartner.dataSource = data;
         this.configPartner.displayFields = [
             { field: 'taxCode', label: 'Tax Code' },
-            { field: 'shortName', label: 'Name' },
-            { field: 'partnerNameEn', label: 'Customer Name' },
+            { field: 'shortName', label: 'Partner Name' },
         ];
         this.configPartner.selectedDisplayFields = ['shortName'];
     }
