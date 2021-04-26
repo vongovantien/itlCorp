@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
-import { User, Currency, Customer, Partner } from '@models';
+import { User, Currency, Partner } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -128,7 +128,6 @@ export class SettlementFormCreateComponent extends AppForm {
             (data) => {
                 this._catalogueRepo.customersSource$.next({ data }); // * Update service.
                 this.customers = data;
-                this.getBeneficiaryInfo();
             }
         );
     }
@@ -151,7 +150,7 @@ export class SettlementFormCreateComponent extends AppForm {
             this.bankName.setValue(null);
         }
     }
-    
+
     getPartnerById(id: string) {
         const partner: Partner = !this.customers ? null : this.customers.find((p: Partner) => p.id === id);
         return partner || null;

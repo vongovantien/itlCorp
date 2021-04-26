@@ -85,7 +85,10 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             userCreated: this.settlementPayment.settlement.userCreated,
             datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
             statusApproval: this.settlementPayment.settlement.statusApproval,
-            payee: this.formCreateSurcharge.payee.value
+            payee: this.formCreateSurcharge.payee.value,
+            bankName: this.formCreateSurcharge.bankName.value,
+            bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
+            bankAccountNo: this.formCreateSurcharge.bankAccountNo.value
         };
 
         return settlement;
@@ -172,9 +175,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         statusApproval: this.settlementPayment.settlement.statusApproval,
                         amount: this.settlementPayment.settlement.amount,
                         currency: this.settlementPayment.settlement.settlementCurrency,
-                        payee: this.settlementPayment.settlement.payee
+                        payee: this.settlementPayment.settlement.payee,
+                        bankName: this.settlementPayment.settlement.bankName,
+                        beneficiaryName: this.settlementPayment.settlement.bankAccountName,
+                        bankAccountNo: this.settlementPayment.settlement.bankAccountNo,
                     });
-                    this.formCreateSurcharge.getBeneficiaryInfo();
+                    // this.formCreateSurcharge.getBeneficiaryInfo();
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
@@ -290,7 +296,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             )
             .subscribe(
                 (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
+                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} General Preview - eFMS.xlsx`);
                 },
             );
     }

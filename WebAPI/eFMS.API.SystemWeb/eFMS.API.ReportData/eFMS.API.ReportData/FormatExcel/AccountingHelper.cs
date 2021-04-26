@@ -3228,7 +3228,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("PaymentMethod", settlementExport.PaymentMethod);
                 listKeyData.Add("BankName", "Bank (Tên Ngân hàng): " + settlementExport.BankName);
                 listKeyData.Add("BankAccountNo", "Acc No (số TK): " + settlementExport.BankAccountNo);
-                listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.PayeeName);
+                listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.BankAccountName);
                 excel.SetData(listKeyData);
                 //Set format amount
                 var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
