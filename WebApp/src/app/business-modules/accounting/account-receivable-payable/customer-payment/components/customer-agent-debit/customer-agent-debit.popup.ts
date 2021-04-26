@@ -31,6 +31,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
 
     type: string = null;
     customerFromReceipt: string = null;
+
     dateFromReceipt: any = null;
 
     displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
