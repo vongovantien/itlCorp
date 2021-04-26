@@ -2748,7 +2748,6 @@ namespace eFMS.API.Documentation.DL.Services
                 if (surcharges.Count > 0)
                 {
                     var units = catUnitRepo.Get();
-                    surcharges = surcharges.Where(x => x.Type == "BUY").ToList();
                     foreach (var surcharge in surcharges)
                     {
                         var unitCode = units.FirstOrDefault(x => x.Id == surcharge.UnitId)?.Code;
