@@ -247,7 +247,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public string GenerateReceiptNo()
         {
-            string ReceiptNo = "PT" + DateTime.Now.ToString("yyMM");
+            string ReceiptNo = "PT" + DateTime.Now.ToString("yy");
 
             IQueryable<string> codes = DataContext.Where(x => x.PaymentRefNo.Contains(ReceiptNo)).Select(x => x.PaymentRefNo);
 
@@ -267,16 +267,16 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     int maxCurrentOder = oders.Max();
 
-                    ReceiptNo += (maxCurrentOder + 1).ToString("0000");
+                    ReceiptNo += (maxCurrentOder + 1).ToString("00000");
                 }
                 else
                 {
-                    ReceiptNo += "0001";
+                    ReceiptNo += "00001";
                 }
             }
             else
             {
-                ReceiptNo += "0001";
+                ReceiptNo += "00001";
             }
 
             return ReceiptNo;

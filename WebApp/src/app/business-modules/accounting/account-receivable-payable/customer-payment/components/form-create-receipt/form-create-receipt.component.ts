@@ -34,9 +34,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
-        { field: 'saleManName', label: 'Salesman' },
-        { field: 'contractNo', label: 'Contract No' },
-        { field: 'contractType', label: 'Contract Type' },
+        { field: 'contractType', label: 'Agreement Type' },
+        { field: 'contractNo', label: 'Agreement No' },
+        { field: 'expiredDate', label: 'Expired Date' },
     ];
     isReadonly = null;
     customerName: string;
@@ -103,6 +103,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                 this.agreements = d || [];
                                 if (!!this.agreements.length) {
                                     this.agreementId.setValue(d[0].id);
+                                    
 
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
@@ -116,6 +117,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             case 'agreement':
                 this.agreementId.setValue((data as IAgreementReceipt).id);
                 this._dataService.setData('cus-advance', (data as IAgreementReceipt).cusAdvanceAmount);
+                this._dataService.setData('currency', (data as IAgreementReceipt).creditCurrency);
                 break;
             default:
                 break;
@@ -158,6 +160,7 @@ interface IAgreementReceipt {
     saleManName: string;
     expiredDate: Date;
     cusAdvanceAmount: number;
+    creditCurrency: string;
 }
 
 interface IQueryAgreementCriteria {

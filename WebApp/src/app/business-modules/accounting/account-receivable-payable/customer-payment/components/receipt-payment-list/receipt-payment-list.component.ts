@@ -4,14 +4,14 @@ import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { SortService, DataService } from '@services';
-import { formatDate } from '@angular/common';
+import { formatCurrency, formatDate } from '@angular/common';
 import { AppList } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
+import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
 
 import { Store } from '@ngrx/store';
-import { catchError, finalize, takeUntil, pluck } from 'rxjs/operators';
-import { Observable, from } from 'rxjs';
+import { catchError, finalize, takeUntil, pluck, debounceTime, startWith, distinctUntilChanged, tap, switchMap, skip } from 'rxjs/operators';
+import { Observable, from, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 
@@ -26,11 +26,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     @Input() syncInfoTemplate: TemplateRef<any>
 
     invoices: ReceiptInvoiceModel[] = [];
-
+    term$ = new BehaviorSubject<string>('');
+    
     form: FormGroup;
     paidAmount: AbstractControl;
     methods: CommonInterface.ICommonTitleValue[];
-    userLogged: SystemInterface.IClaimUser;
+    userLogged: Partial<SystemInterface.IClaimUser>;
     type: AbstractControl;
     cusAdvanceAmount: AbstractControl;
     finalPaidAmount: AbstractControl;
@@ -41,17 +42,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     exchangeRate: AbstractControl;
     bankAccountNo: AbstractControl;
     description: AbstractControl;
+    amountVND: AbstractControl;
+    amountUSD: AbstractControl;
+    paidAmountVND: AbstractControl;
+    paidAmountUSD: AbstractControl;
 
     $currencyList: Observable<Currency[]>;
 
 
-    paymentMethods: string[] = ['Cash', 'Bank Transfer'];
+    paymentMethods: string[] = ['Cash', 'Bank Transfer', 'Other'];
     receiptTypes: string[] = ['Debit', 'NetOff Adv'];
 
     customerInfo: Partner = null;
 
     isSubmitted: boolean = false;
     isReadonly: boolean = null;  // * DONE | CANCEL
+    exchangeRateUsd: number = 1;
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },
@@ -77,7 +83,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         private _fb: FormBuilder,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -112,6 +118,23 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.initSubscriptioontInvoiceList();
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((u) => {
+                if (!!u) {
+                    this.userLogged = u;
+                    console.log('sue', this.userLogged)
+                }
+            });
+        this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'));
+        
+    }
+
+    formatNumberCurrency(input: number) {
+        return input.toLocaleString(
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            { minimumFractionDigits: 0 }
+        );
     }
 
     initSubscriptioontInvoiceList() {
@@ -146,6 +169,16 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             );
     }
 
+    listenCurrencyInfoData() {
+        this._dataService.currentMessage
+            .pipe(pluck('currency'))
+            .subscribe(
+                (data: Partner) => {
+                    data !== undefined&& !this.currencyId.value && (this.currencyId.setValue(data));
+                }
+            );
+    }
+
     initForm() {
         this.form = this._fb.group({
             paidAmount: [null, Validators.required],
@@ -158,6 +191,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [1, Validators.required],
             bankAccountNo: [],
+            amountVND: [],
+            amountUSD: [],
+            paidAmountVND: [],
+            paidAmountUSD: [],
             description: [],
         });
 
@@ -172,17 +209,33 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.bankAccountNo = this.form.controls['bankAccountNo'];
         this.currencyId = this.form.controls['currencyId'];
         this.description = this.form.controls['description'];
-
+        this.amountVND = this.form.controls['amountVND'];
+        this.amountUSD = this.form.controls['amountUSD'];
+        this.paidAmountVND = this.form.controls['paidAmountVND'];
+        this.paidAmountUSD = this.form.controls['paidAmountUSD'];
     }
 
-    generateExchangeRate(date: string, fromCurrency: string) {
-        this._catalogueRepo.convertExchangeRate(date, fromCurrency)
+    generateExchangeRateUSD(date: string) {
+        this._catalogueRepo.convertExchangeRate(date, 'USD')
             .pipe()
             .subscribe(
                 (data: { rate: number }) => {
-                    this.exchangeRate.setValue(data?.rate);
+                    this.exchangeRateUsd = data?.rate;
+                    console.log('change 1111', this.exchangeRateUsd)
                 }
             );
+    }
+
+    getBankAccountNo(event: any){
+        if(event === this.paymentMethods[1]){
+            if(this.currencyId.value === 'VND'){
+                this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoVnd)
+            }else{
+                this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoUsd)
+            }
+        }else{
+            this.bankAccountNo.setValue(null);
+        }
     }
 
     sortTrialOfficalList(sortField: string, order: boolean) {
@@ -213,6 +266,37 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
 
                 break;
+            case 'paid-amountVnd':
+                // if (this.currencyId.value === 'VND') {
+                //     console.log('amountVnd', this.exchangeRateUsd)
+                //     if (!this.paidAmountVND.value) {
+                //         this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd)
+                //     }
+                // } else {
+                //     this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd)
+                // }
+                console.log('amountVnd')
+                this.paidAmountUSD.setValue(formatCurrency(this.paidAmountVND.value / this.exchangeRateUsd, 'en', ''));
+                // this.paidAmountVND.valueChanges
+                // .pipe(
+                //     debounceTime(200)
+                // ).subscribe(
+                //     (value: number) => {
+                //         this.paidAmountUSD.setValue(formatCurrency(this.paidAmountVND.value / this.exchangeRateUsd, 'en', ''))
+                //     }
+                // );
+                break;
+            case 'paid-amountUsd':
+                console.log('amountUsd')
+                    // if (this.currencyId.value === 'USD') {
+                    //     if (!this.paidAmountVND.value) {
+                    //         this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value)
+                    //     }
+                    // } else {
+                    //     this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value)
+                    // }
+                    this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRate.value));
+                    break;
             case 'type':
                 if (data.length === 1) {
                     if (data?.includes(this.receiptTypes[0])) {
@@ -229,9 +313,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.exchangeRate.setValue(1);
                     break;
                 } else {
-                    this.exchangeRate.setValue(null);
-                    if ((data as Currency).id !== 'VND' && this.paymentDate.value?.startDate) {
-                        this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'), (data as Currency).id);
+                    if ((data as Currency).id !== 'VND') {
+                        this.exchangeRate.setValue(this.exchangeRateUsd);
+                    }else{
+                        this.exchangeRate.setValue(1);
                     }
 
                 }
@@ -242,17 +327,41 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 break;
 
             case 'payment-date':
+                this.generateExchangeRateUSD(formatDate(data?.startDate, 'yyy-MM-dd', 'en'));
                 if (this.currencyId.value === 'VND') {
                     this.exchangeRate.setValue(1);
-                    break;
+                }else{
+                    this.exchangeRate.setValue(this.exchangeRateUsd);
                 }
-                this.generateExchangeRate(formatDate(data?.startDate, 'yyy-MM-dd', 'en'), this.currencyId.value);
                 break;
             default:
                 break;
         }
     }
 
+    onSearchAutoComplete(keyword: string) {
+        console.log('text2', keyword)
+        // if(keyword === 'paid-amountVnd'){
+        //     this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd);
+        // }else{
+        //     this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value);
+        // }
+        // this.isLoading = false;
+    }
+
+    // autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
+    //     source$.pipe(
+    //         debounceTime(time),
+    //         distinctUntilChanged(),
+    //         tap(() => {
+    //             this.isLoading = true;
+    //         }),
+    //         switchMap((...args: any[]) => callBack(...args).pipe(
+    //             takeUntil(source$.pipe(skip(1)))
+    //         )
+    //         )
+    //     )
+        
     removeInvoiceItem() {
         if (!!this.invoices.length) {
             this.invoices = this.invoices.filter((item: any) => !item.isSelected);
