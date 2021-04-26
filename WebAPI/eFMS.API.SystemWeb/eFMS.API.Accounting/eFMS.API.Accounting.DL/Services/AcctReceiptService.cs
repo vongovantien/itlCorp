@@ -189,7 +189,33 @@ namespace eFMS.API.Accounting.DL.Services
             if (receipt.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow delete. Receipt has canceled");
             if (receipt.Status == AccountingConstants.RECEIPT_STATUS_DRAFT)
             {
-                hs = DataContext.Delete(x => x.Id == receipt.Id);
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        hs = DataContext.Delete(x => x.Id == receipt.Id);
+                        if (hs.Success)
+                        {
+                            var payments = acctPaymentRepository.Get(x => x.ReceiptId == id).Select(x => x.Id).ToList();
+                            if(payments.Count() > 0)
+                            {
+                                var hsDeletePayment = DeletePayments(payments);
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState((object)ex.ToString());
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+               
             }
             return hs;
         }
@@ -462,7 +488,7 @@ namespace eFMS.API.Accounting.DL.Services
                     hs = SaveDone(receiptModel);
                     break;
                 case SaveAction.SAVECANCEL:
-                    currentUser.Action = "ReceiptSaveCabcel";
+                    currentUser.Action = "ReceiptSaveCancel";
                     hs = SaveCancel(receiptModel.Id);
                     break;
             }
@@ -497,7 +523,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.RefId = invTemp.Id.ToString(); // ID hóa đơn tạm
             _payment.BillingRefNo = paymentGroupOBH.RefNo; // Cùng một BillingRefNo SOA DEBIT /DEBITNOTE
             _payment.PaymentNo = invTemp.InvoiceNoReal + "_" + receipt.PaymentRefNo;
-            _payment.InvoiceNo = null;
+            _payment.InvoiceNo = invTemp.InvoiceNoTempt;
             _payment.Type = "OBH";
             _payment.CurrencyId = receipt.CurrencyId; // Theo currency của phiếu thu
             _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
@@ -764,7 +790,7 @@ namespace eFMS.API.Accounting.DL.Services
             return _paymentStatus;
         }
 
-        private HandleState UpdateInvoiceOfPayment(Guid receiptId)
+        private HandleState UpdateInvoiceOfPayment(Guid receiptId, string action)
         {
             HandleState hsInvoiceUpdate = new HandleState();
             IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
@@ -847,7 +873,14 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in credits)
                                 {
-                                    item.NetOff = true;
+                                    if(action == "CANCEL")
+                                    {
+                                        item.NetOff = false;
+                                    }
+                                    else
+                                    {
+                                        item.NetOff = true;
+                                    }
                                     cdNoteRepository.Update(item, x => x.Id == item.Id, false);
                                 }
                                 cdNoteRepository.SubmitChanges();
@@ -860,7 +893,14 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in soas)
                                 {
-                                    item.NetOff = true;
+                                    if (action == "CANCEL")
+                                    {
+                                        item.NetOff = false;
+                                    }
+                                    else
+                                    {
+                                        item.NetOff = true;
+                                    }
                                     soaRepository.Update(item, x => x.Id == item.Id, false);
                                 }
                                 soaRepository.SubmitChanges();
@@ -1060,7 +1100,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
 
                             // cấn trừ cho hóa đơn
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id);
+                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id,"DONE");
                             //TODO: Tính lại công nợ trên hợp đồng
 
                             DataContext.SubmitChanges();
@@ -1118,7 +1158,7 @@ namespace eFMS.API.Accounting.DL.Services
                             // Phát sinh những dòng payment âm 
                             HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentsReceipt, receiptCurrent);
                             // Cập nhật invoice cho những payment
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receiptCurrent.Id);
+                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receiptCurrent.Id, "CANCEL");
                             // Cập nhật Cus Advance của Agreement
                             HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
 

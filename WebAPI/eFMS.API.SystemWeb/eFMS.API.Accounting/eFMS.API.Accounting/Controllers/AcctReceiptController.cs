@@ -94,6 +94,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult Delete(Guid id)
         {
+            currentUser.Action = "DeleteReceipt";
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
 
