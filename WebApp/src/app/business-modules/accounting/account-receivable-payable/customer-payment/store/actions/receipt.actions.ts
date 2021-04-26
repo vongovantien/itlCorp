@@ -22,4 +22,4 @@ export const GetInvoiceListFail = createAction(ReceiptActionTypes.GET_INVOICE_FA
 
 export const ProcessClear = createAction(ReceiptActionTypes.PROCESS_CLEAR_INVOICE, props<{ amount?: number }>())
 export const RemoveInvoice = createAction(ReceiptActionTypes.REMOVE_INVOICE, props<{ index: number }>())
-export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, props<{}>());
+export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, props<{ data: ReceiptInvoiceModel }>());

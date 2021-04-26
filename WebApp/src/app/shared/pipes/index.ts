@@ -7,11 +7,12 @@ export * from './remove-trim.pipe';
 export * from './highlight.pipe';
 export * from './service-name.pipe';
 export * from './special-permission.pipe';
-export * from './sum.pipe';
+export { SumPipe, SumAmountCurrencyPipe } from './sum.pipe';
 export * from './date-ago.pipe';
 export * from './safe.pipe';
 export * from './class-status-approval.pipe';
 export * from './extension';
 export * from './class-status-sync.pipe';
+
 
 

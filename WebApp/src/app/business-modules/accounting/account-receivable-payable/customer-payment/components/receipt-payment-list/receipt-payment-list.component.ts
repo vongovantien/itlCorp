@@ -14,6 +14,7 @@ import { catchError, finalize, takeUntil, pluck, debounceTime, startWith, distin
 import { Observable, from, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
+import { InsertAdvance } from '../../store/actions';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -369,22 +370,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         }
         this.isCheckAll = false;
     }
-
     insertAdvanceRowData() {
         const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
-            type: 'ADV',
-            paidAmount: 0,
-            unpaidAmount: 0,
-            invoiceBalance: 0,
-            taxCode: this.customerInfo?.taxCode,
-            partnerName: this.customerInfo?.shortName
+            typeInvoice: 'ADV',
+            paidAmountVnd: 0,
+            paidAmountUsd: 0
         });
-        this.invoices.push(newInvoiceWithAdv);
+        this._store.dispatch(InsertAdvance({ data: newInvoiceWithAdv }));
+
+        ///this.invoices.push(newInvoiceWithAdv);
     }
 
     getCurrencyInvoice(invoiceList: ReceiptInvoiceModel[]): string[] {
         if (!invoiceList.length) { return ["VND"] };
-        const currencyList = [...new Set(invoiceList.map(i => i.currency))];
+        const currencyList = [...new Set(invoiceList.map(i => i.currencyId))];
 
         return currencyList;
     }

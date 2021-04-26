@@ -30,12 +30,12 @@ export class ARCustomerPaymentReceiptSummaryComponent extends AppList implements
         ];
     }
 
-    calculateInfodataInvoice(invoice: ReceiptInvoiceModel[]) {
-        if (invoice.length) {
-            this.totalDebit = invoice.filter(x => x.type === 'DEBIT').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
-            this.totalOBH = invoice.filter(x => x.type === 'OBH').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
-            this.totalAdv = invoice.filter(x => x.type === 'ADV').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
-        }
-    }
+    // calculateInfodataInvoice(invoice: ReceiptInvoiceModel[]) {
+    //     if (invoice.length) {
+    //         this.totalDebit = invoice.filter(x => x.type === 'DEBIT').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+    //         this.totalOBH = invoice.filter(x => x.type === 'OBH').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+    //         this.totalAdv = invoice.filter(x => x.type === 'ADV').reduce((acc: any, curr: ReceiptInvoiceModel) => acc += curr.paidAmount, 0);
+    //     }
+    // }
 }
 

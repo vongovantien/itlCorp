@@ -100,7 +100,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateSummary(res: ReceiptModel) {
         this.summary.invoices = [...(res.payments || [])];
-        this.summary.calculateInfodataInvoice([...res.payments] || []);
+        //this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
     onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = this.receiptDetail.id;
