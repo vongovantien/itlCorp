@@ -91,7 +91,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Serie No', field: 'serieNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Vat Partner', field: 'vatPartnerId', sortable: true, width: 250 },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 250 },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
         ];
