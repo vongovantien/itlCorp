@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -10,11 +10,14 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
 
 import { Store } from '@ngrx/store';
-import { catchError, finalize, takeUntil, pluck, debounceTime, startWith, distinctUntilChanged, tap, switchMap, skip } from 'rxjs/operators';
+import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, from, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState } from '../../store/reducers';
+import { customerPaymentReceipInvoiceListState, customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance } from '../../store/actions';
+import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
+import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
+import { InfoPopupComponent } from '@common';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -23,10 +26,15 @@ import { InsertAdvance } from '../../store/actions';
 })
 
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
-
+    @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
+    @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
+    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    
     @Input() syncInfoTemplate: TemplateRef<any>
 
     invoices: ReceiptInvoiceModel[] = [];
+    creditList: Observable<ReceiptInvoiceModel[]>;
+    debitList: Observable<ReceiptInvoiceModel[]>;
     term$ = new BehaviorSubject<string>('');
     
     form: FormGroup;
@@ -128,7 +136,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
             });
         this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'));
-        
+        this.creditList = this._store.select(ReceiptCreditListState);
+        this.debitList = this._store.select(ReceiptDebitListState);
     }
 
     formatNumberCurrency(input: number) {
@@ -222,7 +231,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (data: { rate: number }) => {
                     this.exchangeRateUsd = data?.rate;
-                    console.log('change 1111', this.exchangeRateUsd)
                 }
             );
     }
@@ -268,34 +276,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
                 break;
             case 'paid-amountVnd':
-                // if (this.currencyId.value === 'VND') {
-                //     console.log('amountVnd', this.exchangeRateUsd)
-                //     if (!this.paidAmountVND.value) {
-                //         this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd)
-                //     }
-                // } else {
-                //     this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd)
-                // }
-                console.log('amountVnd')
                 this.paidAmountUSD.setValue(formatCurrency(this.paidAmountVND.value / this.exchangeRateUsd, 'en', ''));
-                // this.paidAmountVND.valueChanges
-                // .pipe(
-                //     debounceTime(200)
-                // ).subscribe(
-                //     (value: number) => {
-                //         this.paidAmountUSD.setValue(formatCurrency(this.paidAmountVND.value / this.exchangeRateUsd, 'en', ''))
-                //     }
-                // );
                 break;
             case 'paid-amountUsd':
-                console.log('amountUsd')
-                    // if (this.currencyId.value === 'USD') {
-                    //     if (!this.paidAmountVND.value) {
-                    //         this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value)
-                    //     }
-                    // } else {
-                    //     this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value)
-                    // }
                     this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRate.value));
                     break;
             case 'type':
@@ -362,13 +345,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     //         )
     //         )
     //     )
+    
+    confirmPopup(){
+        this.infoPopup.show();
+    }
+
+    removeReceiptItem() {
         
-    removeInvoiceItem() {
-        if (!!this.invoices.length) {
-            this.invoices = this.invoices.filter((item: any) => !item.isSelected);
-            return;
-        }
-        this.isCheckAll = false;
+        this.receiptDebitList.removeListItem();
+        this.receiptCreditList.removeListItem();
     }
     insertAdvanceRowData() {
         const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({

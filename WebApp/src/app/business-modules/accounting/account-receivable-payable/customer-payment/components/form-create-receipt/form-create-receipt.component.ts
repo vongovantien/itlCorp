@@ -6,7 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Partner, } from '@models';
+import { Partner, ReceiptInvoiceModel, } from '@models';
 import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
 import { IAppState } from '@store';
 import { AppForm } from '@app';
@@ -34,6 +34,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     $customers: Observable<Partner[]>;
     agreements: IAgreementReceipt[];
+    listReceipts: ReceiptInvoiceModel[] = [];
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
@@ -162,11 +163,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     //         );
     // }
 
-    addToReceipt($event: string) {
-        const partnerId = $event;
-        if (!this.customerId.value) {
-            this.customerId.setValue(partnerId);
-        }
+    addToReceipt(listDebit: any[]) {
+        // const partnerId = $event;
+        // if (!this.customerId.value) {
+        //     this.customerId.setValue(partnerId);
+        // }
+        this.listReceipts = [...this.listReceipts, ...listDebit];
     }
 
 }

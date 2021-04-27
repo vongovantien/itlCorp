@@ -12,37 +12,48 @@
         <div class="collapse show" id="debit-list">
             <div class="table-wrapper" id="">
                 <table class="table table-striped table-brand">
-                    <thead app-table-header [headers]="headers">
-                        <th class="first"></th>
+                    <thead app-table-header [headers]="headers" class="text-left">
+                        <th class="m--w-50 first">
+                            <label class="m-checkbox">
+                                <input type="checkbox" name="" [(ngModel)]="isCheckAll"
+                                    (change)="checkAllChange()">
+                                <span></span>
+                            </label>
+                        </th>
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!(debitList$ | async)?.length">
-                            <tr *ngFor="let item of (debitList$ | async); let i = index; trackBy: trackByFn">
-                                <td></td>
+                            <tr *ngFor="let item of (this.debitList$ | async); let i = index; trackBy: trackByFn">
+                                <td>
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" name="" [(ngModel)]="item.isSelected" (change)="onCheckChange()">
+                                        <span></span>
+                                    </label>
+                                </td>
                                 <td>{{item.refNo}}</td>
-                                <td>{{item.type}}</td>
+                                <td ALIGN="center">{{item.type}}</td>
                                 <td>{{item.invoiceNo}}</td>
-                                <td ALIGN="left">
+                                <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
-                                <td ALIGN="left">
-                                    {{item.unpaidAmountUsd}}
+                                <td ALIGN="right">
+                                    {{item.unpaidUsd | number:'1.3-3'}}
                                 </td>
-                                <td>
-                                    {{item.unpaidAmountVnd}}
+                                <td ALIGN="right">
+                                    {{item.unpaidVnd | number:'1.0-3'}}
                                 </td>
 
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountUsd">
+                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountUsd" numeric autoFormatCurrency>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountUVnd">
+                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency>
                                 </td>
                                 <td>
-                                    {{item.balanceAmountUsd}}
+                                    {{item.unpaidUsd - item.paidAmountUsd  | number:'1.3-3'}}
                                 </td>
                                 <td>
-                                    {{item.balanceAmountVnd}}
+                                    {{item.unpaidVnd - item.paidAmountVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="item.notes">
@@ -56,14 +67,22 @@
                     </tbody>
                     <tfoot *ngIf="!!(debitList$ | async)?.length">
                         <tr class="font-weight-bold">
-                            <td>Total</td>
                             <td></td>
+                            <td></td>
+                            <td>Total</td>
                             <td></td>
                             <td class="text-left">{{debitList$ | async | sumAmount:'amount':'USD':'currencyId' |
                                 number}} USD |
                                 {{debitList$ | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidAmountUsd' | number}} </td>
-                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidAmountVnd' | number}} </td>
+                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidUsd' | number:'1.3-3'}} </td>
+                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidVnd' | number:'1.0-3'}} </td>
+                            <td class="text-left">{{(debitList$ | async | sumAmount:'paidAmountUsd') | number:'1.3-3'}}</td>
+                            <td class="text-left">{{(debitList$ | async | sumAmount:'paidAmountVnd') | number:'1.0-3'}}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
                         </tr>
                     </tfoot>
                 </table>

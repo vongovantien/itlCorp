@@ -1,7 +1,5 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { AddCustomerDebitComponent } from './components/popup/customer-debit/add-customer-debit/add-customer-debit.component';
-import { AddCustomerDebit } from './components/popup/add-customer-debit.popup/add-customer-debit.popup.component';
 
 const routing: Routes = [
     {
@@ -35,8 +33,7 @@ const routing: Routes = [
 
 @NgModule({
     declarations: [
-    AddCustomerDebitComponent,
-    AddCustomerDebit.PopupComponent],
+    ],
     imports: [
         RouterModule.forChild(routing),
     ],

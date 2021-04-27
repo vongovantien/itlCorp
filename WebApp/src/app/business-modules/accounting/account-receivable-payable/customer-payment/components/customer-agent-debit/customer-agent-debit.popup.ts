@@ -21,7 +21,7 @@ import { customerPaymentReceipInvoiceListState, ReceiptCreditListState, ReceiptD
 })
 
 export class CustomerAgentDebitPopupComponent extends PopupBase {
-    @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onAddToReceipt: EventEmitter<any[]> = new EventEmitter<any[]>();
     typeSearch: AbstractControl;
     partnerId: AbstractControl;
     referenceNo: AbstractControl;
@@ -210,7 +210,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         }
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
-        this.onAddToReceipt.emit(this.partnerId.value);
+        this.onAddToReceipt.emit(datatoReceipt);
         this.hide();
     }
 

@@ -1,11 +1,13 @@
-import { OnInit, Component, ChangeDetectionStrategy, Input } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, Input, ViewChild } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
-import { ReceiptCreditDebitModel } from "@models";
+import { ReceiptCreditDebitModel, ReceiptInvoiceModel } from "@models";
 import { map, reduce, takeUntil } from "rxjs/operators";
+import { RemoveCredit } from "../../store/actions";
+import { InfoPopupComponent } from "@common";
 
 @Component({
     selector: 'customer-payment-receipt-credit-list',
@@ -20,14 +22,11 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             if (this._type !== 'Customer') {
                 this.headers = Array.from([
                     { title: 'RefNo', field: 'refNo', sortable: true },
-                    { title: 'JobNo', field: '' },
-                    { title: 'MBL', field: '' },
-                    { title: 'HBL', field: '' },
                     { title: 'Net Off Invoice No', field: '', width: 250 },
                     { title: 'Org Amount', field: '' },
                     { title: 'Amount USD', field: '' },
                     { title: 'Amount VND', field: '' },
-                    { title: 'Note', field: '' },
+                    { title: 'Payment Note', field: '' },
                     { title: 'BU Handle', field: '' },
                     { title: 'Office', field: '' },
                 ]);
@@ -42,8 +41,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     }
 
     private _type: string = 'Customer' // Agent
-    creditList: Observable<ReceiptCreditDebitModel[]>;
-    debitList$: Observable<ReceiptCreditDebitModel[]>;
+    creditList: Observable<ReceiptInvoiceModel[]>;
+    debitList$: Observable<ReceiptInvoiceModel[]>;
     configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
 
     constructor(
@@ -68,11 +67,40 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { field: 'invoiceNo', label: 'Invoice No' },
             { field: 'amount', label: 'Unpaid Invoice' }
         ];
-
+        this.isCheckAll = true;
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList$ = this._store.select(ReceiptDebitListState);
 
 
 
+    }
+
+    checkAllChange() {
+        this.creditList.pipe()
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                x.every((element: ReceiptInvoiceModel) => {
+                    element.isSelected = this.isCheckAll;
+                });
+            });
+    }
+
+    onCheckChange() {
+        this.creditList.pipe()
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
+            });
+    }
+
+    removeListItem(){
+        this.creditList.pipe()
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                if (x.filter((item: ReceiptInvoiceModel) => item.isSelected).length > 0) {
+                    for (let i = 0; i < x.length; i++) {
+                        if (x[i].isSelected === true) {
+                            this._store.dispatch(RemoveCredit({ index: i }));
+                        }
+                    }
+                }
+            });
     }
 }
