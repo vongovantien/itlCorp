@@ -29,6 +29,8 @@ export class CsTransactionDetail {
   eta: string = null;
   pol: string = null;
   pod: string = null;
+  polDescription: string = null;
+  podDescription: string = null;
   deliveryPlace: string = null;
   finalDestinationPlace: string = null;
   coloaderId: string = null;
@@ -78,6 +80,7 @@ export class CsTransactionDetail {
   saleManNameVn: string = null;
   forwardingAgentName: string = null;
   notifyParty: string = null;
+  polName: string = null;
   podName: string = null;
   contSealNo: string;
   containerNames: string = null;
