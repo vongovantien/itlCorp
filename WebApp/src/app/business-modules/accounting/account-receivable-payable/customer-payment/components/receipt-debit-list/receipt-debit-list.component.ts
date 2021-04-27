@@ -1,10 +1,10 @@
-import { OnInit, Component, ChangeDetectionStrategy } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
 import { ReceiptDebitListState } from "../../store/reducers";
-import { ReceiptCreditDebitModel, ReceiptInvoiceModel } from "@models";
+import { ReceiptInvoiceModel } from "@models";
 import { RemoveInvoice } from "../../store/actions";
 
 @Component({
@@ -13,7 +13,8 @@ import { RemoveInvoice } from "../../store/actions";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
-
+    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    
     debitList$: Observable<ReceiptInvoiceModel[]>;
     constructor(
         private _store: Store<IReceiptState>

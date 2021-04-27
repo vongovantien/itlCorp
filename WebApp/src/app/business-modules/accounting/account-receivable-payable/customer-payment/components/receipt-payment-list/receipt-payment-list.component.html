@@ -43,14 +43,14 @@
                 <div class="form-group">
                     <label class="form-control-label">Cus Advance Amount</label>
                     <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly">
+                        autoFormatCurrency [attr.readOnly]="isReadonly" (ngModelChange)="getFinalPaidAmount()">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" required> Exchange Rate </label>
                     <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                        [attr.readOnly]="isReadonly" numeric>
+                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency>
                 </div>
             </div>
         </div>
@@ -59,14 +59,14 @@
                 <div class="form-group">
                     <label class="form-control-label">Credit Amount VND</label>
                     <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
-                        autoFormatCurrency [attr.readOnly]="isReadonly" (onChange)="getFinalPaidAmount('VND')">
+                        autoFormatCurrency [attr.readOnly]="isReadonly" (change)="getFinalPaidAmount()">
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
                     <label class="form-control-label">Credit Amount USD</label>
                     <input class="form-control" type="number" formControlName="amountUSD" numeric [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly">
+                        autoFormatCurrency [attr.readOnly]="isReadonly" (change)="getFinalPaidAmount()">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -74,7 +74,7 @@
                         <label class="form-control-label" required>Paid Amount VND</label>
                         <input type="text" class="form-control m-input m-input--square text-success"
                             formControlName="paidAmountVND" numeric [decimals]="0" autoFormatCurrency
-                            [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
+                            [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountVnd');getFinalPaidAmount()">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -82,17 +82,17 @@
                     <label class="form-control-label" required>Paid Amount USD</label>
                     <input type="text" class="form-control m-input m-input--square text-success"
                         formControlName="paidAmountUSD" numeric [decimals]="2" autoFormatCurrency
-                        [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
+                        [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountUsd');getFinalPaidAmount()">
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <label class="form-control-label">Final Paid Amount USD {{finalPaidAmountUSD}}</label>
+                <label class="form-control-label">Final Paid Amount USD {{finalPaidAmountUSD.value}}</label>
                 <!-- <span *ngIf="currencyId.value !== 'VND'">{{cusAdvanceAmount + amountUSD + paidAmountUSD}}</span> -->
             </div>
             <div class="col-lg-6">
-                <label class="form-control-label">Final Paid Amount VND {{finalPaidAmountVND}}</label>
+                <label class="form-control-label">Final Paid Amount VND {{finalPaidAmountVND.value}}</label>
             </div>
         </div>
         <div class="row">
@@ -133,7 +133,7 @@
                         </span>
                     </button>
                     <button class="btn btn-danger m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="confirmPopup()">
+                        (click)="showConfirmPopup()">
                         <span>
                             <i class="la la-trash"></i>
                             <span> Remove </span>
@@ -155,7 +155,8 @@
         </div>
     </div>
 </div>
-<confirm-popup #confirmRemoveCreditPopup body="Some Debit Values will change, do you want to remove you selections?" (onSubmit)="removeReceiptItem()"></confirm-popup>
+<confirm-popup body="Some Debit Values will change, do you want to remove you selections?" (onSubmit)="removeReceiptItem()"
+[labelCancel]="'No'" [labelConfirm]="'Yes'" title="Confirm Remove"></confirm-popup>
 <!-- <ng-template #tableInvoice>
     <table class="table table-hover table-brand dataTable table-hover">
         <thead app-table-header [headers]="headerReceiptReadonly">

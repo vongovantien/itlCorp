@@ -131,6 +131,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             )
     };
 
+    changeDebitList(event){
+        if(event){
+            this.listInvoice.caculatorAmountFromDebitList();
+        }
+    }
+
     gotoList() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer`]);
 

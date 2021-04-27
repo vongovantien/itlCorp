@@ -1,10 +1,10 @@
-import { OnInit, Component, ChangeDetectionStrategy, Input, ViewChild } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, Input, ViewChild, Output, EventEmitter } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
-import { ReceiptCreditDebitModel, ReceiptInvoiceModel } from "@models";
+import { ReceiptInvoiceModel } from "@models";
 import { map, reduce, takeUntil } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
 import { InfoPopupComponent } from "@common";

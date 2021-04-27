@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
@@ -21,6 +21,7 @@ import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/custom
     templateUrl: './form-create-receipt.component.html',
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
+    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
     @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
@@ -163,12 +164,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     //         );
     // }
 
-    addToReceipt(listDebit: any[]) {
-        // const partnerId = $event;
-        // if (!this.customerId.value) {
-        //     this.customerId.setValue(partnerId);
-        // }
-        this.listReceipts = [...this.listReceipts, ...listDebit];
+    addToReceipt($event: any) {
+        const partnerId = $event;
+        if (!this.customerId.value) {
+            this.customerId.setValue(partnerId);
+        }
+        this.onRequest.emit(true);
     }
 
 }

@@ -8,7 +8,7 @@
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>Create Customer Receipt</h3>
                 </div>
-                <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
+                <customer-payment-form-create-receipt (onRequest)="changeDebitList($event)"></customer-payment-form-create-receipt>
 
                 <customer-payment-list-receipt></customer-payment-list-receipt>
                 <div class="c-button-actions text-center">
