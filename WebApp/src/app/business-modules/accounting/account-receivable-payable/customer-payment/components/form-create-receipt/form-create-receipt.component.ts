@@ -126,7 +126,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     getDebit() {
         this.debitPopup.show();
-        this.debitPopup.type = 'customer';
         this.debitPopup.customerFromReceipt = this.customerId.value;
         this.debitPopup.dateFromReceipt = this.date.value;
         if (!this.debitPopup.partnerId.value) {

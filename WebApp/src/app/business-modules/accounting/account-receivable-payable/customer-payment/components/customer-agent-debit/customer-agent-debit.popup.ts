@@ -14,6 +14,7 @@ import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -66,7 +67,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         private _accountingRepo: AccountingRepo,
         private _progressService: NgProgress,
         private _store: Store<IAppState>,
-        private _toastService: ToastrService
+        private _toastService: ToastrService,
+        private _activedRoute: ActivatedRoute
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -74,6 +76,12 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
+        this._activedRoute.queryParams.subscribe((param: any) => {
+            if (!!param) {
+                this.type = param.type;
+                console.log(this.type);
+            }
+        })
         this.initForm();
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
@@ -92,6 +100,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             { title: 'Bu Handle', field: 'departmentName', sortable: true },
             { title: 'Office', field: 'officeName', sortable: true },
         ];
+
         this.getCustomer();
 
     }
