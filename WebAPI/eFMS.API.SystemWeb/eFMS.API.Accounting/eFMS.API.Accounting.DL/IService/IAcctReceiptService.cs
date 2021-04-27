@@ -16,7 +16,6 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<AcctReceiptModel> Paging(AcctReceiptCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria);
         HandleState Delete(Guid id);
-        HandleState CancelReceipt(Guid id);
         string GenerateReceiptNo();
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
         AcctReceiptModel GetById(Guid id);
