@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { NgProgress } from "@ngx-progressbar/core";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute, Params } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
@@ -49,6 +49,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _activedRoute: ActivatedRoute,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -57,6 +58,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     ngOnInit() {
+
         this.headers = [
             { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
@@ -163,9 +165,16 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             case 'HISTORY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
+
             default:
                 break;
         }
         this.selectedTab = tabName;
     }
+
+    gotoCreateReceipt(type: string) {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { type: type } });
+    }
+
+
 }

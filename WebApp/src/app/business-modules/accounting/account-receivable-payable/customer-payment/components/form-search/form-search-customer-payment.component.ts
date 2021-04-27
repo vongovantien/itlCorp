@@ -25,6 +25,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     currency: AbstractControl;
     syncStatus: AbstractControl;
     status: AbstractControl;
+    typeReceipt: AbstractControl;
 
     customerIDs: Observable<Customer[]>;
     creators: Observable<User[]>;
@@ -36,7 +37,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     dateTypes: string[] = AccountingConstants.DATE_TYPE;
     syncStatuss = AccountingConstants.SYNC_STATUSS;
     statuss = AccountingConstants.STATUS;
-
+    typesReceipt: string[] = ['Customer', 'Agency'];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -65,6 +66,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: [this.dateTypes[0]],
             currency: ['VND'],
             syncStatus: [this.syncStatuss[0]],
+            typeReceipt: [this.typesReceipt[0]]
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -73,6 +75,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType = this.formSearch.controls['dateType'];
         this.currency = this.formSearch.controls['currency'];
         this.syncStatus = this.formSearch.controls['syncStatus'];
+        this.typeReceipt = this.formSearch.controls['typeReceipt'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -97,7 +100,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateTo: (!!this.date.value && !!this.date.value.endDate) ? formatDate(this.date.value.endDate, 'yyyy-MM-dd', 'en') : null,
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
-            syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null
+            syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
+            typeReceipt: !!this.typeReceipt.value ? this.typeReceipt.value : null,
         };
         this._listReceipt.getCPs(body);
 
@@ -126,4 +130,5 @@ interface IAcctReceiptCriteria {
     dateType: string;
     currency: string;
     syncStatus: string;
+    typeReceipt: string;
 }

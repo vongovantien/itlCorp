@@ -103,6 +103,9 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
             this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.Other, this.otherListComponent);
 
         }
+        if (tabname === 'HISTORY') {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
+        }
         this.accountReceivableFormComponent.formSearch.patchValue(Object.assign({}));
         this.accountReceivableFormComponent.initForm();
 
