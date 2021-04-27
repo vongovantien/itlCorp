@@ -58,7 +58,8 @@ export class AirExportCreateJobComponent extends AppForm implements OnInit {
             serviceDate: !!form.serviceDate && !!form.serviceDate.startDate ? formatDate(form.serviceDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDate: !!form.flightDate && !!form.flightDate.startDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
             commodity: !!form.commodity && !!form.commodity.length ? form.commodity.toString() : null,
-
+            ata: !!form.ata && !!form.ata.startDate ? formatDate(form.ata.startDate, 'yyyy-MM-dd', 'en') : null,
+            atd: !!form.atd && !!form.atd.startDate ? formatDate(form.atd.startDate, 'yyyy-MM-dd', 'en') : null
         };
         const csTransaction: CsTransaction = new CsTransaction(Object.assign(_merge(form, formData)));
         csTransaction.transactionTypeEnum = CommonEnum.TransactionTypeEnum.AirExport;

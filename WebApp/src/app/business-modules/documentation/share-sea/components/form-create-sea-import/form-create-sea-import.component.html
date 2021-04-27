@@ -191,6 +191,41 @@
                             </select>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>ATD</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="atd" calendar [allowRemove]="!!atd.value && !!atd.value.startDate"
+                                    (remove)="resetFormControl(atd)" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>ATA</label>
+                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                    [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
+                                    formControlName="ata" calendar [allowRemove]="!!ata.value && !!ata.value.startDate"
+                                    (remove)="resetFormControl(ata)" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="form-group">
+                            <label>Incoterm</label>
+                            <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                            </ng-select>
+                        </div>
+
+                    </div>
                     <div class="col-md-12">
                         <div class="form-group">
                             <label>Note</label>
