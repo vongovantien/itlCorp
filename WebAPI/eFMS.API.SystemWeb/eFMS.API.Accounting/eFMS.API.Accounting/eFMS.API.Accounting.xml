@@ -703,6 +703,13 @@
             <param name="settlementId">Id of settlement payment</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GeneralSettlementPaymentExport(System.Guid)">
+            <summary>
+            Get data for General Preview
+            </summary>
+            <param name="settlementId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String[])">
              <summary>
             Settlement export List within Shipment.

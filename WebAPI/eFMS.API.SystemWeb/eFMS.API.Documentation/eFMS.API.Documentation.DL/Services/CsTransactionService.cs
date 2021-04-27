@@ -2778,8 +2778,28 @@ namespace eFMS.API.Documentation.DL.Services
                         saleProfitIncludeVAT = cost + revenue;
                         saleProfitNonVAT = costNonVat + revenueNonVat;
 
-                        decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
-                        decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                        decimal _exchangeRateUSD = 0;
+                        decimal _exchangeRateLocal = 0;
+                        var kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                        if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true)
+                        {
+                            if (surcharge.CurrencyId == DocumentConstants.CURRENCY_USD)
+                            {
+                                _exchangeRateLocal = kickBackExcRate;
+                                _exchangeRateUSD = 1;
+                            }
+                            if (surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _exchangeRateLocal = 1;
+                                _exchangeRateUSD = 1 / kickBackExcRate;
+                            }
+                        }
+                        else
+                        {
+                            _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
+                            _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                        }
 
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
@@ -2816,7 +2836,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.VATAmount = 0; //NOT USE
                         charge.Cost = cost + _decimalNumber; //Phí chi của charge
                         charge.Revenue = revenue + _decimalNumber; //Phí thu của charge
-                        charge.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
+                        charge.Exchange = _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
                         charge.Exchange = charge.Exchange + _decimalNumber; //Cộng thêm phần thập phân
                         charge.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : _exchangeRateUSD;
                         charge.VNDExchange = charge.VNDExchange + _decimalNumber; //Cộng thêm phần thập phân
