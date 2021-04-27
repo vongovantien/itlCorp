@@ -80,6 +80,7 @@ export class CsTransactionDetail {
   saleManNameVn: string = null;
   forwardingAgentName: string = null;
   notifyParty: string = null;
+  polName: string = null;
   podName: string = null;
   contSealNo: string;
   containerNames: string = null;
