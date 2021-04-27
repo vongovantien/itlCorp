@@ -2722,10 +2722,6 @@ namespace eFMS.API.Documentation.DL.Services
                         bool isOBH = false;
                         decimal cost = 0;
                         decimal revenue = 0;
-                        decimal costNonVat = 0;
-                        decimal revenueNonVat = 0;
-                        decimal saleProfitIncludeVAT = 0;
-                        decimal saleProfitNonVAT = 0;
                         string partnerName = string.Empty;
                         if (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                         {
@@ -2736,39 +2732,12 @@ namespace eFMS.API.Documentation.DL.Services
                         if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             cost = surcharge.Total;
-                            costNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                         }
                         if (surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             revenue = surcharge.Total;
-                            revenueNonVat = (surcharge.Quantity * surcharge.UnitPrice) ?? 0;
                         }
-                        saleProfitIncludeVAT = cost + revenue;
-                        saleProfitNonVAT = costNonVat + revenueNonVat;
-
-                        decimal _exchangeRateUSD = 0;
-                        decimal _exchangeRateLocal = 0;
-                        var kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
-                        if (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true)
-                        {
-                            if (surcharge.CurrencyId == DocumentConstants.CURRENCY_USD)
-                            {
-                                _exchangeRateLocal = kickBackExcRate;
-                                _exchangeRateUSD = 1;
-                            }
-                            if (surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _exchangeRateLocal = 1;
-                                _exchangeRateUSD = 1 / kickBackExcRate;
-                            }
-                        }
-                        else
-                        {
-                            _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_USD);
-                            _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                        }
-
+                        
                         var charge = new FormPLsheetReport();
                         charge.COSTING = "COSTING";
                         charge.TransID = shipment.JobNo?.ToUpper(); //JobNo of shipment
@@ -2800,8 +2769,7 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
                         charge.Cost = cost + _decimalNumber; //Phí chi của charge
                         charge.Revenue = revenue + _decimalNumber; //Phí thu của charge
-                        charge.Exchange = _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
-                        charge.Exchange = charge.Exchange + _decimalNumber; //Cộng thêm phần thập phân
+                        charge.Exchange = 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.Docs = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? surcharge.InvoiceNo : (surcharge.CreditNo ?? surcharge.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
                         charge.Notes = surcharge.Notes;
@@ -2826,9 +2794,9 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.TypeOfService = surcharge.TransactionType; //NOT USE
                         charge.ShipmentSource = shipment.ShipmentType?.ToUpper();
                         charge.RealCost = true;
-
-                        charge.NetAmountCurr = (surcharge.Type != "OBH" ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber;
-                        charge.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber;
+                        //Đối với phí OBH thì NetAmountCurr gán bằng 0
+                        charge.NetAmountCurr = (surcharge.Type != DocumentConstants.CHARGE_OBH_TYPE ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber; //NetAmount quy đổi về currency preview
+                        charge.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber; //GrossAmount quy đổi về currency preview
 
                         listCharge.Add(charge);
                     }
