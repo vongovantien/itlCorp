@@ -4891,17 +4891,13 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            string _bankAccountNo = string.Empty;
-            string _bankName = string.Empty;
             string _payeeName = string.Empty;
 
-            if (settlementPayment.PaymentMethod == "Bank" && !string.IsNullOrEmpty(settlementPayment.Payee))
+            if (settlementPayment.PaymentMethod == AccountingConstants.PAYMENT_METHOD_BANK && !string.IsNullOrEmpty(settlementPayment.Payee))
             {
                 var payeeInfo = catPartnerRepo.Get(x => x.Id == settlementPayment.Payee).FirstOrDefault();
                 if (payeeInfo != null)
                 {
-                    _bankAccountNo = payeeInfo.BankAccountNo;
-                    _bankName = string.IsNullOrEmpty(payeeInfo.BankName?.Trim()) ? payeeInfo.BankAccountName : payeeInfo.BankName;
                     _payeeName = payeeInfo.PartnerNameEn;
                 }
             }
@@ -4925,9 +4921,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                BankAccountNo = _bankAccountNo,
-                BankName = _bankName,
-                PayeeName = _payeeName,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankAccountName = settlementPayment.BankAccountName,
+                PayeeName = settlementPayment.BankAccountName,
                 Note = settlementPayment.Note
             };
             return infoSettlement;
