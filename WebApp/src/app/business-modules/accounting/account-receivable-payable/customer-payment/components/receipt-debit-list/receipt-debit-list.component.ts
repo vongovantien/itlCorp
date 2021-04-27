@@ -53,8 +53,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     onCheckChange(){
         this.debitList$.pipe()
-        .subscribe((x : ReceiptCreditDebitModel[]) => {
-            this.isCheckAll = x.filter((element: ReceiptCreditDebitModel) => !element.isSelected).length === 0;
+        .subscribe((x : ReceiptInvoiceModel[]) => {
+            this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
         });
     }
 

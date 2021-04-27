@@ -67,6 +67,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     isSubmitted: boolean = false;
     isReadonly: boolean = null;  // * DONE | CANCEL
     exchangeRateUsd: number = 1;
+    finalPaidAmountVND: number = 0;
+    finalPaidAmountUSD: number = 0;
 
     headerReceiptReadonly: CommonInterface.IHeaderTable[] = [
         { title: 'Billing Ref No', field: 'invoiceNo' },
@@ -407,6 +409,18 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
             );
 
+
+    }
+
+    getFinalPaidAmount(currency: string) {
+        switch (currency) {
+            case 'USD':
+                this.finalPaidAmountUSD = this.cusAdvanceAmount.value + this.amountUSD.value + this.paidAmountUSD.value;
+                break;
+            case 'VND':
+                this.finalPaidAmountUSD = this.cusAdvanceAmount.value + this.amountUSD.value + this.paidAmountUSD.value;
+                break;
+        }
 
     }
 }

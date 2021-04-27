@@ -59,7 +59,7 @@
                 <div class="form-group">
                     <label class="form-control-label">Credit Amount VND</label>
                     <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
-                        autoFormatCurrency [attr.readOnly]="isReadonly">
+                        autoFormatCurrency [attr.readOnly]="isReadonly" (onChange)="getFinalPaidAmount('VND')">
                 </div>
             </div>
             <div class="col-lg-2">
@@ -88,12 +88,11 @@
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <label class="form-control-label">Final Paid Amount USD </label>
-                <span *ngIf="currencyId.value === 'VND'">{{cusAdvanceAmount/exchangeRate}}</span>
-                <span *ngIf="currencyId.value !== 'VND'">{{cusAdvanceAmount}}</span>
+                <label class="form-control-label">Final Paid Amount USD {{finalPaidAmountUSD}}</label>
+                <!-- <span *ngIf="currencyId.value !== 'VND'">{{cusAdvanceAmount + amountUSD + paidAmountUSD}}</span> -->
             </div>
             <div class="col-lg-6">
-                <label class="form-control-label">Final Paid Amount VND</label>
+                <label class="form-control-label">Final Paid Amount VND {{finalPaidAmountVND}}</label>
             </div>
         </div>
         <div class="row">
