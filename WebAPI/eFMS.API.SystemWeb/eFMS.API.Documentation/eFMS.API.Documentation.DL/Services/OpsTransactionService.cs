@@ -1158,8 +1158,28 @@ namespace eFMS.API.Documentation.DL.Services
                     saleProfitIncludeVAT = cost + revenue;
                     saleProfitNonVAT = costNonVat + revenueNonVat;
 
-                    decimal _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                    decimal _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    decimal _exchangeRateUSD = 0;
+                    decimal _exchangeRateLocal = 0;
+                    var kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                    if (item.Type == DocumentConstants.CHARGE_BUY_TYPE && item.KickBack == true)
+                    {
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_USD)
+                        {
+                            _exchangeRateLocal = kickBackExcRate;
+                            _exchangeRateUSD = 1;
+                        }
+                        if (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
+                        {
+                            _exchangeRateLocal = 1;
+                            _exchangeRateUSD = 1 / kickBackExcRate;
+                        }
+                    }
+                    else
+                    {
+                        _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
+                        _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+                    }
 
                     var surchargeRpt = new FormPLsheetReport();
 
