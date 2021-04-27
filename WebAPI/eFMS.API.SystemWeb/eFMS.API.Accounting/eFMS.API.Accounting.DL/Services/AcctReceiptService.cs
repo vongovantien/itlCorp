@@ -1352,7 +1352,7 @@ namespace eFMS.API.Accounting.DL.Services
                     acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
                 }
 
-                if (acctManagementIds != null)
+                if (acctManagementIds != null && acctManagementIds.Count > 0)
                 {
                     query = query.And(x => acctManagementIds.Contains(x.Id));
                 }
@@ -1404,7 +1404,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var acctManagementIds = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.AcctManagementId).Distinct().ToList();
-                            if (acctManagementIds != null)
+                            if (acctManagementIds != null && acctManagementIds.Count > 0)
                             {
                                 query = query.And(x => acctManagementIds.Contains(x.Id));
                             }
@@ -1416,7 +1416,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var acctManagementIds = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
-                if (acctManagementIds != null)
+                if (acctManagementIds != null && acctManagementIds.Count > 0)
                 {
                     query = query.And(x => acctManagementIds.Contains(x.Id));
                 }
@@ -1466,7 +1466,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
                 }
 
-                if (soaNo != null)
+                if (soaNo != null && soaNo.Count > 0)
                 {
                     query = query.And(x => soaNo.Contains(x.Soano));
                 }
@@ -1529,7 +1529,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var soaNos = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.PaySoano).Distinct().ToList();
-                            if (soaNos != null)
+                            if (soaNos != null && soaNos.Count > 0)
                             {
                                 query = query.And(x => soaNos.Contains(x.Soano));
                             }
@@ -1541,7 +1541,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var soaNos = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.PaySoano).Distinct().ToList();
-                if (soaNos != null)
+                if (soaNos != null && soaNos.Count > 0)
                 {
                     query = query.And(x => soaNos.Contains(x.Soano));
                 }
@@ -1590,7 +1590,7 @@ namespace eFMS.API.Accounting.DL.Services
                     creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
                 }
 
-                if (creditNo != null)
+                if (creditNo != null && creditNo.Count > 0)
                 {
                     query = query.And(x => creditNo.Contains(x.Code));
                 }
@@ -1653,7 +1653,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var creditNos = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.CreditNo).Distinct().ToList();
-                            if (creditNos != null)
+                            if (creditNos != null && creditNos.Count > 0)
                             {
                                 query = query.And(x => creditNos.Contains(x.Code));
                             }
@@ -1665,7 +1665,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var creditNos = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.CreditNo).Distinct().ToList();
-                if (creditNos != null)
+                if (creditNos != null && creditNos.Count > 0)
                 {
                     query = query.And(x => creditNos.Contains(x.Code));
                 }
