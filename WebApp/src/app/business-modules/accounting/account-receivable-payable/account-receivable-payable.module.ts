@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { ARCustomerPaymentFormSearchComponent } from './customer-payment/components/form-search/form-search-customer-payment.component';
 
 const routing: Routes = [
     {
@@ -10,8 +11,8 @@ const routing: Routes = [
                 path: '', redirectTo: 'customer'
             },
             {
-                path: 'customer', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
-                data: { name: 'Customer Payment' }
+                path: '', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                data: { name: 'Account Payment' }
             },
             {
                 path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
@@ -35,7 +36,7 @@ const routing: Routes = [
     declarations: [
     ],
     imports: [
-        RouterModule.forChild(routing),
+        RouterModule.forChild(routing)
     ],
     exports: [],
     providers: [],

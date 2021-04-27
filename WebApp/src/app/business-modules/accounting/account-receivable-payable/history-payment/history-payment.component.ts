@@ -11,20 +11,28 @@ import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-
 
 type TAB = 'INVOICE' | 'OBH';
 
+enum PAYMENT_TAB {
+    CUSTOMER = 'CUSTOMER',
+    AGENCY = 'AGENCY',
+    ARSUMMARY = 'ARSUMMARY',
+    HISTORY = 'HISTORY'
 
+}
 @Component({
     selector: 'app-history-payment',
     templateUrl: './history-payment.component.html',
 
 })
+
 export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
     @ViewChild(ARHistoryPaymentListInvoiceComponent) invoiceListComponent: ARHistoryPaymentListInvoiceComponent;
 
-    selectedTab: TAB | string = "INVOICE";
+    //selectedTab: TAB | string = "INVOICE";
     selectedTabAR: string = 'payment';
 
     isAccountPaymentTab: boolean = true;
+    selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
     constructor(
         private _router: Router,
@@ -112,18 +120,17 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
         this.requestSearchShipment();
     }
 
-    onSelectTab(tab: string) {
-        switch (tab) {
-            case 'customer':
+    onSelectTab(tabName: PAYMENT_TAB | string) {
+        switch (tabName) {
+            case 'CUSTOMER':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
                 break;
-            case 'agency':
-                break;
-            case 'summary':
-                break;
-            case 'history':
+            case 'HISTORY':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
             default:
                 break;
         }
+        this.selectedTab = tabName;
     }
 }

@@ -13,6 +13,14 @@ import { RoutingConstants } from "@constants";
 
 import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+
+enum PAYMENT_TAB {
+    CUSTOMER = 'CUSTOMER',
+    AGENCY = 'AGENCY',
+    ARSUMMARY = 'ARSUMMARY',
+    HISTORY = 'HISTORY'
+
+}
 @Component({
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
@@ -23,10 +31,12 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
+
     CPs: ReceiptModel[] = [];
 
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
+    selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
     dataSearch = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
@@ -145,19 +155,17 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
 
-    onSelectTab(tab: string) {
-        switch (tab) {
-            case 'agency':
-                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/agency`]);
-                break;
+    onSelectTab(tabName: PAYMENT_TAB | string) {
+        switch (tabName) {
             case 'ar':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
-            case 'history':
+            case 'HISTORY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
             default:
                 break;
         }
+        this.selectedTab = tabName;
     }
 }
