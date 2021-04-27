@@ -3,14 +3,29 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Customer Payment" [active]="true">
+                <tab heading="Customer/Agency Payment" [active]="selectedTab === 'CUSTOMER'"
+                    (selectTab)="onSelectTab('CUSTOMER')">
                     <customer-payment-form-search></customer-payment-form-search>
 
                     <div class="m-portlet">
                         <div class="m-portlet__body">
                             <div class="m--align-right">
-                                <app-permission-button type="add" title="Create Receipt" routerLink="receipt/new">
-                                </app-permission-button>
+                                <!-- <app-permission-button type="add" title="Create Receipt" routerLink="receipt/new">
+                                </app-permission-button> -->
+
+                                <div class="dropdown m-dropdown m-dropdown--inline">
+                                    <button class="btn btn-success dropdown-toggle" type="button"
+                                        data-toggle="dropdown">
+                                        <i class="la la-plus"></i>Create Receipt<span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item pointer"
+                                            (click)="gotoCreateReceipt('Customer')">Customer Receipt</a>
+                                        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('Agency')">Agency
+                                            Receipt</a>
+                                    </div>
+                                </div>
+
                             </div>
                             <tabset class="custom-class-tab">
                                 <tab heading="Payment" [active]="true">
@@ -37,14 +52,15 @@
                                                                     </app-permission-button>
                                                                     <button type="button"
                                                                         class="btn btn-warning btn-sm  m-btn--icon m-btn--icon-only"
-                                                                        title="Cancel" *ngIf="(cps.status === 'Done')">
+                                                                        title="Cancel"
+                                                                        *ngIf="(cps.status === 'Done' && cps.syncStatus !=='Synced')">
                                                                         <i class="la la-ban"></i>
                                                                     </button>
-                                                                    <button type="button"
+                                                                    <!-- <button type="button"
                                                                         class="btn btn-dark btn-sm  m-btn--icon m-btn--icon-only"
                                                                         title="Lock" *ngIf="(cps.status === 'Cancel')">
                                                                         <i class="la la-lock"></i>
-                                                                    </button>
+                                                                    </button> -->
                                                                 </div>
                                                             </td>
 
@@ -145,14 +161,14 @@
                         </div>
                     </div>
                 </tab>
-                <tab heading="Agency Payment" (selectTab)="onSelectTab('agency')">
-                    Agency Payment
-                </tab>
+                <!-- <tab heading="Agency Payment" (selectTab)="onSelectTab('AGENCY')" [active]="selectedTab === 'AGENCY'">
+                    <customer-payment-form-search *ngIf="selectedTab === 'AGENCY'"></customer-payment-form-search>
+
+                </tab> -->
                 <tab heading="AR Summary" (selectTab)="onSelectTab('ar')">
-                    Summary
                 </tab>
-                <tab heading="Payment History" (selectTab)="onSelectTab('history')">
-                    History
+                <tab heading="Payment History" (selectTab)="onSelectTab('HISTORY')"
+                    [active]="selectedTab === 'HISTORY'">
                 </tab>
             </tabset>
         </div>

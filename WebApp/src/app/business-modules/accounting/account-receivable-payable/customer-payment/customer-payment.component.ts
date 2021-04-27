@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { NgProgress } from "@ngx-progressbar/core";
-import { Router } from "@angular/router";
+import { Router, ActivatedRoute, Params } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
@@ -13,6 +13,14 @@ import { RoutingConstants } from "@constants";
 
 import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+
+enum PAYMENT_TAB {
+    CUSTOMER = 'CUSTOMER',
+    AGENCY = 'AGENCY',
+    ARSUMMARY = 'ARSUMMARY',
+    HISTORY = 'HISTORY'
+
+}
 @Component({
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
@@ -23,10 +31,12 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
+
     CPs: ReceiptModel[] = [];
 
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
+    selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
     dataSearch = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
@@ -39,6 +49,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _activedRoute: ActivatedRoute,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -47,8 +58,9 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     ngOnInit() {
+
         this.headers = [
-            { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
+            { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
@@ -145,19 +157,24 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
 
-    onSelectTab(tab: string) {
-        switch (tab) {
-            case 'agency':
-                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/agency`]);
-                break;
+    onSelectTab(tabName: PAYMENT_TAB | string) {
+        switch (tabName) {
             case 'ar':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
-            case 'history':
+            case 'HISTORY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
+
             default:
                 break;
         }
+        this.selectedTab = tabName;
     }
+
+    gotoCreateReceipt(type: string) {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { type: type } });
+    }
+
+
 }

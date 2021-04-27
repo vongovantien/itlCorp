@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.Controllers
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
            IAcctReceiptService acctReceipt)
-        {
+        {   
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
             currentUser = curUser;
@@ -112,6 +112,25 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
+
+        /// <summary>
+        /// Update Cancel Receipt
+        /// </summary>
+        /// <param name="id">id of receipt</param>
+        /// <returns></returns>
+        [HttpPut]
+        public IActionResult CancelReceipt(Guid id)
+        {
+            HandleState hs = acctReceiptService.CancelReceipt(id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
         /// <summary>
         /// Save Receipt
         /// </summary>

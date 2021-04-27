@@ -29,7 +29,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute
     ) {
-        super(_router, _toast, _accountingRepo);
+        super(_router, _toast, _accountingRepo, _activedRoute);
     }
 
     ngOnInit() {
@@ -100,7 +100,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateSummary(res: ReceiptModel) {
         this.summary.invoices = [...(res.payments || [])];
-        this.summary.calculateInfodataInvoice([...res.payments] || []);
+        //this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
     onSaveDataReceipt(model: ReceiptModel, actionString: string) {
         model.id = this.receiptDetail.id;

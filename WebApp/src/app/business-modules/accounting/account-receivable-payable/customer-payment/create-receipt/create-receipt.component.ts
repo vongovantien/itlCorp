@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
@@ -30,11 +30,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     invalidBalance: string = 'Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!';
-
+    type: string = null;
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
-        protected _accountingRepo: AccountingRepo
+        protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute
 
     ) {
         super();
@@ -42,6 +43,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     ngOnInit(): void {
         this.initSubmitClickSubscription(() => { this.saveReceipt('draft') });
+        this._activedRoute.queryParams.subscribe((param: any) => {
+            if (!!param) {
+                this.type = param.type;
+            }
+        })
     }
 
     saveReceipt(type: string) {
@@ -69,11 +75,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const receiptModel: ReceiptModel = this.getDataForm();
         receiptModel.payments = this.listInvoice.invoices;
 
-        if (receiptModel.payments.some(x => x.type === 'ADV')) {
-            receiptModel.payments.forEach(inv => {
-                inv.receiptExcPaidAmount = inv.paidAmount;
-            });
-        }
+        // if (receiptModel.payments.some(x => x.type === 'ADV')) {
+        //     receiptModel.payments.forEach(inv => {
+        //         inv.receiptExcPaidAmount = inv.paidAmount;
+        //     });
+        // }
 
         this.onSaveDataReceipt(receiptModel, type);
     }
@@ -102,10 +108,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     checkValidateBalance(invoices: ReceiptInvoiceModel[], finalPaid: number = 0, balance: number = 0) {
         let valid: boolean = true;
-        const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
-        if (+paidAmount + balance !== finalPaid) {
-            valid = false;
-        }
+        // const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
+        // if (+paidAmount + balance !== finalPaid) {
+        //     valid = false;
+        // }
 
         return valid;
     }
