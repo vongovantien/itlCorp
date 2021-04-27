@@ -220,19 +220,6 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        public HandleState CancelReceipt(Guid id)
-        {
-            HandleState hs = new HandleState();
-            AcctReceipt receipt = DataContext.Get(o => o.Id == id).FirstOrDefault();
-            receipt.Status = "Cancel";
-            if (receipt == null)
-            {
-                return hs;
-            }
-            hs = DataContext.Update(receipt, x => x.Id == id);
-            return hs;
-        }
-
         public IQueryable<AcctReceiptModel> Paging(AcctReceiptCriteria criteria, int page, int size, out int rowsCount)
         {
             IQueryable<AcctReceipt> data = GetQueryBy(criteria);

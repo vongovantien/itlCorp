@@ -118,15 +118,16 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="id">id of receipt</param>
         /// <returns></returns>
-        [HttpPut]
-        public IActionResult CancelReceipt(Guid id)
+        [HttpPut("CancelReceipt")]
+        public IActionResult CancelReceipt(Guid receiptId)
         {
-            HandleState hs = acctReceiptService.CancelReceipt(id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            var hs = acctReceiptService.SaveCancel(receiptId);
+
+            ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
-                return BadRequest(result);
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
+                return BadRequest(_result);
             }
             return Ok(result);
         }
@@ -217,19 +218,6 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        [HttpPut("CancelReceipt")]
-        public IActionResult CancelReceipt(Guid receiptId)
-        {
-            var hs = acctReceiptService.SaveCancel(receiptId);
-
-            ResultHandle result = new ResultHandle();
-            if (!hs.Success)
-            {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
-                return BadRequest(_result);
-            }
-            return Ok(result);
-        }
         
         [HttpPost("ProcessInvoice")]
         public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
