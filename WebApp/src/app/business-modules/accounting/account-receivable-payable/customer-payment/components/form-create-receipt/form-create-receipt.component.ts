@@ -159,7 +159,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     addToReceipt($event: any) {
         const partnerId = $event;
-        if (!!this.customerId) {
+        if (!!this.customerId.value) {
             this.$customers.pipe()
             .subscribe((x: Partner[]) =>{
                 const partner = x.filter((x: Partner) => x.id === partnerId).shift();
