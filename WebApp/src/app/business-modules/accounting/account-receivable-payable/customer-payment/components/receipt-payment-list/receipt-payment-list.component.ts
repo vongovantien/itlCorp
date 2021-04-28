@@ -42,8 +42,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     userLogged: Partial<SystemInterface.IClaimUser>;
     type: AbstractControl;
     cusAdvanceAmount: AbstractControl;
-    // finalPaidAmount: AbstractControl;
-    // balance: AbstractControl;
     paymentMethod: AbstractControl;
     currencyId: AbstractControl;
     paymentDate: AbstractControl;
@@ -297,29 +295,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 break;
         }
     }
-
-    onSearchAutoComplete(keyword: string) {
-        console.log('text2', keyword)
-        // if(keyword === 'paid-amountVnd'){
-        //     this.paidAmountUSD.setValue(this.paidAmountVND.value / this.exchangeRateUsd);
-        // }else{
-        //     this.paidAmountVND.setValue(this.paidAmountUSD.value * this.exchangeRate.value);
-        // }
-        // this.isLoading = false;
-    }
-
-    // autocomplete = (time: number, callBack: Function) => (source$: Observable<any>) =>
-    //     source$.pipe(
-    //         debounceTime(time),
-    //         distinctUntilChanged(),
-    //         tap(() => {
-    //             this.isLoading = true;
-    //         }),
-    //         switchMap((...args: any[]) => callBack(...args).pipe(
-    //             takeUntil(source$.pipe(skip(1)))
-    //         )
-    //         )
-    //     )
     
     showConfirmPopup(){
         this.confirmPopup.show();
