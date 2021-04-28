@@ -89,7 +89,6 @@
         <div class="row">
             <div class="col-lg-6">
                 <label class="form-control-label">Final Paid Amount USD {{finalPaidAmountUSD.value}}</label>
-                <!-- <span *ngIf="currencyId.value !== 'VND'">{{cusAdvanceAmount + amountUSD + paidAmountUSD}}</span> -->
             </div>
             <div class="col-lg-6">
                 <label class="form-control-label">Final Paid Amount VND {{finalPaidAmountVND.value}}</label>
@@ -104,21 +103,6 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="row">
-                <div class="col-lg-{{syncInfoTemplate ? 8 : 12}}">
-                    <div class="form-group">
-                        <label class="form-control-label">Description</label>
-                        <textarea cols="30" rows="5" class="form-control" formControlName="description"
-                            [attr.readOnly]="isReadonly"></textarea>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="form-group">
-                        <label class="form-control-label"></label>
-                        <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>
-                    </div>
-                </div>
-            </div> -->
     </div>
     <div class="row"></div>
     <div class="row m--margin-top-20">
