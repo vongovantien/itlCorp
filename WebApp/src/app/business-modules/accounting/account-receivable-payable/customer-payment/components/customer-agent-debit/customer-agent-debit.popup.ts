@@ -217,7 +217,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         }
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
-        this.onAddToReceipt.emit(datatoReceipt[0].partnerId);
+        this.onAddToReceipt.emit(this.partnerId.value);
         this.hide();
     }
 
