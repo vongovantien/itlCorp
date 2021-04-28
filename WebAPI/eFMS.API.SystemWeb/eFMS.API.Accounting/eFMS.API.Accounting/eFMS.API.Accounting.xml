@@ -255,6 +255,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivableNotAuthorize(eFMS.API.Accounting.DL.Models.CalculatorReceivableNotAuthorizeModel)">
+            <summary>
+            Calculator Receivable Not Authorize
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(eFMS.API.Accounting.DL.Models.ObjectReceivableModel)">
             <summary>
             Insert Or Update Receivable

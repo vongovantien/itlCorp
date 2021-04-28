@@ -265,7 +265,7 @@ export class StatementOfAccountEditComponent extends AppList {
                             // this.getDetailSOA(this.soaNO, this.currencyLocal);
 
                             // Tính công nợ
-                            //this.calculatorReceivable(this.soa.chargeShipments);
+                            this.calculatorReceivable(this.soa.chargeShipments);
 
                             // * init checkbox all
                             this.isCheckAllCharge = false;
@@ -302,8 +302,8 @@ export class StatementOfAccountEditComponent extends AppList {
     }
 
     calculatorReceivable(surcharges: any[]) {
-        /*const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
-        this._accoutingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();*/
+        const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
+        this._accoutingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 
     selectJobId(charge: SoaCharge) {

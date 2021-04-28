@@ -14,6 +14,11 @@ using Newtonsoft.Json;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using System.Net.Http;
+using eFMS.API.ForPartner.DL.Infrastructure.Http;
+using System.Threading.Tasks;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -29,16 +34,20 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingManagementService;
         private readonly IActionFuncLogService actionFuncLogService;
+        private readonly IOptions<ApiUrl> apiUrl;
+
         /// <summary>
         /// Accounting Contructor
         /// </summary>
         public AccountingController(IAccountingManagementService service,
             IStringLocalizer<LanguageSub> localizer,
-            IActionFuncLogService actionFuncLog)
+            IActionFuncLogService actionFuncLog,
+            IOptions<ApiUrl> aUrl)
         {
             accountingManagementService = service;
             stringLocalizer = localizer;
             actionFuncLogService = actionFuncLog;
+            apiUrl = aUrl;
         }
 
         /// <summary>
@@ -545,5 +554,19 @@ namespace eFMS.API.ForPartner.Controllers
         }
         #endregion --- PRIVATE ---
         
+        [HttpPost("CalculatorReceivableNotAuthorize")]
+        public async Task<IActionResult> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        {
+            var cr = await CalculatorReceivable(model);
+            return Ok(cr);
+        }
+        
+        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
+        {
+            var urlApiAcct = "http://localhost:44368";//apiUrl.Value.Url + "Accounting";//
+            HttpResponseMessage resquest = await HttpService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState UpdateReceivable(AccAccountReceivableModel model);
         HandleState InsertOrUpdateReceivable(ObjectReceivableModel model);
         HandleState CalculatorReceivable(CalculatorReceivableModel model);
+        HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
         AccountReceivableDetailResult GetDetailAccountReceivableByArgeementId(Guid argeementId);
         AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId);
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);

@@ -723,18 +723,60 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- CALCULATOR VALUE ---
 
         #region --- CRUD ---
+        private CatContract CalculatorAgreement(CatContract agreement)
+        {
+            //Get DS Công nợ có cùng PartnerId, Saleman, Service, Office của Agreement
+            var receivables = DataContext.Get(x => x.PartnerId == agreement.PartnerId
+                                                && x.SaleMan == agreement.SaleManId
+                                                && agreement.SaleService.Contains(x.Service)
+                                                && agreement.OfficeId.Contains(x.Office.ToString()));
+
+            agreement.BillingAmount = receivables.Sum(su => su.BillingAmount + su.ObhBilling); //Sum BillingAmount + BillingOBH
+            //Credit Amount ~ Debit Amount
+            agreement.CreditAmount = receivables.Sum(su => su.DebitAmount); //Sum DebitAmount
+            agreement.UnpaidAmount = receivables.Sum(su => su.BillingUnpaid + su.ObhAmount); //Sum BillingUnpaid + BillingOBH
+            agreement.PaidAmount = receivables.Sum(su => su.PaidAmount); //Sum PaidAmount
+
+            decimal? _creditRate = agreement.CreditRate;
+            if (agreement.ContractType == "Trial")
+            {
+                _creditRate = ((agreement.CreditAmount + agreement.CustomerAdvanceAmount) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+            }
+            if (agreement.ContractType == "Official")
+            {
+                _creditRate = ((agreement.CreditAmount + agreement.CustomerAdvanceAmount) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+            }
+            if (agreement.ContractType == "Parent Contract")
+            {
+                //???
+            }
+            agreement.CreditRate = _creditRate;
+            return agreement;
+        }
+
         private HandleState UpdateAgreementPartner(string partnerId)
         {
             var hs = new HandleState();
+            var partner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault();
+            if (partner == null) return hs;
+            //Agreement của partner
             var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                             && x.PartnerId == partnerId).FirstOrDefault();
             if (contractPartner != null)
             {
-
+                var agreementPartner = CalculatorAgreement(contractPartner);
+                hs = contractPartnerRepo.Update(agreementPartner, x => x.Id == agreementPartner.Id);
             }
             else
             {
-
+                //Agreement của AcRef của partner
+                var contractParent = contractPartnerRepo.Get(x => x.Active == true 
+                                                               && x.PartnerId == partner.ParentId).FirstOrDefault();
+                if (contractParent != null)
+                {
+                    var agreementParent = CalculatorAgreement(contractParent);
+                    hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
+                }
             }
             return hs;
         }
@@ -882,7 +924,6 @@ namespace eFMS.API.Accounting.DL.Services
                     model.CompanyId = contractPartner.CompanyId;
                 }
                 model.DatetimeModified = DateTime.Now;
-                model.UserModified = currentUser.UserID;
 
                 var _billingAmount = CalculatorBillingAmount(model);
                 var _billingUnpaid = CalculatorBillingUnpaid(model);
@@ -1002,6 +1043,18 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return hs;
         }
+
+        public HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        {
+            currentUser.UserID = model.UserID;
+            currentUser.GroupId = model.GroupId;
+            currentUser.DepartmentId = model.DepartmentId;
+            currentUser.OfficeID = model.OfficeID;
+            currentUser.CompanyID = model.CompanyID;
+            var hs = CalculatorReceivable(model);
+            return hs;
+        }
+
         #endregion --- CRUD ---
 
         private List<ObjectReceivableModel> GetObjectReceivableBySurchargeId(List<Guid?> surchargeIds)

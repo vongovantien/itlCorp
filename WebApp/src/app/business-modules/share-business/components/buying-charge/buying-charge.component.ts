@@ -421,6 +421,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                             this._toastService.success(res.message);
                             if (this.selectedIndexCharge > -1) {
 
+                                // Tính công nợ
+                                this.calculatorReceivable([this.selectedSurcharge]);
+
                                 this.deleteChargeWithType(type, this.selectedIndexCharge);
 
                             }
@@ -505,6 +508,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+
+                        // Tính công nợ
+                        this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(type);
@@ -1322,6 +1328,17 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         if (!!invNo) {
             chargeItem.vatPartnerId = chargeItem.paymentObjectId;
         }
+    }
+
+    calculatorReceivable(charges: CsShipmentSurcharge[]) {
+        const objReceivable = charges.map((item: any) => ({ surchargeId: item.id, partnerId: item.paymentObjectId, office: (!!item.officeId ? item.officeId : this.userLogged.officeId), service: (!!item.transactionType ? item.transactionType : this.serviceTypeId) }));
+        charges.forEach((element: any) => {
+            if (element.type === 'OBH') {
+                objReceivable.push({ surchargeId: element.id, partnerId: element.payerId, office: (!!element.officeId ? element.officeId : this.userLogged.officeId), service: (!!element.transactionType ? element.transactionType : this.serviceTypeId) });
+            }
+        });
+
+        this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
     }
 }
 
