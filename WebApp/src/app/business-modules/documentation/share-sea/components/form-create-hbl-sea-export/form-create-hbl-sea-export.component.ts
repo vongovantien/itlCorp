@@ -371,7 +371,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             placeDelivery: data.deliveryPlace,
             forwardingAgent: data.forwardingAgentId,
             goodsDelivery: data.goodsDeliveryId,
-
+            podDescription: !!data.podDescription ? data.podDescription : data.podName,
+            polDescription: !!data.polDescription ? data.polDescription : data.polName
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));

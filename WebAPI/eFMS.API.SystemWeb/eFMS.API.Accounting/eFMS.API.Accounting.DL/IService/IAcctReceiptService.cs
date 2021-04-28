@@ -16,11 +16,12 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<AcctReceiptModel> Paging(AcctReceiptCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria);
         HandleState Delete(Guid id);
-        HandleState CancelReceipt(Guid id);
         string GenerateReceiptNo();
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
         AcctReceiptModel GetById(Guid id);
         HandleState SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction);
+        HandleState SaveDoneReceipt(Guid receiptId);
+        HandleState SaveCancel(Guid receiptId);
         ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
         List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
     }

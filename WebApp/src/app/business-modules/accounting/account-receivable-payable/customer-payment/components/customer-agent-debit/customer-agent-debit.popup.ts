@@ -8,7 +8,7 @@ import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError } from 'rxjs/operators';
+import { finalize, catchError, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
@@ -178,26 +178,30 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     filterList() {
-        this._store.select(ReceiptDebitListState).subscribe((result: any) => {
-            if (!!result) {
-                this.listDebitInvoice = result || [];
-                this.listDebit = this.listDebit.filter(s =>
-                    result.every(t => {
-                        var key = Object.keys(t)[0];
-                        return s[key] !== t[key]
-                    }));
-            }
-        })
-        this._store.select(ReceiptCreditListState).subscribe((result: any) => {
-            if (!!result) {
-                this.listCreditInvoice = result || [];
-                this.listDebit = this.listDebit.filter(s =>
-                    result.every(t => {
-                        var key = Object.keys(t)[0];
-                        return s[key] !== t[key]
-                    }));
-            }
-        });
+        this._store.select(ReceiptDebitListState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((result: any) => {
+                if (!!result) {
+                    this.listDebitInvoice = result || [];
+                    this.listDebit = this.listDebit.filter(s =>
+                        result.every(t => {
+                            var key = Object.keys(t)[0];
+                            return s[key] !== t[key]
+                        }));
+                }
+            })
+        this._store.select(ReceiptCreditListState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((result: any) => {
+                if (!!result) {
+                    this.listCreditInvoice = result || [];
+                    this.listDebit = this.listDebit.filter(s =>
+                        result.every(t => {
+                            var key = Object.keys(t)[0];
+                            return s[key] !== t[key]
+                        }));
+                }
+            });
 
     }
 

@@ -122,12 +122,13 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CancelReceipt")]
         public IActionResult CancelReceipt(Guid id)
         {
-            HandleState hs = acctReceiptService.CancelReceipt(id);
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            var hs = acctReceiptService.SaveCancel(receiptId);
+
+            ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
-                return BadRequest(result);
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
+                return BadRequest(_result);
             }
             return Ok(result);
         }
@@ -170,14 +171,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            //Check valid data amount: nếu Tổng Paid Amount (không bao gồm ADV) + Balance phiếu thu # Final Paid Amount => Thông báo lỗi
-            //var paidAmount = receiptModel.Payments.Where(x => x.Type != "ADV").Select(s => s.PaidAmount + s.InvoiceBalance).Sum();
-            //if (paidAmount + receiptModel.Balance != receiptModel.FinalPaidAmount)
-            //{
-            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!", Data = receiptModel };
-            //    return BadRequest(_result);
-            //}
-
             var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
 
             ResultHandle result = new ResultHandle();
@@ -212,6 +205,21 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        [HttpPut("SaveDoneReceipt")]
+        public IActionResult SaveDoneReceipt(Guid receiptId)
+        {
+            var hs = acctReceiptService.SaveDoneReceipt(receiptId);
+
+            ResultHandle result = new ResultHandle();
+            if (!hs.Success)
+            {
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
+                return BadRequest(_result);
+            }
+            return Ok(result);
+        }
+
+        
         [HttpPost("ProcessInvoice")]
         public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
         {
