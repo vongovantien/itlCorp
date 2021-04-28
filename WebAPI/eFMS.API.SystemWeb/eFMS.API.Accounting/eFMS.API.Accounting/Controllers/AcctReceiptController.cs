@@ -122,12 +122,12 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut("CancelReceipt")]
         public IActionResult CancelReceipt(Guid id)
         {
-            var hs = acctReceiptService.SaveCancel(receiptId);
+            var hs = acctReceiptService.SaveCancel(id);
 
             ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
+                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
             return Ok(result);
