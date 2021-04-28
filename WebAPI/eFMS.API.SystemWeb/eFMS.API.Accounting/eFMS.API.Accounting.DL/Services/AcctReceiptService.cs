@@ -102,6 +102,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => (x.PaymentRefNo ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
+            if (!string.IsNullOrEmpty(criteria.Type))
+            {
+                query = query.And(x => x.Type == criteria.Type);
+
+            }
             if (!string.IsNullOrEmpty(criteria.PaymentType) && criteria.PaymentType == "Invoice")
             {
                 // Lấy ra thông tin hóa đơn
@@ -275,7 +280,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public string GenerateReceiptNo()
         {
-            string ReceiptNo = "PT" + DateTime.Now.ToString("yyMM");
+            string ReceiptNo = "PT" + DateTime.Now.ToString("yy");
 
             IQueryable<string> codes = DataContext.Where(x => x.PaymentRefNo.Contains(ReceiptNo)).Select(x => x.PaymentRefNo);
 
@@ -285,7 +290,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (string code in codes)
                 {
-                    if (code.Length > 9 && int.TryParse(code.Substring(code.Length - 4), out int _))
+                    if (code.Length > 8 && int.TryParse(code.Substring(code.Length - 4), out int _))
                     {
                         oders.Add(int.Parse(code.Substring(code.Length - 4)));
                     }
@@ -295,16 +300,16 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     int maxCurrentOder = oders.Max();
 
-                    ReceiptNo += (maxCurrentOder + 1).ToString("0000");
+                    ReceiptNo += (maxCurrentOder + 1).ToString("00000");
                 }
                 else
                 {
-                    ReceiptNo += "0001";
+                    ReceiptNo += "00001";
                 }
             }
             else
             {
-                ReceiptNo += "0001";
+                ReceiptNo += "00001";
             }
 
             return ReceiptNo;
@@ -418,8 +423,8 @@ namespace eFMS.API.Accounting.DL.Services
                     InvoiceNo = null,
                     Amount = s.Sum(x => x.RefAmount),
                     UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
-                    UnpaidVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
-                    UnpaidUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    UnpaidAmountVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
+                    UnpaidAmountUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
                     PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
                     PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
                     Notes = s.FirstOrDefault().Note,
@@ -443,12 +448,12 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaymentId = acctPayment.Id;
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
-                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "CREDIT" : acctPayment.PaymentType;
+                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "CREDIT" : acctPayment.Type;
                     payment.CreditType = (acctPayment.PaymentType != "DEBIT") ? acctPayment.PaymentType : null;
                     payment.CurrencyId = acctPayment.CurrencyId;
                     payment.UnpaidAmount = acctPayment.RefAmount;
-                    payment.UnpaidUsd = acctPayment.UnpaidPaymentAmountUsd;
-                    payment.UnpaidVnd = acctPayment.UnpaidPaymentAmountVnd;
+                    payment.UnpaidAmountUsd = acctPayment.UnpaidPaymentAmountUsd;
+                    payment.UnpaidAmountVnd = acctPayment.UnpaidPaymentAmountVnd;
                     payment.PaidAmountUsd = acctPayment.PaymentAmountUsd;
                     payment.PaidAmountVnd = acctPayment.PaymentAmountVnd;
                     payment.Notes = acctPayment.Note;
@@ -532,8 +537,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             _payment.PaymentAmountVnd = paymentGroupOBH.PaidAmountVnd;
             _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd;
-            _payment.BalanceVnd = paymentGroupOBH.UnpaidVnd - paymentGroupOBH.PaidAmountVnd;
-            _payment.BalanceUsd = paymentGroupOBH.UnpaidUsd - paymentGroupOBH.PaidAmountUsd;
+            _payment.BalanceVnd = paymentGroupOBH.UnpaidAmountVnd - paymentGroupOBH.PaidAmountVnd;
+            _payment.BalanceUsd = paymentGroupOBH.UnpaidAmountUsd - paymentGroupOBH.PaidAmountUsd;
 
             _payment.RefCurrency = invTemp.Currency; // currency của hóa đơn
             _payment.Note = paymentGroupOBH.Notes; // Cùng một notes
@@ -634,14 +639,14 @@ namespace eFMS.API.Accounting.DL.Services
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
                     _payment.PaymentAmount = _payment.PaymentAmountVnd = payment.PaidAmountVnd;
-                    _payment.Balance = _payment.BalanceVnd = payment.UnpaidVnd - payment.PaidAmountVnd;
+                    _payment.Balance = _payment.BalanceVnd = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
 
                     _payment.PaymentAmountUsd = _payment.BalanceUsd = null;
                 }
                 else
                 {
                     _payment.PaymentAmount = _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                    _payment.Balance = _payment.BalanceUsd = payment.UnpaidUsd - payment.PaidAmountUsd;
+                    _payment.Balance = _payment.BalanceUsd = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
 
                     _payment.PaymentAmountVnd = _payment.BalanceVnd = null;
 
@@ -1635,8 +1640,8 @@ namespace eFMS.API.Accounting.DL.Services
                 CurrencyId = se.Invoice.Currency,
                 Amount = se.Invoice.TotalAmount,
                 UnpaidAmount = se.Invoice.UnpaidAmount,
-                UnpaidVnd = se.Invoice.UnpaidAmountVnd,
-                UnpaidUsd = se.Invoice.UnpaidAmountUsd,
+                UnpaidAmountVnd = se.Invoice.UnpaidAmountVnd,
+                UnpaidAmountUsd = se.Invoice.UnpaidAmountUsd,
                 PaymentTerm = se.Invoice.PaymentTerm,
                 DueDate = se.Invoice.PaymentDueDate,
                 PaymentStatus = se.Invoice.PaymentStatus,
@@ -1663,9 +1668,11 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
+                               PaidAmountUsd = inv.CurrencyId == AccountingConstants.CURRENCY_USD ? inv.UnpaidAmount : null,
+                               PaidAmountVnd = inv.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? inv.UnpaidAmount : null,
                                UnpaidAmount = inv.UnpaidAmount,
-                               UnpaidVnd = inv.UnpaidVnd,
-                               UnpaidUsd = inv.UnpaidUsd,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
                                PaymentTerm = inv.PaymentTerm,
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
@@ -1708,8 +1715,8 @@ namespace eFMS.API.Accounting.DL.Services
                 CurrencyId = se.Invoice.Select(s => s.Currency).FirstOrDefault(),
                 Amount = se.Invoice.Sum(su => su.TotalAmount),
                 UnpaidAmount = se.Invoice.Sum(su => su.UnpaidAmount),
-                UnpaidVnd = se.Invoice.Sum(su => su.UnpaidAmountVnd),
-                UnpaidUsd = se.Invoice.Sum(su => su.UnpaidAmountUsd),
+                UnpaidAmountVnd = se.Invoice.Sum(su => su.UnpaidAmountVnd),
+                UnpaidAmountUsd = se.Invoice.Sum(su => su.UnpaidAmountUsd),
                 PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
                 DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
                 PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
@@ -1736,9 +1743,11 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
+                               PaidAmountUsd = inv.CurrencyId == AccountingConstants.CURRENCY_USD ? inv.UnpaidAmount : null,
+                               PaidAmountVnd = inv.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? inv.UnpaidAmount : null,
                                UnpaidAmount = inv.UnpaidAmount,
-                               UnpaidVnd = inv.UnpaidVnd,
-                               UnpaidUsd = inv.UnpaidUsd,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
                                PaymentTerm = inv.PaymentTerm,
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
@@ -1780,8 +1789,8 @@ namespace eFMS.API.Accounting.DL.Services
                 CurrencyId = se.Soa.Currency,
                 Amount = se.Soa.CreditAmount,
                 UnpaidAmount = se.Soa.CreditAmount,
-                UnpaidVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
-                UnpaidUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
                 PaymentTerm = null,
                 DueDate = null,
                 PaymentStatus = null,
@@ -1809,8 +1818,8 @@ namespace eFMS.API.Accounting.DL.Services
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
                                UnpaidAmount = inv.UnpaidAmount,
-                               UnpaidVnd = inv.UnpaidVnd,
-                               UnpaidUsd = inv.UnpaidUsd,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
                                PaymentTerm = inv.PaymentTerm,
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
@@ -1853,8 +1862,8 @@ namespace eFMS.API.Accounting.DL.Services
                 CurrencyId = se.CreditNote.CurrencyId,
                 Amount = se.CreditNote.Total,
                 UnpaidAmount = se.CreditNote.Total,
-                UnpaidVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
-                UnpaidUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
                 PaymentTerm = null,
                 DueDate = null,
                 PaymentStatus = null,
@@ -1882,8 +1891,8 @@ namespace eFMS.API.Accounting.DL.Services
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
                                UnpaidAmount = inv.UnpaidAmount,
-                               UnpaidVnd = inv.UnpaidVnd,
-                               UnpaidUsd = inv.UnpaidUsd,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
                                PaymentTerm = inv.PaymentTerm,
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,

@@ -7,7 +7,7 @@
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>Create {{type === 'Customer' ? 'Customer': 'Agency'}} Receipt</h3>
-                    <div>
+                    <!-- <div>
                         <div class="c-button-actions">
                             <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
                                 (onClick)="submitClick('draft')">
@@ -15,12 +15,21 @@
                             <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="submitClick()">
                             </app-default-button>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
-                <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
+                <customer-payment-form-create-receipt (onRequest)="changeDebitList($event)"></customer-payment-form-create-receipt>
 
                 <customer-payment-list-receipt></customer-payment-list-receipt>
-
+                <div class="c-button-actions text-center">
+                    <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
+                        (onClick)="submitClick('draft')">
+                    </app-permission-button>
+                    <app-permission-button type="save" title="Done" class="success"
+                                    (onClick)="confirmDoneReceiptPopup.show()">
+                                </app-permission-button>
+                    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
+                    </app-default-button>
+                </div>
             </div>
         </div>
     </div>
@@ -30,3 +39,8 @@
 <info-popup [body]="invalidFormText"></info-popup>
 
 <confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
+
+<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();submitClick('done')"
+    [labelConfirm]="'Yes'" labelCancel="No"
+    body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
+</confirm-popup>
