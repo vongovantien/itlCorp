@@ -15,6 +15,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 
 import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
 import { Observable } from 'rxjs';
+import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
@@ -22,6 +23,8 @@ import { Observable } from 'rxjs';
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
+    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
+
 
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
@@ -46,7 +49,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         private _store: Store<IAppState>,
         private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
-        private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _dataService: DataService
 
@@ -122,6 +124,15 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
+    getDebit() {
+        this.debitPopup.show();
+        this.debitPopup.customerFromReceipt = this.customerId.value;
+        this.debitPopup.dateFromReceipt = this.date.value;
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
+        //this.debitPopup.filterList();
+    }
     getInvoiceList() {
         this.isSubmitted = true;
         if (!this.formSearchInvoice.valid) {
@@ -149,6 +160,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 }
             );
     }
+
+    addToReceipt($event: string) {
+        const partnerId = $event;
+        if (!this.customerId.value) {
+            this.customerId.setValue(partnerId);
+        }
+    }
+
 }
 
 interface IAgreementReceipt {

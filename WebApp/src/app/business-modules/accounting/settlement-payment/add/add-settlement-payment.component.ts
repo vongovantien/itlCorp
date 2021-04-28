@@ -150,6 +150,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             note: this.formCreateSurcharge.note.value,
             payee: this.formCreateSurcharge.payee.value,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
+            bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
+            bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
+            bankName: this.formCreateSurcharge.bankName.value
         };
 
         return dataSettle;

@@ -189,7 +189,33 @@ namespace eFMS.API.Accounting.DL.Services
             if (receipt.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow delete. Receipt has canceled");
             if (receipt.Status == AccountingConstants.RECEIPT_STATUS_DRAFT)
             {
-                hs = DataContext.Delete(x => x.Id == receipt.Id);
+                using (var trans = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        hs = DataContext.Delete(x => x.Id == receipt.Id);
+                        if (hs.Success)
+                        {
+                            var payments = acctPaymentRepository.Get(x => x.ReceiptId == id).Select(x => x.Id).ToList();
+                            if(payments.Count() > 0)
+                            {
+                                var hsDeletePayment = DeletePayments(payments);
+                            }
+                        }
+
+                        trans.Commit();
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.Rollback();
+                        return new HandleState((object)ex.ToString());
+                    }
+                    finally
+                    {
+                        trans.Dispose();
+                    }
+                }
+               
             }
             return hs;
         }
@@ -462,7 +488,7 @@ namespace eFMS.API.Accounting.DL.Services
                     hs = SaveDone(receiptModel);
                     break;
                 case SaveAction.SAVECANCEL:
-                    currentUser.Action = "ReceiptSaveCabcel";
+                    currentUser.Action = "ReceiptSaveCancel";
                     hs = SaveCancel(receiptModel.Id);
                     break;
             }
@@ -497,7 +523,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.RefId = invTemp.Id.ToString(); // ID hóa đơn tạm
             _payment.BillingRefNo = paymentGroupOBH.RefNo; // Cùng một BillingRefNo SOA DEBIT /DEBITNOTE
             _payment.PaymentNo = invTemp.InvoiceNoReal + "_" + receipt.PaymentRefNo;
-            _payment.InvoiceNo = null;
+            _payment.InvoiceNo = invTemp.InvoiceNoTempt;
             _payment.Type = "OBH";
             _payment.CurrencyId = receipt.CurrencyId; // Theo currency của phiếu thu
             _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
@@ -764,7 +790,7 @@ namespace eFMS.API.Accounting.DL.Services
             return _paymentStatus;
         }
 
-        private HandleState UpdateInvoiceOfPayment(Guid receiptId)
+        private HandleState UpdateInvoiceOfPayment(Guid receiptId, string action)
         {
             HandleState hsInvoiceUpdate = new HandleState();
             IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
@@ -847,7 +873,14 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in credits)
                                 {
-                                    item.NetOff = true;
+                                    if(action == "CANCEL")
+                                    {
+                                        item.NetOff = false;
+                                    }
+                                    else
+                                    {
+                                        item.NetOff = true;
+                                    }
                                     cdNoteRepository.Update(item, x => x.Id == item.Id, false);
                                 }
                                 cdNoteRepository.SubmitChanges();
@@ -860,7 +893,14 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 foreach (var item in soas)
                                 {
-                                    item.NetOff = true;
+                                    if (action == "CANCEL")
+                                    {
+                                        item.NetOff = false;
+                                    }
+                                    else
+                                    {
+                                        item.NetOff = true;
+                                    }
                                     soaRepository.Update(item, x => x.Id == item.Id, false);
                                 }
                                 soaRepository.SubmitChanges();
@@ -909,6 +949,12 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptModel.OfficeId = currentUser.OfficeID;
                 receiptModel.CompanyId = currentUser.CompanyID;
 
+                CatPartner  partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
+                if(partner != null)
+                {
+                    receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                }
+               
                 AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -926,6 +972,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -936,6 +983,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -956,6 +1004,12 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptModel.OfficeId = currentUser.OfficeID;
                 receiptModel.CompanyId = currentUser.CompanyID;
 
+                CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
+                if (partner != null)
+                {
+                    receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                }
+
                 AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
@@ -964,21 +1018,11 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Update(receipt, x => x.Id == receipt.Id, false);
                         if (hs.Success)
                         {
-                            List<ReceiptInvoiceModel> paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
-                            List<ReceiptInvoiceModel> paymentsUpdate = receiptModel.Payments.Where(x => x.PaymentId != Guid.Empty && x.PaymentId != null).ToList();
                             // Xóa các payment hiện tại, add các payment mới khi update
-                            List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && !paymentsUpdate.Select(se => se.PaymentId)
-                            .Contains(x.Id))
-                            .Select(s => s.Id)
-                            .ToList();
-                            List<Guid> paymentsUpdateDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && paymentsUpdate.Select(se => se.PaymentId)
-                            .Contains(x.Id))
-                            .Select(s => s.Id)
-                            .ToList();
-                            HandleState hsPaymentAdd = AddPayments(paymentsAdd, receipt);
-                            HandleState hsPaymentUpdateDelete = DeletePayments(paymentsUpdateDelete);
-                            HandleState hsPaymentUpdate = AddPayments(paymentsUpdate, receipt);
+                            List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).Select(x => x.Id).ToList();
                             HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
+                     
+                            HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receipt);
 
                             DataContext.SubmitChanges();
                             trans.Commit();
@@ -1008,59 +1052,80 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 bool isAddNew = false;
+
+                CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
+                if (partner != null)
+                {
+                    receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                }
                 if (receiptModel.Id == Guid.Empty || receiptModel.Id == null)
                 {
                     isAddNew = true;
                     receiptModel.Id = Guid.NewGuid();
                     receiptModel.UserCreated = receiptModel.UserModified = currentUser.UserID;
                     receiptModel.DatetimeCreated = receiptModel.DatetimeModified = DateTime.Now;
+                    receiptModel.GroupId = currentUser.GroupId;
+                    receiptModel.DepartmentId = currentUser.DepartmentId;
+                    receiptModel.OfficeId = currentUser.OfficeID;
+                    receiptModel.CompanyId = currentUser.CompanyID;
+                    receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
+
+                    AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
+                    HandleState hs = DataContext.Add(receiptData);
+
+                    // Save Done
+                    hs = SaveDoneReceipt(receiptData.Id);
+
+                    return hs;
                 }
                 else
                 {
                     isAddNew = false;
                     AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
-                    if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
-                    if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save done. Receipt has canceled");
 
-                    receiptModel.UserModified = currentUser.UserID;
-                    receiptModel.DatetimeModified = DateTime.Now;
+                    // Xóa các payment hiện tại, add các payment mới khi update
+                    List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
+                    HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
+
+                    HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
+
+                    HandleState hs = SaveDoneReceipt(receiptCurrent.Id);
+
+                    return hs;
+
                 }
-                receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
-                receiptModel.GroupId = currentUser.GroupId;
-                receiptModel.DepartmentId = currentUser.DepartmentId;
-                receiptModel.OfficeId = currentUser.OfficeID;
-                receiptModel.CompanyId = currentUser.CompanyID;
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
+                return new HandleState((object)ex.Message);
+            }
+           
+        }
 
-                AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
+        public HandleState SaveDoneReceipt(Guid receiptId)
+        {
+            try
+            {
+                HandleState hs = new HandleState();
+                AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptId).FirstOrDefault();
+                if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
+
+                if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save done. Receipt has canceled");
+
+                receiptCurrent.Status = AccountingConstants.RECEIPT_STATUS_DONE;
+                receiptCurrent.UserModified = currentUser.UserID;
+                receiptCurrent.DatetimeModified = DateTime.Now;
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
-                        HandleState hs = isAddNew ? DataContext.Add(receipt, false) : DataContext.Update(receipt, x => x.Id == receipt.Id, false);
+                        hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id, false);
                         if (hs.Success)
                         {
-                            List<ReceiptInvoiceModel> paymentsAdd = receiptModel.Payments.Where(x => x.PaymentId == Guid.Empty || x.PaymentId == null).ToList();
-                            HandleState hsPaymentAdd = AddPayments(paymentsAdd, receipt);
-                            if (isAddNew == false)
-                            {
-                                List<ReceiptInvoiceModel> paymentsUpdate = receiptModel.Payments.Where(x => x.PaymentId != Guid.Empty && x.PaymentId != null).ToList();
-                                List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && !paymentsUpdate
-                                                            .Select(se => se.PaymentId).Contains(x.Id))
-                                                            .Select(s => s.Id)
-                                                            .ToList();
-
-                                List<Guid> paymentsUpdateDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && paymentsUpdate.Select(se => se.PaymentId)
-                                                                   .Contains(x.Id))
-                                                                   .Select(s => s.Id)
-                                                                   .ToList();
-
-                                HandleState hsPaymentUpdateDelete = DeletePayments(paymentsUpdateDelete);
-                                HandleState hsPaymentUpdate = AddPayments(paymentsUpdate, receipt);
-                                HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
-                            }
-
                             // cấn trừ cho hóa đơn
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receipt.Id);
+                            hs = UpdateInvoiceOfPayment(receiptId, "DONE");
                             //TODO: Tính lại công nợ trên hợp đồng
 
                             DataContext.SubmitChanges();
@@ -1071,6 +1136,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -1081,6 +1147,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -1118,7 +1185,7 @@ namespace eFMS.API.Accounting.DL.Services
                             // Phát sinh những dòng payment âm 
                             HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentsReceipt, receiptCurrent);
                             // Cập nhật invoice cho những payment
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receiptCurrent.Id);
+                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPayment(receiptCurrent.Id, "CANCEL");
                             // Cập nhật Cus Advance của Agreement
                             HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
 
@@ -1130,6 +1197,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_AR_SaveCancel_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -1147,100 +1215,6 @@ namespace eFMS.API.Accounting.DL.Services
         public ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
         {
             return new ProcessClearInvoiceModel { };
-            //List<ReceiptInvoiceModel> invoiceList = new List<ReceiptInvoiceModel>();
-            //ProcessClearInvoiceModel results = new ProcessClearInvoiceModel();
-
-            //if (criteria.List.Count() > 0)
-            //{
-            //    invoiceList = criteria.List.OrderBy(x => x.Index).ToList();
-
-            //    decimal currentPaidAmount = criteria.PaidAmount;
-
-            //    foreach (ReceiptInvoiceModel invoice in invoiceList)
-            //    {
-            //        if (criteria.Currency == AccountingConstants.CURRENCY_LOCAL)
-            //        {
-            //            invoice.ReceiptExcUnpaidAmount = invoice.UnpaidAmount * criteria.FinalExchangeRate; // số tiền còn lại cần thu của invoice theo tỉ giá phiếu thu
-            //            if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
-            //            {
-            //                if (invoice.Currency != AccountingConstants.CURRENCY_LOCAL)
-            //                {
-            //                    invoice.PaidAmount = invoice.ReceiptExcUnpaidAmount;
-            //                }
-            //                else
-            //                {
-            //                    invoice.PaidAmount = invoice.UnpaidAmount;
-            //                }
-
-            //                invoice.InvoiceBalance = 0;
-            //            }
-            //            else
-            //            {
-            //                invoice.PaidAmount = currentPaidAmount;
-            //                invoice.InvoiceBalance = invoice.ReceiptExcUnpaidAmount - invoice.PaidAmount;
-            //            }
-
-            //            invoice.ReceiptExcPaidAmount = NumberHelper.RoundNumber(invoice.PaidAmount / criteria.FinalExchangeRate ?? 0, 3);
-            //            invoice.ReceiptExcInvoiceBalance = NumberHelper.RoundNumber(invoice.InvoiceBalance / criteria.FinalExchangeRate ?? 0, 3);
-
-            //        }
-            //        else
-            //        {
-            //            invoice.ReceiptExcUnpaidAmount = NumberHelper.RoundNumber(invoice.UnpaidAmount / criteria.FinalExchangeRate, 3); // số tiền còn lại của invoice theo tỉ giá phiếu thu
-            //            if (currentPaidAmount - invoice.ReceiptExcUnpaidAmount > 0) // Trừ hết số tiền còn lại của invoice
-            //            {
-            //                if (invoice.Currency != AccountingConstants.CURRENCY_LOCAL)
-            //                {
-            //                    invoice.PaidAmount = invoice.UnpaidAmount;
-            //                }
-            //                else
-            //                {
-            //                    invoice.PaidAmount = invoice.ReceiptExcUnpaidAmount;
-            //                }
-
-            //                invoice.InvoiceBalance = 0;
-
-            //            }
-            //            else
-            //            {
-            //                invoice.PaidAmount = currentPaidAmount;
-            //                invoice.InvoiceBalance = invoice.ReceiptExcUnpaidAmount - invoice.PaidAmount;
-
-            //            }
-
-            //            invoice.ReceiptExcPaidAmount = NumberHelper.RoundNumber(invoice.PaidAmount * criteria.FinalExchangeRate ?? 0);
-            //            invoice.ReceiptExcInvoiceBalance = NumberHelper.RoundNumber(invoice.InvoiceBalance * criteria.FinalExchangeRate ?? 0);
-            //        }
-            //        currentPaidAmount -= (invoice.ReceiptExcUnpaidAmount ?? 0);
-
-            //    }
-
-            //    results.Invoices = invoiceList;
-            //    if (currentPaidAmount > 0) // trường hợp thu dư
-            //    {
-            //        CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == criteria.CustomerID)?.FirstOrDefault();
-            //        ReceiptInvoiceModel adv = new ReceiptInvoiceModel
-            //        {
-            //            PartnerName = partnerInfo?.ShortName,
-            //            Type = "ADV",
-            //            PaidAmount = currentPaidAmount,
-            //            InvoiceBalance = 0,
-            //            TaxCode = partnerInfo?.TaxCode,
-            //            Currency = criteria.Currency
-            //        };
-            //        results.Balance = currentPaidAmount;
-            //        results.Invoices.Add(adv);
-            //    }
-            //    else if (currentPaidAmount < 0) // trường hợp thu thiếu
-            //    {
-            //        results.Balance = currentPaidAmount;
-            //    }
-            //    else
-            //    {
-            //        results.Balance = 0;
-            //    }
-            //}
-            //return results;
         }
 
         #region -- Get Customers Debit --
@@ -1312,7 +1286,7 @@ namespace eFMS.API.Accounting.DL.Services
                     acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
                 }
 
-                if (acctManagementIds != null)
+                if (acctManagementIds != null && acctManagementIds.Count > 0)
                 {
                     query = query.And(x => acctManagementIds.Contains(x.Id));
                 }
@@ -1364,7 +1338,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var acctManagementIds = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.AcctManagementId).Distinct().ToList();
-                            if (acctManagementIds != null)
+                            if (acctManagementIds != null && acctManagementIds.Count > 0)
                             {
                                 query = query.And(x => acctManagementIds.Contains(x.Id));
                             }
@@ -1376,7 +1350,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var acctManagementIds = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.AcctManagementId).Distinct().ToList();
-                if (acctManagementIds != null)
+                if (acctManagementIds != null && acctManagementIds.Count > 0)
                 {
                     query = query.And(x => acctManagementIds.Contains(x.Id));
                 }
@@ -1426,7 +1400,7 @@ namespace eFMS.API.Accounting.DL.Services
                     soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
                 }
 
-                if (soaNo != null)
+                if (soaNo != null && soaNo.Count > 0)
                 {
                     query = query.And(x => soaNo.Contains(x.Soano));
                 }
@@ -1489,7 +1463,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var soaNos = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.PaySoano).Distinct().ToList();
-                            if (soaNos != null)
+                            if (soaNos != null && soaNos.Count > 0)
                             {
                                 query = query.And(x => soaNos.Contains(x.Soano));
                             }
@@ -1501,7 +1475,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var soaNos = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.PaySoano).Distinct().ToList();
-                if (soaNos != null)
+                if (soaNos != null && soaNos.Count > 0)
                 {
                     query = query.And(x => soaNos.Contains(x.Soano));
                 }
@@ -1550,7 +1524,7 @@ namespace eFMS.API.Accounting.DL.Services
                     creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.ClearanceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
                 }
 
-                if (creditNo != null)
+                if (creditNo != null && creditNo.Count > 0)
                 {
                     query = query.And(x => creditNo.Contains(x.Code));
                 }
@@ -1613,7 +1587,7 @@ namespace eFMS.API.Accounting.DL.Services
                         if (dateModeJobNos.Count > 0)
                         {
                             var creditNos = surchargeRepository.Where(x => dateModeJobNos.Where(w => w == x.JobNo).Any()).Select(se => se.CreditNo).Distinct().ToList();
-                            if (creditNos != null)
+                            if (creditNos != null && creditNos.Count > 0)
                             {
                                 query = query.And(x => creditNos.Contains(x.Code));
                             }
@@ -1625,7 +1599,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.Service))
             {
                 var creditNos = surchargeRepository.Get(x => criteria.Service.Contains(x.TransactionType)).Select(se => se.CreditNo).Distinct().ToList();
-                if (creditNos != null)
+                if (creditNos != null && creditNos.Count > 0)
                 {
                     query = query.And(x => creditNos.Contains(x.Code));
                 }

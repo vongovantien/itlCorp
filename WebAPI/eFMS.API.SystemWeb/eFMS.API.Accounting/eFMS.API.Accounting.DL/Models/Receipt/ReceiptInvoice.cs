@@ -9,6 +9,9 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string Notes { get; set; }
         public decimal? PaidAmountVnd { get; set; }
         public decimal? PaidAmountUsd { get; set; }
+        public decimal? RemainUsd { get; set; }
+        public decimal? RemainVnd { get; set; }
+
     }
 
     public class ProcessClearInvoiceModel

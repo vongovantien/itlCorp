@@ -879,6 +879,12 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.BankAccountName).HasMaxLength(150);
+
+                entity.Property(e => e.BankAccountNo).HasMaxLength(150);
+
+                entity.Property(e => e.BankName).HasMaxLength(150);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");

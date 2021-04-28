@@ -30,7 +30,7 @@
             <tabset class="custom-class-tab">
                 <tab heading="HAWB Detail">
                     <app-form-create-hbl-sea-export type="SLE" [isUpdate]="true"></app-form-create-hbl-sea-export>
-                    <hbl-goods-summary-lcl (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
+                    <hbl-goods-summary-lcl type="export" (onSelectQty)="selectedPackage($event)"> HBL Goods Summary
                     </hbl-goods-summary-lcl>
                 </tab>
                 <tab heading="Attach List">

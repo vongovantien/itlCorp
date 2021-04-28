@@ -2,9 +2,10 @@ import { OnInit, Component, ChangeDetectionStrategy, Input } from "@angular/core
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
-import { ReceiptCreditListState } from "../../store/reducers";
+import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptCreditDebitModel } from "@models";
+import { map, reduce, takeUntil } from "rxjs/operators";
 
 @Component({
     selector: 'customer-payment-receipt-credit-list',
@@ -34,12 +35,16 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         }
     }
 
+    totalOrgAmount: number;
+
     get type() {
         return this._type;
     }
 
     private _type: string = 'Customer' // Agent
-    creditList$: Observable<ReceiptCreditDebitModel[]>;
+    creditList: Observable<ReceiptCreditDebitModel[]>;
+    debitList$: Observable<ReceiptCreditDebitModel[]>;
+    configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
 
     constructor(
         private _store: Store<IReceiptState>
@@ -59,7 +64,15 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Office', field: '' },
         ];
 
-        this.creditList$ = this._store.select(ReceiptCreditListState);
+        this.configDebitDisplayFields = [
+            { field: 'invoiceNo', label: 'Invoice No' },
+            { field: 'amount', label: 'Unpaid Invoice' }
+        ];
+
+        this.creditList = this._store.select(ReceiptCreditListState);
+        this.debitList$ = this._store.select(ReceiptDebitListState);
+
+
 
     }
 }

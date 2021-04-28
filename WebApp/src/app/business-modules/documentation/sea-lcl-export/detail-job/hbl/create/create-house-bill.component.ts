@@ -106,7 +106,6 @@ export class SeaLCLExportCreateHBLComponent extends AppForm {
     ngAfterViewInit() {
         this.goodSummaryComponent.initContainer();
         this.goodSummaryComponent.containerDetail = 'A PART OF CONTAINER S.T.C';
-        this.goodSummaryComponent.isExport = true;
         this._cd.detectChanges();
     }
 

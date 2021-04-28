@@ -6,7 +6,7 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>Create Customer Receipt</h3>
+                    <h3>Create {{type === 'Customer' ? 'Customer': 'Agency'}} Receipt</h3>
                     <div>
                         <div class="c-button-actions">
                             <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"

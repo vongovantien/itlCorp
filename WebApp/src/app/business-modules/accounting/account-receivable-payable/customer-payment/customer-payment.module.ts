@@ -17,6 +17,8 @@ import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
 import { NgxCurrencyModule } from 'ngx-currency';
+import { CustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
+import { ModalModule } from 'ngx-bootstrap';
 import { ARCustomerPaymentReceiptCreditListComponent } from './components/receipt-credit-list/receipt-credit-list.component';
 import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt-debit-list/receipt-debit-list.component';
 
@@ -35,12 +37,13 @@ const routing: Routes = [
 @NgModule({
     declarations: [
         ARCustomerPaymentComponent,
-        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentCreateReciptComponent,
         ARCustomerPaymentDetailReceiptComponent,
+        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentFormCreateReceiptComponent,
         ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,
+        CustomerAgentDebitPopupComponent,
         ARCustomerPaymentReceiptCreditListComponent,
         ARCustomerPaymentReceiptDebitListComponent
     ],
@@ -50,6 +53,7 @@ const routing: Routes = [
         TabsModule.forRoot(),
         NgSelectModule,
         NgxDaterangepickerMd,
+        ModalModule.forRoot(),
         StoreModule.forFeature('customer-payment', reducers),
         EffectsModule.forFeature(effects),
         NgxCurrencyModule.forRoot({
