@@ -10,12 +10,12 @@
                 </div>
                 <div class="col-lg-3">
                     <div class="form-group">
-                        <label for="form-control-label">Type</label>
-                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom form-group">
+                        <label for="form-control-label">Payment Type</label>
+                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom">
                         </ng-select>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-3 ">
                     <div class="form-group">
                         <label for="form-control-label">Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -36,9 +36,9 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3">
+                <div class="col-lg-6">
                     <div class="form-group">
-                        <label for="form-control-label">Partner</label>
+                        <label for="form-control-label">Customer</label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
@@ -47,7 +47,7 @@
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="form-group">
                         <label for="form-control-label">Currency</label>
                         <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id"
@@ -56,18 +56,22 @@
 
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="form-group">
                         <label for="form-control-label">Sync Status</label>
                         <ng-select [items]="syncStatuss" formControlName="syncStatus" class="custom"></ng-select>
                     </div>
                 </div>
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     <div class="form-group">
-                        <label for="form-control-label">Status</label>
-                        <ng-select [items]="statuss" formControlName="status" class="custom"></ng-select>
+                        <label for="form-control-label">Type Receipt</label>
+                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
+                            class="custom">
+                        </ng-select>
                     </div>
                 </div>
+
+
             </div>
             <div class="form-actions">
                 <div class="row ">

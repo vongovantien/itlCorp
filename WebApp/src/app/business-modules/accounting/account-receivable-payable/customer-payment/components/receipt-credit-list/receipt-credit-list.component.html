@@ -37,13 +37,13 @@
                                         placeholder="Please select invoice">
                                     </app-combo-grid-virtual-scroll>
                                 </td>
-                                <td ALIGN="left">
+                                <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
-                                <td ALIGN="left">
+                                <td ALIGN="right">
                                     {{item.unpaidUsd | number:'1.3-3'}}
                                 </td>
-                                <td ALIGN="left">
+                                <td ALIGN="right">
                                     {{item.unpaidVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
@@ -64,8 +64,8 @@
                             <td class="text-left">{{creditList | async | sumAmount:'amount':'USD':'currencyId' |
                                 number}} USD |
                                 {{creditList | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                            <td class="text-left">{{creditList | async | sumAmount:'unpaidUsd' | number:'1.3-3'}} </td>
-                            <td class="text-left">{{creditList | async | sumAmount:'unpaidVnd' | number:'1.0-3'}} </td>
+                            <td class="text-right">{{creditList | async | sumAmount:'unpaidUsd' | number:'1.3-3'}} </td>
+                            <td class="text-right">{{creditList | async | sumAmount:'unpaidVnd' | number:'1.0-3'}} </td>
                             <td></td>
                             <td></td>
                             <td></td>

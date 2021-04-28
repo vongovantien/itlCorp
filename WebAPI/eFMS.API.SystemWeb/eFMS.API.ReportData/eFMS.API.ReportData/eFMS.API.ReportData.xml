@@ -84,6 +84,13 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportGeneralSettlementPayment(System.Guid)">
+            <summary>
+            Export General Preview in Settlement detail
+            </summary>
+            <param name="settlementId"></param>
+            <returns></returns>
+        </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOASupplierAirfreight(System.String,System.String)">
             <summary>
@@ -397,6 +404,12 @@
             Accountant
             </summary>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetSettleExcelFolder">
+            <summary>
+            Get folder contain settlement payment template excel
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
             <summary>
             Generate advance payment excel
@@ -440,6 +453,14 @@
             <param name="settlementExport"></param>
             <param name="language"></param>
             <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportGeneralSettlementPayment(eFMS.API.ReportData.Models.Accounting.InfoSettlementExport,System.String)">
+            <summary>
+            Generate data to Export General Preview in Settlement detail
+            </summary>
+            <param name="settlementExport"></param>
+            <param name="fileName"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.DocumentationHelper.GenerateMAWBAirExportExcel(eFMS.API.ReportData.Models.Documentation.AirwayBillExportResult,System.IO.Stream)">

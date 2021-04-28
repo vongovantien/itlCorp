@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
-import { Router } from '@angular/router';
-import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { InfoPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -11,6 +11,10 @@ import { ToastrService } from 'ngx-toastr';
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
 import { HttpErrorResponse } from '@angular/common/http';
+import { cloneDeep } from 'lodash';
+import { IAppState } from '@store';
+import { Store } from '@ngrx/store';
+import { ResetInvoiceList } from '../store/actions';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -30,18 +34,24 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
 
     invalidBalance: string = 'Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!';
-
+    type: string = null;
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
-        protected _accountingRepo: AccountingRepo
-
+        protected _accountingRepo: AccountingRepo,
+        protected _activedRoute: ActivatedRoute,
+        protected _store: Store<IAppState>,
     ) {
         super();
     }
 
     ngOnInit(): void {
         this.initSubmitClickSubscription(() => { this.saveReceipt('draft') });
+        this._activedRoute.queryParams.subscribe((param: any) => {
+            if (!!param) {
+                this.type = param.type;
+            }
+        })
     }
 
     saveReceipt(type: string) {
@@ -52,23 +62,39 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
-        if (!this.listInvoice.invoices.length) {
-            this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
-            return;
-        }
-        if (this.listInvoice.invoices.some(x => x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID)) {
-            this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+        // if (!this.listInvoice.invoices.length) {
+        //     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+        //     return;
+        // }
+        // if (this.listInvoice.invoices.some(x => x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID)) {
+        //     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
 
-            return;
-        }
+        //     return;
+        // }
 
-        if (!this.checkValidateBalance(this.listInvoice.invoices, +this.listInvoice.finalPaidAmount.value, +this.listInvoice.balance.value)) {
-            this._toastService.warning(this.invalidBalance, 'Warning');
-            return;
-        }
+        // if (!this.checkValidateBalance(this.listInvoice.invoices, +this.listInvoice.finalPaidAmount.value, +this.listInvoice.balance.value)) {
+        //     this._toastService.warning(this.invalidBalance, 'Warning');
+        //     return;
+        // }
         const receiptModel: ReceiptModel = this.getDataForm();
-        receiptModel.payments = this.listInvoice.invoices;
 
+        let paymentList = [];
+        this.listInvoice.debitList.pipe().subscribe((x: ReceiptInvoiceModel[]) => {
+            if (x.length > 0) {
+                console.log('paymentList1', x)
+                paymentList = cloneDeep(x);
+            }
+        });
+        this.listInvoice.creditList.pipe().subscribe((x: ReceiptInvoiceModel[]) => {
+            if (x.length > 0) {
+                paymentList = cloneDeep(x);
+            }
+        });
+        if(paymentList.length === 0){
+            this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+            return;
+        }
+        receiptModel.payments = paymentList;
         // if (receiptModel.payments.some(x => x.type === 'ADV')) {
         //     receiptModel.payments.forEach(inv => {
         //         inv.receiptExcPaidAmount = inv.paidAmount;
@@ -84,7 +110,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
-            type: dataForm.type?.length ? dataForm.type.toString() : null,
+            type: this.type,
         };
 
         const d = this.utility.mergeObject(dataForm, formMapValue);
@@ -118,7 +144,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
                     }
                     this._toastService.error("Create data fail, Please check again!");
@@ -138,7 +164,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     gotoList() {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer`]);
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
 
     }
 }

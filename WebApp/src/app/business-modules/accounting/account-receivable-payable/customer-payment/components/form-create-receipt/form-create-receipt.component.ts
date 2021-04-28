@@ -45,6 +45,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     ];
     isReadonly = null;
     customerName: string;
+    contractNo: string;
 
     constructor(
         private _fb: FormBuilder,
@@ -91,6 +92,25 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         );
     }
 
+    getContract(){
+        this._catalogueRepo.getAgreement(
+            <IQueryAgreementCriteria>{
+                partnerId: this.customerId.value, status: true
+            }).subscribe(
+                (d: IAgreementReceipt[]) => {
+                    if (!!d) {
+                        this.agreements = d || [];
+                        if (!!this.agreements.length) {
+                            this.agreementId.setValue(d[0].id);
+                        } else {
+                            this.combogrid.displaySelectedStr = '';
+                            this.agreementId.setValue(null);
+                        }
+                    }
+                }
+            );
+    }
+
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
@@ -130,44 +150,23 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     getDebit() {
         this.debitPopup.show();
-        this.debitPopup.type = 'customer';
         this.debitPopup.customerFromReceipt = this.customerId.value;
         this.debitPopup.dateFromReceipt = this.date.value;
-        this.debitPopup.reset();
-        this.debitPopup.setDefaultValue();
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
     }
-    // getInvoiceList() {
-    //     this.isSubmitted = true;
-    //     if (!this.formSearchInvoice.valid) {
-    //         return;
-    //     }
-    //     const body = {
-    //         customerId: this.customerId.value,
-    //         agreementId: this.agreementId.value,
-    //         fromDate: !!this.date.value?.startDate ? formatDate(this.date.value?.startDate, 'yyyy-MM-dd', 'en') : null,
-    //         toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
-    //     };
-
-    //     this._store.dispatch(GetInvoiceList());
-    //     this._accountingRepo.getInvoiceForReceipt(body)
-    //         .pipe()
-    //         .subscribe(
-    //             (res: CommonInterface.IResult) => {
-    //                 if (res.status) {
-    //                     this._store.dispatch(GetInvoiceListSuccess({ invoices: res.data }));
-    //                     return;
-    //                 }
-
-    //                 this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
-    //                 this._toastService.warning("Not found invoices");
-    //             }
-    //         );
-    // }
 
     addToReceipt($event: any) {
         const partnerId = $event;
-        if (!this.customerId.value) {
-            this.customerId.setValue(partnerId);
+        if (!!this.customerId) {
+            this.$customers.pipe()
+            .subscribe((x: Partner[]) =>{
+                const partner = x.filter((x: Partner) => x.id === partnerId).shift();
+                if(!!partner){
+                    this.onSelectDataFormInfo(partner, 'partner');
+                }
+            })
         }
         this.onRequest.emit(true);
     }

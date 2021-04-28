@@ -3,16 +3,16 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Customer Payment" (selectTab)="onSelectTab('customer')">
+                <tab heading="Customer/Agency Payment" (selectTab)="onSelectTab('CUSTOMER')"
+                    [active]="selectedTab === 'CUSTOMER'">
 
                 </tab>
-                <tab heading="Agency Payment" (selectTab)="onSelectTab('agency')">
-                    Agency Payment
-                </tab>
-                <tab heading="AR Summary" (selectTab)="onSelectTab('ar')">
+                <!-- <tab heading="Agency Payment" (selectTab)="onSelectTab('AGENCY')" [active]="selectedTab === 'AGENCY'">
+                </tab> -->
+                <tab heading="AR Summary" (selectTab)="onSelectTab('ARSUMMARY')">
                     Summary
                 </tab>
-                <tab heading="Payment History" (selectTab)="onSelectTab('history')" [active]="true">
+                <tab heading="Payment History" (selectTab)="onSelectTab('HISTORY')" [active]="true">
                     <form-search-history-payment (onSearch)="onSearchPayment($event)">
                     </form-search-history-payment>
 

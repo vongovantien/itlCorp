@@ -91,7 +91,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Serie No', field: 'serieNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Vat Partner', field: 'vatPartnerId', sortable: true, width: 250 },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 250 },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
         ];
@@ -458,6 +458,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                     chargeItem.paymentObjectId = partner.id;
                     chargeItem.payer = partner.shortName;
                 }
+                this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
                 break;
             case 'obh-type':
                 switch (partnerType.value) {
@@ -480,7 +481,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
         }
 
-        this.onChangeInvoiceNo(chargeItem, chargeItem.invoiceNo);
+
     }
 
     addCharge() {
@@ -709,16 +710,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
         if (invNo) {
             if (!!chargeItem.chargeId) {
-                switch (chargeItem.type) {
-                    case CommonEnum.SurchargeTypeEnum.OBH:
-                        chargeItem.vatPartnerId = chargeItem.obhId;
-                        break;
-                    case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
-                        chargeItem.vatPartnerId = chargeItem.paymentObjectId;
-                        break;
-                    default:
-                        break;
-                }
+                chargeItem.vatPartnerId = chargeItem.paymentObjectId;
             }
         }
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { ActionsSubject, Store } from '@ngrx/store';
 import { Params, ActivatedRoute } from '@angular/router';
 
@@ -25,6 +25,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
 
     @ViewChild(ShareBussinessGoodsListPopupComponent) goodsImportPopup: ShareBussinessGoodsListPopupComponent;
     @Output() onSelectQty: EventEmitter<any> = new EventEmitter<any>();
+    @Input() type: string = 'import';
 
     packageQty: number = null;
 
@@ -35,6 +36,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     packages: Unit[] = [];
     selectedPackage: any;
     selectedPackageName: string = '';
+    isExport: boolean = false;
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -153,12 +155,17 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
         // * Container
         this.containerDetail = '';
         this.containerDescription = '';
-
         if (!!containers) {
-            const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
-            containerLst.forEach((c: Container) => {
-                this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
-            });
+            if (this.type === 'export') {
+                const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
+                containerLst.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
+                });
+            } else {
+                containers.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+                });
+            }
         }
 
         const contObject: any[] = (containers || []).map((container: Container | any) => ({

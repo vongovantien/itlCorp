@@ -14,9 +14,9 @@ namespace SystemInterface {
         nameEn: string;
         nameVn: string;
         bankAccountNo: string;
-        bankOfficeAccountNoVnd: string;
-        bankOfficeAccountNoUsd: string;
         bankAccountName: string;
+        bankOfficeAccountNoUsd: string;
+        bankOfficeAccountNoVnd: string;
         bankName: string;
         photo: string;
         title: string;

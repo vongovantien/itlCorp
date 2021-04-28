@@ -40,7 +40,8 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly List<CommonData> PaymentMethod = new List<CommonData>
         {
             new CommonData { Value = "Cash", DisplayName = "Cash" },
-            new CommonData { Value = "Bank", DisplayName = "Bank Transfer" }
+            new CommonData { Value = "Bank", DisplayName = "Bank Transfer" },
+            new CommonData { Value = "Other", DisplayName = "Other" },
         };
 
         //Define list status approve advance

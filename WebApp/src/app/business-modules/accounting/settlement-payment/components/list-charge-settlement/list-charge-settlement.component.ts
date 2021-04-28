@@ -109,7 +109,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Inv Date', field: 'invoiceDate', sortable: true },
-            { title: 'Vat partner', field: 'vatPartnerShortName', sortable: true },
+            { title: 'VAT Partner', field: 'vatPartnerShortName', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
@@ -167,7 +167,9 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                 }
             })
         }
-        this.onChange.emit(true);
+        if (surcharge[0].isFromShipment) {
+            this.onChange.emit(true);
+        }
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {

@@ -2,7 +2,7 @@ import { Component, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 import { AppForm } from '@app';
-import { User, Currency, Customer } from '@models';
+import { User, Currency, Partner } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
@@ -31,6 +31,9 @@ export class SettlementFormCreateComponent extends AppForm {
     note: AbstractControl;
     statusApproval: AbstractControl;
     payee: AbstractControl;
+    beneficiaryName: AbstractControl;
+    bankAccountNo: AbstractControl;
+    bankName: AbstractControl;
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     methods: CommonInterface.ICommonTitleValue[];
@@ -64,7 +67,10 @@ export class SettlementFormCreateComponent extends AppForm {
             'currency': ['VND'],
             'note': [],
             'statusApproval': ['New'],
-            'payee': []
+            'payee': [],
+            'beneficiaryName': [],
+            'bankAccountNo': [],
+            'bankName': []
         });
 
 
@@ -77,6 +83,9 @@ export class SettlementFormCreateComponent extends AppForm {
         this.note = this.form.controls['note'];
         this.statusApproval = this.form.controls['statusApproval'];
         this.payee = this.form.controls['payee'];
+        this.beneficiaryName = this.form.controls['beneficiaryName'];
+        this.bankAccountNo = this.form.controls['bankAccountNo'];
+        this.bankName = this.form.controls['bankName'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)
@@ -122,4 +131,29 @@ export class SettlementFormCreateComponent extends AppForm {
             }
         );
     }
+
+    getBeneficiaryInfo() {
+        if (this.paymentMethod.value === this.methods[1] && !!this.payee.value) {
+            const beneficiary = this.getPartnerById(this.payee.value);
+            if (!!beneficiary) {
+                this.beneficiaryName.setValue(beneficiary.partnerNameEn);
+                this.bankAccountNo.setValue(beneficiary.bankAccountNo);
+                if (beneficiary.bankName?.trim().length > 0) {
+                    this.bankName.setValue(beneficiary.bankName);
+                } else {
+                    this.bankName.setValue(beneficiary.bankAccountName);
+                }
+            }
+        } else {
+            this.beneficiaryName.setValue(null);
+            this.bankAccountNo.setValue(null);
+            this.bankName.setValue(null);
+        }
+    }
+
+    getPartnerById(id: string) {
+        const partner: Partner = !this.customers ? null : this.customers.find((p: Partner) => p.id === id);
+        return partner || null;
+    }
+
 }

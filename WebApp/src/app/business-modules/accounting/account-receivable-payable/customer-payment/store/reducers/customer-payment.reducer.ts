@@ -1,5 +1,5 @@
 import { createReducer, on, Action } from "@ngrx/store";
-import { ReceiptInvoiceModel, Receipt, ReceiptCreditDebitModel } from "@models";
+import { ReceiptInvoiceModel, Receipt } from "@models";
 import * as ReceiptActions from "../actions";
 
 
@@ -8,6 +8,7 @@ export interface IReceiptState {
     invoices: ReceiptInvoiceModel[];
     debitList: ReceiptInvoiceModel[],
     creditList: ReceiptInvoiceModel[],
+    debitInvoice: ReceiptInvoiceModel[];
     isLoading: boolean;
     isLoaded: boolean;
 }
@@ -17,6 +18,7 @@ export const initialState: IReceiptState = {
     debitList: [],
     creditList: [],
     invoices: [],
+    debitInvoice: [],
     isLoaded: false,
     isLoading: false
 };
@@ -32,7 +34,7 @@ export const receiptManagementReducer = createReducer(
         creditList: [...payload.invoices.filter(x => x.type === 'Credit'), ...state.creditList],
         debitList: [...payload.invoices.filter(x => x.type === 'Debit' || x.type === 'OBH'), ...state.debitList]
     })),
-
+    on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, creditList: [], debitList: [] })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
         debitList: [...state.debitList, payload.data]

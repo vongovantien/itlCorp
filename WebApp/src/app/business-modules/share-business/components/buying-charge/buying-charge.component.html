@@ -364,8 +364,7 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="form-group "
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted  && charge.vatPartnerId === null }">
+                                <div class="form-group">
                                     <ng-container *ngIf="!!charge.creditNo 
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
@@ -383,7 +382,7 @@
                                                 (itemSelected)="onSelectDataFormInfo($event, 'vat-partner', charge)"
                                                 [selectedDisplayFields]="['shortName']" [dataSources]="listPartner"
                                                 [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
-                                                (remove)="charge.vatPartnerId = null" placeholder="Vat Partner"
+                                                (remove)="charge.vatPartnerId = null" placeholder="VAT Partner"
                                                 [clearable]="false" size="15">
                                             </app-combo-grid-virtual-scroll>
                                         </div>

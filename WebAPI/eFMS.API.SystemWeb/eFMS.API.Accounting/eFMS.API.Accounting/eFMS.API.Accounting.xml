@@ -504,6 +504,13 @@
             <param name="id">id of receipt</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CancelReceipt(System.Guid)">
+            <summary>
+            Update Cancel Receipt
+            </summary>
+            <param name="id">id of receipt</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveReceipt(eFMS.API.Accounting.DL.Models.AcctReceiptModel,eFMS.API.Accounting.DL.Models.SaveAction)">
             <summary>
             Save Receipt
@@ -701,6 +708,13 @@
             Export detail settlement payment by settlement id
             </summary>
             <param name="settlementId">Id of settlement payment</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GeneralSettlementPaymentExport(System.Guid)">
+            <summary>
+            Get data for General Preview
+            </summary>
+            <param name="settlementId"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.Preview(System.String[])">

@@ -38,13 +38,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     term$ = new BehaviorSubject<string>('');
     
     form: FormGroup;
-    paidAmount: AbstractControl;
     methods: CommonInterface.ICommonTitleValue[];
     userLogged: Partial<SystemInterface.IClaimUser>;
     type: AbstractControl;
     cusAdvanceAmount: AbstractControl;
-    finalPaidAmount: AbstractControl;
-    balance: AbstractControl;
+    // finalPaidAmount: AbstractControl;
+    // balance: AbstractControl;
     paymentMethod: AbstractControl;
     currencyId: AbstractControl;
     paymentDate: AbstractControl;
@@ -154,7 +153,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (res: ReceiptInvoiceModel[]) => {
                     this.invoices = [...res];
-                    this.balance.setValue(null);
+                    // this.balance.setValue(null);
 
                     console.log(this.invoices);
                 });
@@ -192,11 +191,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     initForm() {
         this.form = this._fb.group({
-            paidAmount: [null, Validators.required],
+            paidAmountVND: [null, Validators.required],
+            paidAmountUSD: [null, Validators.required],
             type: [[this.receiptTypes[0]]],
             cusAdvanceAmount: [],
             finalPaidAmount: [{ value: null, disabled: true }],
-            balance: [{ value: null, disabled: true }],
+            // balance: [{ value: null, disabled: true }],
             paymentMethod: [this.paymentMethods[0]],
             currencyId: ['VND'],
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
@@ -204,18 +204,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             bankAccountNo: [],
             amountVND: [],
             amountUSD: [],
-            paidAmountVND: [],
-            paidAmountUSD: [],
             description: [],
             finalPaidAmountVND: [],
             finalPaidAmountUSD: []
         });
 
-        this.paidAmount = this.form.controls['paidAmount'];
         this.type = this.form.controls['type'];
         this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
-        this.finalPaidAmount = this.form.controls['finalPaidAmount'];
-        this.balance = this.form.controls['balance'];
+        // this.finalPaidAmount = this.form.controls['finalPaidAmount'];
+        // this.balance = this.form.controls['balance'];
         this.paymentMethod = this.form.controls['paymentMethod'];
         this.paymentDate = this.form.controls['paymentDate'];
         this.exchangeRate = this.form.controls['exchangeRate'];
@@ -268,35 +265,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
-            case 'paid-amount':
-                if (this.type.value?.length === 1) {
-                    if (this.type.value?.includes(this.receiptTypes[0])) {
-                        this.finalPaidAmount.setValue(data);
-                    } else if (this.type.value?.includes(this.receiptTypes[1])) {
-                        this.finalPaidAmount.setValue(+this.cusAdvanceAmount.value);
-                    }
-                } else {
-                    this.finalPaidAmount.setValue(this.cusAdvanceAmount.value + +this.paidAmount.value);
-                }
-
-                break;
             case 'paid-amountVnd':
                 this.paidAmountUSD.setValue(this.formatNumberCurrency(this.paidAmountVND.value / this.exchangeRateUsd, 0));
                 break;
             case 'paid-amountUsd':
                     this.paidAmountVND.setValue(this.formatNumberCurrency(Math.round(this.paidAmountUSD.value * this.exchangeRateUsd), 2));
                     break;
-            case 'type':
-                if (data.length === 1) {
-                    if (data?.includes(this.receiptTypes[0])) {
-                        this.finalPaidAmount.setValue(+this.paidAmount.value);
-                    } else if (data.includes(this.receiptTypes[1])) {
-                        this.finalPaidAmount.setValue(+this.cusAdvanceAmount.value);
-                    }
-                } else {
-                    this.finalPaidAmount.setValue(this.cusAdvanceAmount.value + +this.paidAmount.value);
-                }
-                break;
             case 'currency':
                 if ((data as Currency).id === this.getCurrencyInvoice(this.invoices)[0]) {
                     this.exchangeRate.setValue(1);
@@ -309,10 +283,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     }
 
                 }
-
-                this.balance.setValue(null);
-                this.finalPaidAmount.setValue(null);
-                this.paidAmount.setValue(null);
                 break;
 
             case 'payment-date':
@@ -386,14 +356,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
             finalExchangeRate: this.exchangeRate.value,
-            paidAmount: this.finalPaidAmount.value,
+            // paidAmount: this.finalPaidAmount.value,
             list: this.invoices.filter(x => x.type !== 'ADV'),
             customerId: this.customerInfo?.id
         };
-        if (!body.customerId || !body.list.length || !body.paidAmount) {
-            this._toastService.warning('Missing data to process', 'Warning');
-            return;
-        }
+        // if (!body.customerId || !body.list.length || !body.paidAmount) {
+        //     this._toastService.warning('Missing data to process', 'Warning');
+        //     return;
+        // }
         if (this.getCurrencyInvoice(body.list).length === 2) {
             this._toastService.warning('List invoice should only have one currency', 'Warning');
             return;
@@ -405,7 +375,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                         this.invoices.length = 0;
                         this.invoices = [...data.invoices];
 
-                        this.balance.setValue(data.balance);
                     } else {
                         console.log(data);
                     }
@@ -418,29 +387,44 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     getFinalPaidAmount() {
         const exChangeRateUSD = this.currencyId.value !== 'USD' ? this.exchangeRateUsd : 1;
         const exChangeRateVND = this.currencyId.value === 'USD' ? this.exchangeRateUsd : 1;
-        this.finalPaidAmountUSD.setValue(this.formatNumberCurrency(((this.cusAdvanceAmount.value / exChangeRateUSD) + this.amountUSD.value + this.paidAmountUSD.value), 2));
-        this.finalPaidAmountVND.setValue(this.formatNumberCurrency(Math.round((this.cusAdvanceAmount.value * exChangeRateVND) + this.amountVND.value + this.paidAmountVND.value), 0));
+        const cusAdvanceAmount = !this.cusAdvanceAmount.value ? 0 : this.cusAdvanceAmount.value;
+        const amountUSD = !this.amountUSD.value ? 0 : this.amountUSD.value;
+        const paidAmountUSD = !this.paidAmountUSD.value ? 0 : this.paidAmountUSD.value;
+        const amountVND = !this.amountVND.value ? 0 : this.amountVND.value;
+        const paidAmountVND = !this.paidAmountVND.value ? 0 : this.paidAmountVND.value;
+        this.finalPaidAmountUSD.setValue(this.formatNumberCurrency(((cusAdvanceAmount / exChangeRateUSD) + amountUSD + paidAmountUSD), 2));
+        this.finalPaidAmountVND.setValue(this.formatNumberCurrency((cusAdvanceAmount * exChangeRateVND) + amountVND + paidAmountVND, 0));
     }
 
-    caculatorAmountFromDebitList(){
+    caculatorAmountFromDebitList() {
         let valueUSD = 0;
         let valueVND = 0;
+        let paidUSD = 0;
+        let paidVND = 0;
         const exChangeRateUSD = this.currencyId.value !== 'USD' ? this.exchangeRateUsd : 1;
         const exChangeRateVND = this.currencyId.value === 'USD' ? this.exchangeRateUsd : 1;
+        const cusAdvanceAmount = !this.cusAdvanceAmount.value ? 0 : this.cusAdvanceAmount.value;
         this.creditList
-        .subscribe((x: ReceiptInvoiceModel[]) => {
-            valueUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.unpaidAmountUsd, 0);
-            valueVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.unpaidAmountVnd, 0);
-        });
-        this.amountVND.setValue(valueUSD);
-        this.amountVND.setValue(valueVND);
-        this.finalPaidAmountUSD.setValue(this.formatNumberCurrency((this.cusAdvanceAmount.value / exChangeRateUSD) + valueUSD + this.paidAmountUSD.value, 2));
-        this.finalPaidAmountVND.setValue(this.formatNumberCurrency(Math.round((this.cusAdvanceAmount.value * exChangeRateVND) + valueVND + this.paidAmountVND.value), 0));
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                x.reduce((amount: number, item: ReceiptInvoiceModel) => valueUSD += item.unpaidAmountUsd, 0);
+                x.reduce((amount: number, item: ReceiptInvoiceModel) => valueVND += item.unpaidAmountVnd, 0);
+            });
+        this.debitList
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                paidUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountUsd, 0);
+                paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
+            });
+        this.amountUSD.setValue(this.formatNumberCurrency(valueUSD, 2));
+        this.amountVND.setValue(this.formatNumberCurrency(valueVND, 0));
+        this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
+        this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 0));
+        console.log('this.cusAdvanceAmount', (cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND)
+        this.finalPaidAmountUSD.setValue(this.formatNumberCurrency(((cusAdvanceAmount / exChangeRateUSD)) + valueUSD + paidUSD, 2));
+        this.finalPaidAmountVND.setValue(this.formatNumberCurrency((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND, 0));
     }
 }
 
 interface IProcessClearInvoiceModel {
-    paidAmount: number;
     currency: string;
     list: ReceiptInvoiceModel[];
     finalExchangeRate: number;

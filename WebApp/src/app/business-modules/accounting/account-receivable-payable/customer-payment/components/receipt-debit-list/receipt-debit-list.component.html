@@ -37,22 +37,22 @@
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidUsd | number:'1.3-3'}}
+                                    {{item.unpaidAmountUsd | number:'1.3-3'}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidVnd | number:'1.0-3'}}
+                                    {{item.unpaidAmountVnd | number:'1.0-3'}}
                                 </td>
 
-                                <td>
+                                <td ALIGN="right">
                                     <input type="text" class="form-control" [(ngModel)]="item.paidAmountUsd" numeric autoFormatCurrency>
                                 </td>
-                                <td>
+                                <td ALIGN="right">
                                     <input type="text" class="form-control" [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency>
                                 </td>
-                                <td>
+                                <td ALIGN="right">
                                     {{item.unpaidUsd - item.paidAmountUsd  | number:'1.3-3'}}
                                 </td>
-                                <td>
+                                <td ALIGN="right">
                                     {{item.unpaidVnd - item.paidAmountVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
@@ -71,13 +71,13 @@
                             <td></td>
                             <td>Total</td>
                             <td></td>
-                            <td class="text-left">{{debitList$ | async | sumAmount:'amount':'USD':'currencyId' |
+                            <td class="text-center">{{debitList$ | async | sumAmount:'amount':'USD':'currencyId' |
                                 number}} USD |
                                 {{debitList$ | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidUsd' | number:'1.3-3'}} </td>
-                            <td class="text-left">{{debitList$ | async | sumAmount:'unpaidVnd' | number:'1.0-3'}} </td>
-                            <td class="text-left">{{(debitList$ | async | sumAmount:'paidAmountUsd') | number:'1.3-3'}}</td>
-                            <td class="text-left">{{(debitList$ | async | sumAmount:'paidAmountVnd') | number:'1.0-3'}}</td>
+                            <td class="text-right">{{debitList$ | async | sumAmount:'unpaidAmountUsd' | number:'1.3-3'}} </td>
+                            <td class="text-right">{{debitList$ | async | sumAmount:'unpaidAmountVnd' | number:'1.0-3'}} </td>
+                            <td class="text-right">{{(debitList$ | async | sumAmount:'paidAmountUsd') | number:'1.3-3'}}</td>
+                            <td class="text-right">{{(debitList$ | async | sumAmount:'paidAmountVnd') | number:'1.0-3'}}</td>
                             <td></td>
                             <td></td>
                             <td></td>

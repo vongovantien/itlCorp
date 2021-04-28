@@ -37,9 +37,9 @@ const routing: Routes = [
 @NgModule({
     declarations: [
         ARCustomerPaymentComponent,
-        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentCreateReciptComponent,
         ARCustomerPaymentDetailReceiptComponent,
+        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentFormCreateReceiptComponent,
         ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,

@@ -15,28 +15,14 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <ng-container *ngIf="receiptDetail?.status === 'Draft'">
-                                <app-permission-button title="Save Draft" class="primary" [icon]="'la la-check'"
-                                    (onClick)="submitClick('update')">
-                                </app-permission-button>
-                                <app-permission-button type="save" title="Done" class="success"
-                                    (onClick)="confirmDoneReceiptPopup.show()">
-                                </app-permission-button>
-                            </ng-container>
 
                             <ng-container *ngIf="receiptDetail?.status === 'Done'">
-                                <app-permission-button title="Cancel Receipt" type="reject" class="danger"
-                                    icon="la la-times" (onClick)="submitClick('cancel')">
-                                </app-permission-button>
 
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
                                     icon="la la-cloud-upload" (onClick)="confirmSyncReceiptPopup.show()">
                                 </app-permission-button>
 
                             </ng-container>
-
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
-                            </app-default-button>
 
                         </div>
                     </div>

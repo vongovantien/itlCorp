@@ -4,13 +4,17 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
 import { ReceiptModel } from '@models';
-import { SystemConstants, AccountingConstants } from '@constants';
+import { SystemConstants, AccountingConstants, RoutingConstants } from '@constants';
 
 import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
 import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
+import { IAppState } from '@store';
+import { Store } from '@ngrx/store';
+import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
+import { GetInvoiceListSuccess, ResetInvoiceList } from '../store/actions';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -27,9 +31,10 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         protected _router: Router,
         protected _toast: ToastrService,
         protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute
+        protected _activedRoute: ActivatedRoute,
+        protected _store: Store<IAppState>,
     ) {
-        super(_router, _toast, _accountingRepo);
+        super(_router, _toast, _accountingRepo, _activedRoute, _store);
     }
 
     ngOnInit() {
@@ -78,8 +83,8 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
+        this.formCreate.getContract();
         this.formCreate.isReadonly = true;
-
     }
 
     updateListInvoice(res: ReceiptModel) {
@@ -90,7 +95,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
-        this.listInvoice.invoices = res.payments || [];
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.customerInfo as any) = { id: res.customerId };
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
@@ -158,4 +163,10 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     onSyncBravo() { }
 
+    gotoList() {
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
+
+    }
+    
 }

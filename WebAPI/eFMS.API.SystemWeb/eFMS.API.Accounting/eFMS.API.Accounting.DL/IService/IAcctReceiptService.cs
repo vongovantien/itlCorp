@@ -20,6 +20,8 @@ namespace eFMS.API.Accounting.DL.IService
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
         AcctReceiptModel GetById(Guid id);
         HandleState SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction);
+        HandleState SaveDoneReceipt(Guid receiptId);
+        HandleState SaveCancel(Guid receiptId);
         ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
         List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
     }

@@ -10,15 +10,15 @@ const routing: Routes = [
                 path: '', redirectTo: 'customer'
             },
             {
-                path: 'customer', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
-                data: { name: 'Customer Payment' }
+                path: '', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                data: { name: 'Account Payment' }
             },
+            // {
+            //     path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
+            //     data: { name: 'Agency Payment' }
+            // },
             {
-                path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
-                data: { name: 'Agency Payment' }
-            },
-            {
-                path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
+                path: 'summary', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
                 data: { name: 'A.R Summary' }
             },
             {
@@ -35,7 +35,7 @@ const routing: Routes = [
     declarations: [
     ],
     imports: [
-        RouterModule.forChild(routing),
+        RouterModule.forChild(routing)
     ],
     exports: [],
     providers: [],
