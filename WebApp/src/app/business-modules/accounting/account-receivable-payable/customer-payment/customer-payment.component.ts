@@ -40,7 +40,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     dataSearch = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
-        dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')
+        dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        type: 'Customer'
     }
 
     constructor(
