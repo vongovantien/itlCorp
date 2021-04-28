@@ -79,7 +79,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this._activedRoute.queryParams.subscribe((param: any) => {
             if (!!param) {
                 this.type = param.type;
-                console.log(this.type);
+                this.getCustomer(this.type);
             }
         })
         this.initForm();
@@ -101,7 +101,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             { title: 'Office', field: 'officeName', sortable: true },
         ];
 
-        this.getCustomer();
 
     }
     initForm() {
@@ -121,8 +120,13 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.partnerId = this.formSearch.controls['partnerId'];
     }
 
-    getCustomer() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+    getCustomer(type: string) {
+        if (type === 'Customer') {
+            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
+        }
+        else {
+            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
+        }
     }
 
     onSelectDataFormInfo(data: any) {

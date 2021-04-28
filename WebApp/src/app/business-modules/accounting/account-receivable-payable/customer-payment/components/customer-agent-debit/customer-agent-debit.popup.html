@@ -133,16 +133,16 @@
                                         <td>
                                             <span>{{debit.partnerName}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.amount | number}} {{debit.currencyId}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmountVnd | number}} </span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmountUsd | number}} </span>
                                         </td>
                                         <td>
@@ -154,8 +154,12 @@
                                         <td>
                                             <span>{{debit.dueDate | date: 'dd/MM/yyyy'}} </span>
                                         </td>
-                                        <td>
-                                            <span>{{debit.paymentStatus}} </span>
+
+                                        <td [ngSwitch]="debit.paymentStatus">
+                                            <span *ngSwitchCase="'Unpaid'" class="text-danger">
+                                                {{debit.paymentStatus}}</span>
+                                            <span *ngSwitchCase="'Paid'" class="text-success">
+                                                {{debit.paymentStatus}}</span>
                                         </td>
                                         <td>
                                             <span>{{debit.departmentName}} </span>
@@ -171,9 +175,11 @@
                                         <td></td>
                                         <td></td>
                                         <td>Total</td>
-                                        <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}} USD |
+                                        <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}}
+                                            USD |
                                             {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                                        <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' | number}} USD |
+                                        <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' |
+                                            number}} USD |
                                             {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
                                         </td>
                                         <td>{{listDebit | sumAmount:'unpaidAmountVnd'| number}}
