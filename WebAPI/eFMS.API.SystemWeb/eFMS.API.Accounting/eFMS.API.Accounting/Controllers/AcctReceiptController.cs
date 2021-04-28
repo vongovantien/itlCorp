@@ -118,7 +118,8 @@ namespace eFMS.API.Accounting.Controllers
         /// </summary>
         /// <param name="id">id of receipt</param>
         /// <returns></returns>
-        [HttpPut]
+        /// 
+        [HttpPut("CancelReceipt")]
         public IActionResult CancelReceipt(Guid id)
         {
             HandleState hs = acctReceiptService.CancelReceipt(id);

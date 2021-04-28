@@ -49,8 +49,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _router: Router,
-        private _accountingRepo: AccountingRepo,
-        private _activedRoute: ActivatedRoute,
+        private _accountingRepo: AccountingRepo
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -104,6 +103,25 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 }
             });
     }
+
+    cancelReceipt(id: string) {
+        this._accountingRepo.cancelReceipt(id)
+            .pipe(catchError(this.catchError), finalize(() => {
+                this._progressRef.complete();
+            }))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (res.status) {
+                        this._toastService.success('Cancel Receipt Success!');
+                        this.getCPs(this.dataSearch);
+                    } else {
+                        this._toastService.warning(res.message);
+                    }
+                },
+            );
+    }
+
+
 
     getCPs(dataSearch) {
         this.isLoading = true;
