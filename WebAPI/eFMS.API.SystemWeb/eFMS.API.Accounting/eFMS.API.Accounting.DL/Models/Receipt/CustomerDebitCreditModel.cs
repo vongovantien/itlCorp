@@ -14,9 +14,12 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string TaxCode { get; set; }
         public string CurrencyId { get; set; }
         public decimal? Amount { get; set; }
+        public decimal? PaidAmount { get; set; }
+        public decimal? PaidAmountVnd { get; set; }
+        public decimal? PaidAmountUsd { get; set; }
         public decimal? UnpaidAmount { get; set; }
-        public decimal? UnpaidVnd { get; set; }
-        public decimal? UnpaidUsd { get; set; }
+        public decimal? UnpaidAmountVnd { get; set; }
+        public decimal? UnpaidAmountUsd { get; set; }
         public decimal? PaymentTerm { get; set; }
         public DateTime? DueDate { get; set; }
         public string PaymentStatus { get; set; }

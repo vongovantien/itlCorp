@@ -83,7 +83,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .checkAllowGetDetailCPS(data.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${data.id}`]);
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
                     this.permissionPopup.show();
                 }
