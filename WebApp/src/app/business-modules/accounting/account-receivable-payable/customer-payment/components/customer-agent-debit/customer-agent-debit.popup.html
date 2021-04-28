@@ -133,16 +133,16 @@
                                         <td>
                                             <span>{{debit.partnerName}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.amount | number}} {{debit.currencyId}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmountVnd | number}} </span>
                                         </td>
-                                        <td>
+                                        <td ALIGN="right">
                                             <span>{{debit.unpaidAmountUsd | number}} </span>
                                         </td>
                                         <td>
@@ -171,9 +171,11 @@
                                         <td></td>
                                         <td></td>
                                         <td>Total</td>
-                                        <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}} USD |
+                                        <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}}
+                                            USD |
                                             {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                                        <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' | number}} USD |
+                                        <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' |
+                                            number}} USD |
                                             {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
                                         </td>
                                         <td>{{listDebit | sumAmount:'unpaidAmountVnd'| number}}
