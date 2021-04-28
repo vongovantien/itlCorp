@@ -101,7 +101,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
-            typeReceipt: !!this.typeReceipt.value ? this.typeReceipt.value : null,
+            type: !!this.typeReceipt.value ? this.typeReceipt.value : null,
         };
         this._listReceipt.getCPs(body);
 
@@ -130,5 +130,5 @@ interface IAcctReceiptCriteria {
     dateType: string;
     currency: string;
     syncStatus: string;
-    typeReceipt: string;
+    type: string;
 }

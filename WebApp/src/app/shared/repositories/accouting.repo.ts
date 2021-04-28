@@ -757,6 +757,12 @@ export class AccountingRepo {
         );
     }
 
+    cancelReceipt(id: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CancelReceipt`, { id: id }).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkAllowDeleteCusPayment(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${id}`).pipe(
             map((data: any) => data)
