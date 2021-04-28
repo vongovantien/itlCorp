@@ -758,7 +758,7 @@ export class AccountingRepo {
     }
 
     cancelReceipt(id: string) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CancelReceipt`, { id: id }).pipe(
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CancelReceipt`, id).pipe(
             map((data: any) => data)
         );
     }
@@ -840,7 +840,7 @@ export class AccountingRepo {
         );
     }
 
-    uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
+    uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
         }
