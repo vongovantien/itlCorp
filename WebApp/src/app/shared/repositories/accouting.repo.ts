@@ -758,7 +758,7 @@ export class AccountingRepo {
     }
 
     cancelReceipt(id: string) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CancelReceipt`, id).pipe(
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CancelReceipt/${id}`).pipe(
             map((data: any) => data)
         );
     }
