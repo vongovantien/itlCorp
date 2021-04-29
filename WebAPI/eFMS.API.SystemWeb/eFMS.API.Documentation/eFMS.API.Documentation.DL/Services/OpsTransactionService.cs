@@ -61,6 +61,10 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<CsTransaction> transactionRepository;
+
+        private decimal _decimalNumber = Constants.DecimalNumber;
+        private decimal _decimalMinNumber = Constants.DecimalMinNumber;
+
         public OpsTransactionService(IContextBase<OpsTransaction> repository, 
             IMapper mapper, 
             ICurrentUser user, 
@@ -1096,17 +1100,16 @@ namespace eFMS.API.Documentation.DL.Services
 
         public Crystal PreviewFormPLsheet(Guid id, string currency)
         {
-            double _doubleNumber = 0.000000001;
             var shipment = DataContext.First(x => x.Id == id);
             Crystal result = null;
             var parameter = new FormPLsheetReportParameter
             {
                 Contact = currentUser.UserName,
-                CompanyName = "CompanyName",
-                CompanyDescription = "CompanyDescription",
-                CompanyAddress1 = "CompanyAddress1",
-                CompanyAddress2 = "CompanyAddress2",
-                Website = "Website",
+                CompanyName = DocumentConstants.COMPANY_NAME,
+                CompanyDescription = string.Empty,
+                CompanyAddress1 = DocumentConstants.COMPANY_ADDRESS1,
+                CompanyAddress2 = DocumentConstants.COMPANY_CONTACT,
+                Website = DocumentConstants.COMPANY_WEBSITE,
                 CurrDecimalNo = 2,
                 DecimalNo = 0,
                 HBLList = shipment.Hwbno
@@ -1128,67 +1131,36 @@ namespace eFMS.API.Documentation.DL.Services
             var podName = placeRepository.Get(x => x.Id == shipment.Pod).FirstOrDefault()?.NameEn;
             if(surcharges != null)
             {
-                foreach(var item in surcharges)
+                foreach(var surcharge in surcharges)
                 {
-                    var unitCode = units.FirstOrDefault(x => x.Id == item.UnitId)?.Code;
+                    var unitCode = units.FirstOrDefault(x => x.Id == surcharge.UnitId)?.Code;
                     bool isOBH = false;
                     decimal cost = 0;
                     decimal revenue = 0;
-                    decimal costNonVat = 0;
-                    decimal revenueNonVat = 0;
-                    decimal saleProfitIncludeVAT = 0;
-                    decimal saleProfitNonVAT = 0;
                     string partnerName = string.Empty;
-                    if (item.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                    if (surcharge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                     {
                         isOBH = true;
-                        partnerName = item.PayerName;
-                        cost = item.Total;
+                        partnerName = surcharge.PayerName;
+                        cost = surcharge.Total;
                     }
-                    if(item.Type == DocumentConstants.CHARGE_BUY_TYPE)
+                    if(surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                     {
-                        cost = item.Total;
-                        costNonVat = (item.Quantity * item.UnitPrice) ?? 0;
+                        cost = surcharge.Total;
                     }
-                    if(item.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                    if(surcharge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                     {
-                        revenue = item.Total;
-                        revenueNonVat = (item.Quantity * item.UnitPrice) ?? 0;
+                        revenue = surcharge.Total;
                     }
-                    saleProfitIncludeVAT = cost + revenue;
-                    saleProfitNonVAT = costNonVat + revenueNonVat;
-
-                    decimal _exchangeRateUSD = 0;
-                    decimal _exchangeRateLocal = 0;
-                    var kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
-                    if (item.Type == DocumentConstants.CHARGE_BUY_TYPE && item.KickBack == true)
-                    {
-                        if (item.CurrencyId == DocumentConstants.CURRENCY_USD)
-                        {
-                            _exchangeRateLocal = kickBackExcRate;
-                            _exchangeRateUSD = 1;
-                        }
-                        if (item.CurrencyId == DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            _exchangeRateLocal = 1;
-                            _exchangeRateUSD = 1 / kickBackExcRate;
-                        }
-                    }
-                    else
-                    {
-                        _exchangeRateUSD = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_USD);
-                        _exchangeRateLocal = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-                    }
-
+                    
                     var surchargeRpt = new FormPLsheetReport();
 
-                    surchargeRpt.COSTING = "COSTING Test";
+                    surchargeRpt.COSTING = "COSTING";
                     surchargeRpt.TransID = shipment.JobNo?.ToUpper();
                     surchargeRpt.TransDate = (DateTime)shipment.DatetimeCreated;
                     surchargeRpt.HWBNO = shipment.Hwbno?.ToUpper();
                     surchargeRpt.MAWB = shipment.Mblno?.ToUpper();
-                    surchargeRpt.PartnerName = "PartnerName";
+                    surchargeRpt.PartnerName = string.Empty; //Not Use
                     surchargeRpt.ContactName = user?.Username;
                     surchargeRpt.ShipmentType = "Logistics";
                     surchargeRpt.NominationParty = string.Empty;
@@ -1199,41 +1171,29 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.Volumne = string.Empty;
                     surchargeRpt.Carrier = supplier?.PartnerNameEn?.ToUpper();
                     surchargeRpt.Agent = agent?.PartnerNameEn?.ToUpper();
-                    surchargeRpt.ContainerNo = item.ContNo;
+                    surchargeRpt.ContainerNo = surcharge.ContNo;
                     surchargeRpt.OceanVessel = string.Empty;
                     surchargeRpt.LocalVessel = string.Empty;
                     surchargeRpt.FlightNo = shipment.FlightVessel?.ToUpper();
                     surchargeRpt.SeaImpVoy = string.Empty;
-                    surchargeRpt.LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd' 'MMM' 'yyyy");
-                    surchargeRpt.ArrivalDate = shipment.FinishDate != null ? ((DateTime)shipment.FinishDate).ToString("dd' 'MM' 'yyyy") : null;
-                    surchargeRpt.FreightCustomer = "FreightCustomer";
-                    surchargeRpt.FreightColoader = 128;
-                    surchargeRpt.PayableAccount = item.PartnerName?.ToUpper();
-                    surchargeRpt.Description = item.ChargeNameEn;
-                    surchargeRpt.Curr = item.CurrencyId;
-                    surchargeRpt.VAT = item.Vatrate ?? 0;
-                    surchargeRpt.VATAmount = 12;
-                    surchargeRpt.Cost = cost + (decimal)_doubleNumber; //Phí chi của charge
-                    surchargeRpt.Revenue = revenue + (decimal)_doubleNumber;
-                    surchargeRpt.Exchange = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitIncludeVAT : _exchangeRateUSD * saleProfitIncludeVAT; //Exchange phí của charge về USD
-                    surchargeRpt.Exchange = surchargeRpt.Exchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
-                    surchargeRpt.VNDExchange = currency == DocumentConstants.CURRENCY_LOCAL ? _exchangeRateLocal : _exchangeRateUSD;
-                    surchargeRpt.VNDExchange = surchargeRpt.VNDExchange + (decimal)_doubleNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.LoadingDate = ((DateTime)shipment.ServiceDate).ToString("dd MMM yyyy");
+                    surchargeRpt.ArrivalDate = shipment.FinishDate != null ? ((DateTime)shipment.FinishDate).ToString("dd MMM yyyy") : null;
+                    surchargeRpt.PayableAccount = surcharge.PartnerName?.ToUpper();
+                    surchargeRpt.Description = surcharge.ChargeNameEn;
+                    surchargeRpt.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
+                    surchargeRpt.Cost = cost + _decimalNumber; //Phí chi của charge
+                    surchargeRpt.Revenue = revenue + _decimalNumber;
+                    surchargeRpt.Exchange = 0;
                     surchargeRpt.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
-                    surchargeRpt.DatePaid = DateTime.Now;
-                    surchargeRpt.Docs = !string.IsNullOrEmpty(item.InvoiceNo) ? item.InvoiceNo : (item.CreditNo ?? item.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
-                    surchargeRpt.Notes = item.Notes;
-                    surchargeRpt.InputData = "InputData";
-                    surchargeRpt.SalesProfit = currency == DocumentConstants.CURRENCY_USD ? _exchangeRateUSD * saleProfitNonVAT : _exchangeRateLocal * saleProfitNonVAT; //Non VAT
-                    surchargeRpt.SalesProfit = surchargeRpt.SalesProfit + (decimal)_doubleNumber; //Cộng thêm phần thập phân
-                    surchargeRpt.Quantity = item.Quantity;
-                    //surchargeRpt.UnitPrice = item.UnitPrice ?? 0;
-                    surchargeRpt.UnitPrice = (item.UnitPrice ?? 0) + (decimal)_doubleNumber; //Cộng thêm phần thập phân
-                    surchargeRpt.UnitPriceStr = item.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (item.UnitPrice ?? 0)) : string.Format("{0:n3}", (item.UnitPrice ?? 0));
+                    surchargeRpt.Docs = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? surcharge.InvoiceNo : (surcharge.CreditNo ?? surcharge.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
+                    surchargeRpt.Notes = surcharge.Notes;
+                    surchargeRpt.InputData = string.Empty; //Gán rỗng
+                    surchargeRpt.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân
+                    surchargeRpt.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}", (surcharge.UnitPrice ?? 0));
                     surchargeRpt.Unit = unitCode;
                     surchargeRpt.LastRevised = string.Empty;
                     surchargeRpt.OBH = isOBH;
-                    surchargeRpt.ExtRateVND = 34;
                     surchargeRpt.KBck = true;
                     surchargeRpt.NoInv = true;
                     surchargeRpt.Approvedby = string.Empty;
@@ -1245,20 +1205,13 @@ namespace eFMS.API.Documentation.DL.Services
                     surchargeRpt.PaymentTerm = string.Empty;
                     surchargeRpt.DetailNotes = string.Empty;
                     surchargeRpt.ExpressNotes = string.Empty;
-                    surchargeRpt.InvoiceNo = "InvoiceNo";
-                    surchargeRpt.CodeVender = "CodeVender";
-                    surchargeRpt.CodeCus = "CodeCus";
-                    surchargeRpt.Freight = true;
-                    surchargeRpt.Collect = true;
-                    surchargeRpt.FreightPayableAt = "FreightPayableAt";
-                    surchargeRpt.PaymentTime = 1;
-                    surchargeRpt.PaymentTimeCus = 1;
-                    surchargeRpt.Noofpieces = 12;
-                    surchargeRpt.UnitPieaces = "UnitPieaces";
-                    surchargeRpt.TpyeofService = "TpyeofService";
+                    surchargeRpt.TypeOfService = "CL";
                     surchargeRpt.ShipmentSource = "FREE-HAND";
                     surchargeRpt.RealCost = true;
-                    
+                    //Đối với phí OBH thì NetAmountCurr gán bằng 0
+                    surchargeRpt.NetAmountCurr = (surcharge.Type != DocumentConstants.CHARGE_OBH_TYPE ? currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(surcharge, currency) : 0) + _decimalMinNumber; //NetAmount quy đổi về currency preview
+                    surchargeRpt.GrossAmountCurr = currencyExchangeService.ConvertAmountChargeToAmountObj(surcharge, currency) + _decimalMinNumber;  //GrossAmount quy đổi về currency preview
+
                     dataSources.Add(surchargeRpt);
                 }
             }

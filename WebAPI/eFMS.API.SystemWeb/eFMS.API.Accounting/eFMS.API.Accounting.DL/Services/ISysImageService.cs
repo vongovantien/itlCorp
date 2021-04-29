@@ -78,7 +78,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
                     string extension = Path.GetExtension(file.FileName);
-                    fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"\s+", "") + "_" + StringHelper.RandomString(5);
+                    fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#]+", "") + "_" + StringHelper.RandomString(5);
 
                     string fullFileName = fileName + extension;
 

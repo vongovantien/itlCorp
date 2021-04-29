@@ -448,8 +448,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaymentId = acctPayment.Id;
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
-                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "CREDIT" : acctPayment.Type;
-                    payment.CreditType = (acctPayment.PaymentType != "DEBIT") ? acctPayment.PaymentType : null;
+                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "Credit" : acctPayment.Type;
+                    payment.CreditType = (acctPayment.PaymentType != "Debit") ? acctPayment.PaymentType : null;
                     payment.CurrencyId = acctPayment.CurrencyId;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
@@ -805,7 +805,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 switch (payment.Type)
                 {
-                    case "DEBIT":
+                    case "Debit":
                         // Tổng thu của invoice bao gôm VND/USD. 
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
@@ -872,7 +872,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
                         break;
-                    case "CREDIT":
+                    case "Credit":
                         if (payment.Type == "CREDITNOTE")
                         {
                             IQueryable<AcctCdnote> credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
