@@ -10,13 +10,12 @@
     </div>
     <div class="m-portlet__body">
         <div class="collapse show" id="credit-summary">
-            <div class="table-wrapper table-scrollabler">
+            <div class="table-wrapper table-scrollabler" style="height: 200px;">
                 <table class="table table-striped table-brand">
                     <thead app-table-header [headers]="headers">
                         <th class="m--w-50 first">
                             <label class="m-checkbox">
-                                <input type="checkbox" name="" [(ngModel)]="isCheckAll"
-                                    (change)="checkAllChange()">
+                                <input type="checkbox" name="" [(ngModel)]="isCheckAll" (change)="checkAllChange()">
                                 <span></span>
                             </label>
                         </th>
@@ -25,7 +24,8 @@
                         <ng-container *ngIf="!!(creditList | async)?.length">
                             <tr *ngFor="let item of (creditList | async); let i = index; trackBy: trackByFn">
                                 <td><label class="m-checkbox">
-                                        <input type="checkbox" name="" [(ngModel)]="item.isSelected" (change)="onCheckChange()">
+                                        <input type="checkbox" name="" [(ngModel)]="item.isSelected"
+                                            (change)="onCheckChange()">
                                         <span></span>
                                     </label>
                                 </td>
@@ -41,10 +41,10 @@
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidUsd | number:'1.3-3'}}
+                                    {{item.unpaidAmountUsd | number:'1.3-3'}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidVnd | number:'1.0-3'}}
+                                    {{item.unpaidAmountVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="item.notes">
@@ -64,8 +64,10 @@
                             <td class="text-left">{{creditList | async | sumAmount:'amount':'USD':'currencyId' |
                                 number}} USD |
                                 {{creditList | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
-                            <td class="text-right">{{creditList | async | sumAmount:'unpaidUsd' | number:'1.3-3'}} </td>
-                            <td class="text-right">{{creditList | async | sumAmount:'unpaidVnd' | number:'1.0-3'}} </td>
+                            <td class="text-right">{{creditList | async | sumAmount:'unpaidAmountUsd' | number:'1.3-3'}}
+                            </td>
+                            <td class="text-right">{{creditList | async | sumAmount:'unpaidAmountVnd' | number:'1.0-3'}}
+                            </td>
                             <td></td>
                             <td></td>
                             <td></td>

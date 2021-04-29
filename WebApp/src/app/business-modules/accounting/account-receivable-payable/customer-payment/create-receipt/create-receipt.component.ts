@@ -10,11 +10,11 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
-import { HttpErrorResponse } from '@angular/common/http';
-import { cloneDeep } from 'lodash';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { ResetInvoiceList } from '../store/actions';
+import { combineLatest, empty } from 'rxjs';
+import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -57,6 +57,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     saveReceipt(type: string) {
         this.formCreate.isSubmitted = true;
         this.listInvoice.isSubmitted = true;
+        this.listInvoice.receiptCreditList.isSubmitted = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
@@ -79,19 +80,28 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const receiptModel: ReceiptModel = this.getDataForm();
 
         let paymentList = [];
-        this.listInvoice.debitList.pipe().subscribe((x: ReceiptInvoiceModel[]) => {
-            if (x.length > 0) {
-                console.log('paymentList1', x)
-                paymentList = cloneDeep(x);
+       combineLatest([
+            this._store.select(ReceiptDebitListState),
+            this._store.select(ReceiptCreditListState)])
+            .subscribe(x=> {
+                x.forEach((element: ReceiptInvoiceModel[]) => {
+                    if(element.length > 0){
+                        element.map(item => paymentList.push(item))
+                    }
+                });
             }
-        });
-        this.listInvoice.creditList.pipe().subscribe((x: ReceiptInvoiceModel[]) => {
-            if (x.length > 0) {
-                paymentList = cloneDeep(x);
-            }
-        });
-        if(paymentList.length === 0){
+                )
+        console.log('list', paymentList)
+        if (paymentList.length === 0) {
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+            return;
+        }
+        if (paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Debit' || x.type === 'OBH').length === 0) {
+            this._toastService.warning("You can't save without debit in this period, Please check it again!");
+            return;
+        }
+        if (paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Credit' && !x.invoiceNo).length > 0) {
+            this._toastService.warning("Please select invoice no!");
             return;
         }
         receiptModel.payments = paymentList;
@@ -103,6 +113,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         this.onSaveDataReceipt(receiptModel, type);
     }
+    
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
 
@@ -144,16 +155,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._store.dispatch(ResetInvoiceList);
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
                     }
                     this._toastService.error("Create data fail, Please check again!");
                 },
-                (res: HttpErrorResponse) => {
-                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
-                        this.formCreate.paymentRefNo.setErrors({ existed: true });
-                    }
-                }
+                // (res: HttpErrorResponse) => {
+                //     if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+                //         this.formCreate.paymentRefNo.setErrors({ existed: true });
+                //     }
+                // }
             )
     };
 

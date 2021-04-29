@@ -70,7 +70,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.updateFormCreate(this.receiptDetail);
         this.updateListInvoice(this.receiptDetail);
-        this.updateSummary(this.receiptDetail);
     }
 
     updateFormCreate(res: ReceiptModel) {
@@ -97,6 +96,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.customerInfo as any) = { id: res.customerId };
+        this.listInvoice.caculatorAmountFromDebitList();
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;
@@ -140,6 +140,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
+                        this._store.dispatch(ResetInvoiceList);
                         return this._accountingRepo.getDetailReceipt(this.receiptId);
                     }
                     of(res);

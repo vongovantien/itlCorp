@@ -25,7 +25,14 @@ export const GetInvoiceListSuccess = createAction(ReceiptActionTypes.GET_INVOICE
 export const GetInvoiceListFail = createAction(ReceiptActionTypes.GET_INVOICE_FAIL);
 export const ResetInvoiceList = createAction(ReceiptActionTypes.RESET_INVOICE);
 
-export const ProcessClear = createAction(ReceiptActionTypes.PROCESS_CLEAR_INVOICE, props<{ amount?: number }>())
+export const ProcessClearSuccess = createAction(ReceiptActionTypes.PROCESS_CLEAR_INVOICE, props<{ data: ProcessClearInvoiceModel }>())
 export const RemoveInvoice = createAction(ReceiptActionTypes.REMOVE_INVOICE, props<{ index: number }>())
 export const RemoveCredit = createAction(ReceiptActionTypes.REMOVE_CREDIT, props<{ index: number }>())
 export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, props<{ data: ReceiptInvoiceModel }>());
+
+
+export interface ProcessClearInvoiceModel{
+    invoices: ReceiptInvoiceModel[],
+    cusAdvanceAmountVnd: number,
+    cusAdvanceAmountUsd: number,
+}

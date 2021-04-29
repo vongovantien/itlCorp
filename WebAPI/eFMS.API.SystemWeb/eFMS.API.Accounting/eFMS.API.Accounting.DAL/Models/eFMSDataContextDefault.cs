@@ -828,6 +828,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.FinalPaidAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.FinalPaidAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.FinalPaidAmountVnd).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.FromDate).HasColumnType("datetime");
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
@@ -837,6 +841,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.PaidAmount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PaidAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PaidAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.PaymentDate).HasColumnType("datetime");
 

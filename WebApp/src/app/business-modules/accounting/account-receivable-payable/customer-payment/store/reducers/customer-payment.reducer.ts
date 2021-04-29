@@ -45,9 +45,17 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: any) => ({
         ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
     })),
-    on(ReceiptActions.ProcessClear, (state: IReceiptState, payload: any) => ({
-        ...state, debitList: [...state.debitList] // TODO implement
-    }))
+    on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
+        if(payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0){
+            const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
+                typeInvoice: 'ADV',
+                paidAmountVnd: payload.data.cusAdvanceAmountVnd,
+                paidAmountUsd: payload.data.cusAdvanceAmountUsd
+            });
+            return { ...state, debitList: [ ...payload.data.invoices, newInvoiceWithAdv]};
+        }
+        return {...state, debitList: [...payload.data.invoices] }// TODO implement
+    })
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {
