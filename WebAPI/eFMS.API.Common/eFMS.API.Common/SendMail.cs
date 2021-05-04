@@ -6,6 +6,8 @@ using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Net.Mime;
+using eFMS.API.Common.Helpers;
+using System.IO;
 
 namespace eFMS.API.Common
 {
@@ -68,9 +70,14 @@ namespace eFMS.API.Common
             //now attached the file
             if (attachments != null)
             {
+                var webClient = new WebClient();
+                string fileName = string.Empty;
                 foreach (string attachment in attachments)
                 {
-                    Attachment attached = new Attachment(attachment, MediaTypeNames.Application.Octet);
+                    fileName = Path.GetFileName(attachment);
+                    webClient.DownloadFile(attachment, fileName);
+
+                    Attachment attached = new Attachment(fileName, MediaTypeNames.Application.Octet);
                     message.Attachments.Add(attached);
                 }
             }
