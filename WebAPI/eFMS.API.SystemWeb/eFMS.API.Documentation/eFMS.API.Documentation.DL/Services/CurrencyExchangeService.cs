@@ -254,6 +254,12 @@ namespace eFMS.API.Documentation.DL.Services
             return amountResult;
         }
 
+        /// <summary>
+        /// Amount Sau Thuế
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <param name="currencyObject"></param>
+        /// <returns></returns>
         public decimal ConvertAmountChargeToAmountObj(CsShipmentSurcharge surcharge, string currencyObject)
         {
             decimal _totalAmount = 0;
@@ -282,6 +288,35 @@ namespace eFMS.API.Documentation.DL.Services
                 _totalAmount = _netAmount + _vatAmount;
             }
             return _totalAmount;
+        }
+
+        /// <summary>
+        /// Amount Trước Thuế
+        /// </summary>
+        /// <param name="surcharge"></param>
+        /// <param name="currencyObject"></param>
+        /// <returns></returns>
+        public decimal ConvertNetAmountChargeToNetAmountObj(CsShipmentSurcharge surcharge, string currencyObject)
+        {
+            decimal _netAmount = 0;
+            if (currencyObject == DocumentConstants.CURRENCY_LOCAL)
+            {
+                _netAmount = surcharge.AmountVnd ?? 0;
+            }
+            else if (currencyObject == DocumentConstants.CURRENCY_USD)
+            {
+                _netAmount = surcharge.AmountUsd ?? 0;
+            }
+            else if (currencyObject == surcharge.CurrencyId)
+            {
+                _netAmount = surcharge.NetAmount ?? 0;
+            }
+            else //Ngoại tệ khác
+            {
+                decimal _exchangeRate = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, currencyObject);
+                _netAmount = NumberHelper.RoundNumber((surcharge.UnitPrice * surcharge.Quantity * _exchangeRate) ?? 0, 2);                
+            }
+            return _netAmount;
         }
 
         /// <summary>

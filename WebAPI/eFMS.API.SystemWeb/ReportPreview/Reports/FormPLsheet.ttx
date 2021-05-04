@@ -23,29 +23,21 @@ FlightNo	String	255
 SeaImpVoy	String	255	
 LoadingDate	String	255	
 ArrivalDate	String	255	
-FreightCustomer	Number		
-FreightColoader	Number		
 PayableAccount	String	150	
 Description	String	255	
 Curr	String	50	
-VAT	Number		
-VATAmount	Number		
 Cost	Number		
 Revenue	Number		
 Exchange	Number		
-VNDExchange	Number		
 Paid	Boolean		
-DatePaid	Date		
 Docs	String	50	
 Notes	String	255	
 InputData	String	50	
-SalesProfit	Number		
 Quantity	Number		
 UnitPrice	Number		
 Unit	String	50	
 LastRevised	String	255	
 OBH	Boolean		
-ExtRateVND	Number		
 KBck	Boolean		
 NoInv	Boolean		
 Approvedby	String	255	
@@ -57,18 +49,10 @@ HCW	Number
 PaymentTerm	String	255	
 DetailNotes	Memo		
 ExpressNotes	Memo		
-InvoiceNo	String	50	
-CodeVender	String	50	
-CodeCus	String	50	
-Freight	Boolean		
-Collect	Boolean		
-FreightPayableAt	String	150	
-PaymentTime	Number		
-PaymentTimeCus	Number		
-Noofpieces	Number		
-UnitPieaces	String	50	
-TpyeofService	String	50	
+TypeOfService	String	50	
 ShipmentSource	String	255	
 RealCost	Boolean		
 UnitPriceStr	String	150	
+NetAmountCurr	Number	
+GrossAmountCurr	Number	
 		

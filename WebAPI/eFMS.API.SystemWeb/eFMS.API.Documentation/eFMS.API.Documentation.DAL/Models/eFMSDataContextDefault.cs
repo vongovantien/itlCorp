@@ -2527,6 +2527,14 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AirlineInfo).HasMaxLength(800);
 
+                entity.Property(e => e.Ata)
+                    .HasColumnName("ATA")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Atd)
+                    .HasColumnName("ATD")
+                    .HasColumnType("datetime");
+
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
                 entity.Property(e => e.BranchId).HasColumnName("BranchID");
@@ -2936,11 +2944,15 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Pod).HasColumnName("POD");
 
+                entity.Property(e => e.PodDescription).HasMaxLength(4000);
+
                 entity.Property(e => e.PoinvoiceNo)
                     .HasColumnName("POInvoiceNo")
                     .HasMaxLength(250);
 
                 entity.Property(e => e.Pol).HasColumnName("POL");
+
+                entity.Property(e => e.PolDescription).HasMaxLength(4000);
 
                 entity.Property(e => e.PurchaseOrderNo)
                     .HasMaxLength(50)
@@ -3479,6 +3491,18 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.UserModified)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+
+                entity.HasOne(d => d.AssignToNavigation)
+                    .WithMany(p => p.SysAuthorizationAssignToNavigation)
+                    .HasForeignKey(d => d.AssignTo)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysAuthorization_AssignedUser");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SysAuthorizationUser)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_sysAuthorization_sysUser");
             });
 
             modelBuilder.Entity<SysCompany>(entity =>

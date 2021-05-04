@@ -54,6 +54,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     country: AbstractControl;
     pol: AbstractControl;
     pod: AbstractControl;
+    polDescription: AbstractControl;
+    podDescription: AbstractControl;
     freightCharge: AbstractControl;
     goodsDelivery: AbstractControl;
     goodsDeliveryDescription: AbstractControl;
@@ -183,7 +185,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             moveType: (this.shipmmentDetail.transactionType === ChargeConstants.SFE_CODE) ? 'FCL/FCL-CY/CY' : 'LCL/LCL-CY/CY',
                             originBlnumber: this.setDefaultOriginBLNumber(this.shipmmentDetail),
                             placeDelivery: this.shipmmentDetail.podName,
-                            placeReceipt: this.shipmmentDetail.polName
+                            placeReceipt: this.shipmmentDetail.polName,
+                            podDescription: !!this.shipmmentDetail.podDescription ? this.shipmmentDetail.podDescription : this.shipmmentDetail.podName,
+                            polDescription: !!this.shipmmentDetail.polDescription ? this.shipmmentDetail.polDescription : this.shipmmentDetail.polName,
                         });
 
                         if (!!this.shipmmentDetail.bookingNo) {
@@ -266,6 +270,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             country: [],
             pol: [null, Validators.required],
             pod: [null, Validators.required],
+            polDescription: [null, Validators.required],
+            podDescription: [null, Validators.required],
             forwardingAgent: [],
             goodsDelivery: [],
 
@@ -335,6 +341,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
         this.moveType = this.formCreate.controls["moveType"];
         this.issueHbldate = this.formCreate.controls["issueHbldate"];
         this.issueHblplace = this.formCreate.controls["issueHblplace"];
+        this.polDescription = this.formCreate.controls["polDescription"];
+        this.podDescription = this.formCreate.controls["podDescription"];
 
         this.hwbno.valueChanges
             .pipe(startWith(this.hwbno.value))
@@ -363,7 +371,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             placeDelivery: data.deliveryPlace,
             forwardingAgent: data.forwardingAgentId,
             goodsDelivery: data.goodsDeliveryId,
-
+            podDescription: !!data.podDescription ? data.podDescription : data.podName,
+            polDescription: !!data.polDescription ? data.polDescription : data.polName
         };
 
         this.formCreate.patchValue(_merge(_cloneDeep(data), formValue));
@@ -420,7 +429,9 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             freightCharge: data.freightPayment,
             moveType: data.moveType,
             serviceType: data.serviceType,
-            hbltype: data.hbltype
+            hbltype: data.hbltype,
+            polDescription: data.polDescription,
+            podDescription: data.podDescription,
         });
     }
 
@@ -467,12 +478,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                 break;
             case 'pol':
                 this.pol.setValue(data.id);
+                this.polDescription.setValue((data as PortIndex).nameEn);
 
                 // * CHANGE POL update onBoard Status
                 this.formCreate.controls['onBoardStatus'].setValue(this.setDefaultOnboard((data as PortIndex).nameEn, (data as PortIndex).countryNameEN, this.shipmmentDetail.etd));
                 break;
             case 'pod':
                 this.pod.setValue(data.id);
+                this.podDescription.setValue((data as PortIndex).nameEn);
                 break;
             case 'forwarding':
                 this.forwardingAgent.setValue(data.id);

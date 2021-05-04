@@ -18,6 +18,8 @@ namespace eFMS.API.Documentation.DL.IService
 
         decimal ConvertAmountChargeToAmountObj(CsShipmentSurcharge surcharge, string currencyObject);
 
+        decimal ConvertNetAmountChargeToNetAmountObj(CsShipmentSurcharge surcharge, string currencyObject);
+
         AmountSurchargeResult CalculatorAmountSurcharge(CsShipmentSurcharge surcharge, decimal KickBackExcRate);
     }
 }

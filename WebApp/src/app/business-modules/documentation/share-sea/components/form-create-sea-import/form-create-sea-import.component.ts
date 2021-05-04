@@ -5,7 +5,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 
 import { AppForm } from '@app';
 import { DocumentationRepo, CatalogueRepo, SystemRepo } from '@repositories';
-import { User, Customer, PortIndex, CsTransaction } from '@models';
+import { User, Customer, PortIndex, CsTransaction, Incoterm } from '@models';
 import { CommonEnum } from '@enums';
 import { getTransactionDetailCsTransactionState, ITransactionState } from '@share-bussiness';
 import { FormValidators } from '@validators';
@@ -43,6 +43,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     agents: Observable<Customer[]>;
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
+    incoterms: Observable<Incoterm[]>;
 
     formCreate: FormGroup;
     etd: AbstractControl;
@@ -52,6 +53,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
     shipmentType: AbstractControl;
     typeOfService: AbstractControl;
     serviceDate: AbstractControl;
+    ata: AbstractControl;
+    atd: AbstractControl;
+    incotermId: AbstractControl;
     personIncharge: AbstractControl;
 
     agentId: AbstractControl;
@@ -94,6 +98,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.listUsers = this._systemRepo.getListSystemUser();
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.service] });
 
         this.initForm();
         this.getUserLogged();
@@ -129,11 +134,14 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                                 etd: !!this.fclImportDetail.etd ? { startDate: new Date(this.fclImportDetail.etd), endDate: new Date(this.fclImportDetail.etd) } : null,
                                 eta: !!this.fclImportDetail.eta ? { startDate: new Date(this.fclImportDetail.eta), endDate: new Date(this.fclImportDetail.eta) } : null,
                                 serviceDate: !!this.fclImportDetail.serviceDate ? { startDate: new Date(this.fclImportDetail.serviceDate) } : null,
+                                atd: !!this.fclImportDetail.atd ? { startDate: new Date(this.fclImportDetail.atd), endDate: new Date(this.fclImportDetail.atd) } : null,
+                                ata: !!this.fclImportDetail.ata ? { startDate: new Date(this.fclImportDetail.ata), endDate: new Date(this.fclImportDetail.ata) } : null,
 
                                 mbltype: this.fclImportDetail.mbltype,
                                 shipmentType: this.fclImportDetail.shipmentType,
                                 typeOfService: this.fclImportDetail.typeOfService,
                                 personIncharge: this.fclImportDetail.personIncharge,
+                                incotermId: res.incotermId,
 
                                 pod: this.fclImportDetail.pod,
                                 pol: this.fclImportDetail.pol,
@@ -161,6 +169,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             // * Date
             etd: [],
             eta: [null, Validators.required],
+            ata: [],
+            atd: [],
             serviceDate: [],
 
             subColoader: [],
@@ -175,6 +185,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             shipmentType: [this.shipmentTypes[0], Validators.required],
             typeOfService: [null, Validators.required],
             personIncharge: [],
+            incotermId: [],
             notes: [],
             // * Combogrid.
             agentId: [],
@@ -199,6 +210,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.deliveryPlace = this.formCreate.controls["deliveryPlace"];
         this.polDescription = this.formCreate.controls["polDescription"];
         this.podDescription = this.formCreate.controls["podDescription"];
+        this.ata = this.formCreate.controls['ata'];
+        this.atd = this.formCreate.controls['atd'];
+        this.incotermId = this.formCreate.controls['incotermId'];
 
         if (this.service === 'fcl') {
             this.typeOfService.setValue(this.serviceTypes[0]);

@@ -428,13 +428,15 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
     }
 
     attachFileUpload() {
-        const _attachFileUpload = this.hashedUrlFileUpload();
-        _attachFileUpload.forEach(element => {
-            const idxOf = this.attachedFile.indexOf(element);
-            if (idxOf === -1) {
-                this.attachedFile.push(element);
-            }
-        });
+        // const _attachFileUpload = this.hashedUrlFileUpload();
+        // _attachFileUpload.forEach(element => {
+        //     const idxOf = this.attachedFile.indexOf(element);
+        //     if (idxOf === -1) {
+        //         this.attachedFile.push(element);
+        //     }
+        // });
+        const shipmentFileUrls: string[] = (this.files || []).map(x => x.url);
+        this.attachedFile = [...this.attachedFile, ...shipmentFileUrls];
     }
 
     hashedUrlFileUpload() {
