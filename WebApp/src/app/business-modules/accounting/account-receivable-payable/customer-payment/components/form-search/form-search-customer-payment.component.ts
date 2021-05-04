@@ -37,7 +37,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     dateTypes: string[] = AccountingConstants.DATE_TYPE;
     syncStatuss = AccountingConstants.SYNC_STATUSS;
     statuss = AccountingConstants.STATUS;
-    typesReceipt: string[] = ['Customer', 'Agency'];
+    typesReceipt: string[] = ['All', 'Customer', 'Agent'];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -101,7 +101,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
-            type: !!this.typeReceipt.value ? this.typeReceipt.value : null,
+            type: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null,
         };
         this._listReceipt.getCPs(body);
 
