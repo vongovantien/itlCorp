@@ -3095,7 +3095,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PRIVATE METHOD ---
 
         #region --- Calculator Receivable SOA ---
-        public HandleState CalculatorReceivableSoa(string soaNo)
+        public async Task<HandleState> CalculatorReceivableSoa(string soaNo)
         {
             var hs = new HandleState();
             //Get list charge of by Soa No
@@ -3110,7 +3110,7 @@ namespace eFMS.API.Accounting.DL.Services
                     && objectReceivable.Office != Guid.Empty
                     && !string.IsNullOrEmpty(objectReceivable.Service))
                 {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
+                    hs = await accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
                 }
             }
             return hs;

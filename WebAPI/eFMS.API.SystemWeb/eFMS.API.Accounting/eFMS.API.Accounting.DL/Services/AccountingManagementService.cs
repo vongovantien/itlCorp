@@ -2459,7 +2459,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="acctId"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableAcctMngt(Guid acctId)
+        public async Task<HandleState> CalculatorReceivableAcctMngt(Guid acctId)
         {
             var hs = new HandleState();
             //Get list charge of Accounting Management
@@ -2474,7 +2474,7 @@ namespace eFMS.API.Accounting.DL.Services
                     && objectReceivable.Office != Guid.Empty 
                     && !string.IsNullOrEmpty(objectReceivable.Service))
                 {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
+                    hs = await accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
                 }
             }
             return hs;

@@ -5207,7 +5207,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="settlementCode"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableSettlement(string settlementCode)
+        public async Task<HandleState> CalculatorReceivableSettlement(string settlementCode)
         {
             var hs = new HandleState();
             //Get list charge by SettlementCode
@@ -5222,7 +5222,7 @@ namespace eFMS.API.Accounting.DL.Services
                     && objectReceivable.Office != Guid.Empty
                     && !string.IsNullOrEmpty(objectReceivable.Service))
                 {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
+                    hs = await accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
                 }
             }
             return hs;

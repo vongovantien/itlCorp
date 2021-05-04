@@ -136,6 +136,5 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountReceivableService.GetDataARByCriteria(criteria);
             return Ok(data);
         }
-
     }
 }

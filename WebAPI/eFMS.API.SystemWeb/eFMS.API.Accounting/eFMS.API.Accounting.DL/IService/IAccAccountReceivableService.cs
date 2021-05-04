@@ -13,11 +13,11 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IAccAccountReceivableService : IRepositoryBase<AccAccountReceivable, AccAccountReceivableModel>
     {
-        HandleState AddReceivable(AccAccountReceivableModel model);
-        HandleState UpdateReceivable(AccAccountReceivableModel model);
-        HandleState InsertOrUpdateReceivable(ObjectReceivableModel model);
-        HandleState CalculatorReceivable(CalculatorReceivableModel model);
-        HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
+        Task<HandleState> AddReceivable(AccAccountReceivableModel model);
+        Task<HandleState> UpdateReceivable(AccAccountReceivableModel model);
+        Task<HandleState> InsertOrUpdateReceivable(ObjectReceivableModel model);
+        Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model);
+        Task<HandleState> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
         AccountReceivableDetailResult GetDetailAccountReceivableByArgeementId(Guid argeementId);
         AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId);
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);

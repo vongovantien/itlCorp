@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -781,7 +782,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        public HandleState AddReceivable(AccAccountReceivableModel model)
+        public async Task<HandleState> AddReceivable(AccAccountReceivableModel model)
         {
             try
             {
@@ -858,7 +859,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        HandleState hs = DataContext.Add(receivable, false);
+                        HandleState hs = await DataContext.AddAsync(receivable, false);
                         if (hs.Success)
                         {
                             DataContext.SubmitChanges();
@@ -884,7 +885,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState UpdateReceivable(AccAccountReceivableModel model)
+        public async Task<HandleState> UpdateReceivable(AccAccountReceivableModel model)
         {
             try
             {
@@ -957,7 +958,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        HandleState hs = DataContext.Update(receivable, x => x.Id == receivable.Id, false);
+                        HandleState hs = await DataContext.UpdateAsync(receivable, x => x.Id == receivable.Id, false);
                         if (hs.Success)
                         {
                             DataContext.SubmitChanges();
@@ -983,7 +984,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState InsertOrUpdateReceivable(ObjectReceivableModel model)
+        public async Task<HandleState> InsertOrUpdateReceivable(ObjectReceivableModel model)
         {
             AccAccountReceivableModel receivableModel = new AccAccountReceivableModel()
             {
@@ -997,17 +998,17 @@ namespace eFMS.API.Accounting.DL.Services
             var message = string.Empty;
             if (receivable == null)
             {
-                hs = AddReceivable(receivableModel);
+                hs = await AddReceivable(receivableModel);
             }
             else
             {
-                hs = UpdateReceivable(receivable);
+                hs = await UpdateReceivable(receivable);
                 receivableModel = receivable;
             }
             return hs;
         }
 
-        public HandleState CalculatorReceivable(CalculatorReceivableModel model)
+        public async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
             if (model != null && model.ObjectReceivable.Count() > 0)
@@ -1022,7 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (!string.IsNullOrEmpty(obj.PartnerId) && obj.Office != null && obj.Office != Guid.Empty && !string.IsNullOrEmpty(obj.Service))
                     {
-                        hs = InsertOrUpdateReceivable(obj);
+                        hs = await InsertOrUpdateReceivable(obj);
                     }
                 }
 
@@ -1038,7 +1039,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach (var objectReceivable in objectReceivables)
                         {
-                            hs = InsertOrUpdateReceivable(objectReceivable);
+                            hs = await InsertOrUpdateReceivable(objectReceivable);
                         }
                     }
                 }
@@ -1046,7 +1047,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        public HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        public async Task<HandleState> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
         {
             currentUser.UserID = model.UserID;
             currentUser.GroupId = model.GroupId;
@@ -1054,7 +1055,7 @@ namespace eFMS.API.Accounting.DL.Services
             currentUser.OfficeID = model.OfficeID;
             currentUser.CompanyID = model.CompanyID;
             currentUser.Action = model.Action;
-            var hs = CalculatorReceivable(model);
+            var hs = await CalculatorReceivable(model);
             return hs;
         }
 
