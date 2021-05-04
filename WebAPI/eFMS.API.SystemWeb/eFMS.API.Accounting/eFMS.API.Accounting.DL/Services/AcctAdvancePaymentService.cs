@@ -3959,7 +3959,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="acctAdvanceRequests"></param>
         /// <returns></returns>
-        public async Task<HandleState> CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
+        public HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
         {
             var hs = new HandleState();
             var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
@@ -3975,7 +3975,7 @@ namespace eFMS.API.Accounting.DL.Services
                     && objectReceivable.Office != Guid.Empty
                     && !string.IsNullOrEmpty(objectReceivable.Service))
                 {
-                    hs = await accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
+                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
                 }
             }
             return hs;

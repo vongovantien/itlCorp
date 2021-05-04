@@ -223,17 +223,26 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
-            //Tính công nợ sau khi tạo mới hóa đơn thành công
-            if (hs.Success)
+            try
             {
-                var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
-                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
-                var cr = await CalculatorReceivable(modelReceivable);
-            }
-
-            if (!hs.Success)
+                if (!hs.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
+            }
+            finally
+            {
+                if (hs.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi tạo mới hóa đơn thành công
+                        var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -322,18 +331,27 @@ namespace eFMS.API.ForPartner.Controllers
             string _major = "Tạo Hóa Đơn";
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
-
-            //Tính công nợ sau khi replace invoice thành công
-            if (hsInsertInvoice.Success)
+            
+            try
             {
-                var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
-                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
-                var cr = await CalculatorReceivable(modelReceivable);
-            }
-
-            if (!hsInsertInvoice.Success)
+                if (!hsInsertInvoice.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
+            }
+            finally
+            {
+                if (hsInsertInvoice.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi replace invoice thành công
+                        var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -371,18 +389,26 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
-            //Tính công nợ sau khi cancel invoice thành công
-            if (hs.Success)
+            try
             {
-                //Get list charge id of invoice by Reference No
-                var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
-                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
-                var cr = await CalculatorReceivable(modelReceivable);
-            }
-
-            if (!hs.Success)
+                if (!hs.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
+            }
+            finally
+            {
+                if (hs.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi cancel invoice thành công
+                        var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -579,7 +605,7 @@ namespace eFMS.API.ForPartner.Controllers
         }
         #endregion --- PRIVATE ---
         
-        [HttpPost("CalculatorReceivableNotAuthorize")]
+        [HttpPost("CalculatorReceivableNotAuthorize_Test")]
         public async Task<IActionResult> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
         {
             var cr = await CalculatorReceivable(model);

@@ -97,6 +97,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<string> GetListAdvanceNoForShipment(Guid hblId);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
-        Task<HandleState> CalculatorReceivableSettlement(string settlementCode);
+        HandleState CalculatorReceivableSettlement(string settlementCode);
     }
 }

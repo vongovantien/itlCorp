@@ -69,7 +69,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-        
+
         /// <summary>
         /// Query data
         /// </summary>
@@ -181,29 +181,20 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            
-            try
+
+            if (hs.Success)
             {
-                var message = HandleError.GetMessage(hs, Crud.Insert);
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-                if (!hs.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+                // Tính lại công nợ sau khi Add thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
             }
-            finally
+
+            var message = HandleError.GetMessage(hs, Crud.Insert);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
             {
-                if (hs.Success)
-                {
-                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-                    Response.OnCompleted(async () =>
-                    {
-                        // Tính lại công nợ sau khi Add thành công
-                        await acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    });
-                }
+                return BadRequest(result);
             }
+            return Ok(result);
         }
 
         /// <summary>
@@ -259,29 +250,20 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            
-            try
+
+            if (hs.Success)
             {
-                var message = HandleError.GetMessage(hs, Crud.Delete);
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
-                if (!hs.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
             }
-            finally
+
+            var message = HandleError.GetMessage(hs, Crud.Delete);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
             {
-                if (hs.Success)
-                {
-                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-                    Response.OnCompleted(async () =>
-                    {
-                        // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
-                        await acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
-                    });
-                }
+                return BadRequest(result);
             }
+            return Ok(result);
         }
 
         /// <summary>
@@ -325,7 +307,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet]
         [Route("GetAdvancePaymentByAdvanceId")]
         [Authorize]
-        public async Task<IActionResult> GetAdvancePaymentByAdvanceId(Guid advanceId)
+        public IActionResult GetAdvancePaymentByAdvanceId(Guid advanceId)
         {
             var isAllowViewDetail = acctAdvancePaymentService.CheckDetailPermissionByAdvanceId(advanceId);
             if (isAllowViewDetail == false)
@@ -345,7 +327,7 @@ namespace eFMS.API.Accounting.Controllers
         [HttpPut]
         [Route("Update")]
         [Authorize]
-        public async Task<IActionResult> Update(AcctAdvancePaymentModel model)
+        public IActionResult Update(AcctAdvancePaymentModel model)
         {
             currentUser.Action = "UpdateAdvancePayment";
 
@@ -401,29 +383,20 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-            
-            try
+
+            if (hs.Success)
             {
-                var message = HandleError.GetMessage(hs, Crud.Update);
-                ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
-                if (!hs.Success)
-                {
-                    return BadRequest(result);
-                }
-                return Ok(result);
+                // Tính công nợ sau khi Update Advance thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
             }
-            finally
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            if (!hs.Success)
             {
-                if (hs.Success)
-                {
-                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-                    Response.OnCompleted(async () =>
-                    {
-                        // Tính công nợ sau khi Update Advance thành công
-                        await acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    });
-                }
+                return BadRequest(result);
             }
+            return Ok(result);
         }
 
         /// <summary>
@@ -439,7 +412,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.Preview(advanceId);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// Save and Send Request
         /// </summary>
@@ -592,29 +565,15 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
-            }
 
-            try
-            {
-                if (hs.Success)
-                {
-                    return Ok(result);
-                } else
-                {
-                    return BadRequest(result);
-                }
+                // Tính công nợ sau khi Save & Send Request Advance thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+
+                return Ok(result);
             }
-            finally
+            else
             {
-                if (hs.Success)
-                {
-                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-                    Response.OnCompleted(async () =>
-                    {
-                        // Tính công nợ sau khi Save & Send Request Advance thành công
-                        await acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-                    });
-                }
+                return BadRequest(result);
             }
         }
 
@@ -944,7 +903,7 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctAdvancePaymentService.GetAgreementDatasByAdvanceNo(advanceNo);
             return Ok(data);
         }
-        
+
         [HttpPost("PreviewMultipleAdvancePaymentByAdvanceIds")]
         [Authorize]
         public IActionResult PreviewMultipleAdvancePaymentByAdvanceIds(List<Guid> advanceIds)
@@ -960,7 +919,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             currentUser.Action = "UpdatePaymentTermAdvancePayment";
 
-            HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id,days);
+            HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id, days);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Id };
