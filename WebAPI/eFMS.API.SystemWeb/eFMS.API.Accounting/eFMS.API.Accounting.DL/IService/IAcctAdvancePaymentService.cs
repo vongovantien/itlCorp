@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -97,5 +98,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState DenyAdvancePayments(List<Guid> Ids);
 
+        HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests);
     }
 }

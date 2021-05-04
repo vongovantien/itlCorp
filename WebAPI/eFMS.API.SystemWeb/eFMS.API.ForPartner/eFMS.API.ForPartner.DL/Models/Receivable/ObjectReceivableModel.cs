@@ -20,5 +20,6 @@ namespace eFMS.API.ForPartner.DL.Models.Receivable
         public int? DepartmentId { get; set; }
         public Guid OfficeID { get; set; }
         public Guid CompanyID { get; set; }
+        public string Action { get; set; }
     }
 }

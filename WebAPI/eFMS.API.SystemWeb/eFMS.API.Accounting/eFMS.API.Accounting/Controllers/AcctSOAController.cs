@@ -58,6 +58,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi Add SOA thành công
+                acctSOAService.CalculatorReceivableSoa(model.Soano);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -92,6 +98,12 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi Update SOA thành công
+                acctSOAService.CalculatorReceivableSoa(model.Soano);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -153,6 +165,14 @@ namespace eFMS.API.Accounting.Controllers
 
             //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge (Đã xử lý bên trong hàm DeleteSOA)
             //acctSOAService.UpdateSOASurCharge(soaNo);
+
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi Delete SOA thành công
+                var soaNo = acctSOAService.Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
+                acctSOAService.CalculatorReceivableSoa(soaNo);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)

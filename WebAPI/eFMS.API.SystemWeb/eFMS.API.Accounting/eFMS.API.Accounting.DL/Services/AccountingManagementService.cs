@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -48,7 +49,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<SysNotifications> sysNotifyRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
-
+        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -74,7 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatContract> catContractRepo,
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUserNotifyRepo,
-
+            IAccAccountReceivableService accAccountReceivable,
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -100,7 +101,7 @@ namespace eFMS.API.Accounting.DL.Services
             catContractRepository = catContractRepo;
             sysUserNotifyRepository = sysUserNotifyRepo;
             sysNotifyRepository = sysNotifyRepo;
-
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region --- DELETE ---
@@ -2451,5 +2452,34 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        #region --- Calculator Receivable Accounting Management ---
+        /// <summary>
+        /// Tính công nợ dựa vào id của Accounting Management
+        /// </summary>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
+        public HandleState CalculatorReceivableAcctMngt(Guid acctId)
+        {
+            var hs = new HandleState();
+            //Get list charge of Accounting Management
+            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == acctId || x.PayerAcctManagementId == acctId);
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+
+            //Tính công nợ cho từng Partner, Service, Office có trong Invoice
+            foreach (var objectReceivable in objectReceivablesModel)
+            {
+                if (!string.IsNullOrEmpty(objectReceivable.PartnerId) 
+                    && objectReceivable.Office != null 
+                    && objectReceivable.Office != Guid.Empty 
+                    && !string.IsNullOrEmpty(objectReceivable.Service))
+                {
+                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
+                }
+            }
+            return hs;
+        }
+        #endregion --- Calculator Receivable Accounting Management ---
+
     }
 }

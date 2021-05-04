@@ -20,8 +20,6 @@ using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Globalization;
-using System.Text.RegularExpressions;
-using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -39,7 +37,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private string typeApproval = "Advance";
-        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         /// <summary>
         /// Contructor
@@ -48,14 +45,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        /// <param name="accAccountReceivable"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accAccountReceivable)
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
-            accAccountReceivableService = accAccountReceivable;
         }
 
         /// <summary>
@@ -189,8 +184,8 @@ namespace eFMS.API.Accounting.Controllers
 
             if (hs.Success)
             {
-                // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                // Tính công nợ sau khi Add Advance
+                var cr = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
@@ -259,7 +254,7 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Success)
             {
                 // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
-                CalculatorReceivableAdvancePayment(advanceRequests);
+                var cr = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -391,8 +386,8 @@ namespace eFMS.API.Accounting.Controllers
 
             if (hs.Success)
             {
-                // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                // Tính công nợ sau khi Update Advance
+                var cr = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -401,7 +396,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(result);
             }
-            return Ok(result);
+            return  Ok(result);
         }
 
         /// <summary>
@@ -572,7 +567,7 @@ namespace eFMS.API.Accounting.Controllers
                 }
                 
                 // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
                 
                 return Ok(result);
             }
@@ -908,26 +903,7 @@ namespace eFMS.API.Accounting.Controllers
             var data = acctAdvancePaymentService.GetAgreementDatasByAdvanceNo(advanceNo);
             return Ok(data);
         }
-
-        private void CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
-        {
-            var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
-            foreach (var hblId in hblIds)
-            {
-                var surchargeIds = acctAdvancePaymentService.GetSurchargeIdByHblId(hblId);
-                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
-                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
-                foreach (var surchargeId in surchargeIds)
-                {
-                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
-                    objectReceivable.SurchargeId = surchargeId;
-                    receivableModels.Add(objectReceivable);
-                }
-                calculatorReceivable.ObjectReceivable = receivableModels;
-                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
-            }
-        }
-
+        
         [HttpPost("PreviewMultipleAdvancePaymentByAdvanceIds")]
         [Authorize]
         public IActionResult PreviewMultipleAdvancePaymentByAdvanceIds(List<Guid> advanceIds)

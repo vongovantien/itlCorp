@@ -175,7 +175,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPost("CreateInvoiceData")]
-        public IActionResult CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -223,6 +223,14 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
+            //Tính công nợ sau khi tạo mới hóa đơn thành công
+            if (hs.Success)
+            {
+                var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
+                var cr = await CalculatorReceivable(modelReceivable);
+            }
+
             if (!hs.Success)
                 return Ok(result);
             return Ok(result);
@@ -236,7 +244,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("ReplaceInvoiceData")]
-        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -315,6 +323,14 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
+            //Tính công nợ sau khi replace invoice thành công
+            if (hsInsertInvoice.Success)
+            {
+                var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
+                var cr = await CalculatorReceivable(modelReceivable);
+            }
+
             if (!hsInsertInvoice.Success)
                 return Ok(result);
             return Ok(result);
@@ -328,7 +344,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("CancellingInvoice")]
-        public IActionResult CancellingInvoice(InvoiceInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> CancellingInvoice(InvoiceInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
 
@@ -354,6 +370,15 @@ namespace eFMS.API.ForPartner.Controllers
             string _major = "Xóa Hóa Đơn";
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
+
+            //Tính công nợ sau khi cancel invoice thành công
+            if (hs.Success)
+            {
+                //Get list charge id of invoice by Reference No
+                var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+                var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+                var cr = await CalculatorReceivable(modelReceivable);
+            }
 
             if (!hs.Success)
                 return Ok(result);
@@ -563,7 +588,7 @@ namespace eFMS.API.ForPartner.Controllers
         
         private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
         {
-            var urlApiAcct = "http://localhost:44368";//apiUrl.Value.Url + "Accounting";//
+            var urlApiAcct = apiUrl.Value.Url + "Accounting";//"http://localhost:44368";//
             HttpResponseMessage resquest = await HttpService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;

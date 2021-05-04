@@ -822,7 +822,7 @@ namespace eFMS.API.Accounting.DL.Services
                     model.UserModified = contractPartner.UserCreated;
                     model.GroupId = null;
                     model.DepartmentId = null;
-                    model.OfficeId = Guid.Parse(contractPartner.OfficeId);
+                    model.OfficeId = model.Office;
                     model.CompanyId = contractPartner.CompanyId;
                 }
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
@@ -869,6 +869,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_Receivable_Add_LOG", ex.ToString());
                         return new HandleState(ex.Message);
                     }
                     finally
@@ -920,7 +921,7 @@ namespace eFMS.API.Accounting.DL.Services
                     model.UserModified = contractPartner.UserCreated;
                     model.GroupId = null;
                     model.DepartmentId = null;
-                    model.OfficeId = model.OfficeId;//Guid.Parse(contractPartner.OfficeId);
+                    model.OfficeId = model.OfficeId;
                     model.CompanyId = contractPartner.CompanyId;
                 }
                 model.DatetimeModified = DateTime.Now;
@@ -967,6 +968,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_Receivable_Update_LOG", ex.ToString());
                         return new HandleState(ex.Message);
                     }
                     finally
@@ -1010,7 +1012,7 @@ namespace eFMS.API.Accounting.DL.Services
             HandleState hs = new HandleState();
             if (model != null && model.ObjectReceivable.Count() > 0)
             {
-                // PartnerId, Office, Service # Empty And Null
+                // PartnerId, Office, Service # Empty And # Null
                 var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)
                                                                   && (x.Office != null && x.Office != Guid.Empty)
                                                                   && !string.IsNullOrEmpty(x.Service))
@@ -1051,55 +1053,42 @@ namespace eFMS.API.Accounting.DL.Services
             currentUser.DepartmentId = model.DepartmentId;
             currentUser.OfficeID = model.OfficeID;
             currentUser.CompanyID = model.CompanyID;
+            currentUser.Action = model.Action;
             var hs = CalculatorReceivable(model);
             return hs;
         }
 
         #endregion --- CRUD ---
 
-        private List<ObjectReceivableModel> GetObjectReceivableBySurchargeId(List<Guid?> surchargeIds)
+        /// <summary>
+        /// Get Object Receivable By list Surcharges Id
+        /// </summary>
+        /// <param name="surchargeIds">List Id of surcharge</param>
+        /// <returns></returns>
+        public List<ObjectReceivableModel> GetObjectReceivableBySurchargeId(List<Guid?> surchargeIds)
         {
             var surcharges = surchargeRepo.Get(x => surchargeIds.Any(a => a == x.Id));
-            /*
-            #region --- OPERATION ---
-            var operations = opsRepo.Get();
-            var objOpsPO = from surcharge in surcharges
-                           join operation in operations on surcharge.Hblid equals operation.Hblid
-                           where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                           select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = operation.OfficeId, Service = "CL" };
-            var objOpsPR = from surcharge in surcharges
-                           join operation in operations on surcharge.Hblid equals operation.Hblid
-                           where !string.IsNullOrEmpty(surcharge.PayerId)
-                           select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = operation.OfficeId, Service = "CL" };
-            var objOps = objOpsPO.Union(objOpsPR);
-            #endregion --- OPERATION ---
+            var data = GetObjectReceivableBySurcharges(surcharges);
+            return data;
+        }
 
-            #region --- DOCUMENTATION ---
-            var transDetails = transactionDetailRepo.Get();
-            var transactions = transactionRepo.Get();
-            var objDocPO = from surcharge in surcharges
-                           join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
-                           join trans in transactions on transDetail.JobId equals trans.Id
-                           where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                           select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = transDetail.OfficeId, Service = trans.TransactionType };
-
-            var objDocPR = from surcharge in surcharges
-                           join transDetail in transDetails on surcharge.Hblid equals transDetail.Id
-                           join trans in transactions on transDetail.JobId equals trans.Id
-                           where !string.IsNullOrEmpty(surcharge.PayerId)
-                           select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = transDetail.OfficeId, Service = trans.TransactionType };
-            var objDoc = objDocPO.Union(objDocPR);
-            #endregion --- DOCUMENTATION ---
-            */
+        /// <summary>
+        /// Get Object Receivable By Surcharges
+        /// </summary>
+        /// <param name="surcharges"></param>
+        /// <returns></returns>
+        public List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges)
+        {
             var objPO = from surcharge in surcharges
                         where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
                         select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
             var objPR = from surcharge in surcharges
                         where !string.IsNullOrEmpty(surcharge.PayerId)
                         select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var ObjectReceivable = objPO.Union(objPR);
-            var data = ObjectReceivable.Distinct().ToList();
-            return data;
+            var objMerge = objPO.Union(objPR).ToList();
+            var objectReceivables = objMerge.GroupBy(g => new { Service = g.Service, PartnerId =  g.PartnerId, Office = g.Office })
+                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
+            return objectReceivables.ToList();
         }
 
         #region --- LIST & PAGING ---

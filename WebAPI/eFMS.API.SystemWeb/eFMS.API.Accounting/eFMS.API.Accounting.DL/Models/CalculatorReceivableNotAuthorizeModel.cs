@@ -11,5 +11,6 @@ namespace eFMS.API.Accounting.DL.Models
         public int? DepartmentId { get; set; }
         public Guid OfficeID { get; set; }
         public Guid CompanyID { get; set; }
+        public string Action { get; set; }
     }
 }

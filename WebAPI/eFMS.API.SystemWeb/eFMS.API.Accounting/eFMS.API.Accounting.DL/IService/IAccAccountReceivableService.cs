@@ -7,7 +7,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -22,5 +22,6 @@ namespace eFMS.API.Accounting.DL.IService
         AccountReceivableDetailResult GetDetailAccountReceivableByPartnerId(string partnerId);
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
+        List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
     }
 }
