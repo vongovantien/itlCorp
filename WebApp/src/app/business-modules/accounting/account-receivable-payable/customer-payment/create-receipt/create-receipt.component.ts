@@ -86,6 +86,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .subscribe(x=> {
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     if(element.length > 0){
+                        console.log('element', element)
                         element.map(item => paymentList.push(item))
                     }
                 });
@@ -111,7 +112,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         //     });
         // }
 
-        this.onSaveDataReceipt(receiptModel, type);
+        // this.onSaveDataReceipt(receiptModel, type);
     }
     
     getDataForm() {
@@ -155,7 +156,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._store.dispatch(ResetInvoiceList);
+                        this._store.dispatch(ResetInvoiceList());
                         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
                     }

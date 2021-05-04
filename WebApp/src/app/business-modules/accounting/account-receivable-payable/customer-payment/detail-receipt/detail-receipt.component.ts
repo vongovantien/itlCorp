@@ -83,7 +83,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
-        this.formCreate.isReadonly = true;
+        // this.formCreate.isReadonly = true;
     }
 
     updateListInvoice(res: ReceiptModel) {
@@ -140,7 +140,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._store.dispatch(ResetInvoiceList);
+                        this._store.dispatch(ResetInvoiceList());
                         return this._accountingRepo.getDetailReceipt(this.receiptId);
                     }
                     of(res);

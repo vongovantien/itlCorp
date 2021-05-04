@@ -314,6 +314,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     insertAdvanceRowData() {
         const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
             typeInvoice: 'ADV',
+            type: 'ADV',
             paidAmountVnd: 0,
             paidAmountUsd: 0
         });

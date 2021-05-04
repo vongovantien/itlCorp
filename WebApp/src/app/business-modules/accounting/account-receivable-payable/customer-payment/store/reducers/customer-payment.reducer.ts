@@ -49,6 +49,7 @@ export const receiptManagementReducer = createReducer(
         if(payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0){
             const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
                 typeInvoice: 'ADV',
+                type: 'ADV',
                 paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                 paidAmountUsd: payload.data.cusAdvanceAmountUsd
             });
