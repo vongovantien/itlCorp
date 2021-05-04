@@ -124,12 +124,14 @@ namespace eFMS.API.Accounting.Controllers
         {
             var hs = acctReceiptService.SaveCancel(id);
 
-            ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
             return Ok(result);
         }
 
