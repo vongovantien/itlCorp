@@ -30,7 +30,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public decimal Quantity { get; set; }
         public string ClearanceNo { get; set; }
         public string UserCreated { get; set; }
-
+        public string SyncedFrom { get; set; }
 
     }
 }
