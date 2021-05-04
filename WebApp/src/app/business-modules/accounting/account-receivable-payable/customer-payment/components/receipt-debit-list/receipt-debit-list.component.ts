@@ -6,6 +6,7 @@ import { Store } from "@ngrx/store";
 import { ReceiptDebitListState } from "../../store/reducers";
 import { ReceiptInvoiceModel } from "@models";
 import { RemoveInvoice } from "../../store/actions";
+import { takeUntil } from "rxjs/operators";
 
 @Component({
     selector: 'customer-payment-receipt-debit-list',
@@ -15,7 +16,7 @@ import { RemoveInvoice } from "../../store/actions";
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     
-    debitList$: Observable<ReceiptInvoiceModel[]>;
+    debitList$: Observable<ReceiptInvoiceModel[]>; 
     constructor(
         private _store: Store<IReceiptState>
     ) {
@@ -39,12 +40,12 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
-        this.isCheckAll = true;
+        this.isCheckAll = false;
         this.debitList$ = this._store.select(ReceiptDebitListState);
     }
 
     checkAllChange() {
-        this.debitList$.pipe()
+        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 x.forEach((element: ReceiptInvoiceModel) => {
                     element.isSelected = this.isCheckAll;
@@ -53,14 +54,14 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     }
 
     onCheckChange(){
-        this.debitList$.pipe()
+        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
         .subscribe((x : ReceiptInvoiceModel[]) => {
             this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
         });
     }
 
     removeListItem() {
-        this.debitList$.pipe()
+        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 if (x.filter((item: ReceiptInvoiceModel) => item.isSelected).length > 0) {
                     for (let i = 0; i < x.length; i++) {
@@ -69,6 +70,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                         }
                     }
                 }
-            });
+            }).unsubscribe();
     }
 }

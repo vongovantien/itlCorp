@@ -451,6 +451,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "Credit" : acctPayment.Type;
                     payment.CreditType = (acctPayment.PaymentType != "Debit") ? acctPayment.PaymentType : null;
                     payment.CurrencyId = acctPayment.CurrencyId;
+                    payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
                     payment.UnpaidAmountUsd = acctPayment.UnpaidPaymentAmountUsd;
                     payment.UnpaidAmountVnd = acctPayment.UnpaidPaymentAmountVnd;
@@ -638,19 +639,20 @@ namespace eFMS.API.Accounting.DL.Services
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _payment.PaymentAmount = _payment.PaymentAmountVnd = payment.PaidAmountVnd;
-                    _payment.Balance = _payment.BalanceVnd = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
-
-                    _payment.PaymentAmountUsd = _payment.BalanceUsd = null;
+                    _payment.PaymentAmount = payment.PaidAmountVnd;
+                    _payment.Balance = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
                 }
                 else
                 {
                     _payment.PaymentAmount = _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                    _payment.Balance = _payment.BalanceUsd = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
-
-                    _payment.PaymentAmountVnd = _payment.BalanceVnd = null;
-
+                    _payment.Balance = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
                 }
+                _payment.PaymentAmountUsd = payment.PaidAmountUsd;
+                _payment.PaymentAmountVnd = payment.PaidAmountVnd;
+                _payment.BalanceUsd = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
+                _payment.BalanceVnd = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
+                _payment.UnpaidPaymentAmountUsd = payment.UnpaidAmountUsd;
+                _payment.UnpaidPaymentAmountVnd = payment.UnpaidAmountVnd;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.Type = payment.Type;               // OBH/DEBIT
@@ -1219,7 +1221,36 @@ namespace eFMS.API.Accounting.DL.Services
 
         public ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
         {
-            return new ProcessClearInvoiceModel { };
+            var invoiceList = criteria.List;
+            var paidVnd = criteria.PaidAmountVnd;
+            var paidUsd = criteria.PaidAmountUsd;
+            foreach (var invoice in invoiceList)
+            {
+                if (paidVnd > 0)
+                {
+                    if (invoice.PaidAmountVnd == 0)
+                    {
+                        invoice.PaidAmountVnd = invoice.UnpaidAmountVnd;
+                    }
+                    invoice.UnpaidAmountVnd = paidVnd - invoice.PaidAmountVnd;
+                    paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
+                }
+                if (paidUsd > 0)
+                {
+                    if (invoice.PaidAmountUsd == 0)
+                    {
+                        invoice.PaidAmountUsd = invoice.UnpaidAmountUsd;
+                    }
+                    invoice.UnpaidAmountUsd = paidUsd - invoice.PaidAmountUsd;
+                    paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
+                }
+            }
+            return new ProcessClearInvoiceModel
+            {
+                Invoices = invoiceList,
+                CusAdvanceAmountVnd = paidVnd,
+                CusAdvanceAmountUsd = paidUsd,
+            };
         }
 
         #region -- Get Customers Debit --
@@ -1668,8 +1699,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.CurrencyId == AccountingConstants.CURRENCY_USD ? inv.UnpaidAmount : null,
-                               PaidAmountVnd = inv.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? inv.UnpaidAmount : null,
+                               PaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -1743,8 +1774,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.CurrencyId == AccountingConstants.CURRENCY_USD ? inv.UnpaidAmount : null,
-                               PaidAmountVnd = inv.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? inv.UnpaidAmount : null,
+                               PaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
