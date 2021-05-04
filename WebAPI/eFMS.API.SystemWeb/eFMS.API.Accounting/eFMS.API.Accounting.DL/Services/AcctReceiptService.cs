@@ -955,6 +955,8 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptModel.DepartmentId = currentUser.DepartmentId;
                 receiptModel.OfficeId = currentUser.OfficeID;
                 receiptModel.CompanyId = currentUser.CompanyID;
+                receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
 
                 CatPartner  partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
                 if(partner != null)
@@ -1010,6 +1012,9 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptModel.DepartmentId = currentUser.DepartmentId;
                 receiptModel.OfficeId = currentUser.OfficeID;
                 receiptModel.CompanyId = currentUser.CompanyID;
+
+                receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
 
                 CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
                 if (partner != null)
