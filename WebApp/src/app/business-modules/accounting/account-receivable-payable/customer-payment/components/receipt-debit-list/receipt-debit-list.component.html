@@ -44,16 +44,16 @@
                                 </td>
 
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountUsd" numeric autoFormatCurrency>
+                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd" numeric autoFormatCurrency>
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency>
                                 </td>
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control" [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency>
+                                    {{item.unpaidAmountUsd - item.paidAmountUsd  | number:'1.3-3'}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidUsd - item.paidAmountUsd  | number:'1.3-3'}}
-                                </td>
-                                <td ALIGN="right">
-                                    {{item.unpaidVnd - item.paidAmountVnd | number:'1.0-3'}}
+                                    {{item.unpaidAmountVnd - item.paidAmountVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
                                     <input type="text" class="form-control" [(ngModel)]="item.notes">

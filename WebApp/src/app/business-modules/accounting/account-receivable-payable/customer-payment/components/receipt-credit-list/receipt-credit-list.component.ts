@@ -5,9 +5,8 @@ import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
-import { map, reduce, takeUntil } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
-import { InfoPopupComponent } from "@common";
 
 @Component({
     selector: 'customer-payment-receipt-credit-list',
@@ -44,6 +43,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     creditList: Observable<ReceiptInvoiceModel[]>;
     debitList$: Observable<ReceiptInvoiceModel[]>;
     configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
+    isSubmitted: boolean = false;
 
     constructor(
         private _store: Store<IReceiptState>
@@ -67,16 +67,14 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { field: 'invoiceNo', label: 'Invoice No' },
             { field: 'amount', label: 'Unpaid Invoice' }
         ];
-        this.isCheckAll = true;
+        this.isCheckAll = false;
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList$ = this._store.select(ReceiptDebitListState);
-
-
 
     }
 
     checkAllChange() {
-        this.creditList.pipe()
+        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 x.every((element: ReceiptInvoiceModel) => {
                     element.isSelected = this.isCheckAll;
@@ -85,14 +83,14 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     }
 
     onCheckChange() {
-        this.creditList.pipe()
+        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
             });
     }
 
     removeListItem(){
-        this.creditList.pipe()
+        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 if (x.filter((item: ReceiptInvoiceModel) => item.isSelected).length > 0) {
                     for (let i = 0; i < x.length; i++) {
@@ -101,6 +99,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                         }
                     }
                 }
-            });
+            }).unsubscribe();
     }
 }

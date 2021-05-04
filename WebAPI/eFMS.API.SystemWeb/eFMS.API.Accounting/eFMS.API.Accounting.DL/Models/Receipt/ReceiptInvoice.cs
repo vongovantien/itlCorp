@@ -17,6 +17,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
     public class ProcessClearInvoiceModel
     {
         public List<ReceiptInvoiceModel> Invoices { get; set; }
-        public decimal Balance { get; set; }
+        public decimal CusAdvanceAmountVnd { get; set; }
+        public decimal CusAdvanceAmountUsd { get; set; }
     }
 }

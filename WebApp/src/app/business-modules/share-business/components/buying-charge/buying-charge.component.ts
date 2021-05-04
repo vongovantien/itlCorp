@@ -181,7 +181,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Vat Partner', field: 'vatPartnerId', sortable: true },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true },
             { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },

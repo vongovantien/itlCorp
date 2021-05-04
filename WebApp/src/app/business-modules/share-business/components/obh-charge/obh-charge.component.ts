@@ -116,7 +116,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Vat Partner', field: 'vatPartnerId', sortable: true, width: 200 },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 200 },
             { title: 'SOA', field: 'soano', sortable: true, width: 170 },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true, width: 230 },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },

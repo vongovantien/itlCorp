@@ -16,6 +16,8 @@ import { ComboGridVirtualScrollComponent } from '@common';
 import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
 import { Observable } from 'rxjs';
 import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
+import { takeUntil } from 'rxjs/operators';
+import { ReceiptDebitListState } from '../../store/reducers';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
@@ -159,8 +161,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     addToReceipt($event: any) {
         const partnerId = $event;
-        if (!!this.customerId.value) {
-            this.$customers.pipe()
+        if (!!partnerId) {
+            this.$customers.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: Partner[]) =>{
                 const partner = x.filter((x: Partner) => x.id === partnerId).shift();
                 if(!!partner){

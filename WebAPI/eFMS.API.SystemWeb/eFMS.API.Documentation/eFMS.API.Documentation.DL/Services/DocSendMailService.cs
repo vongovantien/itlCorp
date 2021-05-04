@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.Service.Models;
@@ -83,8 +84,9 @@ namespace eFMS.API.Documentation.DL.Services
 
                 return sendMailResult;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                new LogHelper("LOG_SEND_MAIl", ex.ToString());
                 return false;
             }
         }
