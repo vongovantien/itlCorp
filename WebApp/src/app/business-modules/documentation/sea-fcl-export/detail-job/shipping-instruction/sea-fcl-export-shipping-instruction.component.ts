@@ -107,6 +107,7 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
                             }
                         }
                         this.billSIComponent.shippingInstruction.csTransactionDetails = this.houseBills;
+                        console.log(this.billSIComponent.shippingInstruction);
                         this.billSIComponent.setformValue(this.billSIComponent.shippingInstruction);
                     }
                 }
@@ -174,9 +175,9 @@ export class SeaFclExportShippingInstructionComponent extends AppList implements
         if (contseal.length > 0) {
             contseal.forEach(element => {
                 if (element.length > 0) {
-                    if (element.includes('\n')) {
-                        element = element.substring(0, element.length - 2);
-                    }
+                    // if (element.includes('\n')) {
+                    //     element = element.substring(0, element.length - 2);
+                    // }
                     contSealNos += element + '\n';
                 }
             });
