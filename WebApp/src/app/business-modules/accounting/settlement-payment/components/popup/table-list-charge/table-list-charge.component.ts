@@ -481,7 +481,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
         }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> prod/14-04-2021-sprint24
     }
 
     addCharge() {
@@ -710,6 +713,16 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
         if (invNo) {
             if (!!chargeItem.chargeId) {
+                // switch (chargeItem.type) {
+                //     case CommonEnum.SurchargeTypeEnum.OBH:
+                //         chargeItem.vatPartnerId = chargeItem.obhId;
+                //         break;
+                //     case CommonEnum.SurchargeTypeEnum.BUYING_RATE:
+                //         chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+                //         break;
+                //     default:
+                //         break;
+                // }
                 chargeItem.vatPartnerId = chargeItem.paymentObjectId;
             }
         }

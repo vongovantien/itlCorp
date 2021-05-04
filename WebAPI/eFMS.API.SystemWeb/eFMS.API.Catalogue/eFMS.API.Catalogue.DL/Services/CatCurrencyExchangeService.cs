@@ -134,13 +134,22 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 var rate = new vw_catCurrencyExchangeNewest
                 {
+                    ID = item.Id,
                     CurrencyFromID = item.CurrencyFromId,
                     Rate = item.Rate,
-                    DatetimeCreated = item.DatetimeModified
+                    DatetimeCreated = item.DatetimeModified,
+                    Active = item.Active ?? false
                 };
                 result.ExchangeRates.Add(rate);
             }
-            result.ExchangeRates = result.ExchangeRates.OrderByDescending(x => x.DatetimeCreated).GroupBy(x => new { x.CurrencyFromID, x.Rate }).Select(x => new vw_catCurrencyExchangeNewest { CurrencyFromID = x.Key.CurrencyFromID, Rate = x.Key.Rate }).ToList();
+            result.ExchangeRates = result.ExchangeRates.OrderByDescending(x => x.DatetimeCreated).ThenByDescending(x => x.Active).GroupBy(x => new { x.CurrencyFromID, x.Rate })
+                .Select(x => new vw_catCurrencyExchangeNewest {
+                    ID = x.Select(s => s.ID).FirstOrDefault(),
+                    CurrencyFromID = x.Key.CurrencyFromID,
+                    Rate = x.Key.Rate,
+                    Active = x.Select(s => s.Active).FirstOrDefault(),
+                    DatetimeCreated = x.Select(s => s.DatetimeCreated).FirstOrDefault()
+                }).ToList();
             return result;
         }
 
@@ -148,9 +157,11 @@ namespace eFMS.API.Catalogue.DL.Services
         {
             var users = userRepository.Get();
             var exchanges = DataContext.Get(x => (x.CurrencyToId ?? "").IndexOf(criteria.LocalCurrencyId ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-                                && (x.DatetimeCreated >= criteria.FromDate || criteria.FromDate == null)
-                                && (x.DatetimeCreated <= criteria.ToDate || criteria.ToDate == null)
                                 && (x.Active == criteria.Active || criteria.Active == null));
+            if (criteria.FromDate != null && criteria.ToDate != null)
+            {
+                exchanges = exchanges.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToDate.Value.Date);
+            }
             var data = (from ex in exchanges
                         join u in users on ex.UserCreated equals u.Id into grpUsers
                         from user in grpUsers.DefaultIfEmpty()
