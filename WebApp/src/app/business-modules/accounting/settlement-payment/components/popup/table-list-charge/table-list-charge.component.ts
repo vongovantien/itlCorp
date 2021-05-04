@@ -481,10 +481,6 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 break;
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> prod/14-04-2021-sprint24
     }
 
     addCharge() {

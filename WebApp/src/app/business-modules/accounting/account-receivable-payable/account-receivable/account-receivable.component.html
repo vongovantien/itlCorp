@@ -3,10 +3,10 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Account Payment" (selectTab)="changeTabAccount('payment')">
+                <tab heading="Customer/Agency Payment" (selectTab)="changeTabAccount('payment')">
 
                 </tab>
-                <tab heading="Account Receivable" [active]="true" (selectTab)="changeTabAccount('receivable')">
+                <tab heading="AR Summary" [active]="true" (selectTab)="changeTabAccount('receivable')">
                     <form-search-account-receivable (onSearch)="onSearchReceivable($event)">
                     </form-search-account-receivable>
                     <tabset class="custom-class-tab">
