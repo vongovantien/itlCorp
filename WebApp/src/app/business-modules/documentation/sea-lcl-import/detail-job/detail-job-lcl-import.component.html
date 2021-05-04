@@ -12,7 +12,7 @@
             <tabset class="custom-class-tab">
                 <tab heading="Shipment Detail" [active]="selectedTab === 'SHIPMENT'"
                     (selectTab)="onSelectTab('shipment')">
-                    <app-form-create-sea-import>
+                    <app-form-create-sea-import service='SLI'>
                         <ng-container *ngIf="!!shipmentDetail">
                             <date-time-modified [timeCreated]="shipmentDetail.datetimeCreated"
                                 [userCreated]="shipmentDetail.userNameCreated"
