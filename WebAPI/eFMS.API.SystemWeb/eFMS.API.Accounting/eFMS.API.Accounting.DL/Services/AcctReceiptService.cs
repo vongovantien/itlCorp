@@ -1291,7 +1291,10 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.UnpaidAmountVnd;
                     }
-                    invoice.UnpaidAmountVnd = paidVnd - invoice.PaidAmountVnd;
+                    if (paidVnd < invoice.PaidAmountVnd)
+                    {
+                        invoice.PaidAmountVnd = paidVnd;
+                    }
                     paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                 }
                 if (paidUsd > 0)
@@ -1300,7 +1303,10 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountUsd = invoice.UnpaidAmountUsd;
                     }
-                    invoice.UnpaidAmountUsd = paidUsd - invoice.PaidAmountUsd;
+                    if (paidUsd < invoice.PaidAmountUsd)
+                    {
+                        invoice.PaidAmountUsd = paidUsd;
+                    }
                     paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
                 }
             }
