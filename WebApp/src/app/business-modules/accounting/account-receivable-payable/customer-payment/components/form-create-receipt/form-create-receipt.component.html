@@ -27,14 +27,15 @@
                                 <input type="text" ngxDaterangepickerMd class="form-control"
                                     [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                                     placeholder="Select request date" [autoApply]="true" formControlName="date"
-                                    [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly" />
+                                    [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
+                                    [attr.disabled]="isReadonly" />
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3" *ngIf="!isReadonly">
+                    <div class="col-lg-3">
                         <div class="form-group m--align-right">
-                            <button class="btn btn-info m-btn--icon m-btn--uppercase"
-                                type="button" (click)="getDebit()">
+                            <button class="btn btn-info m-btn--icon m-btn--uppercase" type="button"
+                                (click)="getDebit()">
                                 <span>
                                     <i class="la la-search"></i>
                                     <span>Get Debit </span>
