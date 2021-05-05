@@ -5,7 +5,7 @@ import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
-import { skip, takeUntil } from "rxjs/operators";
+import { distinctUntilChanged, skip, takeUntil } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
 import { AppComboGridComponent } from "@common";
 
@@ -118,17 +118,18 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             }).unsubscribe();
     }
 
-    getInvoiceList(){
-        this.debitList.pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((x: ReceiptInvoiceModel[]) => {
-            x.forEach((element: ReceiptInvoiceModel) => {
-                const item = {
-                    invoiceNo: element.amount,
-                    amount: this.formatNumberCurrency(element.amount),
-                };
-                this.invoiceDatasource = [...this.invoiceDatasource, item]
+    getInvoiceList() {
+        this.debitList.pipe(distinctUntilChanged(), takeUntil(this.ngUnsubscribe))
+            .subscribe((x: ReceiptInvoiceModel[]) => {
+                this.invoiceDatasource = [];
+                x.filter((element: ReceiptInvoiceModel) => element.type !== 'ADV').map((element: ReceiptInvoiceModel) => {
+                    const item = {
+                        invoiceNo: element.invoiceNo,
+                        amount: this.formatNumberCurrency(element.amount),
+                    };
+                    this.invoiceDatasource = [...this.invoiceDatasource, item];
+                })
             });
-        });
     }
 
     onSelectInvoice(data: any, invoiceItem: ReceiptInvoiceModel) {
