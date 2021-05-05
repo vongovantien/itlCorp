@@ -13,8 +13,9 @@ import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/rece
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { ResetInvoiceList } from '../store/actions';
-import { combineLatest, empty } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
+import { CustomerAgentDebitPopupComponent } from '../components/customer-agent-debit/customer-agent-debit.popup';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -28,7 +29,7 @@ export enum SaveReceiptActionEnum {
     templateUrl: './create-receipt.component.html',
 })
 export class ARCustomerPaymentCreateReciptComponent extends AppForm implements OnInit {
-
+    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
     @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
     @ViewChild(ARCustomerPaymentReceiptPaymentListComponent) listInvoice: ARCustomerPaymentReceiptPaymentListComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
@@ -46,7 +47,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     ngOnInit(): void {
-        this.initSubmitClickSubscription(() => { this.saveReceipt(SaveReceiptActionEnum.DRAFT_CREATE) });
+        this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
         this._activedRoute.queryParams.subscribe((param: any) => {
             if (!!param) {
                 this.type = param.type;
@@ -54,13 +55,52 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         })
     }
 
-    saveReceipt(type: number) {
+    getDebit() {
+        this.debitPopup.show();
+        this.debitPopup.customerFromReceipt = this.formCreate.customerId.value;
+        this.debitPopup.dateFromReceipt = this.formCreate.date.value;
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
+    }
+
+    addToReceipt($event: any) {
+        const partnerId = $event;
+        if (!!partnerId) {
+            this.formCreate.getPartnerOnForm(partnerId);
+            this.listInvoice.caculatorAmountFromDebitList();
+        }
+    }
+
+    saveReceipt(actionString: string) {
         this.formCreate.isSubmitted = true;
         this.listInvoice.isSubmitted = true;
         this.listInvoice.receiptCreditList.isSubmitted = true;
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
+        }
+
+        if (!actionString) {
+            return;
+        }
+
+        let action: number;
+        switch (actionString) {
+            case 'draft':
+                action = SaveReceiptActionEnum.DRAFT_CREATE
+                break;
+            case 'update':
+                action = SaveReceiptActionEnum.DRAFT_UPDATE
+                break;
+            case 'done':
+                action = SaveReceiptActionEnum.DONE
+                break;
+            case 'cancel':
+                action = SaveReceiptActionEnum.CANCEL
+                break;
+            default:
+                break;
         }
 
         // if (!this.listInvoice.invoices.length) {
@@ -111,7 +151,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         //     });
         // }
 
-        this.onSaveDataReceipt(receiptModel, type);
+        this.onSaveDataReceipt(receiptModel, action);
     }
     
     getDataForm() {
@@ -168,12 +208,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 // }
             )
     };
-
-    changeDebitList(event){
-        if(event){
-            this.listInvoice.caculatorAmountFromDebitList();
-        }
-    }
 
     gotoList() {
         this._store.dispatch(ResetInvoiceList());

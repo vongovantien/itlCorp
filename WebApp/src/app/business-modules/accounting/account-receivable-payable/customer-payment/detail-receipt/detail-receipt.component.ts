@@ -7,14 +7,15 @@ import { ReceiptModel } from '@models';
 import { SystemConstants, AccountingConstants, RoutingConstants } from '@constants';
 
 import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
-import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '../create-receipt/create-receipt.component';
+import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../store/actions';
+import { CustomerAgentDebitPopupComponent } from '../components/customer-agent-debit/customer-agent-debit.popup';
+import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -23,7 +24,9 @@ import { GetInvoiceListSuccess, ResetInvoiceList } from '../store/actions';
 })
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptSummaryComponent) summary: ARCustomerPaymentReceiptSummaryComponent;
-
+    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
+    @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
+    
     receiptId: string;
     receiptDetail: ReceiptModel;
 
@@ -40,7 +43,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     ngOnInit() {
         this.subscriptRouterChangeToGetDetailReceipt();
 
-        this.initSubmitClickSubscription((actionType: string) => this.saveReceipt(SaveReceiptActionEnum.DRAFT_UPDATE));
+        this.initSubmitClickSubscription((actionType: string) => this.saveReceipt(actionType));
     }
 
     subscriptRouterChangeToGetDetailReceipt() {
@@ -107,7 +110,16 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         // this.summary.invoices = [...(res.payments || [])];
         //this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
-    
+
+    getDebit(){
+        this.debitPopup.show();
+        this.debitPopup.customerFromReceipt = this.formCreate.customerId.value;
+        this.debitPopup.dateFromReceipt = this.formCreate.date.value;
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
+    }
+
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = this.receiptDetail.id;
         model.userCreated = this.receiptDetail.userCreated;

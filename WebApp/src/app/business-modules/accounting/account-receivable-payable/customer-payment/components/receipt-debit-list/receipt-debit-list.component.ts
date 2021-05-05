@@ -63,11 +63,10 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     removeListItem() {
         this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
-                if (x.filter((item: ReceiptInvoiceModel) => item.isSelected).length > 0) {
-                    for (let i = 0; i < x.length; i++) {
-                        if (x[i].isSelected === true) {
-                            this._store.dispatch(RemoveInvoice({ index: i }));
-                        }
+                const removeList = x.filter((item: ReceiptInvoiceModel) => item.isSelected);
+                if (removeList.length > 0) {
+                    for (let i = 0; i < removeList.length; i++) {
+                        this._store.dispatch(RemoveInvoice({ index: i }));
                     }
                 }
             }).unsubscribe();

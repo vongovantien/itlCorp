@@ -106,14 +106,13 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             });
     }
 
-    removeListItem(){
+    removeListItem() {
         this.creditList.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
-                if (x.filter((item: ReceiptInvoiceModel) => item.isSelected).length > 0) {
-                    for (let i = 0; i < x.length; i++) {
-                        if (x[i].isSelected === true) {
-                            this._store.dispatch(RemoveCredit({ index: i }));
-                        }
+                const removeList = x.filter((item: ReceiptInvoiceModel) => item.isSelected);
+                if (removeList.length > 0) {
+                    for (let i = 0; i < removeList.length; i++) {
+                        this._store.dispatch(RemoveCredit({ index: i }));
                     }
                 }
             }).unsubscribe();
