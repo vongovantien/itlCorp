@@ -261,11 +261,11 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(eFMS.API.Accounting.DL.Models.ObjectReceivableModel)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.ObjectReceivableModel})">
             <summary>
             Insert Or Update Receivable
             </summary>
-            <param name="model"></param>
+            <param name="models"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">

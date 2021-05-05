@@ -7,7 +7,6 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -15,7 +14,8 @@ namespace eFMS.API.Accounting.DL.IService
     {
         HandleState AddReceivable(AccAccountReceivableModel model);
         HandleState UpdateReceivable(AccAccountReceivableModel model);
-        HandleState InsertOrUpdateReceivable(ObjectReceivableModel model);
+        HandleState InsertOrUpdateReceivable(List<ObjectReceivableModel> models);
+        HandleState AddOrUpdateReceivableMulti(List<ObjectReceivableModel> models);
         HandleState CalculatorReceivable(CalculatorReceivableModel model);
         HandleState CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model);
         AccountReceivableDetailResult GetDetailAccountReceivableByArgeementId(Guid argeementId);

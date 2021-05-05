@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
@@ -73,13 +74,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Insert Or Update Receivable
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="models"></param>
         /// <returns></returns>
         [HttpPost("InsertOrUpdateReceivable")]
         [Authorize]
-        public IActionResult InsertOrUpdateReceivable(ObjectReceivableModel model)
+        public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
         {
-            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(model);
+            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
             return Ok(insertOrUpdateReceivable);
         }
 

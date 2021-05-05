@@ -3968,7 +3968,7 @@ namespace eFMS.API.Accounting.DL.Services
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
 
             //Tính công nợ cho từng Partner, Service, Office có trong Advance
-            foreach (var objectReceivable in objectReceivablesModel)
+            /*foreach (var objectReceivable in objectReceivablesModel)
             {
                 if (!string.IsNullOrEmpty(objectReceivable.PartnerId)
                     && objectReceivable.Office != null
@@ -3977,7 +3977,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
                 }
-            }
+            }*/
+            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return hs;
         }
         #endregion --- Calculator Receivable Advance ---
