@@ -26,7 +26,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
-    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
+    @ViewChild(CustomerAgentDebitPopupComponent, { static: true }) debitPopup: CustomerAgentDebitPopupComponent;
 
 
     formSearchInvoice: FormGroup;
@@ -94,7 +94,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         );
     }
 
-    getContract(){
+    getContract() {
         this._catalogueRepo.getAgreement(
             <IQueryAgreementCriteria>{
                 partnerId: this.customerId.value, status: true
@@ -129,7 +129,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                 this.agreements = d || [];
                                 if (!!this.agreements.length) {
                                     this.agreementId.setValue(d[0].id);
-                                    
+
 
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
@@ -163,12 +163,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         const partnerId = $event;
         if (!!partnerId) {
             this.$customers.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: Partner[]) =>{
-                const partner = x.filter((x: Partner) => x.id === partnerId).shift();
-                if(!!partner){
-                    this.onSelectDataFormInfo(partner, 'partner');
-                }
-            })
+                .subscribe((x: Partner[]) => {
+                    const partner = x.filter((x: Partner) => x.id === partnerId).shift();
+                    if (!!partner) {
+                        this.onSelectDataFormInfo(partner, 'partner');
+                    }
+                })
         }
         this.onRequest.emit(true);
     }
