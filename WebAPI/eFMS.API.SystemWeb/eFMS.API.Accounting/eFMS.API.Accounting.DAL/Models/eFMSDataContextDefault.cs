@@ -113,6 +113,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ObhBilling).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.ObhPaid).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.ObhUnpaid).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
