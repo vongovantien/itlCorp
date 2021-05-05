@@ -3306,6 +3306,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ChargeCode = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.Code;
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
+                data.SyncedFrom = charge.SyncedFrom;
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
