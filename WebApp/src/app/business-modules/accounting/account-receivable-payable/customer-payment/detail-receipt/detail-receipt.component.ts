@@ -20,7 +20,7 @@ import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-
 @Component({
     selector: 'app-detail-receipt',
     templateUrl: './detail-receipt.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptSummaryComponent) summary: ARCustomerPaymentReceiptSummaryComponent;
@@ -165,5 +165,5 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
 
     }
-    
+
 }

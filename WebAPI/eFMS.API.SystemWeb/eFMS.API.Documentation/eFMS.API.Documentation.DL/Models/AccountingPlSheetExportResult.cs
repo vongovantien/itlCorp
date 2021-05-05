@@ -48,5 +48,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? VATAmountVND { get; set; }
         public string CdNote { get; set; }
         public string Creator { get; set; }
+        public string SyncedFrom { get; set; }
     }
 }

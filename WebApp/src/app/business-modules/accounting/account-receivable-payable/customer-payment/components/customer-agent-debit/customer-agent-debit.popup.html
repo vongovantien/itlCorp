@@ -108,7 +108,7 @@
                             </thead>
                             <tbody>
                                 <ng-container *ngIf="!!listDebit.length">
-                                    <tr *ngFor="let debit of listDebit;let i = index;">
+                                    <tr *ngFor="let debit of listDebit;let i = index;trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions">
                                                 <label class="m-checkbox">
