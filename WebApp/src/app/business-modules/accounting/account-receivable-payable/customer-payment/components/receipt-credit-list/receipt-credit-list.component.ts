@@ -147,7 +147,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             
             this.componentRef.instance.headers = this.headerInvoice;
             this.componentRef.instance.data = this.invoiceDatasource;
-            // this.componentRef.instance.fields = ['invoiceNo', "amount | number: '.3-3'"];
             this.componentRef.instance.active = item.invoiceNo;
 
             this.subscription = ((this.componentRef.instance) as AppComboGridComponent<ReceiptInvoiceModel>).onClick.subscribe(
