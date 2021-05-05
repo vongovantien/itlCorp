@@ -40,7 +40,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     ngOnInit() {
         this.subscriptRouterChangeToGetDetailReceipt();
 
-        this.initSubmitClickSubscription((actionType: string) => this.saveReceipt(actionType));
+        this.initSubmitClickSubscription((actionType: string) => this.saveReceipt(SaveReceiptActionEnum.DRAFT_UPDATE));
     }
 
     subscriptRouterChangeToGetDetailReceipt() {
@@ -104,10 +104,11 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     }
 
     updateSummary(res: ReceiptModel) {
-        this.summary.invoices = [...(res.payments || [])];
+        // this.summary.invoices = [...(res.payments || [])];
         //this.summary.calculateInfodataInvoice([...res.payments] || []);
     }
-    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
+    
+    onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = this.receiptDetail.id;
         model.userCreated = this.receiptDetail.userCreated;
         model.userModified = this.receiptDetail.userModified;
@@ -117,23 +118,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         model.syncStatus = this.receiptDetail.syncStatus;
         model.lastSyncDate = this.receiptDetail.lastSyncDate;
 
-        if (!actionString) {
-            return;
-        }
-        let action: number;
-        switch (actionString) {
-            case 'update':
-                action = SaveReceiptActionEnum.DRAFT_UPDATE
-                break;
-            case 'done':
-                action = SaveReceiptActionEnum.DONE
-                break;
-            case 'cancel':
-                action = SaveReceiptActionEnum.CANCEL
-                break;
-            default:
-                break;
-        }
         if (!action) { return; };
         this._accountingRepo.saveReceipt(model, action)
             .pipe(

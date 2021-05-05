@@ -40,8 +40,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
-        this.isCheckAll = false;
         this.debitList$ = this._store.select(ReceiptDebitListState);
+        this.checkAllChange();
     }
 
     checkAllChange() {

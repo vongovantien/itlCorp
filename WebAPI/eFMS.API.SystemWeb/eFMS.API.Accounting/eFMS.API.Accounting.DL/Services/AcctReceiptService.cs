@@ -629,7 +629,10 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.ReceiptId = receipt.Id;
                 _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.RefNo;
                 _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
-                _payment.RefId = string.Join(",", payment.RefIds);
+                if (payment.RefIds != null)
+                {
+                    _payment.RefId = string.Join(",", payment.RefIds);
+                }
                 _payment.InvoiceNo = payment.InvoiceNo;
 
                 if (payment.Type == "CREDIT")
@@ -1248,8 +1251,8 @@ namespace eFMS.API.Accounting.DL.Services
             return new ProcessClearInvoiceModel
             {
                 Invoices = invoiceList,
-                CusAdvanceAmountVnd = paidVnd,
-                CusAdvanceAmountUsd = paidUsd,
+                CusAdvanceAmountVnd = NumberHelper.RoundNumber(paidVnd, 0),
+                CusAdvanceAmountUsd = NumberHelper.RoundNumber(paidUsd, 2),
             };
         }
 

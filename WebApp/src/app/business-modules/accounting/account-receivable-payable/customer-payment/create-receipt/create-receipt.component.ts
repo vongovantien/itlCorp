@@ -46,7 +46,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     ngOnInit(): void {
-        this.initSubmitClickSubscription(() => { this.saveReceipt('draft') });
+        this.initSubmitClickSubscription(() => { this.saveReceipt(SaveReceiptActionEnum.DRAFT_CREATE) });
         this._activedRoute.queryParams.subscribe((param: any) => {
             if (!!param) {
                 this.type = param.type;
@@ -54,7 +54,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         })
     }
 
-    saveReceipt(type: string) {
+    saveReceipt(type: number) {
         this.formCreate.isSubmitted = true;
         this.listInvoice.isSubmitted = true;
         this.listInvoice.receiptCreditList.isSubmitted = true;
@@ -86,7 +86,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .subscribe(x=> {
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     if(element.length > 0){
-                        console.log('element', element)
                         element.map(item => paymentList.push(item))
                     }
                 });
@@ -112,7 +111,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         //     });
         // }
 
-        // this.onSaveDataReceipt(receiptModel, type);
+        this.onSaveDataReceipt(receiptModel, type);
     }
     
     getDataForm() {
@@ -148,16 +147,16 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         return valid;
     }
 
-    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
+    onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
-        this._accountingRepo.saveReceipt(model, SaveReceiptActionEnum.DRAFT_CREATE)
+        this._accountingRepo.saveReceipt(model, action)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(ResetInvoiceList());
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`], { queryParams: { type: this.type } });
                         return;
                     }
                     this._toastService.error("Create data fail, Please check again!");
