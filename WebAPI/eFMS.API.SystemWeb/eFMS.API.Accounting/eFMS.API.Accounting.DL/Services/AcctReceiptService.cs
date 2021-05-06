@@ -38,6 +38,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<SysCompany> companyRepository;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
             IMapper mapper,
@@ -55,7 +57,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<AcctSoa> soaRepo,
             IContextBase<AcctCdnote> cdNoteRepo,
-            IContextBase<SysCompany> companyRepo
+            IContextBase<SysCompany> companyRepo,
+            IAccAccountReceivableService accAccountReceivable
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -72,6 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
             soaRepository = soaRepo;
             cdNoteRepository = cdNoteRepo;
             companyRepository = companyRepo;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -1106,7 +1110,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id, "DONE");
 
-                                //TODO: Tính lại công nợ trên hợp đồng
+                                //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
                             }
 
                             trans.Commit();
@@ -1141,7 +1145,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id, "DONE");
 
-                                //TODO: Tính lại công nợ trên hợp đồng
+                                //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
                             }
 
                             trans.Commit();
@@ -1192,7 +1196,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             // cấn trừ cho hóa đơn
                             hs = UpdateInvoiceOfPayment(receiptId, "DONE");
-                            //TODO: Tính lại công nợ trên hợp đồng
+                            //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
 
                             DataContext.SubmitChanges();
                             trans.Commit();
@@ -1858,7 +1862,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get list Credit Note/ SOA type Credit by Criteria
+        /// Get list SOA type Credit by Criteria
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -1931,7 +1935,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get list Credit Note/ SOA type Credit by Criteria
+        /// Get list Credit Note by Criteria
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -2003,6 +2007,54 @@ namespace eFMS.API.Accounting.DL.Services
             return joinData;
         }
         #endregion -- Get Customers Debit --
+
+        /// <summary>
+        /// Tính công nợ dựa vào id của Receipt
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        public HandleState CalculatorReceivableForReceipt(Guid receiptId)
+        {
+            //Get list payment of Receipt
+            var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
+            //Get list Invoice of payments
+            var invoiceIds = payments.Where(x => x.Type == "DEBIT").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
+            //Get list Invoice Temp of payments
+            var invoiceTempIds = payments.Where(x => x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
+            //Get list Soa Credit of payments
+            var soaIds = payments.Where(x => x.Type == "CREDITSOA").Select(s => s.RefId).Distinct().ToList();
+            var paySoaNos = new List<string>();
+            if (soaIds.Count > 0)
+            {
+                paySoaNos = soaRepository.Get(x => soaIds.Any(s => s == x.Id)).Select(s => s.Soano).Distinct().ToList();
+            }
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            if (invoiceIds.Count > 0 || invoiceTempIds.Count > 0 || paySoaNos.Count > 0)
+            {
+                Expression<Func<CsShipmentSurcharge, bool>> query = chg => false;
+                
+                if (invoiceIds.Count > 0)
+                {
+                    query = query.Or(x => invoiceIds.Any(i => i == x.AcctManagementId));
+                }
+                if (invoiceTempIds.Count > 0)
+                {
+                    query = query.Or(x => invoiceTempIds.Any(t => t == x.PayerAcctManagementId));
+                }
+                if (paySoaNos.Count > 0)
+                {
+                    query = query.Or(x => paySoaNos.Any(p => p == x.PaySoano));
+                }
+                surcharges = surchargeRepository.Get(query);
+            }
+            var hs = new HandleState();
+            if (surcharges == null) return hs;
+            
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+            //Tính công nợ cho Partner, Service, Office có trong Receipt
+            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return hs;
+        }
 
     }
 }

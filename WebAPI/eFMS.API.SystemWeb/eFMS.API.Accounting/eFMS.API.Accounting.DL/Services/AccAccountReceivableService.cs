@@ -766,7 +766,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 && x.SaleMan == agreement.SaleManId
                                                 && agreement.SaleService.Contains(x.Service)
                                                 && agreement.OfficeId.Contains(x.Office.ToString()));
-            if (receivables != null)
+            if (receivables != null && receivables.Count() > 0)
             {
                 var partnerChildIds = partnerRepo.Get(x => x.ParentId == agreement.PartnerId).Select(s => s.Id).ToList();
                 List<CatContract> contractChildOfPartner = new List<CatContract>();
@@ -930,7 +930,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                currentUser.Action = "InsertOrUpdateReceivable";
                 UpdateAgreementPartners(partnerIds);
 
                 return hs;
@@ -945,6 +944,7 @@ namespace eFMS.API.Accounting.DL.Services
         public HandleState CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
+            currentUser.Action = "CalculatorReceivable";
             if (model != null && model.ObjectReceivable.Count() > 0)
             {
                 // PartnerId, Office, Service # Empty And # Null
