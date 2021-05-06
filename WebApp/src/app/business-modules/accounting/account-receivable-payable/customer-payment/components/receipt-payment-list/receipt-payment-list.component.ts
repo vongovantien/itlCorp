@@ -11,7 +11,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
 import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
@@ -124,9 +124,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         ];
 
         this.isLoading = this._store.select(customerPaymentReceipLoadingState);
-        // this.initSubscriptioontInvoiceList();
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
+
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((u) => {
@@ -135,26 +135,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
             });
         this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'));
+
     }
 
     formatNumberCurrency(input: number, digit: number) {
         return input.toLocaleString(
-            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            'en-Us', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: digit }
         );
     }
-
-    // initSubscriptioontInvoiceList() {
-    //     this._store.select(customerPaymentReceipInvoiceListState)
-    //         .pipe(takeUntil(this.ngUnsubscribe))
-    //         .subscribe(
-    //             (res: ReceiptInvoiceModel[]) => {
-    //                 this.invoices = [...res];
-    //                 // this.balance.setValue(null);
-
-    //                 console.log(this.invoices);
-    //             });
-    // }
 
     listenCusAdvanceData() {
         this._dataService.currentMessage
@@ -307,8 +296,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     removeReceiptItem() {
         this.confirmPopup.hide();
-        this.receiptDebitList.removeListItem();
-        this.receiptCreditList.removeListItem();
         this.caculatorAmountFromDebitList();
     }
 
@@ -388,6 +375,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     caculatorAmountFromDebitList() {
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList = this._store.select(ReceiptDebitListState);
+
         let valueUSD = 0;
         let valueVND = 0;
         let paidUSD = 0;
@@ -405,10 +393,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountUsd, 0);
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
-        this.amountUSD.setValue(this.formatNumberCurrency(valueUSD, 2));
-        this.amountVND.setValue(this.formatNumberCurrency(valueVND, 0));
+
+        this.amountUSD.setValue(paidUSD);
+        this.amountVND.setValue(paidVND);
+
         this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
-        this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 0));
+        this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 2));
+
         this.finalPaidAmountUSD.setValue((cusAdvanceAmount / exChangeRateUSD) + valueUSD + paidUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }

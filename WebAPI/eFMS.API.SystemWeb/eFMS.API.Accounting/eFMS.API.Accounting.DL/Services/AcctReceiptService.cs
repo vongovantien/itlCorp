@@ -448,8 +448,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaymentId = acctPayment.Id;
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
+                    payment.CreditType = acctPayment.Type;
                     payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "Credit" : acctPayment.Type;
-                    payment.CreditType = (acctPayment.PaymentType != "Debit") ? acctPayment.PaymentType : null;
                     payment.CurrencyId = acctPayment.CurrencyId;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
@@ -639,6 +639,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _payment.Type = payment.CreditType;
                 }
+                else
+                {
+                    _payment.Type = payment.Type;  // OBH/DEBIT
+                }
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -658,7 +662,6 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.UnpaidPaymentAmountVnd = payment.UnpaidAmountVnd;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
-                _payment.Type = payment.Type;               // OBH/DEBIT
                 _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
                 _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
                 _payment.RefCurrency = payment.CurrencyId; // currency của hóa đơn
@@ -1039,10 +1042,10 @@ namespace eFMS.API.Accounting.DL.Services
                         if (hs.Success)
                         {
                             // Xóa các payment hiện tại, add các payment mới khi update
-                            List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).Select(x => x.Id).ToList();
-                            HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
-
+                            List<Guid> paymentsOldDelete = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id).Select(x => x.Id).ToList();
                             HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receipt);
+
+                            HandleState hsPaymentDelete = DeletePayments(paymentsOldDelete);
 
                             DataContext.SubmitChanges();
                             trans.Commit();
@@ -1100,11 +1103,17 @@ namespace eFMS.API.Accounting.DL.Services
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                             HandleState hs = DataContext.Add(receiptData);
 
-                            hs = DataContext.Update(receiptData, x => x.Id == receiptData.Id);
+                            hs = DataContext.Add(receiptData);
                             if (hs.Success)
                             {
+                                AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
+
+                                // Phát sinh Payment
+                                HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id, "DONE");
+                                // Cập nhật CusAdvance cho hợp đồng
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel);
 
                                 //TODO: Tính lại công nợ trên hợp đồng
                             }
@@ -1119,10 +1128,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
-                            HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
-
                             HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
 
+                            HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
 
                             // Done Receipt
                             HandleState hs = new HandleState();
@@ -1141,6 +1149,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id, "DONE");
 
+                                // Cập nhật CusAdvance cho hợp đồng
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
                                 //TODO: Tính lại công nợ trên hợp đồng
                             }
 
@@ -1193,6 +1203,8 @@ namespace eFMS.API.Accounting.DL.Services
                             // cấn trừ cho hóa đơn
                             hs = UpdateInvoiceOfPayment(receiptId, "DONE");
                             //TODO: Tính lại công nợ trên hợp đồng
+                            // Cập nhật Cus Advance của Agreement
+                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
 
                             DataContext.SubmitChanges();
                             trans.Commit();

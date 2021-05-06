@@ -8,7 +8,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ARCustomerPaymentCreateReciptComponent } from './create-receipt/create-receipt.component';
 import { ARCustomerPaymentDetailReceiptComponent } from './detail-receipt/detail-receipt.component';
 import { ARCustomerPaymentFormCreateReceiptComponent } from './components/form-create-receipt/form-create-receipt.component';
-import { ARCustomerPaymentReceiptSummaryComponent } from './components/receipt-summary/receipt-summary.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from './components/receipt-payment-list/receipt-payment-list.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -41,7 +40,6 @@ const routing: Routes = [
         ARCustomerPaymentDetailReceiptComponent,
         ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentFormCreateReceiptComponent,
-        ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,
         CustomerAgentDebitPopupComponent,
         ARCustomerPaymentReceiptCreditListComponent,

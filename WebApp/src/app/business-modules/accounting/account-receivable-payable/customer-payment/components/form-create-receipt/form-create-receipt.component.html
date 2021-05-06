@@ -10,7 +10,7 @@
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"
                         [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
+                        [selectedDisplayFields]="['shortName']" [dataSources]="customers"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                         [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
@@ -25,7 +25,8 @@
                         <input type="text" ngxDaterangepickerMd class="form-control"
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                             placeholder="Select request date" [autoApply]="true" formControlName="date"
-                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly" />
+                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
+                            [attr.disabled]="isReadonly" />
                     </div>
                 </div>
             </div>
@@ -55,6 +56,17 @@
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
+            <div class="col-lg-12">
+                <div class="m--align-right m--margin-top-10">
+                    <ng-container>
+                        <app-permission-button title="Get Debit" class="info" [icon]="'la la-search'"
+                            (onClick)="getDebit()">
+                        </app-permission-button>
+                    </ng-container>
+                </div>
+            </div>
         </div>
     </form>
 </div>
+
+<customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>

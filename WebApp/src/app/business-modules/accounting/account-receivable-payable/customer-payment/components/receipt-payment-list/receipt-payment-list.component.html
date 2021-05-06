@@ -24,9 +24,9 @@
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label">Currency</label>
-                    <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async" bindLabel="id"
-                        bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false"
-                        [readonly]="isReadonly">
+                    <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
+                        bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
+                        [clearable]="false" [readonly]="isReadonly">
                     </ng-select>
                 </div>
             </div>
@@ -43,7 +43,8 @@
                 <div class="form-group">
                     <label class="form-control-label">Cus Advance Amount</label>
                     <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
+                        autoFormatCurrency [attr.readOnly]="isReadonly"
+                        (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
                 </div>
             </div>
             <div class="col-lg-4">
@@ -59,30 +60,32 @@
                 <div class="form-group">
                     <label class="form-control-label">Credit Amount VND</label>
                     <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
-                        autoFormatCurrency [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountVND')">
+                        autoFormatCurrency [attr.readOnly]="isReadonly"
+                        (change)="onSelectDataFormInfo($event,'amountVND')">
                 </div>
             </div>
             <div class="col-lg-2">
                 <div class="form-group">
                     <label class="form-control-label">Credit Amount USD</label>
                     <input class="form-control" type="number" formControlName="amountUSD" [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountUSD')">
+                        autoFormatCurrency [attr.readOnly]="isReadonly"
+                        (change)="onSelectDataFormInfo($event,'amountUSD')">
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group" >
-                        <label class="form-control-label" required>Paid Amount VND</label>
-                        <input type="number" class="form-control m-input m-input--square text-success"
-                            formControlName="paidAmountVND" numeric autoFormatCurrency
-                            [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
+                <div class="form-group">
+                    <label class="form-control-label" required>Paid Amount VND</label>
+                    <input type="number" class="form-control m-input m-input--square text-success"
+                        formControlName="paidAmountVND" autoFormatCurrency [attr.readOnly]="isReadonly"
+                        (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="form-group">
                     <label class="form-control-label" required>Paid Amount USD</label>
                     <input type="number" class="form-control m-input m-input--square text-success"
-                        formControlName="paidAmountUSD" autoFormatCurrency
-                        [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
+                        formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
+                        (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
                 </div>
             </div>
         </div>
@@ -90,25 +93,37 @@
             <div class="col-lg-6">
                 <label class="form-control-label">Final Paid Amount USD</label>
                 <input type="text" class="form-control m-input m-input--square" formControlName="finalPaidAmountUSD"
-                        currencyMask [attr.disabled]="true">
+                    currencyMask [attr.disabled]="true">
             </div>
             <div class="col-lg-6">
                 <label class="form-control-label">Final Paid Amount VND</label>
                 <input type="text" class="form-control m-input m-input--square" formControlName="finalPaidAmountVND"
-                        currencyMask [attr.disabled]="true">
+                    currencyMask [attr.disabled]="true">
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-{{syncInfoTemplate ? 8 : 12}}">
                 <div class="form-group">
                     <label class="form-control-label">Description</label>
                     <textarea cols="30" rows="5" class="form-control" formControlName="description"
                         [attr.readOnly]="isReadonly"></textarea>
                 </div>
             </div>
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label class="form-control-label"></label>
+                    <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>
+                </div>
+            </div>
         </div>
+
     </div>
-    <div class="row"></div>
+    <ng-content>
+
+    </ng-content>
+    <div class="row">
+
+    </div>
     <div class="row m--margin-top-20">
         <ng-container *ngIf="!isReadonly">
             <div class="col-lg-12 m--align-left d-flex align-items-center justify-content-between">
@@ -120,14 +135,8 @@
                             <span> Process Clear </span>
                         </span>
                     </button>
-                    <button class="btn btn-danger m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="showConfirmPopup()">
-                        <span>
-                            <i class="la la-trash"></i>
-                            <span> Remove </span>
-                        </span>
-                    </button>
-                    <button class="btn btn-success m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
+
+                    <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
                         (click)="insertAdvanceRowData()">
                         <span>
                             <i class="la la-plus"></i>
@@ -143,54 +152,3 @@
         </div>
     </div>
 </div>
-<confirm-popup #confirmRemove body="Some Debit Values will change, do you want to remove you selections?" (onSubmit)="removeReceiptItem()"
-[labelCancel]="'No'" [labelConfirm]="'Yes'" title="Confirm Remove"></confirm-popup>
-<!-- <ng-template #tableInvoice>
-    <table class="table table-hover table-brand dataTable table-hover">
-        <thead app-table-header [headers]="headerReceiptReadonly">
-        </thead>
-        <tbody>
-            <ng-container *ngIf="!!invoices.length">
-                <ng-container *ngFor="let invoice of invoices; let i = index; trackBy: trackByFn">
-                    <tr [class.selected-row]="invoice.type === 'ADV'">
-                        <td class="text-primary">{{invoice.invoiceNo}}</td>
-                        <td class="text-primary">{{invoice.serieNo}}</td>
-                        <td>{{invoice.type}}</td>
-                        <td class="text-info">{{invoice.partnerName}}</td>
-                        <td>{{invoice.taxCode}}</td>
-       
-                        <td>
-                            {{invoice.paidAmount | number: '.0-3'}}
-                        </td>
-                        <td class="text-left">{{invoice.receiptExcInvoiceBalance | number: '.0-3'}}
-                        </td>
-                        <td>
-                            <ng-container [ngSwitch]="invoice.paymentStatus">
-                                <ng-container *ngSwitchCase="'Paid'">
-                                    <span class="text-success">Paid</span>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'Unpaid'">
-                                    <span class="text-danger">Unpaid</span>
-                                </ng-container>
-                                <ng-container *ngSwitchCase="'Paid A Part'">
-                                    <span class="text-warning">Paid A Part</span>
-                                </ng-container>
-                                <ng-container *ngSwitchDefault>
-                                    {{invoice.paymentStatus}}
-                                </ng-container>
-                            </ng-container>
-                        </td>
-                        <td>{{invoice.billingDate | date: 'dd/MM/yyyy'}}</td>
-                        <td>{{invoice.invoiceDate | date: 'dd/MM/yyyy'}}</td>
-                        <td>
-                            <input type="text" class="form-control" [(ngModel)]="invoice.note">
-                        </td>
-                    </tr>
-                </ng-container>
-            </ng-container>
-            <tr app-table-none-record *ngIf="!(isLoading | async) && !invoices.length">
-            </tr>
-            <tr app-table-row-loading *ngIf="isLoading | async"></tr>
-        </tbody>
-    </table>
-</ng-template> -->
