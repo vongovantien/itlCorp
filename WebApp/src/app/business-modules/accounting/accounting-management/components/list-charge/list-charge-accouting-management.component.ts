@@ -184,6 +184,15 @@ export class AccountingManagementListChargeComponent extends AppList implements 
             ).subscribe(
                 (data: IChargeAccountingMngtTotal) => {
                     if (!!data) {
+                        if (data.charges.length) {
+                            data.charges.forEach(c => {
+                                if (!!c.invoiceDate) {
+                                    if (new Date(c.invoiceDate).toString() !== "Invalid Date") {
+                                        c.invoiceDate = formatDate(new Date(c.invoiceDate), 'MM/dd/yyyy', 'en');
+                                    }
+                                }
+                            })
+                        }
                         this.charges = [...data.charges];
                         this.totalAmountVnd = data.totalAmountVnd;
                         this.totalAmountVat = data.totalAmountVat;
