@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
@@ -6,27 +6,25 @@ import { AccountingRepo } from '@repositories';
 import { ReceiptModel } from '@models';
 import { SystemConstants, AccountingConstants, RoutingConstants } from '@constants';
 
-import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
 import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../store/actions';
-import { CustomerAgentDebitPopupComponent } from '../components/customer-agent-debit/customer-agent-debit.popup';
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
 
 @Component({
     selector: 'app-detail-receipt',
     templateUrl: './detail-receipt.component.html',
-    //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
-    @ViewChild(ARCustomerPaymentReceiptSummaryComponent) summary: ARCustomerPaymentReceiptSummaryComponent;
-    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
     @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
-    
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+
     receiptId: string;
     receiptDetail: ReceiptModel;
 
@@ -51,6 +49,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             .pipe(
                 pluck('id'),
                 tap((id: string) => { this.receiptId = id }),
+                takeUntil(this.ngUnsubscribe),
                 switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId))
             )
             .subscribe(
@@ -106,19 +105,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         }
     }
 
-    updateSummary(res: ReceiptModel) {
-        // this.summary.invoices = [...(res.payments || [])];
-        //this.summary.calculateInfodataInvoice([...res.payments] || []);
-    }
-
-    getDebit(){
-        this.debitPopup.show();
-        this.debitPopup.customerFromReceipt = this.formCreate.customerId.value;
-        this.debitPopup.dateFromReceipt = this.formCreate.date.value;
-        if (!this.debitPopup.partnerId.value) {
-            this.debitPopup.setDefaultValue();
-        }
-    }
 
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = this.receiptDetail.id;
@@ -140,7 +126,8 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                         return this._accountingRepo.getDetailReceipt(this.receiptId);
                     }
                     of(res);
-                })
+                }),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: any) => {

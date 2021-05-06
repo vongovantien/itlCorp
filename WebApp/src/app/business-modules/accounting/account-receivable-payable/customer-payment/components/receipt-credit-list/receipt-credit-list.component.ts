@@ -16,7 +16,7 @@ import { AppComboGridComponent } from "@common";
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
-    
+
     @Input() set type(t: string) {
         if (!!t) {
             this._type = t;
@@ -42,8 +42,10 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     }
 
     private _type: string = 'Customer' // Agent
+
     creditList: Observable<ReceiptInvoiceModel[]>;
     debitList: Observable<ReceiptInvoiceModel[]>;
+
     configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
     isSubmitted: boolean = false;
     selectedInvoice: ReceiptInvoiceModel;
@@ -106,17 +108,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             });
     }
 
-    removeListItem() {
-        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                const removeList = x.filter((item: ReceiptInvoiceModel) => item.isSelected);
-                if (removeList.length > 0) {
-                    for (let i = 0; i < removeList.length; i++) {
-                        this._store.dispatch(RemoveCredit({ index: i }));
-                    }
-                }
-            }).unsubscribe();
-    }
 
     getInvoiceList() {
         this.debitList.pipe(distinctUntilChanged(), takeUntil(this.ngUnsubscribe))
@@ -144,7 +135,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
         this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
         if (!!this.componentRef) {
-            
+
             this.componentRef.instance.headers = this.headerInvoice;
             this.componentRef.instance.data = this.invoiceDatasource;
             this.componentRef.instance.active = item.invoiceNo;
@@ -164,5 +155,17 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                     }
                 );
         }
+    }
+
+    confirmDeleteInvoiceItem(index: number) {
+        this.selectedIndexInvoice = index;
+    }
+
+    onDeleteInvoiceItem() {
+        if (this.selectedIndexInvoice === -1) {
+            return;
+        }
+        this._store.dispatch(RemoveCredit({ index: this.selectedIndexInvoice }));
+
     }
 }

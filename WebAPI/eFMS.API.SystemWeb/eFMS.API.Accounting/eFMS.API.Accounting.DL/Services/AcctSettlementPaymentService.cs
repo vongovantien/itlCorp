@@ -1777,6 +1777,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
                         return new HandleState(ex.Message);
                     }
                     finally
@@ -1787,6 +1788,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
                 return new HandleState(ex.Message);
             }
         }
@@ -2063,6 +2065,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
                         return new HandleState(ex.Message);
                     }
                     finally
@@ -2073,6 +2076,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
                 return new HandleState(ex.Message);
             }
         }
@@ -3018,6 +3022,7 @@ namespace eFMS.API.Accounting.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    new LogHelper("eFMS_LOG_AcctSettlePayment", ex.ToString());
                     return new HandleState(ex.Message);
                 }
                 finally

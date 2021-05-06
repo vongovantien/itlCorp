@@ -80,7 +80,7 @@
         <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--uppercase"
             *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
             <span>
-                <i class="la la-plus"></i>
+                <i className="{{icon ? icon : 'la la-plus'}}"></i>
                 <span>
                     {{!!title ? title : 'Add New'}}
                 </span>
