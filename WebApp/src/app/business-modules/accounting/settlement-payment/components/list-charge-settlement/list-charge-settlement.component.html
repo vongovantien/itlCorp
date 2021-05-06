@@ -30,9 +30,7 @@
                             </span>
                         </span>
                     </button>
-                    <ng-container *ngIf="((detailSettlement | async)?.settlement?.statusApproval === 'New' 
-                    || (detailSettlement | async)?.settlement?.statusApproval === 'Done')
-                    && (detailSettlement | async)?.settlement?.isRequester">
+                    <ng-container>
                         <button type="button" class="btn btn-danger   m-btn--icon m-btn--uppercase"
                             (click)="deleteShipmentItem()">
                             <span>
