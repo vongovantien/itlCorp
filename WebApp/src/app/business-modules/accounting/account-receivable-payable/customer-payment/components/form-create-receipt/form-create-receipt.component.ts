@@ -1,5 +1,4 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
-import { formatDate } from '@angular/common';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -15,14 +14,17 @@ import { ComboGridVirtualScrollComponent } from '@common';
 
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
+
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
+
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
-
+    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
 
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
@@ -31,6 +33,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     agreementId: AbstractControl;
 
     $customers: Observable<Partner[]>;
+    customers: Partner[] = [];
+
     agreements: IAgreementReceipt[];
     listReceipts: ReceiptInvoiceModel[] = [];
 
@@ -40,6 +44,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         { field: 'contractNo', label: 'Agreement No' },
         { field: 'expiredDate', label: 'Expired Date' },
     ];
+
     isReadonly = null;
     customerName: string;
     contractNo: string;
@@ -57,11 +62,27 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     }
     ngOnInit() {
         this.initForm();
+        this.getCustomerAgent();
 
         if (!this.isUpdate) {
-            this.$customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
             this.generateReceiptNo();
         }
+    }
+
+    getCustomerAgent() {
+        const customersFromService = this._catalogueRepo.getCurrentCustomerSource();
+
+        if (!!customersFromService.data.length) {
+            this.customers = customersFromService.data;
+            return;
+        }
+        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT])
+            .subscribe(
+                (data) => {
+                    this._catalogueRepo.customersSource$.next({ data }); // * Update service.
+                    this.customers = data;
+                }
+            );
     }
 
     initForm() {
@@ -145,17 +166,29 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
-
     getPartnerOnForm($event: any) {
         const partnerId = $event;
+        const partner = this.customers.find((x: Partner) => x.id === partnerId);
+        if (!!partner) {
+            this.onSelectDataFormInfo(partner, 'partner');
+        }
+    }
+
+
+    getDebit() {
+        this.debitPopup.show();
+        this.debitPopup.customerFromReceipt = this.customerId.value;
+        this.debitPopup.dateFromReceipt = this.date.value;
+        if (!this.debitPopup.partnerId.value) {
+            this.debitPopup.setDefaultValue();
+        }
+    }
+
+    addToReceipt($event: any) {
+        const partnerId = $event;
         if (!!partnerId) {
-            this.$customers.pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe((x: Partner[]) => {
-                    const partner = x.filter((x: Partner) => x.id === partnerId).shift();
-                    if (!!partner) {
-                        this.onSelectDataFormInfo(partner, 'partner');
-                    }
-                })
+            this.getPartnerOnForm(partnerId);
+            // this.listInvoice.caculatorAmountFromDebitList();
         }
     }
 

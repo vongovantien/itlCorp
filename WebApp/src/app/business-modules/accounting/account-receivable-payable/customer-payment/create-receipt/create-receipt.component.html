@@ -8,18 +8,13 @@
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>Create {{type === 'Customer' ? 'Customer': 'Agency'}} Receipt</h3>
                     <div>
-                        <!-- <div class="c-button-actions">
-                            <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
+                        <div class="c-button-actions">
+
+                            <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
                                 (onClick)="submitClick('draft')">
                             </app-permission-button>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
-                            </app-default-button>
-                        </div> -->
-                        <div class="c-button-actions">
-                            <app-permission-button title="Get Debit" class="info" [icon]="'la la-search'"
-                                (onClick)="getDebit()">
-                            </app-permission-button>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                             </app-default-button>
                         </div>
                     </div>
@@ -27,26 +22,16 @@
                 <customer-payment-form-create-receipt></customer-payment-form-create-receipt>
 
                 <customer-payment-list-receipt></customer-payment-list-receipt>
+
                 <div class="c-button-actions text-center">
-                    <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
-                        (onClick)="submitClick('draft')">
+                    <app-permission-button type="save" title="Done" class="success" (onClick)="confirmDoneReceipt()">
                     </app-permission-button>
-                    <app-permission-button type="save" title="Done" class="success"
-                                    (onClick)="confirmDoneReceiptPopup.show()">
-                                </app-permission-button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>
-
 <info-popup [body]="invalidFormText"></info-popup>
 
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
-
-<confirm-popup #confirmDoneReceiptPopup (onSubmit)="confirmDoneReceiptPopup.hide();submitClick('done')"
-    [labelConfirm]="'Yes'" labelCancel="No"
-    body="Noted: After you save the receipt, you can not edit. Are you sure do this action?" iconConfirm="la la-save">
-</confirm-popup>
+<ng-template inject></ng-template>

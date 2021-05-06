@@ -15,8 +15,10 @@ import { takeUntil } from "rxjs/operators";
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
-    
-    debitList$: Observable<ReceiptInvoiceModel[]>; 
+
+    debitList$: Observable<ReceiptInvoiceModel[]>;
+    selectedIndexItem: number;
+
     constructor(
         private _store: Store<IReceiptState>
     ) {
@@ -53,22 +55,22 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             });
     }
 
-    onCheckChange(){
-        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((x : ReceiptInvoiceModel[]) => {
-            this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
-        });
-    }
-
-    removeListItem() {
+    onCheckChange() {
         this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
-                const removeList = x.filter((item: ReceiptInvoiceModel) => item.isSelected);
-                if (removeList.length > 0) {
-                    for (let i = 0; i < removeList.length; i++) {
-                        this._store.dispatch(RemoveInvoice({ index: i }));
-                    }
-                }
-            }).unsubscribe();
+                this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
+            });
+    }
+
+    confirmDeleteInvoiceItem(index: number) {
+        this.selectedIndexItem = index;
+    }
+
+    onDeleteInvoiceItem() {
+        if (this.selectedIndexItem === undefined) {
+            return;
+        }
+        this._store.dispatch(RemoveInvoice({ index: this.selectedIndexItem }));
+
     }
 }

@@ -4,11 +4,10 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { Observable } from 'rxjs';
 import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
-import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError, takeUntil } from 'rxjs/operators';
+import { finalize, catchError, takeUntil, pluck } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
@@ -76,12 +75,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this._activedRoute.queryParams.subscribe((param: any) => {
-            if (!!param) {
-                this.type = param.type;
-                this.getCustomer(this.type);
-            }
-        })
+        this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
+
         this.initForm();
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
@@ -118,15 +113,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.dateType = this.formSearch.controls['dateType'];
         this.service = this.formSearch.controls['service'];
         this.partnerId = this.formSearch.controls['partnerId'];
-    }
-
-    getCustomer(type: string) {
-        if (type === 'Customer') {
-            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER);
-        }
-        else {
-            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT);
-        }
     }
 
     onSelectDataFormInfo(data: any) {
@@ -268,7 +254,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     removeAllChecked() {
         this.checkAll = false;
     }
-
 }
 
 interface IAcctCustomerDebitCredit {
