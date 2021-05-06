@@ -1336,6 +1336,82 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
+        public AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var data = new AgencyDebitCreditDetailModel();
+
+        }
+
+        #region Agency credit notes
+        private IQueryable<CustomerDebitCreditModel> GetCreditNoteForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var expQuery = CreditNoteExpressionQuery(criteria);
+            var creditNotes = cdNoteRepository.Get(expQuery);
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
+            var query = from credit in creditNotes
+                        join sur in surcharges on credit.Code equals sur.CreditNo
+                        select new { credit, sur };
+            var grpCreditNoteCharge = query.GroupBy(g =>  ).Select(s => new { CreditNote = s.Key, Surcharge = s.Select(se => se.sur) });
+            var data = grpCreditNoteCharge.Select(se => new CustomerDebitCreditModel
+            {
+                RefNo = se.CreditNote.Code,
+                Type = "Credit",
+                InvoiceNo = null,
+                InvoiceDate = null,
+                PartnerId = se.CreditNote.PartnerId,
+                CurrencyId = se.CreditNote.CurrencyId,
+                Amount = se.CreditNote.Total,
+                UnpaidAmount = se.CreditNote.Total,
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                PaymentTerm = null,
+                DueDate = null,
+                PaymentStatus = null,
+                DepartmentId = se.CreditNote.DepartmentId,
+                OfficeId = se.CreditNote.OfficeId,
+                CompanyId = se.CreditNote.CompanyId,
+                RefIds = new List<string> { se.CreditNote.Id.ToString() }
+            });
+            var joinData = from inv in data
+                           join par in partners on inv.PartnerId equals par.Id into parGrp
+                           from par in parGrp.DefaultIfEmpty()
+                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
+                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           from ofi in ofiGrp.DefaultIfEmpty()
+                           select new CustomerDebitCreditModel
+                           {
+                               RefNo = inv.RefNo,
+                               Type = inv.Type,
+                               InvoiceNo = inv.InvoiceNo,
+                               InvoiceDate = inv.InvoiceDate,
+                               PartnerId = inv.PartnerId,
+                               PartnerName = par.ShortName,
+                               TaxCode = par.TaxCode,
+                               CurrencyId = inv.CurrencyId,
+                               Amount = inv.Amount,
+                               UnpaidAmount = inv.UnpaidAmount,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaymentTerm = inv.PaymentTerm,
+                               DueDate = inv.DueDate,
+                               PaymentStatus = inv.PaymentStatus,
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               OfficeId = inv.OfficeId,
+                               OfficeName = ofi != null ? ofi.ShortName : null,
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               CreditType = "CREDITNOTE"
+                           };
+            return joinData;
+        }
+
+        #endregion
 
         private Expression<Func<AccAccountingManagement, bool>> InvoiceExpressionQuery(CustomerDebitCreditCriteria criteria, string type)
         {
