@@ -309,15 +309,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.confirmPopup.hide();
         this.receiptDebitList.removeListItem();
         this.receiptCreditList.removeListItem();
+        this.caculatorAmountFromDebitList();
     }
 
     insertAdvanceRowData() {
-        const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
-            typeInvoice: 'ADV',
-            paidAmountVnd: 0,
-            paidAmountUsd: 0
-        });
-        this._store.dispatch(InsertAdvance({ data: newInvoiceWithAdv }));
+        const newInvoiceWithAdv: any = {};
+        newInvoiceWithAdv.typeInvoice = 'ADV';
+        newInvoiceWithAdv.type = 'ADV';
+        newInvoiceWithAdv.paidAmountVnd = 0;
+        newInvoiceWithAdv.paidAmountUsd = 0;
+        const data = newInvoiceWithAdv as ReceiptInvoiceModel;
+        this._store.dispatch(InsertAdvance({ data: data }));
 
         ///this.invoices.push(newInvoiceWithAdv);
     }

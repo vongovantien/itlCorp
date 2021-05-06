@@ -15,15 +15,20 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-
-                            <ng-container *ngIf="receiptDetail?.status === 'Done'">
-
-                                <app-permission-button title="Sync to Accountant" type="sync" class="info"
-                                    icon="la la-cloud-upload" (onClick)="confirmSyncReceiptPopup.show()">
+                            <ng-container *ngIf="receiptDetail?.status !== 'Done' || receiptDetail?.status !== 'Synced'">
+                                <app-permission-button title="Get Debit" class="info" [icon]="'la la-search'" (onClick)="getDebit()">
                                 </app-permission-button>
-
                             </ng-container>
-
+                            <ng-container *ngIf="receiptDetail?.status === 'Done'">
+                                <app-permission-button title="Sync to Accountant" type="sync" class="info" icon="la la-cloud-upload"
+                                    (onClick)="confirmSyncReceiptPopup.show()">
+                                </app-permission-button>
+                        
+                            </ng-container>
+                            <ng-container>
+                                <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
+                                </app-default-button>
+                            </ng-container>
                         </div>
                     </div>
                 </div>
@@ -46,20 +51,22 @@
                 <div></div> -->
                 <div class="c-button-actions text-center">
                     <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
-                        (onClick)="submitClick('draft')">
+                        (onClick)="submitClick('update')">
                     </app-permission-button>
                     <app-permission-button type="save" title="Done" class="success"
                                     (onClick)="confirmDoneReceiptPopup.show()">
                                 </app-permission-button>
-                    <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="gotoList()">
-                    </app-default-button>
+                    
+                    <app-permission-button title="Cancel Receipt" type="reject" class="danger"
+                                    icon="la la-times" (onClick)="submitClick('cancel')">
+                    </app-permission-button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-
+<customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>
 <info-popup [body]="invalidFormText"></info-popup>
 
 <confirm-popup #confirmCancelPopup body="Do you want to exit without saving?"

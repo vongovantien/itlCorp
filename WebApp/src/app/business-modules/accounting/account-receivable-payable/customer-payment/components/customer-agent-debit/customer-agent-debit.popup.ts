@@ -38,7 +38,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
 
     formSearch: FormGroup;
-    searchOptions: string[] = ['Soa', 'Debit Note/Invoice', 'VAT Invoice', 'Job No', 'HBL', 'MBL', 'Customs No'];
+    searchOptions: string[] = ['SOA', 'Debit Note/Invoice', 'VAT Invoice', 'JOB NO', 'HBL', 'MBL', 'Customs No'];
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
 
     listDebit: ReceiptInvoiceModel[] = [];
@@ -229,7 +229,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         if (this.customerFromReceipt !== this.partnerId.value) {
             this.listDebit = [];
         }
-        if (!!this.dateFromReceipt) {
+        if (!!this.dateFromReceipt && !!this.dateFromReceipt.startDate) {
             this.date.setValue({ startDate: new Date(this.dateFromReceipt.startDate), endDate: new Date(this.dateFromReceipt.endDate) });
         }
         if (!!this.customerFromReceipt) {

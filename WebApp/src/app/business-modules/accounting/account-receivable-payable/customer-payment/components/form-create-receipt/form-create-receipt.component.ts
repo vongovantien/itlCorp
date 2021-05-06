@@ -7,26 +7,21 @@ import { ToastrService } from 'ngx-toastr';
 import { JobConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Partner, ReceiptInvoiceModel, } from '@models';
-import { CatalogueRepo, SystemRepo, AccountingRepo } from '@repositories';
+import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { IAppState } from '@store';
 import { AppForm } from '@app';
 import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
 
-import { GetInvoiceListSuccess, GetInvoiceList } from '../../store/actions';
 import { Observable } from 'rxjs';
-import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { takeUntil } from 'rxjs/operators';
-import { ReceiptDebitListState } from '../../store/reducers';
 @Component({
     selector: 'customer-payment-form-create-receipt',
     templateUrl: './form-create-receipt.component.html',
 })
 export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm implements OnInit {
-    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
-    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
 
 
     formSearchInvoice: FormGroup;
@@ -94,7 +89,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         );
     }
 
-    getContract(){
+    getContract() {
         this._catalogueRepo.getAgreement(
             <IQueryAgreementCriteria>{
                 partnerId: this.customerId.value, status: true
@@ -129,7 +124,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                 this.agreements = d || [];
                                 if (!!this.agreements.length) {
                                     this.agreementId.setValue(d[0].id);
-                                    
+
 
                                     this.onSelectDataFormInfo(d[0], 'agreement');
                                 } else {
@@ -150,27 +145,18 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         }
     }
 
-    getDebit() {
-        this.debitPopup.show();
-        this.debitPopup.customerFromReceipt = this.customerId.value;
-        this.debitPopup.dateFromReceipt = this.date.value;
-        if (!this.debitPopup.partnerId.value) {
-            this.debitPopup.setDefaultValue();
-        }
-    }
 
-    addToReceipt($event: any) {
+    getPartnerOnForm($event: any) {
         const partnerId = $event;
         if (!!partnerId) {
             this.$customers.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: Partner[]) =>{
-                const partner = x.filter((x: Partner) => x.id === partnerId).shift();
-                if(!!partner){
-                    this.onSelectDataFormInfo(partner, 'partner');
-                }
-            })
+                .subscribe((x: Partner[]) => {
+                    const partner = x.filter((x: Partner) => x.id === partnerId).shift();
+                    if (!!partner) {
+                        this.onSelectDataFormInfo(partner, 'partner');
+                    }
+                })
         }
-        this.onRequest.emit(true);
     }
 
 }

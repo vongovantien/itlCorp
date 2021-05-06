@@ -32,7 +32,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
         creditList: [...payload.invoices.filter(x => x.type === 'Credit'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.type === 'Debit' || x.type === 'OBH'), ...state.debitList]
+        debitList: [...payload.invoices.filter(x => x.type === 'Debit' || x.type === 'OBH' || x.type === 'ADV'), ...state.debitList]
     })),
     on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, creditList: [], debitList: [] })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
@@ -47,12 +47,14 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
         if(payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0){
-            const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
+            const newInvoiceWithAdv: any = {
                 typeInvoice: 'ADV',
+                type: 'ADV',
                 paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                 paidAmountUsd: payload.data.cusAdvanceAmountUsd
-            });
-            return { ...state, debitList: [ ...payload.data.invoices, newInvoiceWithAdv]};
+            };
+            const advData = newInvoiceWithAdv as ReceiptInvoiceModel;
+            return { ...state, debitList: [ ...payload.data.invoices, advData]};
         }
         return {...state, debitList: [...payload.data.invoices] }// TODO implement
     })
