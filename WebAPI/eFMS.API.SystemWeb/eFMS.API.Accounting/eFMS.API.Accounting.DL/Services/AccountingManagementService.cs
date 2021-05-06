@@ -15,12 +15,10 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -2461,23 +2459,11 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public HandleState CalculatorReceivableAcctMngt(Guid acctId)
         {
-            var hs = new HandleState();
             //Get list charge of Accounting Management
             var surcharges = surchargeRepo.Get(x => x.AcctManagementId == acctId || x.PayerAcctManagementId == acctId);
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-
-            //Tính công nợ cho từng Partner, Service, Office có trong Invoice
-            /*foreach (var objectReceivable in objectReceivablesModel)
-            {
-                if (!string.IsNullOrEmpty(objectReceivable.PartnerId) 
-                    && objectReceivable.Office != null 
-                    && objectReceivable.Office != Guid.Empty 
-                    && !string.IsNullOrEmpty(objectReceivable.Service))
-                {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
-                }
-            }*/
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            //Tính công nợ cho Partner, Service, Office có trong Invoice
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return hs;
         }
         #endregion --- Calculator Receivable Accounting Management ---

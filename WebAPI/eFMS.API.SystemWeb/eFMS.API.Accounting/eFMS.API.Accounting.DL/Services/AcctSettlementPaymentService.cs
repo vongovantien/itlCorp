@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -5209,23 +5208,11 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public HandleState CalculatorReceivableSettlement(string settlementCode)
         {
-            var hs = new HandleState();
             //Get list charge by SettlementCode
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode);
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-
-            //Tính công nợ cho từng Partner, Service, Office có trong charge của Settlement
-            /*foreach (var objectReceivable in objectReceivablesModel)
-            {
-                if (!string.IsNullOrEmpty(objectReceivable.PartnerId)
-                    && objectReceivable.Office != null
-                    && objectReceivable.Office != Guid.Empty
-                    && !string.IsNullOrEmpty(objectReceivable.Service))
-                {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
-                }
-            }*/
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            //Tính công nợ cho Partner, Service, Office có trong charge của Settlement
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return hs;
         }
         #endregion --- Calculator Receivable Settlement ---

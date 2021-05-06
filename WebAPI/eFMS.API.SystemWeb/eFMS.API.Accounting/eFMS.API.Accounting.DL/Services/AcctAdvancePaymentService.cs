@@ -21,7 +21,6 @@ using eFMS.API.Accounting.DL.Models.ExportResults;
 using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
 using eFMS.API.Common.Helpers;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -3961,24 +3960,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
         {
-            var hs = new HandleState();
             var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
             //Get list charge of by hblid
             var surcharges = csShipmentSurchargeRepo.Get(x => hblIds.Any(a => a == x.Hblid));
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-
-            //Tính công nợ cho từng Partner, Service, Office có trong Advance
-            /*foreach (var objectReceivable in objectReceivablesModel)
-            {
-                if (!string.IsNullOrEmpty(objectReceivable.PartnerId)
-                    && objectReceivable.Office != null
-                    && objectReceivable.Office != Guid.Empty
-                    && !string.IsNullOrEmpty(objectReceivable.Service))
-                {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
-                }
-            }*/
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            //Tính công nợ Partner, Service, Office có trong Advance
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return hs;
         }
         #endregion --- Calculator Receivable Advance ---

@@ -24,7 +24,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -3097,23 +3096,11 @@ namespace eFMS.API.Accounting.DL.Services
         #region --- Calculator Receivable SOA ---
         public HandleState CalculatorReceivableSoa(string soaNo)
         {
-            var hs = new HandleState();
             //Get list charge of by Soa No
             var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
-
-            //Tính công nợ cho từng Partner, Service, Office có trong list charge của SOA
-            /*foreach (var objectReceivable in objectReceivablesModel)
-            {
-                if (!string.IsNullOrEmpty(objectReceivable.PartnerId)
-                    && objectReceivable.Office != null
-                    && objectReceivable.Office != Guid.Empty
-                    && !string.IsNullOrEmpty(objectReceivable.Service))
-                {
-                    hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivable);
-                }
-            }*/
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            //Tính công nợ từng Partner, Service, Office có trong list charge của SOA
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return hs;
         }
         #endregion --- Calculator Receivable SOA ---
