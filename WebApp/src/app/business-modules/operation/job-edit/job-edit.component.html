@@ -127,7 +127,7 @@
                         </ng-container>
                     </tab>
                     <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')"
-                        [disabled]="isDuplicate">
+                        [disabled]="isDuplicate" [active]="tab === 'cre-debit-note'">
                         <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
                         </ng-container>
                     </tab>

@@ -1500,7 +1500,7 @@ namespace eFMS.API.Accounting.DL.Services
             return customerName;
         }
 
-        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
@@ -1546,7 +1546,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     prefixService += "sea-lcl-import";
                 }
-                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE&view={2}&export={3}", prefixService, jobId.ToString(), cdNoteNo, currency);
             }
             return _link;
         }
@@ -2023,7 +2023,7 @@ namespace eFMS.API.Accounting.DL.Services
                         serviceName = GetServiceNameOfCdNote(creditNote.Code);
                         var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == creditNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
-                        urlFunc = GetLinkCdNote(creditNote.Code, creditNote.JobId);
+                        urlFunc = GetLinkCdNote(creditNote.Code, creditNote.JobId, creditNote.CurrencyId);
 
                         catagory = "CDNOTE_CREDIT";
                         var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(creditNote.UserCreated);
@@ -2103,7 +2103,7 @@ namespace eFMS.API.Accounting.DL.Services
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
                         var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
-                        urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
+                        urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId, debitNote.CurrencyId);
 
                         catagory = "CDNOTE_" + debitNote.Type;
                         var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(debitNote.UserCreated);

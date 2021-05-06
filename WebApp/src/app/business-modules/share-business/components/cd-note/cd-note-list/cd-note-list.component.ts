@@ -61,18 +61,25 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     ngOnInit(): void {
         combineLatest([
             this._activedRouter.params,
-            this._activedRouter.data
+            this._activedRouter.queryParams
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
-            take(1)
         ).subscribe(
             (params: any) => {
                 const jobId = params.id || params.jobId;
                 console.log(jobId);
-                if (jobId) {
+                const cdNo = params.view;
+                const currencyId = params.export;
+                if (!!cdNo && !!currencyId) {
                     this.transactionType = +params.transactionType || 0;
                     this.idMasterBill = jobId;
-                    this.getListCdNote(this.idMasterBill);
+                    this.getListCdNoteWithPreview(this.idMasterBill, cdNo, currencyId)
+                } else {
+                    if (jobId) {
+                        this.transactionType = +params.transactionType || 0;
+                        this.idMasterBill = jobId;
+                        this.getListCdNote(this.idMasterBill);
+                    }
                 }
             }
         );
@@ -129,6 +136,41 @@ export class ShareBussinessCdNoteListComponent extends AppList {
                             Object.assign(item, selected);
                         });
                     });
+                },
+            );
+    }
+
+    getListCdNoteWithPreview(id: string, cdNo: string, currencyId: string) {
+        this.isLoading = true;
+        const isShipmentOperation = false;
+        this._documentationRepo.getListCDNote(id, isShipmentOperation)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.cdNoteGroups = res;
+                    this.initGroup = res;
+                    const selected = { isSelected: false };
+                    this.cdNoteGroups.forEach(element => {
+                        element.listCDNote.forEach((item: any[]) => {
+                            Object.assign(item, selected);
+                        });
+                    });
+                    let isExist = false;
+                    this.cdNoteGroups.forEach(element => {
+                        const item = element.listCDNote.filter(cdNote => cdNote.code === cdNo);
+                        if (item.length > 0) {
+                            isExist = true;
+                            element.listCDNote.filter(cdNote => cdNote.code === cdNo).map(cdNote => cdNote.isSelected = true);
+                            this.transactionType = item.transactionTypeEnum;
+                            this.previewCdNote(currencyId);
+                        }
+                    }
+                    );
+                    if (!isExist) {
+                        this._toastService.error("CD Note " + cdNo + "does not existed!");
+                    }
                 },
             );
     }
