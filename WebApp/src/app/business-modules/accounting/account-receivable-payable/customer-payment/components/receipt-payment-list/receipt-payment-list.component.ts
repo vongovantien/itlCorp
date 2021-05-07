@@ -362,7 +362,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
         const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
         const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        console.log('finalPaidAmountUSD', amountUSD + paidAmountUSD)
         this.finalPaidAmountUSD.setValue(((cusAdvanceAmount / exChangeRateUSD)) + (amountUSD) + (paidAmountUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
@@ -389,8 +388,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
 
-        this.amountUSD.setValue(this.formatNumberCurrency(valueUSD, 2));
-        this.amountVND.setValue(this.formatNumberCurrency(valueVND, 2));
+        this.amountUSD.setValue(valueUSD);
+        this.amountVND.setValue(valueVND);
 
         this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
         this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 2));

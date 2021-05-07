@@ -118,6 +118,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
+        receiptModel.payments = this.paymentList;
         this.onSaveDataReceipt(receiptModel, action);
     }
 
