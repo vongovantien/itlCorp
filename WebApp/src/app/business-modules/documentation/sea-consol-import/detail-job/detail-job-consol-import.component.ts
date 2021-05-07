@@ -21,6 +21,7 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -212,6 +213,11 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formCreate.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );
