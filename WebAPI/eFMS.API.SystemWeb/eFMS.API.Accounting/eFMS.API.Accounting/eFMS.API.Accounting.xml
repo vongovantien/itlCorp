@@ -532,6 +532,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueAgencyPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
             <summary>
             A base class for an MVC controller without view support.

@@ -290,5 +290,16 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctReceiptService.GetDataIssueCustomerPayment(criteria);
             return Ok(result);
         }
+        /// <summary>
+        /// Get Data Issue Customer Payment
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataIssueAgencyPayment")]
+        public IActionResult GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var result = acctReceiptService.GetDataIssueAgencyPayment(criteria);
+            return Ok(result);
+        }
     }
 }
