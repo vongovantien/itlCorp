@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 
 import { Customer, User } from '@models';
 import { SystemRepo, CatalogueRepo } from '@repositories';
-import { JobConstants } from '@constants';
+import { JobConstants, SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
 import { AppForm } from 'src/app/app.form';
@@ -133,11 +133,11 @@ export class JobManagementFormSearchComponent extends AppForm {
     searchShipment() {
         const body: ISearchDataShipment = {
             all: null,
-            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            mblno: this.filterType.value.value === 'mblno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            clearanceNo: this.filterType.value.value === 'clearanceNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            creditDebitInvoice: this.filterType.value.value === 'creditDebitInvoice' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            mblno: this.filterType.value.value === 'mblno' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            clearanceNo: this.filterType.value.value === 'clearanceNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            creditDebitInvoice: this.filterType.value.value === 'creditDebitInvoice' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
             productService: !!this.productService.value ? this.productService.value.id : null,
             serviceMode: !!this.serviceMode.value ? this.serviceMode.value.id : null,
             shipmentMode: !!this.shipmentMode.value ? this.shipmentMode.value.id : null,
