@@ -428,19 +428,19 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.totalAmountVnd = (this.formatNumberCurrency(totalAmountVnd) + ' = ' + this.formatNumberCurrency(netAmountVND) + ' + ' + this.formatNumberCurrency(vatAmountVND));
     }
 
-    // onBlurAnyCharge(e: any, hblId: string) {
-    //     this.updateForChargerByFieldName(e.target.name, e.target.value, hblId);
-    // }
+    onBlurAnyCharge(e: any, hblId: string) {
+        this.updateForChargerByFieldName(e.target.name, e.target.value, hblId);
+    }
 
-    // updateForChargerByFieldName(field: string, value: string, hblId: string) {
-    //     this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
-    //         shipment.chargeSettlements.forEach(ele => {
-    //             if (ele[field] === null || ele[field] === "") {
-    //                 ele[field] = value;
-    //             }
-    //         });
-    //     });
-    // }
+    updateForChargerByFieldName(field: string, value: string, hblId: string) {
+        this.shipments.filter((shipment: any) => shipment.hblId === hblId).map((shipment: any) => {
+            shipment.chargeSettlements.forEach(ele => {
+                if (ele[field] === null || ele[field] === "") {
+                    ele[field] = value;
+                }
+            });
+        });
+    }
 
     onBlurAmountCharge(event: any, hblId: string) {
         if (event.target.name === 'amount') {
