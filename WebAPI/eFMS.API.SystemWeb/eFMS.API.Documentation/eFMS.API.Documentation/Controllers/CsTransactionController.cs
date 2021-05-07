@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -218,6 +219,12 @@ namespace eFMS.API.Documentation.Controllers
             if (checkExistMessage.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
+            }
+
+            string msgCheckUpdateEtdEta = CheckUpdateEtdEta(model, out string  type);
+            if(msgCheckUpdateEtdEta.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateEtdEta, Data = new { errorCode = type } });
             }
 
             string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
@@ -659,6 +666,40 @@ namespace eFMS.API.Documentation.Controllers
                 errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(", ", advs.ToArray()));
             }
 
+            return errorMsg;
+        }
+
+        private string CheckUpdateEtdEta(CsTransactionEditModel model, out string type)
+        {
+            string errorMsg = string.Empty;
+            string _typeError = string.Empty;
+            var currentJob = csTransactionService.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            switch (model.TransactionTypeEnum)
+            {
+                case TransactionTypeEnum.SeaFCLImport:
+                case TransactionTypeEnum.SeaLCLImport:
+                case TransactionTypeEnum.SeaConsolImport:
+                case TransactionTypeEnum.AirImport:
+                    if (model.Eta.HasValue)
+                    {
+                        _typeError = "eta";
+                        errorMsg = model.Eta.Value.Month != currentJob.Eta.Value.Month ? stringLocalizer[DocumentationLanguageSub.MSG_ETA_CANNOT_CHANGE_MONTH].Value : errorMsg;
+                    }
+                    break;
+                case TransactionTypeEnum.SeaFCLExport:
+                case TransactionTypeEnum.SeaLCLExport:
+                case TransactionTypeEnum.SeaConsolExport:
+                case TransactionTypeEnum.AirExport:
+                    if (model.Etd.HasValue)
+                    {
+                        _typeError = "etd";
+                        errorMsg = model.Etd.Value.Month != currentJob.Etd.Value.Month ? stringLocalizer[DocumentationLanguageSub.MSG_ETD_CANNOT_CHANGE_MONTH].Value : errorMsg;
+                    }
+                    break;
+            }
+
+            type = _typeError;
             return errorMsg;
         }
         #endregion -- METHOD PRIVATE --
