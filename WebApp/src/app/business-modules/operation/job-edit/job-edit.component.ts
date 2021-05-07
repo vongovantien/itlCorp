@@ -26,6 +26,7 @@ import * as fromShareBussiness from './../../share-business/store';
 
 import _groupBy from 'lodash/groupBy';
 import isUUID from 'validator/lib/isUUID';
+import { HttpErrorResponse } from '@angular/common/http';
 @Component({
     selector: 'app-ops-module-billing-job-edit',
     templateUrl: './job-edit.component.html',
@@ -330,6 +331,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                         } else {
                             this._toastService.warning(res.message);
                         }
+                    },
+                    (error: HttpErrorResponse) => {
+                        if (error.error?.data?.errorCode) {
+                            this.editForm.formEdit.controls[error.error?.data?.errorCode].setErrors({ existed: true });
+                        }
                     }
                 );
         } else {
@@ -342,6 +348,11 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                             this.getShipmentDetails(this.opsTransaction.id);
                         } else {
                             this._toastService.warning(res.message);
+                        }
+                    },
+                    (error: HttpErrorResponse) => {
+                        if (error.error?.data?.errorCode) {
+                            this.editForm.formEdit.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                         }
                     }
                 );

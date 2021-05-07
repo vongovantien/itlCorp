@@ -19,6 +19,7 @@ import { ICanComponentDeactivate } from '@core';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -198,6 +199,11 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formGroup.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );
