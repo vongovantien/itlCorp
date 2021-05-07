@@ -20,8 +20,6 @@ using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
 using System.Globalization;
-using System.Text.RegularExpressions;
-using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -39,7 +37,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
         private string typeApproval = "Advance";
-        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         /// <summary>
         /// Contructor
@@ -48,14 +45,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        /// <param name="accAccountReceivable"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accAccountReceivable)
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
-            accAccountReceivableService = accAccountReceivable;
         }
 
         /// <summary>
@@ -74,7 +69,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
-        
+
         /// <summary>
         /// Query data
         /// </summary>
@@ -187,11 +182,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
-                // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }*/ //[31/03/2021]
+                // Tính lại công nợ sau khi Add thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -256,11 +251,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
                 // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
-                CalculatorReceivableAdvancePayment(advanceRequests);
-            }*/ //[31/03/2021]
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -389,11 +384,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
-                // Tính công nợ
-                CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }*/ //[31/03/2021]
+                // Tính công nợ sau khi Update Advance thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -417,7 +412,7 @@ namespace eFMS.API.Accounting.Controllers
             var result = acctAdvancePaymentService.Preview(advanceId);
             return Ok(result);
         }
-        
+
         /// <summary>
         /// Save and Send Request
         /// </summary>
@@ -570,10 +565,10 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
-                
-                // Tính công nợ
-               // CalculatorReceivableAdvancePayment(model.AdvanceRequests); [31/03/2021]
-                
+
+                // Tính công nợ sau khi Save & Send Request Advance thành công
+                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+
                 return Ok(result);
             }
             else
@@ -909,25 +904,6 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
-        private void CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
-        {
-            var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
-            foreach (var hblId in hblIds)
-            {
-                var surchargeIds = acctAdvancePaymentService.GetSurchargeIdByHblId(hblId);
-                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
-                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
-                foreach (var surchargeId in surchargeIds)
-                {
-                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
-                    objectReceivable.SurchargeId = surchargeId;
-                    receivableModels.Add(objectReceivable);
-                }
-                calculatorReceivable.ObjectReceivable = receivableModels;
-                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
-            }
-        }
-
         [HttpPost("PreviewMultipleAdvancePaymentByAdvanceIds")]
         [Authorize]
         public IActionResult PreviewMultipleAdvancePaymentByAdvanceIds(List<Guid> advanceIds)
@@ -943,7 +919,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             currentUser.Action = "UpdatePaymentTermAdvancePayment";
 
-            HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id,days);
+            HandleState hs = acctAdvancePaymentService.UpdatePaymentTerm(Id, days);
 
             string message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = Id };

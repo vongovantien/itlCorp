@@ -2,6 +2,7 @@
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.DL.ViewModel;
 using eFMS.API.Accounting.Service.Models;
 
 namespace eFMS.API.Accounting.Infrastructure
@@ -39,6 +40,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<CatContractModel, CatContract>();
             CreateMap<AcctReceipt, AcctReceiptModel>().ReverseMap();
             CreateMap<SysImage, SysImageModel>().ReverseMap();
+            CreateMap<AccAccountReceivable, ReceivableTable>();
 
         }
     }

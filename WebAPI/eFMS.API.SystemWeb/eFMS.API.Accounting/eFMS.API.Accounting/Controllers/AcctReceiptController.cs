@@ -188,6 +188,11 @@ namespace eFMS.API.Accounting.Controllers
             } 
             else if (saveAction == SaveAction.SAVEDONE)
             {
+                if (hs.Success)
+                {
+                    //Tính công nợ sau khi Save Done thành công
+                    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                }
                 result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
             } 
             else if (saveAction == SaveAction.SAVECANCEL)
@@ -211,7 +216,11 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveDoneReceipt(Guid receiptId)
         {
             var hs = acctReceiptService.SaveDoneReceipt(receiptId);
-
+            if (hs.Success)
+            {
+                //Tính công nợ sau khi Save Done thành công
+                acctReceiptService.CalculatorReceivableForReceipt(receiptId);
+            }
             ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
