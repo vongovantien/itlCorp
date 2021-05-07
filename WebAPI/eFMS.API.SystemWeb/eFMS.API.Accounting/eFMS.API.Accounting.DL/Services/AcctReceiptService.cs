@@ -1741,7 +1741,7 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
-                Type = "Debit",
+                Type = "DEBIT",
                 InvoiceNo = se.Invoice.InvoiceNoReal,
                 InvoiceDate = se.Invoice.Date,
                 PartnerId = se.Invoice.PartnerId,
@@ -1890,7 +1890,7 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpSoaCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.Soa.Soano,
-                Type = "Credit",
+                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.Soa.Customer,
@@ -1963,7 +1963,7 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpCreditNoteCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.CreditNote.Code,
-                Type = "Credit",
+                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.CreditNote.PartnerId,

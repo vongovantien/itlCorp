@@ -109,11 +109,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Debit' || x.type === 'OBH').length === 0) {
+        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0) {
             this._toastService.warning("You can't save without debit in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Credit' && !x.invoiceNo).length > 0) {
+        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'CREDIT' && !x.invoiceNo).length > 0) {
             this._toastService.warning("Please select invoice no!");
             return;
         }
@@ -164,6 +164,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 }
             )
     };
+
+    caculateReceipt(onChange: boolean){
+        if(onchange){
+            this.listInvoice.caculateAmountFromDebitList();
+        }
+    }
 
     gotoList() {
         this._store.dispatch(ResetInvoiceList());

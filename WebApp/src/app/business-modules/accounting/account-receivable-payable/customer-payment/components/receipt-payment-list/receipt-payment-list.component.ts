@@ -296,7 +296,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     removeReceiptItem() {
         this.confirmPopup.hide();
-        this.caculatorAmountFromDebitList();
+        this.caculateAmountFromDebitList();
     }
 
     insertAdvanceRowData() {
@@ -372,7 +372,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
 
-    caculatorAmountFromDebitList() {
+    caculateAmountFromDebitList() {
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList = this._store.select(ReceiptDebitListState);
 

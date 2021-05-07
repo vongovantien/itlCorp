@@ -98,7 +98,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.customerInfo as any) = { id: res.customerId };
-        this.listInvoice.caculatorAmountFromDebitList();
+        this.listInvoice.caculateAmountFromDebitList();
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -25,7 +25,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
     @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
-
+    @Output() onChangeReceipt: EventEmitter<boolean> = new EventEmitter<boolean>();
+    
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
     date: AbstractControl;
@@ -188,6 +189,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         const partnerId = $event;
         if (!!partnerId) {
             this.getPartnerOnForm(partnerId);
+            this.onChangeReceipt.emit(true);
             // this.listInvoice.caculatorAmountFromDebitList();
         }
     }
