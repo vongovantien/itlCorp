@@ -449,7 +449,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
                     payment.CreditType = acctPayment.Type;
-                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "Credit" : acctPayment.Type;
+                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "CREDITSOA") ? "CREDIT" : acctPayment.Type;
                     payment.CurrencyId = acctPayment.CurrencyId;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
@@ -635,7 +635,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 _payment.InvoiceNo = payment.InvoiceNo;
 
-                if (payment.Type == "Credit")
+                if (payment.Type == "CREDIT")
                 {
                     _payment.Type = payment.CreditType;
                 }
@@ -816,7 +816,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 switch (payment.Type)
                 {
-                    case "Debit":
+                    case "DEBIT":
                         // Tổng thu của invoice bao gôm VND/USD. 
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
@@ -883,7 +883,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
                         break;
-                    case "Credit":
+                    case "CREDIT":
                         if (payment.Type == "CREDITNOTE")
                         {
                             IQueryable<AcctCdnote> credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
@@ -904,7 +904,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 cdNoteRepository.SubmitChanges();
                             }
                         }
-                        if (payment.Type == "SOA")
+                        if (payment.Type == "CREDITSOA")
                         {
                             IQueryable<AcctSoa> soas = soaRepository.Get(x => payment.RefId.Contains(x.Id));
                             if (soas != null && soas.Count() > 0)
@@ -1890,7 +1890,7 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpSoaCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.Soa.Soano,
-                Type = "Credit",
+                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.Soa.Customer,
@@ -1937,7 +1937,7 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "SOA"
+                               CreditType = "CREDITSOA"
                            };
             return joinData;
         }
@@ -1963,7 +1963,7 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpCreditNoteCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.CreditNote.Code,
-                Type = "Credit",
+                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.CreditNote.PartnerId,
