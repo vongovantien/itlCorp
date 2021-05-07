@@ -437,8 +437,34 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.chargeSettlements.forEach(ele => {
                 if (ele[field] === null || ele[field] === "") {
                     ele[field] = value;
+                    if(field === 'invoiceNo'){
+                        this.onChangeInvoiceNo(ele, value);
+                    }
                 }
             });
+        });
+    }
+
+    onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
+        if (!!invNo) {
+            const payeeId = chargeItem.type === 'OBH' ? chargeItem.payerId : chargeItem.paymentObjectId;
+            const partner = this.getPartnerById(payeeId);
+            chargeItem.vatPartnerId = partner.id;
+            chargeItem.vatPartnerShortName = partner.shortName;
+        }else{
+            chargeItem.vatPartnerId = null;
+            chargeItem.vatPartnerShortName = null;
+        }
+    }
+
+    getInvoiceAndVatPartner(){
+        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+            shipment.chargeSettlements.forEach((charge: Surcharge)=>
+            {
+                if(!!charge.invoiceNo && !charge.vatPartnerId){
+                    this.onChangeInvoiceNo(charge, charge.invoiceNo);
+                }
+            })
         });
     }
 
@@ -521,7 +547,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.searchWithSOAOrCDNote(body);
         } else {
             if (!this.selectedPartnerData) {
-                return
+                return;
             }
             this._accoutingRepo.getExistingCharge(body)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
@@ -541,6 +567,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                             });
                             this.checkedAllCharges();
                             this.getVatpartnerDataSource();
+                            this.getInvoiceAndVatPartner();
                             this.orgChargeShipment = cloneDeep(res);
                             this.isSubmitted = false;
                         }
@@ -594,6 +621,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                             });
                             this.checkedAllCharges();
                             this.getVatpartnerDataSource();
+                            this.getInvoiceAndVatPartner();
                             this.isSubmitted = false;
                         }
                     }
@@ -624,6 +652,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                             });
                             this.checkedAllCharges();
                             this.getVatpartnerDataSource();
+                            this.getInvoiceAndVatPartner();
                             this.isSubmitted = false;
                         }
                     }
@@ -671,18 +700,6 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.onRequest.emit(this.selectedCharge);
             this.selectedCharge = [];
             this.closePopup();
-        }
-    }
-
-    onChangeInvoiceNo(chargeItem: Surcharge, invNo: string) {
-        if (!!invNo) {
-            const payeeId = chargeItem.type === 'OBH' ? chargeItem.payerId : chargeItem.paymentObjectId;
-            const partner = this.getPartnerById(payeeId);
-            chargeItem.vatPartnerId = partner.id;
-            chargeItem.vatPartnerShortName = partner.shortName;
-        }else{
-            chargeItem.vatPartnerId = null;
-            chargeItem.vatPartnerShortName = null;
         }
     }
 
