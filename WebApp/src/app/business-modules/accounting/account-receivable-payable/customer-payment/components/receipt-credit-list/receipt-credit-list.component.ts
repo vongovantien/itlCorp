@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChildren, QueryList } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
@@ -16,7 +16,8 @@ import { AppComboGridComponent } from "@common";
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
-
+    @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
+    
     @Input() set type(t: string) {
         if (!!t) {
             this._type = t;
@@ -166,6 +167,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             return;
         }
         this._store.dispatch(RemoveCredit({ index: this.selectedIndexInvoice }));
-
+        this.onChangeCredit.emit(true);
     }
 }

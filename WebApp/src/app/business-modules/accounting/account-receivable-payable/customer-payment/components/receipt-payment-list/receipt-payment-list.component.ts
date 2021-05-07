@@ -11,13 +11,12 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
-import { ConfirmPopupComponent } from '@common';
 import { cloneDeep, isNumber } from 'lodash';
 
 @Component({
@@ -29,7 +28,6 @@ import { cloneDeep, isNumber } from 'lodash';
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
-    @ViewChild("confirmRemove") confirmPopup: ConfirmPopupComponent;
 
     @Input() syncInfoTemplate: TemplateRef<any>
 
@@ -290,13 +288,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         }
     }
 
-    showConfirmPopup() {
-        this.confirmPopup.show();
-    }
-
-    removeReceiptItem() {
-        this.confirmPopup.hide();
-        this.caculateAmountFromDebitList();
+    getListReceiptChange(onChange: boolean){
+        if(onChange){
+            this.caculateAmountFromDebitList();
+        }
     }
 
     insertAdvanceRowData() {
@@ -394,8 +389,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
 
-        this.amountUSD.setValue(paidUSD);
-        this.amountVND.setValue(paidVND);
+        this.amountUSD.setValue(this.formatNumberCurrency(valueUSD, 2));
+        this.amountVND.setValue(this.formatNumberCurrency(valueVND, 2));
 
         this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
         this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 2));
