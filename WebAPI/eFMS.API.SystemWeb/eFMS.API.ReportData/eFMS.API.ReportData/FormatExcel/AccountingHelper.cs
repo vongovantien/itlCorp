@@ -27,6 +27,16 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
 
         const string decimalFormat = "#,##0.00";
+
+        /// <summary>
+        /// Get folder contain settlement payment template excel
+        /// </summary>
+        /// <returns></returns>
+        private string GetSettleExcelFolder()
+        {
+            return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.SettlementPath);
+        }
+
         /// <summary>
         /// Generate advance payment excel
         /// </summary>
@@ -3191,6 +3201,78 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
 
+        /// <summary>
+        /// Generate data to Export General Preview in Settlement detail
+        /// </summary>
+        /// <param name="settlementExport"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream GenerateExportGeneralSettlementPayment(InfoSettlementExport settlementExport, string fileName)
+        {
+            try
+            {
+                var folderOfFile = GetSettleExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                var listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("SettlementNo", settlementExport.SettlementNo);
+                listKeyData.Add("RequestDate", settlementExport.RequestDate);
+                listKeyData.Add("Requester", settlementExport.Requester);
+                listKeyData.Add("Department", settlementExport.Department);
+                listKeyData.Add("PayeeName", settlementExport.PayeeName);
+                listKeyData.Add("PaymentMethod", settlementExport.PaymentMethod);
+                listKeyData.Add("BankName", "Bank (Tên Ngân hàng): " + settlementExport.BankName);
+                listKeyData.Add("BankAccountNo", "Acc No (số TK): " + settlementExport.BankAccountNo);
+                listKeyData.Add("BeneficiaryName", "Beneficiary (Tên người thụ hưởng): " + settlementExport.BankAccountName);
+                excel.SetData(listKeyData);
+                //Set format amount
+                var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
+                var formatAmountUSD = "_([$USD] * #,##0.00_);_([$USD] * (#,##0.00);_([$USD] * \"\"??_);_(@_)";
+                var listKeyFormat = new List<string>();
+                if (settlementExport.SettlementCurrency == "VND")
+                {
+                    listKeyFormat.Add("SettlementAmount");
+                    listKeyFormat.Add("SettlementAmountSum");
+                    listKeyFormat.Add("SettlementAmountVND");
+                    listKeyFormat.Add("SettlementAmountTotalVND");
+                    excel.SetFormatCell(listKeyFormat, formatAmountVND);
+                }
+                else
+                {
+                    listKeyFormat.Add("SettlementAmount");
+                    listKeyFormat.Add("SettlementAmountSum");
+                    listKeyFormat.Add("SettlementAmountUSD");
+                    listKeyFormat.Add("SettlementAmountTotalUSD");
+                    excel.SetFormatCell(listKeyFormat, formatAmountUSD);
+                }
+                // footer
+                listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("SettlementAmount", settlementExport.SettlementAmount);
+                listKeyData.Add("SettlementAmountVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
+                listKeyData.Add("SettlementAmountSumVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
+                listKeyData.Add("SettlementAmountTotalVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
+                listKeyData.Add("SettlementAmountSum", settlementExport.SettlementAmount);
+                listKeyData.Add("SettlementAmountUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
+                listKeyData.Add("SettlementAmountSumUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
+                listKeyData.Add("SettlementAmountTotalUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
+
+                listKeyData.Add("AmountInWord", "In word (Thành tiền): " + settlementExport.AmountInWords);
+                listKeyData.Add("Requester", settlementExport.Requester);
+                excel.SetData(listKeyData);
+
+                excel.SetData(listKeyData);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         #endregion --- SETTLEMENT PAYMENT ---
 
         #region --- ACCOUNTING MANAGEMENT ---

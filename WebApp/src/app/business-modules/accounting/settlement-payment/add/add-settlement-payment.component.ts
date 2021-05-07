@@ -57,6 +57,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
                 const partnerId = this.requestSurchargeListComponent.surcharges[0].type === 'OBH' ? this.requestSurchargeListComponent.surcharges[0].payerId
                     : this.requestSurchargeListComponent.surcharges[0].paymentObjectId;
                 this.formCreateSurcharge.payee.setValue(partnerId);
+                this.formCreateSurcharge.getBeneficiaryInfo();
             }
         }
     }
@@ -149,6 +150,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             note: this.formCreateSurcharge.note.value,
             payee: this.formCreateSurcharge.payee.value,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
+            bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
+            bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
+            bankName: this.formCreateSurcharge.bankName.value
         };
 
         return dataSettle;

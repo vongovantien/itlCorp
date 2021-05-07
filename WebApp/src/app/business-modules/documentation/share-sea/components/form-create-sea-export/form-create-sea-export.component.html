@@ -103,8 +103,7 @@
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort"
                                 (remove)="resetFormControl(pol);resetFormControl(polDescription)"
-                                placeholder="Please select" allowFreeText [displaySelectedStr]="polDescription.value"
-                                (displaySelectedStrChange)="polDescription.setValue($event)">
+                                placeholder="Please select" allowFreeText formControlName="polDescription">
                             </app-combo-grid-virtual-scroll>
                         </div>
                     </div>
@@ -117,8 +116,7 @@
                                 [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
                                 [displayFields]="displayFieldPort"
                                 (remove)="resetFormControl(pod);resetFormControl(podDescription)" allowFreeText
-                                [displaySelectedStr]="podDescription.value"
-                                (displaySelectedStrChange)="podDescription.setValue($event)">
+                                formControlName="podDescription">
                             </app-combo-grid-virtual-scroll>
                             <div class="form-control-feedback"
                                 *ngIf="isSubmitted && formGroup.errors | equalError:'invalidPort'">

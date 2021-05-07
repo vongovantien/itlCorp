@@ -40,5 +40,6 @@ namespace eFMS.API.ReportData.Models
         public string UserExport { get; set; }
         public string CdNote { get; set; }
         public string Creator { get; set; }
+        public string SyncedFrom { get; set; }
     }
 }

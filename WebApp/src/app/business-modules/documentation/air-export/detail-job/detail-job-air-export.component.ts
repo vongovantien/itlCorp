@@ -18,7 +18,9 @@ import isUUID from 'validator/lib/isUUID';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
+
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -30,13 +32,10 @@ type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SET
 export class AirExportDetailJobComponent extends AirExportCreateJobComponent implements OnInit, ICanComponentDeactivate, ICrystalReport {
 
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-    @ViewChild('confirmDeleteJob') confirmDeleteJobPopup: ConfirmPopupComponent;
-    @ViewChild("duplicateconfirmTemplate") confirmDuplicatePopup: ConfirmPopupComponent;
-    @ViewChild("confirmLockShipment") confirmLockPopup: ConfirmPopupComponent;
     @ViewChild(SubHeaderComponent) headerComponent: SubHeaderComponent;
-    @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild('Permission403PopupComponent') permissionPopup: Permission403PopupComponent;
-    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
+
 
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
@@ -75,14 +74,13 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     ngAfterViewInit() {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
-                this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
                     this.isDuplicate = this.ACTION === 'COPY';
@@ -93,14 +91,15 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
                 this._cd.detectChanges();
             }),
-            switchMap(() => of(this.jobId)),
+            switchMap((params) => of(params.jobId)),
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    this.jobId = jobId;
 
-                    this.getDetailShipment();
+                    this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
+                    // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    this.getDetailShipment(this.jobId);
                 } else {
                     this.gotoList();
                 }
@@ -118,27 +117,23 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         merge(this.createShortcut(['ControlLeft', 'KeyB'])).pipe(takeUntil(this.ngUnsubscribe)).subscribe(() => { this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}` + '/mawb']); });
     }
 
-    getDetailShipment() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(
-                skip(1),
-                takeUntil(this.ngUnsubscribe)
-            )
+    getDetailShipment(jobId: string) {
+        this._documenRepo.getDetailTransaction(jobId)
             .subscribe(
-                (res: any) => {
-                    if (!!res) {
-                        this.shipmentDetail = res;
-                        this.formCreateComponent.isUpdate = true;
-                        // * reset field duplicate
-                        if (this.ACTION === "COPY") {
-                            this.formCreateComponent.getUserLogged();
-                            this.headerComponent.resetBreadcrumb("Create Job");
-                        } else {
-                            this.headerComponent.resetBreadcrumb("Job Detail");
-                        }
+                (res: CsTransaction) => {
+                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
+                    this.shipmentDetail = res;
+                    this.formCreateComponent.isUpdate = true;
+
+                    // * reset field duplicate
+                    if (this.ACTION === "COPY") {
+                        this.formCreateComponent.getUserLogged();
+                        this.headerComponent.resetBreadcrumb("Create Job");
+                    } else {
+                        this.headerComponent.resetBreadcrumb("Job Detail");
                     }
-                },
-            );
+                }
+            )
     }
 
     previewShipmentCoverPage() {
@@ -200,7 +195,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this.jobId = res.data.id;
 
                         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
-                        this.ACTION = 'SHIPMENT';
+                        this.ACTION = "SHIPMENT";
                         this.isDuplicate = true;
 
                     } else {
@@ -223,7 +218,8 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         this._toastService.success(res.message);
 
                         // * get detail.
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        this.getDetailShipment(this.jobId);
+                        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -242,7 +238,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                if (this.ACTION === 'COPY') {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`]);
+                }
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
@@ -304,10 +304,18 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                     return;
                 }
                 if (value === 200) {
-                    this.confirmDeleteJobPopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                        body: 'You you sure you want to delete this Job?',
+                        title: 'Alert',
+                        labelConfirm: 'Yes',
+                    }, () => {
+                        this.onDeleteJob();
+                    })
                     return;
                 } else {
-                    this.canNotDeleteJobPopup.show();
+                    this.showPopupDynamicRender(InfoPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                        body: 'You are not allowed to delete this job?',
+                    })
                 }
             });
     }
@@ -319,7 +327,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 catchError(this.catchError),
                 finalize(() => {
                     this._progressRef.complete();
-                    this.confirmDeleteJobPopup.hide();
                 })
             ).subscribe(
                 (respone: CommonInterface.IResult) => {
@@ -334,24 +341,32 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     showDuplicateConfirm() {
-        this.confirmDuplicatePopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            title: 'Duplicate job detail',
+            body: 'The system will open the Job Create Screen. Are you sure you want to leave?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.duplicateConfirm();
+        })
     }
 
     duplicateConfirm() {
         this.action = { action: 'copy' };
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_EXPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+            queryParams: this.action
         });
-        this.confirmDuplicatePopup.hide();
     }
 
     lockShipment() {
-        this.confirmLockPopup.show();
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            body: 'Do you want to lock this shipment ?',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onLockShipment();
+        })
     }
 
     onLockShipment() {
-        this.confirmLockPopup.hide();
-
         this._progressRef.start();
         this._documentRepo.LockCsTransaction(this.jobId)
             .pipe(
@@ -364,13 +379,24 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
                         this._toastService.success(r.message);
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        this.getDetailShipment(this.jobId);
 
                     } else {
                         this._toastService.error(r.message);
                     }
                 },
             );
+    }
+
+    showSyncHBL() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            title: 'Sync HAWB',
+            body: this.confirmSyncHBLText,
+            labelConfirm: 'Yes'
+        }, () => {
+            this.onSyncHBL();
+        })
     }
 
     onSyncHBL() {
@@ -423,7 +449,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     handleCancelForm() {
         const isEdited = JSON.stringify(this.formCreateComponent.currentFormValue) !== JSON.stringify(this.formCreateComponent.formGroup.getRawValue());
         if (isEdited) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            })
         } else {
             this.isCancelFormPopupSuccess = true;
             this.gotoList();
@@ -431,7 +462,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
     }
 
     confirmCancel() {
-        this.confirmCancelPopup.hide();
         this.isCancelFormPopupSuccess = true;
 
         if (this.nextState) {
@@ -452,7 +482,12 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
 
         // * Trường hợp user confirm cancel
         if (isEdited && !this.isCancelFormPopupSuccess && !this.isDuplicate) {
-            this.confirmCancelPopup.show();
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+                body: 'All entered data will be discard. Are you sure you want to leave?',
+                labelConfirm: 'Yes'
+            }, () => {
+                this.confirmCancel();
+            })
             return;
         }
         return of(!isEdited);

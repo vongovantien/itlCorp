@@ -4870,7 +4870,70 @@ namespace eFMS.API.Accounting.DL.Services
             return output;
 
         }
+        
+        /// <summary>
+        /// Get data for General Preview
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns></returns>
+        public InfoSettlementExport GetGeneralSettlementExport(Guid settlementId)
+        {
+            var settlementPayment = GetSettlementPaymentById(settlementId);
+            if (settlementPayment == null) return null;
 
+            string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameEn;
+
+            #region -- Info Manager, Accoutant & Department --
+            var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
+            string _manager = string.Empty;
+            string _accountant = string.Empty;
+            if (_settlementApprove != null)
+            {
+                _manager = string.IsNullOrEmpty(_settlementApprove.Manager) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Manager)?.EmployeeNameVn;
+                _accountant = string.IsNullOrEmpty(_settlementApprove.Accountant) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Accountant)?.EmployeeNameVn;
+            }
+
+            var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
+            #endregion -- Info Manager, Accoutant & Department --
+
+            string _payeeName = string.Empty;
+
+            if (settlementPayment.PaymentMethod == AccountingConstants.PAYMENT_METHOD_BANK && !string.IsNullOrEmpty(settlementPayment.Payee))
+            {
+                var payeeInfo = catPartnerRepo.Get(x => x.Id == settlementPayment.Payee).FirstOrDefault();
+                if (payeeInfo != null)
+                {
+                    _payeeName = payeeInfo.PartnerNameEn;
+                }
+            }
+            string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
+                    :
+                        InWordCurrency.ConvertNumberCurrencyToStringUSD(settlementPayment.Amount ?? 0, "") + " " + settlementPayment.SettlementCurrency;
+
+            var infoSettlement = new InfoSettlementExport
+            {
+                Requester = _requester,
+                RequestDate = settlementPayment.RequestDate,
+                Department = _department,
+                SettlementNo = settlementPayment.SettlementNo,
+                SettlementAmount = settlementPayment.Amount,
+                SettlementCurrency = settlementPayment.SettlementCurrency,
+                PaymentMethod = Common.CustomData.PaymentMethod.Where(x => x.Value == settlementPayment.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
+                AmountInWords = _inWords,
+                Manager = _manager,
+                Accountant = _accountant,
+                IsRequesterApproved = _settlementApprove?.RequesterAprDate != null,
+                IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
+                IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
+                IsBODApproved = _settlementApprove?.BuheadAprDate != null,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankAccountName = settlementPayment.BankAccountName,
+                PayeeName = settlementPayment.BankAccountName,
+                Note = settlementPayment.Note
+            };
+            return infoSettlement;
+        }
         #endregion --- EXPORT SETTLEMENT ---
 
         public HandleState RecallRequest(Guid settlementId)

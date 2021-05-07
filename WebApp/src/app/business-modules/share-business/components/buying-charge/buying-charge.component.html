@@ -431,7 +431,7 @@
                                 </div>
                             </td>
                             <td>
-                                <app-switch [(toggle)]="charge.kickBack" [disabled]="!!charge.creditNo 
+                                <app-switch [(ngModel)]="charge.kickBack" [disabled]="!!charge.creditNo 
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate

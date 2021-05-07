@@ -71,7 +71,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
 
 
     ngAfterViewInit() {
-        this.subscription = combineLatest([
+        this.subscription = this.subscription = combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
         ]).pipe(
