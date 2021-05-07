@@ -38,6 +38,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<SysCompany> companyRepository;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
             IMapper mapper,
@@ -55,7 +57,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CsTransaction> csTransactionRepo,
             IContextBase<AcctSoa> soaRepo,
             IContextBase<AcctCdnote> cdNoteRepo,
-            IContextBase<SysCompany> companyRepo
+            IContextBase<SysCompany> companyRepo,
+            IAccAccountReceivableService accAccountReceivable
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -72,6 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
             soaRepository = soaRepo;
             cdNoteRepository = cdNoteRepo;
             companyRepository = companyRepo;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -449,7 +453,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
                     payment.CreditType = acctPayment.Type;
-                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "SOA") ? "Credit" : acctPayment.Type;
+                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "CREDITSOA") ? "CREDIT" : acctPayment.Type;
                     payment.CurrencyId = acctPayment.CurrencyId;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
@@ -635,7 +639,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 _payment.InvoiceNo = payment.InvoiceNo;
 
-                if (payment.Type == "Credit")
+                if (payment.Type == "CREDIT")
                 {
                     _payment.Type = payment.CreditType;
                 }
@@ -816,7 +820,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 switch (payment.Type)
                 {
-                    case "Debit":
+                    case "DEBIT":
                         // Tổng thu của invoice bao gôm VND/USD. 
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
@@ -883,7 +887,7 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
                         break;
-                    case "Credit":
+                    case "CREDIT":
                         if (payment.Type == "CREDITNOTE")
                         {
                             IQueryable<AcctCdnote> credits = cdNoteRepository.Get(x => payment.RefId.Contains(x.Id.ToString()));
@@ -904,7 +908,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 cdNoteRepository.SubmitChanges();
                             }
                         }
-                        if (payment.Type == "SOA")
+                        if (payment.Type == "CREDITSOA")
                         {
                             IQueryable<AcctSoa> soas = soaRepository.Get(x => payment.RefId.Contains(x.Id));
                             if (soas != null && soas.Count() > 0)
@@ -1115,7 +1119,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel);
 
-                                //TODO: Tính lại công nợ trên hợp đồng
+                                //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
                             }
 
                             trans.Commit();
@@ -1151,7 +1155,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
-                                //TODO: Tính lại công nợ trên hợp đồng
+                                //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
                             }
 
                             trans.Commit();
@@ -1202,7 +1206,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             // cấn trừ cho hóa đơn
                             hs = UpdateInvoiceOfPayment(receiptId, "DONE");
-                            //TODO: Tính lại công nợ trên hợp đồng
+                            //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
                             // Cập nhật Cus Advance của Agreement
                             HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
 
@@ -1870,7 +1874,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// Get list Credit Note/ SOA type Credit by Criteria
+        /// Get list SOA type Credit by Criteria
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -1937,13 +1941,13 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "SOA"
+                               CreditType = "CREDITSOA"
                            };
             return joinData;
         }
 
         /// <summary>
-        /// Get list Credit Note/ SOA type Credit by Criteria
+        /// Get list Credit Note by Criteria
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
@@ -2015,6 +2019,54 @@ namespace eFMS.API.Accounting.DL.Services
             return joinData;
         }
         #endregion -- Get Customers Debit --
+
+        /// <summary>
+        /// Tính công nợ dựa vào id của Receipt
+        /// </summary>
+        /// <param name="receiptId"></param>
+        /// <returns></returns>
+        public HandleState CalculatorReceivableForReceipt(Guid receiptId)
+        {
+            //Get list payment of Receipt
+            var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
+            //Get list Invoice of payments
+            var invoiceIds = payments.Where(x => x.Type == "DEBIT").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
+            //Get list Invoice Temp of payments
+            var invoiceTempIds = payments.Where(x => x.Type == "OBH").Select(s => Guid.Parse(s.RefId)).Distinct().ToList();
+            //Get list Soa Credit of payments
+            var soaIds = payments.Where(x => x.Type == "CREDITSOA").Select(s => s.RefId).Distinct().ToList();
+            var paySoaNos = new List<string>();
+            if (soaIds.Count > 0)
+            {
+                paySoaNos = soaRepository.Get(x => soaIds.Any(s => s == x.Id)).Select(s => s.Soano).Distinct().ToList();
+            }
+            IQueryable<CsShipmentSurcharge> surcharges = null;
+            if (invoiceIds.Count > 0 || invoiceTempIds.Count > 0 || paySoaNos.Count > 0)
+            {
+                Expression<Func<CsShipmentSurcharge, bool>> query = chg => false;
+                
+                if (invoiceIds.Count > 0)
+                {
+                    query = query.Or(x => invoiceIds.Any(i => i == x.AcctManagementId));
+                }
+                if (invoiceTempIds.Count > 0)
+                {
+                    query = query.Or(x => invoiceTempIds.Any(t => t == x.PayerAcctManagementId));
+                }
+                if (paySoaNos.Count > 0)
+                {
+                    query = query.Or(x => paySoaNos.Any(p => p == x.PaySoano));
+                }
+                surcharges = surchargeRepository.Get(query);
+            }
+            var hs = new HandleState();
+            if (surcharges == null) return hs;
+            
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+            //Tính công nợ cho Partner, Service, Office có trong Receipt
+            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return hs;
+        }
 
     }
 }
