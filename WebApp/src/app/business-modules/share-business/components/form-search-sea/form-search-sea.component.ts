@@ -10,6 +10,7 @@ import { Store } from "@ngrx/store";
 import { IShareBussinessState, TransactionSearchListAction, getTransactionDataSearchState } from "../../store";
 import { shareReplay, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
+import { SystemConstants } from "@constants";
 
 @Component({
     selector: 'form-search-sea',
@@ -180,15 +181,15 @@ export class ShareBusinessFormSearchSeaComponent extends AppForm {
     searchShipment() {
         const body: ISearchDataShipment = {
             all: null,
-            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            mawb: this.filterType.value.value === 'mawb' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            containerNo: this.filterType.value.value === 'containerNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            sealNo: this.filterType.value.value === 'sealNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            markNo: this.filterType.value.value === 'markNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            creditDebitNo: this.filterType.value.value === 'creditDebitNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            soaNo: this.filterType.value.value === 'soaNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
-            bookingNo: this.filterType.value.value === 'bookingNo' ? (this.searchText.value ? this.searchText.value.trim() : '') : null,
+            jobNo: this.filterType.value.value === 'jobNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            mawb: this.filterType.value.value === 'mawb' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            hwbno: this.filterType.value.value === 'hwbno' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            containerNo: this.filterType.value.value === 'containerNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            sealNo: this.filterType.value.value === 'sealNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            markNo: this.filterType.value.value === 'markNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            creditDebitNo: this.filterType.value.value === 'creditDebitNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            soaNo: this.filterType.value.value === 'soaNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
+            bookingNo: this.filterType.value.value === 'bookingNo' ? (this.searchText.value ? this.searchText.value.trim().replace(SystemConstants.CPATTERN.UNICODE_ZERO_WIDTH, '') : '') : null,
             customerId: this.customer.value,
             coloaderId: this.supplier.value,
             agentId: this.agent.value,
