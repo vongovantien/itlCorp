@@ -19,6 +19,7 @@ import { combineLatest, of, Observable } from 'rxjs';
 import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap } from 'rxjs/operators';
 
 import isUUID from 'validator/lib/isUUID';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
@@ -208,6 +209,11 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formGroup.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );
