@@ -14,7 +14,7 @@ import { takeUntil } from "rxjs/operators";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
-    @Output() onRequest: EventEmitter<any> = new EventEmitter<any>();
+    @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     debitList$: Observable<ReceiptInvoiceModel[]>;
     selectedIndexItem: number;
@@ -71,6 +71,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             return;
         }
         this._store.dispatch(RemoveInvoice({ index: this.selectedIndexItem }));
-
+        this.onChangeDebit.emit(true);
     }
 }

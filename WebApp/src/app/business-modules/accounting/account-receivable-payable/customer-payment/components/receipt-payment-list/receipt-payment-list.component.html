@@ -147,8 +147,8 @@
             </div>
         </ng-container>
         <div class="col-lg-12 m--margin-top-20">
-            <customer-payment-receipt-debit-list></customer-payment-receipt-debit-list>
-            <customer-payment-receipt-credit-list></customer-payment-receipt-credit-list>
+            <customer-payment-receipt-debit-list (onChangeDebit)="getListReceiptChange($event)"></customer-payment-receipt-debit-list>
+            <customer-payment-receipt-credit-list (onChangeCredit)="getListReceiptChange($event)"></customer-payment-receipt-credit-list>
         </div>
     </div>
 </div>

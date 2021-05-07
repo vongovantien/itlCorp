@@ -11,13 +11,12 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
-import { Observable, BehaviorSubject, combineLatest } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
-import { ConfirmPopupComponent } from '@common';
 import { cloneDeep, isNumber } from 'lodash';
 
 @Component({
@@ -29,7 +28,6 @@ import { cloneDeep, isNumber } from 'lodash';
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
-    @ViewChild("confirmRemove") confirmPopup: ConfirmPopupComponent;
 
     @Input() syncInfoTemplate: TemplateRef<any>
 
@@ -290,13 +288,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         }
     }
 
-    showConfirmPopup() {
-        this.confirmPopup.show();
-    }
-
-    removeReceiptItem() {
-        this.confirmPopup.hide();
-        this.caculatorAmountFromDebitList();
+    getListReceiptChange(onChange: boolean){
+        if(onChange){
+            this.caculateAmountFromDebitList();
+        }
     }
 
     insertAdvanceRowData() {
@@ -367,12 +362,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
         const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
         const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        console.log('finalPaidAmountUSD', amountUSD + paidAmountUSD)
         this.finalPaidAmountUSD.setValue(((cusAdvanceAmount / exChangeRateUSD)) + (amountUSD) + (paidAmountUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
 
-    caculatorAmountFromDebitList() {
+    caculateAmountFromDebitList() {
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList = this._store.select(ReceiptDebitListState);
 
@@ -394,8 +388,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
 
-        this.amountUSD.setValue(paidUSD);
-        this.amountVND.setValue(paidVND);
+        this.amountUSD.setValue(valueUSD);
+        this.amountVND.setValue(valueVND);
 
         this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
         this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 2));
