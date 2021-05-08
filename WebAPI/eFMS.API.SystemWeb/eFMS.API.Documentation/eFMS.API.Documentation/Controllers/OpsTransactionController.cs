@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -158,6 +159,14 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
+
+            string msgCheckUpdateServiceDate= CheckUpdateServiceDate(model);
+            if (msgCheckUpdateServiceDate.Length > 0)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateServiceDate, Data = new { errorCode = "serviceDate" } });
+            }
+
+
             string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
             if (msgCheckUpdateMawb.Length > 0)
             {
@@ -342,6 +351,16 @@ namespace eFMS.API.Documentation.Controllers
             {
                 errorMsg = String.Format("MBL {0} has  Advances {1} that Synced to accounting system, Please you check Again!", mblNo, string.Join(",", advs.ToArray()));
             }
+
+            return errorMsg;
+        }
+
+        private string CheckUpdateServiceDate(OpsTransactionModel model)
+        {
+            string errorMsg = string.Empty;
+            OpsTransactionModel currentJob = transactionService.Get(x => x.Id == model.Id).FirstOrDefault();
+
+            errorMsg = model.ServiceDate.Value.Month != currentJob.ServiceDate.Value.Month ? stringLocalizer[DocumentationLanguageSub.MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH].Value : errorMsg;
 
             return errorMsg;
         }
