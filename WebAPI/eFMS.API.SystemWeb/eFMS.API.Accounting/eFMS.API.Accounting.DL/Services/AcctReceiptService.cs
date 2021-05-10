@@ -425,7 +425,7 @@ namespace eFMS.API.Accounting.DL.Services
                     RefNo = s.Key.BillingRefNo,
                     Type = "OBH",
                     InvoiceNo = null,
-                    Amount = s.Sum(x => x.RefAmount),
+                    Amount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
                     UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
                     UnpaidAmountVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
                     UnpaidAmountUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
