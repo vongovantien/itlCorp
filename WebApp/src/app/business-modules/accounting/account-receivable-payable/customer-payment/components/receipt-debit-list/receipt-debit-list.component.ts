@@ -32,7 +32,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'RefNo', field: '', sortable: true },
             { title: 'Type', field: '' },
             { title: 'Invoice No', field: '', width: 150 },
-            { title: 'Org Unpaid Amount', field: '' },
+            { title: 'Org Amount', field: '' },
             { title: 'Unpaid USD', field: '' },
             { title: 'Unpaid VND', field: '' },
             { title: 'Paid Amount USD', field: '' },

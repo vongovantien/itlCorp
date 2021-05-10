@@ -57,7 +57,7 @@
                         <app-permission-button type="save" title="Done" class="success" (onClick)="confirmDoneReceipt()">
                         </app-permission-button>
                     </ng-container>
-                    <ng-container *ngIf="receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                    <ng-container *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button title="Cancel Receipt" type="reject" class="danger" icon="la la-times"
                             (onClick)="submitClick('cancel')">
                         </app-permission-button>
