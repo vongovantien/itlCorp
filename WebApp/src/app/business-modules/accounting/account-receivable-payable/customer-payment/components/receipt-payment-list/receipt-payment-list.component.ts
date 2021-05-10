@@ -391,8 +391,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.amountUSD.setValue(valueUSD);
         this.amountVND.setValue(valueVND);
 
-        this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
-        this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 2));
+        this.paidAmountUSD.setValue(paidUSD);
+        this.paidAmountVND.setValue(paidVND);
 
         this.finalPaidAmountUSD.setValue((cusAdvanceAmount / exChangeRateUSD) + valueUSD + paidUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);

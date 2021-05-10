@@ -17,6 +17,7 @@ import { AppComboGridComponent } from "@common";
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Input() isReadonly: boolean = false;
     
     @Input() set type(t: string) {
         if (!!t) {

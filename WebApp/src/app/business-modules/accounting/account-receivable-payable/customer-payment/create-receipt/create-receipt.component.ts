@@ -187,9 +187,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     confirmDoneReceipt() {
-        if (!this.paymentList.length) {
-            return;
-        }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             body: 'Noted: After you save the receipt, you can not edit. Are you sure do this action?',
             title: 'Alert',

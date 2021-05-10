@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
@@ -15,7 +15,8 @@ import { takeUntil } from "rxjs/operators";
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
-
+    @Input() isReadonly: boolean = false;
+    
     debitList$: Observable<ReceiptInvoiceModel[]>;
     selectedIndexItem: number;
 

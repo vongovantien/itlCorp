@@ -48,7 +48,7 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
                     <label class="form-control-label" required> Exchange Rate </label>
                     <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
                         [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency>
@@ -73,18 +73,18 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVND.valid }">
                     <label class="form-control-label" required>Paid Amount VND</label>
                     <input type="number" class="form-control m-input m-input--square text-success"
-                        formControlName="paidAmountVND" autoFormatCurrency [attr.readOnly]="isReadonly"
+                        formControlName="paidAmountVND" numeric autoFormatCurrency [attr.readOnly]="isReadonly"
                         (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
+                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
                     <label class="form-control-label" required>Paid Amount USD</label>
                     <input type="number" class="form-control m-input m-input--square text-success"
-                        formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
+                        formControlName="paidAmountUSD" numeric autoFormatCurrency [attr.readOnly]="isReadonly"
                         (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
                 </div>
             </div>
@@ -147,8 +147,8 @@
             </div>
         </ng-container>
         <div class="col-lg-12 m--margin-top-20">
-            <customer-payment-receipt-debit-list (onChangeDebit)="getListReceiptChange($event)"></customer-payment-receipt-debit-list>
-            <customer-payment-receipt-credit-list (onChangeCredit)="getListReceiptChange($event)"></customer-payment-receipt-credit-list>
+            <customer-payment-receipt-debit-list [isReadonly]="isReadonly" (onChangeDebit)="getListReceiptChange($event)"></customer-payment-receipt-debit-list>
+            <customer-payment-receipt-credit-list [isReadonly]="isReadonly" (onChangeCredit)="getListReceiptChange($event)"></customer-payment-receipt-credit-list>
         </div>
     </div>
 </div>
