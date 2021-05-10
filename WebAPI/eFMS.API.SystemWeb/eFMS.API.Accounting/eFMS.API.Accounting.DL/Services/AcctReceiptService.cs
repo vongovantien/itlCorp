@@ -468,6 +468,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.DepartmentName = dept?.DeptNameAbbr;
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
+                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(acctPayment.RefId) : null;
+
                     paymentReceipts.Add(payment);
                 }
             }
@@ -479,6 +481,17 @@ namespace eFMS.API.Accounting.DL.Services
             result.CustomerName = partnerInfo?.ShortName;
 
             return result;
+        }
+
+        private string GetPaymentStatus(string Id)
+        {
+            string _paymentStatus = string.Empty;
+            AccAccountingManagement inv = acctMngtRepository.Get(x => x.Id.ToString() == Id).FirstOrDefault();
+            if(inv != null)
+            {
+                _paymentStatus = inv.PaymentStatus;
+            }
+            return _paymentStatus;
         }
 
         public HandleState SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction)
