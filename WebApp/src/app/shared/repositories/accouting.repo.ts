@@ -751,8 +751,15 @@ export class AccountingRepo {
             );
         }
     }
+
     getDataIssueCustomerPayment(body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueCustomerPayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDataIssueAgencyPayment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueAgencyPayment`, body).pipe(
             map((data: any) => data)
         );
     }
