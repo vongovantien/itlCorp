@@ -16,6 +16,7 @@ export const customerPaymentReceipLoadingState = createSelector(customerPaymentS
 
 export const ReceiptDebitListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.debitList);
 export const ReceiptCreditListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.creditList);
+export const ReceiptTypeState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.type);
 export const reducers: ActionReducerMap<ICustomerPaymentState> = {
     receipt: receiptReducer,
 };

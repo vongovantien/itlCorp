@@ -15,7 +15,7 @@
         <div class="collapse show" id="debit-list">
             <div class="table-wrapper">
                 <table class="table table-striped table-brand">
-                    <thead app-table-header [headers]="headers" class="text-left">
+                    <thead app-table-header [headers]="receiptType ==='Customer' ? headers : agencyHeaders" class="text-left">
                         <th class="m--w-50 first">
                             <!-- <label class="m-checkbox">
                                 <input type="checkbox" name="" [(ngModel)]="isCheckAll" (change)="checkAllChange()">

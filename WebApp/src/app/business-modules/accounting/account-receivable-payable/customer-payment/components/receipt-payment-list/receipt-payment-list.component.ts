@@ -12,7 +12,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
@@ -39,7 +39,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     form: FormGroup;
     methods: CommonInterface.ICommonTitleValue[];
     userLogged: Partial<SystemInterface.IClaimUser>;
-    type: AbstractControl;
     cusAdvanceAmount: AbstractControl;
     paymentMethod: AbstractControl;
     currencyId: AbstractControl;
@@ -58,7 +57,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
 
     paymentMethods: string[] = ['Cash', 'Bank Transfer', 'Other'];
-    receiptTypes: string[] = ['Debit', 'NetOff Adv'];
 
     customerInfo: Partner = null;
 
@@ -103,24 +101,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
         this.initForm();
 
-        this.headers = [
-            { title: 'Billing Ref No', field: 'invoiceNo', sortable: true },
-            { title: 'Series No', field: 'serieNo', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
-            { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Taxcode', field: 'taxCode', sortable: true },
-            { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
-            { title: 'Unpaid Ex Amount', field: 'receiptExcUnpaidAmount', sortable: true },
-            { title: 'Paid Amount', field: 'paidAmount', sortable: true },
-            { title: 'Paid Ex Amount', field: 'receiptExcPaidAmount', sortable: true },
-            { title: 'Balance Amount', field: 'invoiceBalance', sortable: true },
-            { title: 'Balance Ex Amount', field: 'receiptInvoicebalance', sortable: true },
-            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
-            { title: 'Billing Date', field: 'billingDate', sortable: true },
-            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Note', field: 'note', sortable: true },
-        ];
-
         this.isLoading = this._store.select(customerPaymentReceipLoadingState);
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
@@ -133,7 +113,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
             });
         this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'));
-
     }
 
     formatNumberCurrency(input: number, digit: number) {
@@ -177,7 +156,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.form = this._fb.group({
             paidAmountVND: [null, Validators.required],
             paidAmountUSD: [null, Validators.required],
-            type: [[this.receiptTypes[0]]],
             cusAdvanceAmount: [],
             finalPaidAmount: [{ value: null, disabled: true }],
             // balance: [{ value: null, disabled: true }],
@@ -193,7 +171,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             finalPaidAmountUSD: []
         });
 
-        this.type = this.form.controls['type'];
         this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
         // this.finalPaidAmount = this.form.controls['finalPaidAmount'];
         // this.balance = this.form.controls['balance'];
