@@ -41,7 +41,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AcctReceipt, AcctReceiptModel>().ReverseMap();
             CreateMap<SysImage, SysImageModel>().ReverseMap();
             CreateMap<AccAccountReceivable, ReceivableTable>();
-
+            CreateMap<AcctReceiptSyncModel, AcctReceiptSync>();
         }
     }
 }
