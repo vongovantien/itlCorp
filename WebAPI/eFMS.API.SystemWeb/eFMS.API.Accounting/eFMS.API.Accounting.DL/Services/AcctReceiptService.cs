@@ -541,16 +541,16 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
             _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
 
-            _payment.PaymentAmountVnd = paymentGroupOBH.PaidAmountVnd;
-            _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd;
-            _payment.BalanceVnd = paymentGroupOBH.UnpaidAmountVnd - paymentGroupOBH.PaidAmountVnd;
-            _payment.BalanceUsd = paymentGroupOBH.UnpaidAmountUsd - paymentGroupOBH.PaidAmountUsd;
-            _payment.UnpaidPaymentAmountVnd = paymentGroupOBH.UnpaidAmountVnd;
-            _payment.UnpaidPaymentAmountUsd = paymentGroupOBH.UnpaidAmountUsd;
+            _payment.PaymentAmountVnd = paymentGroupOBH.PaidAmountVnd ?? 0;
+            _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd ?? 0;
+            _payment.BalanceVnd = (paymentGroupOBH.UnpaidAmountVnd ?? 0) - (paymentGroupOBH.PaidAmountVnd ?? 0);
+            _payment.BalanceUsd = (paymentGroupOBH.UnpaidAmountUsd ?? 0) - (paymentGroupOBH.PaidAmountUsd ?? 0);
+            _payment.UnpaidPaymentAmountVnd = paymentGroupOBH.UnpaidAmountVnd ?? 0;
+            _payment.UnpaidPaymentAmountUsd = paymentGroupOBH.UnpaidAmountUsd ?? 0;
 
             _payment.RefCurrency = invTemp.Currency; // currency của hóa đơn
             _payment.Note = paymentGroupOBH.Notes; // Cùng một notes
-            _payment.RefAmount = paymentGroupOBH.Amount; // Tổng UnpaidAmount của group OBH
+            _payment.RefAmount = paymentGroupOBH.Amount ?? 0; // Tổng UnpaidAmount của group OBH
             _payment.DeptInvoiceId = paymentGroupOBH.DepartmentId;
             _payment.OfficeInvoiceId = paymentGroupOBH.OfficeId;
             _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
@@ -680,20 +680,20 @@ namespace eFMS.API.Accounting.DL.Services
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _payment.PaymentAmount = payment.PaidAmountVnd;
-                    _payment.Balance = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
+                    _payment.PaymentAmount = payment.PaidAmountVnd ?? 0;
+                    _payment.Balance = (payment.UnpaidAmountVnd ?? 0) - (payment.PaidAmountVnd ?? 0);
                 }
                 else
                 {
-                    _payment.PaymentAmount = _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                    _payment.Balance = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
+                    _payment.PaymentAmount = _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
+                    _payment.Balance = (payment.UnpaidAmountUsd ?? 0) - (payment.PaidAmountUsd ?? 0);
                 }
-                _payment.PaymentAmountUsd = payment.PaidAmountUsd;
-                _payment.PaymentAmountVnd = payment.PaidAmountVnd;
-                _payment.BalanceUsd = payment.UnpaidAmountUsd - payment.PaidAmountUsd;
-                _payment.BalanceVnd = payment.UnpaidAmountVnd - payment.PaidAmountVnd;
-                _payment.UnpaidPaymentAmountUsd = payment.UnpaidAmountUsd;
-                _payment.UnpaidPaymentAmountVnd = payment.UnpaidAmountVnd;
+                _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
+                _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
+                _payment.BalanceUsd = (payment.UnpaidAmountUsd ?? 0) - (payment.PaidAmountUsd ?? 0);
+                _payment.BalanceVnd = (payment.UnpaidAmountVnd ?? 0) - (payment.PaidAmountVnd ?? 0);
+                _payment.UnpaidPaymentAmountUsd = payment.UnpaidAmountUsd ?? 0;
+                _payment.UnpaidPaymentAmountVnd = payment.UnpaidAmountVnd ?? 0;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
@@ -854,17 +854,17 @@ namespace eFMS.API.Accounting.DL.Services
                         // Tổng thu của invoice bao gôm VND/USD. 
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
-                        decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmount) ?? 0;
-                        decimal totalAmountVndPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountVnd) ?? 0;
-                        decimal totalAmountUsdPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountUsd) ?? 0;
+                        decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => (s.PaymentAmount ?? 0));
+                        decimal totalAmountVndPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountVnd ?? 0);
+                        decimal totalAmountUsdPaymentOfInv = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => s.PaymentAmountUsd ?? 0);
 
                         invoice.PaidAmount = totalAmountPayment;
                         invoice.PaidAmountUsd = totalAmountUsdPaymentOfInv;
                         invoice.PaidAmountVnd = totalAmountVndPaymentOfInv;
 
-                        invoice.UnpaidAmount = invoice.UnpaidAmount - totalAmountPayment;
-                        invoice.UnpaidAmountUsd = invoice.UnpaidAmountUsd - totalAmountUsdPaymentOfInv;
-                        invoice.UnpaidAmountVnd = invoice.UnpaidAmountVnd - totalAmountVndPaymentOfInv;
+                        invoice.UnpaidAmount = (invoice.UnpaidAmount ?? 0) - totalAmountPayment;
+                        invoice.UnpaidAmountUsd = (invoice.UnpaidAmountUsd ?? 0) - totalAmountUsdPaymentOfInv;
+                        invoice.UnpaidAmountVnd = (invoice.UnpaidAmountVnd ?? 0) - totalAmountVndPaymentOfInv;
 
                         invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
                         invoice.UserModified = currentUser.UserID;
@@ -904,9 +904,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
 
 
-                                    item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                    item.UnpaidAmountUsd = item.UnpaidAmountUsd - item.PaidAmountUsd;
-                                    item.UnpaidAmountVnd = item.UnpaidAmountVnd - item.PaidAmountVnd;
+                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                    item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
+                                    item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
                                 }
                                 else
                                 {
@@ -915,16 +915,16 @@ namespace eFMS.API.Accounting.DL.Services
                                         item.PaidAmount = remainAmount;
                                         item.PaidAmountVnd = remainAmountVnd;
 
-                                        item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                        item.UnpaidAmountVnd = item.UnpaidAmountVnd - item.PaidAmountVnd;
+                                        item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                        item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
                                     }
                                     else
                                     {
                                         item.PaidAmount = remainAmount;
                                         item.PaidAmountUsd = remainAmountUsd;
 
-                                        item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                        item.UnpaidAmountUsd = item.UnpaidAmountUsd - item.PaidAmountUsd;
+                                        item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                        item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
                                     }
 
                                     remainAmountUsd = 0;
@@ -1160,7 +1160,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                             HandleState hs = DataContext.Add(receiptData);
-
                             if (hs.Success)
                             {
                                 AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
@@ -1173,9 +1172,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel);
 
                                 //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
+                                trans.Commit();
                             }
 
-                            trans.Commit();
                             return hs;
                         }
                         else
@@ -1209,9 +1208,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
                                 //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
+                                trans.Commit();
                             }
 
-                            trans.Commit();
                             return hs;
                         }
                     }

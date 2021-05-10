@@ -29,21 +29,22 @@
                             <tr *ngFor="let item of (creditList | async); let i = index; trackBy: trackByFn">
                                 <td>
                                     <!-- <label class="m-checkbox">
-                                        <input type="checkbox" name="" [(ngModel)]="item.isSelected"
-                                            (change)="onCheckChange()">
-                                        <span></span>
-                                    </label> -->
-                                    <app-permission-button type="delete"
-                                        (onClick)="confirmDeleteInvoiceItem(i); confirmRemove.show()" class="icon"
-                                        icon="la la-trash text-danger">
-                                    </app-permission-button>
+                                                                <input type="checkbox" name="" [(ngModel)]="item.isSelected"
+                                                                    (change)="onCheckChange()">
+                                                                <span></span>
+                                                            </label> -->
+                                    <ng-container *ngIf="!isReadonly">
+                                        <app-permission-button type="delete" (onClick)="confirmDeleteInvoiceItem(i); confirmRemove.show()"
+                                            class="icon" icon="la la-trash text-danger">
+                                        </app-permission-button>
+                                    </ng-container>
                                 </td>
                                 <td>{{item.refNo}}</td>
                                 <td>
                                     <div class="form-group col-md-12 dropdown-partner" dropdown>
                                         <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                            placeholder="Vat Partner" [(ngModel)]="item.invoiceNo"
-                                            (click)="loadDynamicComoGrid(item,i)">
+                                            placeholder="Vat Partner" [(ngModel)]="item.invoiceNo" (click)="loadDynamicComoGrid(item,i)"
+                                            [disabled]="isReadonly">
                                         <ng-container>
                                             <div class="d-flex justify-content-end dropdown-partner__header">
                                                 <a class="text-primary text-underline m--margin-right-20 pointer"
@@ -63,7 +64,7 @@
                                     {{item.unpaidAmountVnd | number:'1.0-3'}}
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control" [(ngModel)]="item.notes">
+                                    <input type="text" class="form-control" [(ngModel)]="item.notes" [disabled]="isReadonly">
                                 </td>
                                 <td>{{item.departmentName}}</td>
                                 <td>{{item.officeName}}</td>

@@ -17,7 +17,8 @@ import { AppComboGridComponent } from "@common";
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
-    
+    @Input() isReadonly: boolean = false;
+
     @Input() set type(t: string) {
         if (!!t) {
             this._type = t;
@@ -47,6 +48,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     creditList: Observable<ReceiptInvoiceModel[]>;
     debitList: Observable<ReceiptInvoiceModel[]>;
 
+    agencyHeaders: CommonInterface.IHeaderTable[];
     configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
     isSubmitted: boolean = false;
     selectedInvoice: ReceiptInvoiceModel;
@@ -68,6 +70,19 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Amount USD', field: '' },
             { title: 'Amount VND', field: '' },
             { title: 'Note', field: '' },
+            { title: 'BU Handle', field: '' },
+            { title: 'Office', field: '' },
+        ];
+        this.agencyHeaders = [
+            { title: 'RefNo', field: '' },
+            { title: 'Job', field: '' },
+            { title: 'HBL', field: '' },
+            { title: 'MBL', field: '' },
+            { title: 'Net Off Invoice No', field: '', width: 250 },
+            { title: 'Org Amount', field: '' },
+            { title: 'Amount USD', field: '' },
+            { title: 'Amount VND', field: '' },
+            { title: 'Payment Note', field: '' },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
