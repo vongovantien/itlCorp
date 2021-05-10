@@ -425,7 +425,7 @@ namespace eFMS.API.Accounting.DL.Services
                     RefNo = s.Key.BillingRefNo,
                     Type = "OBH",
                     InvoiceNo = null,
-                    Amount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    Amount = s.Sum(x => x.RefAmount),
                     UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
                     UnpaidAmountVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
                     UnpaidAmountUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
@@ -435,6 +435,7 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeId = s.FirstOrDefault().OfficeInvoiceId,
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
                     CompanyId = s.FirstOrDefault().CompanyInvoiceId,
+                    RefIds = listOBH.Select(x => x.RefId).ToList()
                 }).ToList();
 
                 paymentReceipts.AddRange(OBHGrp);
@@ -544,6 +545,8 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd;
             _payment.BalanceVnd = paymentGroupOBH.UnpaidAmountVnd - paymentGroupOBH.PaidAmountVnd;
             _payment.BalanceUsd = paymentGroupOBH.UnpaidAmountUsd - paymentGroupOBH.PaidAmountUsd;
+            _payment.UnpaidPaymentAmountVnd = paymentGroupOBH.UnpaidAmountVnd;
+            _payment.UnpaidPaymentAmountUsd = paymentGroupOBH.UnpaidAmountUsd;
 
             _payment.RefCurrency = invTemp.Currency; // currency của hóa đơn
             _payment.Note = paymentGroupOBH.Notes; // Cùng một notes
@@ -572,11 +575,14 @@ namespace eFMS.API.Accounting.DL.Services
                 List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && paymentOBH.RefIds.Contains(x.Id.ToString()))
                      .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
                      .ToList(); // xắp xếp theo unpaidAmount
+
+                decimal remainOBHAmountVnd = paymentOBH.PaidAmountVnd ?? 0; // Tổng tiền thu VND trên group OBH
+                decimal remainOBHAmountUsd = paymentOBH.PaidAmountUsd ?? 0;// Tổng tiền thu USD trên group OBH
+
                 foreach (var invTemp in invoicesTemp)
                 {
                     // Tổng Số tiền amount OBH đã thu trên group.
-                    decimal remainOBHAmountVnd = paymentOBH.PaidAmountVnd ?? 0;
-                    decimal remainOBHAmountUsd = paymentOBH.PaidAmountUsd ?? 0;
+
 
                     if (invTemp.Currency == AccountingConstants.CURRENCY_LOCAL)
                     {
@@ -596,6 +602,18 @@ namespace eFMS.API.Accounting.DL.Services
                                 results.Add(_paymentOBH);
                             }
                         }
+                        else 
+                        {
+                            AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
+                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd ;// Số tiền thu 
+                            _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
+
+                            _paymentOBH.PaymentAmountUsd = null;
+                            _paymentOBH.BalanceUsd = null;
+
+                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
+                            results.Add(_paymentOBH);
+                        }
                     }
                     else
                     {
@@ -606,6 +624,18 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                                 _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; // Số tiền thu 
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
+
+                                _paymentOBH.PaymentAmountVnd = null;
+                                _paymentOBH.BalanceVnd = null;
+
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
+                                results.Add(_paymentOBH);
+                            }
+                            else
+                            {
+                                AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd;// Số tiền thu 
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
 
                                 _paymentOBH.PaymentAmountVnd = null;
@@ -800,7 +830,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
             }
-            if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
+            else if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
             {
                 _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
             }
@@ -855,23 +885,47 @@ namespace eFMS.API.Accounting.DL.Services
                                 //1. Số tiền còn lại của payment lớn hơn số tiền phải thu của invoice
                                 if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
                                 {
-                                    item.PaidAmount = remainAmount - item.UnpaidAmount;
-                                    item.PaidAmountVnd = remainAmountVnd - item.UnpaidAmountVnd;
-                                    item.PaidAmountUsd = remainAmountUsd - item.UnpaidAmountUsd;
+                                    if(item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        item.PaidAmount =  remainAmount ;
+                                        item.PaidAmountVnd = remainAmountVnd ;
 
-                                    remainAmount = remainAmount - item.UnpaidAmount ?? 0; // Cập nhật lại số tiền còn lại
-                                    remainAmountVnd = remainAmountVnd - item.UnpaidAmountVnd ?? 0;
-                                    remainAmountUsd = remainAmountUsd - item.UnpaidAmountUsd ?? 0;
+                                        remainAmount = remainAmount - item.PaidAmountVnd ?? 0; // Cập nhật lại số tiền còn lại
+                                        remainAmountVnd = remainAmountVnd - item.PaidAmountVnd ?? 0;
 
-                                    item.UnpaidAmount = item.TotalAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                    item.UnpaidAmountUsd = item.TotalAmountUsd - item.PaidAmountUsd;
-                                    item.UnpaidAmountVnd = item.TotalAmountVnd - item.PaidAmountVnd;
+                                    }
+                                    else
+                                    {
+                                        item.PaidAmount = remainAmount;
+                                        item.PaidAmountUsd = remainAmountUsd;
+
+                                        remainAmount = remainAmount - item.PaidAmount ?? 0; // Cập nhật lại số tiền còn lại
+                                        remainAmountUsd = remainAmountUsd - item.PaidAmountUsd ?? 0;
+                                    }
+
+
+                                    item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                    item.UnpaidAmountUsd = item.UnpaidAmountUsd - item.PaidAmountUsd;
+                                    item.UnpaidAmountVnd = item.UnpaidAmountVnd - item.PaidAmountVnd;
                                 }
                                 else
                                 {
-                                    item.PaidAmount = remainAmount;
-                                    item.PaidAmountUsd = remainAmountUsd;
-                                    item.PaidAmountVnd = remainAmountVnd;
+                                    if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                    {
+                                        item.PaidAmount = remainAmount;
+                                        item.PaidAmountVnd = remainAmountVnd;
+
+                                        item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                        item.UnpaidAmountVnd = item.UnpaidAmountVnd - item.PaidAmountVnd;
+                                    }
+                                    else
+                                    {
+                                        item.PaidAmount = remainAmount;
+                                        item.PaidAmountUsd = remainAmountUsd;
+
+                                        item.UnpaidAmount = item.UnpaidAmount - item.PaidAmount; // Số tiền còn lại của hóa đơn
+                                        item.UnpaidAmountUsd = item.UnpaidAmountUsd - item.PaidAmountUsd;
+                                    }
 
                                     remainAmountUsd = 0;
                                     remainAmountVnd = 0;
