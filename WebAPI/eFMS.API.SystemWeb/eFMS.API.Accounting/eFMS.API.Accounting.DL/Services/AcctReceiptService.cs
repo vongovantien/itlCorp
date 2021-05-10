@@ -586,8 +586,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd - invTemp.UnpaidAmountVnd; // Số tiền thu 
-                                _paymentOBH.Balance = _paymentOBH.BalanceVnd = _paymentOBH.PaymentAmount - invTemp.UnpaidAmount; // Số tiền còn lại
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu 
+                                _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
 
                                 _paymentOBH.PaymentAmountUsd = null;
                                 _paymentOBH.BalanceUsd = null;
@@ -605,8 +605,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd - invTemp.UnpaidAmountUsd; // Số tiền thu 
-                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = _paymentOBH.PaymentAmount - invTemp.UnpaidAmountUsd; // Số tiền còn lại
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; // Số tiền thu 
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
 
                                 _paymentOBH.PaymentAmountVnd = null;
                                 _paymentOBH.BalanceVnd = null;
@@ -832,9 +832,9 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.PaidAmountUsd = totalAmountUsdPaymentOfInv;
                         invoice.PaidAmountVnd = totalAmountVndPaymentOfInv;
 
-                        invoice.UnpaidAmount = invoice.TotalAmount - totalAmountPayment;
-                        invoice.UnpaidAmountUsd = invoice.TotalAmountUsd - totalAmountUsdPaymentOfInv;
-                        invoice.UnpaidAmountVnd = invoice.TotalAmountVnd - totalAmountVndPaymentOfInv;
+                        invoice.UnpaidAmount = invoice.UnpaidAmount - totalAmountPayment;
+                        invoice.UnpaidAmountUsd = invoice.UnpaidAmountUsd - totalAmountUsdPaymentOfInv;
+                        invoice.UnpaidAmountVnd = invoice.UnpaidAmountVnd - totalAmountVndPaymentOfInv;
 
                         invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
                         invoice.UserModified = currentUser.UserID;
@@ -1107,7 +1107,6 @@ namespace eFMS.API.Accounting.DL.Services
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                             HandleState hs = DataContext.Add(receiptData);
 
-                            hs = DataContext.Add(receiptData);
                             if (hs.Success)
                             {
                                 AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
