@@ -227,6 +227,11 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
                 return BadRequest(_result);
             }
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Update);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            }
             return Ok(result);
         }
 
