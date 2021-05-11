@@ -44,7 +44,7 @@
             <summary>
             Func Test (Get List Receipt)
             </summary>
-            <param name="Ids"></param>
+            <param name="ids"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">

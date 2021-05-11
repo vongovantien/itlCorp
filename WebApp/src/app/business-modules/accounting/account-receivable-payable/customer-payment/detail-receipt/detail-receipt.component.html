@@ -11,6 +11,7 @@
                         <span
                             class="m-badge m-badge--{{receiptDetail?.status === 'Draft' && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
+                            {{receiptDetail?.subRejectReceipt}}
                         </span>
                     </h3>
                     <div>
@@ -25,7 +26,7 @@
 
                             <ng-container *ngIf="receiptDetail?.status === 'Done'">
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
-                                    icon="la la-cloud-upload">
+                                    icon="la la-cloud-upload" (onClick)="confirmSync()">
                                 </app-permission-button>
                             </ng-container>
 
@@ -37,7 +38,8 @@
                     </div>
                 </div>
 
-                <customer-payment-form-create-receipt [isUpdate]="true" (onChangeReceipt)="caculateReceipt($event)"> </customer-payment-form-create-receipt>
+                <customer-payment-form-create-receipt [isUpdate]="true" (onChangeReceipt)="caculateReceipt($event)">
+                </customer-payment-form-create-receipt>
 
                 <customer-payment-list-receipt [syncInfoTemplate]="syncInfoTemplate">
                     <div class="row m--margin-top-20">
@@ -53,11 +55,14 @@
                 </customer-payment-list-receipt>
 
                 <div class="c-button-actions text-center">
-                    <ng-container *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
-                        <app-permission-button type="save" title="Done" class="success" (onClick)="confirmDoneReceipt()">
+                    <ng-container
+                        *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                        <app-permission-button type="save" title="Done" class="success"
+                            (onClick)="confirmDoneReceipt()">
                         </app-permission-button>
                     </ng-container>
-                    <ng-container *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                    <ng-container
+                        *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button title="Cancel Receipt" type="reject" class="danger" icon="la la-times"
                             (onClick)="submitClick('cancel')">
                         </app-permission-button>
@@ -71,21 +76,22 @@
 <ng-template #syncInfoTemplate>
     <ul class="list-group">
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Sync Status:
+            <b>Sync Status:</b>
             <span *ngIf="receiptDetail?.syncStatus !== null"
                 class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
-                {{receiptDetail?.syncStatus}}
+                {{receiptDetail?.syncStatus}}{{receiptDetail?.subRejectReceipt}}
             </span>
         </li>
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Reason reject:
+            <b>Reason reject:</b>
             <span>{{receiptDetail?.reasonReject}}</span>
         </li>
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Last Sync:
-            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy'}}</span>
+            <b>Last Sync:</b>
+            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy HH:ss:mm'}}</span>
         </li>
     </ul>
 </ng-template>
 
 <ng-template inject></ng-template>
+<confirm-popup (onSubmit)="onConfirmSync()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>

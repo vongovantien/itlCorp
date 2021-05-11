@@ -39,6 +39,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<SysCompany> companyRepository;
         private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
 
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
@@ -58,7 +59,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctSoa> soaRepo,
             IContextBase<AcctCdnote> cdNoteRepo,
             IContextBase<SysCompany> companyRepo,
-            IAccAccountReceivableService accAccountReceivable
+            IAccAccountReceivableService accAccountReceivable,
+            IContextBase<AcctReceiptSync> receiptSyncRepo
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -76,6 +78,7 @@ namespace eFMS.API.Accounting.DL.Services
             cdNoteRepository = cdNoteRepo;
             companyRepository = companyRepo;
             accAccountReceivableService = accAccountReceivable;
+            receiptSyncRepository = receiptSyncRepo;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -479,7 +482,13 @@ namespace eFMS.API.Accounting.DL.Services
 
             CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             result.CustomerName = partnerInfo?.ShortName;
-
+            
+            //Số phiếu con đã reject
+            var totalRejectReceiptSync = receiptSyncRepository.Get(x => x.ReceiptId == receipt.Id && x.SyncStatus == AccountingConstants.STATUS_REJECTED).Count();
+            if (totalRejectReceiptSync > 0)
+            {
+                result.SubRejectReceipt = receipt.SyncStatus != "Rejected" ? " - Rejected(" + totalRejectReceiptSync + ")" : string.Empty;
+            }
             return result;
         }
 

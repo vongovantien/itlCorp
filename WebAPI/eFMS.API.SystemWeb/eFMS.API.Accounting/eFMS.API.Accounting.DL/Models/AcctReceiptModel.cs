@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models
         public List<ReceiptInvoiceModel> Payments { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
+        public string SubRejectReceipt { get; set; }
     }
 
     public enum SaveAction
