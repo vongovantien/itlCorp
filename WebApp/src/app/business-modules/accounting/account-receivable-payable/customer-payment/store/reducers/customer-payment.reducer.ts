@@ -11,6 +11,7 @@ export interface IReceiptState {
     debitInvoice: ReceiptInvoiceModel[];
     isLoading: boolean;
     isLoaded: boolean;
+    type: string;
 }
 
 export const initialState: IReceiptState = {
@@ -20,7 +21,8 @@ export const initialState: IReceiptState = {
     invoices: [],
     debitInvoice: [],
     isLoaded: false,
-    isLoading: false
+    isLoading: false,
+    type: null
 };
 
 export const receiptManagementReducer = createReducer(
@@ -34,6 +36,7 @@ export const receiptManagementReducer = createReducer(
         creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
         debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.type === 'ADV'), ...state.debitList]
     })),
+    on(ReceiptActions.SetTypeReceipt, (state: IReceiptState, payload: any) => ({ ...state, type: payload.data })),
     on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, creditList: [], debitList: [] })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
