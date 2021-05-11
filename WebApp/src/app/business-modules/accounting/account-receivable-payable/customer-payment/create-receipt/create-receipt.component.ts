@@ -180,11 +180,27 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     confirmCancel() {
-        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
-            body: 'Do you want to exit without saving?',
-        }, () => {
+        let dataList = [];
+        combineLatest([
+            this._store.select(ReceiptDebitListState),
+            this._store.select(ReceiptCreditListState)])
+            .subscribe(x => {
+                x.forEach((element: ReceiptInvoiceModel[]) => {
+                    if (element.length > 0) {
+                        element.map(item => dataList.push(item))
+                    }
+                });
+            });
+
+        if (dataList.length > 0) {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Do you want to exit without saving?',
+            }, () => {
+                this.gotoList();
+            })
+        } else {
             this.gotoList();
-        })
+        }
     }
 
     confirmDoneReceipt() {
