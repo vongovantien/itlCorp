@@ -4,11 +4,10 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { Observable } from 'rxjs';
 import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
-import { CommonEnum } from '@enums';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
 import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError, takeUntil } from 'rxjs/operators';
+import { finalize, catchError, takeUntil, pluck } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
@@ -17,6 +16,7 @@ import { ReceiptCreditListState, ReceiptDebitListState } from '../../store/reduc
 import { ActivatedRoute } from '@angular/router';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -87,12 +87,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this._activedRoute.queryParams.subscribe((param: any) => {
-            if (!!param) {
-                this.type = param.type;
-                this.getCustomer(this.type);
-            }
-        })
+        this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
+
         this.initForm();
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },

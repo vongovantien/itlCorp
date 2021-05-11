@@ -2396,7 +2396,7 @@ namespace eFMS.API.Documentation.DL.Services
             string value = string.Empty;
             if (etd != null && etd.HasValue)
             {
-                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName,country, DateTime.Now.ToString("MMM dd, yyyy"));
+                value = string.Format("SHIPPED ON BOARD \n{0},{1}\n{2}", polName,country, etd.Value.ToString("MMM dd, yyyy"));
             }
             else
             {

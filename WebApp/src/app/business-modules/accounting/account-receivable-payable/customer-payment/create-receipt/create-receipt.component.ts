@@ -4,7 +4,7 @@ import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
 import { Router, ActivatedRoute } from '@angular/router';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { InfoPopupComponent } from '@common';
+import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
@@ -12,9 +12,11 @@ import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ResetInvoiceList } from '../store/actions';
-import { combineLatest, empty } from 'rxjs';
+import { ResetInvoiceList, SetTypeReceipt } from '../store/actions';
+import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
+import { InjectViewContainerRefDirective } from '@directives';
+import { HttpErrorResponse } from '@angular/common/http';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -28,13 +30,15 @@ export enum SaveReceiptActionEnum {
     templateUrl: './create-receipt.component.html',
 })
 export class ARCustomerPaymentCreateReciptComponent extends AppForm implements OnInit {
-
     @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
     @ViewChild(ARCustomerPaymentReceiptPaymentListComponent) listInvoice: ARCustomerPaymentReceiptPaymentListComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     invalidBalance: string = 'Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!';
     type: string = null;
+    paymentList: ReceiptInvoiceModel[] = [];
+
     constructor(
         protected _router: Router,
         protected _toastService: ToastrService,
@@ -46,74 +50,79 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     ngOnInit(): void {
-        this.initSubmitClickSubscription(() => { this.saveReceipt('draft') });
+        this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
         this._activedRoute.queryParams.subscribe((param: any) => {
             if (!!param) {
                 this.type = param.type;
+                this._store.dispatch(SetTypeReceipt({ data: this.type }));
             }
         })
     }
 
-    saveReceipt(type: string) {
+    saveReceipt(actionString: string) {
         this.formCreate.isSubmitted = true;
         this.listInvoice.isSubmitted = true;
         this.listInvoice.receiptCreditList.isSubmitted = true;
+
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
             return;
         }
 
-        // if (!this.listInvoice.invoices.length) {
-        //     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
-        //     return;
-        // }
-        // if (this.listInvoice.invoices.some(x => x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID)) {
-        //     this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
+        if (!actionString) {
+            return;
+        }
 
-        //     return;
-        // }
+        let action: number;
+        switch (actionString) {
+            case 'draft':
+                action = SaveReceiptActionEnum.DRAFT_CREATE
+                break;
+            case 'update':
+                action = SaveReceiptActionEnum.DRAFT_UPDATE
+                break;
+            case 'done':
+                action = SaveReceiptActionEnum.DONE
+                break;
+            case 'cancel':
+                action = SaveReceiptActionEnum.CANCEL
+                break;
+            default:
+                break;
+        }
 
-        // if (!this.checkValidateBalance(this.listInvoice.invoices, +this.listInvoice.finalPaidAmount.value, +this.listInvoice.balance.value)) {
-        //     this._toastService.warning(this.invalidBalance, 'Warning');
-        //     return;
-        // }
+
         const receiptModel: ReceiptModel = this.getDataForm();
 
-        let paymentList = [];
-       combineLatest([
+        this.paymentList = [];
+        this.subscription = combineLatest([
             this._store.select(ReceiptDebitListState),
             this._store.select(ReceiptCreditListState)])
-            .subscribe(x=> {
+            .subscribe(x => {
                 x.forEach((element: ReceiptInvoiceModel[]) => {
-                    if(element.length > 0){
-                        element.map(item => paymentList.push(item))
+                    if (element.length > 0) {
+                        element.map(item => this.paymentList.push(item))
                     }
                 });
             }
-                )
-        console.log('list', paymentList)
-        if (paymentList.length === 0) {
+            )
+        if (this.paymentList.length === 0) {
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Debit' || x.type === 'OBH').length === 0) {
+        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0) {
             this._toastService.warning("You can't save without debit in this period, Please check it again!");
             return;
         }
-        if (paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'Credit' && !x.invoiceNo).length > 0) {
+        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'CREDIT' && !x.invoiceNo).length > 0) {
             this._toastService.warning("Please select invoice no!");
             return;
         }
-        receiptModel.payments = paymentList;
-        // if (receiptModel.payments.some(x => x.type === 'ADV')) {
-        //     receiptModel.payments.forEach(inv => {
-        //         inv.receiptExcPaidAmount = inv.paidAmount;
-        //     });
-        // }
 
-        this.onSaveDataReceipt(receiptModel, type);
+        receiptModel.payments = this.paymentList;
+        this.onSaveDataReceipt(receiptModel, action);
     }
-    
+
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
 
@@ -121,7 +130,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
-            type: this.type,
+            type: this.type || 'Customer',
         };
 
         const d = this.utility.mergeObject(dataForm, formMapValue);
@@ -136,42 +145,31 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
         return valid;
     }
-
-    checkValidateBalance(invoices: ReceiptInvoiceModel[], finalPaid: number = 0, balance: number = 0) {
-        let valid: boolean = true;
-        // const paidAmount = invoices.filter(x => x.type !== 'ADV').reduce((acc: number, curr: ReceiptInvoiceModel) => acc += (curr.paidAmount + curr.invoiceBalance), 0);
-        // if (+paidAmount + balance !== finalPaid) {
-        //     valid = false;
-        // }
-
-        return valid;
-    }
-
-    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
+    onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
-        this._accountingRepo.saveReceipt(model, SaveReceiptActionEnum.DRAFT_CREATE)
+        this._accountingRepo.saveReceipt(model, action)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     console.log(res);
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._store.dispatch(ResetInvoiceList);
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
+                        this._store.dispatch(ResetInvoiceList());
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`], { queryParams: { type: this.type } });
                         return;
                     }
                     this._toastService.error("Create data fail, Please check again!");
                 },
-                // (res: HttpErrorResponse) => {
-                //     if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
-                //         this.formCreate.paymentRefNo.setErrors({ existed: true });
-                //     }
-                // }
+                (res: HttpErrorResponse) => {
+                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+                        this.formCreate.paymentRefNo.setErrors({ existed: true });
+                    }
+                }
             )
     };
 
-    changeDebitList(event){
-        if(event){
-            this.listInvoice.caculatorAmountFromDebitList();
+    caculateReceipt(onChange: boolean){
+        if(onChange){
+            this.listInvoice.caculateAmountFromDebitList();
         }
     }
 
@@ -179,5 +177,25 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this._store.dispatch(ResetInvoiceList());
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
 
+    }
+
+    confirmCancel() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Do you want to exit without saving?',
+        }, () => {
+            this.gotoList();
+        })
+    }
+
+    confirmDoneReceipt() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            body: 'Noted: After you save the receipt, you can not edit. Are you sure do this action?',
+            title: 'Alert',
+            labelCancel: 'No',
+            labelConfirm: 'Yes',
+            iconConfirm: 'la la-save'
+        }, () => {
+            this.submitClick('done');
+        })
     }
 }

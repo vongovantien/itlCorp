@@ -35,7 +35,6 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingService;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly ICurrentUser currentUser;
         /// <summary>
         /// Contructor
@@ -44,19 +43,16 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="hostingEnvironment"></param>
         /// <param name="accService"></param>
         /// <param name="currUser"></param>
-        /// <param name="accAccountReceivable"></param>
         public AccountingManagementController(
             IStringLocalizer<LanguageSub> localizer,
             IHostingEnvironment hostingEnvironment,
             IAccountingManagementService accService,
-            ICurrentUser currUser,
-            IAccAccountReceivableService accAccountReceivable)
+            ICurrentUser currUser)
         {
             stringLocalizer = localizer;
             accountingService = accService;
             _hostingEnvironment = hostingEnvironment;
             currentUser = currUser;
-            accAccountReceivableService = accAccountReceivable;
         }
 
         [Authorize]
@@ -76,20 +72,18 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Delete(Guid id)
         {
             currentUser.Action = "DeleteAcctMngt";
-
-            var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(id);
-
+            
             HandleState hs = accountingService.Delete(id);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
-                // Sau khi xóa thành công >> tính lại công nợ dựa vào list surcharge id của accounting management
-                CalculatorReceivableAcctMngt(surchargeIds);
-            }*/ //[31/03/2021]
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào id của accounting management
+                var cr = accountingService.CalculatorReceivableAcctMngt(id);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -187,12 +181,11 @@ namespace eFMS.API.Accounting.Controllers
             
             var hs = accountingService.AddAcctMgnt(model);
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
-                var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
-                // Tính công nợ
-                CalculatorReceivableAcctMngt(surchargeIds);
-            }*/ //[31/03/2021]
+                // Tính công nợ dựa vào id của Accounting Management
+                var cr = accountingService.CalculatorReceivableAcctMngt(model.Id);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -248,12 +241,11 @@ namespace eFMS.API.Accounting.Controllers
 
             var hs = accountingService.UpdateAcctMngt(model);
 
-            /*if (hs.Success)
+            if (hs.Success)
             {
-                var surchargeIds = model.Charges.Select(s => s.SurchargeId).Distinct().ToList();
-                // Tính công nợ
-                CalculatorReceivableAcctMngt(surchargeIds);
-            }*/ //[31/03/2021]
+                // Tính công nợ dựa vào id của Accounting Management
+                accountingService.CalculatorReceivableAcctMngt(model.Id);
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -432,15 +424,14 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var result = accountingService.ImportVatInvoice(model);
-            /*if (result.Status)
+            if (result.Status)
             {
                 var acctMngtIds = accountingService.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && model.Select(s => s.VoucherId).Contains(x.VoucherId)).Select(s => s.Id);
                 foreach(var acctMngtId in acctMngtIds)
                 {
-                    var surchargeIds = accountingService.GetSurchargeIdByAcctMngtId(acctMngtId);
-                    CalculatorReceivableAcctMngt(surchargeIds);
+                    accountingService.CalculatorReceivableAcctMngt(acctMngtId);
                 }
-            }*/ //[31/03/2021]
+            }
             return Ok(result);
         }
 
@@ -452,23 +443,6 @@ namespace eFMS.API.Accounting.Controllers
             if (!ModelState.IsValid) return BadRequest();
             CatContractInvoiceModel result = accountingService.GetContractForInvoice(model);
             return Ok(result);
-        }
-
-        private void CalculatorReceivableAcctMngt(List<Guid> surchargeIds)
-        {
-            if (surchargeIds != null && surchargeIds.Count > 0)
-            {
-                CalculatorReceivableModel calculatorReceivable = new CalculatorReceivableModel();
-                List<ObjectReceivableModel> receivableModels = new List<ObjectReceivableModel>();
-                foreach (var surchargeId in surchargeIds)
-                {
-                    ObjectReceivableModel objectReceivable = new ObjectReceivableModel();
-                    objectReceivable.SurchargeId = surchargeId;
-                    receivableModels.Add(objectReceivable);
-                }
-                calculatorReceivable.ObjectReceivable = receivableModels;
-                accAccountReceivableService.CalculatorReceivable(calculatorReceivable);
-            }
         }
         
         [HttpPost]

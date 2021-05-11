@@ -46,16 +46,22 @@
                                                             [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                             <td class="table-actions-col">
                                                                 <div class="table-actions">
-                                                                    <app-permission-button
+                                                                    <!-- <app-permission-button
                                                                         *ngIf="(cps.status === 'Draft')" type="delete"
                                                                         (onClick)="checkAllowDelete(cps)">
+                                                                    </app-permission-button> -->
+                                                                    <app-permission-button type="delete"
+                                                                        *ngIf="(cps.status === 'Draft')"
+                                                                        (onClick)="checkAllowDelete(cps)"
+                                                                        [user]="cps.userCreated" class="icon"
+                                                                        icon="la la-trash text-danger">
                                                                     </app-permission-button>
                                                                     <button type="button"
                                                                         (click)="cancelReceipt(cps.id)"
-                                                                        class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only"
+                                                                        class="btn btn-danger  btn-sm  m-btn--icon m-btn--icon-only"
                                                                         title="Cancel"
                                                                         *ngIf="(cps.status === 'Done' && cps.syncStatus !=='Synced')">
-                                                                        <i class="la la-ban"></i>
+                                                                        <i class="la la-times"></i>
                                                                     </button>
                                                                     <!-- <button type="button"
                                                                         class="btn btn-dark btn-sm  m-btn--icon m-btn--icon-only"
@@ -76,7 +82,7 @@
                                                             </td>
 
                                                             <td>
-                                                                <span>{{cps.customerName}}</span>
+                                                                <span class="text-info">{{cps.customerName}}</span>
                                                             </td>
                                                             <td class="text-right">
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
@@ -87,7 +93,7 @@
                                                             </td>
                                                             <td>
                                                                 <span>
-                                                                    {{cps.paymentDate | date :'dd/MM/yyyy HH:mm'}}
+                                                                    {{cps.paymentDate | date :'dd/MM/yyyy'}}
                                                                 </span>
                                                             </td>
                                                             <td>

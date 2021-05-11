@@ -103,6 +103,7 @@ export class ReceiptModel extends Receipt {
     payments: ReceiptInvoiceModel[] = [];
     userNameCreated: string = null;
     userNameModified: string = null;
+    subRejectReceipt: string = null;
     constructor(object?: any) {
         super();
         const self = this;

@@ -73,7 +73,6 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                     this.partnerId = res.partnerId;
                     this.partnerList.parentId = this.partnerId;
                     this.formCommercialComponent.partnerId = this.partnerId;
-
                     this.getDetailCustomer(this.partnerId);
                     this.partnerEmailList.getEmailPartner(this.partnerId);
                     if (!this.isAddSubPartner) {
@@ -103,6 +102,8 @@ export class CommercialDetailComponent extends CommercialCreateComponent impleme
                 (res: Partner) => {
                     if (!!res) {
                         this.partner = res;
+                        this.formCommercialComponent.active = this.partner.active;
+                        console.log(this.formCommercialComponent.active);
                         console.log("detail partner:", this.partner);
                         this.formCreate.isBranchSub = this.isAddSubPartner;
                         this.setDataForm(this.partner);

@@ -871,6 +871,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+
+    syncReceiptToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

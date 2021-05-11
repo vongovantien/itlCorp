@@ -45,7 +45,8 @@
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':(isSubmitted || taxCode.dirty) && !taxCode.valid }">
                                 <label required>Tax Code</label>
-                                <input type="text" class="form-control" formControlName="taxCode">
+                                <input type="text" class="form-control" formControlName="taxCode"
+                                    [attr.disabled]="active ? 'disabled' : null">
                                 <div class="form-control-feedback" *ngIf="isSubmitted && 
                         ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                                     Tax Code include 7 - 14 characters!

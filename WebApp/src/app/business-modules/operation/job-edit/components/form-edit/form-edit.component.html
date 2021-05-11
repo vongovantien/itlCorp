@@ -15,8 +15,10 @@
 				</div>
 			</div>
 			<div class="col-lg-4">
-				<div class="form-group"
-					[ngClass]="{'m-form__group has-danger': (serviceDate.dirty && !serviceDate.value) || (isSubmitted && !serviceDate.value) || (isSubmitted && !serviceDate.value.startDate)}">
+				<div class="form-group" [ngClass]="{'m-form__group has-danger': (serviceDate.dirty && !serviceDate.value)
+					|| (isSubmitted && !serviceDate.value) 
+					|| (isSubmitted && !serviceDate.valid) 
+					|| (isSubmitted && !serviceDate.value.startDate)}">
 					<label class="form-control-label" required>
 						Service Date
 					</label>
@@ -24,19 +26,13 @@
 						<input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
 							[locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
 							[alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
-							formControlName="serviceDate" />
-						<span class="m-input-icon_clear" (click)="resetFormControl(serviceDate)"
-							*ngIf="!!serviceDate.value && !!serviceDate.value.startDate">
-							<i class="la la-times"></i>
-						</span>
-						<span class="m-input-icon__icon m-input-icon__icon--right">
-							<span>
-								<i class="la la-calendar"></i>
-							</span>
-						</span>
+							formControlName="serviceDate" calendar
+							[allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate"
+							(remove)="resetFormControl(serviceDate)" />
 					</div>
-					<div class="form-control-feedback"
-						*ngIf="(serviceDate.dirty && !serviceDate.value) || (isSubmitted && !serviceDate.value) || (isSubmitted && !serviceDate.value.startDate)">
+					<div class="form-control-feedback" *ngIf="(serviceDate.dirty && !serviceDate.value) 
+						|| (isSubmitted && !serviceDate.value) 
+						|| (isSubmitted && !serviceDate.value.startDate)">
 						Service Date is required!
 					</div>
 				</div>
@@ -51,16 +47,9 @@
 						<input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
 							[locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
 							[alwaysShowCalendars]="true" name="daterange" readonly placeholder="DD/MM/YYYY"
-							formControlName="finishDate" />
-						<span class="m-input-icon_clear" (click)="resetFormControl(finishDate)"
-							*ngIf="!!finishDate.value && !!finishDate.value.startDate">
-							<i class="la la-times"></i>
-						</span>
-						<span class="m-input-icon__icon m-input-icon__icon--right">
-							<span>
-								<i class="la la-calendar"></i>
-							</span>
-						</span>
+							formControlName="finishDate" calendar
+							[allowRemove]="!!finishDate.value && !!finishDate.value.startDate"
+							(remove)="resetFormControl(finishDate)" />
 					</div>
 					<div class="form-control-feedback"
 						*ngIf="isSubmitted && finishDate.value.startDate && (serviceDate.value.startDate > finishDate.value.startDate)">

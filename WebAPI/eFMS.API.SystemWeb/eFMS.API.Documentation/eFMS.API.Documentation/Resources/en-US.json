@@ -66,6 +66,9 @@
   "MSG_HOUSEBILL_DO_NOT_DELETE_CONTAIN_CDNOTE_SOA": "Cannot delete, this house bill is containing at least one charge have Credit Debit Note/SOA no!",
   "MSG_HOUSEBILL_NOT_FOUND": "House Bill not found !",
   "MSG_NOT_EXIST_SHIPMENT_COPY": "{0} not found, please recheck!",
+  "MSG_ETD_CANNOT_CHANGE_MONTH": "ETD date can not change month",
+  "MSG_ETA_CANNOT_CHANGE_MONTH": "ETA date can not change month",
+  "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH": "Service date can not change month",
 
   "MSG_HBLNO_EMPTY": "Hbl no not allow empty!",
   "MSG_MBLNO_EMPTY": "Mbl no not allow empty!",

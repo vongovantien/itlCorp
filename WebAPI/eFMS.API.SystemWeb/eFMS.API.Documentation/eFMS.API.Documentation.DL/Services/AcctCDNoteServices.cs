@@ -1579,14 +1579,9 @@ namespace eFMS.API.Documentation.DL.Services
                     var partner = partnerRepositoty.Get(x => x.Id == data.PartnerId).FirstOrDefault();
                     charge.PartnerID = data.PartnerId?.ToUpper();
                     charge.PartnerName = data.PartnerNameEn?.ToUpper();
-                    if (isOriginCurr)
-                    {
-                        charge.Address = (DocumentConstants.CURRENCY_LOCAL == item.CurrencyId && data.CDNote.Type == "DEBIT") ? partner.AddressVn : partner.AddressEn;//Lấy địa chỉ Billing
-                    }
-                    else
-                    {
-                        charge.Address = (DocumentConstants.CURRENCY_LOCAL == currency && data.CDNote.Type == "DEBIT") ? partner.AddressVn : partner.AddressEn;//Lấy địa chỉ Billing
-                    }
+
+                    charge.Address = (DocumentConstants.CURRENCY_LOCAL == currency && data.CDNote.Type == "DEBIT") ? partner.AddressVn : partner.AddressEn;//Lấy địa chỉ Billing
+
                     charge.Workphone = data.PartnerTel?.ToUpper();
                     charge.Fax = data.PartnerFax?.ToUpper();
                     charge.Taxcode = data.PartnerTaxcode?.ToUpper();

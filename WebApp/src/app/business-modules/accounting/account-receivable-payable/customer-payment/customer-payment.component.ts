@@ -13,6 +13,9 @@ import { RoutingConstants } from "@constants";
 
 import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+import { IAppState } from "@store";
+import { Store } from "@ngrx/store";
+import { ResetInvoiceList } from "./store/actions";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -48,7 +51,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         private _toastService: ToastrService,
         private _progressService: NgProgress,
         private _router: Router,
-        private _accountingRepo: AccountingRepo
+        private _accountingRepo: AccountingRepo,
+        protected _store: Store<IAppState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -82,7 +86,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .checkAllowGetDetailCPS(data.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
+                    this._store.dispatch(ResetInvoiceList());
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`], { queryParams: { type: data.type } });
                 } else {
                     this.permissionPopup.show();
                 }
@@ -191,6 +196,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     gotoCreateReceipt(type: string) {
+        this._store.dispatch(ResetInvoiceList());
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { type: type } });
     }
 

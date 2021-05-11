@@ -30,6 +30,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctReceiptService acctReceiptService;
         private readonly ICurrentUser currentUser;
+      
 
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
@@ -55,7 +56,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
         {
             IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);
-            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size };
+            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size, TotalItems = rowsCount };
             return Ok(result);
         }
 
@@ -167,10 +168,13 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check exists invoice payment PAID
-            if (receiptModel.Payments.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+            if(saveAction != SaveAction.SAVECANCEL)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Receipt existed Paid Invoice(s), Please you check and remove them!", Data = receiptModel };
-                return BadRequest(_result);
+                string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
+                if (msgCheckPaidPayment.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
+                }
             }
 
             var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
@@ -188,6 +192,11 @@ namespace eFMS.API.Accounting.Controllers
             } 
             else if (saveAction == SaveAction.SAVEDONE)
             {
+                if (hs.Success)
+                {
+                    //Tính công nợ sau khi Save Done thành công
+                    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                }
                 result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
             } 
             else if (saveAction == SaveAction.SAVECANCEL)
@@ -211,12 +220,21 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveDoneReceipt(Guid receiptId)
         {
             var hs = acctReceiptService.SaveDoneReceipt(receiptId);
-
+            if (hs.Success)
+            {
+                //Tính công nợ sau khi Save Done thành công
+                acctReceiptService.CalculatorReceivableForReceipt(receiptId);
+            }
             ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptId };
                 return BadRequest(_result);
+            }
+            else
+            {
+                var message = HandleError.GetMessage(hs, Crud.Update);
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             }
             return Ok(result);
         }
@@ -277,6 +295,19 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             return valid;
+        }
+
+        private string CheckInvoicePaid(AcctReceiptModel receiptModel)
+        {
+            string result = string.Empty;
+            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT").ToList();
+            bool isValidPayment = acctReceiptService.CheckPaymentPaid(payments);
+
+            if (isValidPayment == true)
+            {
+                result = stringLocalizer[AccountingLanguageSub.MSG_RECEIPT_HAVE_PAYMENT_PAID].Value;
+            }
+            return result;
         }
 
         /// <summary>

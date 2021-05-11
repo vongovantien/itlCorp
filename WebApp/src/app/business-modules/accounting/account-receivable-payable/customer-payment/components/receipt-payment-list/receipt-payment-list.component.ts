@@ -12,12 +12,11 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
-import { ConfirmPopupComponent } from '@common';
 import { cloneDeep, isNumber } from 'lodash';
 
 @Component({
@@ -29,7 +28,6 @@ import { cloneDeep, isNumber } from 'lodash';
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
-    @ViewChild("confirmRemove") confirmPopup: ConfirmPopupComponent;
 
     @Input() syncInfoTemplate: TemplateRef<any>
 
@@ -41,7 +39,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     form: FormGroup;
     methods: CommonInterface.ICommonTitleValue[];
     userLogged: Partial<SystemInterface.IClaimUser>;
-    type: AbstractControl;
     cusAdvanceAmount: AbstractControl;
     paymentMethod: AbstractControl;
     currencyId: AbstractControl;
@@ -60,7 +57,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
 
     paymentMethods: string[] = ['Cash', 'Bank Transfer', 'Other'];
-    receiptTypes: string[] = ['Debit', 'NetOff Adv'];
 
     customerInfo: Partner = null;
 
@@ -105,28 +101,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
         this.initForm();
 
-        this.headers = [
-            { title: 'Billing Ref No', field: 'invoiceNo', sortable: true },
-            { title: 'Series No', field: 'serieNo', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
-            { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Taxcode', field: 'taxCode', sortable: true },
-            { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
-            { title: 'Unpaid Ex Amount', field: 'receiptExcUnpaidAmount', sortable: true },
-            { title: 'Paid Amount', field: 'paidAmount', sortable: true },
-            { title: 'Paid Ex Amount', field: 'receiptExcPaidAmount', sortable: true },
-            { title: 'Balance Amount', field: 'invoiceBalance', sortable: true },
-            { title: 'Balance Ex Amount', field: 'receiptInvoicebalance', sortable: true },
-            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
-            { title: 'Billing Date', field: 'billingDate', sortable: true },
-            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Note', field: 'note', sortable: true },
-        ];
-
         this.isLoading = this._store.select(customerPaymentReceipLoadingState);
-        // this.initSubscriptioontInvoiceList();
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
+
         this._store.select(getCurrentUserState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((u) => {
@@ -139,22 +117,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     formatNumberCurrency(input: number, digit: number) {
         return input.toLocaleString(
-            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            'en-Us', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: digit }
         );
     }
-
-    // initSubscriptioontInvoiceList() {
-    //     this._store.select(customerPaymentReceipInvoiceListState)
-    //         .pipe(takeUntil(this.ngUnsubscribe))
-    //         .subscribe(
-    //             (res: ReceiptInvoiceModel[]) => {
-    //                 this.invoices = [...res];
-    //                 // this.balance.setValue(null);
-
-    //                 console.log(this.invoices);
-    //             });
-    // }
 
     listenCusAdvanceData() {
         this._dataService.currentMessage
@@ -190,7 +156,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.form = this._fb.group({
             paidAmountVND: [null, Validators.required],
             paidAmountUSD: [null, Validators.required],
-            type: [[this.receiptTypes[0]]],
             cusAdvanceAmount: [],
             finalPaidAmount: [{ value: null, disabled: true }],
             // balance: [{ value: null, disabled: true }],
@@ -206,7 +171,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             finalPaidAmountUSD: []
         });
 
-        this.type = this.form.controls['type'];
         this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
         // this.finalPaidAmount = this.form.controls['finalPaidAmount'];
         // this.balance = this.form.controls['balance'];
@@ -301,23 +265,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         }
     }
 
-    showConfirmPopup() {
-        this.confirmPopup.show();
-    }
-
-    removeReceiptItem() {
-        this.confirmPopup.hide();
-        this.receiptDebitList.removeListItem();
-        this.receiptCreditList.removeListItem();
+    getListReceiptChange(onChange: boolean){
+        if(onChange){
+            this.caculateAmountFromDebitList();
+        }
     }
 
     insertAdvanceRowData() {
-        const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel({
-            typeInvoice: 'ADV',
-            paidAmountVnd: 0,
-            paidAmountUsd: 0
-        });
-        this._store.dispatch(InsertAdvance({ data: newInvoiceWithAdv }));
+        const newInvoiceWithAdv: any = {};
+        newInvoiceWithAdv.typeInvoice = 'ADV';
+        newInvoiceWithAdv.type = 'ADV';
+        newInvoiceWithAdv.paidAmountVnd = 0;
+        newInvoiceWithAdv.paidAmountUsd = 0;
+        const data = newInvoiceWithAdv as ReceiptInvoiceModel;
+        this._store.dispatch(InsertAdvance({ data: data }));
 
         ///this.invoices.push(newInvoiceWithAdv);
     }
@@ -378,14 +339,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
         const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
         const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        console.log('finalPaidAmountUSD', amountUSD + paidAmountUSD)
         this.finalPaidAmountUSD.setValue(((cusAdvanceAmount / exChangeRateUSD)) + (amountUSD) + (paidAmountUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
 
-    caculatorAmountFromDebitList() {
+    caculateAmountFromDebitList() {
         this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList = this._store.select(ReceiptDebitListState);
+
         let valueUSD = 0;
         let valueVND = 0;
         let paidUSD = 0;
@@ -403,10 +364,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountUsd, 0);
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
-        this.amountUSD.setValue(this.formatNumberCurrency(valueUSD, 2));
-        this.amountVND.setValue(this.formatNumberCurrency(valueVND, 0));
-        this.paidAmountUSD.setValue(this.formatNumberCurrency(paidUSD, 2));
-        this.paidAmountVND.setValue(this.formatNumberCurrency(paidVND, 0));
+
+        this.amountUSD.setValue(valueUSD);
+        this.amountVND.setValue(valueVND);
+
+        this.paidAmountUSD.setValue(paidUSD);
+        this.paidAmountVND.setValue(paidVND);
+
         this.finalPaidAmountUSD.setValue((cusAdvanceAmount / exChangeRateUSD) + valueUSD + paidUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }

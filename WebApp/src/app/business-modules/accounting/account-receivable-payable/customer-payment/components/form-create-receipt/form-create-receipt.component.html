@@ -10,42 +10,26 @@
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"
                         [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
+                        [selectedDisplayFields]="['shortName']" [dataSources]="customers"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                         [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
             <div class="col-lg-6">
-                <label for="form-control-label">
-                    Date
-                </label>
-                <div class="row">
-                    <div class="col-lg-9">
-                        <div class="form-group">
-                            <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                <input type="text" ngxDaterangepickerMd class="form-control"
-                                    [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
-                                    placeholder="Select request date" [autoApply]="true" formControlName="date"
-                                    [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
-                                    [attr.disabled]="isReadonly" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group m--align-right">
-                            <button class="btn btn-info m-btn--icon m-btn--uppercase" type="button"
-                                (click)="getDebit()">
-                                <span>
-                                    <i class="la la-search"></i>
-                                    <span>Get Debit </span>
-                                </span>
-                            </button>
-                        </div>
+                <div class="form-group">
+                    <label for="form-control-label">
+                        Date
+                    </label>
+                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                        <input type="text" ngxDaterangepickerMd class="form-control"
+                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                            placeholder="Select request date" [autoApply]="true" formControlName="date"
+                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
+                            [attr.disabled]="isReadonly" />
                     </div>
                 </div>
             </div>
-
         </div>
         <div class="row">
             <div class="col-lg-6">
@@ -72,21 +56,17 @@
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
-        </div>
-        <!-- <ng-container *ngIf="!isReadonly">
-            <div class="row">
-                <div class="col-lg-6"></div>
-                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
-                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
-                        type="button" (click)="getInvoiceList()">
-                        <span>
-                            <i class="la la-search"></i>
-                            <span>Apply </span>
-                        </span>
-                    </button>
+            <div class="col-lg-12">
+                <div class="m--align-right m--margin-top-10">
+                    <ng-container *ngIf="!isReadonly">
+                        <app-permission-button title="Get Debit" class="info" [icon]="'la la-search'"
+                            (onClick)="getDebit()">
+                        </app-permission-button>
+                    </ng-container>
                 </div>
             </div>
-        </ng-container> -->
+        </div>
     </form>
 </div>
+
 <customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>

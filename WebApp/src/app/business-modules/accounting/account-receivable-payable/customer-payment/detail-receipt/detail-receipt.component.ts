@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
@@ -6,26 +6,29 @@ import { AccountingRepo } from '@repositories';
 import { ReceiptModel } from '@models';
 import { SystemConstants, AccountingConstants, RoutingConstants } from '@constants';
 
-import { ARCustomerPaymentReceiptSummaryComponent } from '../components/receipt-summary/receipt-summary.component';
-import { ARCustomerPaymentCreateReciptComponent, SaveReceiptActionEnum } from '../create-receipt/create-receipt.component';
+import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap, takeUntil, finalize } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../store/actions';
+import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-detail-receipt',
     templateUrl: './detail-receipt.component.html',
-    //changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
-    @ViewChild(ARCustomerPaymentReceiptSummaryComponent) summary: ARCustomerPaymentReceiptSummaryComponent;
-
+    @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(ConfirmPopupComponent) confirmSyncPopup: ConfirmPopupComponent;
     receiptId: string;
     receiptDetail: ReceiptModel;
+    confirmMessage: string = '';
 
     constructor(
         protected _router: Router,
@@ -33,6 +36,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<IAppState>,
+        private _spinner: NgxSpinnerService,
     ) {
         super(_router, _toast, _accountingRepo, _activedRoute, _store);
     }
@@ -48,6 +52,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             .pipe(
                 pluck('id'),
                 tap((id: string) => { this.receiptId = id }),
+                takeUntil(this.ngUnsubscribe),
                 switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId))
             )
             .subscribe(
@@ -83,7 +88,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
-        this.formCreate.isReadonly = true;
+        // this.formCreate.isReadonly = true;
     }
 
     updateListInvoice(res: ReceiptModel) {
@@ -96,18 +101,16 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.customerInfo as any) = { id: res.customerId };
-        this.listInvoice.caculatorAmountFromDebitList();
+        this.listInvoice.caculateAmountFromDebitList();
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;
+            this.formCreate.isReadonly = true;
         }
     }
 
-    updateSummary(res: ReceiptModel) {
-        this.summary.invoices = [...(res.payments || [])];
-        //this.summary.calculateInfodataInvoice([...res.payments] || []);
-    }
-    onSaveDataReceipt(model: ReceiptModel, actionString: string) {
+
+    onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = this.receiptDetail.id;
         model.userCreated = this.receiptDetail.userCreated;
         model.userModified = this.receiptDetail.userModified;
@@ -117,34 +120,18 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         model.syncStatus = this.receiptDetail.syncStatus;
         model.lastSyncDate = this.receiptDetail.lastSyncDate;
 
-        if (!actionString) {
-            return;
-        }
-        let action: number;
-        switch (actionString) {
-            case 'update':
-                action = SaveReceiptActionEnum.DRAFT_UPDATE
-                break;
-            case 'done':
-                action = SaveReceiptActionEnum.DONE
-                break;
-            case 'cancel':
-                action = SaveReceiptActionEnum.CANCEL
-                break;
-            default:
-                break;
-        }
         if (!action) { return; };
         this._accountingRepo.saveReceipt(model, action)
             .pipe(
                 concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this._store.dispatch(ResetInvoiceList);
+                        this._store.dispatch(ResetInvoiceList());
                         return this._accountingRepo.getDetailReceipt(this.receiptId);
                     }
                     of(res);
-                })
+                }),
+                takeUntil(this.ngUnsubscribe)
             )
             .subscribe(
                 (res: any) => {
@@ -170,4 +157,42 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     }
 
+    confirmSync() {
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
+        this.confirmSyncPopup.show();
+    }
+
+    onConfirmSync() {
+        this.confirmSyncPopup.hide();
+        this.sendReceiptToAccountant();
+    }
+
+    sendReceiptToAccountant() {
+        const receiptSyncIds: AccountingInterface.IRequestString[] = [];
+        const receiptSyncId: AccountingInterface.IRequestString = {
+            id: this.receiptDetail.id,
+            action: this.receiptDetail.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+        };
+        receiptSyncIds.push(receiptSyncId);
+        this._spinner.show();
+        this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Send Data to Accountant System Successful");
+
+                        //TODO: Load detail receipt
+
+                    } else {
+                        this._toastService.error("Send Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
 }

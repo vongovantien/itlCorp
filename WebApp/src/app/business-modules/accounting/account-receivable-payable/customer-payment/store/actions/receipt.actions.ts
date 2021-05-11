@@ -5,6 +5,7 @@ export enum ReceiptActionTypes {
     INIT_INVOICE = '[AR Receipt] Init Invoice List',
     GET_INVOICE = '[AR Receipt] Get Invoice',
     GET_INVOICE_SUCCESS = '[AR Receipt] Get Invoice Success',
+    SET_TYPE_RECEIPT = '[AR Receipt] Type Receipt',
     GET_INVOICE_FAIL = '[AR Receipt] Get Invoice Fail',
     GET_DEBIT_INVOICE = '[AR Receipt] Get Debit Invoice',
     RESET_INVOICE = '[AR Receipt] Reset Invoice List',
@@ -22,6 +23,7 @@ export enum ReceiptActionTypes {
 export const InitInvoiceList = createAction(ReceiptActionTypes.INIT_INVOICE);
 export const GetInvoiceList = createAction(ReceiptActionTypes.GET_INVOICE);
 export const GetInvoiceListSuccess = createAction(ReceiptActionTypes.GET_INVOICE_SUCCESS, props<{ invoices: ReceiptInvoiceModel[] }>());
+export const SetTypeReceipt = createAction(ReceiptActionTypes.SET_TYPE_RECEIPT, props<{ data: string }>())
 export const GetInvoiceListFail = createAction(ReceiptActionTypes.GET_INVOICE_FAIL);
 export const ResetInvoiceList = createAction(ReceiptActionTypes.RESET_INVOICE);
 
