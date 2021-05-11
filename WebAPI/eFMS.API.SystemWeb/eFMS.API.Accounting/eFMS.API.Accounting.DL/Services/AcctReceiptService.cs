@@ -2133,5 +2133,18 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
+        public bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments)
+        {
+            bool result = false;
+
+            List<string> refIds = Payments.Select(x => x.RefIds).SelectMany(i => i).ToList();
+            if(refIds.Count == 0)
+            {
+                return result;
+            }
+            result = acctMngtRepository.Any(x => refIds.Contains(x.Id.ToString()) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+
+            return result;
+        }
     }
 }
