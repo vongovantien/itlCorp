@@ -30,6 +30,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctReceiptService acctReceiptService;
         private readonly ICurrentUser currentUser;
+      
 
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
@@ -167,10 +168,11 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check exists invoice payment PAID
-            if (receiptModel.Payments.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+
+            string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
+            if (msgCheckPaidPayment.Length > 0)
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Receipt existed Paid Invoice(s), Please you check and remove them!", Data = receiptModel };
-                return BadRequest(_result);
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
             }
 
             var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
@@ -291,6 +293,19 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             return valid;
+        }
+
+        private string CheckInvoicePaid(AcctReceiptModel receiptModel)
+        {
+            string result = string.Empty;
+            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT").ToList();
+            bool isValidPayment = acctReceiptService.CheckPaymentPaid(payments);
+
+            if (isValidPayment == true)
+            {
+                result = stringLocalizer[AccountingLanguageSub.MSG_RECEIPT_HAVE_PAYMENT_PAID].Value;
+            }
+            return result;
         }
 
         /// <summary>

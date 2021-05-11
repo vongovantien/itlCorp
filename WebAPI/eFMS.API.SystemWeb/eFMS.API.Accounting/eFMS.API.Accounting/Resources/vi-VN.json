@@ -139,5 +139,8 @@
 
   // -----------------start Settlement
   "MSG_SETTLE_NOT_ALLOW_DELETE": "Phiếu thanh toán {0} có phí đã được issue CDNote/SOA/Voucher",
-  "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK":  "Phiếu thanh toán [{0}] có [{1}] đã bị khóa"
+  "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK": "Phiếu thanh toán [{0}] có [{1}] đã bị khóa",
+
+  // ----------------Receipt
+  "MSG_RECEIPT_HAVE_PAYMENT_PAID": "Phiếu thu có hóa đơn đã thanh toán, Vui lòng xóa ra khỏi phiếu"
 }
