@@ -1678,7 +1678,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         {
                             //Update Reject Receipt                            
                             var receiptSyncs = receiptSyncRepository.Get(x => x.ReceiptId == receiptSync.ReceiptId).ToList();
-                            var hsUpdateRejectReceipt = UpdateRejectReceipt(receipt, receiptSyncs, reason);
+                            var hsUpdateRejectReceipt = UpdateRejectReceipt(receipt, receiptSyncs);
 
                             //Push Notification ReceiptSync
                             string title = string.Format(@"Accountant Rejected Data Receipt {0}", receiptSync.ReceiptSyncNo);
@@ -1729,7 +1729,7 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
-        private HandleState UpdateRejectReceipt(AcctReceipt receipt, List<AcctReceiptSync> receiptSyncs, string reason)
+        private HandleState UpdateRejectReceipt(AcctReceipt receipt, List<AcctReceiptSync> receiptSyncs)
         {
             HandleState hs = new HandleState();
             //Các phiếu ReceiptSync của Receipt đã reject hết >> Update status Rejected cho Receipt
@@ -1740,7 +1740,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
                 receipt.UserModified = currentUser.UserID;
                 receipt.DatetimeModified = DateTime.Now;
-                receipt.ReasonReject += (!string.IsNullOrEmpty(receipt.ReasonReject) ? "; " : string.Empty) + reason; //Cộng dồn Reason
+                receipt.ReasonReject = string.Join("; ", receiptSyncs.Select(s => string.Format("{0} ({1})", s.ReasonReject, s.ReceiptSyncNo))); //Cộng dồn Reason của từng ReceiptSync
                 hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id);
             }
             return hs;
