@@ -20,6 +20,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap }
 
 
 import isUUID from 'validator/lib/isUUID';
+import { HttpErrorResponse } from '@angular/common/http';
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
 
 @Component({
@@ -190,6 +191,11 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formGroup.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );
