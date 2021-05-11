@@ -2320,9 +2320,10 @@ namespace eFMS.API.Accounting.DL.Services
             var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
             foreach (var receipt in receipts)
             {
-                var paymentsDebit = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id && (x.Type == "DEBIT" || x.Type == "OBH"));
-                var paymentsCredit = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id && (x.Type == "CREDITSOA" || x.Type == "CREDITNOTE"));
-                var paymentsAdv = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id && x.Type == "ADV");
+                var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
+                var paymentsDebit = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH");
+                var paymentsCredit = payments.Where(x => x.Type == "CREDITSOA" || x.Type == "CREDITNOTE");
+                var paymentsAdv = payments.Where(x => x.Type == "ADV");
                 if (paymentsDebit.Count() > 0)
                 {
                     var syncDebit = GenerateReceiptToAccountant("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
