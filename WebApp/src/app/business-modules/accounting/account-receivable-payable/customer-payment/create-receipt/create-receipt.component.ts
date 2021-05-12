@@ -12,7 +12,7 @@ import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ResetInvoiceList, SetTypeReceipt } from '../store/actions';
+import { ResetInvoiceList, RegistTypeReceipt } from '../store/actions';
 import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -54,7 +54,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this._activedRoute.queryParams.subscribe((param: any) => {
             if (!!param) {
                 this.type = param.type;
-                this._store.dispatch(SetTypeReceipt({ data: this.type }));
+                this._store.dispatch(RegistTypeReceipt({ data: this.type }));
             }
         })
     }
