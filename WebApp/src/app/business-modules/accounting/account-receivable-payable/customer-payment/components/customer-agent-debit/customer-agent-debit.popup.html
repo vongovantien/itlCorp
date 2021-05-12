@@ -120,13 +120,13 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <span>{{debit.refNo}}</span>
+                                                <span class="text-primary">{{debit.refNo}}</span>
                                             </td>
                                             <td>
                                                 <span>{{debit.type}}</span>
                                             </td>
                                             <td>
-                                                <span>{{debit.invoiceNo}}</span>
+                                                <span class="text-primary">{{debit.invoiceNo}}</span>
                                             </td>
                                             <td>
                                                 <span>{{debit.taxCode}}</span>
@@ -235,13 +235,15 @@
                                             <tr class="collapse-toggle-row tgroup">
                                                 <td colspan="19">
                                                     <div class='row'>
-                                                        <div class="col-2">
+                                                        <div class='col-1'>
                                                             <label class="m-checkbox">
                                                                 <input type="checkbox" name=""
                                                                     [checked]="groupShipment.isSelected"
                                                                     (change)=" groupShipment.isSelected =!groupShipment.isSelected; checkAllChangeGroupAgency(groupShipment)">
                                                                 <span></span>
                                                             </label>
+                                                        </div>
+                                                        <div class="col-2">
                                                             Job No:
                                                             <span class='text-info'>
                                                                 {{groupShipment.jobNo}}
@@ -277,13 +279,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span>{{invoice.refNo}}</span>
+                                                    <span class="text-primary">{{invoice.refNo}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{invoice.invoiceNo}}</span>
+                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.jobNo}}</span>
@@ -358,13 +360,13 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span>{{invoice.refNo}}</span>
+                                                    <span class="text-primary">{{invoice.refNo}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
-                                                    <span>{{invoice.invoiceNo}}</span>
+                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.jobNo}}</span>

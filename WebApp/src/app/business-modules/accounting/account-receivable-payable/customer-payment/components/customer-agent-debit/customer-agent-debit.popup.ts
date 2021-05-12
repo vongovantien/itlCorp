@@ -210,6 +210,12 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     (res: AgencyReceiptModel) => {
                         if (!!res) {
                             this.agencyDebitModel = res;
+                            this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
+                                element.isSelected = false;
+                                element.invoices.forEach(x => {
+                                    x.isSelected = false;
+                                });
+                            });
                             this.filterList();
                         }
                     },
