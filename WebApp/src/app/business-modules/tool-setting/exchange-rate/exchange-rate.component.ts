@@ -65,8 +65,8 @@ export class ExchangeRateComponent extends AppList implements OnInit {
     searchHistory() {
         this.dataSearch = { localCurrencyId: this.localCurrency };
         if (this.selectedrange != null) {
-            this.dataSearch.fromDate = formatDate(this.selectedrange.startDate, 'yyyy-MM-dd', 'en');
-            this.dataSearch.toDate = formatDate(this.selectedrange.endDate, 'yyyy-MM-dd', 'en');
+            this.dataSearch.fromDate = this.selectedrange.startDate != null ? formatDate(this.selectedrange.startDate, 'yyyy-MM-dd', 'en') : null;
+            this.dataSearch.toDate = this.selectedrange.endDate != null ? formatDate(this.selectedrange.endDate, 'yyyy-MM-dd', 'en') : null;
         }
         this.page = 1;
         this.getExchangeRates(this.dataSearch);
