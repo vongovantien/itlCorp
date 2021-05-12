@@ -26,7 +26,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
     @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
     @Output() onChangeReceipt: EventEmitter<boolean> = new EventEmitter<boolean>();
-    
+
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
     date: AbstractControl;
