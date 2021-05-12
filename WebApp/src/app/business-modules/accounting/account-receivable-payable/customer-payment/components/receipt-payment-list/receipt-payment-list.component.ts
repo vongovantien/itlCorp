@@ -172,8 +172,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         });
 
         this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
-        // this.finalPaidAmount = this.form.controls['finalPaidAmount'];
-        // this.balance = this.form.controls['balance'];
         this.paymentMethod = this.form.controls['paymentMethod'];
         this.paymentDate = this.form.controls['paymentDate'];
         this.exchangeRate = this.form.controls['exchangeRate'];

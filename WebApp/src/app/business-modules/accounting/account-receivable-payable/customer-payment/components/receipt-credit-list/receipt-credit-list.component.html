@@ -16,7 +16,7 @@
             <div class="table-wrapper table-scrollabler"
                 [ngStyle]="{'height': !!(creditList | async)?.length ? '210px' : '100%'}">
                 <table class="table table-striped table-brand">
-                    <thead app-table-header [headers]="headers">
+                    <thead app-table-header [headers]="receiptType ==='Customer' ? headers : agencyHeaders">
                         <th class="m--w-50 first">
                             <!-- <label class="m-checkbox">
                                 <input type="checkbox" name="" [(ngModel)]="isCheckAll" (change)="checkAllChange()">
@@ -54,6 +54,9 @@
                                         </ng-container>
                                     </div>
                                 </td>
+                                <td *ngIf="receiptType !=='Customer'">job</td>
+                                <td *ngIf="receiptType !=='Customer'">mbl</td>
+                                <td *ngIf="receiptType !=='Customer'">hbl</td>
                                 <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>

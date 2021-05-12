@@ -2,7 +2,7 @@ import { OnInit, Component, ChangeDetectionStrategy, Input, ViewContainerRef, Vi
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
-import { ReceiptCreditListState, ReceiptDebitListState } from "../../store/reducers";
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { distinctUntilChanged, skip, takeUntil } from "rxjs/operators";
@@ -55,6 +55,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     selectedIndexInvoice: number = -1;
     headerInvoice: CommonInterface.IHeaderTable[] = [];
     invoiceDatasource: any[] = [];
+    receiptType: string = null;
 
     constructor(
         private _store: Store<IReceiptState>
@@ -99,6 +100,9 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { field: 'invoiceNo', title: 'Invoice No' },
             { field: 'amount', title: 'Unpaid Invoice' }
         ];
+        this._store.select(ReceiptTypeState)
+            .pipe()
+            .subscribe(x => this.receiptType = x);
     }
 
     formatNumberCurrency(input: number) {
@@ -151,7 +155,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
         this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
         if (!!this.componentRef) {
-
+            this.getInvoiceList();
             this.componentRef.instance.headers = this.headerInvoice;
             this.componentRef.instance.data = this.invoiceDatasource;
             this.componentRef.instance.active = item.invoiceNo;
