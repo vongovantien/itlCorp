@@ -11,7 +11,7 @@ const routing: Routes = [
             },
             {
                 path: '', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
-                data: { name: 'Account Payment' }
+                data: { name: 'Customer/Agency Payment' }
             },
             // {
             //     path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
