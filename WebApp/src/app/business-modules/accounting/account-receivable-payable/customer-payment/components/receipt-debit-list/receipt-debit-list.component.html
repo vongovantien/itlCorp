@@ -43,6 +43,9 @@
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center">{{item.type}}</td>
                                 <td class="text-primary">{{item.invoiceNo}}</td>
+                                <td *ngIf="receiptType !=='Customer'">job</td>
+                                <td *ngIf="receiptType !=='Customer'">mbl</td>
+                                <td *ngIf="receiptType !=='Customer'">hbl</td>
                                 <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>

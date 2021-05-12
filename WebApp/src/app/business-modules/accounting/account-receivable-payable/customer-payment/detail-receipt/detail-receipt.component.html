@@ -71,18 +71,18 @@
 <ng-template #syncInfoTemplate>
     <ul class="list-group">
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Sync Status:
+            <label>Sync Status: </label>
             <span *ngIf="receiptDetail?.syncStatus !== null"
                 class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                 {{receiptDetail?.syncStatus}}
             </span>
         </li>
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Reason reject:
-            <span>{{receiptDetail?.reasonReject}}</span>
+            <label style="padding-right: 20px;">Reason reject: </label>
+            <span>{{receiptDetail?.reasonReject}}</span> -->
         </li>
         <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            Last Sync:
+            <label>Last Sync: </label>
             <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy'}}</span>
         </li>
     </ul>
