@@ -575,7 +575,13 @@ namespace eFMS.API.Setting.DL.Services
             if (!isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && userCurrent.UserID == unlockRequest.RequestUser) //Requester
             {
                 isApproved = true;
-                if (unlockRequest.RequestDate == null)
+                //User vừa là Requester và vừa là User Deputy
+                if (unlockRequest.RequestDate == null 
+                    || (leaderLevel.UserDeputies.Contains(userCurrent.UserID) && string.IsNullOrEmpty(approve.LeaderApr) && leaderLevel.Role != SettingConstants.ROLE_NONE)
+                    || (managerLevel.UserDeputies.Contains(currentUser.UserID) && string.IsNullOrEmpty(approve.ManagerApr) && managerLevel.Role != SettingConstants.ROLE_NONE)
+                    || (accountantLevel.UserDeputies.Contains(currentUser.UserID) && string.IsNullOrEmpty(approve.AccountantApr) && accountantLevel.Role != SettingConstants.ROLE_NONE)
+                    || (buHeadLevel.UserDeputies.Contains(userCurrent.UserID) && (string.IsNullOrEmpty(approve.BuheadApr) && buHeadLevel.Role != SettingConstants.ROLE_NONE) || (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL && !string.IsNullOrEmpty(unlockRequest.RequestUser)))
+                    )
                 {
                     isApproved = false;
                 }
