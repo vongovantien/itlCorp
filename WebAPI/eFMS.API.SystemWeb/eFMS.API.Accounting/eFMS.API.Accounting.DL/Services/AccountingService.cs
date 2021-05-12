@@ -1505,7 +1505,7 @@ namespace eFMS.API.Accounting.DL.Services
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
             {
-                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE&view={1}&export={2}", jobId.ToString(), cdNoteNo, currency);
             }
             else
             {

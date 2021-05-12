@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { DocumentationRepo } from 'src/app/shared/repositories';
-import { catchError, finalize, map, take } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil } from 'rxjs/operators';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -59,15 +59,16 @@ export class ShareBussinessCdNoteListComponent extends AppList {
     }
 
     ngOnInit(): void {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRouter.params,
+            this._activedRouter.data,
             this._activedRouter.queryParams
         ]).pipe(
-            map(([params, qParams]) => ({ ...params, ...qParams })),
+            map(([params, data, qParams]) => ({ ...params, ...data, ...qParams })),
+            takeUntil(this.ngUnsubscribe)
         ).subscribe(
             (params: any) => {
                 const jobId = params.id || params.jobId;
-                console.log(jobId);
                 const cdNo = params.view;
                 const currencyId = params.export;
                 if (!!cdNo && !!currencyId) {

@@ -40,6 +40,8 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     @ViewChild('notAllowDelete') canNotDeleteJobPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
+    params: any;
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
@@ -75,7 +77,8 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
-                this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
+                this.params = param;
+                this.selectedTab = (!!param.tab && this.tabList.includes(param.tab.toUpperCase()))? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
@@ -236,7 +239,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
                 break;
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
