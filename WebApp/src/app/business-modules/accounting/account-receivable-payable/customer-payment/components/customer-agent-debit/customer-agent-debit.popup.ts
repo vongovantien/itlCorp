@@ -17,7 +17,6 @@ import { ActivatedRoute } from '@angular/router';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
 import { CommonEnum } from '@enums';
-import { forEach } from 'lodash';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -93,7 +92,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             }
         })
         this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
-
         this.initForm();
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
@@ -152,7 +150,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.partnerId = this.formSearch.controls['partnerId'];
     }
 
-    getCustomer(type: string) {
+    getCustomer() {
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
     }
 
@@ -406,12 +404,10 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 x.isSelected = false;
             })
         }
-
     }
 
     checkAllChangeAgency() {
         if (this.checkAllAgency) {
-            //if (this.TYPELIST === 'GROUP') {
             this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                 x.isSelected = true;
                 for (let i = 0; i < x.invoices.length; i++) {
@@ -440,8 +436,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             }
         })
     }
-
-
 }
 
 interface IAcctCustomerDebitCredit {
