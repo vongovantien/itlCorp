@@ -71,13 +71,6 @@
                                                             </td>
 
                                                             <td class="text-underline">
-                                                                <!-- <div>
-                                                                    <span><a class="pointer"
-                                                                            (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}</a></span>
-                                                                </div> -->
-                                                                <!-- <ng-template #CancelNo>
-                                                                    <span>{{cps.paymentRefNo}}</span>
-                                                                </ng-template> -->
                                                                 <div *ngIf="cps.status != 'Cancel'; else CancelNo">
                                                                     <span>
                                                                         <a class="pointer"
@@ -86,11 +79,9 @@
                                                                     </span>
                                                                 </div>
                                                                 <ng-template #CancelNo>
-                                                                    <!-- <span class="text-muted">{{cps.paymentRefNo}} -->
                                                                         <a class="text-muted pointer"
                                                                         (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
                                                                     </a>
-                                                                <!-- </span> -->
                                                                 </ng-template>
                                                             </td>
 
