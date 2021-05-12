@@ -10,23 +10,17 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) || (isSubmitted && !etd.value) || (isSubmitted && !etd.value.startDate)}">
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
+                            || (isSubmitted && !etd.value) 
+                            || (isSubmitted && !etd.valid) 
+                            || (isSubmitted && !etd.value.startDate)}">
                             <label required>ETD</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                     [alwaysShowCalendars]="true" name="daterange" placeholder="Select" readonly
-                                    formControlName="etd" />
-                                <span class="m-input-icon_clear" (click)="resetFormControl(etd)"
-                                    *ngIf="!!etd.value && !!etd.value.startDate">
-                                    <i class="la la-times"></i>
-                                </span>
-                                <span class="m-input-icon__icon m-input-icon__icon--right">
-                                    <span>
-                                        <i class="la la-calendar"></i>
-                                    </span>
-                                </span>
+                                    formControlName="etd" calendar [allowRemove]="!!etd.value && !!etd.value.startDate"
+                                    (remove)="resetFormControl(etd)" />
                             </div>
                         </div>
                     </div>

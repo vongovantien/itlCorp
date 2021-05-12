@@ -81,6 +81,7 @@
                             <div class="col-md-6">
                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
                                     || (isSubmitted && type !== 'import' && !etd.value) 
+                                    || (isSubmitted && type !== 'import' && !etd.valid) 
                                     || (isSubmitted && !!etd.value && !etd.value.startDate && type !== 'import')}">
                                     <label>ETD
                                         <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
@@ -99,6 +100,7 @@
                             <div class="col-md-6 eta-date-picker">
                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
                                     || (isSubmitted && type === 'import' && !eta.value) 
+                                    || (isSubmitted && type === 'import' && !eta.valid) 
                                     || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') 
                                     || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
                                     <label>ETA

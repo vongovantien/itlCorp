@@ -87,10 +87,10 @@
                         <label class="form-control-label" for="">
                             Tax Code <span class="m--font-danger">(*)</span>
                         </label>
-                        <input type="text" min="0" class="form-control m-input m-input--square"
-                            title="Tax code must be number" placeholder="Please enter Tax Code" autocomplete="nope"
-                            formControlName="taxCode" [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }"
-                            required>
+                        <input [attr.disabled]="this.active.value === true ? 'disabled' : null" type="text" min="0"
+                            class="form-control m-input m-input--square" title="Tax code must be number"
+                            placeholder="Please enter Tax Code" autocomplete="nope" formControlName="taxCode"
+                            [ngClass]="{ 'm-input--square': isSubmitted && taxCode.invalid }" required>
                         <div class="form-control-feedback" *ngIf="isSubmitted && 
                             ((taxCode.errors | equalError:'maxlength') || (taxCode.errors | equalError:'minlength'))">
                             Tax Code include 7 - 14 characters!

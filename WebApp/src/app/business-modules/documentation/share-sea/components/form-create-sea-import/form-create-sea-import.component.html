@@ -25,6 +25,7 @@
                     <div class="col-md-4">
                         <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
                             || (isSubmitted && !eta.value) 
+                            || (isSubmitted && !eta.valid) 
                             || (isSubmitted && !eta.value.startDate) 
                             || (isSubmitted && formCreate.errors | equalError:'validateEta_Etd')}">
                             <label required>ETA</label>

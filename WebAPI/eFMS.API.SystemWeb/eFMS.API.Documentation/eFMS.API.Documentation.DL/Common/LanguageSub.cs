@@ -69,6 +69,11 @@ namespace eFMS.API.Documentation.DL.Common
         public static readonly string MSG_HOUSEBILL_NOT_FOUND = "MSG_HOUSEBILL_NOT_FOUND";
         public static readonly string MSG_NOT_EXIST_SHIPMENT_COPY = "MSG_NOT_EXIST_SHIPMENT_COPY";
 
+        public static readonly string MSG_ETD_CANNOT_CHANGE_MONTH = "MSG_ETD_CANNOT_CHANGE_MONTH";
+        public static readonly string MSG_ETA_CANNOT_CHANGE_MONTH = "MSG_ETA_CANNOT_CHANGE_MONTH";
+        public static readonly string MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH = "MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH";
+
+
         // IMPORT SURCHARE 
         public static readonly string MSG_HBLNO_EMPTY = "MSG_HBLNO_EMPTY";
         public static readonly string MSG_MBLNO_EMPTY = "MSG_MBLNO_EMPTY";

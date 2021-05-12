@@ -22,6 +22,7 @@ import { ICanComponentDeactivate } from '@core';
 import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
     selector: 'app-detail-job-fcl-import',
@@ -212,6 +213,11 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
                         this._store.dispatch(new fromShareBussiness.GetContainerAction({ mblid: this.jobId }));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formCreate.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );
