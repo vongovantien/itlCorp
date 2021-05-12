@@ -1040,10 +1040,12 @@ namespace eFMS.API.Catalogue.DL.Services
 
                 // list mail cc Accountant, AR
                 var listEmailCCAcountant = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).ToList();
-                lstCCAccountant = listEmailCCAcountant;
+
+                lstCCAccountant = String.Join(";", listEmailCCAcountant.ToArray())?.Split(";").ToList();
 
                 var listEmailCCAR = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).ToList();
-                lstCCAR = listEmailCCAR;
+
+                lstCCAR = String.Join(";", listEmailCCAR.ToArray())?.Split(";").ToList();
             }
             EmailModel.ListAccountant = lstAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
             EmailModel.ListCCAccountant = lstCCAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
