@@ -420,7 +420,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .ToList()
                 .OrderBy(x => x.Type == "ADV");
 
-            IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH");
+            IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
             {
                 List<ReceiptInvoiceModel> OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.CurrencyId }).Select(s => new ReceiptInvoiceModel
@@ -444,7 +444,7 @@ namespace eFMS.API.Accounting.DL.Services
                 paymentReceipts.AddRange(OBHGrp);
             }
 
-            IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH");
+            IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH").OrderBy(x => x.DatetimeCreated);
             if (listDebitCredit.Count() > 0)
             {
                 foreach (var acctPayment in listDebitCredit)
@@ -472,7 +472,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
                     payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(acctPayment.RefId) : null;
-
+                    
                     paymentReceipts.Add(payment);
                 }
             }
@@ -817,6 +817,8 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
                     _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
                 }
+                _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
+                _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
                 _payment.InvoiceNo = payment.InvoiceNo;
                 _payment.RefId = payment.RefId;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
@@ -1480,6 +1482,360 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return data;
         }
+        public AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var data = new AgencyDebitCreditDetailModel();
+            data.Invoices = new List<AgencyDebitCreditModel>();
+            var creditNote = GetCreditNoteForIssueAgencyPayment(criteria);
+            var soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
+            var debits = GetDebitForIssueAgentPayment(criteria);
+            var obhs = GetObhForIssueAgencyPayment(criteria);
+            if (creditNote != null)
+            {
+                data.Invoices.AddRange(creditNote);
+            }
+            if(soaCredit != null)
+            {
+                data.Invoices.AddRange(soaCredit);
+            }
+            if(debits != null)
+            {
+                data.Invoices.AddRange(debits);
+            }
+            if(obhs != null)
+            {
+                data.Invoices.AddRange(obhs);
+            }
+            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl }).Select(s=> new GroupShimentAgencyModel {
+                JobNo = s.Key.JobNo, 
+                Mbl = s.Key.Mbl,
+                Hbl = s.Key.Hbl,
+                UnpaidAmountUsd = s.Select(t=>t.UnpaidAmountUsd).Sum(),
+                UnpaidAmountVnd = s.Select(t=>t.UnpaidAmountVnd).Sum(),
+                Invoices = s.ToList()
+            }).ToList();
+            data.GroupShipmentsAgency = groupShipmentAgency;
+            return data;
+        }
+
+        #region Agency credit notes
+        private IQueryable<AgencyDebitCreditModel> GetCreditNoteForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var expQuery = CreditNoteExpressionQuery(criteria);
+            var creditNotes = cdNoteRepository.Get(expQuery);
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
+            var query = from credit in creditNotes
+                        join sur in surcharges on credit.Code equals sur.CreditNo
+                        select new { credit,sur };
+            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno , g.credit}).Select(s=> new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
+
+            var data = grpCreditNoteCharge.Select(se => new AgencyDebitCreditModel
+            {
+                RefNo = se.Job.credit.Code,
+                Type = "CREDIT",
+                InvoiceNo = null,
+                InvoiceDate = null,
+                PartnerId = se.Job.credit.PartnerId,
+                CurrencyId = se.Job.credit.CurrencyId,
+                Amount = se.Job.credit.Total,
+                UnpaidAmount = se.Job.credit.CurrencyId == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                PaymentTerm = null,
+                DueDate = null,
+                PaymentStatus = null,
+                DepartmentId = se.Job.credit.DepartmentId,
+                OfficeId = se.Job.credit.OfficeId,
+                CompanyId = se.Job.credit.CompanyId,
+                RefIds = new List<string> { se.Job.credit.Id.ToString() },
+                JobNo = se.Job.JobNo,
+                Mbl = se.Job.Mblno,
+                Hbl = se.Job.Hblno
+            });
+            var joinData = from inv in data
+                           join par in partners on inv.PartnerId equals par.Id into parGrp
+                           from par in parGrp.DefaultIfEmpty()
+                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
+                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           from ofi in ofiGrp.DefaultIfEmpty()
+                           select new AgencyDebitCreditModel
+                           {
+                               RefNo = inv.RefNo,
+                               Type = inv.Type,
+                               InvoiceNo = inv.InvoiceNo,
+                               InvoiceDate = inv.InvoiceDate,
+                               PartnerId = inv.PartnerId,
+                               PartnerName = par.ShortName,
+                               TaxCode = par.TaxCode,
+                               CurrencyId = inv.CurrencyId,
+                               Amount = inv.Amount,
+                               UnpaidAmount = inv.UnpaidAmount,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaymentTerm = inv.PaymentTerm,
+                               DueDate = inv.DueDate,
+                               PaymentStatus = inv.PaymentStatus,
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               OfficeId = inv.OfficeId,
+                               OfficeName = ofi != null ? ofi.ShortName : null,
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               JobNo = inv.JobNo,
+                               Mbl = inv.Mbl,
+                               Hbl = inv.Hbl,
+                               CreditType = "CREDITNOTE"
+                           };
+            return joinData;
+        }
+
+
+        /// <summary>
+        /// Get list Credit Note/ SOA type Credit by Criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AgencyDebitCreditModel> GetSoaCreditForIssueAgentPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var expQuery = SoaCreditExpressionQuery(criteria);
+            var soas = soaRepository.Get(expQuery);
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
+            var query = from soa in soas
+                        join sur in surcharges on soa.Soano equals sur.PaySoano
+                        select new { soa, sur };
+            var grpSoaCharge = query.GroupBy(g => new { g.soa , g.sur.Hblno,g.sur.Mblno,g.sur.JobNo }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
+            var data = grpSoaCharge.Select(se => new AgencyDebitCreditModel
+            {
+                RefNo = se.Soa.soa.Soano,
+                Type = "CREDIT",
+                InvoiceNo = null,
+                InvoiceDate = null,
+                PartnerId = se.Soa.soa.Customer,
+                CurrencyId = se.Soa.soa.Currency,
+                Amount = se.Soa.soa.CreditAmount,
+                UnpaidAmount = se.Soa.soa.Currency == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                PaymentTerm = null,
+                DueDate = null,
+                PaymentStatus = null,
+                DepartmentId = se.Soa.soa.DepartmentId,
+                OfficeId = se.Soa.soa.OfficeId,
+                CompanyId = se.Soa.soa.CompanyId,
+                RefIds = new List<string> { se.Soa.soa.Id },
+                JobNo = se.Soa.JobNo,
+                Mbl = se.Soa.Mblno,
+                Hbl = se.Soa.Hblno
+            });
+            var joinData = from inv in data
+                           join par in partners on inv.PartnerId equals par.Id into parGrp
+                           from par in parGrp.DefaultIfEmpty()
+                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
+                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           from ofi in ofiGrp.DefaultIfEmpty()
+                           select new AgencyDebitCreditModel
+                           {
+                               RefNo = inv.RefNo,
+                               Type = inv.Type,
+                               InvoiceNo = inv.InvoiceNo,
+                               InvoiceDate = inv.InvoiceDate,
+                               PartnerId = inv.PartnerId,
+                               PartnerName = par.ShortName,
+                               TaxCode = par.TaxCode,
+                               CurrencyId = inv.CurrencyId,
+                               Amount = inv.Amount,
+                               UnpaidAmount = inv.UnpaidAmount,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaymentTerm = inv.PaymentTerm,
+                               DueDate = inv.DueDate,
+                               PaymentStatus = inv.PaymentStatus,
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               OfficeId = inv.OfficeId,
+                               OfficeName = ofi != null ? ofi.ShortName : null,
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               JobNo = inv.JobNo,
+                               Mbl = inv.Mbl,
+                               Hbl = inv.Hbl,
+                               CreditType = "SOA"
+                           };
+            return joinData;
+        }
+
+        /// <summary>
+        /// Get list Invoice by Criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AgencyDebitCreditModel> GetDebitForIssueAgentPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
+            var invoices = acctMngtRepository.Get(expQuery);
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
+            var query = from inv in invoices
+                        join sur in surcharges on inv.Id equals sur.AcctManagementId
+                        select new { inv, sur };
+            var grpInvoiceCharge = query.GroupBy(g => new { g.inv ,g.sur.Hblno,g.sur.JobNo,g.sur.Mblno }).Select(s => new { Invoice = s.Key, Surcharge  = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
+            var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
+            {
+                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
+                Type = "DEBIT",
+                InvoiceNo = se.Invoice.inv.InvoiceNoReal,
+                InvoiceDate = se.Invoice.inv.Date,
+                PartnerId = se.Invoice.inv.PartnerId,
+                CurrencyId = se.Invoice.inv.Currency,
+                Amount = se.Invoice.inv.TotalAmount,
+                UnpaidAmount = se.Invoice.inv.Currency == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                PaymentTerm = se.Invoice.inv.PaymentTerm,
+                DueDate = se.Invoice.inv.PaymentDueDate,
+                PaymentStatus = se.Invoice.inv.PaymentStatus,
+                DepartmentId = se.Invoice.inv.DepartmentId,
+                OfficeId = se.Invoice.inv.OfficeId,
+                CompanyId = se.Invoice.inv.CompanyId,
+                RefIds = new List<string> { se.Invoice.inv.Id.ToString() },
+                JobNo = se.Invoice.JobNo,
+                Mbl = se.Invoice.Mblno,
+                Hbl = se.Invoice.Hblno,
+            });
+            var joinData = from inv in data
+                           join par in partners on inv.PartnerId equals par.Id into parGrp
+                           from par in parGrp.DefaultIfEmpty()
+                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
+                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           from ofi in ofiGrp.DefaultIfEmpty()
+                           select new AgencyDebitCreditModel
+                           {
+                               RefNo = inv.RefNo,
+                               Type = inv.Type,
+                               InvoiceNo = inv.InvoiceNo,
+                               InvoiceDate = inv.InvoiceDate,
+                               PartnerId = inv.PartnerId,
+                               PartnerName = par.ShortName,
+                               TaxCode = par.TaxCode,
+                               CurrencyId = inv.CurrencyId,
+                               Amount = inv.Amount,
+                               PaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmount = inv.UnpaidAmount,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaymentTerm = inv.PaymentTerm,
+                               DueDate = inv.DueDate,
+                               PaymentStatus = inv.PaymentStatus,
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               OfficeId = inv.OfficeId,
+                               OfficeName = ofi != null ? ofi.ShortName : null,
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds, 
+                               Mbl = inv.Mbl,
+                               Hbl = inv.Hbl,
+                               JobNo = inv.JobNo
+                           };
+            return joinData;
+        }
+
+        /// <summary>
+        /// Get list Invoice Temp by Criteria
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AgencyDebitCreditModel> GetObhForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
+        {
+            var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+            var invoiceTemps = acctMngtRepository.Get(expQuery);
+            var surcharges = surchargeRepository.Get();
+            var partners = catPartnerRepository.Get();
+            var departments = departmentRepository.Get();
+            var offices = officeRepository.Get();
+
+            var query = from inv in invoiceTemps
+                        join sur in surcharges on inv.Id equals sur.AcctManagementId
+                        select new { inv, sur };
+            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo,g.sur.Mblno,g.sur.Hblno })
+                .Select(s => new { PartnerId = s.Key.PartnerId, RefNo = s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
+            var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
+            {
+                RefNo = se.RefNo,
+                Type = "OBH",
+                InvoiceNo = string.Empty,
+                InvoiceDate = se.Invoice.Select(s => s.Date).FirstOrDefault(),
+                PartnerId = se.PartnerId,
+                CurrencyId = se.Invoice.Select(s => s.Currency).FirstOrDefault(),
+                Amount = se.Invoice.Sum(su => su.TotalAmount),
+                UnpaidAmount = se.Invoice.Select(s => s.Currency).FirstOrDefault() == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
+                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
+                DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
+                PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
+                DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
+                OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
+                CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
+                RefIds = se.Invoice.Select(s => s.Id.ToString()).ToList(),
+                JobNo = se.Job.JobNo,
+                Mbl = se.Job.Mblno,
+                Hbl = se.Job.Hblno
+            });
+            var joinData = from inv in data
+                           join par in partners on inv.PartnerId equals par.Id into parGrp
+                           from par in parGrp.DefaultIfEmpty()
+                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           from dept in deptGrp.DefaultIfEmpty()
+                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           from ofi in ofiGrp.DefaultIfEmpty()
+                           select new AgencyDebitCreditModel
+                           {
+                               RefNo = inv.RefNo,
+                               Type = inv.Type,
+                               InvoiceNo = inv.InvoiceNo,
+                               InvoiceDate = inv.InvoiceDate,
+                               PartnerId = inv.PartnerId,
+                               PartnerName = par.ShortName,
+                               TaxCode = par.TaxCode,
+                               CurrencyId = inv.CurrencyId,
+                               Amount = inv.Amount,
+                               PaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmount = inv.UnpaidAmount,
+                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
+                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
+                               PaymentTerm = inv.PaymentTerm,
+                               DueDate = inv.DueDate,
+                               PaymentStatus = inv.PaymentStatus,
+                               DepartmentId = inv.DepartmentId,
+                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
+                               OfficeId = inv.OfficeId,
+                               OfficeName = ofi != null ? ofi.ShortName : null,
+                               CompanyId = inv.CompanyId,
+                               RefIds = inv.RefIds,
+                               JobNo = inv.JobNo,
+                               Hbl = inv.Hbl, 
+                               Mbl = inv.Mbl
+                           };
+            return joinData;
+        }
+
+        #endregion
 
         private Expression<Func<AccAccountingManagement, bool>> InvoiceExpressionQuery(CustomerDebitCreditCriteria criteria, string type)
         {

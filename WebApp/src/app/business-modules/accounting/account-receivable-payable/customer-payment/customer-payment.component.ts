@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { NgProgress } from "@ngx-progressbar/core";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
@@ -10,12 +10,12 @@ import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants } from "@constants";
 
-
 import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
+import { InjectViewContainerRefDirective } from "@directives";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -33,6 +33,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
 
     CPs: ReceiptModel[] = [];
@@ -65,6 +66,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.headers = [
             { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
@@ -109,24 +111,27 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     cancelReceipt(id: string) {
-        this._accountingRepo.cancelReceipt(id)
-            .pipe(catchError(this.catchError), finalize(() => {
-                this._progressRef.complete();
-            }))
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success('Cancel Receipt Success!');
-                        this.getCPs(this.dataSearch);
-                    } else {
-                        this._toastService.warning(res.message);
-                    }
-                },
-            );
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Cancel Receipt',
+            body: 'This Receipt will be canceled. Are you sure you want to continue?',
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-danger',
+            iconConfirm: 'la la-times'
+        }, () => {
+            this._accountingRepo.cancelReceipt(id)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success('Cancel Receipt Success!');
+                            this.getCPs(this.dataSearch);
+                        } else {
+                            this._toastService.warning(res.message);
+                        }
+                    },
+                );
+        })
     }
-
-
-
     getCPs(dataSearch) {
         this.isLoading = true;
         this._progressRef.start();
@@ -148,12 +153,14 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 this.totalItems = res.totalItems || 0;
             });
     }
+
     onSearchCPs(data: any) {
         this.page = 1;
         this.dataSearch = data;
         this.getCPs(this.dataSearch);
 
     }
+
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
@@ -200,6 +207,4 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this._store.dispatch(RegistTypeReceipt({ data: type }));
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`]);
     }
-
-
 }

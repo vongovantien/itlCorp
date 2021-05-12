@@ -21,6 +21,7 @@ export class ReceiptCreditDebitModel {
     officeName: string;
     companyId: string;
     currencyId: string;
+    jobNo: string;
 
     notes: string;
     paidAmountUsd: number;
@@ -48,6 +49,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     remainVnd: number = null;
     typeInvoice: string = null;
     partnerId: string = null;
+    groupShipmentsAgency: any[] = [];
     constructor(object?: any) {
         super();
         const self = this;

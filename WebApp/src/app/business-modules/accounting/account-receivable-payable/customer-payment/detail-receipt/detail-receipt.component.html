@@ -7,9 +7,12 @@
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
                     <h3>
+                        <span>
+                            <i class="la la-edit"></i>
+                        </span>
                         Customer Receipt Edit Detail
                         <span
-                            class="m-badge m-badge--{{receiptDetail?.status === 'Draft' && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                            class="m-badge m-badge--{{(receiptDetail?.status === 'Draft' || receiptDetail?.status === 'Cancel') && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
                             {{receiptDetail?.subRejectReceipt}}
                         </span>
