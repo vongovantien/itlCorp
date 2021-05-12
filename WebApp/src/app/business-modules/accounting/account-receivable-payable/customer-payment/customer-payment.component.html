@@ -72,13 +72,13 @@
                                                             </td>
 
                                                             <td class="text-underline">
-                                                                <div *ngIf="cps.status != 'Cancel'; else CancelNo">
+                                                                <div>
                                                                     <span><a class="pointer"
                                                                             (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}</a></span>
                                                                 </div>
-                                                                <ng-template #CancelNo>
+                                                                <!-- <ng-template #CancelNo>
                                                                     <span>{{cps.paymentRefNo}}</span>
-                                                                </ng-template>
+                                                                </ng-template> -->
                                                             </td>
 
                                                             <td>

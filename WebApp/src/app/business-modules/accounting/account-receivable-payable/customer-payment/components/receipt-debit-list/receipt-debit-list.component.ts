@@ -96,4 +96,10 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         this._store.dispatch(RemoveInvoice({ index: this.selectedIndexItem }));
         this.onChangeDebit.emit(true);
     }
+
+    formatAmount(event: any, receipt: ReceiptInvoiceModel){
+        if(!event.target.value.length){
+            receipt[event.target.name] = 0;
+        }
+    }
 }

@@ -12,7 +12,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../../store/reducers';
+import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
@@ -275,6 +275,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         newInvoiceWithAdv.type = 'ADV';
         newInvoiceWithAdv.paidAmountVnd = 0;
         newInvoiceWithAdv.paidAmountUsd = 0;
+        newInvoiceWithAdv.refNo = null;
         const data = newInvoiceWithAdv as ReceiptInvoiceModel;
         this._store.dispatch(InsertAdvance({ data: data }));
 

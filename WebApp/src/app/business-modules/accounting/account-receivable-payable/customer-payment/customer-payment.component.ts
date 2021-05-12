@@ -15,7 +15,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { ResetInvoiceList } from "./store/actions";
+import { RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -87,7 +87,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .subscribe((value: boolean) => {
                 if (value) {
                     this._store.dispatch(ResetInvoiceList());
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`], { queryParams: { type: data.type } });
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
                     this.permissionPopup.show();
                 }
@@ -197,7 +197,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     gotoCreateReceipt(type: string) {
         this._store.dispatch(ResetInvoiceList());
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { type: type } });
+        this._store.dispatch(RegistTypeReceipt({ data: type }));
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`]);
     }
 
 

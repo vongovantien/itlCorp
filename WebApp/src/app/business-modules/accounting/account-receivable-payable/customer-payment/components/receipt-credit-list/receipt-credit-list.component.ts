@@ -66,7 +66,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     ngOnInit() {
         this.headers = [
             { title: 'RefNo', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 250 },
+            { title: 'Net Off Invoice No', field: '', width: 200 },
             { title: 'Org Amount', field: '' },
             { title: 'Amount USD', field: '' },
             { title: 'Amount VND', field: '' },
@@ -79,7 +79,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Job', field: '' },
             { title: 'HBL', field: '' },
             { title: 'MBL', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 250 },
+            { title: 'Net Off Invoice No', field: '', width: 100 },
             { title: 'Org Amount', field: '' },
             { title: 'Amount USD', field: '' },
             { title: 'Amount VND', field: '' },
@@ -133,7 +133,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         this.debitList.pipe(distinctUntilChanged(), takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 this.invoiceDatasource = [];
-                x.filter((element: ReceiptInvoiceModel) => element.type !== 'ADV').map((element: ReceiptInvoiceModel) => {
+                x.filter((element: ReceiptInvoiceModel) => (element.type !== 'ADV' && element.type !== 'OBH')).map((element: ReceiptInvoiceModel) => {
                     const item = {
                         invoiceNo: element.invoiceNo,
                         amount: this.formatNumberCurrency(element.amount),

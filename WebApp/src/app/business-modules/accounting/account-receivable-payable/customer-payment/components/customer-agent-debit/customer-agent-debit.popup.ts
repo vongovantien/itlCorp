@@ -171,8 +171,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     this.listDebitInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
                         result.every(t => {
-                            var key = Object.keys(t)[0];
-                            return s[key] !== t[key]
+                            return s["refNo"] !== t["refNo"]
                         }));
                 }
             })

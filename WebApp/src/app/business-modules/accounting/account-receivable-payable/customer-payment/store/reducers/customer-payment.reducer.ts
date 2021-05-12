@@ -54,7 +54,8 @@ export const receiptManagementReducer = createReducer(
                 typeInvoice: 'ADV',
                 type: 'ADV',
                 paidAmountVnd: payload.data.cusAdvanceAmountVnd,
-                paidAmountUsd: payload.data.cusAdvanceAmountUsd
+                paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                refNo: null
             };
             const advData = newInvoiceWithAdv as ReceiptInvoiceModel;
             return { ...state, debitList: [ ...payload.data.invoices, advData]};

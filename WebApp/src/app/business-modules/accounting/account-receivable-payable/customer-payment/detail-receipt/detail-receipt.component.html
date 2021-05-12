@@ -17,8 +17,7 @@
                     <div>
                         <div class="c-button-actions">
                             <ng-container
-                                *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.syncStatus !== 'Synced'">
-
+                                *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                                 <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
                                     (onClick)="submitClick('update')">
                                 </app-permission-button>
