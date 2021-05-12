@@ -68,7 +68,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         this._progressRef = this._ngProgressService.ref();
     }
 
-
     ngOnInit() {
         this.listenShortcutKey();
     }
@@ -81,6 +80,7 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
                 this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
+                this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
                     this.isDuplicate = this.ACTION === 'COPY';
@@ -95,8 +95,6 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
         ).subscribe(
             (jobId: string) => {
                 if (isUUID(jobId)) {
-                    this.jobId = jobId;
-
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
                     // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                     this.getDetailShipment(this.jobId);
