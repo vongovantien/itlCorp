@@ -420,7 +420,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .ToList()
                 .OrderBy(x => x.Type == "ADV");
 
-            IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH");
+            IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
             {
                 List<ReceiptInvoiceModel> OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.CurrencyId }).Select(s => new ReceiptInvoiceModel
@@ -444,7 +444,7 @@ namespace eFMS.API.Accounting.DL.Services
                 paymentReceipts.AddRange(OBHGrp);
             }
 
-            IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH");
+            IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH").OrderBy(x => x.DatetimeCreated);
             if (listDebitCredit.Count() > 0)
             {
                 foreach (var acctPayment in listDebitCredit)
@@ -472,7 +472,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
                     payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(acctPayment.RefId) : null;
-
+                    
                     paymentReceipts.Add(payment);
                 }
             }
@@ -817,6 +817,8 @@ namespace eFMS.API.Accounting.DL.Services
                     _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
                     _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
                 }
+                _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
+                _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
                 _payment.InvoiceNo = payment.InvoiceNo;
                 _payment.RefId = payment.RefId;
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
