@@ -66,6 +66,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.headers = [
             { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
@@ -88,7 +89,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .subscribe((value: boolean) => {
                 if (value) {
                     this._store.dispatch(ResetInvoiceList());
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`], { queryParams: { type: data.type } });
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
                     this.permissionPopup.show();
                 }
