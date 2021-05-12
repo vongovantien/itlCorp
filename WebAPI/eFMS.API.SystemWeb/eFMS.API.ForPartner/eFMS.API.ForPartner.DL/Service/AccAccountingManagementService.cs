@@ -48,6 +48,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysCompany> companyRepository;
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
+        private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -72,7 +73,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctReceipt> receiptRepo,
             IContextBase<SysCompany> companyRepo,
             IContextBase<CatContract> catContractRepo,
-            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
+            IContextBase<AcctReceiptSync> receiptSyncRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -95,6 +97,7 @@ namespace eFMS.API.ForPartner.DL.Service
             companyRepository = companyRepo;
             catContractRepository = catContractRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            receiptSyncRepository = receiptSyncRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -1643,32 +1646,42 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        /// <summary>
+        /// Reject ReceiptSync
+        /// </summary>
+        /// <param name="id">id of receiptSync</param>
+        /// <param name="reason">reason reject</param>
+        /// <returns></returns>
         private HandleState RejectPayment(string id, string reason)
         {
-            return new HandleState();
-            //Tạm thời comment, khi nào xong phần receipt sẽ mở lại
-            /*
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
-                    var receipt = receiptRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    var receiptSync = receiptSyncRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    if (receiptSync == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    var receipt = receiptRepository.Get(x => x.Id == receiptSync.ReceiptId).FirstOrDefault();
                     if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
 
-                    receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    receipt.UserModified = currentUser.UserID;
-                    receipt.DatetimeModified = DateTime.Now;
-                    receipt.ReasonReject = reason;
+                    receiptSync.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                    receiptSync.UserModified = currentUser.UserID;
+                    receiptSync.DatetimeModified = DateTime.Now;
+                    receiptSync.ReasonReject = reason;
 
-                    HandleState hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id, false);
+                    HandleState hs = receiptSyncRepository.Update(receiptSync, x => x.Id == receiptSync.Id, false);
                     if (hs.Success)
                     {
-                        HandleState smReceipt = receiptRepository.SubmitChanges();
+                        HandleState smReceipt = receiptSyncRepository.SubmitChanges();
                         if (smReceipt.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data Receipt {0}", receipt.PaymentRefNo);
+                            //Update Reject Receipt                            
+                            var receiptSyncs = receiptSyncRepository.Get(x => x.ReceiptId == receiptSync.ReceiptId).ToList();
+                            var hsUpdateRejectReceipt = UpdateRejectReceipt(receipt, receiptSyncs);
+
+                            //Push Notification ReceiptSync
+                            string title = string.Format(@"Accountant Rejected Data Receipt {0}", receiptSync.ReceiptSyncNo);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -1713,7 +1726,24 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     trans.Dispose();
                 }
-            }*/
+            }
+        }
+
+        private HandleState UpdateRejectReceipt(AcctReceipt receipt, List<AcctReceiptSync> receiptSyncs)
+        {
+            HandleState hs = new HandleState();
+            //Các phiếu ReceiptSync của Receipt đã reject hết >> Update status Rejected cho Receipt
+            var totalReceiptSync = receiptSyncs.Count();
+            var receiptSyncRejected = receiptSyncs.Where(x => x.SyncStatus == ForPartnerConstants.STATUS_REJECTED).Count();
+            if (totalReceiptSync == receiptSyncRejected && totalReceiptSync != 0)
+            {
+                receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                receipt.UserModified = currentUser.UserID;
+                receipt.DatetimeModified = DateTime.Now;
+                receipt.ReasonReject = string.Join("; ", receiptSyncs.Select(s => string.Format("{0} ({1})", s.ReasonReject, s.ReceiptSyncNo))); //Cộng dồn Reason của từng ReceiptSync
+                hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id);
+            }
+            return hs;
         }
 
         /// <summary>

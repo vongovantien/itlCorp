@@ -56,7 +56,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Paging(AcctReceiptCriteria criteria, int page, int size)
         {
             IQueryable<AcctReceiptModel> data = acctReceiptService.Paging(criteria, page, size, out int rowsCount);
-            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size };
+            var result = new ResponsePagingModel<AcctReceiptModel> { Data = data, Page = page, Size = size, TotalItems = rowsCount };
             return Ok(result);
         }
 
@@ -168,11 +168,13 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check exists invoice payment PAID
-
-            string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
-            if (msgCheckPaidPayment.Length > 0)
+            if(saveAction != SaveAction.SAVECANCEL)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
+                string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
+                if (msgCheckPaidPayment.Length > 0)
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
+                }
             }
 
             var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);

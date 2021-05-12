@@ -9,13 +9,14 @@ import { SystemConstants, AccountingConstants, RoutingConstants } from '@constan
 import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap, takeUntil, finalize } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { GetInvoiceListSuccess, ResetInvoiceList, SetTypeReceipt } from '../store/actions';
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -24,9 +25,10 @@ import { ConfirmPopupComponent } from '@common';
 export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCreateReciptComponent implements OnInit {
     @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
-
+    @ViewChild(ConfirmPopupComponent) confirmSyncPopup: ConfirmPopupComponent;
     receiptId: string;
     receiptDetail: ReceiptModel;
+    confirmMessage: string = '';
 
     constructor(
         protected _router: Router,
@@ -34,6 +36,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         protected _accountingRepo: AccountingRepo,
         protected _activedRoute: ActivatedRoute,
         protected _store: Store<IAppState>,
+        private _spinner: NgxSpinnerService,
     ) {
         super(_router, _toast, _accountingRepo, _activedRoute, _store);
     }
@@ -155,4 +158,42 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     }
 
+    confirmSync() {
+        this.confirmMessage = `Are you sure you want to send data to accountant system?`;
+        this.confirmSyncPopup.show();
+    }
+
+    onConfirmSync() {
+        this.confirmSyncPopup.hide();
+        this.sendReceiptToAccountant();
+    }
+
+    sendReceiptToAccountant() {
+        const receiptSyncIds: AccountingInterface.IRequestString[] = [];
+        const receiptSyncId: AccountingInterface.IRequestString = {
+            id: this.receiptDetail.id,
+            action: this.receiptDetail.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+        };
+        receiptSyncIds.push(receiptSyncId);
+        this._spinner.show();
+        this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
+            .pipe(
+                finalize(() => this._spinner.hide()),
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    console.log(res);
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success("Send Data to Accountant System Successful");
+
+                        //TODO: Load detail receipt
+
+                    } else {
+                        this._toastService.error("Send Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
 }
