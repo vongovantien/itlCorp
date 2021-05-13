@@ -10,6 +10,7 @@ import { ExchangeRateHistoryPopupComponent } from './components/detail-history/e
 import { finalize } from 'rxjs/operators';
 import { ExchangeRateHistory } from '@models';
 import { ExchangeRateConvertComponent } from './components/convert/exchange-rate-convert.component';
+import { formatDate } from '@angular/common';
 
 
 @Component({
@@ -64,8 +65,8 @@ export class ExchangeRateComponent extends AppList implements OnInit {
     searchHistory() {
         this.dataSearch = { localCurrencyId: this.localCurrency };
         if (this.selectedrange != null) {
-            this.dataSearch.fromDate = this.selectedrange.startDate;
-            this.dataSearch.toDate = this.selectedrange.endDate;
+            this.dataSearch.fromDate = this.selectedrange.startDate != null ? formatDate(this.selectedrange.startDate, 'yyyy-MM-dd', 'en') : null;
+            this.dataSearch.toDate = this.selectedrange.endDate != null ? formatDate(this.selectedrange.endDate, 'yyyy-MM-dd', 'en') : null;
         }
         this.page = 1;
         this.getExchangeRates(this.dataSearch);

@@ -304,6 +304,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                         const chargeGrp = (charges || []).find(x => x.id === chargeItem.chargeGroup);
                         if (chargeGrp && chargeGrp.name === 'Com') {
                             chargeItem.kickBack = true;
+                        } else {
+                            chargeItem.kickBack = false;
                         }
                     }
                 });
@@ -1313,6 +1315,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             const checkSelected = feeTypeListTemp.find(e => e.id === event);
             if (!!checkSelected && checkSelected.name === 'Com') {
                 charge.kickBack = true;
+            } else {
+                charge.kickBack = false;
             }
         });
 
