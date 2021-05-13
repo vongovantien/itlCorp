@@ -2767,14 +2767,14 @@ namespace eFMS.API.Documentation.DL.Services
                         charge.PayableAccount = surcharge.PartnerName?.ToUpper();//Partner name of charge
                         charge.Description = surcharge.ChargeNameEn; //Charge name of charge
                         charge.Curr = !string.IsNullOrEmpty(surcharge.CurrencyId) ? surcharge.CurrencyId.Trim() : string.Empty; //Currency of charge
-                        charge.Cost = cost + _decimalNumber; //Phí chi của charge
-                        charge.Revenue = revenue + _decimalNumber; //Phí thu của charge
+                        charge.Cost = cost + _decimalMinNumber; //Phí chi của charge
+                        charge.Revenue = revenue + _decimalMinNumber; //Phí thu của charge
                         charge.Exchange = 0;
                         charge.Paid = (revenue > 0 || cost < 0) && isOBH == false ? false : true;
                         charge.Docs = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? surcharge.InvoiceNo : (surcharge.CreditNo ?? surcharge.DebitNo); //Ưu tiên: InvoiceNo >> CD Note Code  of charge
                         charge.Notes = surcharge.Notes;
                         charge.InputData = string.Empty; //Gán rỗng
-                        charge.Quantity = surcharge.Quantity + _decimalNumber; //Cộng thêm phần thập phân
+                        charge.Quantity = surcharge.Quantity + _decimalMinNumber; //Cộng thêm phần thập phân
                         charge.UnitPrice = (surcharge.UnitPrice ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân nhỏ riêng trường hợp này
                         charge.UnitPriceStr = surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL ? string.Format("{0:n0}", (surcharge.UnitPrice ?? 0)) : string.Format("{0:n3}", (surcharge.UnitPrice ?? 0));
                         charge.Unit = unitCode;
@@ -3212,8 +3212,8 @@ namespace eFMS.API.Documentation.DL.Services
                         objInHbl.Consignee = consignee?.ToUpper();
                         objInHbl.FreightTerm = item.FreightPayment;
                         objInHbl.NoPieces = item.PackageQty != null ? item.PackageQty.ToString() : string.Empty; //Số kiện (Pieces)
-                        objInHbl.GW = (item.GrossWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
-                        objInHbl.CW = (item.ChargeWeight ?? 0) + _decimalNumber; //Cộng thêm phần thập phân
+                        objInHbl.GW = (item.GrossWeight ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân
+                        objInHbl.CW = (item.ChargeWeight ?? 0) + _decimalMinNumber; //Cộng thêm phần thập phân
                         objInHbl.DocsReleaseDate = item.DocumentDate.ToString();
                         objInHbl.TransID = obj.TransID;
                         objInHbl.TransDate = obj.TransDate;
