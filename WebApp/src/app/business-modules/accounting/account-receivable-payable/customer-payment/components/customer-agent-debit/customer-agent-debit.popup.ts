@@ -404,11 +404,13 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     removeAllChecked(groupShipment: any) {
         this.checkAll = false;
         this.checkAllAgency = false;
-        groupShipment.isSelected = false;
-        if (this.TYPELIST === 'GROUP') {
-            groupShipment.invoices.forEach(x => {
-                x.isSelected = false;
-            })
+        if (this.type === 'Agency') {
+            groupShipment.isSelected = false;
+            if (this.TYPELIST === 'GROUP') {
+                groupShipment.invoices.forEach(x => {
+                    x.isSelected = false;
+                })
+            }
         }
     }
 
