@@ -9,6 +9,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string JobNo { get; set; }
         public string Mbl { get; set; }
         public string Hbl { get; set; }
+        public Guid Hblid { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }
         public List<AgencyDebitCreditModel> Invoices { get; set; }
