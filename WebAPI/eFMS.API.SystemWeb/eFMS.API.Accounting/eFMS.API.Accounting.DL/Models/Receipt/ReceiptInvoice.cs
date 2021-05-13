@@ -12,6 +12,10 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? RemainUsd { get; set; }
         public decimal? RemainVnd { get; set; }
 
+        public string JobNo { get; set; }
+        public string Mbl { get; set; }
+        public string Hbl { get; set; }
+        public Guid? Hblid { get; set; }
     }
 
     public class ProcessClearInvoiceModel

@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace eFMS.API.Accounting.DL.Models.Receipt
 {
     public class AgencyDebitCreditModel : CustomerDebitCreditModel
@@ -6,5 +8,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string JobNo { get; set; }
         public string Mbl { get; set; }
         public string Hbl { get; set; }
+        public Guid Hblid { get; set; }
     }
 }

@@ -35,6 +35,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<OpsTransaction> opsTransactionRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
+        private readonly IContextBase<CsTransactionDetail> csTransactionDetailRepository;
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly IContextBase<SysCompany> companyRepository;
@@ -56,6 +57,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysOffice> officeRepo,
             IContextBase<OpsTransaction> opsTransactionRepo,
             IContextBase<CsTransaction> csTransactionRepo,
+            IContextBase<CsTransactionDetail> csTransactionDetailRepo,
             IContextBase<AcctSoa> soaRepo,
             IContextBase<AcctCdnote> cdNoteRepo,
             IContextBase<SysCompany> companyRepo,
@@ -74,6 +76,7 @@ namespace eFMS.API.Accounting.DL.Services
             officeRepository = officeRepo;
             opsTransactionRepository = opsTransactionRepo;
             csTransactionRepository = csTransactionRepo;
+            csTransactionDetailRepository = csTransactionDetailRepo;
             soaRepository = soaRepo;
             cdNoteRepository = cdNoteRepo;
             companyRepository = companyRepo;
@@ -451,6 +454,21 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     CatDepartment dept = departmentRepository.Get(x => x.Id == acctPayment.DeptInvoiceId)?.FirstOrDefault();
                     SysOffice office = officeRepository.Get(x => x.Id == acctPayment.OfficeInvoiceId)?.FirstOrDefault();
+                    string _jobNo = string.Empty;
+                    string _Hbl = string.Empty;
+                    string _Mbl = string.Empty;
+
+                    if (acctPayment.Hblid != null && acctPayment.Hblid != Guid.Empty)
+                    {
+                        CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == acctPayment.Hblid)?.FirstOrDefault();
+                        if(hbl != null)
+                        {
+                            CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+                            _Hbl = hbl.Hwbno;
+                            _Mbl = hbl.Mawb;
+                            _jobNo = job?.JobNo;
+                        }
+                    }
 
                     ReceiptInvoiceModel payment = new ReceiptInvoiceModel();
                     payment.PaymentId = acctPayment.Id;
@@ -458,7 +476,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.InvoiceNo = acctPayment.InvoiceNo;
                     payment.CreditType = acctPayment.Type;
                     payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "CREDITSOA") ? "CREDIT" : acctPayment.Type;
-                    payment.CurrencyId = acctPayment.CurrencyId;
+                    payment.CurrencyId = acctPayment.RefCurrency;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
                     payment.UnpaidAmountUsd = acctPayment.UnpaidPaymentAmountUsd;
@@ -472,7 +490,10 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
                     payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(acctPayment.RefId) : null;
-                    
+                    payment.JobNo = _jobNo;
+                    payment.Mbl = _Mbl;
+                    payment.Hbl = _Hbl;
+                    payment.Hblid = acctPayment.Hblid;
                     paymentReceipts.Add(payment);
                 }
             }
@@ -576,6 +597,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.DeptInvoiceId = paymentGroupOBH.DepartmentId;
             _payment.OfficeInvoiceId = paymentGroupOBH.OfficeId;
             _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
+            _payment.Hblid = paymentGroupOBH.Hblid;
 
             _payment.UserCreated = _payment.UserModified = currentUser.UserID;
             _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
@@ -727,6 +749,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
 
+                _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
                 _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
                 _payment.GroupId = currentUser.GroupId;
@@ -832,6 +855,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DeptInvoiceId = payment.DeptInvoiceId;
                 _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
                 _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
+
+                _payment.Hblid = payment.Hblid; 
 
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
                 _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
@@ -1506,7 +1531,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 data.Invoices.AddRange(obhs);
             }
-            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl }).Select(s=> new GroupShimentAgencyModel {
+            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl, g.Hblid }).Select(s=> new GroupShimentAgencyModel {
+                Hblid = s.Key.Hblid,
                 JobNo = s.Key.JobNo, 
                 Mbl = s.Key.Mbl,
                 Hbl = s.Key.Hbl,
@@ -1531,7 +1557,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from credit in creditNotes
                         join sur in surcharges on credit.Code equals sur.CreditNo
                         select new { credit,sur };
-            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno , g.credit}).Select(s=> new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
+            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno , g.credit, g.sur.Hblid}).Select(s=> new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
 
             var data = grpCreditNoteCharge.Select(se => new AgencyDebitCreditModel
             {
@@ -1554,7 +1580,8 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = new List<string> { se.Job.credit.Id.ToString() },
                 JobNo = se.Job.JobNo,
                 Mbl = se.Job.Mblno,
-                Hbl = se.Job.Hblno
+                Hbl = se.Job.Hblno,
+                Hblid = se.Job.Hblid
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1589,7 +1616,8 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = inv.JobNo,
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
-                               CreditType = "CREDITNOTE"
+                               CreditType = "CREDITNOTE",
+                               Hblid =  inv.Hblid
                            };
             return joinData;
         }
@@ -1612,7 +1640,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from soa in soas
                         join sur in surcharges on soa.Soano equals sur.PaySoano
                         select new { soa, sur };
-            var grpSoaCharge = query.GroupBy(g => new { g.soa , g.sur.Hblno,g.sur.Mblno,g.sur.JobNo }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
+            var grpSoaCharge = query.GroupBy(g => new { g.soa , g.sur.Hblno,g.sur.Mblno,g.sur.JobNo, g.sur.Hblid }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
             var data = grpSoaCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Soa.soa.Soano,
@@ -1634,7 +1662,8 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = new List<string> { se.Soa.soa.Id },
                 JobNo = se.Soa.JobNo,
                 Mbl = se.Soa.Mblno,
-                Hbl = se.Soa.Hblno
+                Hbl = se.Soa.Hblno,
+                Hblid = se.Soa.Hblid
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1669,7 +1698,8 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = inv.JobNo,
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
-                               CreditType = "SOA"
+                               CreditType = "SOA",
+                               Hblid = inv.Hblid
                            };
             return joinData;
         }
@@ -1691,7 +1721,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { g.inv ,g.sur.Hblno,g.sur.JobNo,g.sur.Mblno }).Select(s => new { Invoice = s.Key, Surcharge  = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
+            var grpInvoiceCharge = query.GroupBy(g => new { g.inv ,g.sur.Hblno,g.sur.JobNo,g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge  = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
@@ -1714,6 +1744,7 @@ namespace eFMS.API.Accounting.DL.Services
                 JobNo = se.Invoice.JobNo,
                 Mbl = se.Invoice.Mblno,
                 Hbl = se.Invoice.Hblno,
+                Hblid = se.Invoice.Hblid
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1749,7 +1780,8 @@ namespace eFMS.API.Accounting.DL.Services
                                RefIds = inv.RefIds, 
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
-                               JobNo = inv.JobNo
+                               JobNo = inv.JobNo,
+                               Hblid = inv.Hblid
                            };
             return joinData;
         }
@@ -1771,7 +1803,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo,g.sur.Mblno,g.sur.Hblno })
+            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo,g.sur.Mblno,g.sur.Hblno, g.sur.Hblid })
                 .Select(s => new { PartnerId = s.Key.PartnerId, RefNo = s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
@@ -1794,7 +1826,8 @@ namespace eFMS.API.Accounting.DL.Services
                 RefIds = se.Invoice.Select(s => s.Id.ToString()).ToList(),
                 JobNo = se.Job.JobNo,
                 Mbl = se.Job.Mblno,
-                Hbl = se.Job.Hblno
+                Hbl = se.Job.Hblno,
+                Hblid = se.Job.Hblid
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1830,7 +1863,8 @@ namespace eFMS.API.Accounting.DL.Services
                                RefIds = inv.RefIds,
                                JobNo = inv.JobNo,
                                Hbl = inv.Hbl, 
-                               Mbl = inv.Mbl
+                               Mbl = inv.Mbl,
+                               Hblid = inv.Hblid
                            };
             return joinData;
         }
