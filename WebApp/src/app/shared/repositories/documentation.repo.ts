@@ -66,14 +66,6 @@ export class DocumentationRepo {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction/Import`, body);
     }
 
-    getDetailCSTransaction(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/CsTransaction?id=${id}`).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
-
-
     addOPSJob(body: any = {}) {
         return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/Add`, body);
     }
