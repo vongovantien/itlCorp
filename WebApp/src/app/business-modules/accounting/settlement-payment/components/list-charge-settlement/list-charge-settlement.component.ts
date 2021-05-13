@@ -26,6 +26,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 import { Store } from '@ngrx/store';
+import { SystemConstants } from '@constants';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -102,11 +103,13 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'total', sortable: true },
+            { title: 'Amount VND', field: '', sortable: true },
             { title: 'Payee', field: 'payer', sortable: true },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Inv Date', field: 'invoiceDate', sortable: true },
+            { title: 'VAT Partner', field: 'vatPartnerShortName', sortable: true },
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
@@ -120,6 +123,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     showExistingCharge() {
+        this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
         this.existingChargePopup.show();
     }
 
@@ -132,24 +136,40 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: any) {
-        this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
-        this.surcharges = [...this.surcharges, ...surcharge];
-        this.surcharges.forEach(x => x.isSelected = false);
+    onRequestSurcharge(surcharge: Surcharge[]) {
+        if (surcharge[0].isFromShipment) {
+            this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        } else {
+            this.surcharges = [...this.surcharges, ...surcharge];
+            this.surcharges.forEach(x => x.isSelected = false);
+        }
 
         this.TYPE = 'LIST'; // * SWITCH UI TO LIST
+        if (this.tableListChargePopup.charges.length > 0) {
+            this.isDirectSettlement = true;
+            this.isExistingSettlement = false;
+            this.isShowButtonCopyCharge = true;
+        }
         if (this.existingChargePopup.selectedCharge.length > 0) {
             this.isExistingSettlement = true;
             this.isDirectSettlement = false;
             this.isShowButtonCopyCharge = false;
-        } else {
-            if (this.surcharges.length > 0) {
-                this.isDirectSettlement = true;
-                this.isExistingSettlement = false;
-                this.isShowButtonCopyCharge = true;
-            }
+            this.groupShipments.forEach((groupItem: any) => {
+                if (groupItem.hblId === surcharge[0].hblid) {
+                    groupItem.chargeSettlements.map((charge: Surcharge) => {
+                        const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                        charge.amountVnd = chargeInList.amountVnd;
+                        charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                    })
+                    groupItem.totalAmount = groupItem.chargeSettlements.reduce((net: number, charge: Surcharge) => net += (charge.amountVnd + charge.vatAmountVnd), 0);
+                }
+            })
         }
-        this.onChange.emit(true);
+        if (surcharge[0].isFromShipment) {
+            this.onChange.emit(true);
+        }
     }
 
     onUpdateSurchargeFromTableChargeList(charges: Surcharge[]) {
@@ -340,10 +360,25 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         }
 
         this.selectedIndexSurcharge = null;
+        if (this.isExistingSettlement === true) {
+            this.groupShipments.forEach((groupItem: any) => {
+                groupItem.chargeSettlements.map((charge: Surcharge) => {
+                    const chargeInList = this.surcharges.filter((x: Surcharge) => x.id === charge.id).shift();
+                    charge.amountVnd = chargeInList.amountVnd;
+                    charge.vatAmountVnd = chargeInList.vatAmountVnd;
+                })
+            })
+        }
     }
 
     showCopyCharge() {
         this.copyChargePopup.show();
+    }
+
+    checkAllowUpdateExistingCharge() {
+        const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        const allowUpdate = this.STATE === 'WRITE' &&  userLogged.id === this.requester;
+        return allowUpdate;
     }
 
     updateChargeWithJob(charge: Surcharge, index?: number) {
@@ -359,6 +394,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             // this.listChargeFromShipmentPopup.show();
             this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
             this.existingChargePopup.state = 'update';
+            this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
             this.existingChargePopup.show();
         } else {
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);

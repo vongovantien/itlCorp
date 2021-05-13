@@ -181,6 +181,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true },
             { title: 'Fee Type', field: 'chargeGroup', sortable: true },
             { title: 'Exchange Rate Date', field: 'exchangeDate', sortable: true },
             { title: 'Final Exchange Rate', field: 'finalExchangeRate', sortable: true },
@@ -325,6 +326,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                 break;
             case 'unit':
                 chargeItem.unitId = data.id;
+                break;
+            case 'vat-partner':
+                chargeItem.vatPartnerId = data.id;
                 break;
             default:
                 break;
@@ -667,6 +671,10 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             chargeItem.partnerName = partnerData.partnerNameEn;
             chargeItem.paymentObjectId = partnerData.id;
             chargeItem.objectBePaid = null;  // nếu chọn customer/agent/carrier
+
+            if (chargeItem.invoiceNo) {
+                chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+            }
         }
     }
 
@@ -683,6 +691,9 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     chargeItem.partnerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
                 }
                 chargeItem.paymentObjectId = this.hbl.customerId;
+                if (chargeItem.invoiceNo) {
+                    chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+                }
                 break;
             case CommonEnum.PartnerGroupEnum.CARRIER:
                 // chargeItem.partnerShortName = this.shipment.supplierName;
@@ -1305,6 +1316,12 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         let mblNo = null;
         mblNo = shipment.mawb ? shipment.mawb : (hbl.mawb ? hbl.mawb : hbl.hwbno);
         return mblNo;
+    }
+
+    onChangeInvoiceNo(chargeItem: CsShipmentSurcharge, invNo: string) {
+        if (!!invNo) {
+            chargeItem.vatPartnerId = chargeItem.paymentObjectId;
+        }
     }
 }
 

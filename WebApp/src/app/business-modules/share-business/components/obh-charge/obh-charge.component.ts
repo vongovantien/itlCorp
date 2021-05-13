@@ -116,6 +116,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Series No', field: 'seriesNo', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+            { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 200 },
             { title: 'SOA', field: 'soano', sortable: true, width: 170 },
             { title: 'Credit/Debit Note', field: 'cdno', sortable: true, width: 230 },
             { title: 'Settle Payment', field: 'settlementCode', sortable: true },
@@ -166,6 +167,10 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                         chargeItem.payerName = this.hbl.customerName;
                         chargeItem.payerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
                         chargeItem.payerId = this.hbl.customerId;
+
+                        if (chargeItem.invoiceNo) {
+                            chargeItem.vatPartnerId = chargeItem.payerId;
+                        }
                         break;
                     case CommonEnum.PartnerGroupEnum.CARRIER:
                         chargeItem.payerName = this.shipment.supplierName;
@@ -202,6 +207,10 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     chargeItem.payerName = partnerData.partnerNameEn;
                     chargeItem.payerId = partnerData.id;
                     chargeItem.payerShortName = partnerData.shortName;
+
+                    if (chargeItem.invoiceNo) {
+                        chargeItem.vatPartnerId = chargeItem.payerId;
+                    }
                 }
                 break;
             default:
@@ -275,5 +284,11 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
         }
 
         return valid;
+    }
+
+    onChangeInvoiceNo(chargeItem: CsShipmentSurcharge, invNo: string) {
+        if (invNo) {
+            chargeItem.vatPartnerId = chargeItem.payerId;
+        }
     }
 }

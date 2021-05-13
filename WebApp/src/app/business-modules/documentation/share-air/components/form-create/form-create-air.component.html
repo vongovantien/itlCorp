@@ -81,6 +81,7 @@
                             <div class="col-md-6">
                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (etd.dirty && !etd.value) 
                                     || (isSubmitted && type !== 'import' && !etd.value) 
+                                    || (isSubmitted && type !== 'import' && !etd.valid) 
                                     || (isSubmitted && !!etd.value && !etd.value.startDate && type !== 'import')}">
                                     <label>ETD
                                         <span class="text-danger" *ngIf="type !== 'import'">(*)</span>
@@ -99,6 +100,7 @@
                             <div class="col-md-6 eta-date-picker">
                                 <div class="form-group" [ngClass]="{'m-form__group has-danger': (eta.dirty && !eta.value) 
                                     || (isSubmitted && type === 'import' && !eta.value) 
+                                    || (isSubmitted && type === 'import' && !eta.valid) 
                                     || (isSubmitted && !!eta.value && !eta.value.startDate && type === 'import') 
                                     || (isSubmitted && formGroup.errors | equalError:'validateEta_Etd')}">
                                     <label>ETA
@@ -154,12 +156,21 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <div class="form-group">
                             <label>Payment Method</label>
                             <ng-select class="custom" [items]="termTypes" placeholder="Select payment method"
                                 formControlName="paymentTerm"></ng-select>
                         </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label>Incoterm</label>
+                            <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                            </ng-select>
+                        </div>
+
                     </div>
                     <div class="col-md-4">
                         <div class="row">
@@ -206,6 +217,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <div class="row">
                             <div class="col-md-6">
@@ -292,6 +304,30 @@
                                         [displayFields]="displayFieldWarehouse" placeholder="Select warehouse"
                                         (remove)="resetFormControl(warehouseId)" #CombogridWh>
                                     </app-combo-grid-virtual-scroll>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>ATD</label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly formControlName="atd" (remove)="resetFormControl(atd)" calendar
+                                            [allowRemove]="!!atd.value && !!atd.value.startDate" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>ATA</label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
+                                            [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
+                                            readonly formControlName="ata" (remove)="resetFormControl(ata)" calendar
+                                            [allowRemove]="!!ata.value && !!ata.value.startDate" />
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12">

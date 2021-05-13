@@ -19,6 +19,7 @@ import { RoutingConstants } from '@constants';
 import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
@@ -220,6 +221,11 @@ export class AirExportDetailJobComponent extends AirExportCreateJobComponent imp
                         // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
                     } else {
                         this._toastService.error(res.message);
+                    }
+                },
+                (error: HttpErrorResponse) => {
+                    if (error.error?.data?.errorCode) {
+                        this.formCreateComponent.formGroup.controls[error.error?.data?.errorCode].setErrors({ existed: true });
                     }
                 }
             );

@@ -129,7 +129,8 @@ export class SystemConstants {
         NOT_WHITE_SPACE: /^\S*$/,
         WHITE_SPACE: /^\s*$/,
         TAX_CODE: /^[a-zA-Z0-9_-]*$/,
-        GUID: /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/g
+        GUID: /(\{){0,1}[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}(\}){0,1}/g,
+        UNICODE_ZERO_WIDTH: /[\u200B-\u200D\uFEFF\u200e]/g
     };
 
     public static HTTP_CODE = {

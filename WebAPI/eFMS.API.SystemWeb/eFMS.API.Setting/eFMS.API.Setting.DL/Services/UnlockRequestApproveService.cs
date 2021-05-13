@@ -575,7 +575,13 @@ namespace eFMS.API.Setting.DL.Services
             if (!isLeader && userCurrent.GroupId != SettingConstants.SpecialGroup && userCurrent.UserID == unlockRequest.RequestUser) //Requester
             {
                 isApproved = true;
-                if (unlockRequest.RequestDate == null)
+                //User vừa là Requester và vừa là User Deputy
+                if (unlockRequest.RequestDate == null 
+                    || (leaderLevel.UserDeputies.Contains(userCurrent.UserID) && string.IsNullOrEmpty(approve.LeaderApr) && leaderLevel.Role != SettingConstants.ROLE_NONE)
+                    || (managerLevel.UserDeputies.Contains(currentUser.UserID) && string.IsNullOrEmpty(approve.ManagerApr) && managerLevel.Role != SettingConstants.ROLE_NONE)
+                    || (accountantLevel.UserDeputies.Contains(currentUser.UserID) && string.IsNullOrEmpty(approve.AccountantApr) && accountantLevel.Role != SettingConstants.ROLE_NONE)
+                    || (buHeadLevel.UserDeputies.Contains(userCurrent.UserID) && (string.IsNullOrEmpty(approve.BuheadApr) && buHeadLevel.Role != SettingConstants.ROLE_NONE) || (buHeadLevel.Role == SettingConstants.ROLE_SPECIAL && !string.IsNullOrEmpty(unlockRequest.RequestUser)))
+                    )
                 {
                     isApproved = false;
                 }
@@ -2050,7 +2056,21 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     if (type == "Change Service Date")
                     {
-                        doc.ServiceDate = newServiceDate;
+                        //[CR: 15718 - 07/05/2021 - Andy]
+                        if (doc.TransactionType.Contains("E"))
+                        {
+                            //Export >> Update for ETD
+                            doc.Etd = newServiceDate;
+                        }
+                        else if (doc.TransactionType.Contains("I"))
+                        {
+                            //Import >> Update for ETA
+                            doc.Eta = newServiceDate;
+                        } 
+                        else
+                        {
+                            doc.ServiceDate = newServiceDate;
+                        }
                     }
                     doc.UserModified = currentUser.UserID;
                     doc.DatetimeModified = DateTime.Now;

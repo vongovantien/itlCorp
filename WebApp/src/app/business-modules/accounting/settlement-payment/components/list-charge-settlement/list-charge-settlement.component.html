@@ -30,9 +30,7 @@
                             </span>
                         </span>
                     </button>
-                    <ng-container *ngIf="((detailSettlement | async)?.settlement?.statusApproval === 'New' 
-                    || (detailSettlement | async)?.settlement?.statusApproval === 'Done')
-                    && (detailSettlement | async)?.settlement?.isRequester">
+                    <ng-container>
                         <button type="button" class="btn btn-danger   m-btn--icon m-btn--uppercase"
                             (click)="deleteShipmentItem()">
                             <span>
@@ -213,6 +211,7 @@
                                     <td>{{surcharge.currencyId}}</td>
                                     <td>{{surcharge.vatrate}}</td>
                                     <td>{{surcharge.total | number: '.0-3'}}</td>
+                                    <td>{{surcharge.amountVnd + surcharge.vatAmountVnd| number: '.0-3'}}</td>
                                     <td>{{surcharge.payer }}</td>
                                     <td>{{surcharge.obhPartnerName }}</td>
                                     <td>{{surcharge.invoiceNo}}</td>
@@ -220,6 +219,7 @@
                                     <td>
                                         {{!!surcharge.invoiceDate ? (surcharge.invoiceDate | date: 'dd/MM/yyyy') : ''}}
                                     </td>
+                                    <td>{{surcharge.vatPartnerShortName}}</td>
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>

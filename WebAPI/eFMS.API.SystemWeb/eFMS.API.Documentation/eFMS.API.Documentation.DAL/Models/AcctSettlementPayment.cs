@@ -23,11 +23,12 @@ namespace eFMS.API.Documentation.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
-        public DateTime? VoucherDate { get; set; }
         public string VoucherNo { get; set; }
+        public DateTime? VoucherDate { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
         public string Payee { get; set; }
+        public string SettlementType { get; set; }
     }
 }

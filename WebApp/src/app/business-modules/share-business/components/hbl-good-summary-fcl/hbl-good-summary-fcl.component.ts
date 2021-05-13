@@ -15,6 +15,7 @@ import * as fromStore from '../../store';
 import { AppPage } from 'src/app/app.base';
 import { ConfirmPopupComponent } from '@common';
 import { ShareBussinessHBLFCLContainerPopupComponent } from '../hbl-fcl-container/hbl-fcl-container.popup';
+import { SortService } from '@services';
 
 
 @Component({
@@ -50,12 +51,14 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
     isSave: boolean = false;
 
     jobId: string;
+    isExport: boolean = false;
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
         protected _store: Store<fromStore.IContainerState>,
         private _catalogueRepo: CatalogueRepo,
-        private _activedRoute: ActivatedRoute
+        private _activedRoute: ActivatedRoute,
+        private sortService: SortService
     ) {
         super();
 
@@ -147,9 +150,18 @@ export class ShareBussinessHBLGoodSummaryFCLComponent extends AppPage implements
         this.containerDetail = '';
         this.containerDescription = '';
 
-        containers.forEach((c: Container) => {
-            this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
-        });
+        if (!!containers) {
+            if (this.type === 'export') {
+                const containerLst = this.sortService.sort(containers.map((item: any) => new Container(item)), 'containerNo', true);
+                containerLst.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
+                });
+            }else{
+                containers.forEach((c: Container) => {
+                    this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
+                });
+            }
+        }
 
         const objApartOf = containers.filter(x => x.isPartOfContainer === true);
         const contObject1 = this.mapObjectData(objApartOf);

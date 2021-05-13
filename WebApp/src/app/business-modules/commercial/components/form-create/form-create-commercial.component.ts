@@ -64,6 +64,7 @@ export class CommercialFormCreateComponent extends AppForm implements OnInit {
     countryShippingIdName: string;
     provinceShippingIdName: string;
     partnerId: string = '';
+    active: boolean = false;
     //
     @ViewChild('focusInput') internalReferenceRef: ElementRef;
 

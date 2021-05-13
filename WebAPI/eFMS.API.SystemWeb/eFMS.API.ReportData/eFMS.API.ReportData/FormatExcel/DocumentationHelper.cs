@@ -1977,6 +1977,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(32).Width = 24; //Cột AF
             workSheet.Column(33).Width = 25; //Cột AF
             workSheet.Column(34).Width = 24; //Cột AF
+            workSheet.Column(35).Width = 24; //Cột AF
         }
         /// <summary>
         /// 
@@ -2189,7 +2190,8 @@ namespace eFMS.API.ReportData.FormatExcel
                "P/M Voucher No.", //31
                "Service" ,//32
                "Cd Note", //33,
-               "Creator" //33
+               "Creator", //33,
+               "Synced"
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2225,9 +2227,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AH8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AH8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AH8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AI8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AI8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AI8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2306,9 +2308,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AF7:AF8"].Merge = true;
             workSheet.Cells["AG7:AG8"].Merge = true;
             workSheet.Cells["AH7:AH8"].Merge = true;
+            workSheet.Cells["AI7:AI8"].Merge = true;
             workSheet.Cells["AF7"].Value = headers[32]; //Service
             workSheet.Cells["AG7"].Value = headers[33]; //CD NOTE
             workSheet.Cells["AH7"].Value = headers[34]; //Creator
+            workSheet.Cells["AI7"].Value = headers[35]; //Creator
             //Header table
 
             int rowStart = 9;
@@ -2414,11 +2418,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 32].Value = listData[i].Service;
                 workSheet.Cells[rowStart, 33].Value = listData[i].CdNote;
                 workSheet.Cells[rowStart, 34].Value = listData[i].Creator;
+                workSheet.Cells[rowStart, 35].Value = listData[i].SyncedFrom;
                 rowStart += 1;
 
             }
 
-            workSheet.Cells[rowStart, 1, rowStart, 34].Style.Font.Bold = true;
+            workSheet.Cells[rowStart, 1, rowStart, 35].Style.Font.Bold = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Merge = true;
             workSheet.Cells[rowStart, 1, rowStart, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[rowStart, 1].Value = headers[19];
@@ -2446,9 +2451,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 34].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 34].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 34].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 35].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 35].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 35].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
@@ -3880,7 +3885,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("ForMonth", "FOR MONTH: " + resultData.ForMonth?.ToUpper()); // Set data
                 listKeyData.Add("ExchangeRate", resultData.ExchangeRate);
                 excel.SetData(listKeyData);
-                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate).ThenBy(x => x.HBLNo);
+                var listDetail = resultData.Details.OrderBy(x => x.ServiceDate?.ToString("MMM-yyyy")).ThenBy(x=>x.CustomerName).ThenBy(x => x.HBLNo);
                 var years = resultData.Details.OrderBy(x => x.ServiceDate).Select(x => x.ServiceDate.Value.Year);
 
                 var formatMonth = years.Count() > 1 ? "MMM-yyyy" : "MMM";
@@ -4004,14 +4009,29 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData = new Dictionary<string, object>();
                     listKeyFormula = new Dictionary<string, string>();
                     listKeyData.Add("ServiceDate", item.ServiceDate?.ToString("dd-MMM"));
-                    listKeyData.Add("HBLNo", item.HBLNo);
                     if (item.TransactionType.Contains('A'))
                     {
+                        if (string.IsNullOrEmpty(item.HBLNo) || item.HBLNo.Contains("N/H"))
+                        {
+                            if (!string.IsNullOrEmpty(item.MBLNo))
+                            {
+                                listKeyData.Add("HBLNo", item.MBLNo);
+                            }
+                            else
+                            {
+                                listKeyData.Add("HBLNo", item.JobId);
+                            }
+                        }
+                        else
+                        {
+                            listKeyData.Add("HBLNo", item.HBLNo);
+                        }
                         _chargeWeight += (item.ChargeWeight ?? 0);
                         listKeyData.Add("ChargeWeight", item.ChargeWeight);
                     }
                     else
                     {
+                        listKeyData.Add("HBLNo", item.JobId);
                         _contQty += (item.ContQty ?? 0);
                         listKeyData.Add("ChargeWeight", item.PackageContainer);
                     }
@@ -4055,7 +4075,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     _statement = string.Format("ROUND(M{0}-O{0},0)", startRow);
                     listKeyFormula.Add("EntitledCom", _statement);
                     // PIT (30%)
-                    _statement = string.Format("P{0}*10%", startRow);
+                    _statement = string.Format("ROUND(P{0}*10%, 0)", startRow);
                     listKeyFormula.Add("PIT", _statement);
                     // Net due to customers
                     _statement = string.Format("P{0}-Q{0}", startRow);
@@ -4141,13 +4161,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 foreach (var mon in monthGrp)
                 {
-                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.JobId);
+                    var shipmentGrp = resultData.Details.Where(x => x.ServiceDate?.Month == mon).OrderBy(x => x.CustomerName).ThenBy(x=>x.JobId);
                     if (shipmentGrp.Count() > 0)
                     {
                         listKeyData = new Dictionary<string, object>();
                         var month = shipmentGrp.FirstOrDefault().ServiceDate?.ToString("MMM");
                         excel.SetGroupsTable();
                         listKeyData.Add("ServiceDate", month);
+                        excel.SetData(listKeyData);
                         startRow++;
                     }
                     else
@@ -4158,6 +4179,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     foreach (var shipment in shipmentGrp)
                     {
                         excel.SetDataTable();
+                        listKeyData = new Dictionary<string, object>();
                         listKeyData.Add("JobId", shipment.JobId);
                         listKeyData.Add("CustomerName", shipment.CustomerName);
                         listKeyData.Add("MBL", shipment.MBLNo);
@@ -4171,7 +4193,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData = new Dictionary<string, object>();
                 var _statement = string.Format("SUM(E5:E{0})", rowTotal);
                 listKeyFormula.Add("TotalUSD", _statement); // Total USD
-                _statement = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate);
+                _statement = string.Format("De nghi thanh toan VND: (USDx10% x {0})", resultData.ExchangeRate.ToString("#,##0"));
                 listKeyData.Add("DeNghi", _statement);
                 _statement = string.Format("E{0}*0.1*{1}", startRow, resultData.ExchangeRate);
                 listKeyFormula.Add("TotalAmount", _statement); // Total De nghi thanh toan

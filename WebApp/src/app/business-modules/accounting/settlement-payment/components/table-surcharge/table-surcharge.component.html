@@ -64,11 +64,13 @@
                     <td>{{surcharge.currencyId}}</td>
                     <td>{{surcharge.vatrate}}</td>
                     <td>{{surcharge.total | number: '.0-3'}}</td>
+                    <td>{{surcharge.amountVnd + surcharge.vatAmountVnd| number: '.0-3'}}</td>
                     <td>{{surcharge.payer }}</td>
                     <td>{{surcharge.obhPartnerName}}</td>
                     <td>{{surcharge.invoiceNo}}</td>
                     <td>{{surcharge.seriesNo}}</td>
                     <td>{{surcharge.invoiceDate | date: 'dd/MM/yyyy'}}</td>
+                    <td>{{surcharge.vatPartnerShortName}}</td>
                     <td>{{surcharge.clearanceNo}}</td>
                     <td>{{surcharge.contNo}}</td>
                     <td>{{surcharge.notes}}</td>
