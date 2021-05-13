@@ -21,7 +21,6 @@ import { delayTime } from '@decorators';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
 
-
 type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES' | 'ADVANCE-SETTLE';
 
 @Component({
