@@ -79,19 +79,31 @@ namespace eFMS.API.Documentation.Controllers
             List<string> shipmentNotExits = new List<string>();
             if (searchOption == "JobNo")
             {
-                shipmentNotExits = keywords.Where(x => !data.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+                //shipmentNotExits = keywords.Where(x => !data.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+                //Trả về các Job trong list keywords không nằm trong list jobIds
+                var jobIds = data.Select(s => s.JobId);
+                shipmentNotExits = keywords.Except(jobIds).Select(s => s).ToList();
             }
             else if (searchOption == "Hwbno")
             {
-                shipmentNotExits = keywords.Where(x => !data.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
+                //shipmentNotExits = keywords.Where(x => !data.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
+                //Trả về các HBL trong list keywords không nằm trong list hbls
+                var hbls = data.Select(s => s.HBL);
+                shipmentNotExits = keywords.Except(hbls).Select(s => s).ToList();
             }
             else if (searchOption == "Mawb")
             {
-                shipmentNotExits = keywords.Where(x => !data.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
+                //shipmentNotExits = keywords.Where(x => !data.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
+                //Trả về các MBL trong list keywords không nằm trong list mbls
+                var mbls = data.Select(s => s.MBL);
+                shipmentNotExits = keywords.Except(mbls).Select(s => s).ToList();
             }
             else if (searchOption == "ClearanceNo")
             {
-                shipmentNotExits = keywords.Where(x => !data.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+                //shipmentNotExits = keywords.Where(x => !data.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+                //Trả về các CustomNo trong list keywords không nằm trong list customNos
+                var customNos = data.Select(s => s.CustomNo);
+                shipmentNotExits = keywords.Except(customNos).Select(s => s).ToList();
             }
 
             var _status = true;
@@ -116,19 +128,27 @@ namespace eFMS.API.Documentation.Controllers
                 shipments = shipments.Select(s => s.Trim()).ToList();
                 if (typeSearch == "JOBID")
                 {
-                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.JobId).Contains(x)).Select(s => s).ToList();
+                    //Trả về các Job trong list shipments không nằm trong list jobIds
+                    var jobIds = listShipment.Select(s => s.JobId);
+                    shipmentNotExits = shipments.Except(jobIds).Select(s => s).ToList();
                 }
                 else if (typeSearch == "MBL")
                 {
-                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.MBL).Contains(x)).Select(s => s).ToList();
+                    //Trả về các MBL trong list shipments không nằm trong list mbls
+                    var mbls = listShipment.Select(s => s.MBL);
+                    shipmentNotExits = shipments.Except(mbls).Select(s => s).ToList();
                 }
                 else if (typeSearch == "HBL")
                 {
-                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.HBL).Contains(x)).Select(s => s).ToList();
+                    //Trả về các HBL trong list shipments không nằm trong list hbls
+                    var hbls = listShipment.Select(s => s.HBL);
+                    shipmentNotExits = shipments.Except(hbls).Select(s => s).ToList();
                 }
                 else if (typeSearch == "CustomNo")
                 {
-                    shipmentNotExits = shipments.Where(x => !listShipment.Select(s => s.CustomNo).Contains(x)).Select(s => s).ToList();
+                    //Trả về các CustomNo trong list shipments không nằm trong list customNos
+                    var customNos = listShipment.Select(s => s.CustomNo);
+                    shipmentNotExits = shipments.Except(customNos).Select(s => s).ToList();
                 }
             }
             var _status = false;
