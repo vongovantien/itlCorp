@@ -129,8 +129,7 @@
                             <div class="row">
                                 <label class="col-lg-4 col-form-label form-control-label"> Status </label>
                                 <div class="col-lg-8">
-                                    <app-switch [toggle]="authorizationActive.value" [disabled]="action==='create'"
-                                        (toggleChange)="authorizationActive.setValue($event)"
+                                    <app-switch formControlName="authorizationActive" [disabled]="action==='create'"
                                         (click)="changeStatus($event)">
                                     </app-switch>
                                 </div>
@@ -145,16 +144,16 @@
 
                                     <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                         <span class="m--font-bolder">Created:</span>
-                                        <span
-                                            class="m--font-success m--margin-left-5">{{datetimeCreated | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                        <span class="m--font-success m--margin-left-5">{{datetimeCreated |
+                                            date:'dd/MM/yyyy h:mm:ss a'}}</span>
                                         <span class="m--font-bolder m--margin-left-5">by</span>
                                         <span class="m--font-success m--margin-left-5">{{userCreatedName}}</span>
                                     </div>
                                     <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                         <span class="m--font-bolder">Modified:</span>
                                         <ng-container *ngIf="!!userModifiedName">
-                                            <span
-                                                class="m--font-success m--margin-left-5">{{datetimeModified | date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                            <span class="m--font-success m--margin-left-5">{{datetimeModified |
+                                                date:'dd/MM/yyyy h:mm:ss a'}}</span>
                                             <span class="m--font-bolder m--margin-left-5">by</span>
                                             <span class="m--font-success m--margin-left-5">{{userModifiedName}}</span>
                                         </ng-container>

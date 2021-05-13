@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
+import { formatDate } from '@angular/common';
 
 import { SortService, DataService } from '@services';
 import { ConfirmPopupComponent } from '@common';
 import { delayTime } from '@decorators';
 import { ChargeOfAccountingManagementModel } from '@models';
-
-import { AppList } from 'src/app/app.list';
-import { IAccountingManagementState, getAccountingManagementPartnerChargeState } from '../../store';
-
-import { switchMap, takeUntil } from 'rxjs/operators';
-import { formatDate } from '@angular/common';
+import { InjectViewContainerRefDirective } from '@directives';
 import { AccountingRepo } from '@repositories';
+import { AppList } from '@app';
+import { IAccountingManagementState, getAccountingManagementPartnerChargeState, getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+
+import { switchMap, takeUntil, withLatestFrom, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -62,7 +62,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
 
     private _type: string = 'invoice';
 
-    @ViewChild(ConfirmPopupComponent, { static: true }) confirmRemovePopup: ConfirmPopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) templateInject: InjectViewContainerRefDirective
 
     charges: ChargeOfAccountingManagementModel[] = [];
 
@@ -101,6 +101,9 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     listAmountDefault: IListChargeAmountDefault[] = [];
     titleErrorRangeAmount: string = 'New value is grather than previous value over (+/-1000 VND)';
 
+    currentVoucherPartnerInfo: IAccountingManagementPartnerState;
+    currentListChargeFromNewState: ChargeOfAccountingManagementModel[];
+
     constructor(
         private _sortService: SortService,
         private _store: Store<IAccountingManagementState>,
@@ -113,46 +116,54 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     }
 
     ngOnInit(): void {
-
         // * Listen charge state from Store.
         this._store.select(getAccountingManagementPartnerChargeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (charges: ChargeOfAccountingManagementModel[]) => {
-                    console.log(charges);
-                    if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
-                        this.charges = [...this.charges, ...cloneDeep(charges)]; // * CloneDeep to avoid shadow copy after call fn => refreshListCharge()
-
-                        this.listAmountDefault = [...this.charges].map((item: ChargeOfAccountingManagementModel) => {
-                            return <IListChargeAmountDefault>{
-                                id: item.surchargeId,
-                                amountVnd: item.amountVnd,
-                                vatAmountVnd: item.vatAmountVnd
-                            };
-                        });
-                        console.log("list charge default", this.listAmountDefault);
-
-                        this.updateTotalAmount();
-
-                        if (this._type !== 'invoice') {
-                            this.charges.forEach(c => {
-                                if (!!c.invoiceDate) {
-                                    c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
-                                }
-                            });
-                        }
-
-                    } else {
-                        this._toastService.warning("Charge has existed in list");
-                        return;
+            .pipe(
+                withLatestFrom(this._store.select(getAccoutingManagementPartnerState)),
+                map(([charges, partnerInfo]) => {
+                    if (this.type === 'invoice') {
+                        return charges;
                     }
+                    if (!this.currentVoucherPartnerInfo?.partnerId) {
+                        this.currentVoucherPartnerInfo = partnerInfo;
+                    }
+                    if (!!this.currentVoucherPartnerInfo.partnerId && partnerInfo.partnerId !== this.currentVoucherPartnerInfo.partnerId) {
+                        this.currentListChargeFromNewState = charges;
+                        return false;
+                    }
+                    return charges; // ? RETURN ERROR => WITH CASE VOUCHER HAD BEEN ISSUED ANOTHER PARTNER.
+                }),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (charges: ChargeOfAccountingManagementModel[] | boolean | unknown) => {
+                    if (charges === false) {
+                        this.showPopupDynamicRender(ConfirmPopupComponent, this.templateInject.viewContainerRef, {
+                            title: 'Warning',
+                            body: `There exists another partner in your selected data. Please press "OK" if you want to continue.  <br/>
+                                Tồn tại đối tượng thanh toán khác trong dữ liệu bạn vừa chọn. Vui lòng chọn <span class="font-weight-bold">OK</span> nếu bạn muốn tiếp tục.`,
+                            labelConfirm: 'Ok'
+                        }, () => {
+                            if (!!this.currentListChargeFromNewState?.length) {
+                                this.updateTableListCharge(this.currentListChargeFromNewState);
+                            }
+                        })
+                    } else {
+                        this.updateTableListCharge(charges);
+                    }
+                },
+                (err) => {
+                    console.log(err);
                 }
             );
 
         // * Listen general Exchange rate 
+        this.listenGeneralExchangeRateChange();
+    }
+
+    listenGeneralExchangeRateChange() {
         this._dataService.currentMessage
             .pipe(
-                takeUntil(this.ngUnsubscribe),
                 switchMap((res: { [key: string]: any }) => {
                     if (res.generalExchangeRate) {
                         if (!!this.charges.length) {
@@ -168,7 +179,8 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                         return of(false);
                     }
                     return of(false);
-                })
+                }),
+                takeUntil(this.ngUnsubscribe),
             ).subscribe(
                 (data: IChargeAccountingMngtTotal) => {
                     if (!!data) {
@@ -190,6 +202,36 @@ export class AccountingManagementListChargeComponent extends AppList implements 
                     }
                 }
             );
+    }
+
+    updateTableListCharge(charges: ChargeOfAccountingManagementModel[] | boolean | unknown | any) {
+        if (!this.detectDuplicateCharge([...this.charges, ...charges])) {
+            this.charges = [...this.charges, ...cloneDeep(charges)]; // * CloneDeep to avoid shadow copy after call fn => refreshListCharge()
+
+            this.listAmountDefault = [...this.charges].map((item: ChargeOfAccountingManagementModel) => {
+                return <IListChargeAmountDefault>{
+                    id: item.surchargeId,
+                    amountVnd: item.amountVnd,
+                    vatAmountVnd: item.vatAmountVnd
+                };
+            });
+
+            this.updateTotalAmount();
+
+            if (this._type !== 'invoice') {
+                this.charges.forEach(c => {
+                    if (!!c.invoiceDate) {
+                        if (new Date(c.invoiceDate).toString() !== "Invalid Date") {
+                            c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
+                        }
+                    }
+                });
+            }
+
+        } else {
+            this._toastService.warning("Charge has existed in list");
+            return;
+        }
     }
 
     sortCharges(sort: string) {
@@ -229,7 +271,7 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     }
 
     onChangeCheckBoxCharge(e: any, selectedCharge: ChargeOfAccountingManagementModel) {
-        this.isCheckAll = this.charges.every((item: ChargeOfAccountingManagementModel) => item.isSelected);
+        this.isCheckAll = this.charges.every((item: ChargeOfAccountingManagementModel) => item.isSelected === true);
         if (this.type === 'invoice') {
             if (e.target.checked) {
                 if (!!selectedCharge.soaNo) {
@@ -287,15 +329,20 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     removeCharge() {
         const chargeToDelete: ChargeOfAccountingManagementModel[] = this.charges.filter(x => x.isSelected);
         if (!!chargeToDelete.length) {
-            this.contentConfirmRemoveCharge = `Are you sure you want to remove ${this.getDataRemove(chargeToDelete, 'soaNo')} ${this.getDataRemove(chargeToDelete, 'cdNoteNo')} ?`;
-            this.confirmRemovePopup.show();
+            this.contentConfirmRemoveCharge = `Are you sure you want to remove <span class="font-weight-bold">${this.getDataRemove(chargeToDelete, 'soaNo')} ${this.getDataRemove(chargeToDelete, 'cdNoteNo')} ? </span>`;
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.templateInject.viewContainerRef, {
+                body: this.contentConfirmRemoveCharge,
+                iconConfirm: 'la la-trash',
+                classConfirmButton: 'btn-danger'
+            }, () => {
+                this.onRemoveCharge();
+            })
         } else {
             return;
         }
     }
 
     onRemoveCharge() {
-        this.confirmRemovePopup.hide();
         this.charges = this.charges.filter((item: ChargeOfAccountingManagementModel) => !item.isSelected);
 
         this.isCheckAll = false;
