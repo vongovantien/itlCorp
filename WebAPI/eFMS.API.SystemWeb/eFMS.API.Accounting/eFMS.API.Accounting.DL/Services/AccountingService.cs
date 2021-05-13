@@ -675,8 +675,14 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
-                        charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        //charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        //VAT Partner of Charge [15725 - Andy]
+                        charge.CustomerCodeVAT = partners.Where(x => x.Id == surcharge.VatPartnerId).FirstOrDefault()?.AccountNo;
                         charge.CustomerCodeTransfer = sync.PaymentMethod == "Bank Transfer" ? sync.CustomerCode : null;
+                        charge.AdvanceCustomerCode = null;
+                        charge.RefundAmount = null;
+                        charge.Stt_Cd_Htt = null;
+                        charge.IsRefund = 0;
 
                         charges.Add(charge);
                     }
@@ -969,8 +975,14 @@ namespace eFMS.API.Accounting.DL.Services
                         charge.AtchDocSerialNo = surcharge.SeriesNo;
                         charge.CustomerCodeBook = sync.CustomerCode;
 
-                        charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        //charge.CustomerCodeVAT = !string.IsNullOrEmpty(surcharge.InvoiceNo) ? sync.CustomerCode : null;
+                        //VAT Partner of Charge [15725 - Andy]
+                        charge.CustomerCodeVAT = partners.Where(x => x.Id == surcharge.VatPartnerId).FirstOrDefault()?.AccountNo;
                         charge.CustomerCodeTransfer = sync.PaymentMethod == "Bank Transfer" ? sync.CustomerCode : null;
+                        charge.AdvanceCustomerCode = null;
+                        charge.RefundAmount = null;
+                        charge.Stt_Cd_Htt = null;
+                        charge.IsRefund = 0;
 
                         charges.Add(charge);
                     }
