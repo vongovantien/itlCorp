@@ -1049,9 +1049,9 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
 
-                    invoice.PaidAmount = invoice.PaidAmount + payment.PaymentAmount;
-                    invoice.PaidAmountVnd = invoice.PaidAmountVnd + payment.PaymentAmountVnd;
-                    invoice.PaidAmountUsd = invoice.PaidAmountUsd + payment.PaymentAmountUsd;
+                    invoice.PaidAmount = (invoice.PaidAmount ?? 0) + (payment.PaymentAmount ?? 0);
+                    invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + (payment.PaymentAmountVnd ?? 0);
+                    invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + (payment.PaymentAmountUsd ?? 0);
 
                     invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
                     invoice.UnpaidAmountVnd = (invoice.PaidAmountVnd ?? 0) - invoice.PaidAmountVnd;

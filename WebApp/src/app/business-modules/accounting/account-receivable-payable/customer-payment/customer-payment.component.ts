@@ -1,6 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { NgProgress } from "@ngx-progressbar/core";
-import { Router, ActivatedRoute, Params } from "@angular/router";
+import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
 import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
@@ -14,7 +14,7 @@ import { catchError, finalize } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { ResetInvoiceList } from "./store/actions";
+import { RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
 
 enum PAYMENT_TAB {
@@ -204,6 +204,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     gotoCreateReceipt(type: string) {
         this._store.dispatch(ResetInvoiceList());
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { type: type } });
+        this._store.dispatch(RegistTypeReceipt({ data: type }));
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`]);
     }
 }

@@ -10,9 +10,9 @@
                         <span>
                             <i class="la la-edit"></i>
                         </span>
-                        Customer Receipt Edit Detail
+                        {{receiptDetail?.type === 'Customer' ? 'Customer' : receiptDetail?.type}} Receipt Edit Detail
                         <span
-                            class="m-badge m-badge--{{receiptDetail?.status === 'Draft' && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                            class="m-badge m-badge--{{(receiptDetail?.status === 'Draft' || receiptDetail?.status === 'Cancel') && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
                             {{receiptDetail?.subRejectReceipt}}
                         </span>
@@ -20,8 +20,7 @@
                     <div>
                         <div class="c-button-actions">
                             <ng-container
-                                *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.syncStatus !== 'Synced'">
-
+                                *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                                 <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
                                     (onClick)="submitClick('update')">
                                 </app-permission-button>
@@ -41,8 +40,7 @@
                     </div>
                 </div>
 
-                <customer-payment-form-create-receipt [isUpdate]="true" (onChangeReceipt)="caculateReceipt($event)">
-                </customer-payment-form-create-receipt>
+                <customer-payment-form-create-receipt [isUpdate]="true"></customer-payment-form-create-receipt>
 
                 <customer-payment-list-receipt [syncInfoTemplate]="syncInfoTemplate">
                     <div class="row m--margin-top-20">

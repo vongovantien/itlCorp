@@ -128,9 +128,9 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
             case 'HISTORY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
-            case 'AGENCY':
-                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`], { queryParams: { type: 'Agency' } });
-                break;
+            // case 'AGENCY':
+            //     this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`], { queryParams: { type: 'Agency' } });
+            //     break;
             case 'ARSUMMARY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;

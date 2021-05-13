@@ -36,8 +36,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Org Amount', field: '', align: this.right },
             { title: 'Unpaid USD', field: '' },
             { title: 'Unpaid VND', field: '' },
-            { title: 'Paid Amount USD', field: '' },
-            { title: 'Paid Amount VND', field: '' },
+            { title: 'Paid Amount USD', field: '', align: this.right },
+            { title: 'Paid Amount VND', field: '', align: this.right },
             { title: 'Remain USD', field: '' },
             { title: 'Remain VND', field: '' },
             { title: 'Payment Note', field: '' },
@@ -51,11 +51,11 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Job No', field: '' },
             { title: 'MBL No', field: '' },
             { title: 'HBL No', field: '' },
-            { title: 'Org Amount', field: '' },
+            { title: 'Org Amount', field: '', align: this.right },
             { title: 'Unpaid USD', field: '' },
             { title: 'Unpaid VND', field: '' },
-            { title: 'Paid Amount USD', field: '' },
-            { title: 'Paid Amount VND', field: '' },
+            { title: 'Paid Amount USD', field: '', align: this.right },
+            { title: 'Paid Amount VND', field: '', align: this.right },
             { title: 'Remain USD', field: '' },
             { title: 'Remain VND', field: '' },
             { title: 'Payment Note', field: '' },
@@ -95,5 +95,11 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         }
         this._store.dispatch(RemoveInvoice({ index: this.selectedIndexItem }));
         this.onChangeDebit.emit(true);
+    }
+
+    formatAmount(event: any, receipt: ReceiptInvoiceModel){
+        if(!event.target.value.length){
+            receipt[event.target.name] = 0;
+        }
     }
 }

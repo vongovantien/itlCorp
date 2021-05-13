@@ -66,10 +66,10 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     ngOnInit() {
         this.headers = [
             { title: 'RefNo', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 250 },
-            { title: 'Org Amount', field: '' },
-            { title: 'Amount USD', field: '' },
-            { title: 'Amount VND', field: '' },
+            { title: 'Net Off Invoice No', field: '', width: 200 },
+            { title: 'Org Amount', field: '', align: this.right },
+            { title: 'Amount USD', field: '', align: this.right },
+            { title: 'Amount VND', field: '', align: this.right },
             { title: 'Note', field: '' },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
@@ -79,10 +79,10 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Job', field: '' },
             { title: 'HBL', field: '' },
             { title: 'MBL', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 250 },
-            { title: 'Org Amount', field: '' },
-            { title: 'Amount USD', field: '' },
-            { title: 'Amount VND', field: '' },
+            { title: 'Net Off Invoice No', field: '', width: 100 },
+            { title: 'Org Amount', field: '', align: this.right },
+            { title: 'Amount USD', field: '', align: this.right },
+            { title: 'Amount VND', field: '', align: this.right },
             { title: 'Payment Note', field: '' },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
@@ -101,7 +101,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { field: 'amount', title: 'Unpaid Invoice' }
         ];
         this._store.select(ReceiptTypeState)
-            .pipe()
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x);
     }
 
@@ -133,7 +133,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         this.debitList.pipe(distinctUntilChanged(), takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 this.invoiceDatasource = [];
-                x.filter((element: ReceiptInvoiceModel) => element.type !== 'ADV').map((element: ReceiptInvoiceModel) => {
+                x.filter((element: ReceiptInvoiceModel) => (element.type !== 'ADV' && element.type !== 'OBH')).map((element: ReceiptInvoiceModel) => {
                     const item = {
                         invoiceNo: element.invoiceNo,
                         amount: this.formatNumberCurrency(element.amount),

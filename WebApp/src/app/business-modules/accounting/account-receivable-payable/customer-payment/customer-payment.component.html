@@ -79,7 +79,9 @@
                                                                     </span>
                                                                 </div>
                                                                 <ng-template #CancelNo>
-                                                                    <span class="text-muted">{{cps.paymentRefNo}}</span>
+                                                                        <a class="text-muted pointer"
+                                                                        (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
+                                                                    </a>
                                                                 </ng-template>
                                                             </td>
 

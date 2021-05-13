@@ -86,11 +86,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this._activedRoute.queryParams.subscribe((params: any) => {
-            if (!!params) {
-                this.type = params.type;
-            }
-        })
         this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
         this.initForm();
         this.headers = [
@@ -233,8 +228,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     this.listCreditInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
                         result.every(t => {
-                            var key = Object.keys(t)[0];
-                            return s[key] !== t[key];
+                            return s["refNo"] !== t["refNo"]
                         }));
                     this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                         x.invoices.forEach(invoice => {
@@ -267,8 +261,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     this.listDebitInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
                         result.every(t => {
-                            var key = Object.keys(t)[0];
-                            return s[key] !== t[key];
+                            return s["refNo"] !== t["refNo"];
                         }));
 
                     this.agencyDebitModel.groupShipmentsAgency.forEach(x => {

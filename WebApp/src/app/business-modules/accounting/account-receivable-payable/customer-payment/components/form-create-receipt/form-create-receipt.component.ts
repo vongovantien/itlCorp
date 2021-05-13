@@ -15,6 +15,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
+import { ReceiptTypeState } from '../../store/reducers';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -178,6 +179,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     getDebit() {
         this.debitPopup.show();
+        this._store.select(ReceiptTypeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(x => this.debitPopup.type = !!x ? x : 'Customer');
         this.debitPopup.customerFromReceipt = this.customerId.value;
         this.debitPopup.dateFromReceipt = this.date.value;
         if (!this.debitPopup.partnerId.value) {
@@ -190,7 +194,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         if (!!partnerId) {
             this.getPartnerOnForm(partnerId);
             this.onChangeReceipt.emit(true);
-            // this.listInvoice.caculatorAmountFromDebitList();
         }
     }
 

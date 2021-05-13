@@ -14,9 +14,10 @@ import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { ResetInvoiceList, RegistTypeReceipt } from '../store/actions';
 import { combineLatest } from 'rxjs';
-import { ReceiptCreditListState, ReceiptDebitListState } from '../store/reducers';
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntil } from 'rxjs/operators';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -51,12 +52,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     ngOnInit(): void {
         this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
-        this._activedRoute.queryParams.subscribe((param: any) => {
-            if (!!param) {
-                this.type = param.type;
-                this._store.dispatch(RegistTypeReceipt({ data: this.type }));
-            }
-        })
+        this._store.select(ReceiptTypeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(x => this.type = x || 'Customer');
     }
 
     saveReceipt(actionString: string) {
@@ -154,7 +152,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     if (res.status) {
                         this._toastService.success(res.message);
                         this._store.dispatch(ResetInvoiceList());
-                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`], { queryParams: { type: this.type } });
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                         return;
                     }
                     this._toastService.error("Create data fail, Please check again!");
@@ -167,11 +165,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             )
     };
 
-    caculateReceipt(onChange: boolean) {
-        if (onChange) {
-            this.listInvoice.caculateAmountFromDebitList();
-        }
-    }
 
     gotoList() {
         this._store.dispatch(ResetInvoiceList());

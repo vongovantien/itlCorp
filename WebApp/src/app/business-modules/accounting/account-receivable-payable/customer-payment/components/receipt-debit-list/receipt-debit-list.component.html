@@ -50,12 +50,12 @@
                                 </td>
 
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd"
-                                        numeric autoFormatCurrency [disabled]="isReadonly">
+                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd" name="paidAmountUsd"
+                                        numeric autoFormatCurrency [disabled]="isReadonly" (blur)="formatAmount($event, item)">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountVnd"
-                                        numeric autoFormatCurrency [disabled]="isReadonly">
+                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountVnd" name="paidAmountVnd"
+                                        numeric autoFormatCurrency [disabled]="isReadonly" (blur)="formatAmount($event, item)">
                                 </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.type !== 'ADV'">

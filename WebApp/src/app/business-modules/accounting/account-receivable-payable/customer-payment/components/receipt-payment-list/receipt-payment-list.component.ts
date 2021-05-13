@@ -12,7 +12,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../../store/reducers';
+import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
@@ -128,6 +128,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (data) => {
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
+                    this.caculateAmountFromDebitList();
                 }
             );
     }
@@ -225,7 +226,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'paid-amountVnd':
-                this.paidAmountUSD.setValue((this.paidAmountVND.value / this.exchangeRateUsd).toFixed(2));
+                this.paidAmountUSD.setValue((Math.round((this.paidAmountVND.value / this.exchangeRateUsd) * 100)) / 100);
                 this.getFinalPaidAmount();
                 break;
             case 'paid-amountUsd':
@@ -275,6 +276,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         newInvoiceWithAdv.type = 'ADV';
         newInvoiceWithAdv.paidAmountVnd = 0;
         newInvoiceWithAdv.paidAmountUsd = 0;
+        newInvoiceWithAdv.refNo = null;
         const data = newInvoiceWithAdv as ReceiptInvoiceModel;
         this._store.dispatch(InsertAdvance({ data: data }));
 
@@ -337,7 +339,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
         const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
         const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        this.finalPaidAmountUSD.setValue(((cusAdvanceAmount / exChangeRateUSD)) + (amountUSD) + (paidAmountUSD));
+        this.finalPaidAmountUSD.setValue(((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100) + amountUSD + paidAmountUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
 
@@ -369,7 +371,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paidAmountUSD.setValue(paidUSD);
         this.paidAmountVND.setValue(paidVND);
 
-        this.finalPaidAmountUSD.setValue((cusAdvanceAmount / exChangeRateUSD) + valueUSD + paidUSD);
+        this.finalPaidAmountUSD.setValue(((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100) + valueUSD + paidUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }
 }
