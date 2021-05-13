@@ -6,6 +6,7 @@ namespace CommonInterface {
         class?: string;
         width?: number;
         required?: boolean;
+        align?: AlignSetting;
         dataType?: CommonType.DataType;
     }
 
