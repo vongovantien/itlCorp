@@ -36,9 +36,9 @@
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center">{{item.type}}</td>
                                 <td class="text-primary">{{item.invoiceNo}}</td>
-                                <td *ngIf="receiptType !=='Customer'">job</td>
-                                <td *ngIf="receiptType !=='Customer'">mbl</td>
-                                <td *ngIf="receiptType !=='Customer'">hbl</td>
+                                <td *ngIf="receiptType !=='Customer'">{{item.jobNo}}</td>
+                                <td *ngIf="receiptType !=='Customer'">{{item.mbl}}</td>
+                                <td *ngIf="receiptType !=='Customer'">{{item.hbl}}</td>
                                 <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
@@ -95,6 +95,11 @@
                                 <td></td>
                                 <td>Total</td>
                                 <td></td>
+                                <ng-container *ngIf="receiptType !== 'Customer'">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
                                 <td class="text-center">{{debitList$ | async | sumAmount:'amount':'USD':'currencyId' |
                                     number}} USD |
                                     {{debitList$ | async | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>

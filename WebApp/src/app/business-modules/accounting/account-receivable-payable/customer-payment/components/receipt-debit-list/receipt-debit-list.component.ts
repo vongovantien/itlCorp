@@ -16,7 +16,7 @@ import { takeUntil } from "rxjs/operators";
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
-    
+
     debitList$: Observable<ReceiptInvoiceModel[]>;
     agencyHeaders: CommonInterface.IHeaderTable[];
     selectedIndexItem: number;
@@ -33,7 +33,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'RefNo', field: '', sortable: true },
             { title: 'Type', field: '' },
             { title: 'Invoice No', field: '', width: 150 },
-            { title: 'Org Amount', field: '' },
+            { title: 'Org Amount', field: '', align: this.right },
             { title: 'Unpaid USD', field: '' },
             { title: 'Unpaid VND', field: '' },
             { title: 'Paid Amount USD', field: '' },
@@ -65,7 +65,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         this.debitList$ = this._store.select(ReceiptDebitListState);
         this.checkAllChange();
         this._store.select(ReceiptTypeState)
-            .pipe()
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x);
     }
 

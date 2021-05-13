@@ -29,15 +29,10 @@ export class ReceiptCreditDebitModel {
     balanceAmountUsd: number;
     balanceAmountVnd: number;
 
-    jobId?: string;
-    mbl?: string;
-    hbl?: string;
+
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
-
-
-
 
     // * custom
     isSelected: boolean = false;
@@ -50,6 +45,11 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     typeInvoice: string = null;
     partnerId: string = null;
     groupShipmentsAgency: any[] = [];
+
+    hblid?: string = null;
+    jobId?: string;
+    mbl?: string;
+    hbl?: string;
     constructor(object?: any) {
         super();
         const self = this;
