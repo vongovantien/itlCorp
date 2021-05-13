@@ -71,7 +71,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -835,7 +835,11 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AdvanceAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.BalanceAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.BankAccountName).HasMaxLength(150);
 
@@ -2128,6 +2132,14 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.AirlineInfo).HasMaxLength(800);
+
+                entity.Property(e => e.Ata)
+                    .HasColumnName("ATA")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Atd)
+                    .HasColumnName("ATD")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.BookingNo).HasMaxLength(800);
 
