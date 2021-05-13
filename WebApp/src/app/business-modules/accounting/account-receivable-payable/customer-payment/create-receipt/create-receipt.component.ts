@@ -17,6 +17,7 @@ import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
+import { takeUntil } from 'rxjs/operators';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -52,7 +53,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     ngOnInit(): void {
         this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
         this._store.select(ReceiptTypeState)
-            .pipe()
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.type = x || 'Customer');
     }
 

@@ -89,7 +89,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
-        // this.formCreate.isReadonly = true;
     }
 
     updateListInvoice(res: ReceiptModel) {
@@ -186,7 +185,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                         this._toastService.success("Send Data to Accountant System Successful");
 
                         //TODO: Load detail receipt
-
+                        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${res.data.id}`]);
                     } else {
                         this._toastService.error("Send Data Fail");
                     }

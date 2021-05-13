@@ -10,7 +10,7 @@
                         <span>
                             <i class="la la-edit"></i>
                         </span>
-                        Customer Receipt Edit Detail
+                        {{receiptDetail?.type === 'Customer' ? 'Customer' : receiptDetail?.type}} Receipt Edit Detail
                         <span
                             class="m-badge m-badge--{{(receiptDetail?.status === 'Draft' || receiptDetail?.status === 'Cancel') && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
                             {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
