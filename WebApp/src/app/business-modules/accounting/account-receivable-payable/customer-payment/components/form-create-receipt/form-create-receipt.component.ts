@@ -181,7 +181,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.debitPopup.show();
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.debitPopup.type = x);
+            .subscribe(x => this.debitPopup.type = !!x ? x : 'Customer');
         this.debitPopup.customerFromReceipt = this.customerId.value;
         this.debitPopup.dateFromReceipt = this.date.value;
         if (!this.debitPopup.partnerId.value) {

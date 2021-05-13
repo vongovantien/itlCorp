@@ -165,11 +165,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             )
     };
 
-    caculateReceipt(onChange: boolean) {
-        if (onChange) {
-            this.listInvoice.caculateAmountFromDebitList();
-        }
-    }
 
     gotoList() {
         this._store.dispatch(ResetInvoiceList());
