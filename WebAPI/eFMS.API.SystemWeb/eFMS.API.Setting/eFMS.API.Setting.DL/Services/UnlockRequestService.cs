@@ -614,5 +614,47 @@ namespace eFMS.API.Setting.DL.Services
             return detail;
         }
         #endregion --- DETAIL ---
+
+        #region -- EXPORT --
+        public List<UnlockRequestExport> GetUnlockRequestsExport(UnlockRequestCriteria criteria)
+        {
+            var queryUnlockRequest = ExpressionQuery(criteria);
+            var dataUnlockRequests = GetDataUnlockRequest(criteria);
+            if (dataUnlockRequests == null) return null;
+            var unlockRequests = dataUnlockRequests.Where(queryUnlockRequest);
+
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                var unlockRequestJobs = setUnlockRequestJobRepo.Get(x => criteria.ReferenceNos.Contains(x.UnlockName));
+                unlockRequests = unlockRequests.Join(unlockRequestJobs, u => u.Id, j => j.UnlockRequestId, (u, j) => u);
+            }
+
+            var users = userRepo.Get();            
+            var unlockJobs = setUnlockRequestJobRepo.Get();
+            var unlockApproves = setUnlockRequestApproveRepo.Get(x => x.IsDeny == false);
+
+            //Order by giảm dần theo ngày Modified của UnlockRequest
+            var query = from job in unlockJobs
+                        join unlock in unlockRequests on job.UnlockRequestId equals unlock.Id
+                        join approve in unlockApproves on unlock.Id equals approve.UnlockRequestId into approveGrp
+                        from approve in approveGrp.DefaultIfEmpty()
+                        join user in users on unlock.Requester equals user.Id
+                        orderby unlock.DatetimeModified descending
+                        select new UnlockRequestExport
+                        {
+                            SubjectUnlock = unlock.Subject,
+                            DescriptionUnlock = job.UnlockName,
+                            ReferenceNo = job.Job,
+                            UnlockType = unlock.UnlockType,
+                            ChangeServiceDate = unlock.NewServiceDate,
+                            RequestDate = unlock.RequestDate,
+                            UnlockDate = approve != null ? approve.DatetimeModified : null,
+                            Requester = user.Username,
+                            ReasonDetail = job.Reason,
+                            GeneralReason = unlock.GeneralReason
+                        };
+            return query.ToList();
+        }
+        #endregion -- EXPORT --
     }
 }
