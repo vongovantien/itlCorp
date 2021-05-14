@@ -107,10 +107,12 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         statusApproval: this.settlementPayment.settlement.statusApproval,
                         amount: this.settlementPayment.settlement.amount,
                         currency: this.settlementPayment.settlement.settlementCurrency,
-                        payee: this.settlementPayment.settlement.payee
+                        payee: this.settlementPayment.settlement.payee,
+                        bankName: this.settlementPayment.settlement.bankName,
+                        beneficiaryName: this.settlementPayment.settlement.bankAccountName,
+                        bankAccountNo: this.settlementPayment.settlement.bankAccountNo
                     });
 
-                    this.getParnerDetails(this.settlementPayment.settlement.payee);
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
                     this.requestSurchargeListComponent.groupShipments = this.settlementPayment.chargeGrpSettlement;
                     this.requestSurchargeListComponent.settlementCode = this.settlementPayment.settlement.settlementNo;
@@ -132,22 +134,6 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 (res: any) => {
                     this.approveInfo = res;
                 },
-            );
-    }
-
-    getParnerDetails(partnerId: string) {
-        this._catalogueRepo.getDetailPartner(partnerId)
-            .pipe( catchError(this.catchError), finalize(() => {}))
-            .subscribe(
-                (res: Partner) => {
-                    if (!!res) {
-                        this.formCreateSurcharge.form.patchValue({
-                            beneficiaryName: res.partnerNameEn,
-                            bankAccountNo: res.bankAccountNo,
-                            bankName: res.bankAccountName
-                        });
-                    }
-                }
             );
     }
 
