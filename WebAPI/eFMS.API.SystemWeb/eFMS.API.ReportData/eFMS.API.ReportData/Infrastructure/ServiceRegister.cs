@@ -22,7 +22,7 @@ namespace eFMS.API.ReportData.Infrastructure
                 options.HostStaging = configuration.GetSection("APIs:HostStating").Value;
                 options.CatalogueAPI = configuration.GetSection("APIs:CatalogueAPI").Value;
                 options.AccountingAPI = configuration.GetSection("APIs:AccountingAPI").Value;
-
+                options.SettingAPI = configuration.GetSection("APIs:SettingAPI").Value;
             });
             return service;
         }

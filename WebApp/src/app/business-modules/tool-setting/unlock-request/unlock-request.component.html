@@ -1,9 +1,7 @@
 <div class="unlock-request-page">
     <app-sub-header>
         <div class="c-button-actions">
-            <!-- <app-permission-button title="Create Request" (onClick)="openPopupAddAuthorization()" type="add">
-            </app-permission-button> -->
-            <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
+            <!-- <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase"
                 [routerLink]="'/home/tool/unlock-request/new'">
                 <span>
                     <i class="la la-plus"></i>
@@ -12,6 +10,18 @@
                     </span>
                 </span>
             </button>
+            <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="exportUnlockRequest()">
+                <span>
+                    <i class="la la-download"></i>
+                    <span>
+                        Export
+                    </span>
+                </span>
+            </button> -->
+            <app-permission-button type="add" title="Create Request" [routerLink]="'/home/tool/unlock-request/new'">
+            </app-permission-button>
+            <app-permission-button type="export" title="Export" (onClick)="exportUnlockRequest()">
+            </app-permission-button>
         </div>
     </app-sub-header>
     <div class="m-content">
