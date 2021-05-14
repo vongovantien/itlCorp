@@ -101,5 +101,9 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? DueDate { get; set; }
         public string CustomerCodeVAT { get; set; }
         public string CustomerCodeTransfer { get; set; }
+        public string AdvanceCustomerCode { get; set; }
+        public decimal? RefundAmount { get; set; }
+        public string Stt_Cd_Htt { get; set; }
+        public int IsRefund { get; set; }
     }
 }
