@@ -827,7 +827,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    
+
     uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
@@ -849,6 +849,12 @@ export class AccountingRepo {
 
     getListAdvanceNoForShipment(hblId: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    checkVoucherIdDuplicate(voucherId: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckDuplicateVoucherId?voucherId=${voucherId}&acctId=${acctId}`).pipe(
             map((data: any) => data)
         );
     }
