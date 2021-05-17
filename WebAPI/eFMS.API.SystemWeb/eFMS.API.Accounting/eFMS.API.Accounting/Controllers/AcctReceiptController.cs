@@ -300,7 +300,7 @@ namespace eFMS.API.Accounting.Controllers
         private string CheckInvoicePaid(AcctReceiptModel receiptModel)
         {
             string result = string.Empty;
-            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT").ToList();
+            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT" && x.Type != "ADV").ToList();
             bool isValidPayment = acctReceiptService.CheckPaymentPaid(payments);
 
             if (isValidPayment == true)

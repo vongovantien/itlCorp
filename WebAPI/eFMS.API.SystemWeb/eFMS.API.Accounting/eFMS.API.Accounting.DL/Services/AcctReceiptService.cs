@@ -820,26 +820,16 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.BillingRefNo;
                 _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
 
-                if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    //Phát sinh payment amount âm
-                    _payment.PaymentAmount = -payment.PaymentAmount;
-                    _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
+                //Phát sinh payment amount âm
+                _payment.PaymentAmount = -payment.PaymentAmount;
+                _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
+                _payment.PaymentAmountUsd = -payment.PaymentAmountUsd;
 
-                    // Tính lại Balance
-                    _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
-                    _payment.BalanceVnd = invoice.UnpaidAmountVnd - _payment.PaymentAmountVnd;
-                }
-                else
-                {
-                    //Phát sinh payment amount âm
-                    _payment.PaymentAmount = -payment.PaymentAmount;
-                    _payment.PaymentAmountUsd = -payment.PaymentAmountUsd;
+                // Tính lại Balance
+                _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
+                _payment.BalanceVnd = invoice.UnpaidAmountVnd - _payment.PaymentAmountVnd;
+                _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
 
-                    // Tính lại Balance
-                    _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
-                    _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
-                }
                 _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
                 _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
                 _payment.InvoiceNo = payment.InvoiceNo;
