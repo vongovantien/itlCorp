@@ -276,6 +276,7 @@ export class SeaConsolImportCreateHBLComponent extends AppForm {
             packageQty: this.hblGoodSummaryComponent.packageQty,
             packageType: +this.hblGoodSummaryComponent.selectedPackage,
             contSealNo: this.hblGoodSummaryComponent.containerDescription,
+            incotermId: this.formHouseBill.incotermId.value,
 
             arrivalSecondNotice: null,
             arrivalNo: null,
