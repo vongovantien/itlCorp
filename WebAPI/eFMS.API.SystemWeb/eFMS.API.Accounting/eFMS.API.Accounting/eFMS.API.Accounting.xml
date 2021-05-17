@@ -106,6 +106,22 @@
             <param name="model">object to update</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckVoucherIdExist(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check Exist Voucher ID of VAT Invoice
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckExistedVoucherId(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check Exist Voucher ID of VAT Invoice
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDetailPermission(System.Guid)">
             <summary>
             check permission of user to view a accounting management
@@ -128,6 +144,22 @@
             </summary>
             <param name="ids">List is of Invoice</param>
             <param name="billingDate">Billing Date of Invoice</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDuplicateVoucherId(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check duplicate Voucher ID of Voucher
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.CheckDuplicateVoucherIdInYear(System.String,System.Nullable{System.Guid})">
+            <summary>
+            Check duplicate Voucher ID (In Year) of Voucher
+            </summary>
+            <param name="voucherId"></param>
+            <param name="acctId"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingPaymentController">
