@@ -3492,6 +3492,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelHousebillDailyExport(workSheet);
 
+            //Cố định dòng thứ 4 (Freeze Row 4 and no column)
+            workSheet.View.FreezePanes(5, 1);
+
             workSheet.Cells["B2:G2"].Merge = true;
             workSheet.Cells["B2"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["B2"].Value = "DAILY LIST " + issuedDate.Value.ToString("dd MMM yyyy").ToUpper();
