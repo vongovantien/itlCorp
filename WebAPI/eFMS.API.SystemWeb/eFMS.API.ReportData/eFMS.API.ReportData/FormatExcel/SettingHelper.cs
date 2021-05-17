@@ -103,9 +103,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
 
                 workSheet.Cells[rowStart, 6].Value = item.ChangeServiceDate;
+                workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+
                 workSheet.Cells[rowStart, 7].Value = item.RequestDate;
                 workSheet.Cells[rowStart, 8].Value = item.UnlockDate;                
-                for(var f = 6; f < 9; f++)
+                for(var f = 7; f < 9; f++)
                 {
                     workSheet.Cells[rowStart, f].Style.Numberformat.Format = "dd/MM/yyyy HH:mm";
                 }
