@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Accounting;
+using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
 using eFMS.API.Common.Helpers;
@@ -52,6 +53,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IUserBaseService userBaseService;
+
+        private readonly IAcctSettlementPaymentService settlementPaymentService;
         #endregion --Dependencies--
 
         readonly IQueryable<SysUser> users;
@@ -97,6 +100,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
+            IAcctSettlementPaymentService settlementService,
             IMapper mapper) : base(repository, mapper)
         {
             AdvanceRepository = AdvanceRepo;
@@ -130,6 +134,8 @@ namespace eFMS.API.Accounting.DL.Services
             contractRepository = contractRepo;
             partnerEmailRepository = partnerEmailRepo;
             customsDeclarationRepository = customsDeclarationRepo;
+
+            settlementPaymentService = settlementService;
             // ---
 
             users = UserRepository.Get();
@@ -185,8 +191,8 @@ namespace eFMS.API.Accounting.DL.Services
                             BillEntryNo = !string.IsNullOrEmpty(x.First().CustomNo) ? x.First().CustomNo : x.First().Hbl, //15559
                             MasterBillNo = x.First().Mbl,
                             OriginalAmount = x.Sum(d => d.Amount),
-                            DeptCode = GetDeptCode(x.First().JobId),
-                            Description = GetCustomerHBL(x.Key.Hblid) + " " + x.First().JobId + " " + x.First().Hbl,
+                            DeptCode = GetDeptCode(x.First().JobId),                          
+                            Description = GenerateDescriptionAdvance(x.Key.Hblid, x.First().JobId, x.FirstOrDefault().Hbl, x.First().CustomNo), //15729
                             CustomerCodeVAT = null,
                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, payeeAdvance)
                         }).ToList();
@@ -327,7 +333,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        CustomerMode = partner != null ? partner.PartnerMode : "External",
                                                                        LocalBranchCode = partner != null ? partner.InternalCode : null,
                                                                        Payee = settle.Payee,
-                                                                       CurrencyCode = settle.SettlementCurrency
+                                                                       CurrencyCode = settle.SettlementCurrency,
+                                                                       SettleAmount = settle.Amount
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -349,7 +356,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                          join unit in catUnits on surcharge.UnitId equals unit.Id
                                                                                          select new BravoSettlementRequestModel
                                                                                          {
-                                                                                             RowId = surcharge.Id,
+                                                                                             RowId = surcharge.Id.ToString(),
                                                                                              ItemCode = charge.Code,
                                                                                              Description = charge.ChargeNameVn,
                                                                                              Unit = unit.UnitNameVn,
@@ -360,7 +367,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              MasterBillNo = surcharge.Mblno,
                                                                                              DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                              Quantity9 = surcharge.Quantity,
-                                                                                             OriginalUnitPrice = surcharge.UnitPrice,
+                                                                                             OriginalUnitPrice = surcharge.UnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null,item.DocDate, surcharge.CurrencyId, item.CurrencyCode), // quy đổi về currency của settle: 15709
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
                                                                                              //Nếu phí OBH thì OriginalAmount = thành tiền sau thuế; Ngược lại OriginalAmount = thành tiền trước thuế
                                                                                              OriginalAmount = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? NumberHelper.RoundNumber(surcharge.Total, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)) : NumberHelper.RoundNumber(surcharge.NetAmount ?? 0, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)), //CR: 15500
@@ -373,12 +380,58 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              ChargeType = surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT + (!string.IsNullOrEmpty(charge.Mode) ? "-" + charge.Mode.ToUpper() : string.Empty) : surcharge.Type),
                                                                                              // CustomerCodeBook = obhP.AccountNo
                                                                                              CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId), //CR: 15500
-                                                                                             CustomerCodeVAT = GetCustomerCodeVAT(surcharge),
-                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null)
+                                                                                             CustomerCodeVAT = GetCustomerCodeVAT(surcharge), // 15709: Sẽ bằng Partner Code của VAT Partner
+                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null),
+
+                                                                                             // 15709
+                                                                                             AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo,item.Payee),
+                                                                                             RefundAmount = item.SettleAmount,
+                                                                                             Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
+                                                                                             IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
+                                                                                             AdvanceNo = surcharge.AdvanceNo,
+                                                                                             HblId = surcharge.Hblid
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
+
+                                // Kiểm tra các Details có làm đang làm hoàn ứng
+                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1).ToList();
+                                if(querySettlmentReqList.Count > 0)
+                                {
+                                    foreach (var reqItem in querySettlmentReqList)
+                                    {
+                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo);
+                                        decimal _balance = balanceInfo.TotalAmount - balanceInfo.AdvanceAmount  ?? 0;
+                                        decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
+                                        if (_balance != 0)
+                                        {
+                                            item.Details.Add(new BravoSettlementRequestModel
+                                            {
+                                                RowId = reqItem.Stt_Cd_Htt, //TODO Ref trên advance req
+                                                Ma_SpHt = reqItem.Ma_SpHt,
+                                                ItemCode = "BALANCE",
+                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod), // TODO
+                                                Unit = "Lô",
+                                                CurrencyCode = item.CurrencyCode,
+                                                ExchangeRate = 1,
+                                                BillEntryNo = reqItem.BillEntryNo,
+                                                MasterBillNo = reqItem.MasterBillNo,
+                                                DeptCode = reqItem.DeptCode,
+                                                Quantity9 = 0,
+                                                OriginalUnitPrice = 0,
+                                                TaxRate = null,
+                                                OriginalAmount = _originalAmount,
+                                                OriginalAmount3 = 0,
+                                                ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod),
+                                                CustomerCodeBook = reqItem.CustomerCodeBook,
+                                                CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
+                                                RefundAmount = 0,
+                                                IsRefund = 1
+                                            });
+                                        }
+                                    }
+                                }
                             }
                         }
                         result = data;
@@ -1451,7 +1504,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return exchangeRate;
         }
-
         private string GetDeptCode(string JobNo)
         {
             string deptCode = "ITLCS";
@@ -1471,7 +1523,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return deptCode;
         }
-
         private decimal GetOrgVatAmount(decimal? vatrate, decimal? orgAmount, string currency)
         {
             decimal amount = 0;
@@ -1482,7 +1533,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return amount;
         }
-
         public decimal CalculateRoundStandard(decimal num)
         {
             var d = (num % 1);
@@ -1499,7 +1549,6 @@ namespace eFMS.API.Accounting.DL.Services
                 return num;
             }
         }
-
         private string GetCustomerHBL(Guid? Id)
         {
             string customerName = "";
@@ -1511,7 +1560,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
-
         private string GetLinkCdNote(string cdNoteNo, Guid jobId)
         {
             string _link = string.Empty;
@@ -1562,7 +1610,6 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _link;
         }
-
         private decimal GetOriginalUnitPriceWithAccountNo(decimal unitPrice, string accountNo, decimal finalExchange = 1)
         {
             decimal _unitPrice = 0;
@@ -1577,7 +1624,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _unitPrice;
         }
-
         private decimal GetOriginAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _originAmount = 0;
@@ -1623,7 +1669,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _originAmount;
         }
-
         private decimal GetOrgVatAmountWithAccountNo(string accountNo, CsShipmentSurcharge surcharge)
         {
             decimal _orgVatAmout = 0;
@@ -1667,7 +1712,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             return _orgVatAmout;
         }
-
         private string GetServiceNameOfCdNote(string cdNoteNo)
         {
             string _serviceName = string.Empty;
@@ -1716,7 +1760,106 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return _serviceName;
         }
-        
+        private string GetAdvanceCustomerCode(string advNo, string payeeSettleId)
+        {
+            string advPayeeCode = string.Empty;
+
+            if (string.IsNullOrEmpty(advNo))
+            {
+                return advPayeeCode;
+            }
+            if (string.IsNullOrEmpty(payeeSettleId)){
+                var queryAdv = from ad in AdvanceRepository.Get()
+                               join u in users on ad.Requester equals u.Id
+                               join employee in employees on u.EmployeeId equals employee.Id
+                               where ad.AdvanceNo == advNo
+                               select new { Code = employee.StaffCode };
+                if (queryAdv != null)
+                {
+                    advPayeeCode = queryAdv.FirstOrDefault().Code;
+                }
+                return advPayeeCode;
+
+            }
+            else
+            {
+                CatPartner payeeSettle = PartnerRepository.Get(x => x.Id == payeeSettleId)?.FirstOrDefault();
+                advPayeeCode = payeeSettle.AccountNo;
+            }
+
+            return advPayeeCode;
+        }
+        private string GetAdvanceRefNo(string advNo, Guid hblId)
+        {
+            string advRefNo = string.Empty;
+            if (string.IsNullOrEmpty(advNo))
+            {
+                return advRefNo;
+            }
+            AcctAdvanceRequest advR = AdvanceRequestRepository.Get(x => x.AdvanceNo == advNo && x.Hblid == hblId)?.FirstOrDefault();
+
+            advRefNo = advR.ReferenceNo;
+
+            return advRefNo;
+
+        }
+        private string GenerateDescriptionSettleItemWithBalanceAdvance(decimal balance, string paymentMethod)
+        {
+            if(balance > 0)
+            {
+                return  "Số dư cần thu";
+            }
+
+            if (balance < 0)
+            {
+                return "Số dư cấn chi";
+            }
+
+            if(paymentMethod == AccountingConstants.PAYMENT_METHOD_NETOFF_SHPT)
+            {
+               return "Số Dư Cấn Trừ";
+            }
+
+            return string.Empty;
+        }
+        private string GenerateChargeTypeSettleWithBalanceAdvance(decimal balance, string paymentMethod)
+        {
+            if(balance > 0)
+            {
+                return "DEBIT";
+            }
+            if(balance < 0)
+            {
+                return "CREDIT";
+            }
+
+            if(paymentMethod == AccountingConstants.PAYMENT_METHOD_NETOFF_SHPT)
+            {
+                return "OBH";
+            }
+
+            return string.Empty;
+        }
+        private string GenerateDescriptionAdvance(Guid? hblId, string jobId, string hbl, string cd)
+        {
+            string description = string.Empty;
+            if (jobId.Contains("LOG"))
+            {
+                if (!string.IsNullOrEmpty(cd))
+                {
+                    description = "Tạm ứng làm hàng" + " " + cd;
+                }
+                else
+                {
+                    description = "Tạm ứng làm hàng" + " " + hbl;
+                }
+            }
+            else
+            {
+                description = GetCustomerHBL(hblId) + " " + jobId + " " + hbl;
+            }
+            return description;
+        }
         /// <summary>
         /// 
         /// </summary>
@@ -1756,18 +1899,23 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetCustomerCodeVAT(CsShipmentSurcharge surcharge)
         {
             string codeVat = string.Empty;
-            if (!string.IsNullOrEmpty(surcharge.InvoiceNo))
+            //if (!string.IsNullOrEmpty(surcharge.InvoiceNo))
+            //{
+            //    if (surcharge.Type == "BUY")
+            //    {
+            //        var partner = PartnerRepository.Get(x => x.Id == surcharge.PaymentObjectId)?.FirstOrDefault();
+            //        codeVat = partner?.AccountNo;
+            //    }
+            //    if (surcharge.Type == "OBH")
+            //    {
+            //        var partner = PartnerRepository.Get(x => x.Id == surcharge.PayerId)?.FirstOrDefault();
+            //        codeVat = partner?.AccountNo;
+            //    }
+            //}
+            if (!string.IsNullOrEmpty(surcharge.VatPartnerId))
             {
-                if (surcharge.Type == "BUY")
-                {
-                    var partner = PartnerRepository.Get(x => x.Id == surcharge.PaymentObjectId)?.FirstOrDefault();
-                    codeVat = partner?.AccountNo;
-                }
-                if (surcharge.Type == "OBH")
-                {
-                    var partner = PartnerRepository.Get(x => x.Id == surcharge.PayerId)?.FirstOrDefault();
-                    codeVat = partner?.AccountNo;
-                }
+                CatPartner partner = PartnerRepository.Get(x => x.Id == surcharge.VatPartnerId)?.FirstOrDefault();
+                codeVat = partner?.AccountNo;
             }
             return codeVat;
         }

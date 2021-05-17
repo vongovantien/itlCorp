@@ -54,18 +54,41 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label>Settlement Amount:</label>
-                    <input type="text" formControlName="amount" class="form-control"
-                        [value]="amount.value | number:'.0-3'">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Settlement Amount:</label>
+                            <input type="text" formControlName="amount" class="form-control"
+                                [value]="amount.value | number:'.0-3'">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Advance Amount:</label>
+                            <input type="text" formControlName="advanceAmount" class="form-control"
+                                [value]="advanceAmount.value | number:'.0-3'" disabled>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label>Currency:</label>
-                    <select formControlName="currency" class="form-control">
-                        <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}</option>
-                    </select>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Balance:</label>
+                            <input type="text" formControlName="balanceAmount" class="form-control"
+                                [value]="balanceAmount.value | number:'.0-3'" disabled>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Currency:</label>
+                            <select formControlName="currency" class="form-control">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

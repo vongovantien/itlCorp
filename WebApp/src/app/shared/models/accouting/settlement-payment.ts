@@ -39,6 +39,8 @@ export class SettlementPayment {
     bankName: string = null;
     bankAccountName: string = null;
     bankAccountNo: string = null;
+    advanceAmount: number = null;
+    balanceAmount: number = null;
 
     constructor(object?: any) {
         const self = this;
