@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
@@ -16,6 +16,7 @@ import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { ReceiptTypeState } from '../../store/reducers';
+import { ResetInvoiceList } from '../../store/actions';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -26,7 +27,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
     @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
-    @Output() onChangeReceipt: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
@@ -134,29 +134,33 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
             case 'partner':
-                this.customerName = (data as Partner).shortName;
-                this.customerId.setValue((data as Partner).id);
-                this._dataService.setData('customer', data);
+            case 'partnerPopup':
+                if (!this.isReadonly) {
+                    if (this.customerId.value !== data.id && type === 'partner') {
+                        this._store.dispatch(ResetInvoiceList());
+                    }
+                    this.customerName = (data as Partner).shortName;
+                    this.customerId.setValue((data as Partner).id);
+                    this._dataService.setData('customer', data);
 
-                this._catalogueRepo.getAgreement(
-                    <IQueryAgreementCriteria>{
-                        partnerId: this.customerId.value, status: true
-                    }).subscribe(
-                        (d: IAgreementReceipt[]) => {
-                            if (!!d) {
-                                this.agreements = d || [];
-                                if (!!this.agreements.length) {
-                                    this.agreementId.setValue(d[0].id);
-
-
-                                    this.onSelectDataFormInfo(d[0], 'agreement');
-                                } else {
-                                    this.combogrid.displaySelectedStr = '';
-                                    this.agreementId.setValue(null);
+                    this._catalogueRepo.getAgreement(
+                        <IQueryAgreementCriteria>{
+                            partnerId: this.customerId.value, status: true
+                        }).subscribe(
+                            (d: IAgreementReceipt[]) => {
+                                if (!!d) {
+                                    this.agreements = d || [];
+                                    if (!!this.agreements.length) {
+                                        this.agreementId.setValue(d[0].id);
+                                        this.onSelectDataFormInfo(d[0], 'agreement');
+                                    } else {
+                                        this.combogrid.displaySelectedStr = '';
+                                        this.agreementId.setValue(null);
+                                    }
                                 }
                             }
-                        }
-                    );
+                        );
+                }
                 break;
             case 'agreement':
                 this.agreementId.setValue((data as IAgreementReceipt).id);
@@ -172,7 +176,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         const partnerId = $event;
         const partner = this.customers.find((x: Partner) => x.id === partnerId);
         if (!!partner) {
-            this.onSelectDataFormInfo(partner, 'partner');
+            this.onSelectDataFormInfo(partner, 'partnerPopup');
         }
     }
 
@@ -193,7 +197,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         const partnerId = $event;
         if (!!partnerId) {
             this.getPartnerOnForm(partnerId);
-            this.onChangeReceipt.emit(true);
         }
     }
 

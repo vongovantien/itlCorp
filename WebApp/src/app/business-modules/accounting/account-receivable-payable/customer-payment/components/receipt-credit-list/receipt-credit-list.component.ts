@@ -102,7 +102,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         ];
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.receiptType = x);
+            .subscribe(x => this.receiptType = x || 'Customer');
     }
 
     formatNumberCurrency(input: number) {

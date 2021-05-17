@@ -70,7 +70,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         { title: 'Type', field: 'type' },
         { title: 'Partner Name', field: 'partnerName' },
         { title: 'Taxcode', field: 'taxCode' },
-        // { title: 'Unpaid Amount', field: 'unpaidAmount' },
         { title: 'Paid Amount', field: 'paidAmount' },
         { title: 'Balance Amount', field: 'invoiceBalance' },
         { title: 'Payment Status', field: 'paymentStatus' },
@@ -112,7 +111,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.userLogged = u;
                 }
             });
-        this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyy-MM-dd', 'en'));
     }
 
     formatNumberCurrency(input: number, digit: number) {
@@ -128,7 +126,16 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (data) => {
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
-                    this.caculateAmountFromDebitList();
+                    this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en')).then(
+                        (exchangeRate: IExchangeRate) => {
+                            if (!!exchangeRate) {
+                                this.exchangeRateUsd = exchangeRate.rate;
+                            } else {
+                                this.exchangeRateUsd = 0;
+                            }
+                            this.caculateAmountFromDebitList();
+                        }
+                    );
                 }
             );
     }
@@ -187,14 +194,18 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.finalPaidAmountUSD = this.form.controls['finalPaidAmountUSD'];
     }
 
-    generateExchangeRateUSD(date: string) {
-        this._catalogueRepo.convertExchangeRate(date, 'USD')
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (data: { rate: number }) => {
-                    this.exchangeRateUsd = data?.rate;
-                }
-            );
+    async generateExchangeRateUSD(date: string) {
+        try {
+            this._progressRef.start();
+            const exchangeRate: IExchangeRate = await this._catalogueRepo.convertExchangeRate(date, 'USD').toPromise();
+            if (!!exchangeRate) {
+                return exchangeRate;
+            }
+        } catch (error) {
+
+        } finally {
+            this._progressRef.complete();
+        }
     }
 
     getBankAccountNo(event: any) {
@@ -226,7 +237,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'paid-amountVnd':
-                this.paidAmountUSD.setValue((Math.round((this.paidAmountVND.value / this.exchangeRateUsd) * 100)) / 100);
+                this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : (Math.round((this.paidAmountVND.value / this.exchangeRateUsd) * 100))) / 100);
                 this.getFinalPaidAmount();
                 break;
             case 'paid-amountUsd':
@@ -236,15 +247,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             case 'currency':
                 if ((data as Currency).id === this.getCurrencyInvoice(this.invoices)[0]) {
                     this.exchangeRate.setValue(1);
-                    break;
                 } else {
                     if ((data as Currency).id !== 'VND') {
                         this.exchangeRate.setValue(this.exchangeRateUsd);
                     } else {
                         this.exchangeRate.setValue(1);
                     }
-
                 }
+                this.getFinalPaidAmount();
                 break;
             case 'amountVND':
             case 'amountUSD':
@@ -252,12 +262,24 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 this.getFinalPaidAmount();
                 break;
             case 'payment-date':
-                this.generateExchangeRateUSD(formatDate(data?.startDate, 'yyy-MM-dd', 'en'));
-                if (this.currencyId.value === 'VND') {
-                    this.exchangeRate.setValue(1);
-                } else {
-                    this.exchangeRate.setValue(this.exchangeRateUsd);
-                }
+                this.generateExchangeRateUSD(formatDate(data?.startDate, 'yyy-MM-dd', 'en')).then(
+                    (exchangeRate: IExchangeRate) => {
+                        if (!!exchangeRate) {
+                            this.exchangeRateUsd = exchangeRate.rate;
+                        } else {
+                            this.exchangeRateUsd = 0;
+                        }
+                        if (exchangeRate.rate !== this.exchangeRate.value) {
+                            if (this.currencyId.value === 'VND') {
+                                this.exchangeRate.setValue(1);
+                            } else {
+                                this.exchangeRate.setValue(this.exchangeRateUsd);
+                            }
+                            this.getFinalPaidAmount();
+                        }
+                    }
+                );
+
                 break;
             default:
                 break;
@@ -339,7 +361,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
         const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
         const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        this.finalPaidAmountUSD.setValue(((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100) + amountUSD + paidAmountUSD);
+        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : ((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100)) + amountUSD + paidAmountUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
     }
 
@@ -364,14 +386,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 paidUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountUsd, 0);
                 paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
             });
-
         this.amountUSD.setValue(valueUSD);
         this.amountVND.setValue(valueVND);
 
         this.paidAmountUSD.setValue(paidUSD);
         this.paidAmountVND.setValue(paidVND);
 
-        this.finalPaidAmountUSD.setValue(((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100) + valueUSD + paidUSD);
+        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : ((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100)) + valueUSD + paidUSD);
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }
 }
@@ -383,4 +404,11 @@ interface IProcessClearInvoiceModel {
     list: ReceiptInvoiceModel[];
     finalExchangeRate: number;
     customerId: string;
+}
+
+interface IExchangeRate {
+    id: number;
+    currencyFromID: string;
+    rate: number;
+    currencyToID: string;
 }
