@@ -150,10 +150,18 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            var isExisedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
-            if (isExisedVoucherId)
+            //Check Exist Voucher ID of VAT Invoice
+            var isExistedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
+            if (isExistedVoucherId)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
+            }
+
+            //Check Duplicate Voucher ID (In year) of Voucher
+            var isDuplicateVoucherId = CheckDuplicateVoucherIdInYear(model.VoucherId, model.Id);
+            if (isDuplicateVoucherId)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = string.Format("Voucher ID {0} existed in {1}", model.VoucherId, DateTime.Now.Year) });
             }
 
             if (model.Type == AccountingConstants.ADVANCE_TYPE_INVOICE)
@@ -210,10 +218,19 @@ namespace eFMS.API.Accounting.Controllers
             currentUser.Action = "UpdateAcctMngt";
 
             if (!ModelState.IsValid) return BadRequest();
-            var isExisedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
-            if (isExisedVoucherId)
+
+            //Check Exist Voucher ID of VAT Invoice
+            var isExistedVoucherId = CheckExistedVoucherId(model.VoucherId, model.Id);
+            if (isExistedVoucherId)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = "Voucher ID has been existed" });
+            }
+
+            //Check Duplicate Voucher ID (In year) of Voucher
+            var isDuplicateVoucherId = CheckDuplicateVoucherIdInYear(model.VoucherId, model.Id);
+            if (isDuplicateVoucherId)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = string.Format("Voucher ID {0} existed in {1}", model.VoucherId, DateTime.Now.Year) });
             }
 
             if (model.Type == AccountingConstants.ADVANCE_TYPE_INVOICE)
@@ -256,6 +273,12 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Check Exist Voucher ID of VAT Invoice
+        /// </summary>
+        /// <param name="voucherId"></param>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
         [HttpGet("CheckVoucherIdExist")]
         public IActionResult CheckVoucherIdExist(string voucherId, Guid? acctId)
         {
@@ -263,16 +286,22 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(isExited);
         }
 
+        /// <summary>
+        /// Check Exist Voucher ID of VAT Invoice
+        /// </summary>
+        /// <param name="voucherId"></param>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
         private bool CheckExistedVoucherId(string voucherId, Guid? acctId)
         {
             var isExited = false;
             if (acctId == Guid.Empty || acctId == null)
             {
-                isExited = accountingService.Get(x => x.VoucherId == voucherId).Any();
+                isExited = accountingService.Get(x => x.VoucherId == voucherId && x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).Any();
             }
             else
             {
-                isExited = accountingService.Get(x => x.VoucherId == voucherId && x.Id != acctId).Any();
+                isExited = accountingService.Get(x => x.VoucherId == voucherId && x.Id != acctId && x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).Any();
             }
             return isExited;
         }
@@ -490,6 +519,41 @@ namespace eFMS.API.Accounting.Controllers
             }
             return Ok(result);
         }
-        
+
+        /// <summary>
+        /// Check duplicate Voucher ID of Voucher
+        /// </summary>
+        /// <param name="voucherId"></param>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
+        [HttpGet("CheckDuplicateVoucherId")]
+        public IActionResult CheckDuplicateVoucherId(string voucherId, Guid? acctId)
+        {
+            var isDuplicate = CheckDuplicateVoucherIdInYear(voucherId, acctId);
+            return Ok(isDuplicate);
+        }
+
+        /// <summary>
+        /// Check duplicate Voucher ID (In Year) of Voucher
+        /// </summary>
+        /// <param name="voucherId"></param>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
+        private bool CheckDuplicateVoucherIdInYear(string voucherId, Guid? acctId)
+        {
+            var isDuplicated = false;
+            int yearCurr = DateTime.Now.Year;
+            //Case: Insert
+            if (acctId == Guid.Empty || acctId == null)
+            {
+                isDuplicated = accountingService.Get(x => x.VoucherId == voucherId && x.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Year : yearCurr) == yearCurr).Any();
+            }
+            //Case: Update
+            else
+            {
+                isDuplicated = accountingService.Get(x => x.VoucherId == voucherId && x.Type == AccountingConstants.ACCOUNTING_VOUCHER_TYPE && x.Id != acctId && (x.DatetimeCreated.HasValue ? x.DatetimeCreated.Value.Year : yearCurr) == yearCurr).Any();
+            }            
+            return isDuplicated;
+        }
     }
 }

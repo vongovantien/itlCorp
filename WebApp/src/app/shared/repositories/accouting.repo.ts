@@ -873,7 +873,11 @@ export class AccountingRepo {
     }
 
     syncReceiptToAccountant(list: any[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list).pipe(
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list)
+    }
+
+    checkVoucherIdDuplicate(voucherId: string, acctId: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckDuplicateVoucherId?voucherId=${voucherId}&acctId=${acctId}`).pipe(
             map((data: any) => data)
         );
     }

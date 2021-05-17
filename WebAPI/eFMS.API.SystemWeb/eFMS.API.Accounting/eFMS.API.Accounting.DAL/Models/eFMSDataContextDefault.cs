@@ -925,7 +925,11 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AdvanceAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.BalanceAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.BankAccountName).HasMaxLength(150);
 
