@@ -61,7 +61,7 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Upd
 
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
-
+<info-popup #infoPopupHbl [title]="'HAWB No Existed'"></info-popup>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>

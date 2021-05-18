@@ -2020,6 +2020,7 @@ namespace eFMS.API.Documentation.DL.Services
                            Id = d.Id,
                            TransactionType = t.TransactionType,
                            Hwbno = d.Hwbno,
+                           JobNo = t.JobNo,
                            JobId = d.JobId
                        };
             return data;
