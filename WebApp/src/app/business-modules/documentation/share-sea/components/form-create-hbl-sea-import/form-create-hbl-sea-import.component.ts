@@ -6,7 +6,7 @@ import { CatalogueRepo, SystemRepo } from '@repositories';
 import { AppForm } from '@app';
 import { DataService } from '@services';
 import { JobConstants } from '@constants';
-import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer } from '@models';
+import { CsTransactionDetail, PortIndex, CsTransaction, ProviceModel, Customer, Incoterm } from '@models';
 import { CommonEnum } from '@enums';
 import { InfoPopupComponent } from '@common';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction } from '@store';
@@ -24,6 +24,7 @@ import { FormValidators } from '@validators';
 export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppForm {
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @Input() isUpdate: boolean = false;
+    @Input() type: string = null;
 
     formGroup: FormGroup;
     customer: AbstractControl;
@@ -61,6 +62,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     shipperDescription: AbstractControl;
     notifyPartyDescription: AbstractControl;
     alsonotifyPartyDescription: AbstractControl;
+    incotermId: AbstractControl;
 
     oceanVoyNo: AbstractControl;
     configSaleman: CommonInterface.IComboGirdConfig | any = {};
@@ -79,7 +81,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     ];
 
     jobId: string = '';
-    type: string;
 
     shipmentDetail: CsTransaction;
     ports: Observable<PortIndex[]>;
@@ -89,6 +90,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
     customers: Observable<Customer[]>;
     consignees: Observable<Customer[]>;
     consigneesAndCustomers: Observable<Customer[]>;
+    incoterms: Observable<Incoterm[]>;
 
     isLoading: boolean = false;
     isLoadingPort: Observable<boolean>;
@@ -112,6 +114,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.getConfigComboGrid();
 
         this.initForm();
+        console.log(this.type);
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
         if (!this.isUpdate) {
             this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
                 .pipe(takeUntil(this.ngUnsubscribe))
@@ -134,9 +138,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                             eta: !!this.shipmentDetail.eta ? { startDate: new Date(this.shipmentDetail.eta), endDate: new Date(this.shipmentDetail.eta) } : null,
                             etd: !!this.shipmentDetail.etd ? { startDate: new Date(this.shipmentDetail.etd), endDate: new Date(this.shipmentDetail.etd) } : null,
                             arrivalVessel: this.shipmentDetail.flightVesselName,
-                            arrivalVoyage: this.shipmentDetail.voyNo
+                            arrivalVoyage: this.shipmentDetail.voyNo,
+                            incotermId: this.shipmentDetail.incotermId
+
                         };
-                        console.log(formData);
                         this.formGroup.patchValue(formData);
                     }
                 );
@@ -240,6 +245,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             consigneeDescription: [],
             notifyPartyDescription: [],
             alsonotifyPartyDescription: [],
+            incotermId: [null],
             serviceType: [null,
                 Validators.required]
         }, { validator: [FormValidators.comparePort] });
@@ -279,7 +285,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.shipperDescription = this.formGroup.controls['shipperDescription'];
         this.notifyPartyDescription = this.formGroup.controls['notifyPartyDescription'];
         this.alsonotifyPartyDescription = this.formGroup.controls['alsonotifyPartyDescription'];
-
+        this.incotermId = this.formGroup.controls['incotermId'];
     }
 
     onUpdateDataToImport(data: CsTransactionDetail) {
@@ -351,6 +357,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             placeOfIssues: res.issueHblplace,
             serviceType: res.serviceType,
             hbOfladingType: res.hbltype,
+            incotermId: res.incotermId
         });
     }
 

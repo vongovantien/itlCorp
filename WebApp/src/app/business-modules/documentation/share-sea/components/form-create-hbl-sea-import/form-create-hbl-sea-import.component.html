@@ -416,13 +416,21 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
+                        <div class="col-lg-2">
                             <div class="form-group">
                                 <label class="form-control-label" for="">
                                     Reference No
                                 </label>
                                 <input type="text" class="form-control m-input m-input--square"
                                     formControlName="referenceNo">
+                            </div>
+                        </div>
+                        <div class="col-lg-2">
+                            <div class="form-group">
+                                <label>Incoterm</label>
+                                <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                </ng-select>
                             </div>
                         </div>
                     </div>

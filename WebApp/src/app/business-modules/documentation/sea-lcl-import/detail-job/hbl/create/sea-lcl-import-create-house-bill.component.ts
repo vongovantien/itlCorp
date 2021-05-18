@@ -324,6 +324,7 @@ export class SeaLCLImportCreateHouseBillComponent extends AppForm {
             netWeight: this.hblGoodsSummaryComponent.netWeight,
             packageQty: this.hblGoodsSummaryComponent.packageQty,
             packageType: +this.hblGoodsSummaryComponent.selectedPackage,
+            incotermId: this.formHouseBill.incotermId.value,
             arrivalSecondNotice: null,
             arrivalNo: null,
             arrivalHeader: null,

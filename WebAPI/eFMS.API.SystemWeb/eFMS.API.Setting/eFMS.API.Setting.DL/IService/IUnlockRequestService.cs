@@ -19,5 +19,6 @@ namespace eFMS.API.Setting.DL.IService
         SetUnlockRequestModel GetDetailUnlockRequest(Guid id);
         HandleState CheckExistVoucherNoOfAdvance(UnlockJobCriteria criteria);
         HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria);
+        List<UnlockRequestExport> GetUnlockRequestsExport(UnlockRequestCriteria criteria);
     }
 }

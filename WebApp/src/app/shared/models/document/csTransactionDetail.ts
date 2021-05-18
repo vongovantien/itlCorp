@@ -110,6 +110,7 @@ export class CsTransactionDetail {
   flightNoRowTwo: string = '';
   contactPerson: string = '';
   closingTime: string = '';
+  incotermId: string = null;
   constructor(object?: any) {
     const self = this;
     for (const key in object) {

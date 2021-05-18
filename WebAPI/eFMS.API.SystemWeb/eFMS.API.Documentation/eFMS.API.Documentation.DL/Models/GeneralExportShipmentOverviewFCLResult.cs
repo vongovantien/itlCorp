@@ -14,10 +14,13 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalSellAutomated { get; set; }
         public decimal? TotalSellVGM { get; set; }
         public decimal? TotalSellBookingFee { get; set; }
-        // Origin Container Freight Station Fee
+        // Total Origin Container Freight Station Fee
         public decimal? TotalSellCFSFee { get; set; }
-        // Security EBS
+        // Total Security EBS
         public decimal? TotalSellEBSFee { get; set; }
+        // Total Pick up charge + Customs fee
+        public decimal? TotalSellCustomFee { get; set; }
+
         // --BUYING
         public decimal? TotalBuyTerminal { get; set; }
         public decimal? TotalBuyBillFee { get; set; }
@@ -30,7 +33,11 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? TotalBuyCFSFee { get; set; }
         // Security EBS
         public decimal? TotalBuyEBSFee { get; set; }
+        // Total Pick up charge + Customs fee
+        public decimal? TotalBuyCustomFee { get; set; }
+
         public string FinalDestination { get; set; }
         public string NotifyParty { get; set; }
+        public string Incoterm { get; set; }
     }
 }

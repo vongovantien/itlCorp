@@ -303,7 +303,14 @@
                                 <ng-select class="custom" placeholder="Please Select" formControlName="serviceType"
                                     [items]="serviceTypes"></ng-select>
                             </div>
+                            <div class="form-group">
+                                <label>Incoterm</label>
+                                <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                </ng-select>
+                            </div>
                         </div>
+
                     </div>
                 </div>
             </div>

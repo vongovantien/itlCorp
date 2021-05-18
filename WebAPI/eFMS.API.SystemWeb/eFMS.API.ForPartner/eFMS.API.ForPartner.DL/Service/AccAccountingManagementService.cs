@@ -46,6 +46,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctReceipt> receiptRepository;
         private readonly IContextBase<SysCompany> companyRepository;
         private readonly IContextBase<CatContract> catContractRepository;
+        private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -69,7 +70,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<AcctReceipt> receiptRepo,
             IContextBase<SysCompany> companyRepo,
-            IContextBase<CatContract> catContractRepo
+            IContextBase<CatContract> catContractRepo,
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -91,6 +93,7 @@ namespace eFMS.API.ForPartner.DL.Service
             receiptRepository = receiptRepo;
             companyRepository = companyRepo;
             catContractRepository = catContractRepo;
+            acctAdvanceRequestRepository = acctAdvanceRequestRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -1070,7 +1073,28 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     if (!result.Success)
                     {
-                        return new HandleState((object)"Update fail");
+                        return new HandleState((object)"Update Advance fail");
+                    }
+
+                    if(model.Detail != null && model.Detail.Count > 0)
+                    {
+                        foreach (var item in model.Detail)
+                        {
+                            IQueryable<AcctAdvanceRequest> advReq = acctAdvanceRequestRepository.Get(x => x.AdvanceNo == adv.AdvanceNo && x.JobId == item.JobNo && x.Mbl == item.MBL && x.Hbl == item.HBL);
+                            if (advReq != null && advReq.Count() > 0)
+                            {
+                                foreach (var advR in advReq)
+                                {
+                                    advR.ReferenceNo = item.ReferenceNo;
+                                    acctAdvanceRequestRepository.Update(advR, x => x.Id == item.RowID, false);
+                                }
+                            }
+                        }
+                        HandleState hsUpdateAdvR = acctAdvanceRequestRepository.SubmitChanges();
+                        if (!hsUpdateAdvR.Success)
+                        {
+                            return new HandleState((object)"Update Advance Request fail");
+                        }
                     }
                 }
 

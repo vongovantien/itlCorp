@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder, FormArray, Validators } from '
 import { Store } from '@ngrx/store';
 import { formatCurrency, formatDate } from '@angular/common';
 
-import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse, CsOtherCharge, AirwayBill, CountryModel } from '@models';
+import { Customer, User, PortIndex, Currency, CsTransaction, DIM, HouseBill, Warehouse, CsOtherCharge, AirwayBill, CountryModel, Incoterm } from '@models';
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { JobConstants, SystemConstants } from '@constants';
@@ -79,6 +79,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
     agents: Observable<Customer[]>;
     warehouses: Observable<Warehouse[]>;
     currencies: Observable<Currency[]>;
+    incoterms: Observable<Incoterm[]>;
 
     airwayBill: AirwayBill;
 
@@ -136,7 +137,7 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
         this.initForm();
         this.loadMasterData();
-
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AE'] });
         if (this.isUpdate) {
             this.getDetailHBLState();
             this.getDimensionState();
@@ -173,7 +174,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
                                 firstCarrierBy: shipment.flightVesselName,
                                 freightPayment: shipment.paymentTerm,
                                 kgIb: 'K',
-                                handingInformation: this.setDefaultHandlingInformation(shipment)
+                                handingInformation: this.setDefaultHandlingInformation(shipment),
+                                incotermId: shipment.incotermId
                             });
 
                             // *  CR 14501
@@ -359,7 +361,8 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
             issueHbldate: [{ startDate: new Date(), endDate: new Date() }, Validators.required],
 
             // * Array
-            dimensionDetails: this._fb.array([])
+            dimensionDetails: this._fb.array([]),
+            incotermId: []
 
         },
             { validator: FormValidators.compareGW_CW }
