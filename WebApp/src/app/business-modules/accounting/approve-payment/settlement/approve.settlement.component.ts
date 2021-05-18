@@ -107,7 +107,9 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         statusApproval: this.settlementPayment.settlement.statusApproval,
                         amount: this.settlementPayment.settlement.amount,
                         currency: this.settlementPayment.settlement.settlementCurrency,
-                        payee: this.settlementPayment.settlement.payee
+                        payee: this.settlementPayment.settlement.payee,
+                        advanceAmount: this.settlementPayment.settlement.advanceAmount,
+                        balanceAmount: this.settlementPayment.settlement.balanceAmount
                     });
 
                     this.getParnerDetails(this.settlementPayment.settlement.payee);
