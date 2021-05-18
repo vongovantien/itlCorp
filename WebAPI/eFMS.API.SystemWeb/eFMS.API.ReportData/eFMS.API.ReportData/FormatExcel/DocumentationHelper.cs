@@ -2660,6 +2660,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     "SellAutomated",
                     "SellVGM",
                     "SellBookingFee",
+                    "SellCustomFee",
                     "SellOthers",
                     "TotalSelling",
                     "BuyFreight",
@@ -2670,6 +2671,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     "BuyEBSFee",
                     "BuyAutomated",
                     "BuyVGM",
+                    "BuyCustomFee",
                     "BuyOthers",
                     "TotalBuying",
                     "Profit",
@@ -2696,6 +2698,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
                     listKey.Add("MBL", shipment.MblMawb);
                     listKey.Add("HBL", shipment.HblHawb);
+                    listKey.Add("Incoterm", shipment.Incoterm); // Incoterm
                     listKey.Add("Port", shipment.PolPod);
                     listKey.Add("FinalDestination", shipment.FinalDestination);
                     listKey.Add("Carrier", shipment.Carrier); // Coloader
@@ -2722,6 +2725,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("SellAutomated", shipment.TotalSellAutomated);
                     listKey.Add("SellVGM", shipment.TotalSellVGM);
                     listKey.Add("SellBookingFee", shipment.TotalSellBookingFee);
+                    listKey.Add("SellCustomFee", shipment.TotalSellCustomFee);
                     listKey.Add("SellOthers", shipment.TotalSellOthers);
                     listKey.Add("TotalSelling", shipment.TotalSell);
                     listKey.Add("BuyFreight", shipment.TotalBuyFreight);
@@ -2732,6 +2736,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("BuyEBSFee", shipment.TotalBuyEBSFee);
                     listKey.Add("BuyAutomated", shipment.TotalBuyAutomated);
                     listKey.Add("BuyVGM", shipment.TotalBuyVGM);
+                    listKey.Add("BuyCustomFee", shipment.TotalBuyCustomFee);
                     listKey.Add("BuyOthers", shipment.TotalBuyOthers);
                     listKey.Add("TotalBuying", shipment.TotalBuy);
                     listKey.Add("Profit", shipment.Profit);
