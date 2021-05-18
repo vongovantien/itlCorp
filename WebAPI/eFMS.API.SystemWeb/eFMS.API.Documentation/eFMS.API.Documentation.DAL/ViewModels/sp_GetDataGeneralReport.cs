@@ -53,5 +53,6 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string NotifyPartyDescription { get; set; }
         public string PackageContainer { get; set; }
         public string ServiceType { get; set; }
+        public Guid? IncotermId { get; set; }
     }
 }

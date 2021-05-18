@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCommodity> catCommodityRepo;
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
         readonly IContextBase<CatDepartment> departmentRepository;
+        readonly IContextBase<CatIncoterm> catIncotermRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -68,6 +69,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodityGroup> catCommodityGroup,
             ICurrencyExchangeService currencyExchange,
             IContextBase<CatDepartment> departmentRepo,
+            IContextBase<CatIncoterm> catIncotermRepo,
             IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
         {
             opsRepository = ops;
@@ -90,6 +92,7 @@ namespace eFMS.API.Documentation.DL.Services
             catCommodityRepo = catCommodity;
             catCommodityGroupRepo = catCommodityGroup;
             departmentRepository = departmentRepo;
+            catIncotermRepository = catIncotermRepo;
             csMawbcontainerRepo = csMawbcontainer;
         }
 
@@ -1896,6 +1899,8 @@ namespace eFMS.API.Documentation.DL.Services
             var autoManCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("AUTOMATED MANIFEST"))?.Select(x => x.Id).ToList();
             var vgmCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("VGM"))?.Select(x => x.Id).ToList();
             var lclBookingFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("LCL BOOKING FEE"))?.Select(x => x.Id).ToList();
+            var customFeeName = new string[] { "PICK-UP CHARGE", "CUSTOMS CLEARANCE", "CUSTOMS INSPECTION" };
+            var customFee = catChargeRepo.Get(x => Array.Exists(customFeeName, element => x.ChargeNameEn.ToUpper().Contains(element)))?.Select(x => x.Id).ToList();
 
             foreach (var shipment in shipments)
             {
@@ -1908,6 +1913,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.FlightNo = shipment.FlightNo;
                 data.MblMawb = shipment.Mawb;
                 data.HblHawb = shipment.HwbNo;
+                data.Incoterm = shipment.IncotermId == null ? string.Empty : catIncotermRepository.Get(x => x.Id == shipment.IncotermId).Select(x => x.Code).FirstOrDefault();
                 if (shipment.Pol != null && shipment.Pod != null)
                 {
                     data.PolPod = placesData[(Guid)shipment.Pol]?.Select(x => x.Code).FirstOrDefault() + "/" + placesData[(Guid)shipment.Pod]?.Select(x => x.Code).FirstOrDefault();
@@ -1943,6 +1949,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (criteria.Currency == DocumentConstants.CURRENCY_LOCAL)
                 {
                     #region -- currency = VND
+                    // Freight
                     var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
                     if (_freightCharges?.Count() > 0)
                     {
@@ -1951,6 +1958,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyFreight;
                         data.TotalSell += data.TotalSellFreight;
                     }
+                    // Terminal Handling (THC)
                     var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
                     if (_terminalHandlingCharges?.Count() > 0)
                     {
@@ -1959,6 +1967,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyTerminal;
                         data.TotalSell += data.TotalSellTerminal;
                     }
+                    // Origin Doc Fee (B/L)
                     var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
                     if (_billFeeCharges?.Count() > 0)
                     {
@@ -1967,6 +1976,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyBillFee;
                         data.TotalSell += data.TotalSellBillFee;
                     }
+                    // Telex release Fee
                     var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
                     if (_telexReleaseCharges?.Count() > 0)
                     {
@@ -1975,6 +1985,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyTelexRelease;
                         data.TotalSell += data.TotalSellTelexRelease;
                     }
+                    // Origin Container Freight Station Fee (CFS)
                     var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
                     if (_cfsCharges?.Count() > 0)
                     {
@@ -1983,6 +1994,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyCFSFee;
                         data.TotalSell += data.TotalSellCFSFee;
                     }
+                    // Security (EBS)
                     var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
                     if (_securityCharges?.Count() > 0)
                     {
@@ -1991,6 +2003,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyEBSFee;
                         data.TotalSell += data.TotalSellEBSFee;
                     }
+                    // Automated Manifest System (AMS)
                     var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
                     if (_autoManCharges?.Count() > 0)
                     {
@@ -1999,6 +2012,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyAutomated;
                         data.TotalSell += data.TotalSellAutomated;
                     }
+                    // VGM admin Fee
                     var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
                     if (_vgmCharges?.Count() > 0)
                     {
@@ -2007,11 +2021,23 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyVGM;
                         data.TotalSell += data.TotalSellVGM;
                     }
+                    // Booking fee - LCL
                     var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
                     if (_lclBookingFeeCharges?.Count() > 0)
                     {
-                        data.TotalSellBookingFee = _lclBookingFeeCharges.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellBookingFee = _lclBookingFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSell += data.TotalSellBookingFee;
                     }
+                    // Pick up charge + Customs fee
+                    var _customFeeCharges = surChargesShipment.Where(x => customFee.Contains(x.ChargeId));
+                    if (_customFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCustomFee = _customFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalSellCustomFee = _customFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                        data.TotalBuy += data.TotalBuyCustomFee;
+                        data.TotalSell += data.TotalSellCustomFee;
+                    }
+                    // OTHERS Fee
                     var _lclOtherCharges = surChargesShipment.Except(_freightCharges)
                                                                             .Except(_terminalHandlingCharges)
                                                                             .Except(_billFeeCharges)
@@ -2019,10 +2045,14 @@ namespace eFMS.API.Documentation.DL.Services
                                                                             .Except(_cfsCharges)
                                                                             .Except(_securityCharges)
                                                                             .Except(_autoManCharges)
-                                                                            .Except(_vgmCharges);
+                                                                            .Except(_vgmCharges)
+                                                                            .Except(_customFeeCharges);
+                    // Total Others Fee Of Buying
                     data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                    // Total Others Fee Of Selling
                     _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
                     data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountVnd ?? 0));
+                    // TOTAL
                     data.TotalBuy += data.TotalBuyOthers;
                     data.TotalSell += data.TotalSellOthers;
                     data.Profit = data.TotalSell - data.TotalBuy;
@@ -2031,6 +2061,7 @@ namespace eFMS.API.Documentation.DL.Services
                 else
                 {
                     #region -- currency = USD
+                    // Freight
                     var _freightCharges = surChargesShipment.Where(x => x.ChargeGroup == freightChargeId);
                     if (_freightCharges?.Count() > 0)
                     {
@@ -2039,6 +2070,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyFreight;
                         data.TotalSell += data.TotalSellFreight;
                     }
+                    // Terminal Handling (THC)
                     var _terminalHandlingCharges = surChargesShipment.Where(x => terminalHandling.Contains(x.ChargeId));
                     if (_terminalHandlingCharges?.Count() > 0)
                     {
@@ -2047,6 +2079,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyTerminal;
                         data.TotalSell += data.TotalSellTerminal;
                     }
+                    // Origin Doc Fee (B/L)
                     var _billFeeCharges = surChargesShipment.Where(x => billFee.Contains(x.ChargeId));
                     if (_billFeeCharges?.Count() > 0)
                     {
@@ -2055,6 +2088,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyBillFee;
                         data.TotalSell += data.TotalSellBillFee;
                     }
+                    // Telex release Fee
                     var _telexReleaseCharges = surChargesShipment.Where(x => telexRelease.Contains(x.ChargeId));
                     if (_telexReleaseCharges?.Count() > 0)
                     {
@@ -2063,6 +2097,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyTelexRelease;
                         data.TotalSell += data.TotalSellTelexRelease;
                     }
+                    // Origin Container Freight Station Fee (CFS)
                     var _cfsCharges = surChargesShipment.Where(x => cfsCharge.Contains(x.ChargeId));
                     if (_cfsCharges?.Count() > 0)
                     {
@@ -2071,6 +2106,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyCFSFee;
                         data.TotalSell += data.TotalSellCFSFee;
                     }
+                    // Security (EBS)
                     var _securityCharges = surChargesShipment.Where(x => securityCharge.Contains(x.ChargeId));
                     if (_securityCharges?.Count() > 0)
                     {
@@ -2079,6 +2115,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyEBSFee;
                         data.TotalSell += data.TotalSellEBSFee;
                     }
+                    // Automated Manifest System (AMS)
                     var _autoManCharges = surChargesShipment.Where(x => autoManCharge.Contains(x.ChargeId));
                     if (_autoManCharges?.Count() > 0)
                     {
@@ -2087,6 +2124,7 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyAutomated;
                         data.TotalSell += data.TotalSellAutomated;
                     }
+                    // VGM admin Fee
                     var _vgmCharges = surChargesShipment.Where(x => vgmCharge.Contains(x.ChargeId));
                     if (_vgmCharges?.Count() > 0)
                     {
@@ -2095,11 +2133,23 @@ namespace eFMS.API.Documentation.DL.Services
                         data.TotalBuy += data.TotalBuyVGM;
                         data.TotalSell += data.TotalSellVGM;
                     }
+                    // Booking fee - LCL
                     var _lclBookingFeeCharges = surChargesShipment.Where(x => lclBookingFee.Contains(x.ChargeId));
                     if (_lclBookingFeeCharges?.Count() > 0)
                     {
-                        data.TotalSellBookingFee = _lclBookingFeeCharges.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellBookingFee = _lclBookingFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSell += data.TotalSellBookingFee;
                     }
+                    // Pick up charge + Customs fee
+                    var _customFeeCharges = surChargesShipment.Where(x => customFee.Contains(x.ChargeId));
+                    if (_customFeeCharges?.Count() > 0)
+                    {
+                        data.TotalBuyCustomFee = _customFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalSellCustomFee = _customFeeCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                        data.TotalBuy += data.TotalBuyCustomFee;
+                        data.TotalSell += data.TotalSellCustomFee;
+                    }
+                    // OTHERS Fee
                     var _lclOtherCharges = surChargesShipment.Except(_freightCharges)
                                                                             .Except(_terminalHandlingCharges)
                                                                             .Except(_billFeeCharges)
@@ -2107,10 +2157,14 @@ namespace eFMS.API.Documentation.DL.Services
                                                                             .Except(_cfsCharges)
                                                                             .Except(_securityCharges)
                                                                             .Except(_autoManCharges)
-                                                                            .Except(_vgmCharges);
+                                                                            .Except(_vgmCharges)
+                                                                            .Except(_customFeeCharges);
+                    // Total Others Fee Of Buying
                     data.TotalBuyOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_BUY_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                    // Total Others Fee Of Selling
                     _lclOtherCharges = _lclOtherCharges.Except(_lclBookingFeeCharges);
                     data.TotalSellOthers = _lclOtherCharges.Where(x => x.Type == DocumentConstants.CHARGE_SELL_TYPE)?.Sum(x => (x.AmountUsd ?? 0));
+                    // TOTAL
                     data.TotalBuy += data.TotalBuyOthers;
                     data.TotalSell += data.TotalSellOthers;
                     data.Profit = data.TotalSell - data.TotalBuy;

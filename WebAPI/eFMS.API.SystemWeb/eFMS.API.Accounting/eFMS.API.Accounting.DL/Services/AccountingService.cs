@@ -392,29 +392,43 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
                                                                                              IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
-                                                                                             HblId = surcharge.Hblid
+                                                                                             HblId = surcharge.Hblid,
+                                                                                             ClearanceNo = surcharge.ClearanceNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
 
-                                // Kiểm tra các Details có làm đang làm hoàn ứng
-                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1).ToList();
+                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai
+                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1)
+                                    .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
+                                    .Select(d => new BravoSettlementRequestModel {
+                                        Stt_Cd_Htt = d.First().Stt_Cd_Htt,
+                                        Ma_SpHt = d.First().Ma_SpHt,
+                                        BillEntryNo = d.First().BillEntryNo,
+                                        MasterBillNo = d.First().MasterBillNo,
+                                        DeptCode = d.First().DeptCode,
+                                        CustomerCodeBook = d.First().CustomerCodeBook,
+                                        CustomerCodeTransfer= d.First().CustomerCodeTransfer,
+                                        AdvanceNo = d.Key.AdvanceNo,
+                                        HblId = d.Key.HblId,
+                                        ClearanceNo = d.Key.ClearanceNo,
+                                    }).ToList();
                                 if(querySettlmentReqList.Count > 0)
                                 {
                                     foreach (var reqItem in querySettlmentReqList)
                                     {
-                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo);
+                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
                                         decimal _balance = balanceInfo.TotalAmount - balanceInfo.AdvanceAmount  ?? 0;
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         if (_balance != 0)
                                         {
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
-                                                RowId = reqItem.Stt_Cd_Htt, //TODO Ref trên advance req
+                                                RowId = reqItem.Stt_Cd_Htt,
                                                 Ma_SpHt = reqItem.Ma_SpHt,
                                                 ItemCode = "BALANCE",
-                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod), // TODO
+                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod), 
                                                 Unit = "Lô",
                                                 CurrencyCode = item.CurrencyCode,
                                                 ExchangeRate = 1,
@@ -1815,7 +1829,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (balance < 0)
             {
-                return "Số dư cấn chi";
+                return "Số dư cần chi";
             }
 
             if(paymentMethod == AccountingConstants.PAYMENT_METHOD_NETOFF_SHPT)

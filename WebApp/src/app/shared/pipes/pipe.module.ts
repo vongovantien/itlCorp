@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
-import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe, HighlightPipe, ServiceNamePipe, SpecialPermissionPipe, SumPipe, DateAgoPipe, SafePipe, ClassStatusApprovalPipe, ExtensionPipe, ClassStatusSyncPipe, SumAmountCurrencyPipe } from '.';
+
+import { SearchStage, FilterPipe, NegativeNumberePipe, EqualErrorPipe, AbsPipe, RemoveTrimPipe, HighlightPipe, ServiceNamePipe, SpecialPermissionPipe, SumPipe, DateAgoPipe, SafePipe, ClassStatusApprovalPipe, ExtensionPipe, ClassStatusSyncPipe, SumAmountCurrencyPipe, SortTableClassPipe } from '.';
 
 const APP_PIPES = [
     SearchStage,
@@ -17,7 +18,8 @@ const APP_PIPES = [
     ClassStatusApprovalPipe,
     ExtensionPipe,
     ClassStatusSyncPipe,
-    SumAmountCurrencyPipe
+    SumAmountCurrencyPipe,
+    SortTableClassPipe
 ];
 
 @NgModule({
