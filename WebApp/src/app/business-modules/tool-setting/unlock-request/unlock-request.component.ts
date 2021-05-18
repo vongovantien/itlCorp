@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
 import { SortService } from "@services";
-import { SettingRepo } from "@repositories";
+import { SettingRepo, ExportRepo } from "@repositories";
 import { UnlockRequestResult, User } from "@models";
 import { catchError, finalize, map } from "rxjs/operators";
 import { RoutingConstants, SystemConstants } from "@constants";
@@ -21,7 +21,8 @@ export class UnlockRequestComponent extends AppList {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _sortService: SortService,
-        private _settingRepo: SettingRepo,) {
+        private _settingRepo: SettingRepo,
+        private _exportRepo: ExportRepo) {
         super();
         this._progressRef = this._progressService.ref();
         this.requestList = this.searchUnlockRequest;
@@ -96,6 +97,25 @@ export class UnlockRequestComponent extends AppList {
                         this._toastService.error(res.message);
                     }
                 }
+            );
+    }
+
+    exportUnlockRequest() {
+        this._progressRef.start();
+        this._exportRepo.exportUnlockRequest(this.dataSearch)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        const fileName = "Unlock Request.xlsx";
+                        this.downLoadFile(response, "application/ms-excel", fileName);
+                    } else {
+                        this._toastService.warning('Not found data to print', '');
+                    }
+                },
             );
     }
 }

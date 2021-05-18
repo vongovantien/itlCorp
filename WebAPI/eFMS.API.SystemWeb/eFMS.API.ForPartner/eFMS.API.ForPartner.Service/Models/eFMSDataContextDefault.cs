@@ -17,6 +17,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         public virtual DbSet<AccAccountingManagement> AccAccountingManagement { get; set; }
         public virtual DbSet<AcctAdvancePayment> AcctAdvancePayment { get; set; }
+        public virtual DbSet<AcctAdvanceRequest> AcctAdvanceRequest { get; set; }
         public virtual DbSet<AcctCdnote> AcctCdnote { get; set; }
         public virtual DbSet<AcctReceipt> AcctReceipt { get; set; }
         public virtual DbSet<AcctSettlementPayment> AcctSettlementPayment { get; set; }
@@ -43,7 +44,7 @@ namespace eFMS.API.ForPartner.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountingManagement>(entity =>
             {
@@ -193,6 +194,8 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
 
+                entity.Property(e => e.ExcRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
@@ -233,6 +236,72 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.VoucherNo)
                     .HasMaxLength(100)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AcctAdvanceRequest>(entity =>
+            {
+                entity.ToTable("acctAdvanceRequest");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.AdvanceNo)
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.AdvanceType)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.AmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.AmountVnd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CustomNo).HasMaxLength(100);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(50);
+
+                entity.Property(e => e.Hbl)
+                    .HasColumnName("HBL")
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.JobId)
+                    .HasColumnName("JobID")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Mbl)
+                    .HasColumnName("MBL")
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ReferenceNo)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RequestCurrency).HasMaxLength(10);
+
+                entity.Property(e => e.StatusPayment)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
             });
 

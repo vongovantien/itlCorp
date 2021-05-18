@@ -174,6 +174,7 @@ export class SeaFCLExportCreateHBLComponent extends AppForm {
             podDescription: form.podDescription,
             forwardingAgentId: form.forwardingAgent,
             goodsDeliveryId: form.goodsDelivery,
+            incotermId: form.incotermId,
 
             // * containers summary
             csMawbcontainers: this.containers,

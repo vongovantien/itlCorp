@@ -30,5 +30,10 @@ namespace eFMS.API.Documentation.Service.Models
         public string ReasonReject { get; set; }
         public string Payee { get; set; }
         public string SettlementType { get; set; }
+        public string BankAccountNo { get; set; }
+        public string BankAccountName { get; set; }
+        public string BankName { get; set; }
+        public decimal? AdvanceAmount { get; set; }
+        public decimal? BalanceAmount { get; set; }
     }
 }

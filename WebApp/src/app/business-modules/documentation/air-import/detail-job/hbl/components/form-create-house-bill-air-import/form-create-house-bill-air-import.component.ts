@@ -2,7 +2,7 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 
-import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel, Unit } from '@models';
+import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel, Unit, Incoterm } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
@@ -83,6 +83,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     currencies: Observable<any[]>;
     warehouses: Observable<Warehouse[]>;
     ngDataUnit: Observable<Unit[]>;
+    incoterms: Observable<Incoterm[]>;
 
     isLoadingPort: Observable<boolean>;
 
@@ -125,6 +126,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
         this.initForm();
         this.getMasterData();
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: ['AI'] });
 
         if (!this.isUpdate) {
             this.getShipmentAndSetDefault();
@@ -157,7 +159,8 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
                             packageQty: shipment.packageQty,
                             grossWeight: shipment.grossWeight,
                             chargeWeight: shipment.chargeWeight,
-                            packageType: +shipment.packageType
+                            packageType: +shipment.packageType,
+                            incontermId: shipment.incotermId
                         });
                     }
                 }
@@ -242,6 +245,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             issueHBLDate: [{ startDate: new Date(), endDate: new Date() }],
             flightDateOrigin: [],
             eta: [],
+            incotermId: []
 
         },
             { validator: FormValidators.compareGW_CW }
