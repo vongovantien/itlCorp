@@ -389,14 +389,27 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
                                                                                              IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
-                                                                                             HblId = surcharge.Hblid
+                                                                                             HblId = surcharge.Hblid,
+                                                                                             ClearanceNo = surcharge.ClearanceNo
                                                                                          };
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
 
-                                // Kiểm tra các Details có làm đang làm hoàn ứng
-                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1).ToList();
+                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai
+                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1)
+                                    .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
+                                    .Select(d => new BravoSettlementRequestModel {
+                                        Stt_Cd_Htt = d.First().Stt_Cd_Htt,
+                                        Ma_SpHt = d.First().Ma_SpHt,
+                                        BillEntryNo = d.First().BillEntryNo,
+                                        MasterBillNo = d.First().MasterBillNo,
+                                        DeptCode = d.First().DeptCode,
+                                        CustomerCodeBook = d.First().CustomerCodeBook,
+                                        CustomerCodeTransfer= d.First().CustomerCodeTransfer,
+                                        AdvanceNo = d.Key.AdvanceNo,
+                                        HblId = d.Key.HblId
+                                    }).ToList();
                                 if(querySettlmentReqList.Count > 0)
                                 {
                                     foreach (var reqItem in querySettlmentReqList)
@@ -1800,7 +1813,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (balance < 0)
             {
-                return "Số dư cấn chi";
+                return "Số dư cần chi";
             }
 
             if(paymentMethod == AccountingConstants.PAYMENT_METHOD_NETOFF_SHPT)

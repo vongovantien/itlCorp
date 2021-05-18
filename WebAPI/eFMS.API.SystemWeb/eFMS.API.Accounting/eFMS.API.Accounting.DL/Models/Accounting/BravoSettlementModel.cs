@@ -67,5 +67,6 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         // Custom
         public string AdvanceNo { get; set; }
         public Guid HblId { get; set; }
+        public string ClearanceNo { get; set; }
     }
 }
