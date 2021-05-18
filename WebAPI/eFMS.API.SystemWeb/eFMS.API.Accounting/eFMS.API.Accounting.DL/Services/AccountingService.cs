@@ -408,23 +408,24 @@ namespace eFMS.API.Accounting.DL.Services
                                         CustomerCodeBook = d.First().CustomerCodeBook,
                                         CustomerCodeTransfer= d.First().CustomerCodeTransfer,
                                         AdvanceNo = d.Key.AdvanceNo,
-                                        HblId = d.Key.HblId
+                                        HblId = d.Key.HblId,
+                                        ClearanceNo = d.Key.ClearanceNo,
                                     }).ToList();
                                 if(querySettlmentReqList.Count > 0)
                                 {
                                     foreach (var reqItem in querySettlmentReqList)
                                     {
-                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo);
+                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
                                         decimal _balance = balanceInfo.TotalAmount - balanceInfo.AdvanceAmount  ?? 0;
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         if (_balance != 0)
                                         {
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
-                                                RowId = reqItem.Stt_Cd_Htt, //TODO Ref trên advance req
+                                                RowId = reqItem.Stt_Cd_Htt,
                                                 Ma_SpHt = reqItem.Ma_SpHt,
                                                 ItemCode = "BALANCE",
-                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod), // TODO
+                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod), 
                                                 Unit = "Lô",
                                                 CurrencyCode = item.CurrencyCode,
                                                 ExchangeRate = 1,
