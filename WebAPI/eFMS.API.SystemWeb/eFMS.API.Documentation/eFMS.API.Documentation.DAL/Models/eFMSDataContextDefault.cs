@@ -117,10 +117,6 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ObhAmount).HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.ObhBilling).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.ObhPaid).HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.ObhUnpaid).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
@@ -622,8 +618,6 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.JobId).HasColumnName("JobID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
-
-                entity.Property(e => e.NetOff).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.Note).HasMaxLength(500);
 
