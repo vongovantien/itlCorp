@@ -647,7 +647,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                ShipmentId = opst.Id,
                                                                Type = "OPS",
                                                                AdvanceNo = advGrp.AdvanceNo,
-                                                               IsLocked = opst.IsLocked
+                                                               IsLocked = opst.IsLocked,
+                                                               CustomNo = sur.ClearanceNo
                                                            };
 
             IQueryable<ShipmentSettlement> dataDocument = from sur in surcharge
@@ -671,32 +672,38 @@ namespace eFMS.API.Accounting.DL.Services
                                                               ShipmentId = cst.Id,
                                                               Type = "DOC",
                                                               AdvanceNo = advGrp.AdvanceNo,
-                                                              IsLocked = cst.IsLocked
+                                                              IsLocked = cst.IsLocked,
+                                                              CustomNo = sur.ClearanceNo
+
                                                           };
             IQueryable<ShipmentSettlement> dataQueryUnionService = dataOperation.Union(dataDocument);
 
             var dataGroups = dataQueryUnionService.ToList()
-                                        .GroupBy(x => new { x.SettlementNo, x.JobId, x.HBL, x.MBL, x.CurrencyShipment, x.HblId, x.Type, x.ShipmentId, x.AdvanceNo, x.IsLocked })
+                                        .GroupBy(x => new { x.SettlementNo, x.HblId, x.AdvanceNo, x.CustomNo }) /* case đặc biệt
+                                        1. Có tạm ứng - không có tk 
+                                        2. Có tạm ứng - Có tờ khai
+                                        */
                 .Select(x => new ShipmentSettlement
                 {
                     SettlementNo = x.Key.SettlementNo,
-                    JobId = x.Key.JobId,
-                    HBL = x.Key.HBL,
-                    MBL = x.Key.MBL,
-                    CurrencyShipment = x.Key.CurrencyShipment,
+                    JobId = x.FirstOrDefault().JobId,
+                    HBL = x.FirstOrDefault().HBL,
+                    MBL = x.FirstOrDefault().MBL,
+                    CurrencyShipment = x.FirstOrDefault().CurrencyShipment,
                     //TotalAmount = x.Sum(t => t.TotalAmount),
                     HblId = x.Key.HblId,
-                    Type = x.Key.Type,
-                    ShipmentId = x.Key.ShipmentId,
+                    Type = x.FirstOrDefault().Type,
+                    ShipmentId = x.FirstOrDefault().ShipmentId,
                     AdvanceNo = x.Key.AdvanceNo,
-                    IsLocked = x.Key.IsLocked
+                    IsLocked = x.FirstOrDefault().IsLocked,
+                    CustomNo = x.Key.CustomNo
                 });
 
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (ShipmentSettlement item in dataGroups)
             {
                 // Lấy thông tin advance theo group settlement.
-                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.MBL, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo);
+                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.MBL, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
 
                 int roundDecimal = 0;
                 if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
@@ -712,7 +719,7 @@ namespace eFMS.API.Accounting.DL.Services
                     HBL = item.HBL,
                     // TotalAmount = item.TotalAmount,
                     CurrencyShipment = item.CurrencyShipment,
-                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo),
+                    ChargeSettlements = GetChargesSettlementBySettlementNoAndShipment(item.SettlementNo, item.JobId, item.MBL, item.HBL, item.AdvanceNo, item.CustomNo),
                     HblId = item.HblId,
                     ShipmentId = item.ShipmentId,
                     Type = item.Type,
@@ -778,14 +785,14 @@ namespace eFMS.API.Accounting.DL.Services
             return files;
         }
 
-        public AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _mbl, string _hbl, string _settleCurrency, string _advanceNo)
+        public AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _mbl, string _hbl, string _settleCurrency, string _advanceNo, string _clearanceNo = null)
         {
             AdvanceInfo result = new AdvanceInfo();
             string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
             var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
 
-            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.Mblno == _mbl);
+            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.Mblno == _mbl && x.Key.ClearanceNo == _clearanceNo);
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
             {
                 var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
@@ -857,7 +864,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
-        public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL, string AdvNo)
+        public List<ShipmentChargeSettlement> GetChargesSettlementBySettlementNoAndShipment(string settlementNo, string JobId, string MBL, string HBL, string AdvNo, string clearanceNo)
         {
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
@@ -887,6 +894,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
                                      && sur.AdvanceNo == AdvNo
+                                     && sur.ClearanceNo == clearanceNo
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -951,6 +959,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
                                     && sur.AdvanceNo == AdvNo
+                                    && sur.ClearanceNo == clearanceNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1771,32 +1780,13 @@ namespace eFMS.API.Accounting.DL.Services
                         settlement.Amount = _totalAmount;
 
                         // Tính Balance trong settle
-                        var dataGroups = model.ShipmentCharge
-                                       .GroupBy(x => new { x.JobId, x.HBL, x.MBL,  x.Hblid, x.AdvanceNo})
-                                       .Select(x => new ShipmentSettlement
-                                       {
-                                           JobId = x.Key.JobId,
-                                           HBL = x.Key.HBL,
-                                           MBL = x.Key.MBL,
-                                           HblId = x.Key.Hblid,
-                                           AdvanceNo = x.Key.AdvanceNo,
-                                       });
-
-                        if(dataGroups != null && dataGroups.Count() > 0)
+                        decimal? advanceAmount = CalculateBalanceSettle(model.ShipmentCharge, settlement.SettlementNo, settlement.SettlementCurrency);
+                        if(advanceAmount != null)
                         {
-                            decimal _totalAdvanceAmount = 0; // Tổng tiền tạm ứng
-
-                            foreach (ShipmentSettlement item in dataGroups)
-                            {
-                                // Lấy thông tin advance theo group settlement.
-                                AdvanceInfo advInfo = GetAdvanceBalanceInfo(settlement.SettlementNo, item.MBL, item.HblId.ToString(), settlement.SettlementCurrency, item.AdvanceNo);
-                                _totalAdvanceAmount += advInfo.AdvanceAmount ?? 0;
-                            }
-
-                            settlement.AdvanceAmount = _totalAdvanceAmount;
+                            settlement.AdvanceAmount = advanceAmount;
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
                         }
-
+                        
                         var hs = DataContext.Add(settlement);
 
                         trans.Commit();
@@ -1844,6 +1834,46 @@ namespace eFMS.API.Accounting.DL.Services
             return amount;
         }
 
+        private decimal? CalculateBalanceSettle(List<ShipmentChargeSettlement> charges, string settlementNo, string currency)
+        {
+            decimal? _advanceAmount = null;
+
+            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+                                    .Select(x => new ShipmentSettlement
+                                    {
+                                        JobId = x.Key.JobId,
+                                        HBL = x.Key.HBL,
+                                        MBL = x.Key.MBL,
+                                        HblId = x.Key.Hblid,
+                                        AdvanceNo = x.Key.AdvanceNo,
+                                        CustomNo = x.Key.ClearanceNo
+                                    });
+
+            if (dataGroups != null && dataGroups.Count() > 0)
+            {
+                decimal? _totalAdvanceAmount = 0;
+
+                foreach (ShipmentSettlement item in dataGroups)
+                {
+                    if (!string.IsNullOrEmpty(item.AdvanceNo))
+                    {
+                        AdvanceInfo advInfo = GetAdvanceBalanceInfo(settlementNo, item.MBL, item.HblId.ToString(), currency, item.AdvanceNo, item.CustomNo);
+                        _totalAdvanceAmount += advInfo.AdvanceAmount ?? 0;
+                    }
+                }
+                if(_totalAdvanceAmount == 0)
+                {
+                    _advanceAmount = null;
+                }
+                else
+                {
+                    _advanceAmount = _totalAdvanceAmount;
+                }
+            }
+
+            return _advanceAmount;
+
+        }
         public HandleState UpdateSettlementPayment(CreateUpdateSettlementModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
@@ -2087,29 +2117,10 @@ namespace eFMS.API.Accounting.DL.Services
                         settlement.Amount = _totalAmount;
 
                         // Tính Balance trong settle
-                        var dataGroups = model.ShipmentCharge
-                                       .GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo })
-                                       .Select(x => new ShipmentSettlement
-                                       {
-                                           JobId = x.Key.JobId,
-                                           HBL = x.Key.HBL,
-                                           MBL = x.Key.MBL,
-                                           HblId = x.Key.Hblid,
-                                           AdvanceNo = x.Key.AdvanceNo,
-                                       });
-
-                        if (dataGroups != null && dataGroups.Count() > 0)
+                        decimal? advanceAmount = CalculateBalanceSettle(model.ShipmentCharge, settlement.SettlementNo, settlement.SettlementCurrency);
+                        if (advanceAmount != null)
                         {
-                            decimal _totalAdvanceAmount = 0; // Tổng tiền tạm ứng
-
-                            foreach (ShipmentSettlement item in dataGroups)
-                            {
-                                // Lấy thông tin advance theo group settlement.
-                                AdvanceInfo advInfo = GetAdvanceBalanceInfo(settlement.SettlementNo, item.MBL, item.HblId.ToString(), settlement.SettlementCurrency, item.AdvanceNo);
-                                _totalAdvanceAmount += advInfo.AdvanceAmount ?? 0;
-                            }
-
-                            settlement.AdvanceAmount = _totalAdvanceAmount;
+                            settlement.AdvanceAmount = advanceAmount;
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
                         }
 
