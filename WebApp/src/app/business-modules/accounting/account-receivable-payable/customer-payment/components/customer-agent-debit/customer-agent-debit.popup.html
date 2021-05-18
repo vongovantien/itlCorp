@@ -95,7 +95,7 @@
             <ng-container *ngIf="type === 'Customer'">
                 <div class="m-portlet">
                     <div class="m-portlet__body">
-                        <div class="table-horizontal" style="max-height:800px">
+                        <div class="table-horizontal" style="max-height:500px">
                             <table class="table table-striped table-brand dataTable">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -215,7 +215,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="table-horizontal" style="max-height:800px">
+                        <div class="table-horizontal" style="max-height:500px">
                             <table class="table table-striped table-brand dataTable">
                                 <thead app-table-header [headers]="headersAgency"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
