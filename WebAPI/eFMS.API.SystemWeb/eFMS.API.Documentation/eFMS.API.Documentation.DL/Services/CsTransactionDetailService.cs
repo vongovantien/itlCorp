@@ -222,6 +222,7 @@ namespace eFMS.API.Documentation.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    new LogHelper("eFMS_CsTrasactionDetail_Log", ex.ToString());
                     return new HandleState(ex.Message);
                 }
                 finally
@@ -327,7 +328,7 @@ namespace eFMS.API.Documentation.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
-                    new LogHelper("eFMS_Update_CsTrasactionDetail_Log", ex.ToString());
+                    new LogHelper("eFMS_CsTrasactionDetail_Log", ex.ToString());
                     return new HandleState(ex.Message);
                 }
                 finally
