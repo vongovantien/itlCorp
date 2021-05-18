@@ -200,6 +200,12 @@ export class ExportRepo {
         );
     }
 
+    exportGeneralSettlementPayment(settlementId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${settlementId}`).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
 
     exportShipmentOverview(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverview`, searchObject).pipe(

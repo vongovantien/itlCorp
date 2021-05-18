@@ -345,6 +345,10 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 //Không order theo DatetimeCreated, chỉ order giảm dần theo số HAWBNo
                 var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
+                    .Where(n => 
+                    Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) >= 675 // Số hệ thống gen tới  ITL79390675
+                    && Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) < 9755 // Số user đã giành  ITL79399755
+                    )
                     .OrderByDescending(o => o.Hwbno)
                     .Select(s => s.Hwbno);
                 int count = 0;

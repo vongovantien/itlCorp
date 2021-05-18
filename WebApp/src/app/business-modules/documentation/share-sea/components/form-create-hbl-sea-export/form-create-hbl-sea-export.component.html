@@ -130,38 +130,36 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && (!pol.value || !polDescription.value)}">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && (!pol.value || !polDescription.value)}">
                         <label required>Port of Loading (POL)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pol')"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pol);resetFormControl(polDescription)"
-                            placeholder="Select port" allowFreeText [displaySelectedStr]="polDescription.value"
-                            (displaySelectedStrChange)="polDescription.setValue($event)">
+                            [displayFields]="displayFieldPort"
+                            (remove)="resetFormControl(pol);resetFormControl(polDescription)" placeholder="Select port"
+                            allowFreeText formControlName="polDescription">
                         </app-combo-grid-virtual-scroll>
-                        <div class="form-control-feedback"
-                                *ngIf="isSubmitted && !!polDescription.value && !pol.value">
-                                Please select Port of Discharge
-                            </div>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !!polDescription.value && !pol.value">
+                            Please select Port of Discharge
+                        </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': isSubmitted && 
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && 
                         ((formCreate.errors | equalError:'invalidPort') || (!podDescription.value || !pod.value)) }">
                         <label required>Port of Discharge (POD)</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'pod')"
                             [selectedDisplayFields]="['nameEn']" [dataSources]="ports | async"
-                            [displayFields]="displayFieldPort" (remove)="resetFormControl(pod);resetFormControl(podDescription)"
-                            placeholder="Please select port" allowFreeText [displaySelectedStr]="podDescription.value"
-                            (displaySelectedStrChange)="podDescription.setValue($event)">
+                            [displayFields]="displayFieldPort"
+                            (remove)="resetFormControl(pod);resetFormControl(podDescription)"
+                            placeholder="Please select port" allowFreeText formControlName="podDescription">
                         </app-combo-grid-virtual-scroll>
                         <div class="form-control-feedback"
                             *ngIf="isSubmitted && formCreate.errors | equalError:'invalidPort'">Port of
                             Discharge must be different from Port of Loading
                         </div>
-                        <div class="form-control-feedback"
-                                *ngIf="isSubmitted && !!podDescription.value && !pod.value">
-                                Please select Port of Discharge
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !!podDescription.value && !pod.value">
+                            Please select Port of Discharge
                         </div>
                     </div>
                 </div>
@@ -262,8 +260,8 @@
                                         [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
                                         [alwaysShowCalendars]="true" name="daterange" readonly
                                         formControlName="issueHbldate" (remove)="resetFormControl(issueHbldate)"
-                                        calendar
-                                        [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate" (datesUpdated)="updateOnboardStatus()"/>
+                                        calendar [allowRemove]="!!issueHbldate.value && !!issueHbldate.value.startDate"
+                                        (datesUpdated)="updateOnboardStatus()" />
                                 </div>
                             </div>
                         </div>

@@ -36,6 +36,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
     packages: Unit[] = [];
     selectedPackage: any;
     selectedPackageName: string = '';
+    isExport: boolean = false;
 
     constructor(
         protected _actionStoreSubject: ActionsSubject,
@@ -160,7 +161,7 @@ export class ShareBussinessHBLGoodSummaryLCLComponent extends ShareBussinessShip
                 containerLst.forEach((c: Container) => {
                     this.containerDescription += this.handleStringContSeal(c.containerNo || '', c.containerTypeName || '', c.sealNo || '');
                 });
-            }else{
+            } else {
                 containers.forEach((c: Container) => {
                     this.containerDescription += this.handleStringContSeal(c.containerNo, c.containerTypeName, c.sealNo);
                 });

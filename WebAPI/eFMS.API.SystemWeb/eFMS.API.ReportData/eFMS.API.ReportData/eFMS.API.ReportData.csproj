@@ -34,6 +34,9 @@
      </Reference>
    </ItemGroup>
    <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-General-Preview.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\Shipment-Overview-FCL.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>

@@ -316,7 +316,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                             obhChargesUpdate.Add(surchargeObh);
 
-                            _totalAmountInvoiceObh += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeObh, invoiceDebit.Currency);
+                            _totalAmountInvoiceObh += currencyExchangeService.ConvertAmountChargeToAmountObj(surchargeObh, invoiceObh.Currency);
                             _totalAmountVndInvoiceObh += (surchargeObh.AmountVnd + surchargeObh.VatAmountVnd) ?? 0;
                             _totalAmountUsdInvoiceObh += (surchargeObh.AmountUsd + surchargeObh.VatAmountUsd) ?? 0;
                         }

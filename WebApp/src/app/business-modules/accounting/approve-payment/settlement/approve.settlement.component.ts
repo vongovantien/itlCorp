@@ -1,11 +1,11 @@
-import { SysImage } from '@models';
+import { Partner, SysImage } from '@models';
 import { Component, ViewChild, TemplateRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
-import { AccountingRepo, ExportRepo } from '@repositories';
+import { AccountingRepo, CatalogueRepo, ExportRepo } from '@repositories';
 import { InjectViewContainerRefDirective } from '@directives';
 import { AppPage } from 'src/app/app.base';
 import { delayTime } from '@decorators';
@@ -50,6 +50,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
+        private _catalogueRepo: CatalogueRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _modalService: BsModalService,
@@ -106,7 +107,10 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         statusApproval: this.settlementPayment.settlement.statusApproval,
                         amount: this.settlementPayment.settlement.amount,
                         currency: this.settlementPayment.settlement.settlementCurrency,
-                        payee: this.settlementPayment.settlement.payee
+                        payee: this.settlementPayment.settlement.payee,
+                        bankName: this.settlementPayment.settlement.bankName,
+                        beneficiaryName: this.settlementPayment.settlement.bankAccountName,
+                        bankAccountNo: this.settlementPayment.settlement.bankAccountNo
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
@@ -234,6 +238,23 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             );
     }
 
+    exportGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
+            return;
+        }
+
+        this._exportRepo.exportGeneralSettlementPayment(this.settlementPayment.settlement.id)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
+                },
+            );
+    }
+    
     recall() {
         this._accoutingRepo.RecallRequestSettlement(this.settlementPayment.settlement.id)
             .pipe(

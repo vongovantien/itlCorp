@@ -547,6 +547,7 @@ namespace eFMS.API.Documentation.DL.Services
                             surcharge.Notes = item.Notes;
                             surcharge.KickBack = item.KickBack;
                             surcharge.QuantityType = item.QuantityType;
+                            surcharge.VatPartnerId = item.VatPartnerId;
 
                             //** FinalExchangeRate = null do cần tính lại dựa vào ExchangeDate mới
                             surcharge.FinalExchangeRate = null;

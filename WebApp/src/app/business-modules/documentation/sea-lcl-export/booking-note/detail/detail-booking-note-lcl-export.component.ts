@@ -43,7 +43,7 @@ export class SeaLCLExportBookingNoteDetailComponent extends SeaLCLExportBookingN
     ngOnInit() { }
 
     ngAfterViewInit() {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
         ]).pipe(

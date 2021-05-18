@@ -72,7 +72,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
 
 
     ngAfterViewInit() {
-        combineLatest([
+        this.subscription = combineLatest([
             this._activedRoute.params,
             this._activedRoute.queryParams
         ]).pipe(
@@ -96,10 +96,10 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
             (jobId: string) => {
                 if (isUUID(jobId)) {
                     this._store.dispatch(new fromShareBussiness.TransactionGetProfitAction(jobId));
-                    this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
+                    // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(jobId));
                     this._store.dispatch(new fromShareBussiness.GetDimensionAction(jobId));
 
-                    this.getDetailShipment();
+                    this.getDetailShipment(jobId);
                 } else {
                     this.gotoList();
                 }
@@ -107,17 +107,15 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
         );
     }
 
-    getDetailShipment() {
-        this._store.select<any>(fromShareBussiness.getTransactionDetailCsTransactionState)
-            .pipe(
-                skip(1),
-                takeUntil(this.ngUnsubscribe)
-            )
+    getDetailShipment(jobId: string) {
+        this._documenRepo.getDetailTransaction(jobId)
             .subscribe(
                 (res: any) => {
                     if (!!res) {
                         this.shipmentDetail = res;
                         this.formCreateComponent.isUpdate = true;
+                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailSuccessAction(res));
+
                         // * reset field duplicate
                         if (this.ACTION === "COPY") {
                             this.formCreateComponent.getUserLogged();
@@ -209,7 +207,8 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                         this._toastService.success(res.message);
 
                         // * get detail.
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        this.getDetailShipment(this.jobId);
                     } else {
                         this._toastService.error(res.message);
                     }
@@ -228,7 +227,11 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}/hbl`]);
                 break;
             case 'shipment':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
+                if (this.ACTION === 'COPY') {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: Object.assign({}, { action: 'copy' }) });
+                } else {
+                    this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`]);
+                }
                 break;
             case 'cdNote':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
@@ -319,7 +322,7 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
     duplicateConfirm() {
         this.action = { action: 'copy' };
         this._router.navigate([`${RoutingConstants.DOCUMENTATION.AIR_IMPORT}/${this.jobId}`], {
-            queryParams: Object.assign({}, { tab: 'SHIPMENT' }, this.action)
+            queryParams: this.action
         });
         this.confirmDuplicatePopup.hide();
     }
@@ -343,7 +346,8 @@ export class AirImportDetailJobComponent extends AirImportCreateJobComponent imp
                 (r: CommonInterface.IResult) => {
                     if (r.status) {
                         this._toastService.success(r.message);
-                        this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        // this._store.dispatch(new fromShareBussiness.TransactionGetDetailAction(this.jobId));
+                        this.getDetailShipment(this.jobId);
                     } else {
                         this._toastService.error(r.message);
                     }
