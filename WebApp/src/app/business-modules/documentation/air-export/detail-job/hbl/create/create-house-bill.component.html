@@ -36,6 +36,7 @@ Are you sure all entered details are correct?" (onSubmit)="saveHBL()" title="Cre
 
 <info-popup body="Opps, It looks like you missed something, Please recheck the highlighted field below.'"
     [title]="'Cannot Update HB'"></info-popup>
+<info-popup #infoPopupHbl [title]="'HAWB No Existed'"></info-popup>
 
 
 <confirm-popup #confirmCancelPopup body="All entered data will be discard. Are you sure you want to leave?"
