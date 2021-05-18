@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -651,9 +653,25 @@ namespace eFMS.API.Setting.DL.Services
                             UnlockDate = approve != null ? approve.DatetimeModified : null,
                             Requester = user.Username,
                             ReasonDetail = job.Reason,
-                            GeneralReason = unlock.GeneralReason
+                            GeneralReason = DecodeHtmlGeneralReason(unlock.GeneralReason)
                         };
             return query.ToList();
+        }
+
+        private string DecodeHtmlGeneralReason(string generalReason)
+        {
+            string result = string.Empty;
+            if (!string.IsNullOrEmpty(generalReason))
+            {
+                Regex reg = new Regex("<[^>]+>", RegexOptions.IgnoreCase);
+                result = reg.Replace(generalReason, " ");
+                result = result.Replace("\r","");
+                result = result.Replace("\n", "");
+                result = result.Replace("\t", "").Trim();
+                //Decode special character codes of HTML string
+                result = WebUtility.HtmlDecode(result);
+            }
+            return result;
         }
         #endregion -- EXPORT --
     }
