@@ -98,7 +98,8 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
         this.agents = this._store.select(getCatalogueAgentState);
         this.ports = this._store.select(getCataloguePortState).pipe(shareReplay());
         this.listUsers = this._systemRepo.getListSystemUser();
-        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.service] });
+        console.log(this.service);
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.service == 'lcl' ? 'SLI' : this.service] });
 
         this.initForm();
         this.getUserLogged();

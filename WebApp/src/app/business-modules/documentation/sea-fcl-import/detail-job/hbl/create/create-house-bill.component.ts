@@ -271,6 +271,7 @@ export class CreateHouseBillComponent extends AppForm {
             netWeight: this.hblGoodSummaryComponent.netWeight,
             packageQty: this.hblGoodSummaryComponent.packageQty,
             packageType: +this.hblGoodSummaryComponent.selectedPackage,
+            incotermId: this.formHouseBill.incotermId.value,
             contSealNo: this.hblGoodSummaryComponent.containerDescription,
             chargeWeight: this.hblGoodSummaryComponent.totalChargeWeight,
             arrivalSecondNotice: null,
