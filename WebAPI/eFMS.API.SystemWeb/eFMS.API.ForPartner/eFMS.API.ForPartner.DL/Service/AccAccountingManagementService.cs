@@ -1084,7 +1084,8 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         foreach (var item in model.Detail)
                         {
-                            IQueryable<AcctAdvanceRequest> advReq = acctAdvanceRequestRepository.Get(x => x.AdvanceNo == adv.AdvanceNo && x.JobId == item.JobNo && x.Mbl == item.MBL && x.Hbl == item.HBL);
+                            IQueryable<AcctAdvanceRequest> advReq = acctAdvanceRequestRepository.Get(x => x.AdvanceNo == adv.AdvanceNo && x.JobId == item.JobNo && x.Mbl == item.MBL
+                            && (x.Hbl == item.HBL || x.CustomNo == item.HBL)); // do khi đẩy đi vừa là số HBL, vừa là số TK
                             if (advReq != null && advReq.Count() > 0)
                             {
                                 foreach (var advR in advReq)
