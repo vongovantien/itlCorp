@@ -26,7 +26,8 @@
                                 </app-permission-button>
                             </ng-container>
 
-                            <ng-container *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
+                            <ng-container
+                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
                                     icon="la la-cloud-upload" (onClick)="confirmSync()">
                                 </app-permission-button>
@@ -65,7 +66,7 @@
                     <ng-container
                         *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button title="Cancel Receipt" type="reject" class="danger" icon="la la-times"
-                            (onClick)="submitClick('cancel')">
+                            (onClick)="confirmCancelReceipt()">
                         </app-permission-button>
                     </ng-container>
                 </div>
@@ -75,24 +76,27 @@
 </div>
 
 <ng-template #syncInfoTemplate>
-    <ul class="list-group">
-        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            <b>Sync Status:</b>
-            <span *ngIf="receiptDetail?.syncStatus !== null"
-                class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
-                {{receiptDetail?.syncStatus}}{{receiptDetail?.subRejectReceipt}}
-            </span>
-        </li>
-        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            <b>Reason reject:</b>
-            <span>{{receiptDetail?.reasonReject}}</span>
-        </li>
-        <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
-            <b>Last Sync:</b>
-            <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy HH:ss:mm'}}</span>
-        </li>
-    </ul>
+    <ng-container *ngIf="receiptDetail?.status === 'Done'">
+        <ul class="list-group">
+            <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                <b>Sync Status:</b>
+                <span *ngIf="receiptDetail?.syncStatus !== null"
+                    class="m-badge m-badge--{{(!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? 'danger' : 'success'}} m-badge--wide">
+                    {{receiptDetail?.syncStatus}}{{receiptDetail?.subRejectReceipt}}
+                </span>
+            </li>
+            <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                <b>Reason reject:</b>
+                <span>{{receiptDetail?.reasonReject}}</span>
+            </li>
+            <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
+                <b>Last Sync:</b>
+                <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy HH:ss:mm'}}</span>
+            </li>
+        </ul>
+    </ng-container>
 </ng-template>
 
 <ng-template inject></ng-template>
+
 <confirm-popup (onSubmit)="onConfirmSync()" [body]="confirmMessage" [labelConfirm]="'Ok'"></confirm-popup>

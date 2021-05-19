@@ -207,4 +207,16 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this.submitClick('done');
         })
     }
+
+    confirmCancelReceipt() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Cancel Receipt',
+            body: 'This Receipt will be canceled. Are you sure you want to continue?',
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-danger',
+            iconConfirm: 'la la-times'
+        }, () => {
+            this.submitClick('cancel');
+        })
+    }
 }
