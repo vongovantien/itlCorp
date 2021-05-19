@@ -17,6 +17,7 @@ import { CommercialBranchSubListComponent } from "../commercial/components/branc
 import { NgSelectModule } from "@ng-select/ng-select";
 import { CommercialEmailListComponent } from '../commercial/components/email/commercial-email-list.component';
 import { FormUpdateEmailCommercialCatalogueComponent } from './components/form-update-email-commercial-catalogue/form-update-email-commercial-catalogue.popup';
+import { FormSearchExportComponent } from '../commercial/components/popup/form-search-export/form-search-export.popup';
 
 const COMPONENTS = [
     ShareModulesInputShipmentPopupComponent,
@@ -27,7 +28,8 @@ const COMPONENTS = [
     CommercialBranchSubListComponent,
     CommercialEmailListComponent,
     FormUpdateEmailCommercialCatalogueComponent,
-    ShareModulesReasonRejectPopupComponent
+    ShareModulesReasonRejectPopupComponent,
+    FormSearchExportComponent
 ];
 @NgModule({
     declarations: [

@@ -1018,7 +1018,7 @@ namespace eFMS.API.Catalogue.DL.Services
             var sysUsers = sysUserRepository.Get();
             var agreementData = contractRepository.Get();
             string salemans = string.IsNullOrEmpty(criteria.Saleman) ? criteria.All : criteria.Saleman;
-            string SalemanId = sysUsers.Where(x => x.Username == salemans).Select(t => t.Id).FirstOrDefault();
+            var SalemanId = sysUsers.Where(x => salemans.Contains(x.Username)).Select(t => t.Id).ToList();
 
             string ContractType = string.IsNullOrEmpty(criteria.ContractType) ? criteria.All : criteria.ContractType.Trim();
             ClearCache();
@@ -1047,15 +1047,16 @@ namespace eFMS.API.Catalogue.DL.Services
                            && (x.partner.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.PartnerType ?? "").Contains(criteria.PartnerType ?? "", StringComparison.OrdinalIgnoreCase)
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
+                           && ((criteria.DatetimeCreatedFrom <= x.partner.DatetimeCreated && x.partner.DatetimeCreated <= criteria.DatetimeCreatedTo) || criteria.DatetimeCreatedFrom == null)
                            ));
-                if (!string.IsNullOrEmpty(SalemanId))
+                if (SalemanId.Count() > 0)
                 {
-                    query = query.Where(x => x.agreements.Any(y => y.SaleManId.Equals(SalemanId)));
+                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)) || SalemanId.Contains(x.partner.UserCreated));
                 }
-                else if (!string.IsNullOrEmpty(criteria.Saleman))
-                {
-                    query = null;
-                }
+                //else if (!string.IsNullOrEmpty(criteria.Saleman))
+                //{
+                //    query = null;
+                //}
                 if (!string.IsNullOrEmpty(ContractType))
                 {
                     query = query.Where(x => x.agreements.Any(y => y.ContractType.ToLower().Contains(ContractType.ToLower())));
@@ -1079,7 +1080,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            || (x.partner.Fax ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            || (x.user.Username ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
                            //|| (x.partner.CoLoaderCode ?? "").Contains(criteria.All ?? "", StringComparison.OrdinalIgnoreCase)
-                           || x.agreements.Any(y => y != null && y.SaleManId.Equals(SalemanId))
+                           || x.agreements.Any(y => y != null && SalemanId.Any(sm => sm == y.SaleManId))
                            || x.agreements.Any(y => y != null && y.ContractType.ToLower().Contains(ContractType.ToLower()))
                            )
                            && (x.partner.Active == criteria.Active || criteria.Active == null)
