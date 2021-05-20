@@ -239,5 +239,18 @@ namespace eFMS.API.Setting.Controllers
                 return BadRequest(result);
             }
         }
+
+        /// <summary>
+        /// Get data Unlock Request to Export
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataUnlockRequestsExport")]
+        [Authorize]
+        public IActionResult GetDataUnlockRequestsExport(UnlockRequestCriteria criteria)
+        {
+            var data = unlockRequestService.GetUnlockRequestsExport(criteria);
+            return Ok(data);
+        }
     }
 }

@@ -215,7 +215,7 @@ export class ExportRepo {
     }
 
     exportShipmentOverviewWithType(searchObject: any = {}, reportType: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewWithType`, searchObject, {reportType: reportType}).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportShipmentOverviewWithType`, searchObject, { reportType: reportType }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -376,6 +376,13 @@ export class ExportRepo {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/en-US/Documentation/ExportOpsCdNoteCombine`, data).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
+        );
+    }
+
+    exportUnlockRequest(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/SettingReport/ExportUnlockRequest`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
         );
     }
 }

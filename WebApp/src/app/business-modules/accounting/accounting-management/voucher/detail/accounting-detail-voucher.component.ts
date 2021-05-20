@@ -124,13 +124,13 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         //     return;
         // }
 
-        this._accountingRepo.checkVoucherIdExist(this.formCreateComponent.voucherId.value, this.voucherId)
+        this._accountingRepo.checkVoucherIdDuplicate(this.formCreateComponent.voucherId.value, this.voucherId)
             .pipe(
                 switchMap(
                     (res: boolean) => {
                         if (res) {
                             this.formCreateComponent.voucherId.setErrors({ existed: true });
-                            return of({ data: null, message: 'Voucher ID has been existed', status: false });
+                            return of({ data: null, message: "Voucher ID " + this.formCreateComponent.voucherId.value + " existed in " + (new Date()).getFullYear(), status: false });
                         } else {
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
                             modelAdd.charges = [...this.listChargeComponent.charges];
