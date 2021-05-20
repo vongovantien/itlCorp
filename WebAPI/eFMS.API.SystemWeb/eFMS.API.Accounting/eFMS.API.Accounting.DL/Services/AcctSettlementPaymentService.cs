@@ -1366,12 +1366,11 @@ namespace eFMS.API.Accounting.DL.Services
                 .Get(x =>
                         x.IsFromShipment == true
                      && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId && string.IsNullOrEmpty(x.SyncedFrom))
-                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId) && string.IsNullOrEmpty(x.PaySyncedFrom))
+                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId && string.IsNullOrEmpty(x.PaySyncedFrom)))
                      && string.IsNullOrEmpty(x.SettlementCode)
                 );
             // Get data source
             var charge = catChargeRepo.Get();
-            //var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
@@ -1382,22 +1381,19 @@ namespace eFMS.API.Accounting.DL.Services
             criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.jobIds != null && criteria.jobIds.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
-                csTrans = csTrans.Where(x => criteria.jobIds.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase) && x.JobNo != null);
+                surcharge = surcharge.Where(x => criteria.jobIds.Any(job => job == x.JobNo) && x.JobNo != null);
             }
             // Data search = mblNo
             criteria.mbls = criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.mbls != null && criteria.mbls.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.mbls.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase) && x.Mblno != null);
-                csTrans = csTrans.Where(x => criteria.mbls.Contains(x.Mawb, StringComparer.OrdinalIgnoreCase) && x.Mawb != null);
+                surcharge = surcharge.Where(x => criteria.mbls.Any(mbl => mbl == x.Mblno) && x.Mblno != null);
             }
             // Data search = hblNo
             criteria.hbls = criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
             if (criteria.hbls != null && criteria.hbls.Count() > 0)
             {
-                opsTrans = opsTrans.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
-                csTransD = csTransD.Where(x => criteria.hbls.Contains(x.Hwbno, StringComparer.OrdinalIgnoreCase) && x.Hwbno != null);
+                surcharge = surcharge.Where(x => criteria.hbls.Any(hbl => hbl == x.Hblno) && x.Hblno != null);
             }
             // Data search = soaNo
             criteria.soaNo = criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1410,9 +1406,9 @@ namespace eFMS.API.Accounting.DL.Services
             var clearanceData = customClearanceRepo.Get();
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
             {
-                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Contains(x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
+                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Any(cus => cus == x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
                 var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x => x.Key).ToList();
-                opsTrans = opsTrans.Where(x => clearanceDataGroup.Contains(x.JobNo));
+                opsTrans = opsTrans.Where(x => clearanceDataGroup.Any(cl => cl == x.JobNo));
             }
             // Data search = creditNo
             criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
@@ -1435,8 +1431,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Data search = PIC
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
-                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
-                csTransD = csTransD.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                surcharge = surcharge.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
 
             var userRepo = sysUserRepo.Get();
@@ -1461,9 +1456,9 @@ namespace eFMS.API.Accounting.DL.Services
                                  select new ShipmentChargeSettlement
                                  {
                                      Id = sur.Id,
-                                     JobId = opst.JobNo,
-                                     MBL = opst.Mblno,
-                                     HBL = opst.Hwbno,
+                                     JobId = sur.JobNo,
+                                     MBL = sur.Mblno,
+                                     HBL = sur.Hblno,
                                      Hblid = sur.Hblid,
                                      Type = sur.Type,
                                      //SettlementCode = sur.SettlementCode,
@@ -1485,9 +1480,9 @@ namespace eFMS.API.Accounting.DL.Services
                                      AmountUSD = sur.AmountUsd,
                                      VatAmountUSD = sur.VatAmountUsd,
                                      PayerId = sur.PayerId,
-                                     Payer = par.ShortName,
+                                     Payer = pae.ShortName,
                                      PaymentObjectId = sur.PaymentObjectId,
-                                     OBHPartnerName = pae.ShortName,
+                                     OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
                                      InvoiceNo = sur.InvoiceNo,
                                      SeriesNo = sur.SeriesNo,
                                      InvoiceDate = sur.InvoiceDate,
@@ -1522,8 +1517,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 from par in par2.DefaultIfEmpty()
                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
                                 from pae in pae2.DefaultIfEmpty()
-                                join cstd in csTransD on sur.Hblid equals cstd.Id
-                                join cst in csTrans on cstd.JobId equals cst.Id
+                                join cst in csTrans on sur.JobNo equals cst.JobNo
                                 join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
                                 from vatPgrp in vatPgrps.DefaultIfEmpty()
                                     //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
@@ -1535,7 +1529,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     Id = sur.Id,
                                     JobId = cst.JobNo,
                                     MBL = cst.Mawb,
-                                    HBL = cstd.Hwbno,
+                                    HBL = sur.Hblno,
                                     Hblid = sur.Hblid,
                                     Type = sur.Type,
                                     //SettlementCode = sur.SettlementCode,
@@ -1557,9 +1551,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     AmountUSD = sur.AmountUsd,
                                     VatAmountUSD = sur.VatAmountUsd,
                                     PayerId = sur.PayerId,
-                                    Payer = par.ShortName,
+                                    Payer = pae.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
-                                    OBHPartnerName = pae.ShortName,
+                                    OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
                                     InvoiceNo = sur.InvoiceNo,
                                     SeriesNo = sur.SeriesNo,
                                     InvoiceDate = sur.InvoiceDate,
