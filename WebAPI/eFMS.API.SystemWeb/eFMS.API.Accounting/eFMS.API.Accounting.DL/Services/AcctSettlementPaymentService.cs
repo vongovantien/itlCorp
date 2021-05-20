@@ -1784,6 +1784,10 @@ namespace eFMS.API.Accounting.DL.Services
                         if(advanceAmount != null)
                         {
                             settlement.AdvanceAmount = advanceAmount;
+                            if (settlement.AdvanceAmount == 0)
+                            {
+                                settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                            }
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
                         }
                         
@@ -2121,6 +2125,9 @@ namespace eFMS.API.Accounting.DL.Services
                         if (advanceAmount != null)
                         {
                             settlement.AdvanceAmount = advanceAmount;
+                            if(settlement.AdvanceAmount == 0){
+                                settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                            }
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
                         }
 
