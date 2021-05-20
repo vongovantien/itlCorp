@@ -765,7 +765,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 6, 7].Value = item.Tel;
                 worksheet.Cells[i + 6, 8].Value = item.Fax;
                 worksheet.Cells[i + 6, 9].Value = item.UserCreatedName;
-                worksheet.Cells[i + 6, 10].Value = item.DatetimeModified;
+                worksheet.Cells[i + 6, 10].Value = item.DatetimeModified?.ToString("dd/MM/yyyy");
                 string inactivechar = "Active";
                 if (item.Inactive == false)
                 {
@@ -773,6 +773,7 @@ namespace eFMS.API.ReportData
                 }
                 worksheet.Cells[i + 6, 11].Value = inactivechar;
             }
+            worksheet.Cells.AutoFitColumns();
         }
         #endregion
 
