@@ -79,5 +79,10 @@
             public const string GetDataIncentiveReportUrl = "/Documentation/api/v1/en-US/Shipment/GetIncentiveReport?userId=";
             public const string AddReportLogUrl = "/Documentation/api/v1/en-US/ReportLog/AddNew";
         }
+
+        public class Setting
+        {
+            public const string GetDataUnlockRequestExportUrl = "/api/v1/en-US/UnlockRequest/GetDataUnlockRequestsExport";
+        }
     }
 }

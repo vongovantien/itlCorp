@@ -19,7 +19,7 @@ import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
-    animations: [listAnimation]
+    // animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;

@@ -91,5 +91,12 @@
             <param name="service"></param>
             <param name="currUser"></param>
         </member>
+        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.GetDataUnlockRequestsExport(eFMS.API.Setting.DL.Models.Criteria.UnlockRequestCriteria)">
+            <summary>
+            Get data Unlock Request to Export
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>
