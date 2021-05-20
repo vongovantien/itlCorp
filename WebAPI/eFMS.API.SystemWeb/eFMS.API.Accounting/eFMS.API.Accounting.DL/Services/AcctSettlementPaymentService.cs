@@ -1781,6 +1781,11 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             settlement.AdvanceAmount = advanceAmount;
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
+
+                            if (settlement.BalanceAmount == 0)
+                            {
+                                settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                            }
                         }
                         
                         var hs = DataContext.Add(settlement);
@@ -2116,8 +2121,13 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal? advanceAmount = CalculateBalanceSettle(model.ShipmentCharge, settlement.SettlementNo, settlement.SettlementCurrency);
                         if (advanceAmount != null)
                         {
-                            settlement.AdvanceAmount = advanceAmount;
+                            settlement.AdvanceAmount = advanceAmount;                           
                             settlement.BalanceAmount = settlement.AdvanceAmount - settlement.Amount;
+
+                            if (settlement.BalanceAmount == 0)
+                            {
+                                settlement.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                            }
                         }
 
                         var hs = DataContext.Update(settlement, x => x.Id == settlement.Id);
