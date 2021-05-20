@@ -97,6 +97,11 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => criteria.Status.Contains(x.Status));
             }
 
+            if (!string.IsNullOrEmpty(criteria.SyncStatus))
+            {
+                query = query.And(x => criteria.Status.Contains(x.SyncStatus));
+            }
+
             // Tìm theo ngày sync/ngày thu
             if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Sync")
             {

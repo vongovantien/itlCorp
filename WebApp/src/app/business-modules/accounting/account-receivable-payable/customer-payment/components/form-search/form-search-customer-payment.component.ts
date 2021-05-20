@@ -38,6 +38,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     syncStatuss = AccountingConstants.SYNC_STATUSS;
     statuss = AccountingConstants.STATUS;
     typesReceipt: string[] = ['All', 'Customer', 'Agent'];
+    statusRecepit: string[] = ['Draft', 'Canceled', 'Done'];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -65,6 +66,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             date: [{ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() }],
             dateType: [this.dateTypes[0]],
             currency: ['VND'],
+            status: [null],
             syncStatus: [this.syncStatuss[0]],
             typeReceipt: [this.typesReceipt[0]]
         });
@@ -76,6 +78,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.currency = this.formSearch.controls['currency'];
         this.syncStatus = this.formSearch.controls['syncStatus'];
         this.typeReceipt = this.formSearch.controls['typeReceipt'];
+        this.status = this.formSearch.controls['status'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -101,6 +104,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
+            status: this.status.value,
             type: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null,
         };
         this._listReceipt.getCPs(body);
@@ -117,6 +121,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType.reset(this.dateTypes[0]);
         this.currency.setValue('VND');
         this.syncStatus.reset(this.syncStatuss[0]);
+        this.status.reset();
+
         this._listReceipt.getCPs({});
     }
 
@@ -130,5 +136,6 @@ interface IAcctReceiptCriteria {
     dateType: string;
     currency: string;
     syncStatus: string;
+    status: string;
     type: string;
 }

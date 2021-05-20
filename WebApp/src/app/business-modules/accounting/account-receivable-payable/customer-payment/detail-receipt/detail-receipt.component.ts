@@ -194,4 +194,16 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 }
             );
     }
+
+    confirmCancel() {
+        if (this.receiptDetail.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
+            this.gotoList();
+        } else {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: 'Do you want to exit without saving?',
+            }, () => {
+                this.gotoList();
+            })
+        }
+    }
 }

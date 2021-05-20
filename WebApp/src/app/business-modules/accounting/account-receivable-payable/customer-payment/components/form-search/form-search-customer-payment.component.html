@@ -15,6 +15,44 @@
                         </ng-select>
                     </div>
                 </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="form-control-label">Customer</label>
+                        <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}"
+                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
+                            [displayFields]="displayFilesPartners" [height]="150"
+                            (remove)="resetFormControl(customerID)" placeholder="Select Partner">
+                        </app-combo-grid-virtual-scroll>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Currency</label>
+                        <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id"
+                            bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false"
+                            placeholder="All">
+                        </ng-select>
+
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Sync Status</label>
+                        <ng-select [items]="syncStatuss" formControlName="syncStatus" class="custom">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label for="form-control-label">Date Type</label>
+                        <ng-select [items]="dateTypes" formControlName="dateType" class="custom"></ng-select>
+
+                    </div>
+                </div>
                 <div class="col-lg-3 ">
                     <div class="form-group">
                         <label for="form-control-label">Date</label>
@@ -26,54 +64,32 @@
                                 [allowRemove]="!!date.value && !!date.value.startDate"
                                 (remove)="resetFormControl(date)" />
                         </div>
-
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="form-control-label">Date Type</label>
-                        <ng-select [items]="dateTypes" formControlName="dateType" class="custom"></ng-select>
-
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="form-control-label">Customer</label>
-                        <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}"
-                            (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                            [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
-                            [displayFields]="displayFilesPartners" [height]="150"
-                            (remove)="resetFormControl(customerID)" placeholder="Select Partner">
-                        </app-combo-grid-virtual-scroll>
+                <div class="col-lg-6"></div>
+                <div class="col-lg-6">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="form-control-label">Status</label>
+                                <ng-select [items]="statusRecepit" formControlName="status" class="custom"
+                                    placeholder="All">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label for="form-control-label">Type Receipt</label>
+                                <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
+                                    class="custom">
+                                </ng-select>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="form-control-label">Currency</label>
-                        <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id"
-                            bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false">
-                        </ng-select>
 
-                    </div>
                 </div>
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="form-control-label">Sync Status</label>
-                        <ng-select [items]="syncStatuss" formControlName="syncStatus" class="custom"></ng-select>
-                    </div>
-                </div>
-                <div class="col-lg-3">
-                    <div class="form-group">
-                        <label for="form-control-label">Type Receipt</label>
-                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
-                            class="custom">
-                        </ng-select>
-                    </div>
-                </div>
-
-
             </div>
             <div class="form-actions">
                 <div class="row ">
