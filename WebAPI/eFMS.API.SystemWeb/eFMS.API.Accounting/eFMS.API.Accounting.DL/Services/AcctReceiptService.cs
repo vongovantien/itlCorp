@@ -1224,6 +1224,8 @@ namespace eFMS.API.Accounting.DL.Services
                             receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
                             receiptModel.UserModified = currentUser.UserID;
                             receiptModel.DatetimeModified = DateTime.Now;
+                            receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                            receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
 
                             AcctReceipt receiptData = mapper.Map<AcctReceipt>(receiptModel);
                             HandleState hs = DataContext.Add(receiptData);
