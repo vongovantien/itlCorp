@@ -94,7 +94,7 @@ export class FormSearchExportComponent extends PopupBase {
   }
 
   exportData() {
-    if (this.salesmanActive.findIndex(x => x === 'All') === 0) {
+    if ((this.salesmanActive.findIndex(x => x === 'All') === 0) || !this.salesmanActive.length) {
       this.dataSearch.saleman = this.salesmanList.filter(x => x.id !== 'All').map(x => x.username).join(";");
     } else {
       this.dataSearch.saleman = this.salesmanList.filter(x => this.salesmanActive.findIndex(item => item === x.id) >= 0).map(x => x.username).join(";");
