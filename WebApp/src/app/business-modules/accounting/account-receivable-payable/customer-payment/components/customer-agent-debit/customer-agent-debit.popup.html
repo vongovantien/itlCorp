@@ -156,11 +156,18 @@
                                                 <span>{{debit.dueDate | date: 'dd/MM/yyyy'}} </span>
                                             </td>
 
-                                            <td [ngSwitch]="debit.paymentStatus">
-                                                <span *ngSwitchCase="'Unpaid'" class="text-danger">
-                                                    {{debit.paymentStatus}}</span>
-                                                <span *ngSwitchCase="'Paid'" class="text-success">
-                                                    {{debit.paymentStatus}}</span>
+                                            <td>
+                                                <ng-container [ngSwitch]="debit.paymentStatus">
+                                                    <span class="text-success" *ngSwitchCase="'Paid'">
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                    <span class="text-danger" *ngSwitchDefault>
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                </ng-container>
                                             </td>
                                             <td>
                                                 <span>{{debit.departmentName}} </span>
@@ -325,11 +332,18 @@
                                                     <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
                                                 </td>
 
-                                                <td [ngSwitch]="invoice.paymentStatus">
-                                                    <span *ngSwitchCase="'Unpaid'" class="text-danger">
-                                                        {{invoice.paymentStatus}}</span>
-                                                    <span *ngSwitchCase="'Paid'" class="text-success">
-                                                        {{invoice.paymentStatus}}</span>
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.departmentName}} </span>
@@ -406,11 +420,18 @@
                                                     <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
                                                 </td>
 
-                                                <td [ngSwitch]="invoice.paymentStatus">
-                                                    <span *ngSwitchCase="'Unpaid'" class="text-danger">
-                                                        {{invoice.paymentStatus}}</span>
-                                                    <span *ngSwitchCase="'Paid'" class="text-success">
-                                                        {{invoice.paymentStatus}}</span>
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.departmentName}} </span>
