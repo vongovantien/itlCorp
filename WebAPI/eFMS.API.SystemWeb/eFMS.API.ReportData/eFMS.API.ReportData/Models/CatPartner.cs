@@ -16,7 +16,7 @@ namespace eFMS.API.ReportData.Models
         public string Fax { get; set; }
         public string UserCreatedName { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Inactive { get; set; }
-    
+        public bool? Active { get; set; }
+
     }
 }
