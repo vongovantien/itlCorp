@@ -7,6 +7,6 @@ namespace eFMS.API.ReportData.Models
         public short Id { get; set; }
         public string GroupNameVn { get; set; }
         public string GroupNameEn { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }
