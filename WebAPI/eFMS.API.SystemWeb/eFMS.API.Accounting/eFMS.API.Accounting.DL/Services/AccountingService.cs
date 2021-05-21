@@ -388,7 +388,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                                                                              // 15709
                                                                                              AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo,item.Payee),
-                                                                                             RefundAmount = item.SettleAmount,
+                                                                                             RefundAmount = null, // 2 câu queryAble lồng nhau không đc => Tính bên dưới.
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
                                                                                              IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
@@ -399,6 +399,13 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 item.Details = querySettlementReq.ToList();
 
+                                item.Details.ForEach((x) =>
+                                {
+                                    AdvanceInfo AdvanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, x.HblId.ToString(), item.CurrencyCode, x.AdvanceNo, x.ClearanceNo);
+
+                                    x.RefundAmount = AdvanceInfo?.TotalAmount ?? 0;
+
+                                });
                                 // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai
                                 List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1)
                                     .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
@@ -418,7 +425,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     foreach (var reqItem in querySettlmentReqList)
                                     {
-                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
+                                        AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
                                         decimal _balance = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         if (_balance != 0)
@@ -1877,6 +1884,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return description;
         }
+
         /// <summary>
         /// 
         /// </summary>
