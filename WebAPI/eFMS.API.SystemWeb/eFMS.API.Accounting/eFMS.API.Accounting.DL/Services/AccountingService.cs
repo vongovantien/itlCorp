@@ -419,7 +419,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     foreach (var reqItem in querySettlmentReqList)
                                     {
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.MasterBillNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
-                                        decimal _balance = balanceInfo.TotalAmount - balanceInfo.AdvanceAmount  ?? 0;
+                                        decimal _balance = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         if (_balance != 0)
                                         {
