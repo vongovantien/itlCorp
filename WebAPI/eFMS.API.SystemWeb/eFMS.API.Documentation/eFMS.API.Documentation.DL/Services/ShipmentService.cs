@@ -2611,7 +2611,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var _polCode = item.Pol != null ? PlaceLookup[(Guid)item.Pol].FirstOrDefault()?.Code : string.Empty;
                 var _podCode = item.Pod != null ? PlaceLookup[(Guid)item.Pod].FirstOrDefault()?.Code : string.Empty;
-                data.Route = _polCode + "/" + _podCode;
+                data.Route = _polCode + (!string.IsNullOrEmpty(_polCode) || !string.IsNullOrEmpty(_podCode) ? "/" : "") + _podCode;
 
                 //Qty lấy theo Housebill
                 data.Qty = item.PackageQty ?? 0;

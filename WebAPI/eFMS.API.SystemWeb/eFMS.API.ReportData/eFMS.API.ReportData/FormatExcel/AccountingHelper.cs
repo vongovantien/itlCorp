@@ -3393,7 +3393,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
                 workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
-                     
+
+            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            workSheet.View.FreezePanes(2, 1);
+
             rowStart += 1;
             foreach(var item in acctMngts)
             {               
