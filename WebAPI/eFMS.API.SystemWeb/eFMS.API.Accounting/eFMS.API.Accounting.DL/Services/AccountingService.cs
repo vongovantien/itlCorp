@@ -385,9 +385,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                                                                                              // 15709
                                                                                              AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo,item.Payee),
-                                                                                             RefundAmount = null, // 2 câu queryAble lồng nhau không đc => Tính bên dưới.
+                                                                                             RefundAmount = null, // Logic bên dưới
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
-                                                                                             IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
+                                                                                             IsRefund = 0,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
                                                                                              HblId = surcharge.Hblid,
                                                                                              ClearanceNo = surcharge.ClearanceNo
@@ -396,14 +396,32 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 item.Details = querySettlementReq.ToList();
 
+                                // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
+                                bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
+                              
                                 item.Details.ForEach((x) =>
                                 {
-                                    AdvanceInfo AdvanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, x.HblId.ToString(), item.CurrencyCode, x.AdvanceNo, x.ClearanceNo);
+                                    if(hasAdvancePayment == true)
+                                    {
+                                        x.IsRefund = 1;
+                                    }
+                                    else
+                                    {
+                                        x.IsRefund = 0;
+                                    }
+                                    if(!string.IsNullOrEmpty(x.AdvanceNo))
+                                    {
+                                        AdvanceInfo AdvanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, x.HblId.ToString(), item.CurrencyCode, x.AdvanceNo, x.ClearanceNo);
 
-                                    x.RefundAmount = AdvanceInfo?.TotalAmount ?? 0;
-
+                                        x.RefundAmount = AdvanceInfo?.TotalAmount ?? 0;
+                                    }
+                                    else
+                                    {
+                                        x.RefundAmount = null;
+                                    }
                                 });
-                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai
+
+                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai để phát sinh thêm các dòng Balance
                                 List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1)
                                     .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
                                     .Select(d => new BravoSettlementRequestModel {
