@@ -703,7 +703,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (ShipmentSettlement item in dataGroups)
             {
                 // Lấy thông tin advance theo group settlement.
-                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.MBL, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
+                AdvanceInfo advInfo = GetAdvanceBalanceInfo(item.SettlementNo, item.HblId.ToString(), item.CurrencyShipment, item.AdvanceNo, item.CustomNo);
 
                 int roundDecimal = 0;
                 if (item.CurrencyShipment != AccountingConstants.CURRENCY_LOCAL)
@@ -785,14 +785,14 @@ namespace eFMS.API.Accounting.DL.Services
             return files;
         }
 
-        public AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _mbl, string _hbl, string _settleCurrency, string _advanceNo, string _clearanceNo = null)
+        public AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo,  string _hbl, string _settleCurrency, string _advanceNo, string _clearanceNo = null)
         {
             AdvanceInfo result = new AdvanceInfo();
             string advNo = null, customNo = null;
             IQueryable<CsShipmentSurcharge> surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo);
             var surchargeGrpBy = surcharges.GroupBy(x => new { x.Hblid, x.Mblno, x.Hblno, x.AdvanceNo, x.ClearanceNo }).ToList();
 
-            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.Mblno == _mbl && x.Key.ClearanceNo == _clearanceNo);
+            var surchargeGrp = surchargeGrpBy.Where(x => x.Key.Hblid.ToString() == _hbl && x.Key.ClearanceNo == _clearanceNo);
             if (surchargeGrp != null && surchargeGrp.Count() > 0)
             {
                 var advDataMatch = surchargeGrp.Where(x => x.Key.AdvanceNo == _advanceNo);
@@ -805,7 +805,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var advData = from advP in acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                               join advR in acctAdvanceRequestRepo.Get() on advP.AdvanceNo equals advR.AdvanceNo
-                              where advR.Mbl == _mbl && advR.Hblid.ToString() == _hbl && advR.AdvanceNo == advNo
+                              where advR.Hblid.ToString() == _hbl && advR.AdvanceNo == advNo
                               select new
                               {
                                   AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, _settleCurrency), // tính theo tỷ giá ngày request adv và currency settlement
@@ -815,7 +815,7 @@ namespace eFMS.API.Accounting.DL.Services
 
 
                 // Tính total amount của settlement theo adv đó.
-                IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo && x.AdvanceNo == advNo && x.Mblno == _mbl && x.Hblid.ToString() == _hbl);
+                IQueryable<CsShipmentSurcharge> surChargeToCalculateAmount = csShipmentSurchargeRepo.Get(x => x.SettlementCode == _settlementNo && x.AdvanceNo == advNo && x.Hblid.ToString() == _hbl);
                 //result.TotalAmount = surChargeToCalculateAmount.Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, _settleCurrency));
                 if (_settleCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -1856,7 +1856,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (!string.IsNullOrEmpty(item.AdvanceNo))
                     {
-                        AdvanceInfo advInfo = GetAdvanceBalanceInfo(settlementNo, item.MBL, item.HblId.ToString(), currency, item.AdvanceNo, item.CustomNo);
+                        AdvanceInfo advInfo = GetAdvanceBalanceInfo(settlementNo, item.HblId.ToString(), currency, item.AdvanceNo, item.CustomNo);
                         _totalAdvanceAmount += advInfo.AdvanceAmount ?? 0;
                     }
                 }
