@@ -1,73 +1,66 @@
 import { Directive, OnDestroy, ElementRef, ViewContainerRef, Input } from '@angular/core';
 import { Overlay, OverlayRef, OverlayConfig } from '@angular/cdk/overlay';
+import { OVERLAY_POSITION_MAP } from '@constants';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { Subscription, merge } from 'rxjs';
 
+import { Subscription, merge } from 'rxjs';
+import { IDropdownPanel } from '@common';
 @Directive({
     selector: '[dropdownToggle]',
     host: {
         '(click)': 'toggleDropdown()'
-    }
+    },
 })
 export class DropdownToggleDirective implements OnDestroy {
 
-    @Input('dropdownToggle') public dropdownPanel: any;
+    @Input('dropdownToggle') public dropdownPanel: IDropdownPanel;
 
     private isOpenDropdown: boolean = false;
     private overlayRef: OverlayRef;
-
-    private readonly overlayConfig: OverlayConfig = {
-        hasBackdrop: true,
-        backdropClass: 'cdk-overlay-dropdown-backdrop',
-        scrollStrategy: this._overlay.scrollStrategies.close(),
-        positionStrategy: this._overlay
-            .position()
-            .flexibleConnectedTo(this._elementRef)
-            .withPositions([
-                {
-                    originX: 'end',
-                    originY: 'bottom',
-                    overlayX: 'end',
-                    overlayY: 'top',
-                    offsetY: 8
-                }
-            ])
-    };
-
     private dropdownClosingActions$: Subscription = Subscription.EMPTY;
 
-    private readonly templatePortal: TemplatePortal<any> = new TemplatePortal(
-        this.dropdownPanel.templateRef,
-        this._viewContainerRef
-    );
-
+    private get overlayConfig(): OverlayConfig {
+        return new OverlayConfig({
+            hasBackdrop: true,
+            backdropClass: 'cdk-overlay-dropdown-backdrop',
+            scrollStrategy: this._overlay.scrollStrategies.close(),
+            positionStrategy: this._overlay
+                .position()
+                .flexibleConnectedTo(this._elementRef)
+                .withPositions([
+                    OVERLAY_POSITION_MAP.bottomLeft
+                ])
+        });
+    }
     constructor(
         private readonly _overlay: Overlay,
         private readonly _elementRef: ElementRef<HTMLElement>,
-        private readonly _viewContainerRef: ViewContainerRef
+        private readonly _viewContainerRef: ViewContainerRef,
     ) { }
 
 
-    toggleDropdown() {
+    public toggleDropdown() {
         this.isOpenDropdown ? this.destroyDropdown() : this.openDropdown();
     }
 
-    openDropdown() {
+    private openDropdown() {
         this.isOpenDropdown = true;
 
         this.overlayRef = this._overlay.create(this.overlayConfig);
 
-        this.overlayRef.attach(this.templatePortal);
-
+        this.overlayRef.attach(new TemplatePortal(
+            this.dropdownPanel.templateRef,
+            this._viewContainerRef
+        ));
 
         // Listen Event Closing
-        this.dropdownClosingActions$ = this.onClosingDropdown()
+        this.onClosingDropdown()
             .subscribe(
                 () => this.destroyDropdown()
             );
     }
 
-    destroyDropdown() {
+    private destroyDropdown() {
         if (!this.overlayRef || !this.isOpenDropdown) {
             return;
         }
@@ -78,11 +71,11 @@ export class DropdownToggleDirective implements OnDestroy {
     }
 
     private onClosingDropdown() {
-        const backdropClick$ = this.overlayRef.backdropClick();
+        const backdropClick$ = this.overlayRef.backdropClick(); // ? clickoutside 
         const detachment$ = this.overlayRef.detachments();
-        const dropdownClosed = this.dropdownPanel.closed;
+        const dropdownClosed$ = this.dropdownPanel.closed;   // ? dropdown emit close
 
-        return merge(backdropClick$, detachment$, dropdownClosed);
+        return merge(backdropClick$, detachment$, dropdownClosed$);
     }
 
 
