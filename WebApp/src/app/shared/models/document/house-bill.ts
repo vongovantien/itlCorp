@@ -165,6 +165,7 @@ export class HouseBill extends BaseModel {
     deliveryDate: any = null;
     note: string = null;
     referenceNoProof = null;
+    incotermId: string = null;
     constructor(object?: any) {
         super();
         const self = this;

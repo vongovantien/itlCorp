@@ -5,7 +5,7 @@ import { formatDate } from '@angular/common';
 
 import { CatalogueRepo, SystemRepo, DocumentationRepo } from '@repositories';
 import { CommonEnum } from '@enums';
-import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote } from '@models';
+import { User, CsTransactionDetail, CsTransaction, Customer, CountryModel, PortIndex, csBookingNote, Incoterm } from '@models';
 import { JobConstants, ChargeConstants, SystemConstants } from '@constants';
 import { AppComboGridComponent, InfoPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
@@ -78,6 +78,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     countries: Observable<CountryModel[]>;
     ports: Observable<PortIndex[]>;
     agents: Observable<Customer[]>;
+    incoterms: Observable<Incoterm[]>;
+
 
     serviceTypes: string[] = JobConstants.COMMON_DATA.SERVICETYPES;
     ladingTypes: string[] = JobConstants.COMMON_DATA.BILLOFLADINGS;
@@ -112,7 +114,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     ngOnInit() {
         this.initForm();
         this.getSaleMans();
-
+        this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
         if (this.type === ChargeConstants.SLE_CODE) {
             this.getCSBookingNotes();
         }
@@ -188,6 +190,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
                             placeReceipt: this.shipmmentDetail.polName,
                             podDescription: !!this.shipmmentDetail.podDescription ? this.shipmmentDetail.podDescription : this.shipmmentDetail.podName,
                             polDescription: !!this.shipmmentDetail.polDescription ? this.shipmmentDetail.polDescription : this.shipmmentDetail.polName,
+                            incotermId: this.shipmmentDetail.incotermId
                         });
 
                         if (!!this.shipmmentDetail.bookingNo) {
@@ -309,6 +312,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             shippingMark: [],
             inWord: [],
             onBoardStatus: [],
+            incotermId: []
 
         },
             { validator: FormValidators.comparePort }
@@ -569,10 +573,10 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
     }
 
-    updateOnboardStatus(){
-        if(!!this.issueHbldate.value && !!this.formCreate.controls['onBoardStatus'].value){
+    updateOnboardStatus() {
+        if (!!this.issueHbldate.value && !!this.formCreate.controls['onBoardStatus'].value) {
             let onBoardStatus = this.formCreate.controls['onBoardStatus'].value.split(/\n/).filter(item => item.trim() !== '').map(item => item.trim());
-            if(onBoardStatus.length >1){
+            if (onBoardStatus.length > 1) {
                 onBoardStatus = onBoardStatus[1].split(',').map(item => item.trim());
                 this.formCreate.controls['onBoardStatus'].setValue(this.setDefaultOnboard(onBoardStatus[0], onBoardStatus[1], this.issueHbldate.value.startDate));
             }

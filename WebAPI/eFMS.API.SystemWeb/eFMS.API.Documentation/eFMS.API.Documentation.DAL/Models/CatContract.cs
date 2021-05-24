@@ -40,5 +40,6 @@ namespace eFMS.API.Documentation.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public string CurrencyId { get; set; }
         public bool? CreditUnlimited { get; set; }
+        public string CreditCurrency { get; set; }
     }
 }
