@@ -163,15 +163,15 @@
                                             </ng-template>
 
                                             <span class="dropdown m-dropdown m-dropdown--inline m-0">
-                                                <i class="la la-file-text" data-toggle="dropdown"></i>
-                                                <div class="dropdown-menu">
+                                                <i class="la la-file-text" [dpToggle]="dropdownMenuPreviewPl"></i>
+                                                <app-dropdown #dropdownMenuPreviewPl>
                                                     <a class="dropdown-item pointer"
                                                         (click)="previewPLsheet(surcharge,'USD')">Preview PL with
                                                         USD</a>
                                                     <a class="dropdown-item pointer"
                                                         (click)="previewPLsheet(surcharge,'VND')">Preview PL with
                                                         VND</a>
-                                                </div>
+                                                </app-dropdown>
                                             </span>
                                             <ng-template #locktpl>
                                                 <span class="d-block" style="width:25px"></span>

@@ -21,13 +21,13 @@
                 </span>
             </ng-template>
             <a class="dropdown m-dropdown m-dropdown--inline">
-                <i class="la la-file-text" data-toggle="dropdown"></i>
-                <div class="dropdown-menu">
+                <i class="la la-file-text" [dpToggle]="dropdownMenuShipmentItem"></i>
+                <app-dropdown #dropdownMenuShipmentItem>
                     <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'USD')">Preview
                         PL with USD</a>
                     <a class="dropdown-item pointer" ClickStopPropagation (click)="previewPLsheet($event,'VND')">Preview
                         PL with VND</a>
-                </div>
+                </app-dropdown>
             </a>
         </div>
     </div>

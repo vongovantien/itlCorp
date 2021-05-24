@@ -6,7 +6,8 @@
                 <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" mode="approve">
                     <span *ngIf="!!advancePayment && !!advancePayment.syncStatus"
                         class="m-badge m-badge--{{advancePayment.syncStatus === 'Synced' ?'success' : 'danger'}} m-badge--wide">
-                        {{advancePayment.syncStatus}}{{advancePayment.syncStatus === 'Rejected' && advancePayment.reasonReject ? ' - ' + advancePayment.reasonReject : ''}}
+                        {{advancePayment.syncStatus}}{{advancePayment.syncStatus === 'Rejected' &&
+                        advancePayment.reasonReject ? ' - ' + advancePayment.reasonReject : ''}}
                     </span>
 
                     <!-- ? Cho phép người có quyền approve chỉnh sửa -->
@@ -112,19 +113,18 @@
                                     </span>
                                 </button>
                                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                                    <app-default-button data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false" [buttonSetting]="previewButtonSetting">
+                                    <app-default-button [dpToggle]="dropdownMenu"
+                                        [buttonSetting]="previewButtonSetting">
                                     </app-default-button>
-                                    <div class="dropdown-menu" aria-labelledby="">
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="previewAdvPayment()">Preview single</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportAdvPayment('VN')">Print multiple
+
+                                    <app-dropdown #dropdownMenu>
+                                        <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
+                                            single</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple
                                             (VN)</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportAdvPayment('ENG')">Print multiple
-                                            (ENG)</a>
-                                    </div>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print
+                                            multiple (ENG)</a>
+                                    </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                                 </app-default-button>

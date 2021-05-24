@@ -6,14 +6,14 @@ import { TemplatePortal } from '@angular/cdk/portal';
 import { Subscription, merge } from 'rxjs';
 import { IDropdownPanel } from '@common';
 @Directive({
-    selector: '[dropdownToggle]',
+    selector: '[dpToggle]',
     host: {
         '(click)': 'toggleDropdown()'
     },
 })
 export class DropdownToggleDirective implements OnDestroy {
 
-    @Input('dropdownToggle') public dropdownPanel: IDropdownPanel;
+    @Input('dpToggle') public dropdownPanel: IDropdownPanel;
 
     private isOpenDropdown: boolean = false;
     private overlayRef: OverlayRef;
@@ -78,12 +78,9 @@ export class DropdownToggleDirective implements OnDestroy {
         return merge(backdropClick$, detachment$, dropdownClosed$);
     }
 
-
     ngOnDestroy(): void {
         if (this.overlayRef) {
             this.overlayRef.dispose();
         }
     }
-
-
 }

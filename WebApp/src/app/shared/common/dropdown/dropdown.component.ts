@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, EventEmitter, ViewChild, Output } from '@angular/core';
+import { Component, OnInit, TemplateRef, EventEmitter, ViewChild, Output, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'app-dropdown',
@@ -18,14 +18,16 @@ import { Component, OnInit, TemplateRef, EventEmitter, ViewChild, Output } from 
             min-width: 10rem;
             padding: .5rem 0;
             font-size: 1rem;
-            color: #212529;
+            /* color: #212529; */
+            color: #575962;
             text-align: left;
             list-style: none;   
             background-clip: padding-box;
             background: #fff
+           
         }
-    
-    `]
+    `],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppDropdownComponent implements OnInit, IDropdownPanel {
 
