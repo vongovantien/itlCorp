@@ -38,6 +38,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
     @ViewChild('confirmSave') confirmPopup: ConfirmPopupComponent;
     @ViewChild('confirmSaveExistedHbl') confirmExistedHbl: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
+    @ViewChild('infoPopupHbl') infoPopupHbl: InfoPopupComponent;
     @ViewChild(ShareBusinessAttachListHouseBillComponent) attachListComponent: ShareBusinessAttachListHouseBillComponent;
     @ViewChild(ShareBusinessImportHouseBillDetailComponent) importHouseBillPopup: ShareBusinessImportHouseBillDetailComponent;
     @ViewChild(ShareBusinessProofOfDelieveyComponent, { static: true }) proofOfDeliveryComponent: ShareBusinessProofOfDelieveyComponent;
@@ -126,17 +127,22 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.infoPopup.show();
                             return null;
                         }
-                        return forkJoin([this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
+                        return forkJoin([this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
                     }
                     )).subscribe(result => {
-                        if (result[0]) {
-                            this.confirmExistedHbl.show();
+                        if (!!result && result.length > 0) {
+                            this.infoPopupHbl.class = 'bg-danger';
+                            let jobNo = '';
+                            result.forEach(element => {
+                                jobNo += element + '<br>';
+                            });
+                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
+                            this.infoPopupHbl.show();
+                            //this.confirmExistedHbl.show();
                         } else {
                             const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);
-
                             this.createHbl(houseBill);
-
                         }
                     }
                     );
@@ -145,12 +151,19 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                 this.infoPopup.show();
                 return;
             }
-            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
+            this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: any) => {
-                        if (res) {
-                            this.confirmExistedHbl.show();
+                        if (!!res && res.length > 0) {
+                            this.infoPopupHbl.class = 'bg-danger';
+                            let jobNo = '';
+                            res.forEach(element => {
+                                jobNo += element + '<br>';
+                            });
+                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
+                            this.infoPopupHbl.show();
+                            //this.confirmExistedHbl.show();
                         } else {
                             const houseBill: HouseBill = this.getDataForm();
                             this.setData(houseBill);

@@ -349,11 +349,20 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12 ">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label>Route</label>
                                 <input type="text" class="form-control" formControlName="route">
                             </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Incoterm</label>
+                                <ng-select class="custom" [items]="incoterms | async" bindLabel="code" bindValue="id"
+                                    [clearable]="true" formControlName="incotermId" placeholder="Select Incoterm">
+                                </ng-select>
+                            </div>
+
                         </div>
                         <div class="col-md-12 ">
                             <div class="form-group">

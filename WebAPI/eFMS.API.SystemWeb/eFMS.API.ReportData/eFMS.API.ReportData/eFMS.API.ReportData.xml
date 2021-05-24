@@ -364,6 +364,24 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.ReportData.Controllers.SettingReportController">
+            <summary>
+            Setting Report Controller
+            </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SettingReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
+            <summary>
+            Contructor controller Setting Report
+            </summary>
+            <param name="appSettings"></param>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.SettingReportController.ExportUnlockRequest(eFMS.API.ReportData.Models.Criteria.UnlockRequestCriteria)">
+            <summary>
+            Export List Unlock Request
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.SystemReportController.#ctor(Microsoft.Extensions.Options.IOptions{eFMS.API.ReportData.Models.APIs})">
             <summary>
             
@@ -684,6 +702,30 @@
         </member>
         <member name="T:eFMS.API.ReportData.Models.FilesNames">
             <summary>Supports all classes in the .NET Framework class hierarchy and provides low-level services to derived classes. This is the ultimate base class of all classes in the .NET Framework; it is the root of the type hierarchy.</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalSellCFSFee">
+            <summary>Origin Container Freight Station Fee</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalSellEBSFee">
+            <summary>Security EBS</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalSellCustomFee">
+            <summary>Total Pick up charge + Customs fee</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalBuyTerminal">
+            <summary>BUYING</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalBuyCFSFee">
+            <summary>Origin Container Freight Station Fee</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalBuyEBSFee">
+            <summary>Security EBS</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.TotalBuyCustomFee">
+            <summary>Total Pick up charge + Customs fee</summary>
+        </member>
+        <member name="P:eFMS.API.Documentation.DL.Models.ExportShipmentOverviewFCL.Incoterm">
+            <summary>Incoterm</summary>
         </member>
     </members>
 </doc>

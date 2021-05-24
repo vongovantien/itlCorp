@@ -76,7 +76,8 @@ export class AccountingDetailCdNoteComponent extends PopupBase implements OnInit
         { title: "Credit Value", field: 'credit', sortable: true },
         { title: "Debit Value", field: 'debit', sortable: true },
         { title: 'Note', field: 'notes', sortable: true },
-        { title: 'Exc Rate', field: 'exchangeRate', sortable: true }
+        { title: 'Exc Rate', field: 'exchangeRate', sortable: true },
+        { title: 'Synced From', field: 'syncedFromBy', sortable: true }
     ];
     balanceAmount: string = '';
     totalCredit: string = '';

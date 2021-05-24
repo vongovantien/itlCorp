@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace eFMS.API.Setting.DL.Services
 {
@@ -614,5 +616,63 @@ namespace eFMS.API.Setting.DL.Services
             return detail;
         }
         #endregion --- DETAIL ---
+
+        #region -- EXPORT --
+        public List<UnlockRequestExport> GetUnlockRequestsExport(UnlockRequestCriteria criteria)
+        {
+            var queryUnlockRequest = ExpressionQuery(criteria);
+            var dataUnlockRequests = GetDataUnlockRequest(criteria);
+            if (dataUnlockRequests == null) return null;
+            var unlockRequests = dataUnlockRequests.Where(queryUnlockRequest);
+
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                var unlockRequestJobs = setUnlockRequestJobRepo.Get(x => criteria.ReferenceNos.Contains(x.UnlockName));
+                unlockRequests = unlockRequests.Join(unlockRequestJobs, u => u.Id, j => j.UnlockRequestId, (u, j) => u);
+            }
+
+            var users = userRepo.Get();            
+            var unlockJobs = setUnlockRequestJobRepo.Get();
+            var unlockApproves = setUnlockRequestApproveRepo.Get(x => x.IsDeny == false);
+
+            //Order by giảm dần theo ngày Modified của UnlockRequest
+            var query = from job in unlockJobs
+                        join unlock in unlockRequests on job.UnlockRequestId equals unlock.Id
+                        join approve in unlockApproves on unlock.Id equals approve.UnlockRequestId into approveGrp
+                        from approve in approveGrp.DefaultIfEmpty()
+                        join user in users on unlock.Requester equals user.Id
+                        orderby unlock.DatetimeModified descending
+                        select new UnlockRequestExport
+                        {
+                            SubjectUnlock = unlock.Subject,
+                            DescriptionUnlock = job.UnlockName,
+                            ReferenceNo = job.Job,
+                            UnlockType = unlock.UnlockType,
+                            ChangeServiceDate = unlock.NewServiceDate,
+                            RequestDate = unlock.RequestDate,
+                            UnlockDate = approve != null ? approve.DatetimeModified : null,
+                            Requester = user.Username,
+                            ReasonDetail = job.Reason,
+                            GeneralReason = DecodeHtmlGeneralReason(unlock.GeneralReason)
+                        };
+            return query.ToList();
+        }
+
+        private string DecodeHtmlGeneralReason(string generalReason)
+        {
+            string result = string.Empty;
+            if (!string.IsNullOrEmpty(generalReason))
+            {
+                Regex reg = new Regex("<[^>]+>", RegexOptions.IgnoreCase);
+                result = reg.Replace(generalReason, " ");
+                result = result.Replace("\r","");
+                result = result.Replace("\n", "");
+                result = result.Replace("\t", "").Trim();
+                //Decode special character codes of HTML string
+                result = WebUtility.HtmlDecode(result);
+            }
+            return result;
+        }
+        #endregion -- EXPORT --
     }
 }
