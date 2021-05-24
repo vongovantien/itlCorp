@@ -60,6 +60,7 @@
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
         public static readonly string PAYMENT_METHOD_OTHER = "Other";
+        public static readonly string PAYMENT_METHOD_NETOFF_SHPT = "NETOFF_SHPT";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --

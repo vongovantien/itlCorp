@@ -18,9 +18,13 @@ namespace eFMS.API.ReportData.Models
         public string UserCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
         public string AccountNo { get; set; }
         public string Author { get; set; }
         public string PartnerType { get; set; }
+        public string Saleman { get; set; }
+        public DateTime? DatetimeCreatedFrom { get; set; }
+        public DateTime? DatetimeCreatedTo { get; set; }
     }
     public enum CatPartnerGroupEnum
     {

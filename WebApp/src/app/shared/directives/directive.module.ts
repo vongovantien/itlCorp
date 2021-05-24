@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {
-    AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
-    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective
+    AutofocusDirective, TwoDigitDecimaNumberDirective, SpecialCharacterDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
+    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, IntergerInputDirective
 } from '.';
 import { CurrencyPipe } from '@angular/common';
 
@@ -10,7 +10,6 @@ const APP_DIRECTIVES = [
     TwoDigitDecimaNumberDirective,
     IntergerInputDirective,
     SpecialCharacterDirective,
-    EcusSpecicalCharacterNoSpaceDirective,
     DecimalNumberGreaterThan0Directive,
     ClickOutSideDirective,
     LoadModuleDirective,
@@ -24,7 +23,8 @@ const APP_DIRECTIVES = [
     IConClearCalendarDirective,
     DisabledControlDirective,
     HasOwnerPermissionDirective,
-    ClickStopPropagationDirective
+    ClickStopPropagationDirective,
+    FormatDecimalFormControlDirective
 ];
 @NgModule({
     declarations: [
