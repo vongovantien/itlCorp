@@ -1,4 +1,5 @@
-import { Action } from '@ngrx/store';
+import { createAction, props } from '@ngrx/store';
+import { ISearchCustomClearance } from '../../custom-clearance/components/form-search-custom-clearance/form-search-custom-clearance.component';
 
 
 export enum ClearanceActionTypes {
@@ -13,25 +14,7 @@ export enum ClearanceActionTypes {
     GET_DETAIL_FAIL = '[Custom Declaration] Get Detail Fail',
 };
 
-export class CustomsDeclarationSearchListAction implements Action {
-    readonly type = ClearanceActionTypes.SEARCH_LIST;
-    constructor(public payload: any) { }
-}
-export class CustomsDeclarationLoadListAction implements Action {
-    readonly type = ClearanceActionTypes.LOAD_LIST;
-    constructor(public payload: CommonInterface.IParamPaging) { }
-}
-export class CustomsDeclarationLoadListSuccessAction implements Action {
-    readonly type = ClearanceActionTypes.LOAD_LIST_SUCCESS;
-    constructor(public payload: any) { }
-}
 
-
-/**
- * Export a type alias of all actions in this action group
- * so that reducers can easily compose action types
- */
-export type ClearanceActions
-    = CustomsDeclarationSearchListAction
-    | CustomsDeclarationLoadListAction
-    | CustomsDeclarationLoadListSuccessAction;
+export const CustomsDeclarationSearchListAction = createAction(ClearanceActionTypes.SEARCH_LIST, props<Partial<ISearchCustomClearance>>());
+export const CustomsDeclarationLoadListAction = createAction(ClearanceActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
+export const CustomsDeclarationLoadListSuccessAction = createAction(ClearanceActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
