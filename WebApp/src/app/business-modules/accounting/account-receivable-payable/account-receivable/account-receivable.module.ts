@@ -23,7 +23,7 @@ const routing: Routes = [
                 data: { name: '' },
             },
             {
-                path: ":key", component: AccountReceivableDetailComponent,
+                path: "detail", component: AccountReceivableDetailComponent,
                 data: { name: 'Detail' }
             },
         ]
