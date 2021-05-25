@@ -388,9 +388,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                                                                                              // 15709
                                                                                              AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo,item.Payee),
-                                                                                             RefundAmount = null, // 2 câu queryAble lồng nhau không đc => Tính bên dưới.
+                                                                                             RefundAmount = null, // Logic bên dưới
                                                                                              Stt_Cd_Htt = GetAdvanceRefNo(surcharge.AdvanceNo, surcharge.Hblid),
-                                                                                             IsRefund = string.IsNullOrEmpty(surcharge.AdvanceNo) ? 0 : 1,
+                                                                                             IsRefund = 0,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
                                                                                              HblId = surcharge.Hblid,
                                                                                              ClearanceNo = surcharge.ClearanceNo
@@ -399,14 +399,32 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 item.Details = querySettlementReq.ToList();
 
+                                // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
+                                bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
+                              
                                 item.Details.ForEach((x) =>
                                 {
-                                    AdvanceInfo AdvanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, x.HblId.ToString(), item.CurrencyCode, x.AdvanceNo, x.ClearanceNo);
+                                    if(hasAdvancePayment == true)
+                                    {
+                                        x.IsRefund = 1;
+                                    }
+                                    else
+                                    {
+                                        x.IsRefund = 0;
+                                    }
+                                    if(!string.IsNullOrEmpty(x.AdvanceNo))
+                                    {
+                                        AdvanceInfo AdvanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, x.HblId.ToString(), item.CurrencyCode, x.AdvanceNo, x.ClearanceNo);
 
-                                    x.RefundAmount = AdvanceInfo?.TotalAmount ?? 0;
-
+                                        x.RefundAmount = AdvanceInfo?.TotalAmount ?? 0;
+                                    }
+                                    else
+                                    {
+                                        x.RefundAmount = null;
+                                    }
                                 });
-                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai
+
+                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl,số tạm ứng, tờ khai để phát sinh thêm các dòng Balance
                                 List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => x.IsRefund == 1)
                                     .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
                                     .Select(d => new BravoSettlementRequestModel {
@@ -1584,12 +1602,13 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return customerName;
         }
-        private string GetLinkCdNote(string cdNoteNo, Guid jobId)
+
+        private string GetLinkCdNote(string cdNoteNo, Guid jobId, string currency)
         {
             string _link = string.Empty;
             if (cdNoteNo.Contains("CL"))
             {
-                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE", jobId.ToString());
+                _link = string.Format("home/operation/job-management/job-edit/{0}?tab=CDNOTE&view={1}&export={2}", jobId.ToString(), cdNoteNo, currency);
             }
             else
             {
@@ -1630,7 +1649,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     prefixService += "sea-lcl-import";
                 }
-                _link = string.Format(@"{0}/{1}?tab=CDNOTE", prefixService, jobId.ToString());
+                _link = string.Format(@"{0}/{1}?tab=CDNOTE&view={2}&export={3}", prefixService, jobId.ToString(), cdNoteNo, currency);
             }
             return _link;
         }
@@ -2208,7 +2227,7 @@ namespace eFMS.API.Accounting.DL.Services
                         serviceName = GetServiceNameOfCdNote(creditNote.Code);
                         var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.CreditNo == creditNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
-                        urlFunc = GetLinkCdNote(creditNote.Code, creditNote.JobId);
+                        urlFunc = GetLinkCdNote(creditNote.Code, creditNote.JobId, creditNote.CurrencyId);
 
                         catagory = "CDNOTE_CREDIT";
                         var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(creditNote.UserCreated);
@@ -2288,7 +2307,7 @@ namespace eFMS.API.Accounting.DL.Services
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
                         var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
-                        urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId);
+                        urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId, debitNote.CurrencyId);
 
                         catagory = "CDNOTE_" + debitNote.Type;
                         var employeeIdCreator = userBaseService.GetEmployeeIdOfUser(debitNote.UserCreated);
