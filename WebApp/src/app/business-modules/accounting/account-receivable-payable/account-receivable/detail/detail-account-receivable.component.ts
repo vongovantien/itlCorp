@@ -95,7 +95,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     goBack() {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`],
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`],
             { queryParams: { subTab: this.subTab } });
     }
 }

@@ -70,14 +70,14 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     viewDetail(agreementId: string, partnerId: string) {
 
         if (!!agreementId) {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
                 queryParams: {
                     agreementId: agreementId,
                     subTab: 'other',
                 }
             });
         } else {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
                 queryParams: {
                     partnerId: partnerId,
                     subTab: 'other',

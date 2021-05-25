@@ -19,12 +19,6 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-                            <ng-container
-                                *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
-                                <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
-                                    (onClick)="submitClick('update')">
-                                </app-permission-button>
-                            </ng-container>
 
                             <ng-container
                                 *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
@@ -57,6 +51,12 @@
                 </customer-payment-list-receipt>
 
                 <div class="c-button-actions text-center">
+                    <ng-container
+                        *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                        <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
+                            (onClick)="submitClick('update')">
+                        </app-permission-button>
+                    </ng-container>
                     <ng-container
                         *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button type="save" title="Done" class="success"
