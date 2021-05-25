@@ -3868,7 +3868,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = acctAdvancePaymentService.GetAdvancesOfShipment(shipment.JobId).Where(x => x.Requester == currentUser.UserID).FirstOrDefault()?.AdvanceNo;
+                var advance = GetListAdvanceNoForShipment(shipment.HBLID)?.FirstOrDefault();
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();

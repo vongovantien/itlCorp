@@ -377,7 +377,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     checkAllowUpdateExistingCharge() {
         const userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        const allowUpdate = this.STATE === 'WRITE' &&  userLogged.id === this.requester;
+        const allowUpdate = this.STATE === 'WRITE' && userLogged.id === this.requester;
         return allowUpdate;
     }
 
@@ -440,10 +440,10 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                         }
                     });
                     if (!!this.settlementCode) {
-                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo, this.settlementCode);
+                        this.tableListChargePopup.getAdvances(shipment.jobId, shipment.hblid, !!charge.advanceNo, this.settlementCode);
 
                     } else {
-                        this.tableListChargePopup.getAdvances(shipment.jobId, !!charge.advanceNo);
+                        this.tableListChargePopup.getAdvances(shipment.jobId, shipment.hblid, !!charge.advanceNo);
                     }
 
                     const selectedCD = this.tableListChargePopup.cds.find(x => x.clearanceNo === surcharges[0].clearanceNo);
