@@ -3369,12 +3369,12 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion -- Check Exist, Check Is Manager, Is Approved --
 
-        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string jobId, string settlementCode)
+        public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string jobId, Guid _HblId, string settlementCode)
         {
             //Advance Payment has Status Approve is Done
             var request = from ar in acctAdvanceRequestRepo.Get()
                           join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
-                          where ar.JobId == jobId
+                          where ar.JobId == jobId && ar.Hblid == _HblId
                           select new { ar.AdvanceNo, ar.Hbl, ar.Amount, ar.RequestCurrency, ar.JobId, ar.Hblid, ar.Mbl };
 
             IQueryable<OpsTransaction> opsShipment = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
