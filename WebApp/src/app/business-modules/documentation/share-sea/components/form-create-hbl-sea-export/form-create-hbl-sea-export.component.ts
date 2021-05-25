@@ -437,6 +437,15 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             polDescription: data.polDescription,
             podDescription: data.podDescription,
         });
+        
+        this.ports.pipe().subscribe(
+            (ports: PortIndex[])=> {
+                let portIndex = ports.filter((x: PortIndex)=> x.id === data.pol)[0];
+                this.onSelectDataFormInfo(portIndex, 'pol');
+                portIndex = ports.filter((x: PortIndex)=> x.id === data.pod)[0];
+                this.onSelectDataFormInfo(portIndex, 'pod');
+            }
+        )
     }
 
     onSelectDataFormInfo(data: any, type: string) {
