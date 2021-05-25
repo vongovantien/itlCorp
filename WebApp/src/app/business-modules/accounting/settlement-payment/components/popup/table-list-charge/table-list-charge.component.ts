@@ -176,8 +176,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             );
     }
 
-    getAdvances(jobNo: string, isUpdateFControl: boolean = true, settleCode: string = null) {
-        this._accountingRepo.getAdvanceOfShipment(jobNo, settleCode)
+    getAdvances(jobNo: string, hblId: string, isUpdateFControl: boolean = true, settleCode: string = null) {
+        this._accountingRepo.getAdvanceOfShipment(jobNo, hblId, settleCode)
             .pipe(
                 catchError(this.catchError),
                 map((res: IAdvanceShipment[]) => {
@@ -269,7 +269,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 this.resetAdvanceData();
 
                 this.customNo.setValue(null);
-                this.getAdvances(this.selectedShipment.jobId, true, this.settlementCode);
+                this.getAdvances(this.selectedShipment.jobId, this.selectedShipment.hblid, true, this.settlementCode);
 
                 this.shipment.setValue(this.selectedShipment.hblid);
 
@@ -325,7 +325,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         }
                     }
 
-                    this.getAdvances(data.jobNo, true, this.settlementCode);
+                    this.getAdvances(data.jobNo, data.hblId, true, this.settlementCode);
 
                 } else {
                     this.selectedAdvance = null;
