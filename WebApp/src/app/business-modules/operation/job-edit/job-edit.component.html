@@ -126,9 +126,9 @@
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                         </ng-container>
                     </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('cre-debit-note')"
-                        [disabled]="isDuplicate">
-                        <ng-container *ngIf="tab === 'cre-debit-note'" loadModule="cdNote">
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('CDNOTE')"
+                        [disabled]="isDuplicate" [active]="tab === 'CDNOTE'">
+                        <ng-container *ngIf="tab === 'CDNOTE'" loadModule="cdNote">
                         </ng-container>
                     </tab>
                     <tab heading="Stage management" [active]="tab === 'stage'" (selectTab)="selectTab('stage')"

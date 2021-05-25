@@ -49,6 +49,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
 
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
+    params: any;
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,
@@ -75,7 +77,8 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
-                this.selectedTab = !!param.tab ? param.tab.toUpperCase() : 'SHIPMENT';
+                this.params = param;
+                this.selectedTab = (!!param.tab && this.tabList.includes(param.tab.toUpperCase())) ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();
@@ -210,7 +213,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: Object.assign({}, { tab: 'SHIPMENT' }) });
                 break;
             case 'cdNote':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'CDNOTE', view: this.params.view, export: this.params.export } });
                 break;
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
