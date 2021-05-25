@@ -56,7 +56,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
     pod: AbstractControl;
     polDescription: AbstractControl;
     podDescription: AbstractControl;
-    freightCharge: AbstractControl;
+    // freightCharge: AbstractControl;
     goodsDelivery: AbstractControl;
     goodsDeliveryDescription: AbstractControl;
     forwardingAgent: AbstractControl;
@@ -430,7 +430,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             inWord: data.inWord,
             onBoardStatus: data.onBoardStatus,
             originBlnumber: data.originBlnumber,
-            freightCharge: data.freightPayment,
+            freightPayment: data.freightPayment,
             moveType: data.moveType,
             serviceType: data.serviceType,
             hbltype: data.hbltype,
