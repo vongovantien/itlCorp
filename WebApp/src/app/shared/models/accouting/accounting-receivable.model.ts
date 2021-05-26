@@ -12,7 +12,7 @@ export class TrialOfficialOtherModel {
     expriedDate: Date = null;
     expriedDay: number = null;
     creditLimited: number = null;
-    arCurrency: string = null;
+    creditCurrency: string = null;
     
     debitAmount: number = null;
     obhAmount: number = null;
