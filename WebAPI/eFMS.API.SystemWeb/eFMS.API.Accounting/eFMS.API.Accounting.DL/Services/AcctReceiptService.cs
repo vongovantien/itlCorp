@@ -647,25 +647,28 @@ namespace eFMS.API.Accounting.DL.Services
                                 _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
+                                _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
 
                                 // _paymentOBH.PaymentAmountUsd = null;
                                 //_paymentOBH.BalanceUsd = null;
 
-                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
+                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm tiếp theo sau.
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm tiếp theo sau.
                                 results.Add(_paymentOBH);
                             }
                         }
                         else 
                         {
                             AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd ;// Số tiền thu 
-                            _paymentOBH.PaymentAmountUsd = _paymentOBH.PaymentAmountUsd;
-                            _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
+                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
+                            _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
 
-                            // _paymentOBH.PaymentAmountUsd = null;
-                            //_paymentOBH.BalanceUsd = null;
+                            _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; 
+                            _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
+                           
+                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0; 
+                            remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; 
 
-                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
                             results.Add(_paymentOBH);
                         }
                     }
@@ -677,29 +680,28 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; // Số tiền thu 
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; 
                                 _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;
 
-                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; 
+                                _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
 
-                                //_paymentOBH.PaymentAmountVnd = null;
-                                //_paymentOBH.BalanceVnd = null;
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; 
+                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd?? 0; 
 
-                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
                                 results.Add(_paymentOBH);
                             }
                             else
                             {
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd;// Số tiền thu 
-                                _paymentOBH.PaymentAmountVnd = _paymentOBH.PaymentAmountVnd;
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  remainOBHAmountUsd;
+                                _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
 
-                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
 
-                                //_paymentOBH.PaymentAmountVnd = null;
-                                //_paymentOBH.BalanceVnd = null;
+                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
 
-                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
                                 results.Add(_paymentOBH);
                             }
                         }
