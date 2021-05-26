@@ -17,8 +17,7 @@ export * from './hasOwnerPermisison.directive';
 export * from './click-stop-propagation.directive';
 export * from './format-decimal-form-control.directive';
 export * from './interger-input.directive';
-
-
+export * from './dropdown-toggle.directive';
 
 
 
