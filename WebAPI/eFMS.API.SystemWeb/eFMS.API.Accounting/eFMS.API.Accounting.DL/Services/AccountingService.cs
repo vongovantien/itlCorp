@@ -433,7 +433,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         BillEntryNo = d.FirstOrDefault().BillEntryNo,
                                         MasterBillNo = d.FirstOrDefault().MasterBillNo,
                                         DeptCode = d.FirstOrDefault().DeptCode,
-                                        CustomerCodeBook = d.FirstOrDefault().CustomerCodeBook,
+                                        // CustomerCodeBook = d.FirstOrDefault().CustomerCodeBook,
                                         CustomerCodeTransfer= d.FirstOrDefault().CustomerCodeTransfer,
                                         AdvanceNo = d.Key.AdvanceNo,
                                         HblId = d.Key.HblId,
@@ -447,6 +447,8 @@ namespace eFMS.API.Accounting.DL.Services
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
                                         decimal _balance = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
+                                        string _chargeTypeBalance = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod);
+                                        string _customerCodeBook = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee);
                                         if (_balance != 0)
                                         {
                                             // BALANCE
@@ -466,8 +468,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 OriginalUnitPrice = 0,
                                                 OriginalAmount = _originalAmount,
                                                 OriginalAmount3 = 0,
-                                                ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod),
-                                                CustomerCodeBook = reqItem.CustomerCodeBook,
+                                                ChargeType = _chargeTypeBalance,
+                                                CustomerCodeBook = _customerCodeBook,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
                                                 RefundAmount = 0,
                                                 IsRefund = 1
@@ -492,9 +494,9 @@ namespace eFMS.API.Accounting.DL.Services
                                                 OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
                                                 OriginalAmount3 = 0,
                                                 ChargeType = "CLEAR_ADVANCE",
-                                                CustomerCodeBook = reqItem.CustomerCodeBook,
+                                                CustomerCodeBook = _customerCodeBook,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
-                                                AdvanceCustomerCode = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee),
+                                                AdvanceCustomerCode = _customerCodeBook,
                                                 RefundAmount = 0,
                                                 IsRefund = 1
                                             });
@@ -1929,6 +1931,19 @@ namespace eFMS.API.Accounting.DL.Services
                 description = GetCustomerHBL(hblId) + " " + jobId + " " + hbl;
             }
             return description;
+        }
+
+        private string GetPayeeSettlement(string payeeId)
+        {
+            string payeeCode = string.Empty;
+
+            if (!string.IsNullOrEmpty(payeeCode))
+            {
+                CatPartner payee = PartnerRepository.Get(x => x.Id == payeeId)?.FirstOrDefault();
+                payeeCode = payee.AccountNo;
+            }
+
+            return payeeCode;
         }
 
         /// <summary>
