@@ -130,6 +130,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 //Số lượng Service có trong VAT Invoice
                 var qtyService = !string.IsNullOrEmpty(invoice.ServiceType) ? invoice.ServiceType.Split(';').Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
+                qtyService = (qtyService == 0) ? 1 : qtyService;
                 decimal? _unpaidAmount = 0;
                 if (contractCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -168,6 +169,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 //Số lượng Service có trong VAT Invoice
                 var qtyService = !string.IsNullOrEmpty(invoice.ServiceType) ? invoice.ServiceType.Split(';').Where(x => x.ToString() != string.Empty).ToArray().Count() : 1;
+                qtyService = (qtyService == 0) ? 1 : qtyService;
                 decimal? _paidAmount = invoice.PaidAmount;
                 if (contractCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -255,7 +257,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (SELLING) đã issue VAT Invoice
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
@@ -369,7 +370,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
@@ -414,7 +414,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
@@ -629,7 +628,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (SELLING) or phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
@@ -677,7 +675,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (SELLING) or phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
@@ -724,7 +721,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra các phí thu (SELLING) or phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => (x.Type == AccountingConstants.TYPE_CHARGE_SELL || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                                             && string.IsNullOrEmpty(x.InvoiceNo)
                                              && x.AcctManagementId != null);
 
             var invoices = from acctMngt in acctMngts
