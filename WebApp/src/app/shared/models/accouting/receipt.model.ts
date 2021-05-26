@@ -104,6 +104,12 @@ export class ReceiptModel extends Receipt {
     userNameCreated: string = null;
     userNameModified: string = null;
     subRejectReceipt: string = null;
+    cusAdvanceAmount: number = null;
+    paidAmountUsd: number = null;
+    paidAmountVnd: number = null;
+    finalPaidAmountUsd: number = null;
+    finalPaidAmountVnd: number = null;
+    
     constructor(object?: any) {
         super();
         const self = this;

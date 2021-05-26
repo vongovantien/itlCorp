@@ -3,7 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ToastrService } from 'ngx-toastr';
 import { AccountingRepo } from '@repositories';
-import { ReceiptModel } from '@models';
+import { ReceiptInvoiceModel, ReceiptModel } from '@models';
 import { SystemConstants, AccountingConstants, RoutingConstants } from '@constants';
 
 import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
@@ -106,9 +106,20 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     }
 
     updateListInvoice(res: ReceiptModel) {
+        let valueUSD = 0;
+        let valueVND = 0;
+        res.payments.filter((x: ReceiptInvoiceModel)=> x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueUSD += item.unpaidAmountUsd, 0);
+        res.payments.filter((x: ReceiptInvoiceModel)=> x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueVND += item.unpaidAmountVnd, 0);
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
+            cusAdvanceAmount: res.cusAdvanceAmount,
+            amountUSD: valueUSD,
+            amountVND: valueVND,
+            paidAmountUSD: res.paidAmountUsd,
+            paidAmountVND: res.paidAmountVnd,
+            finalPaidAmountUSD: res.finalPaidAmountUsd,
+            finalPaidAmountVND: res.finalPaidAmountVnd,           
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
