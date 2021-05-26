@@ -126,16 +126,18 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (data) => {
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
-                    this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en')).then(
-                        (exchangeRate: IExchangeRate) => {
-                            if (!!exchangeRate) {
-                                this.exchangeRateUsd = exchangeRate.rate;
-                            } else {
-                                this.exchangeRateUsd = 0;
+                    if (data !== undefined) {
+                        this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en')).then(
+                            (exchangeRate: IExchangeRate) => {
+                                if (!!exchangeRate) {
+                                    this.exchangeRateUsd = exchangeRate.rate;
+                                } else {
+                                    this.exchangeRateUsd = 0;
+                                }
+                                this.caculateAmountFromDebitList();
                             }
-                            this.caculateAmountFromDebitList();
-                        }
-                    );
+                        );
+                    }
                 }
             );
     }
