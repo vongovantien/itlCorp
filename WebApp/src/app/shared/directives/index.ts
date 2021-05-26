@@ -17,6 +17,7 @@ export * from './load-module.directive';
 export * from './disabled-control.directive';
 export * from './hasOwnerPermisison.directive';
 export * from './click-stop-propagation.directive';
+export * from './dropdown-toggle.directive';
 
 
 
