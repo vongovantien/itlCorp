@@ -473,7 +473,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             // CLEAR ADVANCE
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
-                                                RowId = reqItem.Stt_Cd_Htt,
+                                                RowId = Guid.NewGuid().ToString(), // Để tránh duplicate khi hoạch toán bên bravo.
                                                 Stt_Cd_Htt = reqItem.Stt_Cd_Htt,
                                                 Ma_SpHt = reqItem.Ma_SpHt,
                                                 ItemCode = "CLEAR_ADVANCE",
