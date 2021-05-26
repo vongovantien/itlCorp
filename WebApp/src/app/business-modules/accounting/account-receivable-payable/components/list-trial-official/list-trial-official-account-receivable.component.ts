@@ -34,7 +34,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             { title: 'Partner Id', field: 'partnerCode', sortable: true },
             { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
             { title: 'Credit Limited', field: 'creditLimited', sortable: true },
-            { title: 'Currency', field: 'arCurrency', sortable: true },
+            { title: 'Currency', field: 'creditCurrency', sortable: true },
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Debit Rate (%)', field: 'debitRate', sortable: true },
             { title: 'Billing', field: 'billingAmount', sortable: true },

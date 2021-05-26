@@ -42,5 +42,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
         public string ArCurrency { get; set; }
+        public string CreditCurrency { get; set; }
     }
 }

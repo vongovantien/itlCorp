@@ -1088,6 +1088,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Over16To30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over16To30Day : 0).Sum(),
                     Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : 0).Sum(),
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
+                    CreditCurrency = s.First().contract.CreditCurrency
                 });
 
             var data = from contract in groupByContract
@@ -1135,7 +1136,8 @@ namespace eFMS.API.Accounting.DL.Services
                            Over1To15Day = contract.Over1To15Day,
                            Over16To30Day = contract.Over16To30Day,
                            Over30Day = contract.Over30Day,
-                           ArCurrency = contract.ArCurrency
+                           ArCurrency = contract.ArCurrency,
+                           CreditCurrency = contract.CreditCurrency
                        };
             return data;
         }
