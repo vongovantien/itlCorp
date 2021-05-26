@@ -16,14 +16,15 @@
                             <div class="dropdown m-dropdown m-dropdown--inline w-100">
                                 <div class="c-button-actions">
                                     <button type="button" class="btn btn-success dropdown-toggle"
-                                        data-toggle="dropdown">
+                                        [dpToggle]="dropdownMenu">
                                         <i class="la la-download"></i>Voucher<span class="caret"></span>
                                     </button>
-                                    <div class="dropdown-menu">
+
+                                    <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="showPopupUpdateVoucher()"
                                             *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'">
                                             <span>
-                                                <i class="la la-plus text-success"></i>
+                                                <i class="la la-edit text-success"></i>
                                                 <span>
                                                     Update Voucher
                                                 </span>
@@ -48,7 +49,9 @@
                                                 </span>
                                             </span>
                                         </a>
-                                    </div>
+                                    </app-dropdown>
+
+
                                     <button class="btn btn-cancel  m-btn--icon m-btn--uppercase"
                                         (click)="showPopupListAdvance()">
                                         <span>

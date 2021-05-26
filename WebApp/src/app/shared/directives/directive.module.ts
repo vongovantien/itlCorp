@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import {
-    AutofocusDirective, TwoDigitDecimaNumberDirective, SpecialCharacterDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
-    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, IntergerInputDirective
+    AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
+    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, DropdownToggleDirective
 } from '.';
-import { CurrencyPipe } from '@angular/common';
+import { OverlayModule } from '@angular/cdk/overlay';
 
 const APP_DIRECTIVES = [
     AutofocusDirective,
@@ -24,19 +24,20 @@ const APP_DIRECTIVES = [
     DisabledControlDirective,
     HasOwnerPermissionDirective,
     ClickStopPropagationDirective,
-    FormatDecimalFormControlDirective
+    FormatDecimalFormControlDirective,
+    DropdownToggleDirective
 ];
 @NgModule({
     declarations: [
         ...APP_DIRECTIVES
     ],
     imports: [
+        OverlayModule
     ],
     exports: [
         ...APP_DIRECTIVES
     ],
     providers: [
-        CurrencyPipe
     ],
 })
 
