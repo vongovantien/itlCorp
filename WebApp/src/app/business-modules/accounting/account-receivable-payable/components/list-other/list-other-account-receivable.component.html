@@ -27,13 +27,13 @@
                                             </td>
                                             <td>{{ item.partnerNameAbbr }} </td>
 
-                                            <td>{{ item.debitAmount | number: '.0-3' }}</td>
+                                            <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
 
-                                            <td>{{ item.billingAmount | number: '.0-3' }}
+                                            <td class="text-right">{{ item.billingAmount | number: '.0-3' }}
                                             </td>
-                                            <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
-                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
-                                            <td>{{ item.obhAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.billingUnpaid | number: '.0-3' }}</td>
+                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.obhAmount | number: '.0-3'}}</td>
 
                                             <td>
                                                 <span

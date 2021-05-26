@@ -589,28 +589,28 @@
                                                         </td>
 
                                                         <td>{{ item.officeName}}</td>
-                                                        <td>{{ item.totalDebitAmount | number: '.0-3' }}
+                                                        <td class="text-right">{{ item.totalDebitAmount | number: '.0-3' }}
                                                         </td>
 
-                                                        <td>{{ item.totalBillingAmount | number: '.0-3'}}
+                                                        <td class="text-right">{{ item.totalBillingAmount | number: '.0-3'}}
                                                         </td>
-                                                        <td>{{ item.totalBillingUnpaid | number: '.0-3'}}
+                                                        <td class="text-right">{{ item.totalBillingUnpaid | number: '.0-3'}}
                                                         </td>
-                                                        <td>{{ item.totalPaidAmount | number: '.0-3'}}
+                                                        <td class="text-right">{{ item.totalPaidAmount | number: '.0-3'}}
                                                         </td>
-                                                        <td>{{ item.totalObhAmount | number: '.0-3'}}
+                                                        <td class="text-right">{{ item.totalObhAmount | number: '.0-3'}}
                                                         </td>
-                                                        <td>
+                                                        <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
                                                                 {{ item.totalOver1To15Day | number: '.0-3' }}
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
                                                                 {{ item.totalOver15To30Day | number: '.0-3' }}
                                                             </span>
                                                         </td>
-                                                        <td>
+                                                        <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
                                                                 {{ item.totalOver30Day | number: '.0-3' }}
                                                             </span>
@@ -632,28 +632,28 @@
 
                                                                         <td>{{ element.serviceName  }}
                                                                         </td>
-                                                                        <td>{{ element.debitAmount | number: '.0-3'}}
+                                                                        <td class="text-right">{{ element.debitAmount | number: '.0-3'}}
                                                                         </td>
 
-                                                                        <td>{{ element.billingAmount | number: '.0-3'}}
+                                                                        <td class="text-right">{{ element.billingAmount | number: '.0-3'}}
                                                                         </td>
-                                                                        <td>{{ element.billingUnpaid | number: '.0-3'}}
+                                                                        <td class="text-right">{{ element.billingUnpaid | number: '.0-3'}}
                                                                         </td>
-                                                                        <td>{{ element.paidAmount | number: '.0-3' }}
+                                                                        <td class="text-right">{{ element.paidAmount | number: '.0-3' }}
                                                                         </td>
-                                                                        <td>{{ element.obhAmount | number: '.0-3' }}
+                                                                        <td class="text-right">{{ element.obhAmount | number: '.0-3' }}
                                                                         </td>
-                                                                        <td>
+                                                                        <td class="text-right">
                                                                             <span [ngClass]="'text-danger'">
                                                                                 {{ element.over1To15Day | number: '.0-3' }}
                                                                             </span>
                                                                         </td>
-                                                                        <td>
+                                                                        <td class="text-right">
                                                                             <span [ngClass]="'text-danger'">
                                                                                 {{ element.over16To30Day | number: '.0-3' }}
                                                                             </span>
                                                                         </td>
-                                                                        <td>
+                                                                        <td class="text-right">
                                                                             <span [ngClass]="'text-danger'">
                                                                                 {{ element.over30Day | number: '.0-3' }}
                                                                             </span>

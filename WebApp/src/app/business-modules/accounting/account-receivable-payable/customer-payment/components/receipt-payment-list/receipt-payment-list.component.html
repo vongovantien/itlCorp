@@ -51,7 +51,7 @@
                 <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
                     <label class="form-control-label" required> Exchange Rate </label>
                     <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency>
+                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency (change)="onSelectDataFormInfo($event,'exchangeRate')">
                 </div>
             </div>
         </div>

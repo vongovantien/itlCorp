@@ -237,10 +237,16 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'paid-amountVnd':
+                if(!data.target.value.length){
+                    this.paidAmountVND.setValue(0);
+                }
                 this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : (Math.round((this.paidAmountVND.value / this.exchangeRateUsd) * 100))) / 100);
                 this.getFinalPaidAmount();
                 break;
             case 'paid-amountUsd':
+                if(!data.target.value.length){
+                    this.paidAmountUSD.setValue(0);
+                }
                 this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 2));
                 this.getFinalPaidAmount();
                 break;
@@ -257,8 +263,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 this.getFinalPaidAmount();
                 break;
             case 'amountVND':
+                if(!data.target.value.length){
+                    this.amountVND.setValue(0);
+                }
             case 'amountUSD':
+                if(!data.target.value.length){
+                    this.amountUSD.setValue(0);
+                }
+            case 'exchangeRate':
+                if(!data.target.value.length){
+                    this.exchangeRate.setValue(0);
+                }
+                break;
             case 'cusAdvanceAmount':
+                if(!data.target.value.length){
+                    this.cusAdvanceAmount.setValue(0);
+                }
                 this.getFinalPaidAmount();
                 break;
             case 'payment-date':
