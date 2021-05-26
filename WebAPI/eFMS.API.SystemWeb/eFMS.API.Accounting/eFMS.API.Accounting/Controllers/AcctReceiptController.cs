@@ -130,7 +130,11 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
-
+            if (hs.Success)
+            {
+                //Tính công nợ sau khi Save Cancel thành công
+                acctReceiptService.CalculatorReceivableForReceipt(id);
+            }
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
             return Ok(result);
@@ -201,6 +205,11 @@ namespace eFMS.API.Accounting.Controllers
             } 
             else if (saveAction == SaveAction.SAVECANCEL)
             {
+                if (hs.Success)
+                {
+                    //Tính công nợ sau khi Save Cancel thành công
+                    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                }
                 result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
             }
             else
