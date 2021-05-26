@@ -431,15 +431,17 @@ namespace eFMS.API.Accounting.DL.Services
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
             {
-                List<ReceiptInvoiceModel> OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.CurrencyId }).Select(s => new ReceiptInvoiceModel
+                var OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.Negative, x.CurrencyId});
+
+                List< ReceiptInvoiceModel> items = OBHGrp.Select(s => new ReceiptInvoiceModel
                 {
                     RefNo = s.Key.BillingRefNo,
                     Type = "OBH",
                     InvoiceNo = null,
-                    Amount = s.Sum(x => x.RefAmount),
+                    Amount = s.FirstOrDefault().RefAmount,
                     UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
-                    UnpaidAmountVnd = s.Sum(x => x.UnpaidPaymentAmountVnd),
-                    UnpaidAmountUsd = s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidPaymentAmountVnd,
+                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidPaymentAmountUsd,
                     PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
                     PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
                     Notes = s.FirstOrDefault().Note,
@@ -449,7 +451,7 @@ namespace eFMS.API.Accounting.DL.Services
                     RefIds = listOBH.Select(x => x.RefId).ToList()
                 }).ToList();
 
-                paymentReceipts.AddRange(OBHGrp);
+                paymentReceipts.AddRange(items);
             }
 
             IEnumerable<AccAccountingPayment> listDebitCredit = acctPayments.Where(x => x.Type != "OBH").OrderBy(x => x.DatetimeCreated);
@@ -642,10 +644,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                                 _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu 
+                                _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
+
                                 _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
 
-                                _paymentOBH.PaymentAmountUsd = null;
-                                _paymentOBH.BalanceUsd = null;
+                                // _paymentOBH.PaymentAmountUsd = null;
+                                //_paymentOBH.BalanceUsd = null;
 
                                 remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
                                 results.Add(_paymentOBH);
@@ -655,10 +659,11 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                             _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd ;// Số tiền thu 
+                            _paymentOBH.PaymentAmountUsd = _paymentOBH.PaymentAmountUsd;
                             _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
 
-                            _paymentOBH.PaymentAmountUsd = null;
-                            _paymentOBH.BalanceUsd = null;
+                            // _paymentOBH.PaymentAmountUsd = null;
+                            //_paymentOBH.BalanceUsd = null;
 
                             remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu hđ tạm sau.
                             results.Add(_paymentOBH);
@@ -673,10 +678,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                                 _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; // Số tiền thu 
+                                _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;
+
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
 
-                                _paymentOBH.PaymentAmountVnd = null;
-                                _paymentOBH.BalanceVnd = null;
+                                //_paymentOBH.PaymentAmountVnd = null;
+                                //_paymentOBH.BalanceVnd = null;
 
                                 remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
                                 results.Add(_paymentOBH);
@@ -685,10 +692,12 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                                 _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd;// Số tiền thu 
+                                _paymentOBH.PaymentAmountVnd = _paymentOBH.PaymentAmountVnd;
+
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; // Số tiền còn lại
 
-                                _paymentOBH.PaymentAmountVnd = null;
-                                _paymentOBH.BalanceVnd = null;
+                                //_paymentOBH.PaymentAmountVnd = null;
+                                //_paymentOBH.BalanceVnd = null;
 
                                 remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmount ?? 0; // Số tiền amount OBH còn lại để clear tiếp phiếu sau.
                                 results.Add(_paymentOBH);
@@ -851,7 +860,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
                 _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
 
-                _payment.Hblid = payment.Hblid; 
+                _payment.Hblid = payment.Hblid;
+                _payment.Negative = true;
 
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
                 _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
