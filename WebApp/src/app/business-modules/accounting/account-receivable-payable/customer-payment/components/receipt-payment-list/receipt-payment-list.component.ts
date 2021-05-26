@@ -111,6 +111,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.userLogged = u;
                 }
             });
+        this.debitList = this._store.select(ReceiptDebitListState);
+        this.creditList = this._store.select(ReceiptCreditListState);
     }
 
     formatNumberCurrency(input: number, digit: number) {
