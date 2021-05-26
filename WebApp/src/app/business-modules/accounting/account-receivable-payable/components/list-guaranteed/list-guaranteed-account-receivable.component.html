@@ -28,31 +28,31 @@
                                             </td>
                                             <td>{{ item.salesmanNameEn }} </td>
                                             <td>{{ item.salesmanFullName }} </td>
-                                            <td>{{ item.totalCreditLimited | number: '.0-3'}}</td>
-                                            <td>{{ item.totalDebitAmount| number: '.0-3' }}</td>
-                                            <td>
+                                            <td class="text-right">{{ item.totalCreditLimited | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.totalDebitAmount| number: '.0-3' }}</td>
+                                            <td class="text-right">
                                                 <span
                                                     [ngClass]="item.totalDebitRate < 70 ? 'text-success' : item.totalDebitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ item.totalDebitRate | number: '.0-3'}}
                                                 </span>
 
                                             </td>
-                                            <td>{{ item.totalBillingAmount | number: '.0-3'}}
+                                            <td class="text-right">{{ item.totalBillingAmount | number: '.0-3'}}
                                             </td>
-                                            <td>{{ item.totalBillingUnpaid | number: '.0-3'}}</td>
-                                            <td>{{ item.totalPaidAmount | number: '.0-3'}}</td>
-                                            <td>{{ item.totalObhAmount | number: '.0-3'}}</td>
-                                            <td>
+                                            <td class="text-right">{{ item.totalBillingUnpaid | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.totalPaidAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.totalObhAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     {{ item.totalOver1To15Day | number: '.0-3' }}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     {{ item.totalOver16To30Day | number: '.0-3' }}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     {{ item.totalOver30Day | number: '.0-3' }}
                                                 </span>
