@@ -1879,6 +1879,53 @@ namespace eFMS.API.ForPartner.DL.Service
 
         #endregion --- REJECT & REMOVE DATA ---
 
+        public HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey)
+        {
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "UpdateVoucherExpense";
+
+            var hsUpdateVoucherExpense = UpdateVoucherExpense(voucherExpense, currentUser);
+            return hsUpdateVoucherExpense;
+        }
+
+        private HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, ICurrentUser _currentUser)
+        {
+            var expenses = voucherExpense.Detail;
+            var hs = new HandleState();
+            try
+            {
+                foreach (var expense in expenses)
+                {
+                    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
+                    if (surcharge != null)
+                    {
+                        surcharge.UserModified = _currentUser.UserID;
+                        surcharge.DatetimeModified = DateTime.Now;
+                        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                        {
+                            surcharge.VoucherIdre = expense.VoucherNO;
+                            surcharge.VoucherIdredate = expense.VoucherDate;
+                        }
+                        else
+                        {
+                            surcharge.VoucherId = expense.VoucherNO;
+                            surcharge.VoucherIddate = expense.VoucherDate;
+                        }
+                        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
+                    }
+                }
+                return hs;
+            }
+            catch(Exception ex)
+            {
+                return new HandleState((object)"Error");
+            }
+        }
     }
 }
 
