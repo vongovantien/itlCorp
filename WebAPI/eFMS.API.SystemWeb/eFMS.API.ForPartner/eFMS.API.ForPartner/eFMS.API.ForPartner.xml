@@ -96,5 +96,14 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ForPartner.Controllers.AccountingController.UpdateVoucherExpense(eFMS.API.ForPartner.DL.Models.VoucherExpense,System.String,System.String)">
+            <summary>
+            Cập nhật thông tin phiếu chi và số HT
+            </summary>
+            <param name="model"></param>
+            <param name="apiKey"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

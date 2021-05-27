@@ -17,5 +17,6 @@ namespace eFMS.API.ForPartner.DL.IService
         HandleState DeleteInvoice(InvoiceInfo model, string apiKey);
         HandleState RejectData(RejectData model, string apiKey);
         HandleState RemoveVoucher(RejectData model, string apiKey);
+        HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey);
     }
 }
