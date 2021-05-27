@@ -446,6 +446,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         string _chargeTypeBalance = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod);
                                         string _customerCodeBook = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee);
+                                        string _requesterAdvanceCode = GetAdvanceReqterCode(reqItem.AdvanceNo);
 
                                         if (_balance != 0)
                                         {
@@ -493,7 +494,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             ChargeType = "CLEAR_ADVANCE",
                                             CustomerCodeBook = _customerCodeBook,
                                             CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
-                                            AdvanceCustomerCode = _customerCodeBook,
+                                            AdvanceCustomerCode = _requesterAdvanceCode,
                                             RefundAmount = 0,
                                             IsRefund = 1
                                         });
@@ -1826,6 +1827,22 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             return _serviceName;
+        }
+
+        private string GetAdvanceReqterCode(string advNo)
+        {
+            string employCode = string.Empty;
+
+            var queryAdv = from ad in AdvanceRepository.Get()
+                           join u in users on ad.Requester equals u.Id
+                           join employee in employees on u.EmployeeId equals employee.Id
+                           where ad.AdvanceNo == advNo
+                           select new { Code = employee.StaffCode };
+            if(queryAdv != null)
+            {
+                employCode = queryAdv.FirstOrDefault().Code;
+            }
+            return employCode;
         }
         private string GetAdvanceCustomerCode(string advNo, string payeeSettleId)
         {
