@@ -1061,8 +1061,8 @@ namespace eFMS.API.Accounting.DL.Services
                     invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + (payment.PaymentAmountUsd ?? 0);
 
                     invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
-                    invoice.UnpaidAmountVnd = (invoice.PaidAmountVnd ?? 0) - invoice.PaidAmountVnd;
-                    invoice.UnpaidAmountUsd = (invoice.PaidAmountUsd ?? 0) - invoice.PaidAmountUsd;
+                    invoice.UnpaidAmountVnd = (invoice.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;
+                    invoice.UnpaidAmountUsd = (invoice.TotalAmountUsd ?? 0) - invoice.PaidAmountUsd;
 
                     invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
 
