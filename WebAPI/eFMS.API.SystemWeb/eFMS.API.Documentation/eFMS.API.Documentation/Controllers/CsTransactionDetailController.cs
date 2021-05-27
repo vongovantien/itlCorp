@@ -227,7 +227,6 @@ namespace eFMS.API.Documentation.Controllers
         [HttpGet("CheckHwbNoExistedAirExport")]
         public IActionResult CheckHwbNoExistedAirExport(string hwbno, string jobId, string hblId)
         {
-            bool existedHwbNo = false;
             var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
             var data = csTransactionDetailService.GetDataHawbToCheckExisted();
             data = data.Where(x => x.TransactionType == transaction.TransactionType);
@@ -236,12 +235,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null))
                 {
-                    existedHwbNo = true;
                     dataCheck = data.Where(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null).ToList();
-                }
-                else
-                {
-                    existedHwbNo = false;
                 }
             }
             else
@@ -253,17 +247,8 @@ namespace eFMS.API.Documentation.Controllers
                 }
                 if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)))
                 {
-                    existedHwbNo = true;
                     dataCheck = data.Where(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)).ToList();
                 }
-                else
-                {
-                    existedHwbNo = false;
-                }
-            }
-            if (existedHwbNo)
-            {
-
             }
             return Ok(dataCheck.Select(t=>t.JobNo).Distinct());
         }
