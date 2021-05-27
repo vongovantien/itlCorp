@@ -446,9 +446,9 @@ namespace eFMS.API.Accounting.DL.Services
                                         decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
                                         string _chargeTypeBalance = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod);
                                         string _customerCodeBook = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee);
+
                                         if (_balance != 0)
                                         {
-                                            // BALANCE
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
                                                 RowId = reqItem.Stt_Cd_Htt,
@@ -471,33 +471,32 @@ namespace eFMS.API.Accounting.DL.Services
                                                 RefundAmount = 0,
                                                 IsRefund = 1
                                             });
-
-                                            // CLEAR ADVANCE
-                                            item.Details.Add(new BravoSettlementRequestModel
-                                            {
-                                                RowId = Guid.NewGuid().ToString(), // Để tránh duplicate khi hoạch toán bên bravo.
-                                                Stt_Cd_Htt = reqItem.Stt_Cd_Htt,
-                                                Ma_SpHt = reqItem.Ma_SpHt,
-                                                ItemCode = "CLEAR_ADVANCE",
-                                                Description = "Số Tiền Hoàn Ứng",
-                                                Unit = "Lô",
-                                                CurrencyCode = item.CurrencyCode,
-                                                ExchangeRate = 1,
-                                                BillEntryNo = reqItem.BillEntryNo,
-                                                MasterBillNo = reqItem.MasterBillNo,
-                                                DeptCode = reqItem.DeptCode,
-                                                Quantity9 = 0,
-                                                OriginalUnitPrice = 0,
-                                                OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
-                                                OriginalAmount3 = 0,
-                                                ChargeType = "CLEAR_ADVANCE",
-                                                CustomerCodeBook = _customerCodeBook,
-                                                CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
-                                                AdvanceCustomerCode = _customerCodeBook,
-                                                RefundAmount = 0,
-                                                IsRefund = 1
-                                            });
                                         }
+
+                                        item.Details.Add(new BravoSettlementRequestModel
+                                        {
+                                            RowId = Guid.NewGuid().ToString(), // Để tránh duplicate khi hoạch toán bên bravo.
+                                            Stt_Cd_Htt = reqItem.Stt_Cd_Htt,
+                                            Ma_SpHt = reqItem.Ma_SpHt,
+                                            ItemCode = "CLEAR_ADVANCE",
+                                            Description = "Số Tiền Hoàn Ứng",
+                                            Unit = "Lô",
+                                            CurrencyCode = item.CurrencyCode,
+                                            ExchangeRate = 1,
+                                            BillEntryNo = reqItem.BillEntryNo,
+                                            MasterBillNo = reqItem.MasterBillNo,
+                                            DeptCode = reqItem.DeptCode,
+                                            Quantity9 = 0,
+                                            OriginalUnitPrice = 0,
+                                            OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
+                                            OriginalAmount3 = 0,
+                                            ChargeType = "CLEAR_ADVANCE",
+                                            CustomerCodeBook = _customerCodeBook,
+                                            CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
+                                            AdvanceCustomerCode = _customerCodeBook,
+                                            RefundAmount = 0,
+                                            IsRefund = 1
+                                        });
                                     }
                                 }
                             }
@@ -505,7 +504,6 @@ namespace eFMS.API.Accounting.DL.Services
                         result = data;
                     }
                 }
-
             }
             return result;
         }
