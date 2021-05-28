@@ -21,5 +21,6 @@ namespace eFMS.API.ForPartner.DL.IService
         HandleState RemoveVoucher(RejectData model, string apiKey);
         CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action);
         List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo);
+        HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey);
     }
 }
