@@ -15,6 +15,7 @@ namespace eFMS.API.Operation.DL.Models
         public string UserModifieddName { get; set; }
         public bool? isDelete { get; set; }
         public Guid? jobId { get; set; }
+        public Guid? hbl { get; set; }
     }
 
 }
