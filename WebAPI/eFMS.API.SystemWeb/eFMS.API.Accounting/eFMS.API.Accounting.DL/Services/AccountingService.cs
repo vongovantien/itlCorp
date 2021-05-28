@@ -349,6 +349,9 @@ namespace eFMS.API.Accounting.DL.Services
                             //*Note: Nếu charge là OBH thì OriginalAmount = Thành tiền trước thuế + Tiền thuế; OriginalAmount3 = 0; 
                             //Ngược lại OriginalAmount = Thành tiền trước thuế, OriginalAmount3 = Tiền thuế
 
+                            string _staffCodeRequester = GetSettleStaffCode(item.Stt);
+                            string _customerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null);
+
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
                                                                                          join obhP in partners on surcharge.PaymentObjectId equals obhP.Id into obhPGrps
@@ -367,7 +370,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              MasterBillNo = surcharge.Mblno,
                                                                                              DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                              Quantity9 = surcharge.Quantity,
-                                                                                             OriginalUnitPrice = surcharge.UnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null,item.DocDate, surcharge.CurrencyId, item.CurrencyCode), // quy đổi về currency của settle: 15709
+                                                                                             OriginalUnitPrice = surcharge.UnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, surcharge.CurrencyId, item.CurrencyCode), // quy đổi về currency của settle: 15709
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
                                                                                              //Nếu phí OBH thì OriginalAmount = thành tiền sau thuế; Ngược lại OriginalAmount = thành tiền trước thuế
                                                                                              OriginalAmount = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? NumberHelper.RoundNumber(surcharge.Total, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)) : NumberHelper.RoundNumber(surcharge.NetAmount ?? 0, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)), //CR: 15500
@@ -381,7 +384,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              // CustomerCodeBook = obhP.AccountNo
                                                                                              CustomerCodeBook = GetPayeeCode(item.Payee, item.PaymentMethod, obhP.AccountNo, surcharge.Type, surcharge.PayerId), //CR: 15500
                                                                                              CustomerCodeVAT = GetCustomerCodeVAT(surcharge), // 15709: Sẽ bằng Partner Code của VAT Partner
-                                                                                             CustomerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null),
+                                                                                             CustomerCodeTransfer = _customerCodeTransfer,
 
                                                                                              // 15709
                                                                                              AdvanceCustomerCode = GetAdvanceCustomerCode(surcharge.AdvanceNo,item.Payee),
@@ -404,6 +407,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     if(hasAdvancePayment == true)
                                     {
                                         x.IsRefund = 1;
+                                        x.CustomerCodeBook = _staffCodeRequester; // đối tượng hoạch toán là requester.
                                     }
                                     else
                                     {
@@ -430,7 +434,6 @@ namespace eFMS.API.Accounting.DL.Services
                                         BillEntryNo = d.FirstOrDefault().BillEntryNo,
                                         MasterBillNo = d.FirstOrDefault().MasterBillNo,
                                         DeptCode = d.FirstOrDefault().DeptCode,
-                                        // CustomerCodeBook = d.FirstOrDefault().CustomerCodeBook,
                                         CustomerCodeTransfer= d.FirstOrDefault().CustomerCodeTransfer,
                                         AdvanceNo = d.Key.AdvanceNo,
                                         HblId = d.Key.HblId,
@@ -1832,16 +1835,31 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string employCode = string.Empty;
 
-            var queryAdv = from ad in AdvanceRepository.Get()
+            var queryAdv = from ad in AdvanceRepository.Get(x => x.AdvanceNo == advNo)
                            join u in users on ad.Requester equals u.Id
                            join employee in employees on u.EmployeeId equals employee.Id
-                           where ad.AdvanceNo == advNo
-                           select new { Code = employee.StaffCode };
+                           select new { employee.StaffCode };
             if(queryAdv != null)
             {
-                employCode = queryAdv.FirstOrDefault().Code;
+                employCode = queryAdv.FirstOrDefault().StaffCode;
             }
             return employCode;
+        }
+
+        private string GetSettleStaffCode(Guid Id)
+        {
+            string settleRequesterCode = string.Empty;
+
+            var querySettle = from ad in SettlementRepository.Get(x => x.Id == Id)
+                           join u in users on ad.Requester equals u.Id
+                           join employee in employees on u.EmployeeId equals employee.Id
+                           select new { employee.StaffCode };
+
+            if (querySettle != null)
+            {
+                settleRequesterCode = querySettle.FirstOrDefault().StaffCode;
+            }
+            return settleRequesterCode;
         }
         private string GetAdvanceCustomerCode(string advNo, string payeeSettleId)
         {
