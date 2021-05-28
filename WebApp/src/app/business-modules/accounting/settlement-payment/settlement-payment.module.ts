@@ -12,6 +12,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { SettlementPaymentComponent } from './settlement-payment.component';
 import { SettlementFormSearchComponent } from './components/form-search-settlement/form-search-settlement.component';
@@ -113,6 +114,7 @@ const maskConfig: Partial<IConfig> = {
         ShareApprovePaymentModule,
         ShareAccountingModule,
         NgSelectModule,
+        BsDropdownModule.forRoot(),
         StoreModule.forFeature('settlement-payment', reducers),
         EffectsModule.forFeature([SettlePaymentEffect]),
         ShareModulesModule,
