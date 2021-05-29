@@ -127,7 +127,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.infoPopup.show();
                             return null;
                         }
-                        return forkJoin([this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null)]);
+                        return this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, null);
                     }
                     )).subscribe(result => {
                         if (!!result && result.length > 0) {
