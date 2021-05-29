@@ -2611,6 +2611,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.CarrierName = LookupPartner[item.ColoaderId].FirstOrDefault()?.PartnerNameEn;
                 data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameEn;
                 data.ServiceDate = item.ServiceDate;
+                data.VesselFlight = item.FlightNo;
 
                 var _polCode = item.Pol != null ? PlaceLookup[(Guid)item.Pol].FirstOrDefault()?.Code : string.Empty;
                 var _podCode = item.Pod != null ? PlaceLookup[(Guid)item.Pod].FirstOrDefault()?.Code : string.Empty;
