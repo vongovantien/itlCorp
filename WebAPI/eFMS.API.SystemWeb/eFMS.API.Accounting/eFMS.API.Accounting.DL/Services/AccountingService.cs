@@ -470,7 +470,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 OriginalAmount = _originalAmount,
                                                 OriginalAmount3 = 0,
                                                 ChargeType = _chargeTypeBalance,
-                                                CustomerCodeBook = _customerCodeBook,
+                                                CustomerCodeBook = _requesterAdvanceCode,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
                                                 RefundAmount = 0,
                                                 IsRefund = 1
@@ -495,7 +495,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
                                             OriginalAmount3 = 0,
                                             ChargeType = "CLEAR_ADVANCE",
-                                            CustomerCodeBook = _customerCodeBook,
+                                            CustomerCodeBook = _requesterAdvanceCode,
                                             CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
                                             AdvanceCustomerCode = _requesterAdvanceCode,
                                             RefundAmount = 0,
