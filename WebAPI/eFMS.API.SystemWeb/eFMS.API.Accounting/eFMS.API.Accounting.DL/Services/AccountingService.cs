@@ -493,7 +493,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 CustomerCodeBook = balanceInfo.AdvanceAmount == null ? _staffCodeRequester  : _requesterAdvanceCode,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
                                                 RefundAmount = 0,
-                                                IsRefund = _balance != 0 ? 1 : 0
+                                                IsRefund = 1
                                             });
                                         }
 
