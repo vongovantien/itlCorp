@@ -266,7 +266,9 @@ namespace eFMS.API.Documentation.Controllers
             currentUser.Action = "ConvertClearanceToJob";
             var permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return Forbid();
-            var hs = transactionService.ConvertClearanceToJob(model);
+
+            HandleState hs = transactionService.ConvertClearanceToJob(model);
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
