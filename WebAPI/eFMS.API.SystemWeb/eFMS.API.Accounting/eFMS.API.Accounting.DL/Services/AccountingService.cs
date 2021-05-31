@@ -470,12 +470,15 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         if (_balance != 0 || balanceInfo.AdvanceAmount == null)
                                         {
+                                            decimal balanceCase4 = (balanceInfo.AdvanceAmount ?? 0 - balanceInfo.TotalAmount ?? 0);
+                                            string _chargeTypeCase4 = GenerateChargeTypeSettleWithBalanceAdvance(balanceCase4, item.PaymentMethod);
+                                            string descriptionCase4 = GenerateDescriptionSettleItemWithBalanceAdvance(balanceCase4, item.PaymentMethod);
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
-                                                RowId = reqItem.Stt_Cd_Htt,
+                                                RowId = Guid.NewGuid().ToString(),
                                                 Ma_SpHt = reqItem.Ma_SpHt,
                                                 ItemCode = "BALANCE",
-                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod),
+                                                Description = balanceInfo.AdvanceAmount == null ? descriptionCase4: GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod),
                                                 Unit = "Lô",
                                                 CurrencyCode = item.CurrencyCode,
                                                 ExchangeRate = 1,
@@ -484,10 +487,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                 DeptCode = reqItem.DeptCode,
                                                 Quantity9 = 0,
                                                 OriginalUnitPrice = 0,
-                                                OriginalAmount = _originalAmount,
+                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceCase4 : _originalAmount,
                                                 OriginalAmount3 = 0,
-                                                ChargeType = _chargeTypeBalance,
-                                                CustomerCodeBook = _requesterAdvanceCode,
+                                                ChargeType = balanceInfo.AdvanceAmount == null ? _chargeTypeCase4 : _chargeTypeBalance,
+                                                CustomerCodeBook = balanceInfo.AdvanceAmount == null ? _staffCodeRequester  : _requesterAdvanceCode,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
                                                 RefundAmount = 0,
                                                 IsRefund = _balance != 0 ? 1 : 0
