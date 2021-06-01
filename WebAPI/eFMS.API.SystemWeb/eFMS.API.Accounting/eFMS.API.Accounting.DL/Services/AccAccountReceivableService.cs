@@ -1033,6 +1033,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var users = userRepo.Get();
             var employees = employeeRepo.Get();
+            var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
                               join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
@@ -1097,6 +1098,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
+                       join parent in acRefPartner on partner.ParentId equals parent.Id into parents
+                       from parent  in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
                        join employee in employees on user.EmployeeId equals employee.Id into employees2
@@ -1142,7 +1145,7 @@ namespace eFMS.API.Accounting.DL.Services
                            Over30Day = contract.Over30Day,
                            ArCurrency = contract.ArCurrency,
                            CreditCurrency = contract.CreditCurrency,
-                           ParentNameAbbr = partners.Where(x => x.Id == partner.ParentId).Select(x => x.ShortName).FirstOrDefault()
+                           ParentNameAbbr = parent.ShortName
                        };
             return data;
         }
@@ -1499,7 +1502,8 @@ namespace eFMS.API.Accounting.DL.Services
                         Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                         Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                         Over30Day = s.Sum(sum => sum.Over30Day),
-                        ArCurrency = s.First().ArCurrency
+                        ArCurrency = s.First().ArCurrency,
+                        ParentNameAbbr = s.First().ParentNameAbbr
                     }).AsQueryable();
             return groupbyAgreementId;
         }
