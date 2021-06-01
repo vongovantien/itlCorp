@@ -1699,6 +1699,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AA9"].Value = headersTable[26];
             workSheet.Cells["AG9"].Value = headersTable[27];
 
+            //Cố định dòng thứ 10 (Freeze Row 10 and no column)
+            workSheet.View.FreezePanes(11, 1);
+
             int addressStartContent = 11;
             int positionStart = 1;
             int j = 0;
@@ -2084,6 +2087,10 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 workSheet.Cells[6, c - 2].Value = headers[c];
             }
+
+            //Cố định dòng thứ 6 (Freeze Row 6 and no column)
+            workSheet.View.FreezePanes(7, 1);
+
             int rowStart = 7;
             for (int i = 0; i < listData.Count; i++)
             {
@@ -2315,6 +2322,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AI7"].Value = headers[35]; //Creator
             //Header table
 
+            //Cố định dòng thứ 8 (Freeze Row 8 and no column)
+            workSheet.View.FreezePanes(9, 1);
+
             int rowStart = 9;
             for (int i = 0; i < listData.Count; i++)
             {
@@ -2543,10 +2553,17 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[1, c].Value = headers[c - 1];
             }
 
+            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            workSheet.View.FreezePanes(2, 1);
+
             int startRow = 2;
             foreach (var item in listData)
             {
+                workSheet.Row(startRow).Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
                 workSheet.Cells[startRow, 1].Value = item.No;
+                workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
                 workSheet.Cells[startRow, 2].Value = item.JobId;
                 workSheet.Cells[startRow, 3].Value = item.Mawb;
                 workSheet.Cells[startRow, 4].Value = item.Hawb;
@@ -2660,6 +2677,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     "SellAutomated",
                     "SellVGM",
                     "SellBookingFee",
+                    "SellCustomFee",
                     "SellOthers",
                     "TotalSelling",
                     "BuyFreight",
@@ -2670,6 +2688,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     "BuyEBSFee",
                     "BuyAutomated",
                     "BuyVGM",
+                    "BuyCustomFee",
                     "BuyOthers",
                     "TotalBuying",
                     "Profit",
@@ -2696,6 +2715,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
                     listKey.Add("MBL", shipment.MblMawb);
                     listKey.Add("HBL", shipment.HblHawb);
+                    listKey.Add("Incoterm", shipment.Incoterm); // Incoterm
                     listKey.Add("Port", shipment.PolPod);
                     listKey.Add("FinalDestination", shipment.FinalDestination);
                     listKey.Add("Carrier", shipment.Carrier); // Coloader
@@ -2722,6 +2742,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("SellAutomated", shipment.TotalSellAutomated);
                     listKey.Add("SellVGM", shipment.TotalSellVGM);
                     listKey.Add("SellBookingFee", shipment.TotalSellBookingFee);
+                    listKey.Add("SellCustomFee", shipment.TotalSellCustomFee);
                     listKey.Add("SellOthers", shipment.TotalSellOthers);
                     listKey.Add("TotalSelling", shipment.TotalSell);
                     listKey.Add("BuyFreight", shipment.TotalBuyFreight);
@@ -2732,6 +2753,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("BuyEBSFee", shipment.TotalBuyEBSFee);
                     listKey.Add("BuyAutomated", shipment.TotalBuyAutomated);
                     listKey.Add("BuyVGM", shipment.TotalBuyVGM);
+                    listKey.Add("BuyCustomFee", shipment.TotalBuyCustomFee);
                     listKey.Add("BuyOthers", shipment.TotalBuyOthers);
                     listKey.Add("TotalBuying", shipment.TotalBuy);
                     listKey.Add("Profit", shipment.Profit);
@@ -2882,6 +2904,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["I1:K1"].Merge = true;
             workSheet.Cells["L1:N1"].Merge = true;
             workSheet.Cells["O1:Q1"].Merge = true;
+
+            //Cố định dòng thứ 2 (Freeze Row 2 and no column)
+            workSheet.View.FreezePanes(3, 1);
 
             int addressStartContent = 3;
             for (int i = 0; i < lst.Count; i++)
@@ -3146,6 +3171,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L2:T2"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             decimal? totalALLValue = 0;
+
+            //Cố định dòng thứ 2 (Freeze Row 2 and no column)
+            workSheet.View.FreezePanes(3, 1);
 
             int addressStartContent = 3;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");

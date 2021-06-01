@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICurrentUser currentUser;
         ICsMawbcontainerService containerService;
         ICsTransactionService csTransactionService;
-        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user , ICsMawbcontainerService mawbcontainerService, ICsTransactionService csTransaction)
+        public CsTransactionDetailController(IStringLocalizer<LanguageSub> localizer, ICsTransactionDetailService service, ICurrentUser user, ICsMawbcontainerService mawbcontainerService, ICsTransactionService csTransaction)
         {
             stringLocalizer = localizer;
             csTransactionDetailService = service;
@@ -69,7 +69,8 @@ namespace eFMS.API.Documentation.Controllers
             CsMawbcontainerCriteria criteriaMaw = new CsMawbcontainerCriteria { Hblid = Id };
             var hbl = csTransactionDetailService.GetDetails(Id);
             var resultMaw = containerService.Query(criteriaMaw).ToList();
-            if(resultMaw.Count() > 0) {
+            if (resultMaw.Count() > 0)
+            {
                 hbl.CsMawbcontainers = resultMaw;
             }
             return Ok(hbl);
@@ -120,7 +121,7 @@ namespace eFMS.API.Documentation.Controllers
 
             var hs = csTransactionDetailService.DeleteTransactionDetail(id);
             var message = hs.Success == true ? HandleError.GetMessage(hs, Crud.Delete) : hs.Message?.ToString();
-            if(hs.Code == 403)
+            if (hs.Code == 403)
             {
                 message = "Do not have permission";
             }
@@ -183,7 +184,7 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("CheckHwbNoExisted")]
-        public IActionResult CheckHwbNoExisted(string hwbno,string jobId, string hblId )
+        public IActionResult CheckHwbNoExisted(string hwbno, string jobId, string hblId)
         {
             bool existedHwbNo = false;
             var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
@@ -191,7 +192,7 @@ namespace eFMS.API.Documentation.Controllers
             data = data.Where(x => x.TransactionType == transaction.TransactionType);
             if (transaction.TransactionType == TermData.AirExport || transaction.TransactionType == TermData.AirImport)
             {
-                if(hblId == null)
+                if (hblId == null)
                 {
                     if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null))
                     {
@@ -204,12 +205,12 @@ namespace eFMS.API.Documentation.Controllers
                 }
                 else
                 {
-                    var transactionDetail = csTransactionDetailService.Get(x => x.Id.ToString() == hblId ).FirstOrDefault();
+                    var transactionDetail = csTransactionDetailService.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
                     if (transactionDetail.Hwbno == hwbno)
                     {
                         return Ok(false);
                     }
-                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)) )
+                    if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)))
                     {
                         existedHwbNo = true;
                     }
@@ -218,9 +219,38 @@ namespace eFMS.API.Documentation.Controllers
                         existedHwbNo = false;
                     }
                 }
-              
+
             }
             return Ok(existedHwbNo);
+        }
+
+        [HttpGet("CheckHwbNoExistedAirExport")]
+        public IActionResult CheckHwbNoExistedAirExport(string hwbno, string jobId, string hblId)
+        {
+            var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
+            var data = csTransactionDetailService.GetDataHawbToCheckExisted();
+            data = data.Where(x => x.TransactionType == transaction.TransactionType);
+            var dataCheck = new List<CsTransactionDetailModel>();
+            if (hblId == null)
+            {
+                if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null))
+                {
+                    dataCheck = data.Where(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null).ToList();
+                }
+            }
+            else
+            {
+                var transactionDetail = csTransactionDetailService.Get(x => x.Id.ToString() == hblId).FirstOrDefault();
+                if (transactionDetail.Hwbno == hwbno)
+                {
+                    return Ok(false);
+                }
+                if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)))
+                {
+                    dataCheck = data.Where(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)).ToList();
+                }
+            }
+            return Ok(dataCheck.Select(t=>t.JobNo).Distinct());
         }
 
         [HttpGet("GenerateHBLNo")]
@@ -244,8 +274,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
                 //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
-                var masterBillIds = csTransactionService.Get(x=>x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Where(x=>x.CurrentStatus != "Canceled").Select(x=>x.Id).ToList();
-                var houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId)).Where(x=> x.ParentId != null);
+                var masterBillIds = csTransactionService.Get(x => x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Where(x => x.CurrentStatus != "Canceled").Select(x => x.Id).ToList();
+                var houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId)).Where(x => x.ParentId == null);
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
                 {
                     if (model.Id == Guid.Empty)
@@ -265,7 +295,7 @@ namespace eFMS.API.Documentation.Controllers
                 }
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && !string.IsNullOrEmpty(model.Mawb))
                 {
-                    if(model.Id == Guid.Empty)
+                    if (model.Id == Guid.Empty)
                     {
 
                         if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID))
@@ -275,7 +305,7 @@ namespace eFMS.API.Documentation.Controllers
                     }
                     else
                     {
-                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id ))
+                        if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
                             message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
                         }
@@ -310,7 +340,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = new { data, totalItems = rowCount, page, size };
             return Ok(result);
         }
-        
+
         [HttpGet]
         [Route("GetGoodSummaryOfAllHblByJobId")]
         public IActionResult GetGoodSummaryOfAllHBLByJobId(Guid jobId)
@@ -395,7 +425,7 @@ namespace eFMS.API.Documentation.Controllers
             var result = csTransactionDetailService.PreviewAirAttachList(hblId);
             return Ok(result);
         }
-        
+
         [HttpGet("PreviewAirImptAuthorisedLetter")]
         public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId)
         {

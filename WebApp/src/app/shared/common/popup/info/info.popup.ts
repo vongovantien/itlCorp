@@ -14,7 +14,7 @@ export class InfoPopupComponent extends eFMSPopup {
     @Input() isShowButton: boolean = true;
     @Input() label: string = 'Ok';
     @Input() align: CommonType.DIRECTION = 'center';
-
+    @Input() class: string = '';
     @Output() onSubmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     constructor() {

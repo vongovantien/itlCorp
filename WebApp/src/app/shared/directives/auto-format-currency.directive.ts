@@ -4,6 +4,7 @@ import { SystemConstants } from '@constants';
 
 @Directive({
     selector: '[autoFormatCurrency]',
+    providers: [CurrencyPipe]
 })
 export class AutoFormatCurrencyDirective {
     @Input() set digits(d: number) { this._digitNumber = ('.0-' + d); }

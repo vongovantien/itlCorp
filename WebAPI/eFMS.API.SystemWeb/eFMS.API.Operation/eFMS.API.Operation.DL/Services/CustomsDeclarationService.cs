@@ -1335,12 +1335,26 @@ namespace eFMS.API.Operation.DL.Services
             //Join theo số JobNo
             var query = from cus in customs
                         join ope in shipmentMerge on cus.JobNo equals ope.JobNo
-                        select cus;
+                        select new { cus, ope };
+            IQueryable<CustomsDeclarationModel> d = null;
+            if(query != null)
+            {
+                d = query.ToList().Select(x => {
+                    x.cus.Hblid = x.ope.Hblid.ToString();
+                    return mapper.Map<CustomsDeclarationModel>(x.cus);
+                }).AsQueryable();
 
-            var data = mapper.Map<List<CustomsDeclarationModel>>(query);
-            data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
-            return data;
+            }
+
+            if(d != null && d.Count() > 0)
+            {
+                var data = d.ToArray().OrderBy(o => o.ClearanceDate).ToList();
+                return data;
+            }
+
+            return new List<CustomsDeclarationModel>();
         }
+
         public bool CheckAllowUpdate(Guid? jobId)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();

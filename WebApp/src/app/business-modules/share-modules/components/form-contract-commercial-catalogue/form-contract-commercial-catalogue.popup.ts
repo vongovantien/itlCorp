@@ -155,7 +155,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((res: SystemInterface.ISpecialAction) => {
                 if (!!res) {
-                    this.isAllowActiveContract = res[0].isAllow;
+                    this.isAllowActiveContract = res[0]?.isAllow;
                 }
 
             });

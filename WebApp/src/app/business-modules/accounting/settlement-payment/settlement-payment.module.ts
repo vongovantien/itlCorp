@@ -5,7 +5,6 @@ import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { AccordionModule, } from 'ngx-bootstrap/accordion';
-import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgProgressModule } from '@ngx-progressbar/core';
 import { NgxCurrencyModule } from 'ngx-currency';
@@ -13,6 +12,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 import { SettlementPaymentComponent } from './settlement-payment.component';
 import { SettlementFormSearchComponent } from './components/form-search-settlement/form-search-settlement.component';
@@ -112,9 +112,9 @@ const maskConfig: Partial<IConfig> = {
         AccordionModule.forRoot(),
         NgxCurrencyModule.forRoot(customCurrencyMaskConfig),
         ShareApprovePaymentModule,
-        BsDropdownModule.forRoot(),
         ShareAccountingModule,
         NgSelectModule,
+        BsDropdownModule.forRoot(),
         StoreModule.forFeature('settlement-payment', reducers),
         EffectsModule.forFeature([SettlePaymentEffect]),
         ShareModulesModule,

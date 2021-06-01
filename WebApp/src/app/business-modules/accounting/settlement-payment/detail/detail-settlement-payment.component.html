@@ -59,21 +59,20 @@
                                         (onClick)="saveAndSendRequest()"></app-permission-button>
                                 </ng-container>
                                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                                    <app-default-button data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false" [buttonSetting]="previewButtonSetting">
+                                    <app-default-button [dpToggle]="dropdownMenu"
+                                        [buttonSetting]="previewButtonSetting">
                                     </app-default-button>
-                                    <div class="dropdown-menu" aria-labelledby="">
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="previewSettlementPayment()">Preview single</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportSettlementPayment('VN')">Print multiple
+
+                                    <app-dropdown #dropdownMenu>
+                                        <a class="dropdown-item pointer" (click)="previewSettlementPayment()">Preview
+                                            single</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN')">Print
+                                            multiple
                                             (VN)</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportSettlementPayment('ENG')">Print multiple
-                                            (ENG)</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportGeneralPreview()">General Preview</a>  
-                                    </div>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG')">Print
+                                            multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportGeneralPreview()">General Preview</a>
+                                    </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                                 </app-default-button>
