@@ -16,7 +16,6 @@ export const getOperationTransationDataSearch = createSelector(OperationState, (
 export const getOperationTransationLoadingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.isLoading);
 export const getOperationTransationPagingState = createSelector(OperationState, (state: IOperationState) => state && state.transaction?.pagingData);
 
-export const getListCustomClearanceState = createSelector(OperationState, (state: IOperationState) => state && state.clearance);
 export const getOperationClearanceList = createSelector(OperationState, (state: IOperationState) => state && state.clearance?.customDeclarations);
 export const getOperationClearanceDataSearch = createSelector(OperationState, (state: IOperationState) => state && state.clearance?.dataSearch);
 export const getOperationClearanceLoadingState = createSelector(OperationState, (state: IOperationState) => state && state.clearance?.isLoading);

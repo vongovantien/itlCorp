@@ -291,7 +291,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
+                                                                                    && ((x.DatetimeCreated >= criteria.FromImportDate && x.DatetimeCreated <= criteria.ToImportDate) || criteria.FromImportDate == null)
                                                                                     && ((x.AccountNo ?? x.PartnerTaxCode) == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
 
             if (criteria.ImPorted == true)
@@ -498,7 +498,7 @@ namespace eFMS.API.Operation.DL.Services
                                                                                     && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null);
+                                                                                    && ((x.DatetimeCreated >= criteria.FromImportDate && x.DatetimeCreated <= criteria.ToImportDate) || criteria.FromImportDate == null);
 
             if (criteria.ImPorted == true)
             {
