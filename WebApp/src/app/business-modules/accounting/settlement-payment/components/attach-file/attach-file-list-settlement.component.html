@@ -67,11 +67,17 @@
                                     </ng-container>
                                 </div>
                                 <div class="file-item__name m--margin-left-20">
-                                    <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
+                                    <a [href]="file.viewFileUrl" target="_blank" [title]="file.name" >{{file.name}}</a>
+
                                     <ng-container *ngIf="!readonly">
                                         <span class="pointer text-center">
                                             <a title="Delete" (click)="deleteFile(file)">
                                                 <i class="la la-times fa-lg text-danger"></i>
+                                            </a>
+                                        </span>
+                                        <span class="pointer text-center" *ngIf="file.dowFile" download>
+                                            <a title="Dowload" target="_blank" [href]="file.url">
+                                                <i class="la la-download fa-lg"></i>
                                             </a>
                                         </span>
                                     </ng-container>

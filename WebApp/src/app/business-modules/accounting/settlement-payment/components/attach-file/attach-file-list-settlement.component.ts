@@ -65,6 +65,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
+                    this.filterViewFile();
                     this.onChange.emit(this.files);
                 }
             )
@@ -124,9 +125,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
         if (this.settlementPayment) {
             var arr = this.settlementPayment.settlement.settlementNo.split("/");
             var model = {
-                folderName:"Settlement",
-                folderId:this._id,
-                fileName:arr[0] + "_" + arr[1] + ".zip"
+                folderName: "Settlement",
+                folderId: this._id,
+                fileName: arr[0] + "_" + arr[1] + ".zip"
             }
             this._accountingRepo.dowloadallAttach(model)
                 .subscribe(
@@ -134,6 +135,22 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
                         this.downLoadFile(res, "application/zip", model.fileName);
                     }
                 )
+        }
+    }
+    filterViewFile() {
+        if (this.files) {
+            var type = ["xlsx","xls", "doc", "docx","pdf","txt"];
+            for (let i = 0; i < this.files.length; i++) {
+                var f = this.files[i];
+                if (type.includes(f.name.split(".")[1])) {
+                    f.dowFile = true 
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                }
+                else{
+                    f.dowFile = false;
+                    f.viewFileUrl = f.url;
+                }
+            }
         }
     }
 }
