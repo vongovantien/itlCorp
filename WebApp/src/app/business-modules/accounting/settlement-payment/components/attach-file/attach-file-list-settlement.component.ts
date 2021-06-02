@@ -58,7 +58,11 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     loadData() {
-        this._store.select('settlement-payment').subscribe((data: ISettlementPaymentState) => this.settlementPayment = data.detail.settlement);
+        this._store.select('settlement-payment') 
+        .pipe(
+            takeUntil(this.ngUnsubscribe)
+        )
+        .subscribe((data: ISettlementPaymentState) => this.settlementPayment = data.detail.settlement);
     }
     getFiles(id: string) {
         this._accountingRepo.getAttachedFiles('Settlement', id)
@@ -123,8 +127,8 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
 
     dowloadAllAttach() {
         if (this.settlementPayment) {
-            var arr = this.settlementPayment.settlement.settlementNo.split("/");
-            var model = {
+            let arr = this.settlementPayment.settlement.settlementNo.split("/");
+            let model = {
                 folderName: "Settlement",
                 folderId: this._id,
                 fileName: arr[0] + "_" + arr[1] + ".zip"
@@ -139,9 +143,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
     filterViewFile() {
         if (this.files) {
-            var type = ["xlsx","xls", "doc", "docx","pdf","txt"];
+            let type = ["xlsx","xls", "doc", "docx","pdf","txt"];
             for (let i = 0; i < this.files.length; i++) {
-                var f = this.files[i];
+                let f = this.files[i];
                 if (type.includes(f.name.split(".")[1])) {
                     f.dowFile = true 
                     f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
