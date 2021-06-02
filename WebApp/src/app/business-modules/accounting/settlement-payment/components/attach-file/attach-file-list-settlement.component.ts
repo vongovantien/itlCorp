@@ -1,4 +1,5 @@
 import { takeUntil } from 'rxjs/operators';
+import { ISettlementPaymentState } from '../store/reducers/index';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
@@ -8,7 +9,8 @@ import { SysImage } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-
+import { Store } from '@ngrx/store';
+import { ISettlementPaymentData } from '../../detail/detail-settlement-payment.component';
 @Component({
     selector: 'settlement-attach-file-list',
     templateUrl: './attach-file-list-settlement.component.html',
@@ -32,11 +34,13 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
 
     files: SysImage[] = [];
     selectedFile: SysImage;
+    settlementPayment: ISettlementPaymentData;
 
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
+        private _store: Store<ISettlementPaymentState>
     ) {
         super();
     }
@@ -50,13 +54,22 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
                     this.getFiles(this._id);
                 }
             );
+        this.loadData();
     }
 
+    loadData() {
+        this._store.select('settlement-payment') 
+        .pipe(
+            takeUntil(this.ngUnsubscribe)
+        )
+        .subscribe((data: ISettlementPaymentState) => this.settlementPayment = data.detail.settlement);
+    }
     getFiles(id: string) {
         this._accountingRepo.getAttachedFiles('Settlement', id)
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
+                    this.filterViewFile();
                     this.onChange.emit(this.files);
                 }
             )
@@ -112,4 +125,36 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
             )
     }
 
+    dowloadAllAttach() {
+        if (this.settlementPayment) {
+            let arr = this.settlementPayment.settlement.settlementNo.split("/");
+            let model = {
+                folderName: "Settlement",
+                folderId: this._id,
+                fileName: arr[0] + "_" + arr[1] + ".zip"
+            }
+            this._accountingRepo.dowloadallAttach(model)
+                .subscribe(
+                    (res: any) => {
+                        this.downLoadFile(res, "application/zip", model.fileName);
+                    }
+                )
+        }
+    }
+    filterViewFile() {
+        if (this.files) {
+            let type = ["xlsx","xls", "doc", "docx","pdf","txt"];
+            for (let i = 0; i < this.files.length; i++) {
+                let f = this.files[i];
+                if (type.includes(f.name.split(".")[1])) {
+                    f.dowFile = true 
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                }
+                else{
+                    f.dowFile = false;
+                    f.viewFileUrl = f.url;
+                }
+            }
+        }
+    }
 }

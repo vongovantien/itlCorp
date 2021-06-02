@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -1359,5 +1360,16 @@ namespace eFMS.API.Accounting.Controllers
             }
             return BadRequest(hs);
         }
-    }     
+
+        [HttpPost("DowloadAllFileAttached")]
+        //[Authorize]
+        public async Task<ActionResult> DowloadAllFileAttached(FileDowloadZipModel m)
+        {
+            //Return memoryStream res.message
+            var res = await sysFileService.CreateFileZip(m);
+            if (res.Success)
+                return File((MemoryStream)res.Message, "application/zip", m.FileName);
+            return BadRequest(res);
+        }
+    }
 }

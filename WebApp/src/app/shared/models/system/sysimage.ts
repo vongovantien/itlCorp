@@ -11,4 +11,6 @@ export class SysImage {
     userModified: string;
     datetimeModified: Date;
     isTemp: boolean;
+    dowFile :boolean;
+    viewFileUrl:string;
 }

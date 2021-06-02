@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -110,6 +111,31 @@ namespace eFMS.API.Accounting.DL.Services
             catch (Exception ex)
             {
                 return new HandleState(ex.ToString());
+            }
+        }
+
+        public async Task<HandleState> CreateFileZip(FileDowloadZipModel m)
+        {
+            try
+            {
+                var pathFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\"+ m.FileName);
+                string startPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.FolderId);
+
+                ZipFile.CreateFromDirectory(startPath, pathFile);
+                
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(pathFile, FileMode.Open))
+                    await stream.CopyToAsync(memory);
+                memory.Position = 0L;
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                return new HandleState(true, memory);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(false, ex.ToString());
             }
         }
     }
