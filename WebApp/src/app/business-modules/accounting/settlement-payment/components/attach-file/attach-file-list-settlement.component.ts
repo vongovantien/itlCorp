@@ -11,6 +11,7 @@ import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Store } from '@ngrx/store';
 import { ISettlementPaymentData } from '../../detail/detail-settlement-payment.component';
+import { getSettlementPaymentDetailState } from '../store/reducers/index';
 @Component({
     selector: 'settlement-attach-file-list',
     templateUrl: './attach-file-list-settlement.component.html',
@@ -58,11 +59,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     loadData() {
-        this._store.select('settlement-payment') 
-        .pipe(
-            takeUntil(this.ngUnsubscribe)
-        )
-        .subscribe((data: ISettlementPaymentState) => this.settlementPayment = data.detail.settlement);
+        this._store.select(getSettlementPaymentDetailState) 
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((data: any) => this.settlementPayment = data);
     }
     getFiles(id: string) {
         this._accountingRepo.getAttachedFiles('Settlement', id)
@@ -143,10 +142,10 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
     filterViewFile() {
         if (this.files) {
-            let type = ["xlsx","xls", "doc", "docx","pdf","txt"];
+            let type = ["xlsx","xls", "doc", "docx"];
             for (let i = 0; i < this.files.length; i++) {
                 let f = this.files[i];
-                if (type.includes(f.name.split(".")[1])) {
+                if (type.includes(f.name.split('.').pop())) {
                     f.dowFile = true 
                     f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
                 }
