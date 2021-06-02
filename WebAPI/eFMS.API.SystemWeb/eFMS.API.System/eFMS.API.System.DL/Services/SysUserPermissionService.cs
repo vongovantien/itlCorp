@@ -157,7 +157,8 @@ namespace eFMS.API.System.DL.Services
                         {
                             SysUserPermission userPermission = mapper.Map<SysUserPermission>(item);
                             userPermission.Id = Guid.NewGuid();
-                            userPermission.DatetimeCreated = userPermission.DatetimeModified = DateTime.Now;
+                            userPermission.UserCreated = userPermission.UserModified = currentUser.UserID;
+                            userPermission.DatetimeCreated = userPermission.DatetimeModified = userPermission.DatetimeModified = DateTime.Now;
 
                             DataContext.Add(userPermission, false);
 
