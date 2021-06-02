@@ -753,6 +753,13 @@ namespace eFMS.API.Documentation.DL.Services
                 opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
                 opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
 
+
+                bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
+                if (existedJobNo == true)
+                {
+                    return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
+                }
+
                 DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
@@ -978,6 +985,13 @@ namespace eFMS.API.Documentation.DL.Services
                                 opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
                                 opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
 
+
+                                bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
+                                if (existedJobNo == true)
+                                {
+                                    return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
+                                }
+
                                 DataContext.Add(opsTransaction);
 
                                 CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
@@ -1096,6 +1110,19 @@ namespace eFMS.API.Documentation.DL.Services
                 return stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_HBNO_EXISTED].Value;
             }
             return null;
+        }
+
+        private bool CheckExistJobNo(Guid Id, string jobNo)
+        {
+            bool isExisted = false;
+            if(Id == Guid.Empty)
+            {
+                return isExisted;
+            }
+
+            isExisted = DataContext.Any(x => x.Id != Id && x.JobNo == jobNo && x.CurrentStatus != TermData.Canceled);
+
+            return isExisted;
         }
 
         public Crystal PreviewFormPLsheet(Guid id, string currency)
