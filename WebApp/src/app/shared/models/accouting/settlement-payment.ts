@@ -39,6 +39,7 @@ export class SettlementPayment {
     bankName: string = null;
     bankAccountName: string = null;
     bankAccountNo: string = null;
+    departmentName: string = null;
 
     constructor(object?: any) {
         const self = this;
