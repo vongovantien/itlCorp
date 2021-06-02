@@ -16,6 +16,7 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> UploadFiles(FileUploadModel model);
         Task<HandleState> DeleteFile(string folder, Guid id);
         List<SysImage> GetFiles(string folderName, Guid Id);
+        Task<HandleState> CreateFileZip(FileDowloadZipModel model);
     }
 
     public class FileUploadModel
@@ -24,5 +25,12 @@ namespace eFMS.API.Accounting.DL.IService
         public string FolderName { get; set; }
         public Guid Id { get; set; }
         public string Child { get; set; }
+    }
+
+    public class FileDowloadZipModel   
+    {
+        public string FolderName { get; set; }
+        public Guid FolderId { get; set; }
+        public string FileName { get; set; }
     }
 }

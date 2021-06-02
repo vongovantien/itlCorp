@@ -858,6 +858,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+    dowloadallAttach(body:any) {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`,body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 
 
