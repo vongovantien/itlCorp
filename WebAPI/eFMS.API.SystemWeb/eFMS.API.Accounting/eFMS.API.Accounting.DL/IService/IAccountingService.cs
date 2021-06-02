@@ -27,6 +27,7 @@ namespace eFMS.API.Accounting.DL.IService
         void SendMailAndPushNotificationToAccountant(List<SyncCreditModel> syncCreditModels);
         void SendMailAndPushNotificationDebitToAccountant(List<SyncModel> syncModels);
         List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs);
+        List<PaymentModel> GetListReceiptAllInToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs);
         HandleState SyncListReceiptToAccountant(List<Guid> ids, List<AcctReceiptSyncModel> receiptSyncs);
         bool CheckCdNoteSynced(Guid idCdNote);
         bool CheckSoaSynced(string idSoa);

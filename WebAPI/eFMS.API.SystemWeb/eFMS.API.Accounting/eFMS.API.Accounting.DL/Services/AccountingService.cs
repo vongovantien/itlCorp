@@ -2614,6 +2614,12 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- Send Mail & Push Notification to Accountant ---
 
         #region -- Get Data & Sync Receipt --
+        /// <summary>
+        /// Get data sync từng type trong phiếu thu [15658]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
         public List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
         {
             List<PaymentModel> data = new List<PaymentModel>();
@@ -2645,6 +2651,33 @@ namespace eFMS.API.Accounting.DL.Services
                     receiptSyncs.Add(receiptSyncAdv);
                     data.Add(syncAdv);
                 }
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// Option: Get data sync đc tất cả các type trong cùng 1 phiếu thu [15817]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
+        public List<PaymentModel> GetListReceiptAllInToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
+        {
+            List<PaymentModel> data = new List<PaymentModel>();
+            receiptSyncs = new List<AcctReceiptSyncModel>();
+            if (ids == null || ids.Count() == 0) return data;
+
+            var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
+            foreach (var receipt in receipts)
+            {
+                var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
+                if (payments.Count() > 0)
+                {
+                    //Không phân biệt type (ADV, DEBIT, CREDIT) nên gán = null
+                    var syncPayment = GenerateReceiptToAccountant(null, receipt, payments, out AcctReceiptSyncModel receiptSync);
+                    receiptSyncs.Add(receiptSync);
+                    data.Add(syncPayment);
+                }                
             }
             return data;
         }
