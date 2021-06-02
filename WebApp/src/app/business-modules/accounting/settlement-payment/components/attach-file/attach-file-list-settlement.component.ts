@@ -11,6 +11,7 @@ import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 import { Store } from '@ngrx/store';
 import { ISettlementPaymentData } from '../../detail/detail-settlement-payment.component';
+import { getSettlementPaymentDetailState } from '../store/reducers/index';
 @Component({
     selector: 'settlement-attach-file-list',
     templateUrl: './attach-file-list-settlement.component.html',
@@ -58,11 +59,9 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     loadData() {
-        this._store.select('settlement-payment') 
-        .pipe(
-            takeUntil(this.ngUnsubscribe)
-        )
-        .subscribe((data: ISettlementPaymentState) => this.settlementPayment = data.detail.settlement);
+        this._store.select(getSettlementPaymentDetailState) 
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((data: any) => this.settlementPayment = data);
     }
     getFiles(id: string) {
         this._accountingRepo.getAttachedFiles('Settlement', id)
