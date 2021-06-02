@@ -18,11 +18,11 @@
                                     title="Upload files" />
                             </div>
                             <br/>
-                            <div class="float-left">
-                                <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="dowloadAllAttach()">
+                            <div class="float-left" *ngIf="files.length > 0">
+                                <button type="button" class="btn btn-info m-btn--icon m-btn--uppercase " (click)="dowloadAllAttach()">
                                     <span>
                                         <i class="la la-download"></i>
-                                        <span> Dowload All Attach</span>
+                                        <span> Dowload All Files</span>
                                     </span>
                                 </button>  
                             </div>
@@ -69,8 +69,8 @@
                                 <div class="file-item__name m--margin-left-20">
                                     <a [href]="file.viewFileUrl" target="_blank" [title]="file.name" >{{file.name}}</a>
 
-                                    <ng-container *ngIf="!readonly">
-                                        <span class="pointer text-center">
+                                    <ng-container >
+                                        <span class="pointer text-center" *ngIf="!readonly">
                                             <a title="Delete" (click)="deleteFile(file)">
                                                 <i class="la la-times fa-lg text-danger"></i>
                                             </a>

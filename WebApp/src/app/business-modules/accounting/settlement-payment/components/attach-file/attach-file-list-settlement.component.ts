@@ -142,10 +142,10 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
     filterViewFile() {
         if (this.files) {
-            let type = ["xlsx","xls", "doc", "docx","pdf","txt"];
+            let type = ["xlsx","xls", "doc", "docx"];
             for (let i = 0; i < this.files.length; i++) {
                 let f = this.files[i];
-                if (type.includes(f.name.split(".")[1])) {
+                if (type.includes(f.name.split('.').pop())) {
                     f.dowFile = true 
                     f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
                 }
