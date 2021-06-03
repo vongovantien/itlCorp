@@ -40,6 +40,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementPayment: ISettlementPaymentData;
 
     attachFiles: SysImage[] = [];
+    folderModuleName:string='Settlement';
 
     constructor(
         private _activedRouter: ActivatedRoute,
