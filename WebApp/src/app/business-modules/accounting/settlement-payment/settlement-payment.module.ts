@@ -38,7 +38,7 @@ import { SettlementPaymentsPopupComponent } from './components/popup/settlement-
 import { ShareModulesModule } from '../../share-modules/share-modules.module';
 import { SettlePaymentEffect } from './components/store/effects/settlement-payment.effect';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
-import { AccoutingAttachFileListComponent } from '../components/attach-file/attach-file-list.component';
+
 import { SettlementShipmentAttachFilePopupComponent } from './components/popup/shipment-attach-files/shipment-attach-file-settlement.popup';
 
 const routing: Routes = [
@@ -79,8 +79,7 @@ const COMPONENT = [
     SettlementTableListChargePopupComponent,
     SettlementChargeFromShipmentPopupComponent,
     SettlementPaymentsPopupComponent,
-    SettlementShipmentAttachFilePopupComponent,
-    AccoutingAttachFileListComponent
+    SettlementShipmentAttachFilePopupComponent
 ];
 
 const customCurrencyMaskConfig = {
