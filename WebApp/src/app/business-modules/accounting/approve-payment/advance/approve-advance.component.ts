@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppPage } from 'src/app/app.base';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { AdvancePayment } from '@models';
+import { AdvancePayment,SysImage } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
@@ -41,6 +41,9 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
     modalRef: BsModalRef;
     comment: string = '';
     paymentTerm: number;
+
+    attachFiles: SysImage[] = [];
+    folderModuleName:string='Advance';
 
     constructor(
         private _accoutingRepo: AccountingRepo,

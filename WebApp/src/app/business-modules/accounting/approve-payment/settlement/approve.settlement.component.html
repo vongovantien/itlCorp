@@ -45,8 +45,8 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <settlement-attach-file-list (onChange)="attachFiles = $event" readOnly>
-                        </settlement-attach-file-list>
+                        <accounting-attach-file-list  *ngIf="!!settlementPayment" (onChange)="attachFiles = $event" [fileNo]="settlementPayment.settlement.settlementNo" [folderModuleName]="folderModuleName">
+                        </accounting-attach-file-list>
                     </tab>
                 </tabset>
 
