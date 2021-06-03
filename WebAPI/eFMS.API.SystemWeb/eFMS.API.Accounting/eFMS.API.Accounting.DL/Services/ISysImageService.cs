@@ -124,6 +124,9 @@ namespace eFMS.API.Accounting.DL.Services
                 List<SysImage> lstFile = new List<SysImage>();
                 lstFile = DataContext.Get(e => e.ChildId == m.ChillId && e.ObjectId == m.ObjectId && e.Folder == m.FolderName).ToList();
 
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
                 //Create File zip
                 using (FileStream zipToOpen = new FileStream(pathFile, FileMode.Create))
                 {

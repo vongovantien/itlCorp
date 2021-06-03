@@ -17,15 +17,6 @@
                                 <input type="file" multiple (change)="chooseFile($event)" [accept]="accepctFilesUpload"
                                     title="Upload files" />
                             </div>
-                            <br/>
-                            <div class="float-left" *ngIf="files.length > 0">
-                                <button type="button" class="btn btn-info m-btn--icon m-btn--uppercase " (click)="dowloadAllAttach()">
-                                    <span>
-                                        <i class="la la-download"></i>
-                                        <span> Dowload All Files</span>
-                                    </span>
-                                </button>  
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -37,6 +28,16 @@
         <div class="m-portlet__body">
             <ul class="list-group list-unstyled">
                 <ng-container *ngIf="!!(files.length)">
+                    <br/>
+                    <div class="float-left" *ngIf="files.length > 1">
+                        <button type="button" class="btn btn-info m-btn--icon m-btn--uppercase " (click)="dowloadAllAttach()">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span> Download All Files</span>
+                            </span>
+                        </button>  
+                    </div>
+                    <br/>
                     <li class="list-group-item file__item m-animate-fade-in"
                         *ngFor="let file of files; let i = index; trackBy:trackByFn">
                         <div class="d-flex align-items-center justify-content-between">
