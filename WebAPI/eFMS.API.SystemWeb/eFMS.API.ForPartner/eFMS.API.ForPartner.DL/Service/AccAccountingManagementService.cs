@@ -1087,7 +1087,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 foreach (var advR in advReq)
                                 {
                                     advR.ReferenceNo = item.ReferenceNo;
-                                    acctAdvanceRequestRepository.Update(advR, x => x.Id == item.RowID, false);
+                                    var resultAdr = acctAdvanceRequestRepository.Update(advR, x => x.Id == advR.Id, false);
                                 }
                             }
                         }
