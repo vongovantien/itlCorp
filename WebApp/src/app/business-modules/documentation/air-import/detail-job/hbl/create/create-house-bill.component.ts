@@ -90,7 +90,8 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
     onImport(selectedData: any) {
         this.isImport = true;
         this.selectedHbl = selectedData;
-        this.selectedHbl.hwbno = null;
+        this.selectedHbl.hwbno = this.formCreateHBLComponent.hwbno.value;
+        this.selectedHbl.mawb = this.formCreateHBLComponent.mawb.value;
         this.formCreateHBLComponent.updateFormValue(this.selectedHbl);
     }
 
