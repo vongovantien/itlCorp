@@ -19,7 +19,6 @@ job_build:
     - echo "start job_build"
     - cd WebApp
     - npm install
-    - npm install -g @angular/cli
     - ng version
     #- node_modules/.bin/ng build --c=uat-en
     - npm run build:uat:en
