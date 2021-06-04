@@ -18,8 +18,8 @@ job_build:
     - node --version
     - echo "start job_build"
     - npm install
+    - npm install -g @angular/cli
     - cd WebApp
-    - npm run build:uat:en
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
