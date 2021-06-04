@@ -1,31 +1,32 @@
 variables:
-    PROJECT_PATH: "$CI_PROJECT_DIR"
-    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/eFMS-Web"
+  PROJECT_PATH: "$CI_PROJECT_DIR"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/uat"
 
 image: node:12
 
 cache:
-    paths:
-        - node_modules
-        - package-lock.json
+  paths:
+    - node_modules
+    - package-lock.json
 stages:
-    - build
+  - build
+  # - deploy
 
 job_build:
-    stage: build
-    script:
-        - node --version
-        - echo "start job_build"
-        - npm install
-        - npm run build
-        # - echo "job_build doing something..."
-        - echo "end job_build"
-    # only:
-    #     - uat/fixbug/fix-bug-uat
-    artifacts:
-        name: "angular_build"
-        paths:
-            - $APP_OUTPUT_PATH
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - npm install
+    - npm run build:uat:en
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - uat/29-05-2021-sprint24
+  artifacts:
+    name: "angular_build"
+    paths:
+      - $APP_OUTPUT_PATH
 # job_deploy:
 #   stage: deploy
 #   script:
