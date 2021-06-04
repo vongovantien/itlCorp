@@ -21,7 +21,7 @@ job_build:
     - npm install -g @angular/cli
     - cd WebApp
     - ng version
-    - ng build --c=uat-en
+    - ./node_modules/.bin/ng build --c=uat-en
     #- npm run build:uat:en
     - echo "job_build doing something..."
     - echo "end job_build"
