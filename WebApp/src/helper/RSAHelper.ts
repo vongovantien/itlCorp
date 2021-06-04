@@ -7,18 +7,18 @@ export class RSAHelper {
         if (((plainText == null ? null : plainText) || '') === '' || ((key == null ? null : plainText) || '') === '') {
             return null;
         }
-        const decrypt = new JSEncryptModule.JSEncrypt();
+        const decrypt = new JSEncryptModule.JSEncrypt(null);
         decrypt.setPublicKey(key);
-        return decrypt.encrypt(plainText);
+        return '' + decrypt.encrypt(plainText);
     }
 
     public static decode(encodingText: string, key): string {
         if (((encodingText == null ? null : encodingText) || '') === '' || ((key == null ? null : key) || '') === '') {
             return null;
         }
-        const decrypt = new JSEncryptModule.JSEncrypt();
+        const decrypt = new JSEncryptModule.JSEncrypt(null);
         decrypt.setPrivateKey(key);
-        return decrypt.decrypt(encodingText);
+        return '' + decrypt.decrypt(encodingText);
     }
 
     public static clientEncode(plainText: string) {
