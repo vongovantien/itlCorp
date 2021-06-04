@@ -6,8 +6,8 @@ image: node:12
 
 cache:
   paths:
-    - node_modules
-    - package-lock.json
+    - ./WebApp/node_modules
+    - ./WebApp/package-lock.json
 stages:
   - build
   # - deploy
@@ -17,9 +17,9 @@ job_build:
   script:
     - node --version
     - echo "start job_build"
+    - cd WebApp
     - npm install
     - npm install -g @angular/cli
-    - cd WebApp
     - ng version
     #- node_modules/.bin/ng build --c=uat-en
     - npm run build:uat:en
