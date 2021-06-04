@@ -15,9 +15,9 @@ job_build:
     stage: build
     script:
         - node --version
-        # - echo "start job_build"
-        # - npm install
-        # - npm run build
+        - echo "start job_build"
+        - npm install
+        - npm run build
         # - echo "job_build doing something..."
         - echo "end job_build"
     # only:
