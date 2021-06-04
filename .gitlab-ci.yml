@@ -1,6 +1,6 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/uat/eFMS-en"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
 
 image: node:12
 
