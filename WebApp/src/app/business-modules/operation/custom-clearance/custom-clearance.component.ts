@@ -1,8 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { SortService } from 'src/app/shared/services/sort.service';
 import { ToastrService } from 'ngx-toastr';
-import { PlaceTypeEnum } from 'src/app/shared/enums/placeType-enum';
-import { catchError, map, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, map, finalize, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { CustomDeclaration } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { OperationRepo, DocumentationRepo, CatalogueRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -15,6 +14,8 @@ import { Store } from '@ngrx/store';
 import { SystemConstants } from 'src/constants/system.const';
 import { formatDate } from '@angular/common';
 import { RoutingConstants } from '@constants';
+import { getOperationClearanceDataSearch, getOperationClearanceList, getOperationClearanceLoadingState, getOperationClearancePagingState } from '../store';
+import { CustomsDeclarationLoadListAction } from '../store/actions/custom-clearance.action';
 
 @Component({
     selector: 'app-custom-clearance',
@@ -29,6 +30,13 @@ export class CustomClearanceComponent extends AppList {
     messageConvertError: string = '';
     clearancesToConvert: CustomDeclaration[] = [];
     headers: CommonInterface.IHeaderTable[];
+    defaultDataSearch= {
+        fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
+        toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
+        imPorted: null,
+        personHandle: JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id
+    };
+
     constructor(
         private _store: Store<IAppState>,
         private _sortService: SortService,
@@ -41,15 +49,9 @@ export class CustomClearanceComponent extends AppList {
         private _router: Router,
     ) {
         super();
-        this.requestList = this.getListCustomsDeclaration;
         this.requestSort = this.sortCD;
         this._progressRef = this._ngProgressService.ref();
-        this.dataSearch = {
-            fromClearanceDate: formatDate(new Date(new Date().setDate(new Date().getDate() - 30)), 'yyyy-MM-dd', 'en'),
-            toClearanceDate: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
-            imPorted: null,
-            personHandle: JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS)).id
-        };
+        this.requestList = this.requestCustomDeclarationList;
     }
 
     ngOnInit() {
@@ -76,34 +78,57 @@ export class CustomClearanceComponent extends AppList {
             { title: 'Import Country', field: 'importCountryName', sortable: true },
             { title: 'Export Country', field: 'exportCountryName', sortable: true },
         ];
+        this.getListSettlePayment();
         this.getListCustomsDeclaration();
+        this.isLoading = this._store.select(getOperationClearanceLoadingState);
     }
 
     onSearchClearance(dataSearch?: any) {
         this.dataSearch = dataSearch;
-        this.page = 1;
-        this.getListCustomsDeclaration();
     }
 
     getListCustomsDeclaration() {
-        this.isLoading = true;
-        this._progressRef.start();
-        const body = this.dataSearch || {};
-        this._operationRepo.getListCustomDeclaration(this.page, this.pageSize, body)
+        this._store.select(getOperationClearanceDataSearch)
+        .pipe(
+            withLatestFrom(this._store.select(getOperationClearancePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (criteria: any) => {
+                if (!!criteria.dataSearch) {
+                    this.dataSearch = criteria.dataSearch;
+                }
+                else{
+                    this.dataSearch = this.defaultDataSearch;
+                }
+
+                this.page = criteria.page;
+                this.pageSize = criteria.pageSize;
+                this.requestCustomDeclarationList();
+            }
+        );
+    }
+
+    requestCustomDeclarationList() {
+        this._store.dispatch(CustomsDeclarationLoadListAction({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    getListSettlePayment() {
+        this._store.select(getOperationClearanceList)
             .pipe(
                 catchError(this.catchError),
-                map((data: any) => {
+                takeUntil(this.ngUnsubscribe),
+                map((data: CommonInterface.IResponsePaging | any) => {
                     return {
                         data: data.data.map((item: any) => new CustomDeclaration(item)),
                         totalItems: data.totalItems,
                     };
-                }),
-                finalize(() => { this.isLoading = false; this._progressRef.complete(); })
-            )
-            .subscribe(
+                })
+            ).subscribe(
                 (res: any) => {
-                    this.listCustomDeclaration = res.data;
-                    this.totalItems = res.totalItems;
+                    this.listCustomDeclaration = res.data || [];
+                    this.totalItems = res.totalItems || 0;
                 },
             );
     }

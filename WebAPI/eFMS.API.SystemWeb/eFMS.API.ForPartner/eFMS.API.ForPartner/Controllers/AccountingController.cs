@@ -619,5 +619,44 @@ namespace eFMS.API.ForPartner.Controllers
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
+        
+        /// <summary>
+        /// Cập nhật thông tin phiếu chi và số HT
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateVoucherExpense")]
+        public IActionResult UpdateVoucherExpense(VoucherExpense model, [Required] string apiKey, [Required] string hash)
+        {
+            var _startDateProgress = DateTime.Now;
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = accountingManagementService.UpdateVoucherExpense(model, apiKey);
+            string _message = hs.Success ? "Cập nhật thông tin phiếu chi và số HT thành công" : string.Format("{0}. Cập nhật thông tin phiếu chi và số HT thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+            #region -- Ghi Log --
+            string _funcLocal = "UpdateVoucherExpense";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = string.Format("UpdateVoucherExpense {0}", model.DocType);
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion -- Ghi Log --
+
+            if (!hs.Success)
+                return Ok(result);
+            return Ok(result);
+        }
     }
 }

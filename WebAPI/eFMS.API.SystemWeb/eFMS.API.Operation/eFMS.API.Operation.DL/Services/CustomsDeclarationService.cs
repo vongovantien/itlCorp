@@ -288,10 +288,10 @@ namespace eFMS.API.Operation.DL.Services
             }
             Expression<Func<CustomsDeclaration, bool>> query = x => (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
-                                                                                    && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
+                                                                                    && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null)
+                                                                                    && ((x.DatetimeCreated >= criteria.FromImportDate && x.DatetimeCreated <= criteria.ToImportDate) || criteria.FromImportDate == null)
                                                                                     && ((x.AccountNo ?? x.PartnerTaxCode) == criteria.CustomerNo || string.IsNullOrEmpty(criteria.CustomerNo));
 
             if (criteria.ImPorted == true)
@@ -495,10 +495,10 @@ namespace eFMS.API.Operation.DL.Services
 
             Expression<Func<CustomsDeclarationModel, bool>> query = x => (x.ClearanceNo.IndexOf(criteria.ClearanceNo ?? "", StringComparison.OrdinalIgnoreCase) > -1)
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
-                                                                                    && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type))
+                                                                                    && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
                                                                                     && (x.ClearanceDate <= criteria.ToClearanceDate || criteria.ToClearanceDate == null)
-                                                                                    && (x.DatetimeCreated >= criteria.FromImportDate || criteria.FromImportDate == null);
+                                                                                    && ((x.DatetimeCreated >= criteria.FromImportDate && x.DatetimeCreated <= criteria.ToImportDate) || criteria.FromImportDate == null);
 
             if (criteria.ImPorted == true)
             {
@@ -1335,12 +1335,26 @@ namespace eFMS.API.Operation.DL.Services
             //Join theo số JobNo
             var query = from cus in customs
                         join ope in shipmentMerge on cus.JobNo equals ope.JobNo
-                        select cus;
+                        select new { cus, ope };
+            IQueryable<CustomsDeclarationModel> d = null;
+            if(query != null)
+            {
+                d = query.ToList().Select(x => {
+                    x.cus.Hblid = x.ope.Hblid.ToString();
+                    return mapper.Map<CustomsDeclarationModel>(x.cus);
+                }).AsQueryable();
 
-            var data = mapper.Map<List<CustomsDeclarationModel>>(query);
-            data = data.ToArray().OrderBy(o => o.ClearanceDate).ToList();
-            return data;
+            }
+
+            if(d != null && d.Count() > 0)
+            {
+                var data = d.ToArray().OrderBy(o => o.ClearanceDate).ToList();
+                return data;
+            }
+
+            return new List<CustomsDeclarationModel>();
         }
+
         public bool CheckAllowUpdate(Guid? jobId)
         {
             var detail = opsTransactionRepo.Get(x => x.Id == jobId && x.CurrentStatus != "Canceled")?.FirstOrDefault();

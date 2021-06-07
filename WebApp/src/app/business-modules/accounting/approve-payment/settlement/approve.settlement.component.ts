@@ -46,7 +46,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     comment: string = '';
 
     attachFiles: SysImage[] = [];
-
+    folderModuleName:string='Settlement';
+    
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,

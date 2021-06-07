@@ -2536,16 +2536,17 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Carrier", //5
                 "Agent", //6
                 "Service Date", //7
-                "Route", //8
-                "Qty", //9
-                "CW", //10
-                "Revenue", //11
-                "Cost", //12
-                "Profit", //13
-                "OBH", //14
-                "P.I.C", //15
-                "Salesman", //16
-                "Service" //17
+                "Vessel/Flight", //8
+                "Route", //9
+                "Qty", //10
+                "CW", //11
+                "Revenue", //12
+                "Cost", //13
+                "Profit", //14
+                "OBH", //15
+                "P.I.C", //16
+                "Salesman", //17
+                "Service" //18
             };
             workSheet.Cells["A1:R1"].Style.Font.Bold = true;
             for (int c = 1; c < 19; c++)
@@ -2575,35 +2576,36 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[startRow, 7].Style.WrapText = true;
                 workSheet.Cells[startRow, 8].Value = item.ServiceDate;
                 workSheet.Cells[startRow, 8].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[startRow, 9].Value = item.Route;
+                workSheet.Cells[startRow, 9].Value = item.VesselFlight;
+                workSheet.Cells[startRow, 10].Value = item.Route;
 
-                workSheet.Cells[startRow, 10].Value = item.Qty;
-                workSheet.Cells[startRow, 11].Value = item.ChargeWeight;
-                workSheet.Cells[startRow, 12].Value = item.Revenue;
-                workSheet.Cells[startRow, 13].Value = item.Cost;
-                workSheet.Cells[startRow, 14].Value = item.Profit;
-                workSheet.Cells[startRow, 15].Value = item.Obh;
+                workSheet.Cells[startRow, 11].Value = item.Qty;
+                workSheet.Cells[startRow, 12].Value = item.ChargeWeight;
+                workSheet.Cells[startRow, 13].Value = item.Revenue;
+                workSheet.Cells[startRow, 14].Value = item.Cost;
+                workSheet.Cells[startRow, 15].Value = item.Profit;
+                workSheet.Cells[startRow, 16].Value = item.Obh;
 
-                workSheet.Cells[startRow, 10].Style.Numberformat.Format = numberFormatVND;
+                workSheet.Cells[startRow, 11].Style.Numberformat.Format = numberFormatVND;
 
                 if (criteria.Currency != "VND")
                 {
-                    for (int i = 11; i < 16; i++)
+                    for (int i = 12; i < 17; i++)
                     {
                         workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormatVND;
                     }
                 }
                 else
                 {
-                    for (int i = 11; i < 16; i++)
+                    for (int i = 12; i < 17; i++)
                     {
                         workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormats;
                     }
                 }
 
-                workSheet.Cells[startRow, 16].Value = item.PersonInCharge;
-                workSheet.Cells[startRow, 17].Value = item.Salesman;
-                workSheet.Cells[startRow, 18].Value = item.ServiceName;
+                workSheet.Cells[startRow, 17].Value = item.PersonInCharge;
+                workSheet.Cells[startRow, 18].Value = item.Salesman;
+                workSheet.Cells[startRow, 19].Value = item.ServiceName;
 
                 startRow += 1;
             }
@@ -2613,32 +2615,32 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[startRow, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Row(startRow).Style.Font.Bold = true;
             workSheet.Cells["A" + startRow + ":I" + startRow].Merge = true;
-            workSheet.Cells[startRow, 10].Value = listData.Sum(su => su.Qty); //Total Qty
-            workSheet.Cells[startRow, 10].Style.Numberformat.Format = numberFormatVND;
-            workSheet.Cells[startRow, 11].Value = listData.Sum(su => su.ChargeWeight); //Total Charge Weight
-            workSheet.Cells[startRow, 12].Value = listData.Sum(su => su.Revenue); //Total Revenue
-            workSheet.Cells[startRow, 13].Value = listData.Sum(su => su.Cost); //Total Cost
-            workSheet.Cells[startRow, 14].Value = listData.Sum(su => su.Profit); //Total Profit
-            workSheet.Cells[startRow, 15].Value = listData.Sum(su => su.Obh); //Total OBH
+            workSheet.Cells[startRow, 11].Value = listData.Sum(su => su.Qty); //Total Qty
+            workSheet.Cells[startRow, 11].Style.Numberformat.Format = numberFormatVND;
+            workSheet.Cells[startRow, 12].Value = listData.Sum(su => su.ChargeWeight); //Total Charge Weight
+            workSheet.Cells[startRow, 13].Value = listData.Sum(su => su.Revenue); //Total Revenue
+            workSheet.Cells[startRow, 14].Value = listData.Sum(su => su.Cost); //Total Cost
+            workSheet.Cells[startRow, 15].Value = listData.Sum(su => su.Profit); //Total Profit
+            workSheet.Cells[startRow, 16].Value = listData.Sum(su => su.Obh); //Total OBH
             if (criteria.Currency != "VND")
             {
-                for (int i = 11; i < 16; i++)
+                for (int i = 12; i < 17; i++)
                 {
                     workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormatVND;
                 }
             }
             else
             {
-                for (int i = 11; i < 16; i++)
+                for (int i = 12; i < 17; i++)
                 {
                     workSheet.Cells[startRow, i].Style.Numberformat.Format = numberFormats;
                 }
             }
 
-            workSheet.Cells[1, 1, startRow, 18].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow, 18].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow, 18].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[1, 1, startRow, 18].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 19].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 19].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 19].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[1, 1, startRow, 19].Style.Border.Right.Style = ExcelBorderStyle.Thin;
         }
         #endregion
 

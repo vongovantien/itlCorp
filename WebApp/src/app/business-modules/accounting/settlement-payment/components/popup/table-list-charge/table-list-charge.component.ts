@@ -325,7 +325,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                         }
                     }
 
-                    this.getAdvances(data.jobNo, data.hblId, true, this.settlementCode);
+                    this.getAdvances(data.jobNo, data.hblid, true, this.settlementCode);
 
                 } else {
                     this.selectedAdvance = null;
