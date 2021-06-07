@@ -13,6 +13,6 @@ namespace eFMS.API.ReportData.Models
         public string DistrictNameEN { get; set; }
         public string ProvinceNameEN { get; set; }
         public string CountryNameEN { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }

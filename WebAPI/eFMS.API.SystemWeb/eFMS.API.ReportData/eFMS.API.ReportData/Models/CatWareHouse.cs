@@ -12,6 +12,6 @@ namespace eFMS.API.ReportData.Models
         public string DistrictName { get; set; }
         public string ProvinceName { get; set; }
         public short? CountryName { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }
