@@ -11,8 +11,7 @@ cache:
 stages:
   - build
   # - deploy
-
-job_build:
+build_uat:
   stage: build
   script:
     - node --version
@@ -30,9 +29,10 @@ job_build:
   artifacts:
     name: "angular_build"
     paths:
-      - dist/
-job_build:      
-stage: build
+      - APP_OUTPUT_PATH
+      
+build_test:      
+  stage: build
   script:
     - node --version
     - echo "start job_build"
@@ -49,4 +49,4 @@ stage: build
   artifacts:
     name: "angular_build"
     paths:
-      - dist/
+      - APP_OUTPUT_PATH
