@@ -303,6 +303,15 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 },
             );
     }
+    
+    previewExportSettlementPayment(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
+    }
 
     @delayTime(1000)
     showReport(): void {
