@@ -2012,7 +2012,7 @@ namespace eFMS.API.Documentation.DL.Services
         }
         public IQueryable<CsTransactionDetailModel> GetDataHawbToCheckExisted()
         {
-            var transactionData = csTransactionRepo.Get();
+            var transactionData = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var transactionDetailData = csTransactionDetailRepo.Get();
             var data = from t in transactionData
                        join d in transactionDetailData on t.Id equals d.JobId
@@ -2021,6 +2021,7 @@ namespace eFMS.API.Documentation.DL.Services
                            Id = d.Id,
                            TransactionType = t.TransactionType,
                            Hwbno = d.Hwbno,
+                           JobNo = t.JobNo,
                            JobId = d.JobId
                        };
             return data;

@@ -45,8 +45,8 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <settlement-attach-file-list (onChange)="attachFiles = $event" readOnly>
-                        </settlement-attach-file-list>
+                        <accounting-attach-file-list  *ngIf="!!settlementPayment" (onChange)="attachFiles = $event" [fileNo]="settlementPayment.settlement.settlementNo" [folderModuleName]="folderModuleName" readOnly>
+                        </accounting-attach-file-list>
                     </tab>
                 </tabset>
 
@@ -110,21 +110,19 @@
                                     </span>
                                 </button>
                                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                                    <app-default-button data-toggle="dropdown" aria-haspopup="true"
-                                        aria-expanded="false" [buttonSetting]="previewButtonSetting">
+                                    <app-default-button [dpToggle]="dropdownMenu"
+                                        [buttonSetting]="previewButtonSetting">
                                     </app-default-button>
-                                    <div class="dropdown-menu" aria-labelledby="">
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="previewSettlementPayment()">Preview single</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportSettlementPayment('VN')">Print multiple
-                                            (VN)</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportSettlementPayment('ENG')">Print multiple
-                                            (ENG)</a>
-                                        <a class="dropdown-item" href="javascript:void(0)"
-                                            (click)="exportGeneralPreview()">General Preview</a>
-                                    </div>
+
+                                    <app-dropdown #dropdownMenu>
+                                        <a class="dropdown-item pointer" (click)="previewSettlementPayment()">Preview
+                                            single</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('VN')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('ENG')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG')">Print multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportGeneralPreview()">General Preview</a>
+                                    </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
                                 </app-default-button>

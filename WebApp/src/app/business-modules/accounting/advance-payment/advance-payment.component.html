@@ -16,14 +16,15 @@
                             <div class="dropdown m-dropdown m-dropdown--inline w-100">
                                 <div class="c-button-actions">
                                     <button type="button" class="btn btn-success dropdown-toggle"
-                                        data-toggle="dropdown">
+                                        [dpToggle]="dropdownMenu">
                                         <i class="la la-download"></i>Voucher<span class="caret"></span>
                                     </button>
-                                    <div class="dropdown-menu">
+
+                                    <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="showPopupUpdateVoucher()"
                                             *ngIf="menuSpecialPermission | async | specialPermission:'UpdateVoucher'">
                                             <span>
-                                                <i class="la la-plus text-success"></i>
+                                                <i class="la la-edit text-success"></i>
                                                 <span>
                                                     Update Voucher
                                                 </span>
@@ -48,7 +49,9 @@
                                                 </span>
                                             </span>
                                         </a>
-                                    </div>
+                                    </app-dropdown>
+
+
                                     <button class="btn btn-cancel  m-btn--icon m-btn--uppercase"
                                         (click)="showPopupListAdvance()">
                                         <span>
@@ -127,11 +130,6 @@
                                                         </button>
                                                         <ng-container
                                                             *ngIf="advancePayment.statusApproval === 'New' || advancePayment.statusApproval === 'Denied'">
-                                                            <!-- <button class="btn btn-sm  m-btn--icon m-btn--icon-only"
-                                                                title="Delete advance payment"
-                                                                (click)="prepareDeleteAdvance(advancePayment)">
-                                                                <i class="la la-trash text-danger"></i>
-                                                            </button> -->
                                                             <app-permission-button type="delete"
                                                                 (onClick)="prepareDeleteAdvance(advancePayment)"
                                                                 [user]="advancePayment.userCreated" class="icon"
@@ -147,6 +145,8 @@
                                                 <td class="text-right">{{advancePayment.amount | number: '.0-3'}}</td>
                                                 <td>{{advancePayment.advanceCurrency}}</td>
                                                 <td><span class="text-info">{{advancePayment.requesterName}}</span></td>
+                                                <td><span class="text-primary">{{advancePayment.departmentName}}</span>
+                                                </td>
                                                 <td><span class="text-info"
                                                         style="min-width: 200px; white-space:initial">{{advancePayment.payeeName}}</span>
                                                 </td>

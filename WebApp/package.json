@@ -1,6 +1,6 @@
 {
     "name": "e-fms-web",
-    "version": "0.0.0",
+    "version": "1.0.1",
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
@@ -71,7 +71,7 @@
         "highcharts-angular": "^2.4.0",
         "i18n": "^0.8.3",
         "jquery": "^3.5.1",
-        "jsencrypt": "^3.0.0-rc.1",
+        "jsencrypt": "^3.2.0",
         "lodash": "^4.17.20",
         "minimatch": "^3.0.4",
         "moment": "^2.22.2",

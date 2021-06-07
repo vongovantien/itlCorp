@@ -383,12 +383,15 @@ namespace eFMS.API.Accounting.DL.Services
 
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
+            IQueryable<CatDepartment> departments = catDepartmentRepo.Get();
 
             var data = from settlePayment in settlementPayments
                        join p in partners on settlePayment.Payee equals p.Id into partnerGrps
                        from partnerGrp in partnerGrps.DefaultIfEmpty()
                        join user in users on settlePayment.Requester equals user.Id into user2
                        from user in user2.DefaultIfEmpty()
+                       join dept in departments on settlePayment.DepartmentId equals dept.Id into deptGrps
+                       from deptGrp in deptGrps.DefaultIfEmpty()
                        select new AcctSettlementPaymentResult
                        {
                            Id = settlePayment.Id,
@@ -411,7 +414,8 @@ namespace eFMS.API.Accounting.DL.Services
                            LastSyncDate = settlePayment.LastSyncDate,
                            SyncStatus = settlePayment.SyncStatus,
                            ReasonReject = settlePayment.ReasonReject,
-                           PayeeName = partnerGrp.ShortName
+                           PayeeName = partnerGrp.ShortName,
+                           DepartmentName = deptGrp.DeptNameAbbr
                        };
             return data;
         }
@@ -3789,7 +3793,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = acctAdvancePaymentService.GetAdvancesOfShipment(shipment.JobId).Where(x => x.Requester == currentUser.UserID).FirstOrDefault()?.AdvanceNo;
+                var advance = GetListAdvanceNoForShipment(shipment.HBLID)?.FirstOrDefault();
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();

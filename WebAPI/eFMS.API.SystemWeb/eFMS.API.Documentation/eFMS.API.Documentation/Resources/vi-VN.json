@@ -7,6 +7,7 @@
   "MSG_UPDATE_SUCCESS": "Data update success",
   "MSG_DELETE_SUCCESS": "Data delete success",
 
+  "MSG_JOBNO_EXISTED": "Job No {0} đã tồn tại",
   "MSG_NAME_EXISTED": "Tên đã tồn tại",
   "MSG_CODE_EXISTED": "Code đã tồn tại",
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Dữ liệu này đang được sử dụng, không thể xóa",

@@ -325,8 +325,8 @@ export class AccountingRepo {
         );
     }
 
-    getAdvanceOfShipment(jobNo: string, settleCode: string = null): Observable<any> {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo, settleCode: settleCode }).pipe(
+    getAdvanceOfShipment(jobNo: string, hblId: string, settleCode: string = null): Observable<any> {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctAdvancePayment/GetAdvancesOfShipment`, { jobId: jobNo, hblid: hblId, settleCode: settleCode }).pipe(
             map((data: any) => data)
         );
     }
@@ -855,6 +855,12 @@ export class AccountingRepo {
 
     checkVoucherIdDuplicate(voucherId: string, acctId: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/CheckDuplicateVoucherId?voucherId=${voucherId}&acctId=${acctId}`).pipe(
+            map((data: any) => data)
+        );
+    }
+    dowloadallAttach(body:any) {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`,body).pipe(
+            catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }

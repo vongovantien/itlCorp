@@ -111,14 +111,20 @@ export class AirExportDetailHBLComponent extends AirExportCreateHBLComponent imp
             this.infoPopup.show();
             return;
         } else {
-            this._documentationRepo.checkExistedHawbNo(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
+            this._documentationRepo.checkExistedHawbNoAirExport(this.formCreateHBLComponent.hwbno.value, this.jobId, this.hblId)
                 .pipe(
                     catchError(this.catchError),
                 )
                 .subscribe(
                     (res: any) => {
-                        if (res) {
-                            this.confirmExistedHbl.show();
+                        if (!!res && res.length > 0) {
+                            this.infoPopupHbl.class = 'bg-danger';
+                            let jobNo = '';
+                            res.forEach(element => {
+                                jobNo += element + '<br>';
+                            });
+                            this.infoPopupHbl.body = 'Cannot save HB! Hawb no existed in the following job: ' + jobNo;
+                            this.infoPopupHbl.show();
                         } else {
                             const modelUpdate = this.getDataForm();
                             this.setDataToUpdate(modelUpdate);

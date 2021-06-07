@@ -59,8 +59,8 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string ShipmentSource { get; set; }
         public bool RealCost { get; set; }
         public string UnitPriceStr { get; set; }
-        public decimal? NetAmountCurr { get; set; }
-        public decimal? GrossAmountCurr { get; set; }
+        public decimal NetAmountCurr { get; set; }
+        public decimal GrossAmountCurr { get; set; }
     }
 
     public class FormPLsheetReportParameter

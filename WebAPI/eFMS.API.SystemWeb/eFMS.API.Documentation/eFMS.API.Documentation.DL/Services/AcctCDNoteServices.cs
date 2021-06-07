@@ -2682,12 +2682,12 @@ namespace eFMS.API.Documentation.DL.Services
                 cdNoteCharge.JobNo = surcharge.JobNo;
                 cdNoteCharge.CdCode = !string.IsNullOrEmpty(surcharge.CreditNo) ? surcharge.CreditNo : surcharge.DebitNo;
 
-                var invoices = grpInvoiceCdNote.Where(x => x.CdCode == cdNoteCharge.CdCode).Select(se => se.InvoiceNo);
+                var invoices = grpInvoiceCdNote.Where(x => x.CdCode == cdNoteCharge.CdCode && !string.IsNullOrEmpty(x.InvoiceNo)).Select(se => se.InvoiceNo);
                 if (invoices.Count() > 0)
                 {
                     invoices = invoices.Where(w => !string.IsNullOrEmpty(w)).Distinct();
+                    cdNoteCharge.Docs = string.Join(";", invoices.ToList()); //Invoice No
                 }
-                cdNoteCharge.Docs = string.Join(";", invoices.ToList()); //Invoice No
 
                 cdNoteCharges.Add(cdNoteCharge);
             }
@@ -2703,7 +2703,7 @@ namespace eFMS.API.Documentation.DL.Services
             var cdNotePartnerId = criteria.FirstOrDefault()?.PartnerId;
             var currencyCombine = criteria.FirstOrDefault()?.CurrencyCombine;
 
-            var surchargesCDNote = surchargeRepository.Get(x => cdNoteCodes.Any(a => a == x.CreditNo || a == x.DebitNo));
+            var surchargesCDNote = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.DebitNo) || !string.IsNullOrEmpty(x.CreditNo)).Where(x => cdNoteCodes.Any(a => a == x.CreditNo || a == x.DebitNo)).AsQueryable();
 
             if (surchargesCDNote.Count() > 0)
             {
