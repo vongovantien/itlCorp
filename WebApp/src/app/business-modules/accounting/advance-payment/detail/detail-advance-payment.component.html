@@ -4,23 +4,35 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
-                <div class="row" *ngIf="!!advancePayment">
-                    <div class="col-6">
-                        <div class="m--align-left">
-                            Created: {{advancePayment.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{advancePayment.userNameCreated}}</span>
+                <tabset class="custom-class-tab">
+                    <tab heading="Advance Info" [active]="true">
+                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                        <div class="row" *ngIf="!!advancePayment">
+                            <div class="col-6">
+                                <div class="m--align-left">
+                                    Created: {{advancePayment.datetimeCreated | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp;
+                                    By <span class="text-success">{{advancePayment.userNameCreated}}</span>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="m--align-left">
+                                    Modified: {{advancePayment.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                    &nbsp;
+                                    By <span class="text-success">{{advancePayment.userNameModified}}</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="m--align-left">
-                            Modified: {{advancePayment.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
-                            &nbsp;
-                            By <span class="text-success">{{advancePayment.userNameModified}}</span>
-                        </div>
-                    </div>
-                </div>
+                    </tab>
+                    <tab>
+                        <ng-template tabHeading>
+                            <span class="m--margin-right-10">Attach files</span>
+                            <span class="badge badge-success" *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                        </ng-template>
+                        <accounting-attach-file-list *ngIf="!!advancePayment" (onChange)="attachFiles = $event"  [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName' >
+                        </accounting-attach-file-list>
+                    </tab>
+                </tabset>
             </div>
         </div>
     </div>

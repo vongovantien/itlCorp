@@ -15,7 +15,7 @@ import { ConfirmPopupComponent } from '@common';
 @Component({
     selector: 'shipment-attach-file',
     templateUrl: './shipment-attach-file-settlement.popup.html',
-    styleUrls: ['./../../attach-file/attach-file-list-settlement.component.scss']
+    styleUrls: ['./../../../../components/attach-file/attach-file-list.component.scss']
 })
 
 export class SettlementShipmentAttachFilePopupComponent extends PopupBase implements OnInit {
@@ -33,6 +33,7 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
 
     files: SysImage[] = [];
     settlementId: string;
+    settlementNo:string;
 
     shipmentGroups: ISettlementShipmentGroup = null;
 
@@ -50,6 +51,7 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
             .subscribe((res) => {
                 if (res) {
                     this.settlementId = res.settlement.id;
+                    this.settlementNo = res.settlement.settlementNo;
                 }
             })
     }
@@ -132,5 +134,22 @@ export class SettlementShipmentAttachFilePopupComponent extends PopupBase implem
             }
         })
         return child;
+    }
+    dowloadAllAttach() {
+        if (this.settlementNo) {
+            let arr = this.settlementNo.split("/");
+            let model = {
+                folderName: 'Settlement',
+                objectId: this.settlementId,
+                chillId:this.generateChild(this.shipmentGroups),
+                fileName: arr[0] + "_" + arr[1] + ".zip"
+            }
+            this._accountingRepo.dowloadallAttach(model)
+                .subscribe(
+                    (res: any) => {
+                        this.downLoadFile(res, "application/zip", model.fileName);
+                    }
+                )
+        }
     }
 }

@@ -1,5 +1,4 @@
 import { takeUntil } from 'rxjs/operators';
-import { ISettlementPaymentState } from '../store/reducers/index';
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
@@ -9,22 +8,23 @@ import { SysImage } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { Store } from '@ngrx/store';
-import { ISettlementPaymentData } from '../../detail/detail-settlement-payment.component';
-import { getSettlementPaymentDetailState } from '../store/reducers/index';
+
 @Component({
-    selector: 'settlement-attach-file-list',
-    templateUrl: './attach-file-list-settlement.component.html',
-    styleUrls: ['./attach-file-list-settlement.component.scss'],
+    selector: 'accounting-attach-file-list',
+    templateUrl: './attach-file-list.component.html',
+    styleUrls: ['./attach-file-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SettlementAttachFileListComponent extends AppForm implements OnInit {
+export class AccoutingAttachFileListComponent extends AppForm implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
     @Output() onChange: EventEmitter<SysImage[]> = new EventEmitter<SysImage[]>();
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+    @Input() fileNo?: String;
+    @Input() folderModuleName?: string;
+    @Input() chillId?: string;
     //////
     get readonly(): boolean {
         return this._readonly;
@@ -35,13 +35,11 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
 
     files: SysImage[] = [];
     selectedFile: SysImage;
-    settlementPayment: ISettlementPaymentData;
 
     constructor(
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<ISettlementPaymentState>
     ) {
         super();
     }
@@ -55,16 +53,10 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
                     this.getFiles(this._id);
                 }
             );
-        this.loadData();
     }
 
-    loadData() {
-        this._store.select(getSettlementPaymentDetailState) 
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((data: any) => this.settlementPayment = data);
-    }
     getFiles(id: string) {
-        this._accountingRepo.getAttachedFiles('Settlement', id)
+        this._accountingRepo.getAttachedFiles(this.folderModuleName, id)
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
@@ -80,7 +72,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
         }
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0 && !!this._id) {
-            this._accountingRepo.uploadAttachedFiles('Settlement', this._id, fileList)
+            this._accountingRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -111,7 +103,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     onDeleteFile(id: string) {
-        this._accountingRepo.deleteAttachedFile('Settlement', id)
+        this._accountingRepo.deleteAttachedFile(this.folderModuleName, id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -125,11 +117,12 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     dowloadAllAttach() {
-        if (this.settlementPayment) {
-            let arr = this.settlementPayment.settlement.settlementNo.split("/");
+        if (this.fileNo) {
+            let arr = this.fileNo.split("/");
             let model = {
-                folderName: "Settlement",
-                folderId: this._id,
+                folderName: this.folderModuleName,
+                objectId: this._id,
+                chillId:this.chillId,
                 fileName: arr[0] + "_" + arr[1] + ".zip"
             }
             this._accountingRepo.dowloadallAttach(model)
@@ -142,14 +135,14 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
     filterViewFile() {
         if (this.files) {
-            let type = ["xlsx","xls", "doc", "docx"];
+            let type = ["xlsx", "xls", "doc", "docx"];
             for (let i = 0; i < this.files.length; i++) {
                 let f = this.files[i];
                 if (type.includes(f.name.split('.').pop())) {
-                    f.dowFile = true 
+                    f.dowFile = true
                     f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
                 }
-                else{
+                else {
                     f.dowFile = false;
                     f.viewFileUrl = f.url;
                 }

@@ -5,7 +5,7 @@ import { ListKeyManager, FocusKeyManager } from '@angular/cdk/a11y';
 import { DOWN_ARROW, ENTER } from '@angular/cdk/keycodes';
 import { AppCombogridItemComponent } from './combogrid-item/combo-grid-item.component';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
-import { BsDropdownDirective } from 'ngx-bootstrap';
+import { BsDropdownDirective } from 'ngx-bootstrap/dropdown';
 import { NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 
 @Component({

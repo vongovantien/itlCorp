@@ -119,10 +119,31 @@ namespace eFMS.API.Accounting.DL.Services
             try
             {
                 var pathFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\"+ m.FileName);
-                string startPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.FolderId);
+                string startPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.ObjectId);
 
-                ZipFile.CreateFromDirectory(startPath, pathFile);
-                
+                List<SysImage> lstFile = new List<SysImage>();
+                lstFile = DataContext.Get(e => e.ChildId == m.ChillId && e.ObjectId == m.ObjectId && e.Folder == m.FolderName).ToList();
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                //Create File zip
+                using (FileStream zipToOpen = new FileStream(pathFile, FileMode.Create))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                    {
+                        for (int i = 0; i < lstFile.Count(); i++)
+                        {
+                            string url = lstFile[i].Url;
+                            int pos = url.LastIndexOf('/')+1;string fileName = url.Substring(pos, url.Length - pos);
+                            string pathFileName = startPath + "\\" + fileName;
+                            if (!File.Exists(pathFileName))
+                                continue;
+                            ZipArchiveEntry readmeEntry = archive.CreateEntryFromFile(pathFileName, fileName, CompressionLevel.Optimal);
+                        }
+                    }
+                }
+
                 MemoryStream memory = new MemoryStream();
                 using (FileStream stream = new FileStream(pathFile, FileMode.Open))
                     await stream.CopyToAsync(memory);

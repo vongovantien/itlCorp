@@ -627,7 +627,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="apiKey"></param>
         /// <param name="hash"></param>
         /// <returns></returns>
-        [HttpPost("UpdateVoucherExpense")]
+        [HttpPut("UpdateVoucherExpense")]
         public IActionResult UpdateVoucherExpense(VoucherExpense model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
