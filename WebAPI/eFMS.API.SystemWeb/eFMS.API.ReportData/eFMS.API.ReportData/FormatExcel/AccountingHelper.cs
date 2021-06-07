@@ -936,7 +936,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 10, p, 11].Style.WrapText = true;
             workSheet.Cells[p, 10, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 10, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
+            workSheet.Row(p).Height = 50;
             p = p + 1;
 
             if (advanceExport.InfoAdvance.IsRequesterApproved)
@@ -3144,6 +3144,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 9, p, 11].Style.WrapText = true;
             workSheet.Cells[p, 9, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 9, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            
+            workSheet.Row(p).Height = 50;
 
             p = p + 1;
 
