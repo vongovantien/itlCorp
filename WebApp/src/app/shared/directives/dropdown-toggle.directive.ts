@@ -28,7 +28,7 @@ export class DropdownToggleDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo(this._elementRef)
                 .withPositions([
-                    OVERLAY_POSITION_MAP.bottomLeft
+                    OVERLAY_POSITION_MAP.topRight
                 ])
         });
     }
