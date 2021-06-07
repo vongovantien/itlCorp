@@ -17,7 +17,7 @@ import { reducers } from './store/reducers';
 import { effects } from './store/effects';
 import { NgxCurrencyModule } from 'ngx-currency';
 import { CustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { ARCustomerPaymentReceiptCreditListComponent } from './components/receipt-credit-list/receipt-credit-list.component';
 import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt-debit-list/receipt-debit-list.component';
 
