@@ -36,6 +36,28 @@
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center">{{item.type}}</td>
                                 <td class="text-primary">{{item.invoiceNo}}</td>
+                                <td>
+                                    <!-- <div class="form-group col-md-12 dropdown-partner" dropdown>
+                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                            placeholder="Vat Partner" [(ngModel)]="item.creditNo"
+                                            (click)="loadDynamicComoGrid(item,i)" [disabled]="isReadonly">
+                                        <ng-container>
+                                            <div class="d-flex justify-content-end dropdown-partner__header">
+                                                <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                    (click)="onSelectInvoice($event, item)"></a>
+                                            </div>
+                                            <ng-template #container></ng-template>
+                                        </ng-container>
+                                    </div> -->
+                                    <div class="form-group">
+                                        <select class="form-control">
+                                            <option value="selectedCredit" *ngFor="let item of (creditList$ | async)">
+                                                {{item.refNo}}</option>
+                                            <option value="null"></option>
+                                        </select>
+                                    </div>
+                                </td>
+
                                 <td *ngIf="receiptType !=='Customer'">{{item.jobNo}}</td>
                                 <td *ngIf="receiptType !=='Customer'">{{item.mbl}}</td>
                                 <td *ngIf="receiptType !=='Customer'">{{item.hbl}}</td>

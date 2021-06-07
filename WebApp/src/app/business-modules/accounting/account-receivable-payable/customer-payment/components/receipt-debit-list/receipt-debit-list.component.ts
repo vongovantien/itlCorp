@@ -3,7 +3,7 @@ import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
-import { ReceiptDebitListState, ReceiptTypeState } from "../../store/reducers";
+import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
 import { ReceiptInvoiceModel } from "@models";
 import { RemoveInvoice } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
@@ -18,9 +18,13 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     @Input() isReadonly: boolean = false;
 
     debitList$: Observable<ReceiptInvoiceModel[]>;
+    creditList$: Observable<ReceiptInvoiceModel[]>;
+
     agencyHeaders: CommonInterface.IHeaderTable[];
     selectedIndexItem: number;
     receiptType: string = null;
+
+    selectedCredit: ReceiptInvoiceModel;
 
     constructor(
         private _store: Store<IReceiptState>
@@ -33,6 +37,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'RefNo', field: '', sortable: true },
             { title: 'Type', field: '' },
             { title: 'Invoice No', field: '', width: 150 },
+            { title: 'Credit No', field: '', width: 250 },
             { title: 'Org Amount', field: '', align: this.right },
             { title: 'Unpaid USD', field: '' },
             { title: 'Unpaid VND', field: '' },
@@ -65,7 +70,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Office', field: '' }
         ];
         this.debitList$ = this._store.select(ReceiptDebitListState);
-
+        this.creditList$ = this._store.select(ReceiptCreditListState);
         // this.checkAllChange();
 
         this._store.select(ReceiptTypeState)

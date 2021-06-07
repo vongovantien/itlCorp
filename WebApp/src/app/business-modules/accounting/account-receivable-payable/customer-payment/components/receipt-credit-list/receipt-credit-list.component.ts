@@ -66,7 +66,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     ngOnInit() {
         this.headers = [
             { title: 'RefNo', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 200 },
+            // { title: 'Net Off Invoice No', field: '', width: 200 },
             { title: 'Org Amount', field: '', align: this.right },
             { title: 'Amount USD', field: '', align: this.right },
             { title: 'Amount VND', field: '', align: this.right },
@@ -79,7 +79,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Job', field: '' },
             { title: 'HBL', field: '' },
             { title: 'MBL', field: '' },
-            { title: 'Net Off Invoice No', field: '', width: 100 },
+            // { title: 'Net Off Invoice No', field: '', width: 100 },
             { title: 'Org Amount', field: '', align: this.right },
             { title: 'Amount USD', field: '', align: this.right },
             { title: 'Amount VND', field: '', align: this.right },
@@ -142,6 +142,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                 })
             });
     }
+
 
     onSelectInvoice(data: any, invoiceItem: ReceiptInvoiceModel) {
         if (!!data) {
