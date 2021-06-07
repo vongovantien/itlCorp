@@ -64,13 +64,11 @@
                                     </app-default-button>
 
                                     <app-dropdown #dropdownMenu>
-                                        <a class="dropdown-item pointer" (click)="previewSettlementPayment()">Preview
-                                            single</a>
-                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN')">Print
-                                            multiple
-                                            (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG')">Print
-                                            multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="previewSettlementPayment()">Preview single</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('VN')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('ENG')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG')">Print multiple (ENG)</a>
                                         <a class="dropdown-item pointer" (click)="exportGeneralPreview()">General Preview</a>
                                     </app-dropdown>
                                 </div>

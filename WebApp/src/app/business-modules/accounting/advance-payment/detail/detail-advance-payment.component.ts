@@ -228,7 +228,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
         this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
             .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`); });
     }
-
+ 
     getInfoApprove(advanceNo: string) {
         this._accoutingRepo.getInfoApprove(advanceNo).subscribe((res: any) => { this.approveInfo = res; });
     }
@@ -245,5 +245,9 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                     }
                 },
             );
+    }
+
+    previewExportAdvPayment(lang: string) {
+        this._exportRepo.previewExportPayment(this.advId, lang, 'Advance');
     }
 }
