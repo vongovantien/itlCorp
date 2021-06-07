@@ -31,5 +31,7 @@ namespace eFMS.API.ReportData.Models
         public string BankName { get; set; }
         public string PartnerType { get; set; }
         public string Note { get; set; }
+        public bool? Active { get; set; }
+
     }
 }
