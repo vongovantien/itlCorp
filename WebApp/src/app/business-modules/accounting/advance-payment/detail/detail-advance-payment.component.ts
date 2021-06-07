@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppPage } from '@app';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { AdvancePayment } from '@models';
+import { AdvancePayment, SysImage } from '@models';
 import { ReportPreviewComponent } from '@common';
 import { RoutingConstants } from '@constants';
 import { delayTime } from '@decorators';
@@ -36,6 +36,9 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     actionList: string = 'update';
     approveInfo: any = null;
 
+    attachFiles: SysImage[] = [];
+    folderModuleName:string='Advance';
+    
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -225,7 +228,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
         this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
             .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`); });
     }
-
+ 
     getInfoApprove(advanceNo: string) {
         this._accoutingRepo.getInfoApprove(advanceNo).subscribe((res: any) => { this.approveInfo = res; });
     }
@@ -242,5 +245,9 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                     }
                 },
             );
+    }
+
+    previewExportAdvPayment(lang: string) {
+        this._exportRepo.previewExportPayment(this.advId, lang, 'Advance');
     }
 }

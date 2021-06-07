@@ -5,7 +5,7 @@ import { ShareAccountingManagementSelectRequesterPopupComponent } from './compon
 import { StoreModule } from '@ngrx/store';
 import { reducers, effects } from './accounting-management/store';
 import { EffectsModule } from '@ngrx/effects';
-
+import { AccoutingAttachFileListComponent } from './components/attach-file/attach-file-list.component';
 
 @NgModule({
     imports: [
@@ -14,8 +14,8 @@ import { EffectsModule } from '@ngrx/effects';
         StoreModule.forFeature('accounting-management', reducers),
         EffectsModule.forFeature(effects),
     ],
-    exports: [ShareAccountingManagementSelectRequesterPopupComponent],
-    declarations: [ShareAccountingManagementSelectRequesterPopupComponent],
+    exports: [ShareAccountingManagementSelectRequesterPopupComponent,AccoutingAttachFileListComponent],
+    declarations: [ShareAccountingManagementSelectRequesterPopupComponent,AccoutingAttachFileListComponent],
     providers: [],
 })
 export class ShareAccountingModule { }

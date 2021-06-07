@@ -28,6 +28,16 @@
         <div class="m-portlet__body">
             <ul class="list-group list-unstyled">
                 <ng-container *ngIf="!!(files.length)">
+                    <br/>
+                    <div class="float-left" *ngIf="files.length > 1">
+                        <button type="button" class="btn btn-info m-btn--icon m-btn--uppercase " (click)="dowloadAllAttach()">
+                            <span>
+                                <i class="la la-download"></i>
+                                <span> Download All Files</span>
+                            </span>
+                        </button>  
+                    </div>
+                    <br/>
                     <li class="list-group-item file__item m-animate-fade-in"
                         *ngFor="let file of files; let i = index; trackBy:trackByFn">
                         <div class="d-flex align-items-center justify-content-between">
@@ -58,11 +68,17 @@
                                     </ng-container>
                                 </div>
                                 <div class="file-item__name m--margin-left-20">
-                                    <a [href]="file.url" target="_blank" [title]="file.name" download>{{file.name}}</a>
-                                    <ng-container *ngIf="!readonly">
-                                        <span class="pointer text-center">
+                                    <a [href]="file.viewFileUrl" target="_blank" [title]="file.name" >{{file.name}}</a>
+
+                                    <ng-container >
+                                        <span class="pointer text-center" *ngIf="!readonly">
                                             <a title="Delete" (click)="deleteFile(file)">
                                                 <i class="la la-times fa-lg text-danger"></i>
+                                            </a>
+                                        </span>
+                                        <span class="pointer text-center" *ngIf="file.dowFile" download>
+                                            <a title="Dowload" target="_blank" [href]="file.url">
+                                                <i class="la la-download fa-lg"></i>
                                             </a>
                                         </span>
                                     </ng-container>
