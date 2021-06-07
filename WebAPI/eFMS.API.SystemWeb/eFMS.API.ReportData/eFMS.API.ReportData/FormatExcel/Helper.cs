@@ -717,13 +717,14 @@ namespace eFMS.API.ReportData
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
                     var workSheet = excelPackage.Workbook.Worksheets.First();
-                    workSheet.Cells["A1"].Value = "Partner Data - " + partnerType;
+
+                    workSheet.Cells["A1"].Value = "Partner Data - " + (partnerType ?? "Partner");
                     workSheet.Cells["A1"].Style.Font.Bold = true;
-                    workSheet.Cells[1, 1, 2, 4].Merge = true;
+                    workSheet.Cells[1, 1, 2, 3].Merge = true;
+                    workSheet.Cells[1, 1, 2, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A3"].Value = "Export By: " + author;
                     workSheet.Cells["A3"].Style.Font.Bold = true;
                     workSheet.Cells[3, 1, 3, 2].Merge = true;
-                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
                     BindingFormatForPartnerExcel(workSheet, list);
                     excelPackage.Save();
                     return excelPackage.Stream;
@@ -759,8 +760,10 @@ namespace eFMS.API.ReportData
             worksheet.Cells[5, 18].Value = "Status";
             worksheet.Cells[5, 19].Value = "Type";
             worksheet.Cells[5, 20].Value = "Note";
+            ExcelTable tb =  worksheet.Tables.Add(worksheet.Cells[5, 1, 5, 20], "");
+            tb.TableStyle = TableStyles.Light20;
+
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
-            worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             int indexNo = 0;
             for (int i = 0; i < listItems.Count; i++)
             {
@@ -792,6 +795,7 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 6, 19].Value = item.PartnerType;
                 worksheet.Cells[i + 6, 20].Value = item.Note;
             }
+            worksheet.Cells.AutoFitColumns();
         }
         #endregion
 
