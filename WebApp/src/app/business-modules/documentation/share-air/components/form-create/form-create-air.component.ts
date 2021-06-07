@@ -202,6 +202,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 res.etd = null;
                                 res.mawb = null;
                                 res.eta = null;
+                                res.serviceDate = null;
                             }
                         });
                         try {
@@ -268,7 +269,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             // * Date
             etd: [null, this.type !== 'import' ? Validators.required : null],
             eta: [null, this.type === 'import' ? Validators.required : null],
-            serviceDate: [],
+            serviceDate: [null, Validators.required],
             flightDate: [],
 
             // * select
