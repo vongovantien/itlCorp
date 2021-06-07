@@ -8,6 +8,7 @@
   "MSG_DELETE_SUCCESS": "Data delete success",
   "MSG_NAME_EXISTED": "Name has existed",
   "MSG_CODE_EXISTED": "Code has existed",
+  "MSG_JOBNO_EXISTED": "Job No {0} has existed",
   "MSG_DELETE_FAIL_INCLUDED_CHILD": "Data has been used. Delete denied",
   "EF_ANNOTATIONS_REQUIRED": "The [{0}] field is required",
   "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",

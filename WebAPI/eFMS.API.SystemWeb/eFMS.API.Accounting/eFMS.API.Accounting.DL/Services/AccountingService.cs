@@ -337,7 +337,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                        LocalBranchCode = partner != null ? partner.InternalCode : null,
                                                                        Payee = settle.Payee,
                                                                        CurrencyCode = settle.SettlementCurrency,
-                                                                       SettleAmount = settle.Amount
+                                                                       SettleAmount = settle.Amount,
                                                                    };
                 if (querySettlement != null && querySettlement.Count() > 0)
                 {
@@ -354,6 +354,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             string _staffCodeRequester = GetSettleStaffCode(item.Stt);
                             string _customerCodeTransfer = GetCustomerCodeTransfer(item.PaymentMethod, item.CustomerCode, null);
+                            AcctSettlementPayment currentSettle = settlements.First(x => x.Id == item.Stt);
 
                             IQueryable<BravoSettlementRequestModel> querySettlementReq = from surcharge in surcharges
                                                                                          join charge in charges on surcharge.ChargeId equals charge.Id
@@ -404,7 +405,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 // Trong phiếu thanh toán có tồn tại lô nào có hoàn ứng hay không?
                                 bool hasAdvancePayment = item.Details.Any(x => !string.IsNullOrEmpty(x.AdvanceNo));
-                              
+                                
                                 item.Details.ForEach((x) =>
                                 {
                                     if(hasAdvancePayment == true)
@@ -428,8 +429,33 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                 });
 
+                                if (hasAdvancePayment == true)
+                                {
+                                    item.Details.Add(new BravoSettlementRequestModel
+                                    {
+                                        RowId = item.Stt.ToString(),
+                                        Ma_SpHt = "BALANCE",
+                                        ItemCode = "BALANCE",
+                                        Description = GenerateDescriptionSettleItemWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
+                                        Unit = "Lô",
+                                        CurrencyCode = item.CurrencyCode,
+                                        ExchangeRate = 1,
+                                        // DeptCode = reqItem.DeptCode,
+                                        Quantity9 = 0,
+                                        OriginalUnitPrice = 0,
+                                        OriginalAmount = currentSettle.BalanceAmount,
+                                        OriginalAmount3 = 0,
+                                        ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
+                                        CustomerCodeBook = _staffCodeRequester,
+                                        CustomerCodeTransfer = _customerCodeTransfer,
+                                        RefundAmount = 0,
+                                        IsRefund = 1
+                                    });
+                                }
+
                                 // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl, số tạm ứng, tờ khai để phát sinh thêm các dòng Balance và ClearAdvance
-                                List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq.Where(x => !string.IsNullOrEmpty(x.AdvanceNo))
+                                List<BravoSettlementRequestModel> querySettlmentReqListHasAdvance = querySettlementReq
+                                    .Where(x => !string.IsNullOrEmpty(x.AdvanceNo))
                                     .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
                                     .Select(d => new BravoSettlementRequestModel {
                                         Stt_Cd_Htt = d.FirstOrDefault().Stt_Cd_Htt,
@@ -443,9 +469,25 @@ namespace eFMS.API.Accounting.DL.Services
                                         ClearanceNo = d.Key.ClearanceNo,
                                         AdvanceCustomerCode = d.FirstOrDefault().AdvanceCustomerCode
                                     }).ToList();
-                                if(querySettlmentReqList.Count > 0)
+                                if(querySettlmentReqListHasAdvance.Count > 0)
                                 {
-                                    foreach (var reqItem in querySettlmentReqList)
+                                    //List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq
+                                    // //.Where(x => !string.IsNullOrEmpty(x.AdvanceNo))
+                                    //.GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
+                                    //.Select(d => new BravoSettlementRequestModel
+                                    //{
+                                    //    Stt_Cd_Htt = d.FirstOrDefault().Stt_Cd_Htt,
+                                    //    Ma_SpHt = d.FirstOrDefault().Ma_SpHt,
+                                    //    BillEntryNo = d.FirstOrDefault().BillEntryNo,
+                                    //    MasterBillNo = d.FirstOrDefault().MasterBillNo,
+                                    //    DeptCode = d.FirstOrDefault().DeptCode,
+                                    //    CustomerCodeTransfer = d.FirstOrDefault().CustomerCodeTransfer,
+                                    //    AdvanceNo = d.Key.AdvanceNo,
+                                    //    HblId = d.Key.HblId,
+                                    //    ClearanceNo = d.Key.ClearanceNo,
+                                    //    AdvanceCustomerCode = d.FirstOrDefault().AdvanceCustomerCode
+                                    //}).ToList();
+                                    foreach (var reqItem in querySettlmentReqListHasAdvance)
                                     {
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
                                         decimal _balance = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
@@ -454,14 +496,44 @@ namespace eFMS.API.Accounting.DL.Services
                                         string _customerCodeBook = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee);
                                         string _requesterAdvanceCode = GetAdvanceReqterCode(reqItem.AdvanceNo);
 
-                                        if (_balance != 0)
+                                        if (_balance != 0 || balanceInfo.AdvanceAmount == null)
+                                        {
+                                            decimal balanceCase4 = (balanceInfo.AdvanceAmount ?? 0 - balanceInfo.TotalAmount ?? 0);
+                                            string _chargeTypeCase4 = GenerateChargeTypeSettleWithBalanceAdvance(balanceCase4, item.PaymentMethod);
+                                            string descriptionCase4 = GenerateDescriptionSettleItemWithBalanceAdvance(balanceCase4, item.PaymentMethod);
+                                            //item.Details.Add(new BravoSettlementRequestModel
+                                            //{
+                                            //    RowId = Guid.NewGuid().ToString(),
+                                            //    Ma_SpHt = reqItem.Ma_SpHt,
+                                            //    ItemCode = "BALANCE",
+                                            //    Description = balanceInfo.AdvanceAmount == null ? descriptionCase4: GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod),
+                                            //    Unit = "Lô",
+                                            //    CurrencyCode = item.CurrencyCode,
+                                            //    ExchangeRate = 1,
+                                            //    BillEntryNo = reqItem.BillEntryNo,
+                                            //    MasterBillNo = reqItem.MasterBillNo,
+                                            //    DeptCode = reqItem.DeptCode,
+                                            //    Quantity9 = 0,
+                                            //    OriginalUnitPrice = 0,
+                                            //    OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceCase4 : _originalAmount,
+                                            //    OriginalAmount3 = 0,
+                                            //    ChargeType = balanceInfo.AdvanceAmount == null ? _chargeTypeCase4 : _chargeTypeBalance,
+                                            //    CustomerCodeBook = balanceInfo.AdvanceAmount == null ? _staffCodeRequester  : _requesterAdvanceCode,
+                                            //    CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
+                                            //    RefundAmount = 0,
+                                            //    IsRefund = 1
+                                            //});
+                                        }
+
+                                        if(!string.IsNullOrEmpty(reqItem.AdvanceNo))
                                         {
                                             item.Details.Add(new BravoSettlementRequestModel
                                             {
-                                                RowId = reqItem.Stt_Cd_Htt,
+                                                RowId = Guid.NewGuid().ToString(), // Để tránh duplicate khi hoạch toán bên bravo.
+                                                Stt_Cd_Htt = reqItem.Stt_Cd_Htt,
                                                 Ma_SpHt = reqItem.Ma_SpHt,
-                                                ItemCode = "BALANCE",
-                                                Description = GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod),
+                                                ItemCode = "CLEAR_ADVANCE",
+                                                Description = "Số Tiền Hoàn Ứng",
                                                 Unit = "Lô",
                                                 CurrencyCode = item.CurrencyCode,
                                                 ExchangeRate = 1,
@@ -470,40 +542,16 @@ namespace eFMS.API.Accounting.DL.Services
                                                 DeptCode = reqItem.DeptCode,
                                                 Quantity9 = 0,
                                                 OriginalUnitPrice = 0,
-                                                OriginalAmount = _originalAmount,
+                                                OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
                                                 OriginalAmount3 = 0,
-                                                ChargeType = _chargeTypeBalance,
+                                                ChargeType = "CLEAR_ADVANCE",
                                                 CustomerCodeBook = _requesterAdvanceCode,
                                                 CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
+                                                AdvanceCustomerCode = _requesterAdvanceCode,
                                                 RefundAmount = 0,
                                                 IsRefund = 1
                                             });
                                         }
-
-                                        item.Details.Add(new BravoSettlementRequestModel
-                                        {
-                                            RowId = Guid.NewGuid().ToString(), // Để tránh duplicate khi hoạch toán bên bravo.
-                                            Stt_Cd_Htt = reqItem.Stt_Cd_Htt,
-                                            Ma_SpHt = reqItem.Ma_SpHt,
-                                            ItemCode = "CLEAR_ADVANCE",
-                                            Description = "Số Tiền Hoàn Ứng",
-                                            Unit = "Lô",
-                                            CurrencyCode = item.CurrencyCode,
-                                            ExchangeRate = 1,
-                                            BillEntryNo = reqItem.BillEntryNo,
-                                            MasterBillNo = reqItem.MasterBillNo,
-                                            DeptCode = reqItem.DeptCode,
-                                            Quantity9 = 0,
-                                            OriginalUnitPrice = 0,
-                                            OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
-                                            OriginalAmount3 = 0,
-                                            ChargeType = "CLEAR_ADVANCE",
-                                            CustomerCodeBook = _requesterAdvanceCode,
-                                            CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
-                                            AdvanceCustomerCode = _requesterAdvanceCode,
-                                            RefundAmount = 0,
-                                            IsRefund = 1
-                                        });
                                     }
                                 }
                             }
@@ -1837,17 +1885,21 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GetAdvanceReqterCode(string advNo)
         {
-            string employCode = string.Empty;
+            string employeeCode = string.Empty;
 
+            if (string.IsNullOrEmpty(advNo))
+            {
+                return employeeCode;
+            }
             var queryAdv = from ad in AdvanceRepository.Get(x => x.AdvanceNo == advNo)
                            join u in users on ad.Requester equals u.Id
                            join employee in employees on u.EmployeeId equals employee.Id
                            select new { employee.StaffCode };
             if(queryAdv != null)
             {
-                employCode = queryAdv.FirstOrDefault().StaffCode;
+                employeeCode = queryAdv.FirstOrDefault().StaffCode;
             }
-            return employCode;
+            return employeeCode;
         }
 
         private string GetSettleStaffCode(Guid Id)
@@ -2587,6 +2639,12 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- Send Mail & Push Notification to Accountant ---
 
         #region -- Get Data & Sync Receipt --
+        /// <summary>
+        /// Get data sync từng type trong phiếu thu [15658]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
         public List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
         {
             List<PaymentModel> data = new List<PaymentModel>();
@@ -2618,6 +2676,33 @@ namespace eFMS.API.Accounting.DL.Services
                     receiptSyncs.Add(receiptSyncAdv);
                     data.Add(syncAdv);
                 }
+            }
+            return data;
+        }
+
+        /// <summary>
+        /// Option: Get data sync đc tất cả các type trong cùng 1 phiếu thu [15817]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
+        public List<PaymentModel> GetListReceiptAllInToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
+        {
+            List<PaymentModel> data = new List<PaymentModel>();
+            receiptSyncs = new List<AcctReceiptSyncModel>();
+            if (ids == null || ids.Count() == 0) return data;
+
+            var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
+            foreach (var receipt in receipts)
+            {
+                var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
+                if (payments.Count() > 0)
+                {
+                    //Không phân biệt type (ADV, DEBIT, CREDIT) nên gán = null
+                    var syncPayment = GenerateReceiptToAccountant(null, receipt, payments, out AcctReceiptSyncModel receiptSync);
+                    receiptSyncs.Add(receiptSync);
+                    data.Add(syncPayment);
+                }                
             }
             return data;
         }

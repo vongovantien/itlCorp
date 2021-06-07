@@ -62,7 +62,7 @@ export * from './document/container.model';
 export * from './document/arrival-freight-charge';
 export * from './document/csOtherCharge';
 export * from './document/airway-bill';
-export * from './document/csBookingnote';
+export * from './document/csBookingNote';
 export * from './document/arrival-note-hbl';
 export * from './document/shippingInstruction.model';
 export * from './document/emailContent';
