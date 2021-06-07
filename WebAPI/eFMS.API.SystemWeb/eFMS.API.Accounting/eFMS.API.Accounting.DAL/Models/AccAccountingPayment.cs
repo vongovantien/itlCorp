@@ -41,5 +41,8 @@ namespace eFMS.API.Accounting.Service.Models
         public string InvoiceNo { get; set; }
         public Guid? Hblid { get; set; }
         public bool? Negative { get; set; }
+        public decimal? TotalPaidVnd { get; set; }
+        public decimal? TotalPaidUsd { get; set; }
+        public string CreditNo { get; set; }
     }
 }

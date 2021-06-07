@@ -336,6 +336,10 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             this._store.dispatch(ResetInvoiceList());
         }
 
+        datatoReceipt.forEach(element => {
+            element.totalPaidVnd = element.paidAmountVnd;
+            element.totalPaidUsd = element.paidAmountUsd;
+        });
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
         this.onAddToReceipt.emit(this.partnerId.value);
         this.hide();

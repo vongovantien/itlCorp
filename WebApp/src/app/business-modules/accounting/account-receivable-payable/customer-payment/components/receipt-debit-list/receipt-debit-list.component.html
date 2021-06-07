@@ -59,6 +59,13 @@
                                         name="paidAmountVnd" numeric autoFormatCurrency [disabled]="isReadonly"
                                         (blur)="formatAmount($event, item)">
                                 </td>
+
+                                <td ALIGN="right">
+                                    {{item.totalPaidVnd | number:'1.0-3'}}
+                                </td>
+                                <td>
+                                    {{item.totalPaidUsd | number:'1.3-3'}}
+                                </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.type !== 'ADV'">
                                         <ng-container

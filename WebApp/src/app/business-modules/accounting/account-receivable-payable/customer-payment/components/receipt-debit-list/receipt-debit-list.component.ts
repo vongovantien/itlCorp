@@ -38,6 +38,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Unpaid VND', field: '' },
             { title: 'Paid Amount USD', field: '', align: this.right },
             { title: 'Paid Amount VND', field: '', align: this.right },
+            { title: 'Total Paid VND', field: '', align: this.right },
+            { title: 'Total Paid USD', field: '', align: this.right },
             { title: 'Remain USD', field: '' },
             { title: 'Remain VND', field: '' },
             { title: 'Payment Note', field: '' },
@@ -63,7 +65,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Office', field: '' }
         ];
         this.debitList$ = this._store.select(ReceiptDebitListState);
-        this.checkAllChange();
+
+        // this.checkAllChange();
+
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x || 'Customer');
@@ -78,12 +82,12 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             });
     }
 
-    onCheckChange() {
-        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
-            });
-    }
+    // onCheckChange() {
+    //     this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
+    //         .subscribe((x: ReceiptInvoiceModel[]) => {
+    //             this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
+    //         });
+    // }
 
     confirmDeleteInvoiceItem(index: number) {
         this.selectedIndexItem = index;
@@ -97,8 +101,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         this.onChangeDebit.emit(true);
     }
 
-    formatAmount(event: any, receipt: ReceiptInvoiceModel){
-        if(!event.target.value.length){
+    formatAmount(event: any, receipt: ReceiptInvoiceModel) {
+        if (!event.target.value.length) {
             receipt[event.target.name] = 0;
         }
     }

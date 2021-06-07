@@ -28,7 +28,9 @@ export class ReceiptCreditDebitModel {
     paidAmountUVnd: number;
     balanceAmountUsd: number;
     balanceAmountVnd: number;
-
+    totalPaidVnd: number;
+    totalPaidUsd: number;
+    creditNo: string; // * Số Credit dùng để cấn trừ trên hóa đơn
 
 }
 
@@ -109,7 +111,7 @@ export class ReceiptModel extends Receipt {
     paidAmountVnd: number = null;
     finalPaidAmountUsd: number = null;
     finalPaidAmountVnd: number = null;
-    
+
     constructor(object?: any) {
         super();
         const self = this;
