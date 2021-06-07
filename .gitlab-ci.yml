@@ -22,7 +22,7 @@ job_build:
     - npm install -g @angular/cli
     - ng version
     #- node_modules/.bin/ng build --c=uat-en
-    - npm run build:uat:en
+    - npm run build:test:en
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
