@@ -1033,6 +1033,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var users = userRepo.Get();
             var employees = employeeRepo.Get();
+            var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
                               join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
@@ -1078,7 +1079,10 @@ namespace eFMS.API.Accounting.DL.Services
                     SaleDebitRate = null, //Tính toán bên dưới
                     DebitAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : 0).Sum(),
                     ObhAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhAmount : 0).Sum(),
-                    DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ? s.First().contract.TrialCreditLimited : 1)) * 100 : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ? ((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ? s.First().contract.CreditLimit : 1)) * 100 : null),
+                    DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
+                                                                Math.Round(((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ? s.First().contract.TrialCreditLimited : 1)) * 100 ?? 0, 2) :
+                                (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
+                                                                Math.Round((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ? s.First().contract.CreditLimit : 1) ?? 0, 2) * 100 : 0),
                     CusAdvance = s.First().contract.CustomerAdvanceAmount ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
                     BillingUnpaid = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingUnpaid : 0).Sum(),
@@ -1088,11 +1092,14 @@ namespace eFMS.API.Accounting.DL.Services
                     Over16To30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over16To30Day : 0).Sum(),
                     Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : 0).Sum(),
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
-                    CreditCurrency = s.First().contract.CreditCurrency
+                    CreditCurrency = s.First().contract.CreditCurrency,
+                    ParentNameAbbr = string.Empty, //Get data bên dưới
                 });
 
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
+                       join parent in acRefPartner on partner.ParentId equals parent.Id into parents
+                       from parent  in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
                        join employee in employees on user.EmployeeId equals employee.Id into employees2
@@ -1137,7 +1144,8 @@ namespace eFMS.API.Accounting.DL.Services
                            Over16To30Day = contract.Over16To30Day,
                            Over30Day = contract.Over30Day,
                            ArCurrency = contract.ArCurrency,
-                           CreditCurrency = contract.CreditCurrency
+                           CreditCurrency = contract.CreditCurrency,
+                           ParentNameAbbr = parent.ShortName
                        };
             return data;
         }
@@ -1494,7 +1502,8 @@ namespace eFMS.API.Accounting.DL.Services
                         Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                         Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                         Over30Day = s.Sum(sum => sum.Over30Day),
-                        ArCurrency = s.First().ArCurrency
+                        ArCurrency = s.First().ArCurrency,
+                        ParentNameAbbr = s.First().ParentNameAbbr
                     }).AsQueryable();
             return groupbyAgreementId;
         }
