@@ -132,10 +132,10 @@
                                     <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
                                             single</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple
-                                            (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print
-                                            multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('VN')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('ENG')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print multiple (ENG)</a>
                                     </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">

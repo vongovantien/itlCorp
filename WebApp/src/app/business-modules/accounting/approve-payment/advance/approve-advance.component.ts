@@ -5,7 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { AppPage } from 'src/app/app.base';
 import { AccountingRepo, ExportRepo } from '@repositories';
-import { AdvancePayment,SysImage } from '@models';
+import { AdvancePayment, SysImage } from '@models';
 import { ReportPreviewComponent, ConfirmPopupComponent } from '@common';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { ICrystalReport } from 'src/app/shared/interfaces/report-interface';
@@ -43,7 +43,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
     paymentTerm: number;
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Advance';
+    folderModuleName: string = 'Advance';
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -296,5 +296,9 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                     }
                 },
             );
+    }
+    
+    previewExportAdvPayment(lang: string) {
+        this._exportRepo.previewExportPayment(this.idAdvPayment, lang, 'Advance');
     }
 }
