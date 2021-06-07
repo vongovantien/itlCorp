@@ -173,7 +173,7 @@ export class ExportRepo {
     }
 
     exportAdvancePaymentDetail(advanceId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -194,7 +194,7 @@ export class ExportRepo {
     }
 
     exportSettlementPaymentDetail(settlementId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
