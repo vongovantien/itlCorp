@@ -1103,6 +1103,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 Tel = x.partner.Tel,
                 AddressEn = x.partner.AddressEn,
                 AddressVn = x.partner.AddressVn,
+                AddressShippingEn = x.partner.AddressShippingEn,
+                AddressShippingVn = x.partner.AddressShippingVn,
                 Fax = x.partner.Fax,
                 CoLoaderCode = x.partner.CoLoaderCode,
                 AccountNo = x.partner.AccountNo,
@@ -1115,8 +1117,16 @@ namespace eFMS.API.Catalogue.DL.Services
                 GroupId = x.partner.GroupId,
                 OfficeId = x.partner.OfficeId,
                 Active = x.partner.Active,
-                PartnerType = x.partner.PartnerType
-
+                PartnerType = x.partner.PartnerType,
+                PartnerMode = x.partner.PartnerMode,
+                PartnerLocation = x.partner.PartnerLocation,
+                Email = x.partner.Email,
+                BillingEmail = x.partner.BillingEmail,
+                ContactPerson = x.partner.ContactPerson,
+                BankAccountNo = x.partner.BankAccountNo,
+                BankAccountName = x.partner.BankAccountName,
+                BankName = x.partner.BankName,
+                Note = x.partner.Note
             });
             return results;
         }
