@@ -60,7 +60,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     saveReceipt(actionString: string) {
         this.formCreate.isSubmitted = true;
         this.listInvoice.isSubmitted = true;
-        this.listInvoice.receiptCreditList.isSubmitted = true;
+        this.listInvoice.receiptDebitList.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
             this.infoPopup.show();
@@ -112,11 +112,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("You can't save without debit in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'CREDIT' && !x.invoiceNo).length > 0) {
-            this._toastService.warning("Please select invoice no!");
-            return;
+        if (this.paymentList.filter(x => x.type == 'CREDIT').length) {
+            if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' && !x.creditNo).length > 0) {
+                this._toastService.warning("Please select credit no!");
+                return;
+            }
         }
-
         receiptModel.payments = this.paymentList;
         this.onSaveDataReceipt(receiptModel, action);
     }

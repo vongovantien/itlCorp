@@ -50,10 +50,10 @@
                                         </ng-container>
                                     </div> -->
                                     <div class="form-group">
-                                        <select class="form-control">
-                                            <option value="selectedCredit" *ngFor="let item of (creditList$ | async)">
-                                                {{item.refNo}}</option>
-                                            <option value="null"></option>
+                                        <select class="form-control" [(ngModel)]="item.creditNo">
+                                            <option [value]="i.refNo" *ngFor="let i of (creditList$ | async)">
+                                                {{i.refNo}}</option>
+                                            <option value="null">-</option>
                                         </select>
                                     </div>
                                 </td>
@@ -91,14 +91,14 @@
                                 <td ALIGN="right">
                                     <div *ngIf="item.type !== 'ADV'">
                                         <ng-container
-                                            *ngIf="item.unpaidAmountUsd - (item.paidAmountUsd | abs) >= 0 ; else negativeUsd">
+                                            *ngIf="item.unpaidAmountUsd - (item.totalPaidUsd | abs) >= 0 ; else negativeUsd">
 
-                                            <span> {{item.unpaidAmountUsd - (item.paidAmountUsd | abs) | negativeNumber
+                                            <span> {{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | negativeNumber
                                                 |
                                                 number: '.3-3'}} </span>
                                         </ng-container>
                                         <ng-template #negativeUsd>
-                                            <span> ({{item.unpaidAmountUsd - (item.paidAmountUsd | abs) | abs | number:
+                                            <span> ({{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | abs | number:
                                                 '.3-3'}}) </span>
                                         </ng-template>
                                     </div>
@@ -106,13 +106,13 @@
                                 <td ALIGN="right">
                                     <div *ngIf="item.type !== 'ADV'">
                                         <ng-container
-                                            *ngIf="item.unpaidAmountVnd - (item.paidAmountVnd | abs) >= 0 ; else negativeVnd">
-                                            <span> {{item.unpaidAmountVnd - (item.paidAmountVnd | abs) | negativeNumber
+                                            *ngIf="item.unpaidAmountVnd - (item.totalPaidVnd | abs) >= 0 ; else negativeVnd">
+                                            <span> {{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | negativeNumber
                                                 |
                                                 number: '.3-3'}} </span>
                                         </ng-container>
                                         <ng-template #negativeVnd>
-                                            <span> ({{item.unpaidAmountVnd - (item.paidAmountVnd | abs) | abs | number:
+                                            <span> ({{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | abs | number:
                                                 '.3-3'}}) </span>
                                         </ng-template>
                                     </div>

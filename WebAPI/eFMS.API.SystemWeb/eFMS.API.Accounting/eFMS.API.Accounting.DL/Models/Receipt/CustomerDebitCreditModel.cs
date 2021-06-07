@@ -17,6 +17,8 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? PaidAmount { get; set; }
         public decimal? PaidAmountVnd { get; set; }
         public decimal? PaidAmountUsd { get; set; }
+        public decimal? TotalPaidVnd { get; set; }
+        public decimal? TotalPaidUsd { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }
@@ -30,5 +32,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public Guid? CompanyId { get; set; }
         public List<string> RefIds { get; set; }
         public string CreditType { get; set; }
+        public string CreditNo { get; set; }
     }
 }

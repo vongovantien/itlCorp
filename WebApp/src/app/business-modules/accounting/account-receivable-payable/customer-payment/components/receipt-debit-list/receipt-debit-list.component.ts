@@ -26,6 +26,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     selectedCredit: ReceiptInvoiceModel;
 
+    isSubmitted: boolean = false;
+
     constructor(
         private _store: Store<IReceiptState>
     ) {

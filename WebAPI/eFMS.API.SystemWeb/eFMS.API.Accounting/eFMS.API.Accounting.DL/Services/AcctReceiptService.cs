@@ -448,8 +448,9 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeId = s.FirstOrDefault().OfficeInvoiceId,
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
                     CompanyId = s.FirstOrDefault().CompanyInvoiceId,
-                    RefIds = listOBH.Select(x => x.RefId).ToList()
-                }).ToList();
+                    RefIds = listOBH.Select(x => x.RefId).ToList(),
+                    CreditNo = s.FirstOrDefault().CreditNo
+            }).ToList();
 
                 paymentReceipts.AddRange(items);
             }
@@ -488,6 +489,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.UnpaidAmount = acctPayment.RefAmount;
                     payment.UnpaidAmountUsd = acctPayment.UnpaidPaymentAmountUsd;
                     payment.UnpaidAmountVnd = acctPayment.UnpaidPaymentAmountVnd;
+                    payment.TotalPaidVnd = acctPayment.TotalPaidVnd;
+                    payment.TotalPaidUsd = acctPayment.TotalPaidUsd;
                     payment.PaidAmountUsd = acctPayment.PaymentAmountUsd;
                     payment.PaidAmountVnd = acctPayment.PaymentAmountVnd;
                     payment.Notes = acctPayment.Note;
@@ -501,6 +504,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.Mbl = _Mbl;
                     payment.Hbl = _Hbl;
                     payment.Hblid = acctPayment.Hblid;
+                    payment.CreditNo = acctPayment.CreditNo;
+
                     paymentReceipts.Add(payment);
                 }
             }
@@ -605,6 +610,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.OfficeInvoiceId = paymentGroupOBH.OfficeId;
             _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
             _payment.Hblid = paymentGroupOBH.Hblid;
+            _payment.CreditNo = paymentGroupOBH.CreditNo;
 
             _payment.UserCreated = _payment.UserModified = currentUser.UserID;
             _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
@@ -750,6 +756,9 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
                 _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
+                _payment.TotalPaidVnd = (payment.TotalPaidVnd ?? 0);
+                _payment.TotalPaidUsd = (payment.TotalPaidUsd ?? 0);
+
                 _payment.BalanceUsd = (payment.UnpaidAmountUsd ?? 0) - (payment.PaidAmountUsd ?? 0);
                 _payment.BalanceVnd = (payment.UnpaidAmountVnd ?? 0) - (payment.PaidAmountVnd ?? 0);
                 _payment.UnpaidPaymentAmountUsd = payment.UnpaidAmountUsd ?? 0;
@@ -764,6 +773,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DeptInvoiceId = payment.DepartmentId;
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
+                _payment.CreditNo = payment.CreditNo;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -2278,7 +2288,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.Invoice.DepartmentId,
                 OfficeId = se.Invoice.OfficeId,
                 CompanyId = se.Invoice.CompanyId,
-                RefIds = new List<string> { se.Invoice.Id.ToString() }
+                RefIds = new List<string> { se.Invoice.Id.ToString() },
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2427,7 +2437,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.Soa.DepartmentId,
                 OfficeId = se.Soa.OfficeId,
                 CompanyId = se.Soa.CompanyId,
-                RefIds = new List<string> { se.Soa.Id }
+                RefIds = new List<string> { se.Soa.Id },
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
