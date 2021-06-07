@@ -3199,6 +3199,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row, col].Style.Font.Name = "Wingdings 2";
             workSheet.Cells[row, col].Style.Font.Size = 28;
             workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[row, col].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
         }
 
         /// <summary>
