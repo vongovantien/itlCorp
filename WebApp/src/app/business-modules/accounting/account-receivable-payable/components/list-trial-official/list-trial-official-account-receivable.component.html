@@ -39,10 +39,10 @@
                                             </td>
                                             <td class="text-right">{{ item.billingAmount | number: '.0-3' }}
                                             </td>
-                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
-                                            <td>{{ item.billingUnpaid | number: '.0-3' }}</td>
+                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">{{ item.billingUnpaid | number: '.0-3' }}</td>
                                             <!-- <td>{{ item.obhAmount | number: '.0-3'}}</td> -->
-                                            <td>
+                                            <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
                                                     {{ item.over1To15Day | number: '.0-3' }}
                                                 </span>
