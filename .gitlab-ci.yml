@@ -1,6 +1,6 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/test"
 
 image: node:12
 
@@ -26,7 +26,7 @@ job_build:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - uat/29-05-2021-sprint24
+    - feature/sprint25-15-04-2021
   artifacts:
     name: "angular_build"
     paths:
