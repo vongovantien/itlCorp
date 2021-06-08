@@ -936,7 +936,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 10, p, 11].Style.WrapText = true;
             workSheet.Cells[p, 10, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 10, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
+            workSheet.Row(p).Height = 50;
             p = p + 1;
 
             if (advanceExport.InfoAdvance.IsRequesterApproved)
@@ -960,7 +960,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 10, p, 11].Merge = true;
                 AddIconTick(workSheet, p, 10); //Tick BOD
             }
-
+            workSheet.Row(p).Height = 50;
             p = p + 1;
 
             for (int x = 2; x < 5; x++)
@@ -3144,6 +3144,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 9, p, 11].Style.WrapText = true;
             workSheet.Cells[p, 9, p, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 9, p, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            
+            workSheet.Row(p).Height = 50;
 
             p = p + 1;
 
@@ -3169,6 +3171,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 9, p, 11].Merge = true;
                 AddIconTick(workSheet, p, 9); //Tick BOD
             }
+
+            workSheet.Row(p).Height = 50;
 
             p = p + 1;
 
@@ -3199,6 +3203,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[row, col].Style.Font.Name = "Wingdings 2";
             workSheet.Cells[row, col].Style.Font.Size = 28;
             workSheet.Cells[row, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[row, col].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
         }
 
         /// <summary>
