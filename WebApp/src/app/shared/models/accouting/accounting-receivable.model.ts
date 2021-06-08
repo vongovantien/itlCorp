@@ -4,6 +4,7 @@ export class TrialOfficialOtherModel {
     partnerCode: string = null;
 
     partnerNameAbbr: string = null;
+    parentNameAbbr: string = null;
 
     agreementNo: string = null;
     agreementType: string = null;

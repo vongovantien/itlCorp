@@ -221,11 +221,12 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
-            string msgCheckUpdateEtdEta = CheckUpdateEtdEta(model, out string  type);
-            if(msgCheckUpdateEtdEta.Length > 0)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateEtdEta, Data = new { errorCode = type } });
-            }
+            // Remove check etd, eta #15850
+            //string msgCheckUpdateEtdEta = CheckUpdateEtdEta(model, out string  type);
+            //if(msgCheckUpdateEtdEta.Length > 0)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateEtdEta, Data = new { errorCode = type } });
+            //}
 
             string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
             if(msgCheckUpdateMawb.Length > 0)

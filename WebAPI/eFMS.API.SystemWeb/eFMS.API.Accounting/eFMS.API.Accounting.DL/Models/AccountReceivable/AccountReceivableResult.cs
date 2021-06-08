@@ -12,6 +12,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public string PartnerNameAbbr { get; set; }
         public string TaxCode { get; set; }
         public string PartnerStatus { get; set; }
+        public string ParentNameAbbr { get; set; }
         public string AgreementNo { get; set; }
         public string AgreementType { get; set; }
         public string AgreementStatus { get; set; }
