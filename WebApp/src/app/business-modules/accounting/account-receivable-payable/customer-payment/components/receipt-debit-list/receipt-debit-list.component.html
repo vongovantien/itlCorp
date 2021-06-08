@@ -49,11 +49,12 @@
                                             <ng-template #container></ng-template>
                                         </ng-container>
                                     </div> -->
-                                    <div class="form-group">
-                                        <select class="form-control" [(ngModel)]="item.creditNo">
+                                    <div class="form-group" *ngIf="item.type === 'DEBIT'">
+                                        <select class="form-control" [ngModel]="item.creditNo"
+                                            (ngModelChange)="onChangeCalCredit($event, item)">
                                             <option [value]="i.refNo" *ngFor="let i of (creditList$ | async)">
                                                 {{i.refNo}}</option>
-                                            <option value="null">-</option>
+                                            <option value="">-</option>
                                         </select>
                                     </div>
                                 </td>

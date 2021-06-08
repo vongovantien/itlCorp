@@ -5,7 +5,7 @@ import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
 import { ReceiptInvoiceModel } from "@models";
-import { RemoveInvoice } from "../../store/actions";
+import { RemoveInvoice, ClearCredit } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
 
 @Component({
@@ -72,8 +72,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Office', field: '' }
         ];
         this.debitList$ = this._store.select(ReceiptDebitListState);
-        this.creditList$ = this._store.select(ReceiptCreditListState);
-        // this.checkAllChange();
+        this.creditList$ = this._store
+            .select(ReceiptCreditListState)
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -88,13 +88,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 });
             });
     }
-
-    // onCheckChange() {
-    //     this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
-    //         .subscribe((x: ReceiptInvoiceModel[]) => {
-    //             this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
-    //         });
-    // }
 
     confirmDeleteInvoiceItem(index: number) {
         this.selectedIndexItem = index;
@@ -111,6 +104,26 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     formatAmount(event: any, receipt: ReceiptInvoiceModel) {
         if (!event.target.value.length) {
             receipt[event.target.name] = 0;
+        }
+    }
+
+    onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {
+        console.log(_refNo);
+        if (!!_refNo) {
+            this.creditList$
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (credits: ReceiptInvoiceModel[]) => {
+                        if (!!credits.length) {
+                            const currentCredit = credits.find(x => x.refNo == _refNo);
+                            curr.creditNo = _refNo;
+                            curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
+                            curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
+
+                            ClearCredit({ creditNo: _refNo, invoiceNo: curr.invoiceNo });
+                        }
+                    }
+                )
         }
     }
 }

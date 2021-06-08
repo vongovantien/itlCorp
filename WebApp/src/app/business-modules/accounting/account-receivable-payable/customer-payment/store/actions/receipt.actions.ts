@@ -15,6 +15,7 @@ export enum ReceiptActionTypes {
     REMOVE_INVOICE = '[AR Receipt] Remove Invoice',
     REMOVE_CREDIT = '[AR Receipt] Remove Credit',
     INSERT_ADVANCE = '[AR Receipt] Insert Advance',
+    CLEAR_CREDIT = '[AR Receipt] Clear Credit',
 
 
     // TODO another action receipt.
@@ -31,9 +32,10 @@ export const ProcessClearSuccess = createAction(ReceiptActionTypes.PROCESS_CLEAR
 export const RemoveInvoice = createAction(ReceiptActionTypes.REMOVE_INVOICE, props<{ index: number }>())
 export const RemoveCredit = createAction(ReceiptActionTypes.REMOVE_CREDIT, props<{ index: number }>())
 export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, props<{ data: ReceiptInvoiceModel }>());
+export const ClearCredit = createAction(ReceiptActionTypes.CLEAR_CREDIT, props<{ invoiceNo: string, creditNo: string }>());
 
 
-export interface ProcessClearInvoiceModel{
+export interface ProcessClearInvoiceModel {
     invoices: ReceiptInvoiceModel[],
     cusAdvanceAmountVnd: number,
     cusAdvanceAmountUsd: number,

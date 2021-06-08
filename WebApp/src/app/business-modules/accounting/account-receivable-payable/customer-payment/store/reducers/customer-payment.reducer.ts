@@ -49,7 +49,7 @@ export const receiptManagementReducer = createReducer(
         ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
     })),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
-        if(payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0){
+        if (payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0) {
             const newInvoiceWithAdv: any = {
                 typeInvoice: 'ADV',
                 type: 'ADV',
@@ -58,9 +58,25 @@ export const receiptManagementReducer = createReducer(
                 refNo: null
             };
             const advData = newInvoiceWithAdv as ReceiptInvoiceModel;
-            return { ...state, debitList: [ ...payload.data.invoices, advData]};
+            return { ...state, debitList: [...payload.data.invoices, advData] };
         }
-        return {...state, debitList: [...payload.data.invoices] }// TODO implement
+        return { ...state, debitList: [...payload.data.invoices] }// TODO implement
+    }),
+    on(ReceiptActions.ClearCredit, (state: IReceiptState, payload: { invoiceNo: string, creditNo: string }) => {
+        const currentIndexCredit = state.creditList.findIndex(x => x.refNo == payload.creditNo);
+        if (currentIndexCredit !== -1) {
+            return {
+                ...state, creditList: [
+                    ...state.creditList.slice(0, currentIndexCredit),
+                    {
+                        ...state.creditList[currentIndexCredit],
+                        invoiceNo: { payload }
+                    },
+                    ...state.creditList.slice(currentIndexCredit + 1)
+                ]
+            }
+
+        }
     })
 );
 

@@ -756,7 +756,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
                 _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
-                _payment.TotalPaidVnd = (payment.TotalPaidVnd ?? 0);
+                _payment.TotalPaidVnd = (payment.TotalPaidVnd ?? 0); // đã bao gồm credit cấn trừ
                 _payment.TotalPaidUsd = (payment.TotalPaidUsd ?? 0);
 
                 _payment.BalanceUsd = (payment.UnpaidAmountUsd ?? 0) - (payment.PaidAmountUsd ?? 0);
@@ -1470,11 +1470,11 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (invoice.PaidAmountVnd == 0)
                     {
-                        invoice.PaidAmountVnd = invoice.UnpaidAmountVnd;
+                        invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
                     }
                     if (paidVnd < invoice.PaidAmountVnd)
                     {
-                        invoice.PaidAmountVnd = paidVnd;
+                        invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
                     paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                 }
@@ -1482,11 +1482,11 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (invoice.PaidAmountUsd == 0)
                     {
-                        invoice.PaidAmountUsd = invoice.UnpaidAmountUsd;
+                        invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
                     }
                     if (paidUsd < invoice.PaidAmountUsd)
                     {
-                        invoice.PaidAmountUsd = paidUsd;
+                        invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                     }
                     paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
                 }

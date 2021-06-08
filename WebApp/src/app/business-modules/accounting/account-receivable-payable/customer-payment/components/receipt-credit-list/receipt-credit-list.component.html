@@ -32,20 +32,9 @@
                                     </ng-container>
                                 </td>
                                 <td class="text-primary">{{item.refNo}}</td>
-                                <!-- <td>
-                                    <div class="form-group col-md-12 dropdown-partner" dropdown>
-                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                            placeholder="Vat Partner" [(ngModel)]="item.invoiceNo"
-                                            (click)="loadDynamicComoGrid(item,i)" [disabled]="isReadonly">
-                                        <ng-container>
-                                            <div class="d-flex justify-content-end dropdown-partner__header">
-                                                <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                    (click)="onSelectInvoice($event, item)"></a>
-                                            </div>
-                                            <ng-template #container></ng-template>
-                                        </ng-container>
-                                    </div>
-                                </td> -->
+                                <td>
+                                    {{item.invoiceNo}}
+                                </td>
                                 <td *ngIf="receiptType !=='Customer'">job</td>
                                 <td *ngIf="receiptType !=='Customer'">mbl</td>
                                 <td *ngIf="receiptType !=='Customer'">hbl</td>
