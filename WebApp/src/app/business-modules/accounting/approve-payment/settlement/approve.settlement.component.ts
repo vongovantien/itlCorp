@@ -46,7 +46,8 @@ export class ApporveSettlementPaymentComponent extends AppPage {
     comment: string = '';
 
     attachFiles: SysImage[] = [];
-
+    folderModuleName:string='Settlement';
+    
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -239,6 +240,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
                 },
             );
+    }
+    
+    previewExportSettlementPayment(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
     }
 
     exportGeneralPreview() {

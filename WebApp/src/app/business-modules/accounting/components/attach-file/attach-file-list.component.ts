@@ -10,18 +10,21 @@ import { ConfirmPopupComponent } from '@common';
 import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
-    selector: 'settlement-attach-file-list',
-    templateUrl: './attach-file-list-settlement.component.html',
-    styleUrls: ['./attach-file-list-settlement.component.scss'],
+    selector: 'accounting-attach-file-list',
+    templateUrl: './attach-file-list.component.html',
+    styleUrls: ['./attach-file-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class SettlementAttachFileListComponent extends AppForm implements OnInit {
+export class AccoutingAttachFileListComponent extends AppForm implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
     @Output() onChange: EventEmitter<SysImage[]> = new EventEmitter<SysImage[]>();
     @Input() set readOnly(val: any) {
         this._readonly = coerceBooleanProperty(val);
     }
+    @Input() fileNo?: String;
+    @Input() folderModuleName?: string;
+    @Input() chillId?: string;
     //////
     get readonly(): boolean {
         return this._readonly;
@@ -53,10 +56,11 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     getFiles(id: string) {
-        this._accountingRepo.getAttachedFiles('Settlement', id)
+        this._accountingRepo.getAttachedFiles(this.folderModuleName, id)
             .subscribe(
                 (data: any) => {
                     this.files = data || [];
+                    this.filterViewFile();
                     this.onChange.emit(this.files);
                 }
             )
@@ -68,7 +72,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
         }
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0 && !!this._id) {
-            this._accountingRepo.uploadAttachedFiles('Settlement', this._id, fileList)
+            this._accountingRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
@@ -99,7 +103,7 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
     }
 
     onDeleteFile(id: string) {
-        this._accountingRepo.deleteAttachedFile('Settlement', id)
+        this._accountingRepo.deleteAttachedFile(this.folderModuleName, id)
             .subscribe(
                 (res: CommonInterface.IResult) => {
                     if (res.status) {
@@ -112,4 +116,37 @@ export class SettlementAttachFileListComponent extends AppForm implements OnInit
             )
     }
 
+    dowloadAllAttach() {
+        if (this.fileNo) {
+            let arr = this.fileNo.split("/");
+            let model = {
+                folderName: this.folderModuleName,
+                objectId: this._id,
+                chillId:this.chillId,
+                fileName: arr[0] + "_" + arr[1] + ".zip"
+            }
+            this._accountingRepo.dowloadallAttach(model)
+                .subscribe(
+                    (res: any) => {
+                        this.downLoadFile(res, "application/zip", model.fileName);
+                    }
+                )
+        }
+    }
+    filterViewFile() {
+        if (this.files) {
+            let type = ["xlsx", "xls", "doc", "docx"];
+            for (let i = 0; i < this.files.length; i++) {
+                let f = this.files[i];
+                if (type.includes(f.name.split('.').pop())) {
+                    f.dowFile = true
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                }
+                else {
+                    f.dowFile = false;
+                    f.viewFileUrl = f.url;
+                }
+            }
+        }
+    }
 }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 @Component({
@@ -34,7 +34,7 @@ export class SwitchToggleComponent implements ControlValueAccessor {
     private onChange: Function = (v: boolean) => { };
     private onTouch: Function = () => { };
 
-    constructor() { }
+    constructor(private _cd: ChangeDetectorRef) { }
 
     set toggleValue(val: boolean) {
         if (val !== null && val !== undefined) {
@@ -53,6 +53,9 @@ export class SwitchToggleComponent implements ControlValueAccessor {
 
     public writeValue(value: any) {
         this.toggleValue = value;
+
+        // ! Check this out https://github.com/angular/angular/issues/10816
+        this._cd.markForCheck();
     }
 
     public registerOnChange(fn: Function) {

@@ -173,7 +173,7 @@ export class ExportRepo {
     }
 
     exportAdvancePaymentDetail(advanceId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -194,7 +194,7 @@ export class ExportRepo {
     }
 
     exportSettlementPaymentDetail(settlementId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -384,6 +384,13 @@ export class ExportRepo {
             catchError((error) => throwError(error)),
             map(data => data)
         );
+    }
+
+    previewExportPayment(id: string, language: string,moduleName:string) {
+        if (moduleName ==='Settlement') 
+            window.open(`https://view.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${id}&language=${language}`, '_blank');
+        else if (moduleName ==='Advance') 
+            window.open(`https://view.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${id}&language=${language}`, '_blank');
     }
 }
 
