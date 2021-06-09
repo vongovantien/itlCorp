@@ -180,6 +180,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         bankName: this.settlementPayment.settlement.bankName,
                         beneficiaryName: this.settlementPayment.settlement.bankAccountName,
                         bankAccountNo: this.settlementPayment.settlement.bankAccountNo,
+                        advanceAmount: this.settlementPayment.settlement.advanceAmount,
+                        balanceAmount: this.settlementPayment.settlement.balanceAmount,
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
 
