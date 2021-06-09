@@ -100,10 +100,11 @@ export class FormSearchExportComponent extends PopupBase {
       this.dataSearch.saleman = this.salesmanList.filter(x => this.salesmanActive.findIndex(item => item === x.id) >= 0).map(x => x.username).join(";");
     }
     this.dataSearch.partnerType = this.partnerType;
-    this.dataSearch.datetimeCreatedFrom = !!this.createdDate.value ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
-    this.dataSearch.datetimeCreatedTo = !!this.createdDate.value ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null;
+    this.dataSearch.datetimeCreatedFrom = (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+    this.dataSearch.datetimeCreatedTo = (!!this.createdDate.value  && !!this.createdDate.value.endDate) ? formatDate(this.createdDate.value.endDate, 'yyyy-MM-dd', 'en') : null;
     this.dataSearch.active = (!!this.status.value && this.status.value !== this.statusList[0].id) ? (this.status.value === this.statusList[1].id ? true : false) : null;
-    console.log('data', this.dataSearch)
+    const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+    this.dataSearch.author = userLogged.nameEn;
     if (!!this.dataSearch) {
       this._progressRef.start();
       this._exportRepo.exportPartner(this.dataSearch)
@@ -125,7 +126,7 @@ export class FormSearchExportComponent extends PopupBase {
     this.salesmanActive.length = 0;
     this.salesmanActive = [...this.salesmanActive, 'All'];
     this.createdDate.setValue(null);
-    this.status.setValue(this.statusList[0].id)
+    this.status.setValue(this.statusList[0].id);
   }
 
   close() {
