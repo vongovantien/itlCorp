@@ -26,7 +26,7 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && (!customer.value || customer.value.length === 0))}">
+                        [ngClass]="{'m-form__group has-danger': (isCommissionIncentive && isSubmitted && !customerActive.length)}">
                         <label class="form-control-label">
                             {{ isSheetDebitRpt ? "Partner": "Customer" }}
                         </label>
@@ -39,9 +39,9 @@
                         </app-combo-grid-virtual-scroll> -->
                         <ng-select formControlName="customer" [items]="customers | async" [(ngModel)]="customerActive"
                             [virtualScroll]='true' [multiple]='true' [clearable]='true' class="custom"
-                            bindLabel="taxCodeAbbrName" bindValue="id">
+                            bindLabel="taxCodeAbbrName" bindValue="id" (open)="getPartnerData('customer')">
                         </ng-select>
-                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && (!customer.value || customer.value.length === 0)">
+                        <div class="form-control-feedback" *ngIf="isCommissionIncentive && isSubmitted && !customerActive.length">
                             Please select customer
                         </div>
                     </div>
@@ -77,7 +77,7 @@
                         <label *ngIf="typeReport.value !== typeComReportList[2].id" required></label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'acPartner')"
                             [currentActiveItemId]="{ field: 'id', value: partnerAccount.value}"
-                            [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async"
+                            [selectedDisplayFields]="['partnerNameVn']" [dataSources]="partners | async" (click)="getPartnerData('partner')"
                             [displayFields]="displayFieldsPartner" (remove)="resetFormControl(partnerAccount)"
                             placeholder="Select Beneficiary">
                         </app-combo-grid-virtual-scroll>
@@ -199,7 +199,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: carrier.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'carrier')"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="carriers | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                    [displayFields]="displayFieldsCustomer" [height]="150" (click)="getPartnerData('carrier')"
                                     (remove)="resetFormControl(carrier)">
                                 </app-combo-grid-virtual-scroll>
                             </div>
@@ -215,7 +215,7 @@
                                     [currentActiveItemId]="{ field: 'id', value: agent.value}"
                                     (itemSelected)="onSelectDataFormInfo($event, 'agent')"
                                     [selectedDisplayFields]="['shortName']" [dataSources]="agents | async"
-                                    [displayFields]="displayFieldsCustomer" [height]="150"
+                                    [displayFields]="displayFieldsCustomer" [height]="150" (click)="getPartnerData('agent')"
                                     (remove)="resetFormControl(agent)">
                                 </app-combo-grid-virtual-scroll>
                             </div>

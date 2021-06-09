@@ -33,6 +33,6 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? ChargeWeight { get; set; }
         public decimal? AmountUSD { get; set; }
         public decimal? AmountVND { get; set; }
-
+        public string VesselFlight { get; set; }
     }
 }

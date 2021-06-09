@@ -20,6 +20,7 @@ import { ICustomerState, getCustomerSearchParamsState } from './store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
+import { FormSearchExportComponent } from '../components/popup/form-search-export/form-search-export.popup';
 
 
 @Component({
@@ -32,7 +33,8 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
-
+    @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
+    
     menuSpecialPermission: Observable<any[]>;
 
     customers: Customer[] = [];
@@ -322,14 +324,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     }
 
     export() {
-        this._progressRef.start();
-        this._exportRepo.exportPartner(this.dataSearch)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms-commercial-customer.xlsx');
-                }
-            );
+        this.formSearchExportPopup.show();
     }
 }
 interface ISearchGroup {

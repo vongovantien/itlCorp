@@ -26,4 +26,20 @@ namespace eFMS.API.ForPartner.DL.Models
         public string HBL { get; set; }
         public string ReferenceNo { get; set; }
     }
+    
+    public class VoucherExpense
+    {
+        public Guid DocID { get; set; }
+        public string DocNO { get; set; }
+        public string DocType { get; set; }
+        public List<VoucherExpenseCharge> Detail { get; set; }
+    }
+
+    public class VoucherExpenseCharge
+    {
+        public Guid RowID { get; set; }
+        public string JobNo { get; set; }
+        public string VoucherNO { get; set; }
+        public DateTime? VoucherDate { get; set; }
+    }
 }

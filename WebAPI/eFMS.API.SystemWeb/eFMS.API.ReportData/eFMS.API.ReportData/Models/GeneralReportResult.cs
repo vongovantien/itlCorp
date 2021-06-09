@@ -31,5 +31,6 @@ namespace eFMS.API.ReportData.Models
         public string Service { get; set; }
         public string ServiceName { get; set; }
         public decimal? ChargeWeight { get; set; }
+        public string VesselFlight { get; set; }
     }
 }

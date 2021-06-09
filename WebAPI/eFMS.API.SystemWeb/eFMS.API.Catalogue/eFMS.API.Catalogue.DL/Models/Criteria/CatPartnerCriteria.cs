@@ -27,5 +27,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string CoLoaderCode { get; set; }
         public string Saleman { get; set; }
         public string ContractType { get; set; }
+        public DateTime? DatetimeCreatedFrom { get; set; }
+        public DateTime? DatetimeCreatedTo { get; set; }
     }
 }
