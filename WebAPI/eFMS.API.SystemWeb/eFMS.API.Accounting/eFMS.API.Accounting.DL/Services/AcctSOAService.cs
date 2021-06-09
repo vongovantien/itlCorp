@@ -786,27 +786,12 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.StrServices.Contains("CL"))
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false));
-
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
-                    {
-                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
-                                                          && (
-                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                ?
-                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
-                                                                : false
-                                                             )); //Import - ETA, Export - ETD
-                    }
                 }
-                else
+                if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
-                                                          && (
-                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                ?
-                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
-                                                                : false
-                                                             )); //Import - ETA, Export - ETD
+                                                      && (x.ServiceDate.HasValue ? (criteria.FromDate.Date <= x.ServiceDate && x.ServiceDate <= criteria.ToDate.Date)
+                                                         : false)); //Import - ETA, Export - ETD
                 }
             }
 
@@ -1069,7 +1054,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                     if (tran != null)
                     {
-                        _serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                        //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                        _serviceDate = tran.ServiceDate;
                         var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
                         _pic = user?.Username;
                     }
@@ -1200,27 +1186,12 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.StrServices.Contains("CL"))
                 {
                     operations = opsTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? x.ServiceDate.Value.Date >= criteria.FromDate.Date && x.ServiceDate.Value.Date <= criteria.ToDate.Date : false));
-
-                    if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
-                    {
-                        transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
-                                                          && (
-                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                ?
-                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
-                                                                : false
-                                                             )); //Import - ETA, Export - ETD
-                    }
                 }
-                else
+                if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
                 {
                     transactions = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled
-                                                          && (
-                                                                (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                ?
-                                                                (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Date
-                                                                : false
-                                                             )); //Import - ETA, Export - ETD
+                                                      && (x.ServiceDate.HasValue ? (criteria.FromDate.Date <= x.ServiceDate && x.ServiceDate <= criteria.ToDate.Date)
+                                                         : false)); //Import - ETA, Export - ETD
                 }
             }
 
@@ -1485,7 +1456,8 @@ namespace eFMS.API.Accounting.DL.Services
                     var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                     if (tran != null)
                     {
-                        _serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                        //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                        _serviceDate = tran.ServiceDate;
                         var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
                         _pic = user?.Username;
                     }
@@ -1899,7 +1871,8 @@ namespace eFMS.API.Accounting.DL.Services
                         var tran = csTransactionRepo.Get(x => x.JobNo == surcharge.JobNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                         if (tran != null)
                         {
-                            _serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                            //_serviceDate = tran.TransactionType.Contains("I") ? tran.Eta : tran.Etd;
+                            _serviceDate = tran.ServiceDate;
                             var user = sysUserRepo.Get(x => x.Id == tran.PersonIncharge).FirstOrDefault();
                             _pic = user?.Username;
                         }
@@ -2503,8 +2476,9 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var csTransDe = csTransactionDetailRepo.Get(x => x.Id == sur.Hblid).FirstOrDefault();
                     var csTrans = csTransDe == null ? new CsTransaction() : csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled && x.Id == csTransDe.JobId).FirstOrDefault();
-                    _serviceDate = (csTrans?.TransactionType == "AI" || csTrans?.TransactionType == "SFI" || csTrans?.TransactionType == "SLI" || csTrans?.TransactionType == "SCI") ?
-                        csTrans?.Eta : csTrans?.Etd;
+                    //_serviceDate = (csTrans?.TransactionType == "AI" || csTrans?.TransactionType == "SFI" || csTrans?.TransactionType == "SLI" || csTrans?.TransactionType == "SCI") ?
+                    //    csTrans?.Eta : csTrans?.Etd;
+                    _serviceDate = csTrans?.ServiceDate;
                     _createdDate = csTrans?.DatetimeCreated;
                     _service = csTrans.TransactionType;
                     _userCreated = csTrans?.UserCreated;
