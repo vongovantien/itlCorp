@@ -5,14 +5,15 @@ import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
-import { distinctUntilChanged, skip, takeUntil } from "rxjs/operators";
+import { distinctUntilChanged, skip, takeUntil, filter, pluck } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
 import { AppComboGridComponent } from "@common";
-
+import { DataService } from "@services";
+import _cloneDeep from 'lodash/cloneDeep'
 @Component({
     selector: 'customer-payment-receipt-credit-list',
     templateUrl: './receipt-credit-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
@@ -45,7 +46,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
 
     private _type: string = 'Customer' // Agent
 
-    creditList: Observable<ReceiptInvoiceModel[]>;
+    // creditList: Observable<ReceiptInvoiceModel[]>;
+    creditList: ReceiptInvoiceModel[] = [];
     debitList: Observable<ReceiptInvoiceModel[]>;
 
     agencyHeaders: CommonInterface.IHeaderTable[];
@@ -58,7 +60,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     receiptType: string = null;
 
     constructor(
-        private _store: Store<IReceiptState>
+        private readonly _store: Store<IReceiptState>,
+        private readonly dataService: DataService
     ) {
         super();
     }
@@ -92,10 +95,18 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { field: 'invoiceNo', label: 'Invoice No' },
             { field: 'amount', label: 'Unpaid Invoice' }
         ];
-        this.creditList = this._store.select(ReceiptCreditListState);
         this.debitList = this._store.select(ReceiptDebitListState);
-        this.checkAllChange();
+        this._store.select(ReceiptCreditListState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data) => {
+                    console.log(data);
+                    this.creditList = data;
+                }
+            )
+
         this.getInvoiceList();
+
         this.headerInvoice = [
             { field: 'invoiceNo', title: 'Invoice No' },
             { field: 'amount', title: 'Unpaid Invoice' }
@@ -103,6 +114,24 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x || 'Customer');
+
+
+        // * Listen Debit clear Credit
+        this.dataService.currentMessage
+            .pipe(
+                filter(x => !!x['clearCredit']),
+                pluck('clearCredit'),
+                takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data: { invoiceNo: string, creditNo: string }) => {
+                    if (data.creditNo) {
+                        const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)
+                        if (indexCreditCurrent !== -1) {
+                            this.creditList[indexCreditCurrent].invoiceNo = data.invoiceNo;
+                        }
+                    }
+                }
+            )
     }
 
     formatNumberCurrency(input: number) {
@@ -110,22 +139,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
             { minimumFractionDigits: 2 }
         );
-    }
-
-    checkAllChange() {
-        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                x.forEach((element: ReceiptInvoiceModel) => {
-                    element.isSelected = this.isCheckAll;
-                });
-            });
-    }
-
-    onCheckChange() {
-        this.creditList.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                this.isCheckAll = x.filter((element: ReceiptInvoiceModel) => !element.isSelected).length === 0;
-            });
     }
 
 

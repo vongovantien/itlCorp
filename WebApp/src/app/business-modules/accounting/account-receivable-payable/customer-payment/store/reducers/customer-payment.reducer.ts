@@ -63,6 +63,7 @@ export const receiptManagementReducer = createReducer(
         return { ...state, debitList: [...payload.data.invoices] }// TODO implement
     }),
     on(ReceiptActions.ClearCredit, (state: IReceiptState, payload: { invoiceNo: string, creditNo: string }) => {
+        console.log(payload);
         const currentIndexCredit = state.creditList.findIndex(x => x.refNo == payload.creditNo);
         if (currentIndexCredit !== -1) {
             return {

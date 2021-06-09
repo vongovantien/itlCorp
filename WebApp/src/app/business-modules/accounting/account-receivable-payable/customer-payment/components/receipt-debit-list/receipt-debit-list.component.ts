@@ -7,6 +7,7 @@ import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from 
 import { ReceiptInvoiceModel } from "@models";
 import { RemoveInvoice, ClearCredit } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
+import { DataService } from "@services";
 
 @Component({
     selector: 'customer-payment-receipt-debit-list',
@@ -29,7 +30,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     isSubmitted: boolean = false;
 
     constructor(
-        private _store: Store<IReceiptState>
+        private _store: Store<IReceiptState>,
+        private _dataService: DataService
     ) {
         super();
     }
@@ -120,7 +122,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                             curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
                             curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
 
-                            ClearCredit({ creditNo: _refNo, invoiceNo: curr.invoiceNo });
+                            this._dataService.setData('clearCredit', { invoiceNo: curr.invoiceNo, creditNo: _refNo });
                         }
                     }
                 )
