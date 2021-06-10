@@ -1951,13 +1951,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (criteria.Service.Contains("I") || criteria.Service.Contains("A"))
                             {
-                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled
-                                                                  && (
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                        ?
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Value.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Value.Date
-                                                                        : false
-                                                                     )); //Import - ETA, Export - ETD
+                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? (criteria.FromDate.Value.Date <= x.ServiceDate.Value.Date &&
+                                                                                                                    x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date) : false));
                             }
                         }
 
@@ -2076,13 +2071,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (criteria.Service.Contains("I") || criteria.Service.Contains("A"))
                             {
-                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled
-                                                                  && (
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                        ?
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Value.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Value.Date
-                                                                        : false
-                                                                     )); //Import - ETA, Export - ETD
+                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? (criteria.FromDate.Value.Date <= x.ServiceDate.Value.Date &&
+                                                                                                                    x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date) : false));
                             }
                         }
 
@@ -2200,13 +2190,8 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                             if (criteria.Service.Contains("I") || criteria.Service.Contains("A"))
                             {
-                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled
-                                                                  && (
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.HasValue : x.Etd.HasValue)
-                                                                        ?
-                                                                        (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) >= criteria.FromDate.Value.Date && (x.TransactionType.Contains("I") ? x.Eta.Value.Date : x.Etd.Value.Date) <= criteria.ToDate.Value.Date
-                                                                        : false
-                                                                     )); //Import - ETA, Export - ETD
+                                transactions = csTransactionRepository.Get(x => x.CurrentStatus != TermData.Canceled && (x.ServiceDate.HasValue ? (criteria.FromDate.Value.Date <= x.ServiceDate.Value.Date &&
+                                                                                                                    x.ServiceDate.Value.Date <= criteria.ToDate.Value.Date) : false));
                             }
                         }
 
