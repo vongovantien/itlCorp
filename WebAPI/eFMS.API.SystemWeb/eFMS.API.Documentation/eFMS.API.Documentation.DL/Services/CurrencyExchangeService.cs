@@ -211,7 +211,9 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _excRate = 0;
 
             //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
-            decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);            
+            // [CR: 15869]: exchange rate commission theo exchange date
+            //decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+            decimal exchangeRateToLocal = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
             _excRate = exchangeRateToLocal;
 
             if (surcharge.CurrencyId == currencyConvert)
@@ -234,7 +236,8 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     if (surcharge.CurrencyId == DocumentConstants.CURRENCY_LOCAL && currencyConvert == DocumentConstants.CURRENCY_USD)
                     {
-                        exchangeRate = 1 / kickBackExcRate;
+                        var _exChangeRateUsd = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, DocumentConstants.CURRENCY_LOCAL, DocumentConstants.CURRENCY_USD);
+                        exchangeRate = _exChangeRateUsd;
                     }
                 }
                 else
