@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, Output, EventEmitter } from '@angular
 import { Router, ActivatedRoute, NavigationStart, NavigationEnd, NavigationCancel, NavigationError, Event } from '@angular/router';
 import { IdentityRepo, SystemRepo } from '@repositories';
 
-import { SystemConstants } from 'src/constants/system.const';
+import { SystemConstants } from '@system-constants';
 import { Employee, Office, SysNotification, SysUserNotification } from '@models';
 import { forkJoin, Subscription } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
@@ -115,19 +115,26 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         this._signalRService.listenEvent("NotificationWhenChange", (data: SysNotification) => {
             console.log("new notification", data);
             if (data.type === "System") {
-                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 15000, });
+                this._toast.info(data.description, data.title + Math.random, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, timeOut: 15000, });
+
             } else if (data.userIds.includes(this.currenUser.id)) {
-                this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
+                const toastrUser = this._toast.info(data.description, data.title, { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, timeOut: 15000 });
+                if (!toastrUser) {
+                    return;
+                }
+                const toastrSub = toastrUser.onTap.subscribe(() => this.gotoActionLink(data));
+
+                this.subscriptions.push(toastrSub);
             }
             this.getListNotification();
         });
 
         this._signalRService.listenEvent("SendMessageToAllClient", (data: any) => {
-            this._toast.info(`${data}`, 'eFMS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
+            this._toast.info(`${data}`, 'eFMS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, timeOut: 15000, });
         });
 
         this._signalRService.listenEvent("SendMessageToClient", (data: any) => {
-            this._toast.info(`${data}`, 'eMFS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, easeTime: 5000, });
+            this._toast.info(`${data}`, 'eMFS Infomation', { progressBar: true, positionClass: 'toast-top-right', enableHtml: true, timeOut: 15000, });
         });
 
         this._signalRService.listenEvent("BroadCastMessage", (data: any) => {
@@ -199,18 +206,22 @@ export class HeaderComponent implements OnInit, AfterViewInit {
         return obj;
     }
 
+    gotoActionLink(noti: SysUserNotification | SysNotification) {
+        if (noti.actionLink.includes("?")) {
+            const queryParamObject = this.getAllUrlParams(noti.actionLink);
+            if (!!Object.keys(queryParamObject).length) {
+                this.router.navigate([noti.actionLink.substring(0, noti.actionLink.indexOf("?"))], { queryParams: queryParamObject });
+            }
+        } else {
+            this.router.navigate([noti.actionLink]);
+        }
+    }
+
     selectNotification(noti: SysUserNotification, e: any) {
         console.log(noti);
         e.stopPropagation();
         if (noti.actionLink) {
-            if (noti.actionLink.includes("?")) {
-                const queryParamObject = this.getAllUrlParams(noti.actionLink);
-                if (!!Object.keys(queryParamObject).length) {
-                    this.router.navigate([noti.actionLink.substring(0, noti.actionLink.indexOf("?"))], { queryParams: queryParamObject });
-                }
-            } else {
-                this.router.navigate([noti.actionLink]);
-            }
+            this.gotoActionLink(noti);
         }
         if (noti.status === 'Read') {
             return;
