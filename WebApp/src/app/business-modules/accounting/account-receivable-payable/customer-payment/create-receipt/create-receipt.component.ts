@@ -113,8 +113,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         if (this.paymentList.filter(x => x.type == 'CREDIT').length) {
-            if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' && !x.creditNo).length > 0) {
-                this._toastService.warning("Please select credit no!");
+            const isCreditHaveInvoice = this.paymentList.some(x => !x.invoiceNo);
+            if (isCreditHaveInvoice) {
+                this._toastService.warning("Some credit do not have net off invoice");
                 return;
             }
         }

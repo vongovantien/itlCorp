@@ -125,6 +125,9 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .subscribe(
                 (data: { invoiceNo: string, creditNo: string }) => {
                     if (data.creditNo) {
+                        this.creditList.forEach(x => {
+                            x.invoiceNo = null;
+                        })
                         const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)
                         if (indexCreditCurrent !== -1) {
                             this.creditList[indexCreditCurrent].invoiceNo = data.invoiceNo;

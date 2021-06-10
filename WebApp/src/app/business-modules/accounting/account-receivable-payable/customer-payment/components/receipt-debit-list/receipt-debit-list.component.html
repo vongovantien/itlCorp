@@ -54,7 +54,7 @@
                                             (ngModelChange)="onChangeCalCredit($event, item)">
                                             <option [value]="i.refNo" *ngFor="let i of (creditList$ | async)">
                                                 {{i.refNo}}</option>
-                                            <option value="" disabled>-</option>
+                                            <option value=null disabled>Please select</option>
                                         </select>
                                     </div>
                                 </td>

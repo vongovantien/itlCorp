@@ -8,6 +8,7 @@ import { ReceiptInvoiceModel } from "@models";
 import { RemoveInvoice, ClearCredit } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
 import { DataService } from "@services";
+import { ToastrService } from "ngx-toastr";
 
 @Component({
     selector: 'customer-payment-receipt-debit-list',
@@ -21,7 +22,27 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     debitList$: Observable<ReceiptInvoiceModel[]>;
     creditList$: Observable<ReceiptInvoiceModel[]>;
 
-    agencyHeaders: CommonInterface.IHeaderTable[];
+    agencyHeaders: CommonInterface.IHeaderTable[] = [
+        { title: 'RefNo', field: '', sortable: true },
+        { title: 'Type', field: '' },
+        { title: 'Invoice No', field: '', width: 150 },
+        { title: 'Credit No', field: '', width: 250 },
+        { title: 'Job No', field: '' },
+        { title: 'MBL No', field: '' },
+        { title: 'HBL No', field: '' },
+        { title: 'Org Amount', field: '', align: this.right },
+        { title: 'Unpaid USD', field: '' },
+        { title: 'Unpaid VND', field: '' },
+        { title: 'Paid Amount USD', field: '', align: this.right },
+        { title: 'Paid Amount VND', field: '', align: this.right },
+        { title: 'Total Paid VND', field: '', align: this.right },
+        { title: 'Total Paid USD', field: '', align: this.right },
+        { title: 'Remain USD', field: '' },
+        { title: 'Remain VND', field: '' },
+        { title: 'Payment Note', field: '' },
+        { title: 'BU Handle', field: '' },
+        { title: 'Office', field: '' }
+    ];
     selectedIndexItem: number;
     receiptType: string = null;
 
@@ -31,7 +52,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     constructor(
         private _store: Store<IReceiptState>,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private readonly _toastService: ToastrService
     ) {
         super();
     }
@@ -55,40 +77,13 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
-        this.agencyHeaders = [
-            { title: 'RefNo', field: '', sortable: true },
-            { title: 'Type', field: '' },
-            { title: 'Invoice No', field: '', width: 150 },
-            { title: 'Job No', field: '' },
-            { title: 'MBL No', field: '' },
-            { title: 'HBL No', field: '' },
-            { title: 'Org Amount', field: '', align: this.right },
-            { title: 'Unpaid USD', field: '' },
-            { title: 'Unpaid VND', field: '' },
-            { title: 'Paid Amount USD', field: '', align: this.right },
-            { title: 'Paid Amount VND', field: '', align: this.right },
-            { title: 'Remain USD', field: '' },
-            { title: 'Remain VND', field: '' },
-            { title: 'Payment Note', field: '' },
-            { title: 'BU Handle', field: '' },
-            { title: 'Office', field: '' }
-        ];
+
         this.debitList$ = this._store.select(ReceiptDebitListState);
-        this.creditList$ = this._store
-            .select(ReceiptCreditListState)
+        this.creditList$ = this._store.select(ReceiptCreditListState);
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x || 'Customer');
-    }
-
-    checkAllChange() {
-        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                x.forEach((element: ReceiptInvoiceModel) => {
-                    element.isSelected = this.isCheckAll;
-                });
-            });
     }
 
     confirmDeleteInvoiceItem(index: number) {
@@ -118,11 +113,18 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     (credits: ReceiptInvoiceModel[]) => {
                         if (!!credits.length) {
                             const currentCredit = credits.find(x => x.refNo == _refNo);
-                            curr.creditNo = _refNo;
-                            curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
-                            curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
+                            if (!!currentCredit) {
+                                if (currentCredit.amount > curr.amount) {
+                                    this._toastService.warning("Credit Amount > Invoice Amount", "Warning");
+                                    curr.creditNo = null;
+                                    return;
+                                }
+                                curr.creditNo = _refNo;
+                                curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
+                                curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
 
-                            this._dataService.setData('clearCredit', { invoiceNo: curr.invoiceNo, creditNo: _refNo });
+                                this._dataService.setData('clearCredit', { invoiceNo: curr.invoiceNo, creditNo: _refNo });
+                            }
                         }
                     }
                 )
