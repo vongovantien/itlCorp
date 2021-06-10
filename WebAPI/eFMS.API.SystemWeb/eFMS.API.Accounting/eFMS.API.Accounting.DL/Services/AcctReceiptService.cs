@@ -1973,6 +1973,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 query = query.And(x => acctManagementIds.Contains(x.Id));
                             }
                         }
+                        else
+                        {
+                            query = query.And(x => false);
+                        }
                     }
                 }
             }
@@ -2093,6 +2097,10 @@ namespace eFMS.API.Accounting.DL.Services
                                 query = query.And(x => soaNos.Contains(x.Soano));
                             }
                         }
+                        else
+                        {
+                            query = query.And(x => false);
+                        }
                     }
                 }
             }
@@ -2211,6 +2219,10 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 query = query.And(x => creditNos.Contains(x.Code));
                             }
+                        }
+                        else
+                        {
+                            query = query.And(x => false);
                         }
                     }
                 }
