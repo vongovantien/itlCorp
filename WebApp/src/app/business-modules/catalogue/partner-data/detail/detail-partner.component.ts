@@ -8,7 +8,7 @@ import { Saleman } from 'src/app/shared/models/catalogue/saleman.model';
 import { SalemanAdd } from 'src/app/shared/models/catalogue/salemanadd.model';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
-import { catchError, finalize, map } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil } from "rxjs/operators";
 import { AppList } from 'src/app/app.list';
 import { ToastrService } from 'ngx-toastr';
 import { SalemanPopupComponent } from '../components/saleman-popup.component';
@@ -21,7 +21,7 @@ import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
 import { CommercialContractListComponent } from 'src/app/business-modules/commercial/components/contract/commercial-contract-list.component';
 import { CommercialBranchSubListComponent } from 'src/app/business-modules/commercial/components/branch-sub/commercial-branch-sub-list.component';
 import _merge from 'lodash/merge';
-import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { getMenuUserPermissionState, getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { RoutingConstants } from '@constants';
 import { FormContractCommercialPopupComponent, PartnerRejectPopupComponent } from 'src/app/business-modules/share-modules/components';
@@ -185,6 +185,16 @@ export class PartnerDetailComponent extends AppList {
                         this.formPartnerComponent.activePartner = this.partner.active;
 
                         this.userCreatePopup.partnerId = this.partner.id;
+                        this._store.select(getMenuUserPermissionState)
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe(x=>{
+                            if(!x.specialActions.length){getMenuUserPermissionState
+                                const changeUser = x.specialActions.filter( permiss => permiss['action'] === 'ChangeInfo' && permiss['isAllow']).length;
+                                if(changeUser && !this.isAddSubPartner){
+                                    this.userCreatePopup.partnerId = this.partner.id;
+                                }
+                            }
+                        });
                     }
                 }
             );
