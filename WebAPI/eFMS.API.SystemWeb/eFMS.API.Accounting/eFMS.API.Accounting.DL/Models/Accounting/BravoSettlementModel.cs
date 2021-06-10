@@ -22,6 +22,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string LocalBranchCode { get; set; }
         public string PaymentMethod { get; set; }
         public string Payee { get; set; }
+        public decimal? SettleAmount { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
        
     }
@@ -29,7 +30,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
     public class BravoSettlementRequestModel
     {
         public string NganhCode { get => "FWD"; set => NganhCode = value; }
-        public Guid RowId { get; set; } // Charge ID
+        public string RowId { get; set; } // Charge ID
         public string Ma_SpHt { get; set; } // Job No
         public string ItemCode { get; set; } // Charge Code
         public string Description { get; set; }
@@ -58,5 +59,14 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public decimal? DueDate { get; set; }
         public string CustomerCodeVAT { get; set; }
         public string CustomerCodeTransfer { get; set; }
+        public string AdvanceCustomerCode { get; set; } // Mã Đối tượng tạm ứng
+        public decimal? RefundAmount { get; set; } // Tổng Số tiền hoàn ứng
+        public string Stt_Cd_Htt { get; set; } // Số Ref Advance
+        public int IsRefund { get; set; } // 0. Nghiệp vụ chi phí normal, 1.Nghiệp vụ chi phí Có hoàn ứng.
+
+        // Custom
+        public string AdvanceNo { get; set; }
+        public Guid HblId { get; set; }
+        public string ClearanceNo { get; set; }
     }
 }
