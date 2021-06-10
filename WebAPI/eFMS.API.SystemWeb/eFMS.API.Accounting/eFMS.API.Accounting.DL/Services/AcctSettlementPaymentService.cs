@@ -56,6 +56,8 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IUserBaseService userBaseService;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IContextBase<SysNotifications> sysNotificationRepository;
+        private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -89,7 +91,10 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysImage> sysImageRepo,
             IUserBaseService userBase,
-            IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
+            IAccAccountReceivableService accAccountReceivable,
+            IContextBase<SysNotifications> sysNotificationRepo,
+            IContextBase<SysUserNotification> sysUserNotificationRepo,
+            IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -120,6 +125,8 @@ namespace eFMS.API.Accounting.DL.Services
             acctCdnoteRepo = acctCdnote;
             sysImageRepository = sysImageRepo;
             accAccountReceivableService = accAccountReceivable;
+            sysNotificationRepository = sysNotificationRepo;
+            sysUserNotificationRepository = sysUserNotificationRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -5129,12 +5136,12 @@ namespace eFMS.API.Accounting.DL.Services
                                 settle.UserModified = currentUser.UserID;
                                 settle.DatetimeModified = DateTime.Now;
 
-                                // ghi log
-                                string log = String.Format("{0} has been opened at {1} on {2} by {3}", settle.SettlementNo, string.Format("{0:HH:mm:ss tt}", DateTime.Now), DateTime.Now.ToString("dd/MM/yyyy"), currentUser.UserName);
+                                // write log unlock
+                                string log = String.Format("{0} has been opened at {1} on {2} by {3} from denied", settle.SettlementNo, string.Format("{0:HH:mm:ss tt}", DateTime.Now), DateTime.Now.ToString("dd/MM/yyyy"), currentUser.UserName);
 
                                 settle.LockedLog = settle.LockedLog + log + ";";
 
-                                result = DataContext.Update(settle, x => x.Id == Id, false);
+                                result = DataContext.Update(settle, x => x.Id == Id);
 
                                 if (result.Success)
                                 {
@@ -5147,12 +5154,50 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
+
+                                    HandleState hsUpdateApproval = acctApproveSettlementRepo.SubmitChanges();
+                                    // push user notification
+                                    if (hsUpdateApproval.Success)
+                                    {
+                                        string title = string.Format(@"Accountant Denied Data Settlement {0}", settle.SettlementNo);
+                                        string desc = string.Format(@"Settlement {0} has denied by {1}, Click to view", settle.SettlementNo, currentUser.UserName);
+                                        SysNotifications sysNotify = new SysNotifications
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            Type = "User",
+                                            Title = title,
+                                            Description = desc,
+                                            IsClosed = false,
+                                            IsRead = false,
+                                            UserCreated = currentUser.UserID,
+                                            UserModified = currentUser.UserID,
+                                            Action = "Detail",
+                                            ActionLink = string.Format(@"home/accounting/settlement-payment/{0}", settle.Id),
+                                            UserIds = settle.UserCreated
+                                        };
+
+                                        sysNotificationRepository.Add(sysNotify);
+
+                                        SysUserNotification sysUserNotify = new SysUserNotification
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            UserId = settle.UserCreated,
+                                            Status = "New",
+                                            NotitficationId = sysNotify.Id,
+                                            DatetimeCreated = DateTime.Now,
+                                            DatetimeModified = DateTime.Now,
+                                            UserCreated = currentUser.UserID,
+                                            UserModified = currentUser.UserID,
+                                        };
+
+                                        sysUserNotificationRepository.Add(sysUserNotify);
+                                    }
                                 }
                             }
                         }
                     }
-                    DataContext.SubmitChanges();
-                    acctApproveSettlementRepo.SubmitChanges();
                     trans.Commit();
                     return result;
                 }

@@ -51,8 +51,20 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     }
 
     chooseFile(event: any) {
-        const fileList: FileList[] = event.target['files'];
+        const fileList = event.target['files'];
         if (fileList.length > 0) {
+            let validSize: boolean = true;
+            for (let i = 0; i <= fileList.length - 1; i++) {
+                const file: number = Math.round((fileList[i].size / 1024));
+                if (file >= 100) {
+                    validSize = false;
+                    break;
+                }
+            }
+            if (!validSize) {
+                this._toastService.warning("maximum file size < 100Mb");
+                return;
+            }
             this._documentRepo.uploadFileShipment(this.jobId, false, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
