@@ -169,13 +169,13 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string language)
-        {
+        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
+         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + language, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + lang, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
 
-            var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, language);
+            var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, lang);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Form - eFMS.xlsx");
@@ -265,14 +265,14 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPayment")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string language)
+        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
-            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, language);
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");

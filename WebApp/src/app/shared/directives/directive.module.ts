@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import {
-    AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, EcusSpecicalCharacterNoSpaceDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
-    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, DropdownToggleDirective
+    AutofocusDirective, TwoDigitDecimaNumberDirective, IntergerInputDirective, SpecialCharacterDirective, DecimalNumberGreaterThan0Directive, ClickOutSideDirective, AppLoadingButtonDirective, AppRequiredDirective, NumericDirective, InjectViewContainerRefDirective, NoDblClickDirective, AutoFormatCurrencyDirective, IconCalendarDirective,
+    IConClearCalendarDirective, LoadModuleDirective, DisabledControlDirective, HasOwnerPermissionDirective, ClickStopPropagationDirective, FormatDecimalFormControlDirective, DropdownToggleDirective
 } from '.';
 import { OverlayModule } from '@angular/cdk/overlay';
 
@@ -10,7 +10,6 @@ const APP_DIRECTIVES = [
     TwoDigitDecimaNumberDirective,
     IntergerInputDirective,
     SpecialCharacterDirective,
-    EcusSpecicalCharacterNoSpaceDirective,
     DecimalNumberGreaterThan0Directive,
     ClickOutSideDirective,
     LoadModuleDirective,
@@ -25,6 +24,7 @@ const APP_DIRECTIVES = [
     DisabledControlDirective,
     HasOwnerPermissionDirective,
     ClickStopPropagationDirective,
+    FormatDecimalFormControlDirective,
     DropdownToggleDirective
 ];
 @NgModule({

@@ -10,6 +10,6 @@ namespace eFMS.API.ReportData.Models
         public string StageNameEn { get; set; }
         public string DescriptionVn { get; set; }
         public string DescriptionEn { get; set; }
-        public bool? Inactive { get; set; }
+        public bool? Active { get; set; }
     }
 }
