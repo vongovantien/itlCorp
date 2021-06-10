@@ -717,9 +717,11 @@ namespace eFMS.API.ReportData
                 {
                     excelPackage.Workbook.Worksheets.Add("First Sheet");
                     var workSheet = excelPackage.Workbook.Worksheets.First();
-                    workSheet.Cells["A1"].Value = "Partner Data - " + partnerType;
+
+                    workSheet.Cells["A1"].Value = "Partner Data - " + (partnerType ?? "Partner");
                     workSheet.Cells["A1"].Style.Font.Bold = true;
-                    workSheet.Cells[1, 1, 2, 4].Merge = true;
+                    workSheet.Cells[1, 1, 2, 3].Merge = true;
+                    workSheet.Cells[1, 1, 2, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                     workSheet.Cells["A3"].Value = "Export By: " + author;
                     workSheet.Cells["A3"].Style.Font.Bold = true;
                     workSheet.Cells[3, 1, 3, 2].Merge = true;
@@ -739,18 +741,29 @@ namespace eFMS.API.ReportData
         {
             // Tạo header
             worksheet.Cells[5, 1].Value = "No.";
-            worksheet.Cells[5, 2].Value = "Partner ID";
-            worksheet.Cells[5, 3].Value = "Full Name";
-            worksheet.Cells[5, 4].Value = "Short Name";
-            worksheet.Cells[5, 5].Value = "Billing Address";
-            worksheet.Cells[5, 6].Value = "Tax Code";
-            worksheet.Cells[5, 7].Value = "Tel";
-            worksheet.Cells[5, 8].Value = "Fax";
-            worksheet.Cells[5, 9].Value = "Creator";
-            worksheet.Cells[5, 10].Value = "Modify";
-            worksheet.Cells[5, 11].Value = "Inactive";
+            worksheet.Cells[5, 2].Value = "Partner Code";
+            worksheet.Cells[5, 3].Value = "ABBR Name";
+            worksheet.Cells[5, 4].Value = "EN Name";
+            worksheet.Cells[5, 5].Value = "VN Name";
+            worksheet.Cells[5, 6].Value = "Taxcode";
+            worksheet.Cells[5, 7].Value = "Shipping Address";
+            worksheet.Cells[5, 8].Value = "Billing Address";
+            worksheet.Cells[5, 9].Value = "Partner Mode";
+            worksheet.Cells[5, 10].Value = "Partner Location";
+            worksheet.Cells[5, 11].Value = "Email";
+            worksheet.Cells[5, 12].Value = "Billing Email";
+            worksheet.Cells[5, 13].Value = "Contact";
+            worksheet.Cells[5, 14].Value = "Phone";
+            worksheet.Cells[5, 15].Value = "Bank Account";
+            worksheet.Cells[5, 16].Value = "Account Bank Name";
+            worksheet.Cells[5, 17].Value = "Bank Name";
+            worksheet.Cells[5, 18].Value = "Status";
+            worksheet.Cells[5, 19].Value = "Type";
+            worksheet.Cells[5, 20].Value = "Note";
+            ExcelTable tb =  worksheet.Tables.Add(worksheet.Cells[5, 1, 5, 20], "");
+            tb.TableStyle = TableStyles.Light20;
+
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
-            worksheet.Cells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             int indexNo = 0;
             for (int i = 0; i < listItems.Count; i++)
             {
@@ -758,21 +771,31 @@ namespace eFMS.API.ReportData
                 var item = listItems[i];
                 worksheet.Cells[i + 6, 1].Value = indexNo;
                 worksheet.Cells[i + 6, 2].Value = item.AccountNo;
-                worksheet.Cells[i + 6, 3].Value = item.FullName;
-                worksheet.Cells[i + 6, 4].Value = item.ShortName;
-                worksheet.Cells[i + 6, 5].Value = item.AddressVN;
+                worksheet.Cells[i + 6, 3].Value = item.ShortName;
+                worksheet.Cells[i + 6, 4].Value = item.PartnerNameEn;
+                worksheet.Cells[i + 6, 5].Value = item.PartnerNameVn;
                 worksheet.Cells[i + 6, 6].Value = item.TaxCode;
-                worksheet.Cells[i + 6, 7].Value = item.Tel;
-                worksheet.Cells[i + 6, 8].Value = item.Fax;
-                worksheet.Cells[i + 6, 9].Value = item.UserCreatedName;
-                worksheet.Cells[i + 6, 10].Value = item.DatetimeModified;
+                worksheet.Cells[i + 6, 7].Value = item.AddressShippingEn;
+                worksheet.Cells[i + 6, 8].Value = item.AddressEn;
+                worksheet.Cells[i + 6, 9].Value = item.PartnerMode;
+                worksheet.Cells[i + 6, 10].Value = item.PartnerLocation;
+                worksheet.Cells[i + 6, 11].Value = item.Email;
+                worksheet.Cells[i + 6, 12].Value = item.BillingEmail;
+                worksheet.Cells[i + 6, 13].Value = item.ContactPerson;
+                worksheet.Cells[i + 6, 14].Value = item.Tel;
+                worksheet.Cells[i + 6, 15].Value = item.BankAccountNo;
+                worksheet.Cells[i + 6, 16].Value = item.BankAccountName;
+                worksheet.Cells[i + 6, 17].Value = item.BankName;
                 string inactivechar = "Active";
                 if (item.Active == false)
                 {
                     inactivechar = "Inactive";
                 }
-                worksheet.Cells[i + 6, 11].Value = inactivechar;
+                worksheet.Cells[i + 6, 18].Value = inactivechar;
+                worksheet.Cells[i + 6, 19].Value = item.PartnerType;
+                worksheet.Cells[i + 6, 20].Value = item.Note;
             }
+            worksheet.Cells.AutoFitColumns();
         }
         #endregion
 

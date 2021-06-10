@@ -29,12 +29,7 @@
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="requestDate" [attr.disabled]="isDisabled" />
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
+                            formControlName="requestDate" [attr.disabled]="isDisabled" calendar />
                     </div>
                 </div>
             </div>
@@ -54,18 +49,41 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label>Settlement Amount:</label>
-                    <input type="text" formControlName="amount" class="form-control"
-                        [value]="amount.value | number:'.0-3'">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Settlement Amount:</label>
+                            <input type="text" formControlName="amount" class="form-control" formatDecimalFormControl
+                                disabled>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Advance Amount:</label>
+                            <input type="text" formControlName="advanceAmount" class="form-control"
+                                formatDecimalFormControl disabled>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label>Currency:</label>
-                    <select formControlName="currency" class="form-control">
-                        <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}</option>
-                    </select>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Balance:</label>
+                            <input type="text" formControlName="balanceAmount" class="form-control" disabled
+                                formatDecimalFormControl>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Currency:</label>
+                            <select formControlName="currency" class="form-control">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

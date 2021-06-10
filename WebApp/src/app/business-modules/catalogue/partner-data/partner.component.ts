@@ -25,6 +25,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { FormContractCommercialPopupComponent } from '../../share-modules/components';
+import { FormSearchExportComponent } from '../../commercial/components/popup/form-search-export/form-search-export.popup';
 type PARTNERDATA_TAB = 'allTab' | 'Customer' | 'Agent' | 'Carrier' | 'Consginee' | 'Shipper';
 
 
@@ -49,7 +50,8 @@ export class PartnerComponent extends AppList implements OnInit {
     @ViewChild(Permission403PopupComponent) info403Popup: Permission403PopupComponent;
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
-
+    @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
+    
     menuSpecialPermission: Observable<any[]>;
     pager: PagerSetting = PAGINGSETTING;
     partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
@@ -355,14 +357,7 @@ export class PartnerComponent extends AppList implements OnInit {
     }
 
     export() {
-        this._progressRef.start();
-        this._exportRepo.exportPartner(this.criteria)
-            .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
-            .subscribe(
-                (res: any) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'partner.xlsx');
-                }
-            );
+        this.formSearchExportPopup.show();
     }
 }
 
