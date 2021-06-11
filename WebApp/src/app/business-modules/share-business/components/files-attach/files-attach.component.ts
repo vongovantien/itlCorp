@@ -55,8 +55,8 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
         if (fileList.length > 0) {
             let validSize: boolean = true;
             for (let i = 0; i <= fileList.length - 1; i++) {
-                const file: number = Math.round((fileList[i].size / 1024));
-                if (file >= 100) {
+                const fileSize: number = fileList[i].size / Math.pow(1024, 2); //TODO Verify BE
+                if (fileSize >= 100) {
                     validSize = false;
                     break;
                 }
