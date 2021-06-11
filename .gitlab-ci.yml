@@ -16,8 +16,13 @@ job_build:
     script:
         - node --version
         - echo "start job_build"
+        - cd WebApp
         - npm install
+        - npm install -g @angular/cli
+        - ng version
+        #- node_modules/.bin/ng build --c=uat-en
         - npm run build:prod
+        - echo "job_build doing something..."
         - echo "end job_build"
     only:
         - prod/4-6-2021-sprint24
