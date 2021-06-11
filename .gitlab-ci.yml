@@ -1,6 +1,6 @@
 variables:
     PROJECT_PATH: "$CI_PROJECT_DIR"
-    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/eFMS-Web"
+    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/prod"
 
 image: node:12
 
@@ -17,19 +17,11 @@ job_build:
         - node --version
         - echo "start job_build"
         - npm install
-        - npm run build
-        # - echo "job_build doing something..."
+        - npm run build:prod
         - echo "end job_build"
-    # only:
-    #     - uat/fixbug/fix-bug-uat
+    only:
+        - prod/4-6-2021-sprint24
     artifacts:
         name: "angular_build"
         paths:
             - $APP_OUTPUT_PATH
-# job_deploy:
-#   stage: deploy
-#   script:
-#     - echo "deploying to iis",
-#     - mkdir $APP_OUTPUT_PATH/test
-#     - cp -R ./dist/init-angular-project $APP_OUTPUT_PATH/test
-#     - echo "done deploy"
