@@ -34,7 +34,7 @@ namespace eFMS.API.System.Infrastructure.Hubs
             }
             catch (Exception ex)
             {
-                new LogHelper("NotificationHub", e.Error.Message);
+                new LogHelper("NotificationHub", ex.ToString());
 
                 Console.WriteLine(ex.ToString());
             }
