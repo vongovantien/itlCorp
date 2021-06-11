@@ -70,14 +70,13 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
         if (this._readonly) {
             return;
         }
-        console.log(_$event);
         const fileList = event.target['files'];
         if (fileList.length > 0 && !!this._id) {
             let validSize: boolean = true;
 
             for (let i = 0; i <= fileList.length - 1; i++) {
-                const file: number = Math.round((fileList[i].size / 1024));
-                if (file >= 100) {
+                const fileSize: number = fileList[i].size / Math.pow(1024, 2); //TODO Verify BE
+                if (fileSize >= 100) {
                     validSize = false;
                     break;
                 }
