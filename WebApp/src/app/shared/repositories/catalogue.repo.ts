@@ -1304,4 +1304,50 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+
+    getListBank(page: number, size: number, body: any) {
+        if (!!page && !!size && !!body) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/paging`, body, {
+                page: '' + page,
+                size: '' + size
+            }).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/getAllByQuery`, body).pipe(
+                catchError((error) => throwError(error)),
+                map((data: any) => {
+                    return data;
+                })
+            );
+        }
+    }
+
+    addBank(data: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/Add`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+
+    updateBank(data: any) {
+        return this._api.put(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/Update`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
+    }
+    
+    deleteBank(id: string) {
+        return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/${id}`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }

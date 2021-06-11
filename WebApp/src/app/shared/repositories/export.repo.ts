@@ -390,7 +390,14 @@ export class ExportRepo {
         if (moduleName ==='Settlement') 
             window.open(`https://view.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${id}&language=${language}`, '_blank');
         else if (moduleName ==='Advance') 
-            window.open(`https://view.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${id}&language=${language}`, '_blank');
+            window.open(`https://view.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/Acc    untingReport/ExportDetailAdvancePayment?advanceId=${id}&language=${language}`, '_blank');
+    }
+    
+    exportBank(searchObject: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportBank`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
     }
 }
 
