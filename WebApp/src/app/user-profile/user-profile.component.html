@@ -112,11 +112,19 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group row" >
                                 <label>Bank Name: </label>
-                                <input type="input" class="form-control m-input m-input--square"
-                                    formControlName="bankName" placeholder="Please Enter Bank Name">
+                                <!-- <input type="input" class="form-control m-input m-input--square"
+                                    formControlName="bankName" placeholder="Please Enter Bank Name"> -->
+                                    
+                                        <app-combo-grid-virtual-scroll class="form-control"   (itemSelected)="onSelectDataFormInfo($event, 'pol')"
+                                            [selectedDisplayFields]="['nameEn']" [dataSources]="banks | async"
+                                            [displayFields]="displayFieldPort"
+                                            (remove)="resetFormControl(pol)"
+                                            placeholder="Please select" allowFreeText formControlName="bankName">
+                                        </app-combo-grid-virtual-scroll>    
                             </div>
+                          
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group row">

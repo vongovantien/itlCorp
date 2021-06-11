@@ -59,7 +59,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     agentName: string = null;
 
     carries: Observable<Customer[]>;
-    agents: Observable<Customer[]>;
+    agents: Observable<Customer[]>; 
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
     csBookingNotes: csBookingNote[] = [];

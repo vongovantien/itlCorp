@@ -1,23 +1,24 @@
 import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 
 import { SystemRepo } from '@repositories';
-import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, takeUntil, tap, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
-
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Store } from '@ngrx/store';
 import { SystemConstants } from '@constants';
 import { AppForm } from '../app.form';
 import { environment } from 'src/environments/environment';
 import { GlobalState } from '../global-state';
-import { Employee } from '@models';
-
+import { Employee,Bank } from '@models';
+import * as fromShare from '../business-modules/share-business/store';
 import UUID from 'validator/lib/isUUID';
 
 
 declare var $: any;
-
+import { getCatalogueBankState } from '@store';
 @Component({
     selector: 'user-profile-page',
     templateUrl: './user-profile.component.html',
@@ -45,6 +46,12 @@ export class UserProfilePageComponent extends AppForm {
     personalId: AbstractControl;
 
     photoUrl: string;
+    banks:Observable<Bank[]>;
+
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Bank Code' },
+        { field: 'banknameEn', label: 'Bank Name EN' },
+    ];
 
 
     constructor(
@@ -54,7 +61,8 @@ export class UserProfilePageComponent extends AppForm {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _zone: NgZone,
-        private _globalState: GlobalState
+        private _globalState: GlobalState,
+        private _store: Store<fromShare.IShareBussinessState>,
 
     ) {
         super();
@@ -82,6 +90,7 @@ export class UserProfilePageComponent extends AppForm {
                     }
                 }
             );
+        this.banks = this._store.select(getCatalogueBankState).pipe(shareReplay());
     }
 
     ngAfterViewInit() {
@@ -232,5 +241,27 @@ export class UserProfilePageComponent extends AppForm {
                     this._toastService.error("Upload profile fail");
                 }
             });
+    }
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            // case 'supplier':
+            //     this.supplierName = data.shortName;
+            //     this.coloader.setValue(data.id);
+            //     break;
+            // case 'pol':
+            //     this.pol.setValue(data.id);
+            //     this.polDescription.setValue((data as PortIndex).nameEn);
+            //     break;
+            // case 'pod':
+            //     this.pod.setValue(data.id);
+            //     this.podDescription.setValue((data as PortIndex).nameEn);
+            //     break;
+            // case 'agent':
+            //     this.agentName = data.shortName;
+            //     this.agent.setValue(data.id);
+            //     break;
+            default:
+                break;
+        }
     }
 }
