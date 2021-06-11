@@ -1,13 +1,13 @@
 variables:
     PROJECT_PATH: "$CI_PROJECT_DIR"
-    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/dist/prod"
+    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/prod"
 
 image: node:12
 
 cache:
     paths:
-        - node_modules
-        - package-lock.json
+        - ./WebApp/node_modules
+        - ./WebApp/package-lock.json
 stages:
     - build
 
