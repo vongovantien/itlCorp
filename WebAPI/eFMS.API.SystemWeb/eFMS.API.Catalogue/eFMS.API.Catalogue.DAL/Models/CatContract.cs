@@ -19,7 +19,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public string ContractNo { get; set; }
         public string ContractType { get; set; }
         public string Vas { get; set; }
-        public string CurrencyId { get; set; }
         public decimal? TrialCreditLimited { get; set; }
         public int? TrialCreditDays { get; set; }
         public DateTime? TrialEffectDate { get; set; }
@@ -39,6 +38,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string CurrencyId { get; set; }
         public bool? CreditUnlimited { get; set; }
+        public string CreditCurrency { get; set; }
     }
 }
