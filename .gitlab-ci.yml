@@ -29,7 +29,7 @@ build_uat:
   artifacts:
     name: "angular_build"
     paths:
-      - APP_OUTPUT_PATH
+      - $APP_OUTPUT_PATH
       
 build_test:      
   stage: build
@@ -49,4 +49,4 @@ build_test:
   artifacts:
     name: "angular_build"
     paths:
-      - APP_OUTPUT_PATH
+      - $APP_OUTPUT_PATH
