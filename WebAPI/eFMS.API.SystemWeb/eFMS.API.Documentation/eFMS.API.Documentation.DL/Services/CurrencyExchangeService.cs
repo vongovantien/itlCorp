@@ -211,9 +211,7 @@ namespace eFMS.API.Documentation.DL.Services
             decimal _excRate = 0;
 
             //Tính tỉ giá Final Exchange Rate (Tỉ giá so với LOCAL)
-            // [CR: 15869]: exchange rate commission theo exchange date
-            //decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
-            decimal exchangeRateToLocal = CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
+            decimal exchangeRateToLocal = (surcharge.Type == DocumentConstants.CHARGE_BUY_TYPE && surcharge.KickBack == true && surcharge.CurrencyId == DocumentConstants.CURRENCY_USD) ? kickBackExcRate : CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, DocumentConstants.CURRENCY_LOCAL);
             _excRate = exchangeRateToLocal;
 
             if (surcharge.CurrencyId == currencyConvert)
