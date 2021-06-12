@@ -1896,7 +1896,11 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == type && q.PaymentStatus != "Paid";
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
-                query = query.And(q => q.PartnerId == criteria.PartnerId);
+                // Ds các đối tượng con
+                List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+                        .Select(x => x.Id)
+                        .ToList();
+                query = query.And(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
             }
 
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)

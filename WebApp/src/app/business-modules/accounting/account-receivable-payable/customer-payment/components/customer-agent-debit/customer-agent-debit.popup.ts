@@ -150,10 +150,25 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     onSelectDataFormInfo(data: any) {
-        this.partnerId.setValue(data.id);
-        if (this.partnerId.value !== this.customerFromReceipt) {
-            this.listDebit = [];
-        }
+        this._catalogueRepo.getAgreement(
+            {
+                partnerId: data.id, status: true
+            }).subscribe(
+                (d: any[]) => {
+                    if (!!d && !!d.length) {
+                        this.partnerId.setValue(data.id);
+                        if (this.partnerId.value !== this.customerFromReceipt) {
+                            this.listDebit = [];
+                        }
+                    } else {
+                        this.partnerId.setValue(null);
+                        this._toastService.warning("Partner does not have any agreement");
+                        return false;
+                    }
+
+                }
+            );
+
     }
 
     checkAllChange() {

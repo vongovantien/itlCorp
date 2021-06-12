@@ -90,7 +90,6 @@ namespace eFMS.API.Accounting.DL.Services
             IAcctAdvancePaymentService advance,
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysImage> sysImageRepo,
-            IUserBaseService userBase,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysNotifications> sysNotificationRepo,
             IContextBase<SysUserNotification> sysUserNotificationRepo,
