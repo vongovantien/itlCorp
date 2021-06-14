@@ -2217,7 +2217,7 @@ namespace eFMS.API.Documentation.DL.Services
                             CatPlace pod = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault();
 
                             string podCode = pod?.Code;
-                            
+
                             if (string.IsNullOrEmpty(podCode))
                             {
                                 item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -2243,10 +2243,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IssueHbldate = model.Etd;
                             }
                         }
-                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT || model.TransactionType == DocumentConstants.AI_SHIPMENT)
                         {
-                     
-                            if (item.Hwbno == "N/H") {
+                            item.Mawb = model.Mawb;
+                            if (item.Hwbno == "N/H")
+                            {
                                 item.Hwbno = item.Hwbno;
                             }
                             else
@@ -2259,14 +2260,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
                         }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                        {
-                            item.Mawb = model.Mawb;
-                        }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
-                        {
-                            item.Hwbno = null;
-                        }
+                        // [CR: 15787]
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        //{
+                        //    item.Mawb = model.Mawb;
+                        //}
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
+                        //{
+                        //    item.Hwbno = null;
+                        //}
 
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;
