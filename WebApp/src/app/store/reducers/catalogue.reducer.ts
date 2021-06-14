@@ -146,7 +146,7 @@ export function catalogueReducer(state = initialState, action: CatalogueActions)
             return { ...state, isLoading: true };
         }
         case CatalogueActionTypes.GET_BANK_SUCCESS: {
-            return { ...state, isLoading: false, currencies: action.payload };
+            return { ...state, isLoading: false, banks: action.payload };
         }
         case CatalogueActionTypes.GET_BANK_FAIL: {
             return { ...state, isLoading: false, };
