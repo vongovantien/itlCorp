@@ -100,7 +100,6 @@ export class BankComponent extends AppList implements OnInit {
     showDetail(Bank: Bank) {
         this.Bank = Bank;
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
-        debugger
         this.formPopup.id = this.Bank.id;
         this.formPopup.form.setValue({
             bankNameCode: this.Bank.code,

@@ -192,7 +192,6 @@ export class ShareSeaServiceFormSISeaExportComponent extends AppForm implements 
             .subscribe(
                 (res: any) => {
                     this.ports = res;
-                    debugger
                 },
             );
     }
