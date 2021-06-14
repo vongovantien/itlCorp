@@ -48,14 +48,32 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
 
     // creditList: Observable<ReceiptInvoiceModel[]>;
     creditList: ReceiptInvoiceModel[] = [];
-    debitList: Observable<ReceiptInvoiceModel[]>;
+    debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
 
-    agencyHeaders: CommonInterface.IHeaderTable[];
-    configDebitDisplayFields: CommonInterface.IComboGridDisplayField[];
+    agencyHeaders: CommonInterface.IHeaderTable[] = [
+        { title: 'RefNo', field: '' },
+        { title: 'Job', field: '' },
+        { title: 'HBL', field: '' },
+        { title: 'MBL', field: '' },
+        { title: 'Net Off Invoice No', field: '' },
+        { title: 'Org Amount', field: '', align: this.right },
+        { title: 'Amount USD', field: '', align: this.right },
+        { title: 'Amount VND', field: '', align: this.right },
+        { title: 'Payment Note', field: '' },
+        { title: 'BU Handle', field: '' },
+        { title: 'Office', field: '' },
+    ];
+    configDebitDisplayFields: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'invoiceNo', label: 'Invoice No' },
+        { field: 'amount', label: 'Unpaid Invoice' }
+    ];;
     isSubmitted: boolean = false;
     selectedInvoice: ReceiptInvoiceModel;
     selectedIndexInvoice: number = -1;
-    headerInvoice: CommonInterface.IHeaderTable[] = [];
+    headerInvoice: CommonInterface.IHeaderTable[] = [
+        { field: 'invoiceNo', title: 'Invoice No' },
+        { field: 'amount', title: 'Unpaid Invoice' }
+    ];
     invoiceDatasource: any[] = [];
     receiptType: string = null;
 
@@ -77,25 +95,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
-        this.agencyHeaders = [
-            { title: 'RefNo', field: '' },
-            { title: 'Job', field: '' },
-            { title: 'HBL', field: '' },
-            { title: 'MBL', field: '' },
-            { title: 'Net Off Invoice No', field: '' },
-            { title: 'Org Amount', field: '', align: this.right },
-            { title: 'Amount USD', field: '', align: this.right },
-            { title: 'Amount VND', field: '', align: this.right },
-            { title: 'Payment Note', field: '' },
-            { title: 'BU Handle', field: '' },
-            { title: 'Office', field: '' },
-        ];
 
-        this.configDebitDisplayFields = [
-            { field: 'invoiceNo', label: 'Invoice No' },
-            { field: 'amount', label: 'Unpaid Invoice' }
-        ];
-        this.debitList = this._store.select(ReceiptDebitListState);
         this._store.select(ReceiptCreditListState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -107,10 +107,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
 
         this.getInvoiceList();
 
-        this.headerInvoice = [
-            { field: 'invoiceNo', title: 'Invoice No' },
-            { field: 'amount', title: 'Unpaid Invoice' }
-        ];
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x || 'Customer');
@@ -125,9 +121,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .subscribe(
                 (data: { invoiceNo: string, creditNo: string }) => {
                     if (data.creditNo) {
-                        this.creditList.forEach(x => {
-                            x.invoiceNo = null;
-                        })
+
                         const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)
                         if (indexCreditCurrent !== -1) {
                             this.creditList[indexCreditCurrent].invoiceNo = data.invoiceNo;
