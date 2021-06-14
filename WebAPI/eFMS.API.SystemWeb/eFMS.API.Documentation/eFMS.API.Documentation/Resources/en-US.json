@@ -14,7 +14,7 @@
   "EF_ANNOTATIONS_STRING_LENGTH": "The [{0}] field must be charater trom {2}-{1} characters",
   "FILE_NOT_FOUND": "File not found!",
   "NOT_FOUND_DATA_EXCEL": "File exel not found data!",
-  "MSG_MAWB_EXISTED": "MBL has existed",
+  "MSG_MAWB_EXISTED": "MBL {0} has existed",
   "MSG_HBNO_EXISTED": "HBL has existed",
   "MSG_MBLNO_HBNO_EXISTED": "MBL No and HBL No has existed",
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",
