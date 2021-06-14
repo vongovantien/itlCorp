@@ -317,6 +317,17 @@ namespace eFMS.API.ReportData.Controllers
             return new FileHelper().ExportExcel(stream, FilesNames.CustomClearanceName);
         }
 
+        [Route("ExportBank")]
+        [HttpPost]
+        public async Task<IActionResult> ExportBank(CatBankCriteria catBankCriteria)
+        {
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(catBankCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatBankUrl);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<CatBank>>();  //Make sure to add a reference to System.Net.Http.Formatting.dll
+
+            var stream = helper.CreateBankExcelFile(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.BankName);
+        }
 
         #endregion
     }

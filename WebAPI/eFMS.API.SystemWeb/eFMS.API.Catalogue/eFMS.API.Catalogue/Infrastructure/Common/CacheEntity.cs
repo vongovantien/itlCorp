@@ -18,7 +18,7 @@
         CatStage,
         CatUnit,
         CatContract,
-        catChartOfAccounts
-
+        catChartOfAccounts,
+        CatBank
     }
 }
