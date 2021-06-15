@@ -1,23 +1,24 @@
 import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 
 import { SystemRepo } from '@repositories';
-import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { catchError, finalize, map, switchMap, takeUntil, tap, shareReplay } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
-
 import { ActivatedRoute, Params } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { Store } from '@ngrx/store';
 import { SystemConstants } from '@constants';
 import { AppForm } from '../app.form';
 import { environment } from 'src/environments/environment';
 import { GlobalState } from '../global-state';
-import { Employee } from '@models';
-
+import { Employee,Bank } from '@models';
+import * as fromShare from '../business-modules/share-business/store';
 import UUID from 'validator/lib/isUUID';
 
 
 declare var $: any;
-
+import { GetCatalogueBankAction, getCatalogueBankState } from '@store';
 @Component({
     selector: 'user-profile-page',
     templateUrl: './user-profile.component.html',
@@ -43,8 +44,15 @@ export class UserProfilePageComponent extends AppForm {
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
     personalId: AbstractControl;
-
+   
     photoUrl: string;
+    banks: Observable<Bank[]>;
+    bankCode:AbstractControl;
+
+    displayFieldPort: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Bank Code' },
+        { field: 'bankNameEn', label: 'Bank Name EN' },
+    ];
 
 
     constructor(
@@ -54,7 +62,8 @@ export class UserProfilePageComponent extends AppForm {
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _zone: NgZone,
-        private _globalState: GlobalState
+        private _globalState: GlobalState,
+        private _store: Store<fromShare.IShareBussinessState>,
 
     ) {
         super();
@@ -63,6 +72,10 @@ export class UserProfilePageComponent extends AppForm {
 
     ngOnInit() {
         this.initForm();
+        this._store.dispatch(new GetCatalogueBankAction());
+
+        this.banks = this._store.select(getCatalogueBankState);
+
         this._activedRoute.params
             .pipe(
                 takeUntil(this.ngUnsubscribe),
@@ -159,7 +172,8 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: [],
             creditLimit: [],
             creditRate: [],
-            personalId: []
+            personalId: [],
+            bankCode: [{ value: null, disabled: true }],
         });
         //
         this.employeeNameVn = this.formUser.controls['employeeNameVn'];
@@ -178,6 +192,7 @@ export class UserProfilePageComponent extends AppForm {
         this.creditLimit = this.formUser.controls['creditLimit'];
         this.creditRate = this.formUser.controls['creditRate'];
         this.personalId = this.formUser.controls['personalId'];
+        this.bankCode = this.formUser.controls['bankCode'];
     }
 
     setUserForForm(body: any) {
@@ -195,7 +210,8 @@ export class UserProfilePageComponent extends AppForm {
             workingStatus: body.workingStatus,
             creditLimit: body.creditLimit,
             creditRate: body.creditRate,
-            personalId: !!body.sysEmployeeModel ? body.sysEmployeeModel.personalId : null
+            personalId: !!body.sysEmployeeModel ? body.sysEmployeeModel.personalId : null,
+            bankCode: !!body.sysEmployeeModel ? body.sysEmployeeModel.bankCode : null
         });
         this.photoUrl = body.avatar;
     }
@@ -214,7 +230,8 @@ export class UserProfilePageComponent extends AppForm {
             tel: !form.tel ? '' : form.tel,
             description: !form.description ? '' : form.description,
             avatar: this.photoUrl,
-            personalId: form.personalId
+            personalId: form.personalId,
+            bankCode:form.bankCode,
         };
         this.onUpdate(body);
     }
@@ -232,5 +249,11 @@ export class UserProfilePageComponent extends AppForm {
                     this._toastService.error("Upload profile fail");
                 }
             });
+    }
+    onSelectDataFormInfo(data: any) {
+        if(data){
+            this.bankName.setValue(data.bankNameEn);
+            this.bankCode.setValue(data.code);
+        }      
     }
 }
