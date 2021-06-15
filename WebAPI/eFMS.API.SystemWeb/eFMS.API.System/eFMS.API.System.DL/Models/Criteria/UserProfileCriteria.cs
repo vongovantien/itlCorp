@@ -14,6 +14,7 @@ namespace eFMS.API.System.DL.Models.Criteria
         public string Email { get; set; }
         public string BankAccountNo { get; set; }
         public string BankName { get; set; }
+        public string BankCode { get; set; }
         public string Tel { get; set; }
         public string Description { get; set; }
         public string PersonalId { get; set; }

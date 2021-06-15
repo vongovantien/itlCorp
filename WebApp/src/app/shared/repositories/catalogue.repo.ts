@@ -1305,7 +1305,7 @@ export class CatalogueRepo {
         );
     }
 
-    getListBank(page: number, size: number, body: any) {
+    getListBank(page?: number, size?: number, body: any = { active: true }) {
         if (!!page && !!size && !!body) {
             return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/paging`, body, {
                 page: '' + page,

@@ -429,7 +429,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                 });
 
-                                if (hasAdvancePayment == true)
+                                if (hasAdvancePayment == true && currentSettle.BalanceAmount != 0)
                                 {
                                     item.Details.Add(new BravoSettlementRequestModel
                                     {
@@ -453,7 +453,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     });
                                 }
 
-                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl, số tạm ứng, tờ khai để phát sinh thêm các dòng Balance và ClearAdvance
+                                // Kiểm tra các Details có làm đang làm hoàn ứng => Group theo hbl, số tạm ứng, tờ khai để phát sinh thêm các dòng ClearAdvance
                                 List<BravoSettlementRequestModel> querySettlmentReqListHasAdvance = querySettlementReq
                                     .Where(x => !string.IsNullOrEmpty(x.AdvanceNo))
                                     .GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
@@ -471,59 +471,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     }).ToList();
                                 if(querySettlmentReqListHasAdvance.Count > 0)
                                 {
-                                    //List<BravoSettlementRequestModel> querySettlmentReqList = querySettlementReq
-                                    // //.Where(x => !string.IsNullOrEmpty(x.AdvanceNo))
-                                    //.GroupBy(x => new { x.HblId, x.AdvanceNo, x.ClearanceNo })
-                                    //.Select(d => new BravoSettlementRequestModel
-                                    //{
-                                    //    Stt_Cd_Htt = d.FirstOrDefault().Stt_Cd_Htt,
-                                    //    Ma_SpHt = d.FirstOrDefault().Ma_SpHt,
-                                    //    BillEntryNo = d.FirstOrDefault().BillEntryNo,
-                                    //    MasterBillNo = d.FirstOrDefault().MasterBillNo,
-                                    //    DeptCode = d.FirstOrDefault().DeptCode,
-                                    //    CustomerCodeTransfer = d.FirstOrDefault().CustomerCodeTransfer,
-                                    //    AdvanceNo = d.Key.AdvanceNo,
-                                    //    HblId = d.Key.HblId,
-                                    //    ClearanceNo = d.Key.ClearanceNo,
-                                    //    AdvanceCustomerCode = d.FirstOrDefault().AdvanceCustomerCode
-                                    //}).ToList();
                                     foreach (var reqItem in querySettlmentReqListHasAdvance)
                                     {
                                         AdvanceInfo balanceInfo = settlementPaymentService.GetAdvanceBalanceInfo(item.ReferenceNo, reqItem.HblId.ToString(), item.CurrencyCode, reqItem.AdvanceNo, reqItem.ClearanceNo);
-                                        decimal _balance = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
-                                        decimal _originalAmount = balanceInfo.AdvanceAmount - balanceInfo.TotalAmount ?? 0;
-                                        string _chargeTypeBalance = GenerateChargeTypeSettleWithBalanceAdvance(_balance, item.PaymentMethod);
-                                        string _customerCodeBook = GetAdvanceCustomerCode(reqItem.AdvanceNo, item.Payee);
+                                       
                                         string _requesterAdvanceCode = GetAdvanceReqterCode(reqItem.AdvanceNo);
-
-                                        if (_balance != 0 || balanceInfo.AdvanceAmount == null)
-                                        {
-                                            decimal balanceCase4 = (balanceInfo.AdvanceAmount ?? 0 - balanceInfo.TotalAmount ?? 0);
-                                            string _chargeTypeCase4 = GenerateChargeTypeSettleWithBalanceAdvance(balanceCase4, item.PaymentMethod);
-                                            string descriptionCase4 = GenerateDescriptionSettleItemWithBalanceAdvance(balanceCase4, item.PaymentMethod);
-                                            //item.Details.Add(new BravoSettlementRequestModel
-                                            //{
-                                            //    RowId = Guid.NewGuid().ToString(),
-                                            //    Ma_SpHt = reqItem.Ma_SpHt,
-                                            //    ItemCode = "BALANCE",
-                                            //    Description = balanceInfo.AdvanceAmount == null ? descriptionCase4: GenerateDescriptionSettleItemWithBalanceAdvance(_balance, item.PaymentMethod),
-                                            //    Unit = "Lô",
-                                            //    CurrencyCode = item.CurrencyCode,
-                                            //    ExchangeRate = 1,
-                                            //    BillEntryNo = reqItem.BillEntryNo,
-                                            //    MasterBillNo = reqItem.MasterBillNo,
-                                            //    DeptCode = reqItem.DeptCode,
-                                            //    Quantity9 = 0,
-                                            //    OriginalUnitPrice = 0,
-                                            //    OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceCase4 : _originalAmount,
-                                            //    OriginalAmount3 = 0,
-                                            //    ChargeType = balanceInfo.AdvanceAmount == null ? _chargeTypeCase4 : _chargeTypeBalance,
-                                            //    CustomerCodeBook = balanceInfo.AdvanceAmount == null ? _staffCodeRequester  : _requesterAdvanceCode,
-                                            //    CustomerCodeTransfer = reqItem.CustomerCodeTransfer,
-                                            //    RefundAmount = 0,
-                                            //    IsRefund = 1
-                                            //});
-                                        }
 
                                         if(!string.IsNullOrEmpty(reqItem.AdvanceNo))
                                         {

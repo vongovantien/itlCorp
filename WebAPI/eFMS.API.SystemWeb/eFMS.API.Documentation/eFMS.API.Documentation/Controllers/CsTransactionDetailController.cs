@@ -97,9 +97,23 @@ namespace eFMS.API.Documentation.Controllers
         {
             currentUser.Action = "AddNewCSTransactionDetail";
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model);
+            string checkExistMessage = CheckExist(model, out int typeExisted, out List<Guid> data);
             if (checkExistMessage.Length > 0)
             {
+                if (data.Count > 0)
+                {
+                    if (typeExisted == 2) // Trùng mbl
+                    {
+                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
+                    }
+
+                    if (typeExisted == 1) // Trùng HBL
+                    {
+                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
+                    }
+                }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             var hs = csTransactionDetailService.AddTransactionDetail(model);
@@ -142,9 +156,23 @@ namespace eFMS.API.Documentation.Controllers
             currentUser.Action = "ImportCSTransactionDetail";
 
             if (!ModelState.IsValid) return BadRequest();
-            string checkExistMessage = CheckExist(model);
+            string checkExistMessage = CheckExist(model, out int typeExisted, out List<Guid> data);
             if (checkExistMessage.Length > 0)
             {
+                if (data.Count > 0)
+                {
+                    if (typeExisted == 2) // Trùng mbl
+                    {
+                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
+                    }
+
+                    if (typeExisted == 1) // Trùng HBL
+                    {
+                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
+                    }
+                }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             model.UserCreated = currentUser.UserID;
@@ -160,9 +188,23 @@ namespace eFMS.API.Documentation.Controllers
             currentUser.Action = "UpdateCSTransactionDetail";
 
             if (!ModelState.IsValid) return BadRequest();
-            var checkExistMessage = CheckExist(model);
+            var checkExistMessage = CheckExist(model, out int typeExisted, out List<Guid> data);
             if (checkExistMessage.Length > 0)
             {
+                if (data.Count > 0)
+                {
+                    if (typeExisted == 2) // Trùng mbl
+                    {
+                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
+                    }
+
+                    if(typeExisted == 1) // Trùng HBL
+                    {
+                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
+                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
+                    }
+                }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
@@ -188,10 +230,10 @@ namespace eFMS.API.Documentation.Controllers
         {
             bool existedHwbNo = false;
             var transaction = csTransactionService.Get(x => x.Id == new Guid(jobId))?.FirstOrDefault();
-            var data = csTransactionDetailService.GetDataHawbToCheckExisted();
-            data = data.Where(x => x.TransactionType == transaction.TransactionType);
             if (transaction.TransactionType == TermData.AirExport || transaction.TransactionType == TermData.AirImport)
             {
+                var data = csTransactionDetailService.GetDataHawbToCheckExisted();
+                data = data.Where(x => x.TransactionType == transaction.TransactionType);
                 if (hblId == null)
                 {
                     if (data.Any(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno == hwbno.Trim() && x.Hwbno != null))
@@ -250,7 +292,7 @@ namespace eFMS.API.Documentation.Controllers
                     dataCheck = data.Where(x => hwbno != DocumentConstants.NO_HOUSE && x.Hwbno.Trim() == hwbno.Trim() && x.Id != new Guid(hblId)).ToList();
                 }
             }
-            return Ok(dataCheck.Select(t=>t.JobNo).Distinct());
+            return Ok(dataCheck.Select(x => x.JobNo).Distinct().ToList());
         }
 
         [HttpGet("GenerateHBLNo")]
@@ -267,32 +309,52 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(new { hblNo = hblNo });
         }
 
-        private string CheckExist(CsTransactionDetailModel model)
+        private string CheckExist(CsTransactionDetailModel model, out int existedType, out List<Guid> data)
         {
             string message = string.Empty;
+            existedType = 0;
+            data = new List<Guid>(); // các ID Job trùng.
+
             if (model.ParentId == null)
             {
-                var shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
+                string shipmentTransactionType = csTransactionService.Get(x => x.Id == model.JobId).FirstOrDefault()?.TransactionType;
                 //Chỉ check trùng HBLNo đối với các service khác hàng Air(Import & Export)
-                var masterBillIds = csTransactionService.Get(x => x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1))).Where(x => x.CurrentStatus != "Canceled").Select(x => x.Id).ToList();
-                var houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId)).Where(x => x.ParentId == null);
+                List<Guid> masterBillIds = csTransactionService.Get(x => x.TransactionType.Contains(shipmentTransactionType.Substring(0, 1)))
+                                                                .Where(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED)
+                                                                .Select(x => x.Id).ToList();
+
+                IQueryable<CsTransactionDetailModel> houseBills = csTransactionDetailService.Get(x => masterBillIds.Contains(x.JobId)).Where(x => x.ParentId == null);
+
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && shipmentTransactionType != TermData.AirImport && shipmentTransactionType != TermData.AirExport)
                 {
                     if (model.Id == Guid.Empty)
                     {
                         if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID))
                         {
-                            message = "Housebill of Lading No is existed !";
+                            message = string.Format(@"Housebill of Lading No is existed !", model.Hwbno);
+
+                            existedType = 1;
+                            data = houseBills.Where(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID)
+                                             .Select(x => x.Id)
+                                             .Distinct()
+                                             .ToList();
                         }
                     }
                     else
                     {
                         if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
-                            message = "Housebill of Lading No is existed !";
+                            message = string.Format(@"Housebill of Lading No is existed !", model.Hwbno);
+                            data = houseBills.Where(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id)
+                                .Select(x => x.Id)
+                                .Distinct()
+                                .ToList();
+                            existedType = 1;
                         }
                     }
                 }
+
+                //Chỉ check trùng MAWB cùng 1 office.
                 if (!string.IsNullOrEmpty(shipmentTransactionType) && !string.IsNullOrEmpty(model.Mawb))
                 {
                     if (model.Id == Guid.Empty)
@@ -300,14 +362,24 @@ namespace eFMS.API.Documentation.Controllers
 
                         if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID))
                         {
-                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED, model.Mawb].Value;
+                            data = houseBills.Where(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID)
+                                .Select(x => x.JobId)
+                                .Distinct()
+                                .ToList();
+                            existedType = 2;
                         }
                     }
                     else
                     {
                         if (houseBills.Any(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
-                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED].Value;
+                            message = stringLocalizer[DocumentationLanguageSub.MSG_MAWB_EXISTED,model.Mawb].Value;
+                            data = houseBills.Where(x => x.Mawb.ToLower() == model.Mawb.ToLower() && x.JobId != model.JobId && x.OfficeId == currentUser.OfficeID && x.Id != model.Id)
+                              .Select(x => x.JobId)
+                              .Distinct()
+                              .ToList();
+                            existedType = 2;
                         }
                     }
                 }
