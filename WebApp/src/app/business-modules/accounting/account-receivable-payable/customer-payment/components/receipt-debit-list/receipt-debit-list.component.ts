@@ -1,11 +1,10 @@
 import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input } from "@angular/core";
 import { AppList } from "@app";
-import { Observable } from "rxjs";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
 import { ReceiptInvoiceModel } from "@models";
-import { RemoveInvoice, ClearCredit } from "../../store/actions";
+import { RemoveInvoice } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
 import { DataService } from "@services";
 import { ToastrService } from "ngx-toastr";
@@ -19,8 +18,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
 
-    debitList$: Observable<ReceiptInvoiceModel[]>;
-    creditList$: Observable<ReceiptInvoiceModel[]>;
+    debitList$ = this._store.select(ReceiptDebitListState);
+    creditList$ = this._store.select(ReceiptCreditListState);
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '', sortable: true },
@@ -78,9 +77,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Office', field: '' },
         ];
 
-        this.debitList$ = this._store.select(ReceiptDebitListState);
-        this.creditList$ = this._store.select(ReceiptCreditListState);
-
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.receiptType = x || 'Customer');
@@ -105,7 +101,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     }
 
     onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {
-        console.log(_refNo);
         if (!!_refNo) {
             this.creditList$
                 .pipe(takeUntil(this.ngUnsubscribe))
