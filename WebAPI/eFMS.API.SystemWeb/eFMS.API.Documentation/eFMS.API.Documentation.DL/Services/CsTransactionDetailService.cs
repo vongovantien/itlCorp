@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
@@ -17,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,6 +28,8 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsTransactionDetailService : RepositoryBase<CsTransactionDetail, CsTransactionDetailModel>, ICsTransactionDetailService
     {
+        private readonly IOptions<WebUrl> webUrl;
+        private readonly IUserBaseService userBaseService;
         readonly IContextBase<CsTransaction> csTransactionRepo;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
@@ -49,9 +53,11 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
+            IOptions<WebUrl> wUrl,
             IContextBase<CsTransaction> csTransaction,
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<CatPartner> catPartner,
@@ -74,8 +80,10 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, mapper)
         {
+            webUrl = wUrl;
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
             catPartnerRepo = catPartner;
@@ -99,6 +107,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            sysEmployeeRepository = sysEmployeeRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -2311,5 +2320,99 @@ namespace eFMS.API.Documentation.DL.Services
 
             return errorCode;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void SendEmailNewHouseToSales(CsTransactionDetail transDetail)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var _emailFormat = @"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>"
+                                            + "<p><i><b>Dear {0}</b></i></p>"
+                                            + "<p>"
+                                            + "<div>You have a {1} Shipment that need to key Selling rate as info bellow</div>"
+                                            + "<div>Bạn có lô hàng {1} cần nhập giá bán với thông tin như sau</div>"
+                                            + "</p>"
+
+                                            + "<ul>"
+                                            + "Job No: {2}"
+                                            + "HBL / HAWB : {3}"
+                                            + "Customer/Khách hàng: {4}"
+                                            + "ETD/ETA: {5}"
+                                            + "</ul>"
+
+                                            + "<p>"
+                                            + "<div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div>"
+                                            + "<div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div>"
+                                            + "</p>"
+                                            + "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
+                                         "</div>";
+                    var salesmanInfo = sysUserRepo.Get(x => x.Id == transDetail.SaleManId).FirstOrDefault();
+                    var employeeInfo = sysEmployeeRepository.Get(x => x.Id == salesmanInfo.EmployeeId).FirstOrDefault();
+                    var csTransaction = csTransactionRepo.Get(tr => tr.Id == transDetail.JobId).FirstOrDefault();
+                    var serviceName = Common.CustomData.Services.Where(s => s.Value == csTransaction.TransactionType).FirstOrDefault()?.DisplayName;
+                    var customerInfo = catPartnerRepo.Get(x => x.Id == transDetail.CustomerId).FirstOrDefault();
+                    var etaEtd = (transDetail.Eta.HasValue ? transDetail.Eta.Value.ToString("dd/MM/yyyy") + "/" : string.Empty)
+                        + transDetail.Etd?.ToString("dd/MM/yyyy");
+                    var prefixService = string.Empty;
+                    if (csTransaction.TransactionType.Contains("IT"))
+                    {
+                        prefixService += "inland-trucking";
+                    }
+                    else if (csTransaction.TransactionType.Contains("AE"))
+                    {
+                        prefixService += "air-export";
+                    }
+                    else if (csTransaction.TransactionType.Contains("AI"))
+                    {
+                        prefixService += "air-import";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SEC"))
+                    {
+                        prefixService += "sea-consol-export";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SIC"))
+                    {
+                        prefixService += "sea-consol-import";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SEF"))
+                    {
+                        prefixService += "sea-fcl-export";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SIF"))
+                    {
+                        prefixService += "sea-fcl-import";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SEL"))
+                    {
+                        prefixService += "sea-lcl-export";
+                    }
+                    else if (csTransaction.TransactionType.Contains("SIL"))
+                    {
+                        prefixService += "sea-lcl-import";
+                    }
+                    var url = string.Format("{0}/{1}/#/home/documentation/{2}/{3}", webUrl.Value.Url.ToString(), "en", prefixService, transDetail.Id);
+                    _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etaEtd, url);
+
+                    List<string> emails = new List<string>();
+                    var employeeIdCurrentUser = userBaseService.GetEmployeeIdOfUser(currentUser.UserID);
+                    var emailCurrentUser = userBaseService.GetEmployeeByEmployeeId(employeeIdCurrentUser)?.Email;
+                    emails.Add(emailCurrentUser);
+
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
     }
 }
