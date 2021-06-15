@@ -4,12 +4,12 @@ import { AppForm } from 'src/app/app.form';
 import { CatalogueRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { SalemanPopupComponent } from '../saleman-popup.component';
-import { Partner, CountryModel, ProviceModel } from 'src/app/shared/models';
+import { Partner, CountryModel, ProviceModel, Bank } from 'src/app/shared/models';
 import { FormValidators } from 'src/app/shared/validators/form.validator';
 import { PartnerOtherChargePopupComponent } from '../other-charge/partner-other-charge.popup';
 import { JobConstants, SystemConstants } from '@constants';
 import { Observable } from 'rxjs';
-import { getMenuUserSpecialPermissionState, IAppState } from '@store';
+import { GetCatalogueBankAction, getCatalogueBankState, getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -118,7 +118,13 @@ export class FormAddPartnerComponent extends AppForm {
     creditPayments: Array<string> = ['Credit', 'Direct'];
 
     displayFieldCustomer: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
-
+    
+    banks: Observable<Bank[]>;
+    displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Bank Code' },
+        { field: 'bankNameEn', label: 'Bank Name EN' },
+    ];
+    bankCode:AbstractControl;
 
     constructor(
         private _fb: FormBuilder,
@@ -128,6 +134,9 @@ export class FormAddPartnerComponent extends AppForm {
         super();
     }
     ngOnInit() {
+        this._store.dispatch(new GetCatalogueBankAction());
+        this.banks = this._store.select(getCatalogueBankState);
+
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this.initForm();
         this.getCountryProvince();
@@ -342,7 +351,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerLocation: [null, Validators.required],
             internalCode: [null],
             creditPayment: [null],
-            bankName: []
+            bankName: [],
+            bankCode: [{ value: null, disabled: true }]
         });
         this.partnerAccountNo = this.partnerForm.controls['partnerAccountNo'];
         this.internalReferenceNo = this.partnerForm.controls['internalReferenceNo'];
@@ -392,6 +402,7 @@ export class FormAddPartnerComponent extends AppForm {
         }
         this.isDisabled = this.partnerAccountRef != null && !this.isUpdate ? true : false;
         this.activePartner = this.active.value;
+        this.bankCode = this.partnerForm.controls['bankCode'];
     }
 
     onSelectDataFormInfo(data: any, type: string) {
@@ -428,7 +439,11 @@ export class FormAddPartnerComponent extends AppForm {
                 this.billingProvinceName = data.name_EN;
                 this.provinceId.setValue(data.id);
                 break;
-            default:
+            case 'bank':
+                this.bankName.setValue(data.bankNameEn);
+                this.bankCode.setValue(data.code);
+                break;
+            default:    
                 break;
         }
     }
@@ -522,7 +537,8 @@ export class FormAddPartnerComponent extends AppForm {
             partnerLocation: partner.partnerLocation,
             internalCode: partner.internalCode,
             creditPayment: partner.creditPayment,
-            bankName: partner.bankName
+            bankName: partner.bankName,
+            bankCode:partner.bankCode
         });
         if (this.partnerAccountRef.value !== partner.parentId) {
             this.isDisabled = false;
@@ -589,4 +605,5 @@ export class FormAddPartnerComponent extends AppForm {
                 );
         }
     }
+    
 }
