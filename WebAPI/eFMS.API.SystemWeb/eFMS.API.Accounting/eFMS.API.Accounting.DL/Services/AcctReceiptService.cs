@@ -984,24 +984,20 @@ namespace eFMS.API.Accounting.DL.Services
                                 //1. Số tiền còn lại của payment lớn hơn số tiền phải thu của invoice
                                 if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
                                 {
-                                    if(item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                    item.PaidAmount = remainAmount;
+                                    item.PaidAmountVnd = remainAmountVnd;
+                                    item.PaidAmountUsd = remainAmountUsd;
+
+                                    if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
                                     {
-                                        item.PaidAmount =  remainAmount ;
-                                        item.PaidAmountVnd = remainAmountVnd ;
-
                                         remainAmount = remainAmount - item.PaidAmountVnd ?? 0; // Cập nhật lại số tiền còn lại
-                                        remainAmountVnd = remainAmountVnd - item.PaidAmountVnd ?? 0;
-
                                     }
                                     else
                                     {
-                                        item.PaidAmount = remainAmount;
-                                        item.PaidAmountUsd = remainAmountUsd;
-
-                                        remainAmount = remainAmount - item.PaidAmount ?? 0; // Cập nhật lại số tiền còn lại
-                                        remainAmountUsd = remainAmountUsd - item.PaidAmountUsd ?? 0;
+                                        remainAmount = remainAmount - item.PaidAmountUsd ?? 0; // Cập nhật lại số tiền còn lại
                                     }
-
+                                    remainAmountVnd = remainAmountVnd - item.PaidAmountVnd ?? 0;
+                                    remainAmountUsd = remainAmountUsd - item.PaidAmountUsd ?? 0;
 
                                     item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
                                     item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
@@ -1009,22 +1005,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                                 else
                                 {
-                                    if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        item.PaidAmount = remainAmount;
-                                        item.PaidAmountVnd = remainAmountVnd;
+                                    item.PaidAmount = remainAmount;
+                                    item.PaidAmountVnd = remainAmountVnd;
+                                    item.PaidAmountUsd = remainAmountUsd;
 
-                                        item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                        item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
-                                    }
-                                    else
-                                    {
-                                        item.PaidAmount = remainAmount;
-                                        item.PaidAmountUsd = remainAmountUsd;
-
-                                        item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                        item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
-                                    }
+                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount;
+                                    item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
+                                    item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
 
                                     remainAmountUsd = 0;
                                     remainAmountVnd = 0;
