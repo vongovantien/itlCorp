@@ -264,6 +264,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                 },
             );
     }
+
+    previewGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
+    }
     
     recall() {
         this._accoutingRepo.RecallRequestSettlement(this.settlementPayment.settlement.id)
