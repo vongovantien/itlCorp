@@ -36,5 +36,6 @@ namespace eFMS.IdentityServer.Service.Models
         public string BankAccountNo { get; set; }
         public string Photo { get; set; }
         public string PersonalId { get; set; }
+        public string BankCode { get; set; }
     }
 }

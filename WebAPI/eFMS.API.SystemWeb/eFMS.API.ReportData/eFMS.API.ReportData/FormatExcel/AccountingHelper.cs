@@ -3,6 +3,7 @@ using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
 using OfficeOpenXml;
+using OfficeOpenXml.Drawing.Controls;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
@@ -616,7 +617,18 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Trưởng bộ phận\n(Ký, ghi rõ họ tên)", //32
                 "Kế toán\n(Ký, ghi rõ họ tên)", //33
                 "Giám đốc\n(Ký, ghi rõ họ tên)", //34
-                "Chứng từ:" //35
+                "Chứng từ:", //35
+
+                //16/06/2021 - #15834 - Add Field Template Export
+                //ADD
+                "Chuyển khoản",//36
+                "Tên người thụ hưởng",//37
+                "Số ngân hàng",//38
+                "Tên ngân hàng",//39
+                "Mã ngân hàng",//40
+                "Tiền mặt",//41
+                "Ngày đến hạn",//42
+                //END
             };
 
             List<string> engHeaders = new List<string>()
@@ -656,7 +668,18 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Head of Department\n(Name, Signature)", //32
                 "Chief Accountant\n(Name, Signature)", //33
                 "Director\n(Name, Signature)", //34
-                "Doc CS:" //35
+                "Doc CS:", //35
+
+                 //16/06/2021 - #15834 - Add Field Template Export
+                //ADD
+                "By Bank transfer",//36
+                "Beneficiary",//37
+                "Acc No",//38
+                "Bank",//39
+                "Bank code",//40
+                "By cash",//41
+                "Due date",//42
+                 //END
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -710,59 +733,103 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["K5"].Style.Numberformat.Format = "dd MMM, yyyy";
             workSheet.Cells["K5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
-            workSheet.Cells["J6"].Value = headers[5]; //Bộ phận
-            workSheet.Cells["J6"].Style.Font.Bold = true;
-            workSheet.Cells["K6"].Value = advanceExport.InfoAdvance.Department;
+            workSheet.Cells["A6"].Value = headers[5]; //Bộ phận
+            workSheet.Cells["A6"].Style.Font.Bold = true;
+            workSheet.Cells["C6"].Value = advanceExport.InfoAdvance.Department;
+
+            workSheet.Cells["A9"].Value = headers[36]; 
+            workSheet.Cells["A9"].Style.Font.Bold = true;
+            workSheet.Cells["C9"].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
+
+            workSheet.Cells["J9"].Value = headers[41];
+            workSheet.Cells["J9"].Style.Font.Bold = true;
+
+            var check = workSheet.Drawings.AddCheckBoxControl("");
+
+            if (advanceExport.InfoAdvance.PaymentMethod == "Cash")
+            {
+                check.SetPosition(7, 15, 2, 0);
+                check.Checked = eCheckState.Checked;
+            }
+            else if (advanceExport.InfoAdvance.PaymentMethod == "Bank")
+            {
+                check.SetPosition(7, 15, 10, 0);
+                check.Checked = eCheckState.Checked;
+            }
+              
+
+            workSheet.Cells["A10"].Value = headers[37];
+            workSheet.Cells["A10"].Style.Font.Bold = true;
+            workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
+
+            workSheet.Cells["J10"].Value = headers[42];
+            workSheet.Cells["J10"].Style.Font.Bold = true;
+            workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.DeadlinePayment;
+            workSheet.Cells["K10"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["K10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+            workSheet.Cells["A11"].Value = headers[38];
+            workSheet.Cells["A11"].Style.Font.Bold = true;
+            workSheet.Cells["C11"].Value = advanceExport.InfoAdvance.BankAccountNo;
+
+            workSheet.Cells["A12"].Value = headers[39];
+            workSheet.Cells["A12"].Style.Font.Bold = true;
+            workSheet.Cells["C12"].Value = advanceExport.InfoAdvance.BankName;
+
+            workSheet.Cells["A13"].Value = headers[40];
+            workSheet.Cells["A13"].Style.Font.Bold = true;
+            workSheet.Cells["C13"].Value = advanceExport.InfoAdvance.BankCode;
+
 
             //Bôi đen header
-            workSheet.Cells["A8:K9"].Style.Font.Bold = true;
+            workSheet.Cells["A15:K16"].Style.Font.Bold = true;
 
-            workSheet.Cells[8, 1, 9, 1].Merge = true;
-            workSheet.Cells[8, 1, 9, 1].Value = headers[6];//STT
-            workSheet.Cells[8, 1, 9, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[8, 1, 9, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[15, 1, 16, 1].Merge = true;
+            workSheet.Cells[15, 1, 16, 1].Value = headers[6];//STT
+            workSheet.Cells[15, 1, 16, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[15, 1, 16, 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells[8, 2, 9, 3].Merge = true;
-            workSheet.Cells[8, 2, 9, 3].Value = headers[7];//Thông tin chung
-            workSheet.Cells[8, 2, 9, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[8, 2, 9, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[15, 2, 16, 3].Merge = true;
+            workSheet.Cells[15, 2, 16, 3].Value = headers[7];//Thông tin chung
+            workSheet.Cells[15, 2, 16, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[15, 2, 16, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells[8, 4, 8, 7].Merge = true;
-            workSheet.Cells[8, 4, 8, 7].Value = headers[8];//Qty
-            workSheet.Cells[8, 4, 8, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[8, 4, 8, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[15, 4, 15, 7].Merge = true;
+            workSheet.Cells[15, 4, 15, 7].Value = headers[8];//Qty
+            workSheet.Cells[15, 4, 15, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[15, 4, 15, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             for (int x = 4; x < 8; x++)
             {
-                workSheet.Cells[9, x].Style.WrapText = true;
-                workSheet.Cells[9, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[9, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[16, x].Style.WrapText = true;
+                workSheet.Cells[16, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[16, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[9, 4].Value = headers[10]; //Số cont - Loại cont           
-            workSheet.Cells[9, 5].Value = headers[11]; // C.W           
-            workSheet.Cells[9, 6].Value = headers[12]; //Số kiện            
-            workSheet.Cells[9, 7].Value = headers[13]; //số CBM
+            workSheet.Cells[16, 4].Value = headers[10]; //Số cont - Loại cont           
+            workSheet.Cells[16, 5].Value = headers[11]; // C.W           
+            workSheet.Cells[16, 6].Value = headers[12]; //Số kiện            
+            workSheet.Cells[16, 7].Value = headers[13]; //số CBM
 
-            workSheet.Cells[8, 1, 8, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[15, 1, 15, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
-            workSheet.Cells[8, 8, 8, 11].Merge = true;
-            workSheet.Cells[8, 8, 8, 11].Value = headers[9];//Số tiến tạm ứng           
-            workSheet.Cells[8, 8, 8, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells[8, 8, 8, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[15, 8, 15, 11].Merge = true;
+            workSheet.Cells[15, 8, 15, 11].Value = headers[9];//Số tiến tạm ứng           
+            workSheet.Cells[15, 8, 15, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[15, 8, 15, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             for (int x = 8; x < 12; x++)
             {
-                workSheet.Cells[9, x].Style.WrapText = true;
-                workSheet.Cells[9, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[9, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[16, x].Style.WrapText = true;
+                workSheet.Cells[16, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[16, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[9, 8].Value = headers[14]; //Định mức           
-            workSheet.Cells[9, 9].Value = headers[15]; // Chi phí có hóa đơn           
-            workSheet.Cells[9, 10].Value = headers[16]; //Chi phí khác            
-            workSheet.Cells[9, 11].Value = headers[17]; //Tổng cộng
+            workSheet.Cells[16, 8].Value = headers[14]; //Định mức           
+            workSheet.Cells[16, 9].Value = headers[15]; // Chi phí có hóa đơn           
+            workSheet.Cells[16, 10].Value = headers[16]; //Chi phí khác            
+            workSheet.Cells[16, 11].Value = headers[17]; //Tổng cộng
 
-            int p = 10;
-            int j = 10;
+            int p = 17;
+            int j = 17;
             for (int i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
             {
                 workSheet.Cells[j, 2].Value = headers[18]; //Số chứng từ
@@ -853,15 +920,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A" + p + ":K" + p].Style.Font.Bold = true;
             workSheet.Cells["A" + p + ":K" + p].Style.Numberformat.Format = numberFormat;
 
-            workSheet.Cells[7, 1, 7, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            workSheet.Cells[14, 1, 14, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + p + ":K" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":K" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
 
             //All border
-            workSheet.Cells[8, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[8, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[15, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[15, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
-            for (var i = 8; i < p + 1; i++)
+            for (var i = 15; i < p + 1; i++)
             {
                 //In đậm border bên trái của Cột 1
                 workSheet.Cells[i, 1].Style.Border.Left.Style = ExcelBorderStyle.Medium;
@@ -872,10 +939,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 //In đậm border Cột 11
                 workSheet.Cells[i, 11].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             }
-            
+
             //Clear border Shipment
-            int r = 10;
-            int c = 17;
+            int r = 17;
+            int c = 25;
             for (var i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
             {
                 workSheet.Cells["B" + r + ":C" + c].Style.Border.Bottom.Style = ExcelBorderStyle.None;//Xóa border bottom

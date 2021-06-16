@@ -49,7 +49,8 @@ export class AdvancePayment {
     bankAccountName: string = null;
     payee: string = null;
     payeeName: string = null;
-
+    bankCode: string = null;
+    
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

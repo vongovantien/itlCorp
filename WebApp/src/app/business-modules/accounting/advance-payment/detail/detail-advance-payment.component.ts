@@ -117,7 +117,8 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                         bankAccountNo: this.advancePayment.bankAccountNo,
                         bankAccountName: this.advancePayment.bankAccountName,
                         bankName: this.advancePayment.bankName,
-                        payee: this.advancePayment.payee
+                        payee: this.advancePayment.payee,
+                        bankCode:this.advancePayment.bankCode
                     });
 
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
@@ -153,7 +154,8 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
             bankAccountNo: this.formCreateComponent.bankAccountNo.value,
             bankAccountName: this.formCreateComponent.bankAccountName.value,
             bankName: this.formCreateComponent.bankName.value,
-            payee: this.formCreateComponent.payee.value
+            payee: this.formCreateComponent.payee.value,
+            bankCode:this.formCreateComponent.bankCode.value
         };
     }
 

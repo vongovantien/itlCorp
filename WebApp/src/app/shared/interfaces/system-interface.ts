@@ -16,6 +16,7 @@ namespace SystemInterface {
         bankAccountNo: string;
         bankAccountName: string;
         bankName: string;
+        bankCode: string;
         photo: string;
         title: string;
     }
