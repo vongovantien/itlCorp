@@ -1,9 +1,8 @@
 import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, CatalogueRepo } from '@repositories';
-import { SortService, DataService } from '@services';
+import { DataService } from '@services';
 import { formatDate } from '@angular/common';
 import { AppList } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
@@ -31,7 +30,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     @Input() syncInfoTemplate: TemplateRef<any>
 
-    invoices: ReceiptInvoiceModel[] = [];
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
     term$ = new BehaviorSubject<string>('');
@@ -52,6 +50,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     paidAmountUSD: AbstractControl;
     finalPaidAmountVND: AbstractControl;
     finalPaidAmountUSD: AbstractControl;
+    isAutoConvert: AbstractControl;
 
     $currencyList: Observable<Currency[]>;
 
@@ -79,9 +78,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     ];
 
     constructor(
-        private _sortService: SortService,
         private _progressService: NgProgress,
-        private _router: Router,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
         private _fb: FormBuilder,
@@ -90,27 +87,16 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         private _toastService: ToastrService,
     ) {
         super();
-        this._progressRef = this._progressService.ref();
-        this.requestSort = this.sortTrialOfficalList;
     }
 
     ngOnInit() {
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.$currencyList = this._store.select(getCatalogueCurrencyState);
+        this.isLoading = this._store.select(customerPaymentReceipLoadingState);
 
         this.initForm();
-
-        this.isLoading = this._store.select(customerPaymentReceipLoadingState);
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
-
-        this._store.select(getCurrentUserState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((u) => {
-                if (!!u) {
-                    this.userLogged = u;
-                }
-            });
     }
 
     formatNumberCurrency(input: number, digit: number) {
@@ -122,7 +108,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     listenCusAdvanceData() {
         this._dataService.currentMessage
-            .pipe(pluck('cus-advance'))
+            .pipe(pluck('cus-advance'), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data) => {
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
@@ -131,6 +117,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                             (exchangeRate: IExchangeRate) => {
                                 if (!!exchangeRate) {
                                     this.exchangeRateUsd = exchangeRate.rate;
+                                    console.log(this.exchangeRateUsd);
+
                                 } else {
                                     this.exchangeRateUsd = 0;
                                 }
@@ -144,7 +132,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     listenCustomerInfoData() {
         this._dataService.currentMessage
-            .pipe(pluck('customer'))
+            .pipe(pluck('customer'), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: Partner) => {
                     data !== undefined && (this.customerInfo = data);
@@ -154,7 +142,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     listenCurrencyInfoData() {
         this._dataService.currentMessage
-            .pipe(pluck('currency'))
+            .pipe(pluck('currency'), takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: Partner) => {
                     data !== undefined && !this.currencyId.value && (this.currencyId.setValue(data));
@@ -178,7 +166,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             amountUSD: [],
             description: [],
             finalPaidAmountVND: [],
-            finalPaidAmountUSD: []
+            finalPaidAmountUSD: [],
+            isAutoConvert: [true]
         });
 
         this.cusAdvanceAmount = this.form.controls['cusAdvanceAmount'];
@@ -194,46 +183,38 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paidAmountUSD = this.form.controls['paidAmountUSD'];
         this.finalPaidAmountVND = this.form.controls['finalPaidAmountVND'];
         this.finalPaidAmountUSD = this.form.controls['finalPaidAmountUSD'];
+        this.isAutoConvert = this.form.controls['isAutoConvert'];
     }
 
     async generateExchangeRateUSD(date: string) {
         try {
-            this._progressRef.start();
             const exchangeRate: IExchangeRate = await this._catalogueRepo.convertExchangeRate(date, 'USD').toPromise();
             if (!!exchangeRate) {
                 return exchangeRate;
             }
         } catch (error) {
 
-        } finally {
-            this._progressRef.complete();
         }
     }
 
     getBankAccountNo(event: any) {
         if (event === this.paymentMethods[1]) {
-            if (this.currencyId.value === 'VND') {
-                this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoVnd)
-            } else {
-                this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoUsd)
-            }
+            this._store.select(getCurrentUserState)
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((u) => {
+                    if (!!u) {
+                        this.userLogged = u;
+                        if (this.currencyId.value === 'VND') {
+                            this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoVnd)
+                        } else {
+                            this.bankAccountNo.setValue(this.userLogged.bankOfficeAccountNoUsd)
+                        }
+                    }
+                });
+
         } else {
             this.bankAccountNo.setValue(null);
         }
-    }
-
-    sortTrialOfficalList(sortField: string, order: boolean) {
-        this.invoices = this._sortService.sort(this.invoices, sortField, order);
-    }
-
-    onChangeCheckBoxAction() {
-        for (const charge of this.invoices) {
-            charge.isSelected = this.isCheckAll;
-        }
-    }
-
-    onChangeCheckBoxInvoice() {
-        this.isCheckAll = this.invoices.every(x => x.isSelected);
     }
 
     onSelectDataFormInfo(data, type: string) {
@@ -242,7 +223,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 if (!data.target.value.length) {
                     this.paidAmountVND.setValue(0);
                 }
-                this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : (Math.round((this.paidAmountVND.value / this.exchangeRateUsd) * 100))) / 100);
+                if (this.isAutoConvert.value) {
+                    console.log("Ty gia USD", this.exchangeRateUsd);
+                    this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : +(((this.paidAmountVND.value / this.exchangeRateUsd) * 100)) / 100).toFixed(3));
+                }
                 this.getFinalPaidAmount();
                 break;
             case 'paid-amountUsd':
@@ -253,7 +237,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 this.getFinalPaidAmount();
                 break;
             case 'currency':
-                if ((data as Currency).id === this.getCurrencyInvoice(this.invoices)[0]) {
+                if ((data as Currency).id === 'VND') {
                     this.exchangeRate.setValue(1);
                 } else {
                     if ((data as Currency).id !== 'VND') {
@@ -321,17 +305,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         newInvoiceWithAdv.paidAmountVnd = 0;
         newInvoiceWithAdv.paidAmountUsd = 0;
         newInvoiceWithAdv.refNo = null;
+
         const data = newInvoiceWithAdv as ReceiptInvoiceModel;
         this._store.dispatch(InsertAdvance({ data: data }));
 
-        ///this.invoices.push(newInvoiceWithAdv);
-    }
-
-    getCurrencyInvoice(invoiceList: ReceiptInvoiceModel[]): string[] {
-        if (!invoiceList.length) { return ["VND"] };
-        const currencyList = [...new Set(invoiceList.map(i => i.currencyId))];
-
-        return currencyList;
     }
 
     processClear() {
@@ -357,10 +334,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         //     this._toastService.warning('Missing data to process', 'Warning');
         //     return;
         // }
-        if (this.getCurrencyInvoice(body.list).length === 2) {
-            this._toastService.warning('List invoice should only have one currency', 'Warning');
-            return;
-        }
+        // if (this.getCurrencyInvoice(body.list).length === 2) {
+        //     this._toastService.warning('List invoice should only have one currency', 'Warning');
+        //     return;
+        // }
         this._accountingRepo.processInvoiceReceipt(body)
             .subscribe(
                 (data: ProcessClearInvoiceModel) => {
@@ -378,13 +355,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     getFinalPaidAmount() {
         const exChangeRateUSD = this.currencyId.value !== 'USD' ? this.exchangeRateUsd : 1;
         const exChangeRateVND = this.currencyId.value === 'USD' ? this.exchangeRateUsd : 1;
-        const cusAdvanceAmount = isNumber(this.cusAdvanceAmount.value) ? this.cusAdvanceAmount.value : Number(this.cusAdvanceAmount.value?.replace(/,/g, ''));
-        const amountUSD = isNumber(this.amountUSD.value) ? this.amountUSD.value : Number(this.amountUSD.value?.replace(/,/g, ''));
-        const paidAmountUSD = isNumber(this.paidAmountUSD.value) ? this.paidAmountUSD.value : Number(this.paidAmountUSD.value?.replace(/,/g, ''));
-        const amountVND = isNumber(this.amountVND.value) ? this.amountVND.value : Number(this.amountVND.value?.replace(/,/g, ''));
-        const paidAmountVND = isNumber(this.paidAmountVND.value) ? this.paidAmountVND.value : Number(this.paidAmountVND.value?.replace(/,/g, ''));
-        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : ((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100)) + amountUSD + paidAmountUSD);
-        this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + (amountVND) + (paidAmountVND));
+
+        const _finalPaidAmountVnd: number = (this.cusAdvanceAmount.value ?? 0 * exChangeRateVND) + (this.amountVND.value ?? 0) + (this.paidAmountVND.value ?? 0);
+        const _finalPaidAmountUsd: number = exChangeRateUSD === 0 ? 0
+            : (((this.cusAdvanceAmount.value ?? 0) / exChangeRateUSD) * 100) / 100
+            + (this.amountUSD.value ?? 0) + (this.paidAmountUSD.value ?? 0);
+
+        this.finalPaidAmountVND.setValue(_finalPaidAmountVnd ?? 0);
+        this.finalPaidAmountUSD.setValue(_finalPaidAmountUsd ?? 0);
     }
 
     caculateAmountFromDebitList() {
@@ -414,7 +392,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paidAmountUSD.setValue(paidUSD);
         this.paidAmountVND.setValue(paidVND);
 
-        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : ((Math.round((cusAdvanceAmount / exChangeRateUSD) * 100)) / 100)) + valueUSD + paidUSD);
+        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : +((((cusAdvanceAmount / exChangeRateUSD) * 100) / 100).toFixed(3)) + valueUSD + paidUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }
 }

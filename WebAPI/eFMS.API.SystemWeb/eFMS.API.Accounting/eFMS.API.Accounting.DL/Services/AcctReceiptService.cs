@@ -444,6 +444,8 @@ namespace eFMS.API.Accounting.DL.Services
                     UnpaidAmountUsd = s.FirstOrDefault().UnpaidPaymentAmountUsd,
                     PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
                     PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
+                    TotalPaidVnd = s.Sum(x => x.TotalPaidVnd),
+                    TotalPaidUsd = s.Sum(x => x.TotalPaidUsd),
                     Notes = s.FirstOrDefault().Note,
                     OfficeId = s.FirstOrDefault().OfficeInvoiceId,
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
@@ -984,30 +986,38 @@ namespace eFMS.API.Accounting.DL.Services
                                 //1. Số tiền còn lại của payment lớn hơn số tiền phải thu của invoice
                                 if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
                                 {
-                                    item.PaidAmount = remainAmount;
-                                    item.PaidAmountVnd = remainAmountVnd;
-                                    item.PaidAmountUsd = remainAmountUsd;
+                                    decimal _invoiceAmountUnpaid = item.UnpaidAmount ?? 0; // số tiền còn lại cần thu
+                                    decimal _invoiceAmountUnpaidVnd = item.UnpaidAmountVnd ?? 0;
+                                    decimal _invoiceAmountUnpaidUsd = item.UnpaidAmountUsd ?? 0;
+
+
+                                    item.PaidAmount = item.PaidAmount + item.UnpaidAmount;
+                                    item.PaidAmountVnd = item.PaidAmountVnd + item.UnpaidAmountVnd;
+                                    item.PaidAmountUsd = item.PaidAmountUsd + item.UnpaidAmountUsd;
+
+                                    // Số tiền còn lại của hóa đơn
+                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - _invoiceAmountUnpaid;
+                                    item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - _invoiceAmountUnpaidUsd;
+                                    item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - _invoiceAmountUnpaidVnd;
 
                                     if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
                                     {
-                                        remainAmount = remainAmount - item.PaidAmountVnd ?? 0; // Cập nhật lại số tiền còn lại
+                                        // Cập nhật lại số tiền còn lại sau khi trừ cho hđ này
+                                        remainAmount = remainAmount - _invoiceAmountUnpaidVnd; 
                                     }
                                     else
                                     {
-                                        remainAmount = remainAmount - item.PaidAmountUsd ?? 0; // Cập nhật lại số tiền còn lại
+                                        remainAmount = remainAmount - _invoiceAmountUnpaidUsd;
                                     }
-                                    remainAmountVnd = remainAmountVnd - item.PaidAmountVnd ?? 0;
-                                    remainAmountUsd = remainAmountUsd - item.PaidAmountUsd ?? 0;
 
-                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount; // Số tiền còn lại của hóa đơn
-                                    item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
-                                    item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
+                                    remainAmountVnd = remainAmountVnd - _invoiceAmountUnpaidVnd;
+                                    remainAmountUsd = remainAmountUsd - _invoiceAmountUnpaidUsd;
                                 }
                                 else
                                 {
-                                    item.PaidAmount = remainAmount;
-                                    item.PaidAmountVnd = remainAmountVnd;
-                                    item.PaidAmountUsd = remainAmountUsd;
+                                    item.PaidAmount = item.PaidAmount ?? 0 + remainAmount;
+                                    item.PaidAmountVnd = item.PaidAmountVnd ?? 0 + remainAmountVnd;
+                                    item.PaidAmountUsd = item.PaidAmountUsd ?? 0 + remainAmountUsd;
 
                                     item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount;
                                     item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
