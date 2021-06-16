@@ -104,7 +104,7 @@ export class BankComponent extends AppList implements OnInit {
         this.formPopup.form.setValue({
             bankNameCode: this.Bank.code,
             bankNameVN: this.Bank.bankNameVn,
-            bankNameEN: this.Bank.bankNameVn,
+            bankNameEN: this.Bank.bankNameEn,
             active: this.Bank.active,
         });
 

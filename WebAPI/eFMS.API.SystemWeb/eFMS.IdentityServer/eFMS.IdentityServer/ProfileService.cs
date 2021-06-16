@@ -68,6 +68,7 @@ namespace eFMS.IdentityServer
                     new Claim("bankName", employee.BankName ?? ""),
                     new Claim("bankOfficeAccountNoVnd", office?.BankAccountVnd ?? ""),
                     new Claim("bankOfficeAccountNoUsd", office?.BankAccountUsd ?? ""),
+                    new Claim("bankCode", employee.BankCode?? ""),
                     new Claim("kbExchangeRate", company.KbExchangeRate != null ? company.KbExchangeRate.ToString() : "0"),
                     companyClaim,
                     officeClaim,

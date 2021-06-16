@@ -1,11 +1,11 @@
 import { Component, Output, EventEmitter, Input, ChangeDetectionStrategy } from '@angular/core';
-import { User, Currency, Partner } from '@models';
+import { User, Currency, Partner, Bank } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { AppForm } from '@app';
 import { FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 
 import { CommonEnum } from '@enums';
-import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
+import { IAppState, getCurrentUserState, GetCatalogueCurrencyAction, getCatalogueCurrencyState, GetCatalogueBankAction, getCatalogueBankState } from '@store';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { catchError, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
@@ -47,6 +47,12 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     payee: AbstractControl;
 
     selectedPayee: Partner;
+    banks: Observable<Bank[]>;
+    bankCode:AbstractControl;
+    displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Bank Code' },
+        { field: 'bankNameEn', label: 'Bank Name EN' },
+    ];
 
     constructor(
         private _fb: FormBuilder,
@@ -60,10 +66,12 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     ngOnInit() {
         this._store.dispatch(new GetCatalogueCurrencyAction());
+        this._store.dispatch(new GetCatalogueBankAction());
 
         this.initForm();
         this.getCurrency();
 
+        this.banks = this._store.select(getCatalogueBankState);
         this.users = this._systemRepo.getListSystemUser();
         this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
 
@@ -100,7 +108,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             bankAccountNo: [],
             bankAccountName: [],
             bankName: [],
-            payee: []
+            payee: [],
+            bankCode: [{ value: null, disabled: true }]
         });
 
         this.advanceNo = this.formCreate.controls['advanceNo'];
@@ -116,6 +125,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         this.bankName = this.formCreate.controls['bankName'];
         this.paymentTerm = this.formCreate.controls['paymentTerm'];
         this.payee = this.formCreate.controls['payee'];
+        this.bankCode = this.formCreate.controls['bankCode'];
 
         // * Detect form value change.
         this.paymentTerm.valueChanges.pipe(
@@ -194,5 +204,14 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
         if (!!payee.bankAccountName) {
             this.bankAccountName.setValue(payee.bankAccountName);
         }
+        
+        this.bankName.setValue(payee.bankName);
+        this.bankCode.setValue(payee.bankCode);
+    }
+    onSelectDataBankInfo(data: any) {
+        if(data){
+            this.bankName.setValue(data.bankNameEn);
+            this.bankCode.setValue(data.code);
+        }      
     }
 }

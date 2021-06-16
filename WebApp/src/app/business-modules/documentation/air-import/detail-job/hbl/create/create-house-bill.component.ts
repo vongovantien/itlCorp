@@ -114,7 +114,7 @@ export class AirImportCreateHBLComponent extends AppForm implements OnInit {
 
             eta: !!form.eta && !!form.eta.startDate ? formatDate(form.eta.startDate, 'yyyy-MM-dd', 'en') : null,
             arrivalDate: !!form.arrivalDate && !!form.arrivalDate.startDate ? formatDate(form.arrivalDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            flightDate: !!form.flightDate ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            flightDate: (!!form.flightDate && !!form.flightDate.startDate) ? formatDate(form.flightDate.startDate, 'yyyy-MM-dd', 'en') : null,
             flightDateOrigin: !!form.flightDateOrigin && form.flightDateOrigin.startDate !== undefined ? formatDate(form.flightDateOrigin.startDate, 'yyyy-MM-dd', 'en') : null,
             issueHBLDate: !!form.issueHBLDate ? formatDate(form.issueHBLDate.startDate, 'yyyy-MM-dd', 'en') : null,
 
