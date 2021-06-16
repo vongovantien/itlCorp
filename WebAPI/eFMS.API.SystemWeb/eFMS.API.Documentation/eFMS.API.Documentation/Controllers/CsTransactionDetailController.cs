@@ -102,17 +102,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (data.Count > 0)
                 {
-                    if (typeExisted == 2) // Trùng mbl
-                    {
-                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
-                    }
-
-                    if (typeExisted == 1) // Trùng HBL
-                    {
-                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
-                    }
+                    var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
                 }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
@@ -161,17 +152,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (data.Count > 0)
                 {
-                    if (typeExisted == 2) // Trùng mbl
-                    {
-                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
-                    }
-
-                    if (typeExisted == 1) // Trùng HBL
-                    {
-                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
-                    }
+                    var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
                 }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
@@ -193,17 +175,8 @@ namespace eFMS.API.Documentation.Controllers
             {
                 if (data.Count > 0)
                 {
-                    if (typeExisted == 2) // Trùng mbl
-                    {
-                        var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
-                    }
-
-                    if(typeExisted == 1) // Trùng HBL
-                    {
-                        var hblExisted = csTransactionDetailService.Get(x => data.Contains(x.Id)).ToList();
-                        return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", hblExisted.Select(x => x.Hwbno)) });
-                    }
+                    var jobExisted = csTransactionService.Get(x => data.Contains(x.Id)).ToList();
+                    return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage + " In " + string.Join(",", jobExisted.Select(x => x.JobNo)) });
                 }
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
@@ -331,11 +304,11 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID))
                         {
-                            message = string.Format(@"Housebill of Lading No is existed !", model.Hwbno);
+                            message = string.Format(@"Housebill of Lading No is existed", model.Hwbno);
 
                             existedType = 1;
                             data = houseBills.Where(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID)
-                                             .Select(x => x.Id)
+                                             .Select(x => x.JobId)
                                              .Distinct()
                                              .ToList();
                         }
@@ -344,9 +317,9 @@ namespace eFMS.API.Documentation.Controllers
                     {
                         if (houseBills.Any(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id))
                         {
-                            message = string.Format(@"Housebill of Lading No is existed !", model.Hwbno);
+                            message = string.Format(@"Housebill of Lading No is existed", model.Hwbno);
                             data = houseBills.Where(x => x.Hwbno.ToLower() == model.Hwbno.ToLower() && x.OfficeId == currentUser.OfficeID && x.Id != model.Id)
-                                .Select(x => x.Id)
+                                .Select(x => x.JobId)
                                 .Distinct()
                                 .ToList();
                             existedType = 1;
