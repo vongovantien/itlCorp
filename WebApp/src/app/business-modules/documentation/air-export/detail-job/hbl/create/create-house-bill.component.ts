@@ -273,6 +273,8 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                     (hbl: HouseBill) => {
                         if (!!hbl && hbl.id !== SystemConstants.EMPTY_GUID) {
                             this.isImport = true;
+                            hbl.hwbno = this.formCreateHBLComponent.hwbno.value;
+                            hbl.mawb = this.formCreateHBLComponent.mawb.value;
                             this.formCreateHBLComponent.totalCBM = hbl.cbm;
                             this.formCreateHBLComponent.totalHeightWeight = hbl.hw;
                             this.formCreateHBLComponent.jobId = hbl.jobId;
@@ -280,7 +282,7 @@ export class AirExportCreateHBLComponent extends AppForm implements OnInit {
                             this.formCreateHBLComponent.hwconstant = hbl.hwConstant;
 
                             this.formCreateHBLComponent.updateFormValue(hbl, true);
-                            this.formCreateHBLComponent.hwbno.setValue(this.formCreateHBLComponent.hwbno.value);
+                            // this.formCreateHBLComponent.hwbno.setValue(this.formCreateHBLComponent.hwbno.value);
                         }
                     }
                 );

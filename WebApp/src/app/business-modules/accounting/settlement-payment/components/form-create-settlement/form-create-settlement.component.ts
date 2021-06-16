@@ -34,6 +34,8 @@ export class SettlementFormCreateComponent extends AppForm {
     beneficiaryName: AbstractControl;
     bankAccountNo: AbstractControl;
     bankName: AbstractControl;
+    advanceAmount: AbstractControl;
+    balanceAmount: AbstractControl;
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     methods: CommonInterface.ICommonTitleValue[];
@@ -70,7 +72,9 @@ export class SettlementFormCreateComponent extends AppForm {
             'payee': [],
             'beneficiaryName': [],
             'bankAccountNo': [],
-            'bankName': []
+            'bankName': [],
+            'advanceAmount': [],
+            'balanceAmount': []
         });
 
 
@@ -86,6 +90,8 @@ export class SettlementFormCreateComponent extends AppForm {
         this.beneficiaryName = this.form.controls['beneficiaryName'];
         this.bankAccountNo = this.form.controls['bankAccountNo'];
         this.bankName = this.form.controls['bankName'];
+        this.advanceAmount = this.form.controls['advanceAmount'];
+        this.balanceAmount = this.form.controls['balanceAmount'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)
@@ -114,6 +120,7 @@ export class SettlementFormCreateComponent extends AppForm {
         return [
             { title: 'Cash', value: 'Cash' },
             { title: 'Bank Transfer', value: 'Bank' },
+            { title: 'Net Off Shipment', value: 'NETOFF_SHPT' },
             { title: 'Other', value: 'Other' },
         ];
     }
@@ -138,11 +145,7 @@ export class SettlementFormCreateComponent extends AppForm {
             if (!!beneficiary) {
                 this.beneficiaryName.setValue(beneficiary.partnerNameEn);
                 this.bankAccountNo.setValue(beneficiary.bankAccountNo);
-                if (beneficiary.bankName?.trim().length > 0) {
-                    this.bankName.setValue(beneficiary.bankName);
-                } else {
-                    this.bankName.setValue(beneficiary.bankAccountName);
-                }
+                this.bankName.setValue(beneficiary.bankName);
             }
         } else {
             this.beneficiaryName.setValue(null);

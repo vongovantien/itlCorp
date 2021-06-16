@@ -3,7 +3,7 @@ import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/fo
 import { Store } from '@ngrx/store';
 
 import { Customer, User, PortIndex, CsTransaction, HouseBill, Warehouse, CountryModel, Unit, Incoterm } from '@models';
-import { CatalogueRepo, SystemRepo } from '@repositories';
+import { CatalogueRepo, DocumentationRepo, SystemRepo } from '@repositories';
 import { CommonEnum } from '@enums';
 import { FormValidators } from '@validators';
 import { getCataloguePortState, getCataloguePortLoadingState, GetCataloguePortAction, GetCatalogueWarehouseAction, getCatalogueWarehouseState, getCatalogueUnitState, GetCatalogueUnitAction } from '@store';
@@ -13,7 +13,7 @@ import { JobConstants, SystemConstants } from '@constants';
 import { DataService } from '@services';
 import { InfoPopupComponent } from '@common';
 
-import { takeUntil, catchError, skip } from 'rxjs/operators';
+import { takeUntil, catchError, skip, tap, mergeMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import _merge from 'lodash/merge';
 import cloneDeep from 'lodash/cloneDeep';
@@ -108,10 +108,12 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     jobId: string = SystemConstants.EMPTY_GUID;
     hblId: string = SystemConstants.EMPTY_GUID;
+    shipmentDetail: CsTransaction;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
+        private _documentationRepo: DocumentationRepo,
         private _fb: FormBuilder,
         private _store: Store<IShareBussinessState>,
         private _dataService: DataService
@@ -138,30 +140,43 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
     getShipmentAndSetDefault() {
         // * get detail shipment from store.
         this._store.select(getTransactionDetailCsTransactionState)
-            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1))
+            .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
+            tap((shipment: CsTransaction) => {
+                this.shipmentDetail = new CsTransaction(shipment);
+
+                // * set default value for controls from shipment detail.
+                if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
+                    this.jobId = shipment.id;
+                    this.formCreate.patchValue({
+                        mawb: shipment.mawb,
+                        pod: shipment.pod,
+                        pol: shipment.pol,
+                        arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                        eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                        flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
+                        flightNo: shipment.flightVesselName,
+                        forwardingAgentId: shipment.agentId,
+                        arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
+                        warehouseId: shipment.warehouseId,
+                        route: shipment.route,
+                        packageQty: shipment.packageQty,
+                        grossWeight: shipment.grossWeight,
+                        chargeWeight: shipment.chargeWeight,
+                        packageType: +shipment.packageType,
+                        incontermId: shipment.incotermId
+                    });
+                }
+            }),
+            mergeMap(
+                () => this._documentationRepo.generateHBLNo(CommonEnum.TransactionTypeEnum.AirExport)
+            )
+            )
             .subscribe(
-                (shipment: CsTransaction) => {
-                    // * set default value for controls from shipment detail.
-                    if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
-                        this.jobId = shipment.id;
-                        this.formCreate.patchValue({
-                            mawb: shipment.mawb,
-                            pod: shipment.pod,
-                            pol: shipment.pol,
-                            arrivaldate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                            eta: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                            flightDate: !!shipment.flightDate ? { startDate: new Date(shipment.flightDate), endDate: new Date(shipment.flightDate) } : null,
-                            flightNo: shipment.flightVesselName,
-                            forwardingAgentId: shipment.agentId,
-                            arrivalDate: !!shipment.eta ? { startDate: new Date(shipment.eta), endDate: new Date(shipment.eta) } : null,
-                            warehouseId: shipment.warehouseId,
-                            route: shipment.route,
-                            packageQty: shipment.packageQty,
-                            grossWeight: shipment.grossWeight,
-                            chargeWeight: shipment.chargeWeight,
-                            packageType: +shipment.packageType,
-                            incontermId: shipment.incotermId
-                        });
+                (hawbNoGenerate: any) => {
+                    if (this.shipmentDetail.isHawb) {
+                        this.hwbno.setValue('N/H');
+                    } else {
+                        this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
                 }
             );
@@ -214,7 +229,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             warehouseId: [],
             route: [],
             packageQty: [],
-            desOfGoods: ['AS PER BIL'],
+            desOfGoods: ['AS PER BILL'],
             poinvoiceNo: [],
 
             // * Combogrid

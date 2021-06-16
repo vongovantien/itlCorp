@@ -15,6 +15,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string Tel { get; set; }
         public string AddressEn { get; set; }
         public string AddressVn { get; set; }
+        public string AddressShippingVn { get; set; }
+        public string AddressShippingEn { get; set; }
         public string Fax { get; set; }
         public string CoLoaderCode { get; set; }
         public string RoundUpMethod { get; set; }
@@ -37,5 +39,11 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string BankAccountName { get; set; }
         public string BankName { get; set; }
         public string BankCode { get; set; }
+        public string PartnerMode { get; set; }
+        public string PartnerLocation { get; set; }
+        public string Email { get; set; }
+        public string BillingEmail { get; set; }
+        public string ContactPerson { get; set; }
+        public string Note { get; set; }
     }
 }

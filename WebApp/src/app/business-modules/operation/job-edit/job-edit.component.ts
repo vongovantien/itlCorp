@@ -85,8 +85,9 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param) => {
+                console.log('ops',param)
                 this.jobId = param.id;
-                this.tab = !!param.tab ? param.tab : 'job-edit';
+                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit': param.tab) : 'job-edit';
                 if (param.action) {
                     this.isDuplicate = param.action.toUpperCase() === 'COPY';
                     this.selectedTabSurcharge = 'BUY';

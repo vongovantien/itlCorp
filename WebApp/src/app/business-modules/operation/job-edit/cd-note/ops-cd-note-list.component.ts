@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { OpsTransaction } from 'src/app/shared/models/document/OpsTransaction.model';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { DocumentationRepo, ExportRepo } from 'src/app/shared/repositories';
 import { ConfirmPopupComponent, InfoPopupComponent } from 'src/app/shared/common/popup';
 import { SortService } from 'src/app/shared/services';
@@ -15,9 +15,9 @@ import { AcctCDNote } from 'src/app/shared/models/document/acctCDNote.model';
 import _uniq from 'lodash/uniq';
 import { ReportPreviewComponent } from '@common';
 import { Crystal } from '@models';
-import { DomSanitizer } from '@angular/platform-browser';
 import { InjectViewContainerRefDirective } from '@directives';
 import { delayTime } from '@decorators';
+import { combineLatest } from 'rxjs';
 
 @Component({
     selector: 'ops-cd-note-list',
@@ -59,12 +59,25 @@ export class OpsCDNoteComponent extends AppList {
     }
 
     ngOnInit() {
-        this._activedRouter.params.subscribe((param: { id: string }) => {
-            if (!!param.id) {
-                this.idMasterBill = param.id;
-                this.getListCdNote(this.idMasterBill);
+        combineLatest([
+            this._activedRouter.params,
+            this._activedRouter.queryParams
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+        ).subscribe(
+            (params: any) => {
+                if (!!params.id) {
+                    this.idMasterBill = params.id;
+                    const cdNo = params.view;
+                    const currencyId = params.export;
+                    if (!!cdNo && !!currencyId) {
+                        this.getListCdNoteWithPreview(this.idMasterBill, cdNo, currencyId)
+                    } else {
+                        this.getListCdNote(this.idMasterBill);
+                    }
+                }
             }
-        });
+        )
 
         this.headers = [
             { title: 'Type', field: 'type', sortable: true },
@@ -97,6 +110,41 @@ export class OpsCDNoteComponent extends AppList {
                         });
                     });
                 },
+            );
+    }
+
+    getListCdNoteWithPreview(id: string, cdNo: string, currency: string){
+        this.isLoading = true;
+        const isShipmentOperation = true;
+        this._documentRepo.getListCDNote(id, isShipmentOperation)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    this.cdNoteGroups = res;
+                    this.initGroup = res;
+                    const selected = { isSelected: false };
+                    this.cdNoteGroups.forEach(element => {
+                        element.listCDNote.forEach((item: any[]) => {
+                            Object.assign(item, selected);
+                        });
+                    });
+                    let isExist = false;
+                    this.cdNoteGroups.forEach(element => {
+                        const item = element.listCDNote.filter(cdNote => cdNote.code === cdNo);
+                        if (item.length > 0) {
+                            isExist = true;
+                            element.listCDNote.filter(cdNote => cdNote.code === cdNo).map(cdNote => cdNote.isSelected = true);
+                            this.transactionType = item.transactionTypeEnum;
+                            this.openPopupDetail(id, cdNo);
+                            this.cdNoteDetailPopupComponent.previewCdNote(currency);
+                        }
+                    })
+                    if (!isExist) {
+                        this._toastService.error("CD Note " + cdNo + "does not existed!");
+                    }
+                }
             );
     }
 

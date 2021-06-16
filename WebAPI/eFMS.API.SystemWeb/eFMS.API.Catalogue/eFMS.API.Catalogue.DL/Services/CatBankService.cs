@@ -38,11 +38,12 @@ namespace eFMS.API.Catalogue.DL.Services
         #region CRUD
         public override HandleState Add(CatBankModel entity)
         {
-            entity.Id = Guid.NewGuid();
-            entity.DatetimeCreated = entity.DatetimeModified = DateTime.Now;
-            entity.Active = true;
-            entity.UserCreated = currentUser.UserID;
-            var result = DataContext.Add(entity);
+            var bank = mapper.Map<CatBank>(entity);
+            bank.DatetimeCreated = bank.DatetimeModified = DateTime.Now;
+            bank.Active = true;
+            bank.UserCreated = currentUser.UserID;
+            var result = DataContext.Add(bank,false);
+            DataContext.SubmitChanges();
             if (result.Success)
             {
                 ClearCache();

@@ -34,10 +34,9 @@
                                             <label class="form-control-label">
                                                 Person Handle
                                             </label>
-                                            <select class="form-control" formControlName="personalHandle">
-                                                <option *ngFor="let user of users" [ngValue]="user">{{user.username}}
-                                                </option>
-                                            </select>
+                                            <ng-select class="custom" formControlName="personalHandle" [items]="users"
+                                                bindLabel="username" bindValue="id">
+                                            </ng-select>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -88,11 +87,9 @@
                                             <label class="form-control-label">
                                                 Import Status
                                             </label>
-                                            <select formControlName="importStatus" class="form-control">
-                                                <option [ngValue]="null">All</option>
-                                                <option *ngFor="let item of status" [ngValue]="item">{{item.title}}
-                                                </option>
-                                            </select>
+                                            <ng-select class="custom" formControlName="importStatus" [items]="status"
+                                                bindLabel="title" bindValue="value">
+                                            </ng-select>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -100,11 +97,9 @@
                                             <label class="form-control-label">
                                                 Type
                                             </label>
-                                            <select formControlName="type" class="form-control">
-                                                <option [ngValue]="null">All</option>
-                                                <option *ngFor="let type of types" [ngValue]="type">{{type.title}}
-                                                </option>
-                                            </select>
+                                            <ng-select class="custom" formControlName="type" [items]="types"
+                                                bindLabel="title" bindValue="value">
+                                            </ng-select>
                                         </div>
                                     </div>
                                 </div>

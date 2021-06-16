@@ -366,6 +366,7 @@ namespace eFMS.API.Accounting.DL.Services
             var requestAdvances = acctAdvanceRequestRepo.Get();
             var users = sysUserRepo.Get();
             IQueryable<CatPartner> partners = catPartnerRepo.Get();
+            IQueryable<CatDepartment> departments = catDepartmentRepo.Get();
 
             var data = from advancePayment in advancePayments
                        join user in users on advancePayment.Requester equals user.Id into user2
@@ -378,6 +379,8 @@ namespace eFMS.API.Accounting.DL.Services
                        from requestAdvance in requestAdvances2.DefaultIfEmpty()
                        join partner in partners on advancePayment.Payee equals partner.Id into payeeGrps
                        from payeeGrp in payeeGrps.DefaultIfEmpty()
+                       join depart in departments on advancePayment.DepartmentId equals depart.Id into departAdvGrps
+                       from departAdvGrp in departAdvGrps.DefaultIfEmpty()
                        select new AcctAdvancePaymentResult
                        {
                            Id = advancePayment.Id,
@@ -403,7 +406,8 @@ namespace eFMS.API.Accounting.DL.Services
                            UserCreatedName = Ucgrp.Username,
                            UserModifiedName = Umgrp.Username,
                            ReasonReject = advancePayment.ReasonReject,
-                           PayeeName = payeeGrp.ShortName
+                           PayeeName = payeeGrp.ShortName,
+                           DepartmentName = departAdvGrp.DeptNameAbbr
                        };
 
             //Gom nhóm
@@ -425,12 +429,12 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PaymentMethod,
                 x.VoucherNo,
                 x.VoucherDate,
-                x.LastSyncDate,
-                x.SyncStatus,
-                x.UserCreatedName,
-                x.UserModifiedName,
-                x.ReasonReject,
-                x.PayeeName
+                //x.LastSyncDate,
+                //x.SyncStatus,
+                //x.UserCreatedName,
+                //x.UserModifiedName,
+                //x.ReasonReject,
+                //x.PayeeName,
             }).Select(s => new AcctAdvancePaymentResult
             {
                 Id = s.Key.Id,
@@ -453,12 +457,13 @@ namespace eFMS.API.Accounting.DL.Services
                 PaymentMethodName = Common.CustomData.PaymentMethod.Where(x => x.Value == s.Key.PaymentMethod).Select(x => x.DisplayName).FirstOrDefault(),
                 Amount = s.Sum(su => su.Amount),
                 StatusApprovalName = Common.CustomData.StatusApproveAdvance.Where(x => x.Value == s.Key.StatusApproval).Select(x => x.DisplayName).FirstOrDefault(),
-                LastSyncDate = s.Key.LastSyncDate,
-                SyncStatus = s.Key.SyncStatus,
-                UserCreatedName = s.Key.UserCreatedName,
-                UserModifiedName = s.Key.UserModifiedName,
-                ReasonReject = s.Key.ReasonReject,
-                PayeeName = s.Key.PayeeName
+                LastSyncDate = s.FirstOrDefault().LastSyncDate,
+                SyncStatus = s.FirstOrDefault().SyncStatus,
+                UserCreatedName = s.FirstOrDefault().UserCreatedName,
+                UserModifiedName = s.FirstOrDefault().UserModifiedName,
+                ReasonReject = s.FirstOrDefault().ReasonReject,
+                PayeeName = s.FirstOrDefault().PayeeName,
+                DepartmentName = s.FirstOrDefault().DepartmentName
             });
 
             return data;

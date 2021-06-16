@@ -30,12 +30,7 @@
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select request date" [autoApply]="true"
                             formControlName="requestDate" [attr.disabled]="isDisabled" [maxDate]="maxDate"
-                            (datesUpdated)="onUpdateRequestDate($event)" />
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
+                            (datesUpdated)="onUpdateRequestDate($event)" calendar />
                     </div>
                 </div>
             </div>
@@ -71,12 +66,7 @@
                         <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                             [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
                             name="daterange" placeholder="Select Deadline Date" [autoApply]="true"
-                            formControlName="deadlinePayment" [attr.disabled]="isDisabled" />
-                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                            <span>
-                                <i class="la la-calendar"></i>
-                            </span>
-                        </span>
+                            formControlName="deadlinePayment" [attr.disabled]="isDisabled" calendar />
                     </div>
                 </div>
             </div>

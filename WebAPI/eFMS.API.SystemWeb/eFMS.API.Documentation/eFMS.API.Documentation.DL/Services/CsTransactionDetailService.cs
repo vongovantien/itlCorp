@@ -2014,15 +2014,20 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var transactionData = csTransactionRepo.Get(x => x.CurrentStatus != TermData.Canceled);
             var transactionDetailData = csTransactionDetailRepo.Get();
+            var sysUsers = sysUserRepo.Get();
             var data = from t in transactionData
-                       join d in transactionDetailData on t.Id equals d.JobId
+                       join d in transactionDetailData on t.Id equals d.JobId into csDGrps
+                       from csDGrp in csDGrps.DefaultIfEmpty()
+                       join user in sysUsers on csDGrp.UserCreated equals user.Id
                        select new CsTransactionDetailModel
                        {
-                           Id = d.Id,
+                           Id = csDGrp.Id,
                            TransactionType = t.TransactionType,
-                           Hwbno = d.Hwbno,
+                           Hwbno = csDGrp.Hwbno,
                            JobNo = t.JobNo,
-                           JobId = d.JobId
+                           JobId = csDGrp.JobId,
+                           UserCreated = user.Username,
+                           DatetimeCreated = csDGrp.DatetimeCreated
                        };
             return data;
         }

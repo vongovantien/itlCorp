@@ -180,7 +180,7 @@
                         [ngClass]="{'m-form__group has-danger':(freightPayment.dirty && !freightPayment.valid) || (isSubmitted && !freightPayment.valid)}">
                         <label required>Freight Payment </label>
                         <ng-select class="custom" placeholder="Please Select" formControlName="freightPayment"
-                            (change)="onSelectDataFormInfo($event, 'freightPayment')" [clearable]="false"
+                            (ngModelChange)="onSelectDataFormInfo($event, 'freightPayment')" [clearable]="false"
                             [items]="termTypes"></ng-select>
                     </div>
                 </div>
