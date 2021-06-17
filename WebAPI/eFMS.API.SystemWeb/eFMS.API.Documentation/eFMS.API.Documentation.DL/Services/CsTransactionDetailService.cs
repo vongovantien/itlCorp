@@ -226,13 +226,15 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             shipmentOtherChargeService.Add(model.OtherCharges);
                         }
-                        if(!string.IsNullOrEmpty(houseBill.SaleManId))
-                        {
-                            SendEmailNewHouseToSales(houseBill);
-                        }
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    //Send email to salesman
+                    if (!string.IsNullOrEmpty(houseBill.SaleManId))
+                    {
+                        SendEmailNewHouseToSales(houseBill);
+                    }
                     return hs;
 
                 }
@@ -252,6 +254,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
         {
             var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
+            var changedSalesman = false;
             if (hb == null)
             {
                 return new HandleState("Housebill not found !");
@@ -264,6 +267,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserModified = currentUser.UserID;
             if (model.SaleManId != hb.SaleManId)
             {
+                changedSalesman = true;
                 var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
                 if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                 {
@@ -340,6 +344,11 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsAdvanceRq = UpdateHblAdvanceRequest(model);
                     }
                     trans.Commit();
+                    //Send email to salesman
+                    if (changedSalesman && !string.IsNullOrEmpty(houseBill.SaleManId))
+                    {
+                        SendEmailNewHouseToSales(houseBill);
+                    }
                     return isUpdateDone;
                 }
                 catch (Exception ex)
@@ -2349,8 +2358,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var _emailFormat = @"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>"
                                         + "<p><i><b>Dear {0},</b></i></p>"
                                         + "<p>"
-                                        + "<div>You have a <b>{1}</b> Shipment that need to key Selling rate as info bellow</div>"
-                                        + "<div><i>Bạn có lô hàng <b>{1}</b> cần nhập giá bán với thông tin như sau</i></div>"
+                                        + "<div>You have a <b>{1}</b> Shipment that need to key Selling rate as info bellow:</div>"
+                                        + "<div><i>Bạn có lô hàng <b>{1}</b> cần nhập giá bán với thông tin như sau:</i></div>"
                                         + "</p>"
                                         + "<ul>"
                                         + "<li><i>Job No: {2}</i></li>"
@@ -2371,7 +2380,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var customerInfo = catPartnerRepo.Get(x => x.Id == transDetail.CustomerId).FirstOrDefault();
                 var etdEta = transDetail.Etd?.ToString("dd-MM-yyyy") + (transDetail.Etd.HasValue && transDetail.Eta.HasValue ? "/" : string.Empty)
                     + transDetail.Eta?.ToString("dd-MM-yyyy");
-                var url = string.Format("{0}{1}/#/home/documentation/{2}/{3}/hbl?selected={3}", webUrl.Value.Url.ToString(), "en", GetServiceNamePath(csTransaction.TransactionType), csTransaction.Id, transDetail.Id);
+                var url = string.Format("{0}{1}/#/home/documentation/{2}/{3}/hbl?selected={4}", webUrl.Value.Url.ToString(), "en", Common.CustomData.ServiceModulePath.Where(x => x.Value == csTransaction.TransactionType).First().DisplayName, csTransaction.Id, transDetail.Id);
                 var logoUrl = apiUrl.Value.Url.ToString().Replace("Documentation", "") + "ReportPreview/Images/logo-eFMS.png";
 
                 _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etdEta, url, logoUrl);
@@ -2393,47 +2402,6 @@ namespace eFMS.API.Documentation.DL.Services
                 var hsSm = sendEmailHistoryRepository.SubmitChanges();
                 #endregion
             }
-        }
-
-        /// <summary>
-        /// Get service module in link
-        /// </summary>
-        /// <param name="_serviceType"></param>
-        /// <returns></returns>
-        private string GetServiceNamePath(string _serviceType)
-        {
-            string serviceName = string.Empty;
-            switch (_serviceType)
-            {
-                case "IT":
-                    serviceName = "inland-trucking";
-                    break;
-                case "AE":
-                    serviceName = "air-export";
-                    break;
-                case "AI":
-                    serviceName = "air-import";
-                    break;
-                case "SCE":
-                    serviceName = "sea-consol-export";
-                    break;
-                case "SCI":
-                    serviceName = "sea-consol-import";
-                    break;
-                case "SFE":
-                    serviceName = "sea-fcl-export";
-                    break;
-                case "SFI":
-                    serviceName = "sea-fcl-import";
-                    break;
-                case "SLE":
-                    serviceName = "sea-lcl-export";
-                    break;
-                case "SLI":
-                    serviceName = "sea-lcl-import";
-                    break;
-            }
-            return serviceName;
         }
     }
 }
