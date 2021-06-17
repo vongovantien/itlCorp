@@ -94,12 +94,12 @@ namespace eFMS.API.Accounting.DL.Services
             // Tìm theo status
             if (!string.IsNullOrEmpty(criteria.Status))
             {
-                query = query.And(x => criteria.Status.Contains(x.Status));
+                query = query.And(x => criteria.Status == x.Status);
             }
 
             if (!string.IsNullOrEmpty(criteria.SyncStatus))
             {
-                query = query.And(x => criteria.Status.Contains(x.SyncStatus));
+                query = query.And(x => criteria.SyncStatus == x.SyncStatus);
             }
 
             // Tìm theo ngày sync/ngày thu
@@ -598,8 +598,8 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
             _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
 
-            _payment.PaymentAmountVnd = paymentGroupOBH.PaidAmountVnd ?? 0;
-            _payment.PaymentAmountUsd = paymentGroupOBH.PaidAmountUsd ?? 0;
+            _payment.PaymentAmountVnd = _payment.TotalPaidVnd = paymentGroupOBH.PaidAmountVnd ?? 0;
+            _payment.PaymentAmountUsd = _payment.TotalPaidUsd = paymentGroupOBH.PaidAmountUsd ?? 0;
             _payment.BalanceVnd = (paymentGroupOBH.UnpaidAmountVnd ?? 0) - (paymentGroupOBH.PaidAmountVnd ?? 0);
             _payment.BalanceUsd = (paymentGroupOBH.UnpaidAmountUsd ?? 0) - (paymentGroupOBH.PaidAmountUsd ?? 0);
             _payment.UnpaidPaymentAmountVnd = paymentGroupOBH.UnpaidAmountVnd ?? 0;
@@ -1458,7 +1458,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria)
         {
-            var invoiceList = criteria.List;
+            var invoiceList = criteria.List.OrderByDescending(x => x.Type == "OBH").ToList();
             var paidVnd = criteria.PaidAmountVnd;
             var paidUsd = criteria.PaidAmountUsd;
             foreach (var invoice in invoiceList)

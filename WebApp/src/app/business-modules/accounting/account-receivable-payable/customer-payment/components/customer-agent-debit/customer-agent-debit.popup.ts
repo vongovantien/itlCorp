@@ -6,17 +6,14 @@ import { Customer, ReceiptInvoiceModel } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { JobConstants, ChargeConstants } from '@constants';
 import { formatDate } from '@angular/common';
-import { NgProgress } from '@ngx-progressbar/core';
-import { finalize, catchError, takeUntil, pluck } from 'rxjs/operators';
+import { catchError, takeUntil, pluck } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
-import { ActivatedRoute } from '@angular/router';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
-import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -25,6 +22,7 @@ import { CommonEnum } from '@enums';
 
 export class CustomerAgentDebitPopupComponent extends PopupBase {
     @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
+
     typeSearch: AbstractControl;
     partnerId: AbstractControl;
     referenceNo: AbstractControl;
@@ -47,7 +45,28 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     listCreditInvoice: ReceiptInvoiceModel[] = [];
     listDebitInvoice: ReceiptInvoiceModel[] = [];
     customers: Observable<Customer[]>;
-    headersAgency: CommonInterface.IHeaderTable[];
+
+    headersAgency: CommonInterface.IHeaderTable[] = [
+        { title: 'Reference No', field: 'referenceNo', sortable: true },
+        { title: 'Type', field: 'type', sortable: true },
+        { title: 'Invoice No', field: 'invoiceNo', sortable: true },
+        { title: 'JOB', field: 'jobNo', sortable: true },
+        { title: 'HBL', field: 'hbl', sortable: true },
+        { title: 'MBL', field: 'mbl', sortable: true },
+        { title: 'PartnerId', field: 'taxCode', sortable: true },
+        { title: 'Partner Name', field: 'partnerName', sortable: true },
+        { title: 'Amount', field: 'amount', sortable: true },
+        { title: 'Unpaid Amount', field: 'unpaid', sortable: true },
+        { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true },
+        { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true },
+        { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
+        { title: 'Payment Term', field: 'paymentTerm', sortable: true },
+        { title: 'Due Date', field: 'dueDate', sortable: true },
+        { title: 'Payment Status', field: 'paymentStatus', sortable: true },
+        { title: 'Bu Handle', field: 'departmentName', sortable: true },
+        { title: 'Office', field: 'officeName', sortable: true },
+    ];
+
     agencyDebitModel: AgencyReceiptModel = new AgencyReceiptModel();
     checkAll = false;
     checkAllAgency = false;
@@ -73,21 +92,18 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
-        private _progressService: NgProgress,
         private _store: Store<IAppState>,
         private _toastService: ToastrService,
-        private _activedRoute: ActivatedRoute
     ) {
         super();
-        this._progressRef = this._progressService.ref();
         this.requestSort = this.sortDebit;
-
-
     }
 
     ngOnInit() {
         this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
+
         this.initForm();
+
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
@@ -105,29 +121,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             { title: 'Bu Handle', field: 'departmentName', sortable: true },
             { title: 'Office', field: 'officeName', sortable: true },
         ];
-
-        this.headersAgency = [
-            { title: 'Reference No', field: 'referenceNo', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
-            { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-            { title: 'JOB', field: 'jobNo', sortable: true },
-            { title: 'HBL', field: 'hbl', sortable: true },
-            { title: 'MBL', field: 'mbl', sortable: true },
-            { title: 'PartnerId', field: 'taxCode', sortable: true },
-            { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Unpaid Amount', field: 'unpaid', sortable: true },
-            { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true },
-            { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true },
-            { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
-            { title: 'Payment Term', field: 'paymentTerm', sortable: true },
-            { title: 'Due Date', field: 'dueDate', sortable: true },
-            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
-            { title: 'Bu Handle', field: 'departmentName', sortable: true },
-            { title: 'Office', field: 'officeName', sortable: true },
-        ];
-
     }
+
     initForm() {
         this.formSearch = this._fb.group({
             partnerId: [null, Validators.required],
@@ -145,15 +140,10 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.partnerId = this.formSearch.controls['partnerId'];
     }
 
-    getCustomer() {
-        this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-    }
-
     onSelectDataFormInfo(data: any) {
         this._catalogueRepo.getAgreement(
-            {
-                partnerId: data.id, status: true
-            }).subscribe(
+            { partnerId: data.id, status: true })
+            .subscribe(
                 (d: any[]) => {
                     if (!!d && !!d.length) {
                         this.partnerId.setValue(data.id);
@@ -162,13 +152,11 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                         }
                     } else {
                         this.partnerId.setValue(null);
-                        this._toastService.warning("Partner does not have any agreement");
+                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
                         return false;
                     }
-
                 }
             );
-
     }
 
     checkAllChange() {
@@ -195,41 +183,34 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 dateType: this.dateType.value,
                 service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
             };
-            this._progressRef.start();
             if (this.type === 'Customer') {
-                this._accountingRepo.getDataIssueCustomerPayment(body).pipe(
-                    catchError(this.catchError),
-                    finalize(() => {
-                        this._progressRef.complete();
-                    })
-                ).subscribe(
-                    (res: ReceiptInvoiceModel[]) => {
-                        if (!!res) {
-                            this.listDebit = res || [];
-                            this.filterList();
-                        }
-                    },
-                );
+                this._accountingRepo.getDataIssueCustomerPayment(body)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: ReceiptInvoiceModel[]) => {
+                            if (!!res) {
+                                this.listDebit = res || [];
+                                this.filterList();
+                            }
+                        },
+                    );
             } else {
-                this._accountingRepo.getDataIssueAgencyPayment(body).pipe(
-                    catchError(this.catchError),
-                    finalize(() => {
-                        this._progressRef.complete();
-                    })
-                ).subscribe(
-                    (res: AgencyReceiptModel) => {
-                        if (!!res) {
-                            this.agencyDebitModel = res;
-                            this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
-                                element.isSelected = false;
-                                element.invoices.forEach(x => {
-                                    x.isSelected = false;
+                this._accountingRepo.getDataIssueAgencyPayment(body)
+                    .pipe(catchError(this.catchError))
+                    .subscribe(
+                        (res: AgencyReceiptModel) => {
+                            if (!!res) {
+                                this.agencyDebitModel = res;
+                                this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
+                                    element.isSelected = false;
+                                    element.invoices.forEach(x => {
+                                        x.isSelected = false;
+                                    });
                                 });
-                            });
-                            this.filterList();
-                        }
-                    },
-                );
+                                this.filterList();
+                            }
+                        },
+                    );
             }
 
         }
@@ -242,7 +223,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 if (!!result) {
                     this.listCreditInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        result.every(t => {
+                        result.every((t: { [x: string]: string; }) => {
                             return s["refNo"] !== t["refNo"]
                         }));
                     this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
@@ -275,7 +256,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                 if (!!result) {
                     this.listDebitInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        result.every(t => {
+                        result.every((t: { [x: string]: string; }) => {
                             return s["refNo"] !== t["refNo"];
                         }));
 
@@ -304,8 +285,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
                     })
 
                     this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
-
-
                 }
             })
     }
@@ -355,6 +334,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             element.totalPaidVnd = element.paidAmountVnd;
             element.totalPaidUsd = element.paidAmountUsd;
         });
+
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
         this.onAddToReceipt.emit(this.partnerId.value);
         this.hide();
