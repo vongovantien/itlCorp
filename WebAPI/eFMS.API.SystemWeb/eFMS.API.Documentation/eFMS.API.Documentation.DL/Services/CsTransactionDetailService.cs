@@ -29,7 +29,7 @@ namespace eFMS.API.Documentation.DL.Services
     public class CsTransactionDetailService : RepositoryBase<CsTransactionDetail, CsTransactionDetailModel>, ICsTransactionDetailService
     {
         private readonly IOptions<WebUrl> webUrl;
-        private readonly IUserBaseService userBaseService;
+        private readonly IOptions<ApiUrl> apiUrl;
         readonly IContextBase<CsTransaction> csTransactionRepo;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
@@ -54,10 +54,12 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+        private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
             IOptions<WebUrl> wUrl,
+            IOptions<ApiUrl> aUrl,
             IContextBase<CsTransaction> csTransaction,
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<CatPartner> catPartner,
@@ -81,9 +83,11 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
-            IContextBase<SysEmployee> sysEmployeeRepo) : base(repository, mapper)
+            IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             webUrl = wUrl;
+            apiUrl = aUrl;
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
             catPartnerRepo = catPartner;
@@ -108,6 +112,7 @@ namespace eFMS.API.Documentation.DL.Services
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             sysEmployeeRepository = sysEmployeeRepo;
+            sendEmailHistoryRepository = sendEmailHistoryRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -221,7 +226,10 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             shipmentOtherChargeService.Add(model.OtherCharges);
                         }
-
+                        if(!string.IsNullOrEmpty(houseBill.SaleManId))
+                        {
+                            SendEmailNewHouseToSales(houseBill);
+                        }
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
@@ -2322,97 +2330,105 @@ namespace eFMS.API.Documentation.DL.Services
         }
 
         /// <summary>
-        /// 
+        /// Send email when create house bill
         /// </summary>
+        /// <param name="transDetail"></param>
         private void SendEmailNewHouseToSales(CsTransactionDetail transDetail)
         {
-            using (var trans = DataContext.DC.Database.BeginTransaction())
+            var salesmanInfo = sysUserRepo.Get(x => x.Id == transDetail.SaleManId).FirstOrDefault();
+            var employeeInfo = sysEmployeeRepository.Get(x => x.Id == salesmanInfo.EmployeeId).FirstOrDefault();
+            var csTransaction = csTransactionRepo.Get(tr => tr.Id == transDetail.JobId).FirstOrDefault();
+            if (!string.IsNullOrEmpty(employeeInfo.Email) && csTransaction.IsHawb == false)
             {
-                try
+                string subject = string.Format(@"Keying Selling Request - {0}", transDetail.Hwbno);
+                var _emailFormat = @"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>"
+                                        + "<p><i><b>Dear {0},</b></i></p>"
+                                        + "<p>"
+                                        + "<div>You have a <b>{1}</b> Shipment that need to key Selling rate as info bellow</div>"
+                                        + "<div><i>Bạn có lô hàng <b>{1}</b> cần nhập giá bán với thông tin như sau</i></div>"
+                                        + "</p>"
+                                        + "<ul>"
+                                        + "<li><i>Job No: {2}</i></li>"
+                                        + "<li><i>HBL / HAWB : {3}</i></li>"
+                                        + "<li><i>Customer/Khách hàng: {4}</i></li>"
+                                        + "<li><i>ETD/ETA: {5}</i></li>"
+                                        + "</ul>"
+
+                                        + "<p>"
+                                        + "<div><i>You can <span><a href='{6}' target='_blank'>click here</a></span> to view detail.</i></div>"
+                                        + "<div><i>Bạn click <span><a href='{6}' target='_blank'>vào đây</a></span> để xem chi tiết.</i></div>"
+                                        + "</p>"
+                                        + "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{7}'/></p>" +
+                                     "</div>";
+
+
+                var serviceName = Common.CustomData.Services.Where(s => s.Value == csTransaction.TransactionType).FirstOrDefault()?.DisplayName;
+                var customerInfo = catPartnerRepo.Get(x => x.Id == transDetail.CustomerId).FirstOrDefault();
+                var etdEta = transDetail.Etd?.ToString("dd-MM-yyyy") + (transDetail.Etd.HasValue && transDetail.Eta.HasValue ? "/" : string.Empty)
+                    + transDetail.Eta?.ToString("dd-MM-yyyy");
+                var url = string.Format("{0}{1}/#/home/documentation/{2}/{3}/hbl?selected={3}", webUrl.Value.Url.ToString(), "en", GetServiceNamePath(csTransaction.TransactionType), csTransaction.Id, transDetail.Id);
+                var logoUrl = apiUrl.Value.Url.ToString().Replace("Documentation", "") + "ReportPreview/Images/logo-eFMS.png";
+
+                _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etdEta, url, logoUrl);
+                List<string> toEmails = new List<string> { employeeInfo.Email };
+                List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" };
+                var sendMailResult = SendMail.Send(subject, _emailFormat, toEmails, null, null, emailBCCs);
+                #region Log Send email
+                var logSendMail = new SysSentEmailHistory
                 {
-                    var _emailFormat = @"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>"
-                                            + "<p><i><b>Dear {0}</b></i></p>"
-                                            + "<p>"
-                                            + "<div>You have a {1} Shipment that need to key Selling rate as info bellow</div>"
-                                            + "<div>Bạn có lô hàng {1} cần nhập giá bán với thông tin như sau</div>"
-                                            + "</p>"
-
-                                            + "<ul>"
-                                            + "Job No: {2}"
-                                            + "HBL / HAWB : {3}"
-                                            + "Customer/Khách hàng: {4}"
-                                            + "ETD/ETA: {5}"
-                                            + "</ul>"
-
-                                            + "<p>"
-                                            + "<div>You can <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>click here</a></span> to view detail.</div>"
-                                            + "<div><i>Bạn click <span><a href='[Url]/[lang]/#/[UrlFunc]' target='_blank'>vào đây</a></span> để xem chi tiết </i></div>"
-                                            + "</p>"
-                                            + "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='[logoEFMS]'/></p>" +
-                                         "</div>";
-                    var salesmanInfo = sysUserRepo.Get(x => x.Id == transDetail.SaleManId).FirstOrDefault();
-                    var employeeInfo = sysEmployeeRepository.Get(x => x.Id == salesmanInfo.EmployeeId).FirstOrDefault();
-                    var csTransaction = csTransactionRepo.Get(tr => tr.Id == transDetail.JobId).FirstOrDefault();
-                    var serviceName = Common.CustomData.Services.Where(s => s.Value == csTransaction.TransactionType).FirstOrDefault()?.DisplayName;
-                    var customerInfo = catPartnerRepo.Get(x => x.Id == transDetail.CustomerId).FirstOrDefault();
-                    var etaEtd = (transDetail.Eta.HasValue ? transDetail.Eta.Value.ToString("dd/MM/yyyy") + "/" : string.Empty)
-                        + transDetail.Etd?.ToString("dd/MM/yyyy");
-                    var prefixService = string.Empty;
-                    if (csTransaction.TransactionType.Contains("IT"))
-                    {
-                        prefixService += "inland-trucking";
-                    }
-                    else if (csTransaction.TransactionType.Contains("AE"))
-                    {
-                        prefixService += "air-export";
-                    }
-                    else if (csTransaction.TransactionType.Contains("AI"))
-                    {
-                        prefixService += "air-import";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SEC"))
-                    {
-                        prefixService += "sea-consol-export";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SIC"))
-                    {
-                        prefixService += "sea-consol-import";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SEF"))
-                    {
-                        prefixService += "sea-fcl-export";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SIF"))
-                    {
-                        prefixService += "sea-fcl-import";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SEL"))
-                    {
-                        prefixService += "sea-lcl-export";
-                    }
-                    else if (csTransaction.TransactionType.Contains("SIL"))
-                    {
-                        prefixService += "sea-lcl-import";
-                    }
-                    var url = string.Format("{0}/{1}/#/home/documentation/{2}/{3}", webUrl.Value.Url.ToString(), "en", prefixService, transDetail.Id);
-                    _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etaEtd, url);
-
-                    List<string> emails = new List<string>();
-                    var employeeIdCurrentUser = userBaseService.GetEmployeeIdOfUser(currentUser.UserID);
-                    var emailCurrentUser = userBaseService.GetEmployeeByEmployeeId(employeeIdCurrentUser)?.Email;
-                    emails.Add(emailCurrentUser);
-
-                }
-                catch (Exception ex)
-                {
-                    trans.Rollback();
-                }
-                finally
-                {
-                    trans.Dispose();
-                }
+                    SentUser = SendMail._emailFrom,
+                    Receivers = string.Join("; ", toEmails),
+                    Bccs = string.Join("; ", emailBCCs),
+                    Subject = subject,
+                    Sent = sendMailResult,
+                    SentDateTime = DateTime.Now,
+                    Body = _emailFormat
+                };
+                var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+                var hsSm = sendEmailHistoryRepository.SubmitChanges();
+                #endregion
             }
         }
 
+        /// <summary>
+        /// Get service module in link
+        /// </summary>
+        /// <param name="_serviceType"></param>
+        /// <returns></returns>
+        private string GetServiceNamePath(string _serviceType)
+        {
+            string serviceName = string.Empty;
+            switch (_serviceType)
+            {
+                case "IT":
+                    serviceName = "inland-trucking";
+                    break;
+                case "AE":
+                    serviceName = "air-export";
+                    break;
+                case "AI":
+                    serviceName = "air-import";
+                    break;
+                case "SCE":
+                    serviceName = "sea-consol-export";
+                    break;
+                case "SCI":
+                    serviceName = "sea-consol-import";
+                    break;
+                case "SFE":
+                    serviceName = "sea-fcl-export";
+                    break;
+                case "SFI":
+                    serviceName = "sea-fcl-import";
+                    break;
+                case "SLE":
+                    serviceName = "sea-lcl-export";
+                    break;
+                case "SLI":
+                    serviceName = "sea-lcl-import";
+                    break;
+            }
+            return serviceName;
+        }
     }
 }
