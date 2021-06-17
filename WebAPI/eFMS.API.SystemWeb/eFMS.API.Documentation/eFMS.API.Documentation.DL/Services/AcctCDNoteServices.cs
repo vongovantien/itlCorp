@@ -994,7 +994,8 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (cdNote.SyncStatus == "Synced") return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SYNCED]);
                     var charges = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
-                    var isOtherSOA = charges.Where(x => !string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)).Any();
+                    var isOtherSOA = charges.Where(x => (x.CreditNo == cdNote.Code && !string.IsNullOrEmpty(x.PaySoano))
+                                                  || (x.DebitNo == cdNote.Code && (!string.IsNullOrEmpty(x.Soano) || x.AcctManagementId != null))).Any();
                     if (isOtherSOA == true)
                     {
                         hs = new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_ALLOW_DELETED_HAD_SOA]);
