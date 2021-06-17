@@ -51,7 +51,8 @@
                 <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
                     <label class="form-control-label" required> Exchange Rate </label>
                     <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency (change)="onSelectDataFormInfo($event,'exchangeRate')">
+                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
+                        (change)="onSelectDataFormInfo($event,'exchangeRate')">
                 </div>
             </div>
         </div>
@@ -81,11 +82,22 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
-                    <label class="form-control-label" required>Paid Amount USD</label>
-                    <input type="number" class="form-control m-input m-input--square text-success"
-                        formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
-                        (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
+                            <label class="form-control-label" required>Paid Amount USD</label>
+                            <input type="number" class="form-control m-input m-input--square text-success"
+                                formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
+                                (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label for="">Auto convert {{isAutoConvert.value | json}}</label>
+                            <app-switch size="md" class="success" formControlName="isAutoConvert"></app-switch>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,12 +107,12 @@
                     <div class="col-lg-6">
                         <label class="form-control-label">Final Paid Amount USD</label>
                         <input type="text" class="form-control m-input m-input--square text-primary"
-                            formControlName="finalPaidAmountUSD" currencyMask [attr.disabled]="true">
+                            formControlName="finalPaidAmountUSD" readonly formatDecimalFormControl>
                     </div>
                     <div class="col-lg-6">
                         <label class="form-control-label">Final Paid Amount VND</label>
                         <input type="text" class="form-control m-input m-input--square text-primary"
-                            formControlName="finalPaidAmountVND" currencyMask [attr.disabled]="true">
+                            formControlName="finalPaidAmountVND" formatDecimalFormControl readonly format="1.0-3">
                     </div>
                 </div>
                 <div class="row">

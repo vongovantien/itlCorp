@@ -1,4 +1,4 @@
-import { Directive, ElementRef } from '@angular/core';
+import { Directive, ElementRef, Input } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { takeUntil } from 'rxjs/operators';
@@ -10,6 +10,15 @@ import { DestroyService } from '@services';
 })
 export class FormatDecimalFormControlDirective {
 
+    @Input() set(format: string) {
+        this._format = format;
+    }
+
+    private _format = '.0-3';
+
+    get format() {
+        return this._format;
+    }
     constructor(
         private ngControl: NgControl,
         private decimalPipe: DecimalPipe,
@@ -23,7 +32,7 @@ export class FormatDecimalFormControlDirective {
             .pipe(takeUntil(this._destroyService))
             .subscribe(
                 (value: string) => {
-                    this._el.nativeElement.value = this.decimalPipe.transform(value, '.0-3');
+                    this._el.nativeElement.value = this.decimalPipe.transform(value, this.format);
                 }
             );
     }
