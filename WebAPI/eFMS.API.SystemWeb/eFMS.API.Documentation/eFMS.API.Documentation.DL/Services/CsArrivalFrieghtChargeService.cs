@@ -41,7 +41,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatChargeGroup> chargeGroupRepository;
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> webUrl;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -64,7 +64,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysOffice> sysOffice,
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysUserLevel> userlevelRepo,
-            IOptions<WebUrl> url,
+            IOptions<ApiUrl> url,
             IContextBase<SysImage> sysImageRepo,
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
