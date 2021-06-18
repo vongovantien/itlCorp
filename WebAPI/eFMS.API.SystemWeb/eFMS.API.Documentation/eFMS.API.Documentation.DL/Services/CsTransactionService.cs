@@ -745,6 +745,10 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            if(detail == null)
+            {
+                return 0;
+            }
             var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
             var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
 
