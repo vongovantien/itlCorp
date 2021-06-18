@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
@@ -17,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -26,6 +28,8 @@ namespace eFMS.API.Documentation.DL.Services
 {
     public class CsTransactionDetailService : RepositoryBase<CsTransactionDetail, CsTransactionDetailModel>, ICsTransactionDetailService
     {
+        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         readonly IContextBase<CsTransaction> csTransactionRepo;
         readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         readonly IContextBase<CatPartner> catPartnerRepo;
@@ -49,9 +53,13 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+        private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
+            IOptions<WebUrl> wUrl,
+            IOptions<ApiUrl> aUrl,
             IContextBase<CsTransaction> csTransaction,
             IContextBase<CsMawbcontainer> csMawbcontainer,
             IContextBase<CatPartner> catPartner,
@@ -74,8 +82,12 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
+            webUrl = wUrl;
+            apiUrl = aUrl;
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
             catPartnerRepo = catPartner;
@@ -99,6 +111,8 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            sysEmployeeRepository = sysEmployeeRepo;
+            sendEmailHistoryRepository = sendEmailHistoryRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -212,10 +226,15 @@ namespace eFMS.API.Documentation.DL.Services
                             });
                             shipmentOtherChargeService.Add(model.OtherCharges);
                         }
-
                     }
                     DataContext.SubmitChanges();
                     trans.Commit();
+
+                    //Send email to salesman
+                    if (!string.IsNullOrEmpty(houseBill.SaleManId))
+                    {
+                        SendEmailNewHouseToSales(houseBill);
+                    }
                     return hs;
 
                 }
@@ -235,6 +254,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState UpdateTransactionDetail(CsTransactionDetailModel model)
         {
             var hb = DataContext.Where(x => x.Id == model.Id).FirstOrDefault();
+            var changedSalesman = false;
             if (hb == null)
             {
                 return new HandleState("Housebill not found !");
@@ -247,6 +267,7 @@ namespace eFMS.API.Documentation.DL.Services
             model.UserModified = currentUser.UserID;
             if (model.SaleManId != hb.SaleManId)
             {
+                changedSalesman = true;
                 var dataUserLevels = userlevelRepository.Get(x => x.UserId == model.SaleManId).ToList();
                 if (dataUserLevels.Select(t => t.GroupId).Count() >= 1)
                 {
@@ -323,6 +344,11 @@ namespace eFMS.API.Documentation.DL.Services
                         HandleState hsAdvanceRq = UpdateHblAdvanceRequest(model);
                     }
                     trans.Commit();
+                    //Send email to salesman
+                    if (changedSalesman && !string.IsNullOrEmpty(houseBill.SaleManId))
+                    {
+                        SendEmailNewHouseToSales(houseBill);
+                    }
                     return isUpdateDone;
                 }
                 catch (Exception ex)
@@ -2315,6 +2341,67 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return errorCode;
+        }
+
+        /// <summary>
+        /// Send email when create house bill
+        /// </summary>
+        /// <param name="transDetail"></param>
+        private void SendEmailNewHouseToSales(CsTransactionDetail transDetail)
+        {
+            var salesmanInfo = sysUserRepo.Get(x => x.Id == transDetail.SaleManId).FirstOrDefault();
+            var employeeInfo = sysEmployeeRepository.Get(x => x.Id == salesmanInfo.EmployeeId).FirstOrDefault();
+            var csTransaction = csTransactionRepo.Get(tr => tr.Id == transDetail.JobId).FirstOrDefault();
+            if (!string.IsNullOrEmpty(employeeInfo.Email) && csTransaction.IsHawb == false)
+            {
+                string subject = string.Format(@"Keying Selling Request - {0}", transDetail.Hwbno);
+                var _emailFormat = @"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>"
+                                        + "<p><i><b>Dear {0},</b></i></p>"
+                                        + "<p>"
+                                        + "<div>You have a <b>{1}</b> Shipment that need to key Selling rate as info bellow:</div>"
+                                        + "<div><i>Bạn có lô hàng <b>{1}</b> cần nhập giá bán với thông tin như sau:</i></div>"
+                                        + "</p>"
+                                        + "<ul>"
+                                        + "<li><i>Job No: {2}</i></li>"
+                                        + "<li><i>HBL / HAWB : {3}</i></li>"
+                                        + "<li><i>Customer/Khách hàng: {4}</i></li>"
+                                        + "<li><i>ETD/ETA: {5}</i></li>"
+                                        + "</ul>"
+
+                                        + "<p>"
+                                        + "<div><i>You can <span><a href='{6}' target='_blank'>click here</a></span> to view detail.</i></div>"
+                                        + "<div><i>Bạn click <span><a href='{6}' target='_blank'>vào đây</a></span> để xem chi tiết.</i></div>"
+                                        + "</p>"
+                                        + "<p>Thanks and Regards,<p><p><b>eFMS System,</b></p><p><img src='{7}'/></p>" +
+                                     "</div>";
+
+
+                var serviceName = Common.CustomData.Services.Where(s => s.Value == csTransaction.TransactionType).FirstOrDefault()?.DisplayName;
+                var customerInfo = catPartnerRepo.Get(x => x.Id == transDetail.CustomerId).FirstOrDefault();
+                var etdEta = transDetail.Etd?.ToString("dd-MM-yyyy") + (transDetail.Etd.HasValue && transDetail.Eta.HasValue ? "/" : string.Empty)
+                    + transDetail.Eta?.ToString("dd-MM-yyyy");
+                var url = string.Format("{0}{1}/#/home/documentation/{2}/{3}/hbl?selected={4}", webUrl.Value.Url.ToString(), "en", Common.CustomData.ServiceModulePath.Where(x => x.Value == csTransaction.TransactionType).First().DisplayName, csTransaction.Id, transDetail.Id);
+                var logoUrl = apiUrl.Value.Url.ToString().Replace("Documentation", "") + "ReportPreview/Images/logo-eFMS.png";
+
+                _emailFormat = string.Format(_emailFormat, employeeInfo.EmployeeNameEn, serviceName, csTransaction.JobNo, transDetail.Hwbno, customerInfo.PartnerNameEn, etdEta, url, logoUrl);
+                List<string> toEmails = new List<string> { employeeInfo.Email };
+                List<string> emailBCCs = new List<string> { "lynne.loc@itlvn.com", "alex.phuong@itlvn.com", "luis.quang@itlvn.com" };
+                var sendMailResult = SendMail.Send(subject, _emailFormat, toEmails, null, null, emailBCCs);
+                #region Log Send email
+                var logSendMail = new SysSentEmailHistory
+                {
+                    SentUser = SendMail._emailFrom,
+                    Receivers = string.Join("; ", toEmails),
+                    Bccs = string.Join("; ", emailBCCs),
+                    Subject = subject,
+                    Sent = sendMailResult,
+                    SentDateTime = DateTime.Now,
+                    Body = _emailFormat
+                };
+                var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
+                var hsSm = sendEmailHistoryRepository.SubmitChanges();
+                #endregion
+            }
         }
     }
 }

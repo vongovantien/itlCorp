@@ -13,9 +13,10 @@ import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
-import { takeUntil, take, catchError, finalize } from "rxjs/operators";
+import { takeUntil, take, catchError, finalize, map } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
+import { combineLatest } from 'rxjs';
 
 
 @Directive()
@@ -36,6 +37,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
     selectedHbl: CsTransactionDetail;
     selectedTabSurcharge: string = 'BUY';
     selectedIndexHBL: number = -1;
+    selectedHblId: string = null;
 
     shipmentDetail: CsTransaction;
 
@@ -62,15 +64,22 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
 
 
     ngOnInit() {
-        this._activedRoute.params
-            .pipe(takeUntil(this.ngUnsubscribe), take(1))
-            .subscribe((param: Params) => {
+        this.subscription = combineLatest([
+            this._activedRoute.params,
+            this._activedRoute.queryParams
+        ]).pipe(
+            map(([params, qParams]) => ({ ...params, ...qParams })),
+            takeUntil(this.ngUnsubscribe)
+        ).subscribe(
+            (param: any) => {
                 if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
+                    if(param.selected){
+                        this.selectedHblId = param.selected;
+                    }
 
                     this._store.dispatch(new GetListHBLAction({ jobId: this.jobId }));
                     this._store.dispatch(new TransactionGetDetailAction(this.jobId));
-
                     this.getDetailShipment();
                     this.getHouseBills(this.jobId);
                 } else {
@@ -133,7 +142,14 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                         this.totalCW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cw, 0);
                         this.totalQty = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.packageQty, 0);
 
-                        this.selectHBL(this.houseBills[0]);
+                        if(this.selectedHblId){
+                            if(!this.houseBills.some((house: HouseBill)=> house.id === this.selectedHblId)){
+                                this._toastService.error('This House Bill does not exist!');
+                            }
+                            this.selectHBL(this.houseBills.filter((house: HouseBill)=> house.id === this.selectedHblId)[0]);
+                        }else{
+                            this.selectHBL(this.houseBills[0]);
+                        }
                     } else {
                         this.selectedHbl = null;
 

@@ -218,6 +218,9 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                break;
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
                 break;
