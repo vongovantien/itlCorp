@@ -186,6 +186,16 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SettlementCurrency == criteria.CurrencyID);
             }
+
+            if (!string.IsNullOrEmpty(criteria.PayeeId))
+            {
+                query = query.And(x => x.Payee == criteria.PayeeId);
+            }
+
+            if (criteria.DepartmentId != null)
+            {
+                query = query.And(x => x.DepartmentId == criteria.DepartmentId);
+            }
             return query;
         }
 
