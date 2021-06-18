@@ -83,6 +83,7 @@ export class Partner {
 
     isRequestApproval: boolean = false;
     bankName: string = '';
+    bankCode: string = '';
 
     permission: PermissionPartner = new PermissionPartner();
 

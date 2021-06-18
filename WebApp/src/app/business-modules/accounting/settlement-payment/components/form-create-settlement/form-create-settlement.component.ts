@@ -34,13 +34,17 @@ export class SettlementFormCreateComponent extends AppForm {
     beneficiaryName: AbstractControl;
     bankAccountNo: AbstractControl;
     bankName: AbstractControl;
+    bankNameDescription: AbstractControl;
     advanceAmount: AbstractControl;
     balanceAmount: AbstractControl;
+    bankCode: AbstractControl;
+    dueDate: AbstractControl;
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
     methods: CommonInterface.ICommonTitleValue[];
 
     customers: any;
+    banks: Observable<any[]>;
 
     constructor(
         private _fb: FormBuilder,
@@ -56,6 +60,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.getUserLogged();
         this.getSystemUser();
         this.getCustomer();
+        this.banks = this._catalogueRepo.getListBank(null, null, { active: true });
 
     }
 
@@ -73,8 +78,11 @@ export class SettlementFormCreateComponent extends AppForm {
             'beneficiaryName': [],
             'bankAccountNo': [],
             'bankName': [],
+            'bankNameDescription': [],
             'advanceAmount': [],
-            'balanceAmount': []
+            'balanceAmount': [],
+            'bankCode': [],
+            'dueDate': []
         });
 
 
@@ -90,8 +98,11 @@ export class SettlementFormCreateComponent extends AppForm {
         this.beneficiaryName = this.form.controls['beneficiaryName'];
         this.bankAccountNo = this.form.controls['bankAccountNo'];
         this.bankName = this.form.controls['bankName'];
+        this.bankNameDescription = this.form.controls['bankNameDescription'];
         this.advanceAmount = this.form.controls['advanceAmount'];
         this.balanceAmount = this.form.controls['balanceAmount'];
+        this.bankCode = this.form.controls['bankCode'];
+        this.dueDate = this.form.controls['dueDate'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)
@@ -142,15 +153,20 @@ export class SettlementFormCreateComponent extends AppForm {
     getBeneficiaryInfo() {
         if (this.paymentMethod.value === this.methods[1] && !!this.payee.value) {
             const beneficiary = this.getPartnerById(this.payee.value);
+            console.log('beneficiary',beneficiary)
             if (!!beneficiary) {
                 this.beneficiaryName.setValue(beneficiary.partnerNameEn);
                 this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                 this.bankName.setValue(beneficiary.bankName);
+                this.bankNameDescription.setValue(beneficiary.bankName);
+                this.mapBankCode(beneficiary.bankCode);
             }
         } else {
             this.beneficiaryName.setValue(null);
             this.bankAccountNo.setValue(null);
             this.bankName.setValue(null);
+            this.bankNameDescription.setValue(null);
+            this.mapBankCode(null);
         }
     }
 
@@ -159,4 +175,16 @@ export class SettlementFormCreateComponent extends AppForm {
         return partner || null;
     }
 
+    mapBankCode(data: any){
+        this.bankCode.setValue(data);
+    }
+
+    onSelectDataFormInfo(data: any, type: string){
+        switch (type) {
+        case 'bankName':
+            this.bankName.setValue(data.id);
+            this.bankNameDescription.setValue((data as Partner).bankName);
+            break;
+        }
+    }
 }
