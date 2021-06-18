@@ -1028,5 +1028,22 @@ namespace eFMS.API.Accounting.Controllers
             var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId);
             return Ok(_result);
         }
+
+        [HttpPut]
+        [Route("CalculateBalanceSettle")]
+        public IActionResult CalculateBalanceSettle(List<string> settlementNo)
+        {
+            var result = acctSettlementPaymentService.CalculateBalanceSettle(settlementNo);
+
+            ResultHandle _result = new ResultHandle { Status = true };
+            if (result.Success)
+            {
+                _result = new ResultHandle { Status = false, Message = "Cap nhat Balance thanh cong" };
+                return Ok(_result);
+            }
+
+            return BadRequest(new ResultHandle { Status = false, Message = "Cap nhat Balance that bai" });
+
+        }
     }
 }
