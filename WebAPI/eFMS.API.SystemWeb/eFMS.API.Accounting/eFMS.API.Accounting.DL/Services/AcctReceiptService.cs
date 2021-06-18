@@ -431,9 +431,9 @@ namespace eFMS.API.Accounting.DL.Services
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
             {
-                var OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.Negative, x.CurrencyId});
+                var OBHGrp = listOBH.GroupBy(x => new { x.BillingRefNo, x.Negative, x.CurrencyId });
 
-                List< ReceiptInvoiceModel> items = OBHGrp.Select(s => new ReceiptInvoiceModel
+                List<ReceiptInvoiceModel> items = OBHGrp.Select(s => new ReceiptInvoiceModel
                 {
                     RefNo = s.Key.BillingRefNo,
                     Type = "OBH",
@@ -452,7 +452,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CompanyId = s.FirstOrDefault().CompanyInvoiceId,
                     RefIds = listOBH.Select(x => x.RefId).ToList(),
                     CreditNo = s.FirstOrDefault().CreditNo
-            }).ToList();
+                }).ToList();
 
                 paymentReceipts.AddRange(items);
             }
@@ -471,7 +471,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (acctPayment.Hblid != null && acctPayment.Hblid != Guid.Empty)
                     {
                         CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == acctPayment.Hblid)?.FirstOrDefault();
-                        if(hbl != null)
+                        if (hbl != null)
                         {
                             CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
                             _Hbl = hbl.Hwbno;
@@ -517,7 +517,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             result.CustomerName = partnerInfo?.ShortName;
-            
+
             //Số phiếu con đã reject
             var totalRejectReceiptSync = receiptSyncRepository.Get(x => x.ReceiptId == receipt.Id && x.SyncStatus == AccountingConstants.STATUS_REJECTED).Count();
             if (totalRejectReceiptSync > 0)
@@ -531,7 +531,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string _paymentStatus = string.Empty;
             AccAccountingManagement inv = acctMngtRepository.Get(x => x.Id.ToString() == Id).FirstOrDefault();
-            if(inv != null)
+            if (inv != null)
             {
                 _paymentStatus = inv.PaymentStatus;
             }
@@ -665,17 +665,17 @@ namespace eFMS.API.Accounting.DL.Services
                                 results.Add(_paymentOBH);
                             }
                         }
-                        else 
+                        else
                         {
                             AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
                             _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
                             _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
 
-                            _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; 
+                            _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
                             _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
-                           
-                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0; 
-                            remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; 
+
+                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
+                            remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
 
                             results.Add(_paymentOBH);
                         }
@@ -688,21 +688,21 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  invTemp.UnpaidAmountUsd; 
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
                                 _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;
 
-                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd; 
+                                _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
                                 _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
 
-                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0; 
-                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd?? 0; 
+                                remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
+                                remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
 
                                 results.Add(_paymentOBH);
                             }
                             else
                             {
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd =  remainOBHAmountUsd;
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
                                 _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
@@ -1003,7 +1003,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
                                     {
                                         // Cập nhật lại số tiền còn lại sau khi trừ cho hđ này
-                                        remainAmount = remainAmount - _invoiceAmountUnpaidVnd; 
+                                        remainAmount = remainAmount - _invoiceAmountUnpaidVnd;
                                     }
                                     else
                                     {
@@ -1318,7 +1318,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
-               
+
             }
             catch (Exception ex)
             {
@@ -1416,15 +1416,15 @@ namespace eFMS.API.Accounting.DL.Services
                             HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
                             // Cập nhật Netoff cho CREDIT or SOA.
                             List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
-                            if(paymentCredit.Count > 0)
+                            if (paymentCredit.Count > 0)
                             {
                                 foreach (var item in paymentCredit)
                                 {
-                                    if(item.Type == "CREDITNOTE")
+                                    if (item.Type == "CREDITNOTE")
                                     {
                                         UpdateNetOffCredit(item.RefId, false);
                                     }
-                                    if(item.Type == "CREDITSOA")
+                                    if (item.Type == "CREDITSOA")
                                     {
                                         UpdateNetOffSoa(item.RefId, false);
                                     }
@@ -1521,6 +1521,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 data.AddRange(creditNotes);
             }
+            foreach (var item in data)
+            {
+                item.DepartmentName = GetDepartmentName(item.RefNo);
+            }
             return data;
         }
         public AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
@@ -1535,25 +1539,26 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 data.Invoices.AddRange(creditNote);
             }
-            if(soaCredit != null)
+            if (soaCredit != null)
             {
                 data.Invoices.AddRange(soaCredit);
             }
-            if(debits != null)
+            if (debits != null)
             {
                 data.Invoices.AddRange(debits);
             }
-            if(obhs != null)
+            if (obhs != null)
             {
                 data.Invoices.AddRange(obhs);
             }
-            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl, g.Hblid }).Select(s=> new GroupShimentAgencyModel {
+            var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl, g.Hblid }).Select(s => new GroupShimentAgencyModel
+            {
                 Hblid = s.Key.Hblid,
-                JobNo = s.Key.JobNo, 
+                JobNo = s.Key.JobNo,
                 Mbl = s.Key.Mbl,
                 Hbl = s.Key.Hbl,
-                UnpaidAmountUsd = s.Select(t=>t.UnpaidAmountUsd).Sum(),
-                UnpaidAmountVnd = s.Select(t=>t.UnpaidAmountVnd).Sum(),
+                UnpaidAmountUsd = s.Select(t => t.UnpaidAmountUsd).Sum(),
+                UnpaidAmountVnd = s.Select(t => t.UnpaidAmountVnd).Sum(),
                 Invoices = s.ToList()
             }).ToList();
             data.GroupShipmentsAgency = groupShipmentAgency;
@@ -1572,8 +1577,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             var query = from credit in creditNotes
                         join sur in surcharges on credit.Code equals sur.CreditNo
-                        select new { credit,sur };
-            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno , g.credit, g.sur.Hblid}).Select(s=> new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
+                        select new { credit, sur };
+            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno, g.credit, g.sur.Hblid }).Select(s => new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
 
             var data = grpCreditNoteCharge.Select(se => new AgencyDebitCreditModel
             {
@@ -1633,7 +1638,7 @@ namespace eFMS.API.Accounting.DL.Services
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
                                CreditType = "CREDITNOTE",
-                               Hblid =  inv.Hblid
+                               Hblid = inv.Hblid
                            };
             return joinData;
         }
@@ -1656,7 +1661,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from soa in soas
                         join sur in surcharges on soa.Soano equals sur.PaySoano
                         select new { soa, sur };
-            var grpSoaCharge = query.GroupBy(g => new { g.soa , g.sur.Hblno,g.sur.Mblno,g.sur.JobNo, g.sur.Hblid }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
+            var grpSoaCharge = query.GroupBy(g => new { g.soa, g.sur.Hblno, g.sur.Mblno, g.sur.JobNo, g.sur.Hblid }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
             var data = grpSoaCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Soa.soa.Soano,
@@ -1737,7 +1742,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { g.inv ,g.sur.Hblno,g.sur.JobNo,g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge  = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
+            var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
@@ -1793,7 +1798,7 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
-                               RefIds = inv.RefIds, 
+                               RefIds = inv.RefIds,
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
                                JobNo = inv.JobNo,
@@ -1819,7 +1824,7 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo,g.sur.Mblno,g.sur.Hblno, g.sur.Hblid })
+            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
                 .Select(s => new { PartnerId = s.Key.PartnerId, RefNo = s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
@@ -1878,7 +1883,7 @@ namespace eFMS.API.Accounting.DL.Services
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
                                JobNo = inv.JobNo,
-                               Hbl = inv.Hbl, 
+                               Hbl = inv.Hbl,
                                Mbl = inv.Mbl,
                                Hblid = inv.Hblid
                            };
@@ -2315,12 +2320,12 @@ namespace eFMS.API.Accounting.DL.Services
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
                                DepartmentId = inv.DepartmentId,
-                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds
                            };
+          
             return joinData;
         }
 
@@ -2390,12 +2395,12 @@ namespace eFMS.API.Accounting.DL.Services
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
                                DepartmentId = inv.DepartmentId,
-                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds
                            };
+
             return joinData;
         }
 
@@ -2462,13 +2467,13 @@ namespace eFMS.API.Accounting.DL.Services
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
                                DepartmentId = inv.DepartmentId,
-                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
                                CreditType = "CREDITSOA"
                            };
+
             return joinData;
         }
 
@@ -2535,13 +2540,13 @@ namespace eFMS.API.Accounting.DL.Services
                                DueDate = inv.DueDate,
                                PaymentStatus = inv.PaymentStatus,
                                DepartmentId = inv.DepartmentId,
-                               DepartmentName = dept != null ? dept.DeptNameAbbr : null,
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
                                CreditType = "CREDITNOTE"
                            };
+
             return joinData;
         }
         #endregion -- Get Customers Debit --
@@ -2570,7 +2575,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (invoiceIds.Count > 0 || invoiceTempIds.Count > 0 || paySoaNos.Count > 0)
             {
                 Expression<Func<CsShipmentSurcharge, bool>> query = chg => false;
-                
+
                 if (invoiceIds.Count > 0)
                 {
                     query = query.Or(x => invoiceIds.Any(i => i == x.AcctManagementId));
@@ -2587,7 +2592,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             var hs = new HandleState();
             if (surcharges == null) return hs;
-            
+
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong Receipt
             hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
@@ -2599,13 +2604,45 @@ namespace eFMS.API.Accounting.DL.Services
             bool result = false;
 
             List<string> refIds = Payments.Select(x => x.RefIds).SelectMany(i => i).ToList();
-            if(refIds.Count == 0)
+            if (refIds.Count == 0)
             {
                 return result;
             }
             result = acctMngtRepository.Any(x => refIds.Contains(x.Id.ToString()) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
 
             return result;
+        }
+
+        private string GetDepartmentName(string refNo)
+        {
+            string dept = string.Empty;
+            if (string.IsNullOrEmpty(refNo))
+            {
+                return dept;
+            }
+            int? deptId = 0;
+
+            AcctCdnote cd = cdNoteRepository.Get(x => x.Code == refNo)?.FirstOrDefault();
+            if (cd != null)
+            {
+                deptId = cd.DepartmentId;
+            }
+            else
+            {
+                AcctSoa soaDebitOBH = soaRepository.Get(x => x.Soano == refNo)?.FirstOrDefault();
+                if (soaDebitOBH != null)
+                {
+                    deptId = soaDebitOBH?.DepartmentId;
+                }
+            }
+            if (deptId != 0)
+            {
+                CatDepartment department = departmentRepository.Get(x => x.Id == deptId).FirstOrDefault();
+
+                dept = department?.DeptNameAbbr;
+
+            }
+            return dept;
         }
     }
 }

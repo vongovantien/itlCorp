@@ -14,9 +14,9 @@
     <div class="m-portlet__body">
         <div class="collapse show" id="debit-list">
             <div class="table-horizontal">
-                <table class="table table-brand">
+                <table class="table table-brand table-bordered">
                     <thead app-table-header [headers]="receiptType ==='Customer' ? headers : agencyHeaders"
-                        class="text-left">
+                        class="text-center">
                         <th class="m--w-50 first">
                         </th>
                     </thead>
@@ -86,7 +86,7 @@
                                 <td ALIGN="right">
                                     {{item.totalPaidVnd | number:'1.0-3'}}
                                 </td>
-                                <td>
+                                <td ALIGN="right">
                                     {{item.totalPaidUsd | number:'1.3-3'}}
                                 </td>
                                 <td ALIGN="right">
@@ -125,7 +125,7 @@
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
                             </tr>
-                            <tr class="font-weight-bold">
+                            <tr class="font-weight-bold font-15">
                                 <td></td>
                                 <td></td>
                                 <td>Total</td>
