@@ -130,7 +130,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = csTransactionService.CheckDetailPermission(id);
-            if (result == 403) return Ok(false);
+            if (result == 403 || result == 0) return Ok(false);
             return Ok(true);
         }
 
@@ -148,7 +148,10 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
+            if(statusCode == 0)
+            {
+                return Ok();
+            }
             var data = csTransactionService.GetDetails(id);//csTransactionService.GetById(id);
             return Ok(data);
         }
