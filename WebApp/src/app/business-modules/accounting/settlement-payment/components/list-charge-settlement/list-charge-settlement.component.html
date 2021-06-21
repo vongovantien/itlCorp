@@ -144,9 +144,11 @@
                                             <!-- Phí hiện trường -->
                                             <ng-template #chargeFromShipmentTpl>
                                                 <label class="m-checkbox" *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                                    <input type="checkbox" (change)="onChangeCheckBoxCharge()"
-                                                        value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
-                                                    <span></span>
+                                                    <ng-container *ngIf="!surcharge.syncedFromBy">
+                                                        <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                            value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                                        <span></span>
+                                                    </ng-container>
                                                 </label>
                                                 <ng-container *ngIf="!surcharge.isLocked;else locktpl">
                                                     <ng-container *ngIf="!readonly">
@@ -223,6 +225,12 @@
                                     <td>{{surcharge.clearanceNo}}</td>
                                     <td>{{surcharge.contNo}}</td>
                                     <td>{{surcharge.notes}}</td>
+                                    <td class="text-danger">
+                                        <ng-container
+                                            *ngIf="!surcharge.isFromShipment && surcharge.type === 'OBH' && !!surcharge.syncedFrom">
+                                            {{surcharge.syncedFromBy}}
+                                        </ng-container>
+                                    </td>
                                     <td class="text-underline text-primary pointer"
                                         (click)="showPaymentManagement(surcharge)">Payment Management</td>
                                 </tr>
@@ -249,7 +257,7 @@
     <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
         (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
 
-    <copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
+    <copy-settlement-popup (onCopy)="onRequestSurcharge($event, true)"></copy-settlement-popup>
 
     <table-list-charge-popup (onChange)="onRequestSurcharge($event)"
         (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>

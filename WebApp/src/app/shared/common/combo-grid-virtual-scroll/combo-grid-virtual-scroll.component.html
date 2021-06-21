@@ -1,5 +1,5 @@
 <div class="dropdown e--combogrid" [class.show]="!showAngledownIcon" dropdown #dropdown="bs-dropdown"
-    (clickOutside)="keyword = ''; showAngledownIcon = false" [insideClick]="true">
+    (clickOutside)="keyword = ''; showAngledownIcon = false" [insideClick]="true" [isDisabled]="disabled">
     <ng-container *ngIf="allowEditing;else readOnlyTpl">
         <input #clkSearch class="form-control m-input m-input--square dropdown-toggle pos-rel" [disabled]="Disabled"
             type="text" [tooltip]="isTooltip ? (displayStringValue == '' ? null : displayStringValue) : ''"
