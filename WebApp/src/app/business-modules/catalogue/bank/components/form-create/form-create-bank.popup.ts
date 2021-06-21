@@ -18,11 +18,14 @@ export class FormCreateBankPopupComponent extends PopupBase implements OnInit {
     bankNameCode: AbstractControl;
     bankNameVN: AbstractControl;
     bankNameEN: AbstractControl;
+    edit: AbstractControl;
     active: AbstractControl;
 
     isSubmitted: boolean = false;
 
     isUpdate: boolean = false;
+    userModifiedName: any;
+    userCreatedName: any;
 
     constructor(
         private _fb: FormBuilder,
@@ -38,12 +41,16 @@ export class FormCreateBankPopupComponent extends PopupBase implements OnInit {
             bankNameVN: [null, Validators.required],
             bankNameEN: [null, Validators.required],
             active: [true],
+            userModifiedName:[],
+            userCreatedName:[]
         });
 
         this.bankNameCode = this.form.controls['bankNameCode'];
         this.bankNameVN = this.form.controls['bankNameVN'];
         this.bankNameEN = this.form.controls['bankNameEN'];
         this.active = this.form.controls['active'];
+        this.userModifiedName = this.form.controls['userModifiedName'];
+        this.userCreatedName = this.form.controls['userCreatedName'];
     }
 
     onSubmit() {

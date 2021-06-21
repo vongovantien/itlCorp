@@ -9,6 +9,8 @@ export class Bank {
   datetimeModified: string = '';
   active: boolean = true;
   inactiveOn: string = '';
+  userCreatedName:string='';
+  userModifiedName:string='';
 
   constructor(data?: any) {
     const self = this;

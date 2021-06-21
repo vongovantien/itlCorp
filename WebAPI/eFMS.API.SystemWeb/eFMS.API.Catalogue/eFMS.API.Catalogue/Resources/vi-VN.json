@@ -139,5 +139,15 @@
   "MSG_CHART_NAME_EN_EMPTY": "Account Name En is not allow empty!|wrong",
   "MSG_CHART_STATUS_NOT_VALID" "Status {0} not valid",
   "MSG_CHART_CODE_EXISTED": "Account Code {0} has been existed!",
-  "MSG_CHART_CODE_DUPLICATE": "Account Code {0} has been duplicate | wrong "
+  "MSG_CHART_CODE_DUPLICATE": "Account Code {0} has been duplicate | wrong ",
+
+
+  //------------start: Bank,
+  "MSG_BANK_NAME_EN_EMPTY": "Tên ngân hàng EN không được trống|wrong",
+  "MSG_BANK_NAME_VN_EMPTY": "Tên ngân hàng VN không được trống|wrong",
+
+  "MSG_BANK_CODE_EMPTY": "Mã ngân hàng không được trống|wrong",
+  "MSG_BANK_CODE_EXISTED": "Mã ngân hàng đã tồn tại|wrong",
+  "MSG_BANK_CODE_DUPLICATED": "Mã ngân hàng đã trùng trong danh sách|wrong"
+  //------------end  : Bank
 }

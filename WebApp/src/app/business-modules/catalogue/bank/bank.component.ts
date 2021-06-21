@@ -11,6 +11,7 @@ import { ConfirmPopupComponent } from 'src/app/shared/common/popup';
 import { FormCreateBankPopupComponent } from './components/form-create/form-create-bank.popup';
 
 import { catchError, finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'app-bank',
@@ -44,6 +45,7 @@ export class BankComponent extends AppList implements OnInit {
         private _ngProgessSerice: NgProgress,
         private _toastService: ToastrService,
         private _exportRepo: ExportRepo,
+        private _router: Router
     ) {
         super();
 
@@ -68,7 +70,7 @@ export class BankComponent extends AppList implements OnInit {
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (response: CommonInterface.IResponsePaging) => {
-                    this.banks = response.data;
+                    this.banks = response.data??[];
                     this.totalItems = response.totalItems;
                     this.pageSize = response.size;
                 }
@@ -101,11 +103,15 @@ export class BankComponent extends AppList implements OnInit {
         this.Bank = Bank;
         [this.formPopup.isUpdate, this.formPopup.isSubmitted] = [true, false];
         this.formPopup.id = this.Bank.id;
+        this.formPopup.userModifiedName = this.Bank.userModifiedName; 
+        this.formPopup.userCreatedName = this.Bank.userCreatedName; 
         this.formPopup.form.setValue({
             bankNameCode: this.Bank.code,
             bankNameVN: this.Bank.bankNameVn,
             bankNameEN: this.Bank.bankNameEn,
             active: this.Bank.active,
+            userModifiedName:this.Bank.userModifiedName,
+            userCreatedName:this.Bank.userCreatedName
         });
 
         this.formPopup.show();
