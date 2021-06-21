@@ -1,29 +1,9 @@
 <app-sub-header>
     <div class="c-button-actions">
-        <button type="button" class="btn btn-success  m-btn--icon m-btn--uppercase" (click)="showAdd()">
-            <span>
-                <i class="la la-plus"></i>
-                <span>
-                    add new
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-brand  m-btn--icon m-btn--uppercase" disabled>
-            <span>
-                <i class="la la-upload"></i>
-                <span>
-                    import
-                </span>
-            </span>
-        </button>
-        <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase" (click)="export()">
-            <span>
-                <i class="la la-download"></i>
-                <span>
-                    export
-                </span>
-            </span>
-        </button>
+        <app-permission-button title="Add New" (onClick)="showAdd()" title="Add New"></app-permission-button>
+        <app-permission-button routerLink="/home/catalogue/bank/import" title="Import" type="import">
+        </app-permission-button>
+        <app-permission-button type="export" (onClick)="export()" title="Export"></app-permission-button>
     </div>
 </app-sub-header>
 
@@ -51,14 +31,12 @@
                             <tr>
                                 <td class="table-actions-col">
                                     <div class="table-actions" style="width: 70px">
-                                        <button class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only"
-                                            title="Edit" (click)="showDetail(bank)">
-                                            <i class="la la-edit"></i>
-                                        </button>
-                                        <button (click)="showConfirmDelete(bank)"
-                                            class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
-                                            <i class="la la-trash"></i>
-                                        </button>
+                                        <app-permission-button type="detail" (onClick)="showDetail(bank)"
+                                            [user]="bank.userCreated">
+                                        </app-permission-button>
+                                        <app-permission-button type="delete" (onClick)="showConfirmDelete(bank)"
+                                            [user]="bank.userCreated">
+                                        </app-permission-button>
                                     </div>
                                 </td>
                                 <td> <span>{{bank.code}}</span></td>

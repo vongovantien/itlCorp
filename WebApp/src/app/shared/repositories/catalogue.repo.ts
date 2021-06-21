@@ -1350,4 +1350,20 @@ export class CatalogueRepo {
             map((data: any) => data)
         );
     }
+    
+    downloadBankExcel() {
+        return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/downloadExcel`, null).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+    upLoadBankFile(files: any) {
+        return this._api.postFile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatBank/UploadFile`, files, "uploadedFile");
+    }
+    importBank(body: any) {
+        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/import`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
