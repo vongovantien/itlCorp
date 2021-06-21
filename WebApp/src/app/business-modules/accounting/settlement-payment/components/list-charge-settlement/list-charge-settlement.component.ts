@@ -137,7 +137,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
         this.tableListChargePopup.show();
     }
 
-    onRequestSurcharge(surcharge: Surcharge[]) {
+    onRequestSurcharge(surcharge: Surcharge[], isCopy?: boolean) {
         if (surcharge[0].isFromShipment) {
             this.surcharges = this.surcharges.filter((item: any) => surcharge.map((chg: Surcharge) => chg.id).indexOf(item.id) === -1);
             this.surcharges = [...this.surcharges, ...surcharge];
@@ -167,6 +167,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                     groupItem.totalAmount = groupItem.chargeSettlements.reduce((net: number, charge: Surcharge) => net += (charge.amountVnd + charge.vatAmountVnd), 0);
                 }
             })
+        }
+        // ? Flag for Copy charge.
+        if (isCopy == true) {
+            this.isDirectSettlement = true;
+            this.isExistingSettlement = false;
         }
         if (surcharge[0].isFromShipment) {
             this.onChange.emit(true);
