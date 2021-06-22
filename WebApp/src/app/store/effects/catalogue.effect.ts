@@ -5,10 +5,10 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { map, catchError, withLatestFrom, switchMap } from 'rxjs/operators';
 import { CatalogueRepo } from '@repositories';
 import {
-    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction, GetCatalogueWarehouseSuccessAction, GetCatalogueWarehouseFailAction, GetCatalogueCommodityGroupSuccessAction, GetCatalogueCommodityGroupFailAction, GetCataloguePackageSuccessAction, GetCataloguePackageFailAction
+    CatalogueActions, CatalogueActionTypes, GetCataloguePortSuccessAction, GetCataloguePortFailAction, GetCatalogueCarrierSuccessAction, GetCatalogueCarrierFailAction, GetCatalogueAgentSuccessAction, GetCatalogueAgentFailAction, GetCatalogueUnitSuccessAction, GetCatalogueUnitFailAction, GetCatalogueCommoditySuccessAction, GetCatalogueCommodityFailAction, GetCatalogueCurrencyFailAction, GetCatalogueCountrySuccessAction, GetCatalogueCountryFailAction, GetCatalogueCurrencySuccessAction, GetCatalogueWarehouseSuccessAction, GetCatalogueWarehouseFailAction, GetCatalogueCommodityGroupSuccessAction, GetCatalogueCommodityGroupFailAction, GetCataloguePackageSuccessAction, GetCataloguePackageFailAction, GetCatalogueBankSuccessAction, GetCatalogueBankFailAction
 } from '../actions';
-import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState, getCatalogueWarehouseState, getCatalogueCommodityGroupState } from '../reducers';
-import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency, Warehouse, CommodityGroup } from '@models';
+import { getCataloguePortState, getCatalogueCarrierState, getCatalogueAgentState, getCatalogueUnitState, getCatalogueCommodityState, getCatalogueCustomerState, getCatalogueCountryState, getCatalogueCurrencyState, getCatalogueWarehouseState, getCatalogueCommodityGroupState,getCatalogueBankState } from '../reducers';
+import { Commodity, Unit, Customer, PortIndex, CountryModel, Currency, Warehouse, CommodityGroup, Bank } from '@models';
 import { CommonEnum } from '@enums';
 
 @Injectable()
@@ -214,6 +214,24 @@ export class CatalogueEffect {
                 return this._catalogueRepo.getListCurrency().pipe(
                     map((response: Currency[]) => new GetCatalogueCurrencySuccessAction(response)),
                     catchError(err => of(new GetCatalogueCurrencyFailAction(err)))
+                );
+            })
+        );
+    @Effect()
+    getbanks$: Observable<Action> = this.actions$
+        .pipe(
+            ofType<CatalogueActions>(CatalogueActionTypes.GET_BANK),
+            withLatestFrom(
+                this._store.select(getCatalogueBankState),
+                (action: CatalogueActions, banks: Bank[]) => ({ data: banks, action: action })),
+            switchMap((data: { data: Bank[], action: CatalogueActions }) => {
+                // * Check carriers in redux store.
+                if (!!data && data.data && data.data.length) {
+                    return of(new GetCatalogueBankSuccessAction(data.data));
+                }
+                return this._catalogueRepo.getListBank().pipe(
+                    map((response: Bank[]) => new GetCatalogueBankSuccessAction(response)),
+                    catchError(err => of(new GetCatalogueBankFailAction(err)))
                 );
             })
         );

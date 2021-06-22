@@ -89,7 +89,7 @@ export class Partner {
 
     countryShippingName: string = null;
     countryName: string = null;
-
+    bankCode: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

@@ -156,6 +156,9 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DeliveryDate { get; set; }
         public string Note { get; set; }
         public string ReferenceNoProof { get; set; }
+        public string PolDescription { get; set; }
+        public string PodDescription { get; set; }
+        public Guid? IncotermId { get; set; }
 
         public virtual CsTransaction Job { get; set; }
     }

@@ -54,5 +54,19 @@ namespace eFMS.API.Documentation.DL.Common
             new CommonData { Value = "Cash", DisplayName = "Cash" },
             new CommonData { Value = "Bank", DisplayName = "Bank Transfer" }
         };
+
+        /// <summary> Define path of service module </summary>
+        public static readonly List<CommonData> ServiceModulePath = new List<CommonData>
+        {
+            new CommonData { Value = "IT", DisplayName = "inland-trucking" },
+            new CommonData { Value = "AE", DisplayName = "air-export" },
+            new CommonData { Value = "AI", DisplayName = "air-import" },
+            new CommonData { Value = "SCE", DisplayName = "sea-consol-export" },
+            new CommonData { Value = "SCI", DisplayName = "sea-consol-import" },
+            new CommonData { Value = "SFE", DisplayName = "sea-fcl-export" },
+            new CommonData { Value = "SFI", DisplayName = "sea-fcl-import" },
+            new CommonData { Value = "SLE", DisplayName = "sea-lcl-export" },
+            new CommonData { Value = "SLI", DisplayName = "sea-lcl-import" }
+        };
     }
 }

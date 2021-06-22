@@ -3609,7 +3609,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
                 IsBODApproved = _advanceApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                BankAccountNo = advancePayment.BankAccountNo,
+                BankAccountName = advancePayment.BankAccountName,
+                BankName = advancePayment.BankName,
+                BankCode = advancePayment.BankCode,
+                PaymentMethod = advancePayment.PaymentMethod,
+                DeadlinePayment = advancePayment?.DeadlinePayment
             };
             return infoAdvance;
         }

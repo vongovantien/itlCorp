@@ -2036,8 +2036,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 BankAccountNo = x.BankAccountNo,
                 BankAccountName = x.BankAccountName,
                 TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName,
-                BankCode = x.BankCode,
-                BankName = x.BankName
+                BankName = x.BankName,
+                BankCode = x.BankCode
             });
 
             return results;

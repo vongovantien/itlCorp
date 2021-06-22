@@ -150,15 +150,20 @@ namespace eFMS.API.Accounting.Controllers
             var isAllowDelete = acctSettlementPaymentService.CheckDeletePermissionBySettlementNo(settlementNo);
             if (isAllowDelete == false)
             {
-               return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
-
-            if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+            var _settleType = acctSettlementPaymentService.Get(x => x.SettlementNo == settlementNo)?.FirstOrDefault().SettlementType;
+            if (_settleType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+
+                if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",", shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                }
             }
+            
 
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
@@ -885,7 +890,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("GeneralSettlementPaymentExport")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GeneralSettlementPaymentExport(Guid settlementId)
         {
             var result = acctSettlementPaymentService.GetGeneralSettlementExport(settlementId);

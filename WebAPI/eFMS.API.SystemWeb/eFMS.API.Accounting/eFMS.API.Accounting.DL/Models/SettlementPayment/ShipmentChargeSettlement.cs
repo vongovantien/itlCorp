@@ -59,5 +59,8 @@ namespace eFMS.API.Accounting.DL.Models.SettlementPayment
         public bool? KickBack { get; set; }
         public string VatPartnerShortName { get; set; }
         public string VatPartnerId { get; set; }
+        public string SyncedFrom { get; set; }
+        public string PaySyncedFrom { get; set; }
+        public string SyncedFromBy { get; set; }
     }
 }
