@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
-import { SOA } from 'src/app/shared/models';
+import { SOA, SysImage } from 'src/app/shared/models';
 import { AppList } from 'src/app/app.list';
 import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -19,7 +19,7 @@ import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
-    // animations: [listAnimation]
+     animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
@@ -29,6 +29,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild('validateSyncedSOAPopup') validateSyncedPopup: InfoPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
+    folderModuleName:string='SOA';
 
     soa: SOA = new SOA();
     headers: CommonInterface.IHeaderTable[] = [];
@@ -44,7 +45,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     confirmType: string = 'SYNC';
     reasonReject: string = '';
     messageValidate: string = '';
-
+    attachFiles: SysImage[] = [];
+    
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
