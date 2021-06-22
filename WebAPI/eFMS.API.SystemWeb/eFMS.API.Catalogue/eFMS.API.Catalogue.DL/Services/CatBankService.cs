@@ -135,6 +135,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.Where(x => (x.bank.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             else if (criteria.BankNameEn != null)
                 query = query.Where(x => (x.bank.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+            else if (criteria.Active != null)
+            {
+                query = (x => x.Active == criteria.Active);
+            }
             else
             {
                 query = query.Where(x => (x.bank.Code.ToString() ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
