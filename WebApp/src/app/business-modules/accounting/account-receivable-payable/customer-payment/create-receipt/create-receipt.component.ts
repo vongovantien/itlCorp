@@ -12,7 +12,7 @@ import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ResetInvoiceList, RegistTypeReceipt } from '../store/actions';
+import { ResetInvoiceList } from '../store/actions';
 import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
 import { InjectViewContainerRefDirective } from '@directives';

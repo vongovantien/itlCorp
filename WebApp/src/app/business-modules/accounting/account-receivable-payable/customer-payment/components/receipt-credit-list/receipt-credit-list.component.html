@@ -16,7 +16,7 @@
             <div class="table-wrapper table-scrollabler"
                 [ngStyle]="{'height': !!(creditList)?.length ? '210px' : '100%'}">
                 <table class="table table-striped table-brand">
-                    <thead app-table-header [headers]="receiptType ==='Customer' ? headers : agencyHeaders"
+                    <thead app-table-header [headers]="receiptType ==='CUSTOMER' ? headers : agencyHeaders"
                         class="text-center">
                         <th class="m--w-50 first">
                         </th>
@@ -36,9 +36,9 @@
                                 <td>
                                     {{item.invoiceNo}}
                                 </td>
-                                <td *ngIf="receiptType !=='Customer'">{{item.jobNo}}</td>
-                                <td *ngIf="receiptType !=='Customer'">{{item.mbl}}</td>
-                                <td *ngIf="receiptType !=='Customer'">{{item.hbl}}</td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.jobNo}}</td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.mbl}}</td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.hbl}}</td>
                                 <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
