@@ -197,21 +197,8 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     setBankInfoForPayee(payee: Partner) {
-        if (!!payee.bankAccountNo) {
-            this.bankAccountNo.setValue(payee.bankAccountNo);
-        }
-
-        if (!!payee.bankAccountName) {
-            this.bankAccountName.setValue(payee.bankAccountName);
-        }
-        
-        this.bankName.setValue(payee.bankName);
-        this.bankCode.setValue(payee.bankCode);
-    }
-    onSelectDataBankInfo(data: any) {
-        if(data){
-            this.bankName.setValue(data.bankNameEn);
-            this.bankCode.setValue(data.code);
-        }      
+        this.bankAccountNo.setValue(payee.bankAccountNo);
+        this.bankAccountNo.setValue(payee.bankAccountName);
+        this.bankAccountNo.setValue(payee.bankName);
     }
 }
