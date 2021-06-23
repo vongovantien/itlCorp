@@ -99,5 +99,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState CalculatorReceivableSettlement(string settlementCode);
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
+
+        HandleState CalculateBalanceSettle(List<string> settlementNo);
     }
 }

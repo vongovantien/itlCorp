@@ -947,6 +947,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.BankAccountNo).HasMaxLength(150);
 
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankName).HasMaxLength(150);
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -956,6 +960,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
 
                 entity.Property(e => e.DepartmentId).HasColumnName("DepartmentID");
+
+                entity.Property(e => e.DueDate).HasColumnType("datetime");
 
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 

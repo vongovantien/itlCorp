@@ -83,12 +83,12 @@ export class Partner {
 
     isRequestApproval: boolean = false;
     bankName: string = '';
+    bankCode: string = '';
 
     permission: PermissionPartner = new PermissionPartner();
 
     countryShippingName: string = null;
     countryName: string = null;
-    bankCode: string = '';
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

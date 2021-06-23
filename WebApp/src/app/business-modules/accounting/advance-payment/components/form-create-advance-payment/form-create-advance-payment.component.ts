@@ -48,7 +48,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
 
     selectedPayee: Partner;
     banks: Observable<Bank[]>;
-    bankCode:AbstractControl;
+    bankCode: AbstractControl;
     displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
         { field: 'code', label: 'Bank Code' },
         { field: 'bankNameEn', label: 'Bank Name EN' },
@@ -178,6 +178,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
                 this.bankName.setValue(this.userLogged.bankName || null);
+                this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
             }
@@ -186,6 +187,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             this.bankAccountName.setValue(null);
             this.bankAccountNo.setValue(null);
             this.bankName.setValue(null);
+            this.bankCode.setValue(null);
         }
     }
 
@@ -197,21 +199,16 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     }
 
     setBankInfoForPayee(payee: Partner) {
-        if (!!payee.bankAccountNo) {
-            this.bankAccountNo.setValue(payee.bankAccountNo);
-        }
-
-        if (!!payee.bankAccountName) {
-            this.bankAccountName.setValue(payee.bankAccountName);
-        }
-        
-        this.bankName.setValue(payee.bankName);
+        this.bankAccountNo.setValue(payee.bankAccountNo);
+        this.bankAccountNo.setValue(payee.bankAccountName);
+        this.bankAccountNo.setValue(payee.bankName);
         this.bankCode.setValue(payee.bankCode);
     }
+
     onSelectDataBankInfo(data: any) {
-        if(data){
+        if (data) {
             this.bankName.setValue(data.bankNameEn);
             this.bankCode.setValue(data.code);
-        }      
+        }
     }
 }

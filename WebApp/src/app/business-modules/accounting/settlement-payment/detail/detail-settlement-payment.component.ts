@@ -88,9 +88,11 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             statusApproval: this.settlementPayment.settlement.statusApproval,
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             payee: this.formCreateSurcharge.payee.value,
-            bankName: this.formCreateSurcharge.bankName.value,
+            bankName: this.formCreateSurcharge.bankNameDescription.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
-            bankAccountNo: this.formCreateSurcharge.bankAccountNo.value
+            bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
+            bankCode: this.formCreateSurcharge.bankCode.value,
+            dueDate: !!this.formCreateSurcharge.dueDate && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };
 
         return settlement;
@@ -111,6 +113,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
+
+        if(this.formCreateSurcharge.checkStaffPartner()){
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return;
+        }
+
         this.formatInvoiceDateSurcharge();
         const body: any = {
             settlement: this.getBodySettlement(),
@@ -179,10 +187,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         currency: this.settlementPayment.settlement.settlementCurrency,
                         payee: this.settlementPayment.settlement.payee,
                         bankName: this.settlementPayment.settlement.bankName,
+                        bankNameDescription: this.settlementPayment.settlement.bankName,
                         beneficiaryName: this.settlementPayment.settlement.bankAccountName,
                         bankAccountNo: this.settlementPayment.settlement.bankAccountNo,
                         advanceAmount: this.settlementPayment.settlement.advanceAmount,
                         balanceAmount: this.settlementPayment.settlement.balanceAmount,
+                        bankCode: this.settlementPayment.settlement.bankCode,
+                        dueDate: !!this.settlementPayment.settlement.dueDate ? { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) } : null
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
 
@@ -214,6 +225,12 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
+
+        if(this.formCreateSurcharge.checkStaffPartner()){
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return;
+        }
+
         this.formatInvoiceDateSurcharge();
         const body: any = {
             settlement: this.getBodySettlement(),

@@ -24,5 +24,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string PayeeName { get; set; }
         public string AmountInWords { get; set; }
         public string Note { get; set; }
+        public string BankCode { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

@@ -4686,7 +4686,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                PaymentMethod = settlementPayment.PaymentMethod,
+                BankAccountName = settlementPayment.BankAccountName,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankCode = settlementPayment.BankCode,
+                DueDate = settlementPayment.DueDate
             };
             return infoSettlement;
         }
@@ -4779,13 +4785,16 @@ namespace eFMS.API.Accounting.DL.Services
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                 infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 //Quy đổi theo currency của Settlement
-                // infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
@@ -5428,6 +5437,60 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
         #endregion --- Calculator Receivable Settlement ---
+        
+        public HandleState CalculateBalanceSettle(List<string> settlementNo)
+        {
+            HandleState rs = new HandleState();
+            if(settlementNo.Count() == 0)
+            {
+                return rs;
+            }
+            foreach (var item in settlementNo)
+            {
+                AcctSettlementPayment currentSettle = DataContext.Get(x => x.SettlementNo == item)?.FirstOrDefault();
+
+                if (currentSettle != null)
+                {
+                    var charges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == item).ToList();
+
+                    if (charges.Count < 0)
+                    {
+                        return rs;
+                    }
+                    List<ShipmentChargeSettlement> shipmentSettleCharges = new List<ShipmentChargeSettlement>();
+
+                    foreach (var charge in charges)
+                    {
+                        ShipmentChargeSettlement shipmentSettleCharge = new ShipmentChargeSettlement
+                        {
+                            HBL = charge.Hblno,
+                            Hblid = charge.Hblid,
+                            MBL = charge.Mblno,
+                            ClearanceNo = charge.ClearanceNo,
+                            AdvanceNo = charge.AdvanceNo,
+                            JobId = charge.JobNo
+                        };
+                        shipmentSettleCharges.Add(shipmentSettleCharge);
+                    }
+
+                    decimal? advanceAmount = CalculateBalanceSettle(shipmentSettleCharges, currentSettle.SettlementNo, currentSettle.SettlementCurrency);
+                    if (advanceAmount != null)
+                    {
+                        currentSettle.AdvanceAmount = advanceAmount;
+                        currentSettle.BalanceAmount = currentSettle.AdvanceAmount - currentSettle.Amount;
+
+                        if (currentSettle.BalanceAmount == 0)
+                        {
+                            currentSettle.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                        }
+                    }
+
+                    rs = DataContext.Update(currentSettle, x => x.Id == currentSettle.Id);
+                }
+            }
+            
+            return rs;
+        }
     }
 }
 
