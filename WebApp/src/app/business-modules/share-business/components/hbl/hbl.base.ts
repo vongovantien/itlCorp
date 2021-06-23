@@ -167,12 +167,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        if (!res.jobNo) {
-                            this._toastService.error('The Shipment is not found!');
-                            this.gotoList();
-                        } else {
-                            this.shipmentDetail = res;
-                        }
+                        this.shipmentDetail = res;
                     }
                 },
             );
