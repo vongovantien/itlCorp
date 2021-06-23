@@ -1,17 +1,13 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { PopupBase } from '@app';
-import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { Customer, ReceiptInvoiceModel } from '@models';
-import { CatalogueRepo, AccountingRepo } from '@repositories';
-import { JobConstants, ChargeConstants } from '@constants';
-import { formatDate } from '@angular/common';
-import { catchError, takeUntil, pluck } from 'rxjs/operators';
+import { ReceiptInvoiceModel } from '@models';
+import { AccountingRepo } from '@repositories';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
-import { ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState } from '../../store/reducers';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
 
@@ -20,31 +16,15 @@ import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-recei
     templateUrl: 'customer-agent-debit.popup.html'
 })
 
-export class CustomerAgentDebitPopupComponent extends PopupBase {
+export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase {
     @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
-
-    typeSearch: AbstractControl;
-    partnerId: AbstractControl;
-    referenceNo: AbstractControl;
-    date: AbstractControl;
-    dateType: AbstractControl;
-    service: AbstractControl;
 
     type: string = null;
     customerFromReceipt: string = null;
 
-    dateFromReceipt: any = null;
-
-    displayFilesPartners: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
-
-    formSearch: FormGroup;
-    searchOptions: string[] = ['SOA', 'Debit Note/Invoice', 'VAT Invoice', 'JOB NO', 'HBL', 'MBL', 'Customs No'];
-    dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
-
     listDebit: ReceiptInvoiceModel[] = [];
     listCreditInvoice: ReceiptInvoiceModel[] = [];
     listDebitInvoice: ReceiptInvoiceModel[] = [];
-    customers: Observable<Customer[]>;
 
     headersAgency: CommonInterface.IHeaderTable[] = [
         { title: 'Reference No', field: 'referenceNo', sortable: true },
@@ -72,25 +52,10 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     checkAllAgency = false;
     checkAllGroup = false;
     TYPELIST: string = 'LIST';
-
-    services: CommonInterface.INg2Select[] = [
-        { text: 'All', id: 'All' },
-        { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },
-        { text: ChargeConstants.AI_DES, id: ChargeConstants.AI_CODE },
-        { text: ChargeConstants.AE_DES, id: ChargeConstants.AE_CODE },
-        { text: ChargeConstants.SFE_DES, id: ChargeConstants.SFE_CODE },
-        { text: ChargeConstants.SFI_DES, id: ChargeConstants.SFI_CODE },
-        { text: ChargeConstants.SLE_DES, id: ChargeConstants.SLE_CODE },
-        { text: ChargeConstants.SLI_DES, id: ChargeConstants.SLI_CODE },
-        { text: ChargeConstants.SCE_DES, id: ChargeConstants.SCE_CODE },
-        { text: ChargeConstants.SCI_DES, id: ChargeConstants.SCI_CODE },
-        { text: ChargeConstants.CL_DES, id: ChargeConstants.CL_CODE }
-    ];
+    partnerId: string;
 
     constructor(
         private _sortService: SortService,
-        private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
         private _toastService: ToastrService,
@@ -100,10 +65,6 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     ngOnInit() {
-        this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
-
-        this.initForm();
-
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
@@ -121,42 +82,21 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             { title: 'Bu Handle', field: 'departmentName', sortable: true },
             { title: 'Office', field: 'officeName', sortable: true },
         ];
-    }
 
-    initForm() {
-        this.formSearch = this._fb.group({
-            partnerId: [null, Validators.required],
-            typeSearch: [this.searchOptions[1]],
-            referenceNo: [],
-            date: [],
-            dateType: [this.dateTypeList[0]],
-            service: [[this.services[0].id]],
-        });
-        this.typeSearch = this.formSearch.controls['typeSearch'];
-        this.referenceNo = this.formSearch.controls['referenceNo'];
-        this.date = this.formSearch.controls['date'];
-        this.dateType = this.formSearch.controls['dateType'];
-        this.service = this.formSearch.controls['service'];
-        this.partnerId = this.formSearch.controls['partnerId'];
-    }
+        this._store.select(ReceiptTypeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((type: string) => {
+                this.type = type;
+                console.log(this.type);
+            })
 
-    onSelectDataFormInfo(data: any) {
-        this._catalogueRepo.getAgreement(
-            { partnerId: data.id, status: true })
+        this._store.select(ReceiptPartnerCurrentState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (d: any[]) => {
-                    if (!!d && !!d.length) {
-                        this.partnerId.setValue(data.id);
-                        if (this.partnerId.value !== this.customerFromReceipt) {
-                            this.listDebit = [];
-                        }
-                    } else {
-                        this.partnerId.setValue(null);
-                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
-                        return false;
-                    }
+                (id) => {
+                    this.partnerId = id;
                 }
-            );
+            )
     }
 
     checkAllChange() {
@@ -171,48 +111,35 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         }
     }
 
-    onApply() {
-        this.isSubmitted = true;
-        if (this.formSearch.valid) {
-            const body: IAcctCustomerDebitCredit = {
-                partnerId: this.partnerId.value,
-                searchType: this.typeSearch.value,
-                referenceNos: !!this.referenceNo.value ? this.referenceNo.value.trim().replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim()) : null,
-                fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
-                toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
-                dateType: this.dateType.value,
-                service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
-            };
-            if (this.type === 'Customer') {
-                this._accountingRepo.getDataIssueCustomerPayment(body)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: ReceiptInvoiceModel[]) => {
-                            if (!!res) {
-                                this.listDebit = res || [];
-                                this.filterList();
-                            }
-                        },
-                    );
-            } else {
-                this._accountingRepo.getDataIssueAgencyPayment(body)
-                    .pipe(catchError(this.catchError))
-                    .subscribe(
-                        (res: AgencyReceiptModel) => {
-                            if (!!res) {
-                                this.agencyDebitModel = res;
-                                this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
-                                    element.isSelected = false;
-                                    element.invoices.forEach(x => {
-                                        x.isSelected = false;
-                                    });
+    onApply(body) {
+        if (this.type.includes("CUSTOMER")) {
+            this._accountingRepo.getDataIssueCustomerPayment(body)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: ReceiptInvoiceModel[]) => {
+                        if (!!res) {
+                            this.listDebit = res || [];
+                            this.filterList();
+                        }
+                    },
+                );
+        } else {
+            this._accountingRepo.getDataIssueAgencyPayment(body)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: AgencyReceiptModel) => {
+                        if (!!res) {
+                            this.agencyDebitModel = res;
+                            this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
+                                element.isSelected = false;
+                                element.invoices.forEach(x => {
+                                    x.isSelected = false;
                                 });
-                                this.filterList();
-                            }
-                        },
-                    );
-            }
-
+                            });
+                            this.filterList();
+                        }
+                    },
+                );
         }
     }
 
@@ -305,7 +232,7 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 
     addToReceipt() {
-        const partnerId = this.partnerId.value;
+        // const partnerId = this.partnerId.value;
         let datatoReceiptGroup = [];
         let datatoReceiptList = [];
         let datatoReceipt = this.listDebit;
@@ -323,9 +250,9 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
             return;
         }
 
-        if (this.customerFromReceipt !== this.partnerId.value
-            && ((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== partnerId)
-                || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== partnerId)
+        if (this.customerFromReceipt !== this.partnerId
+            && ((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== this.partnerId)
+                || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== this.partnerId)
             )) {
             this._store.dispatch(ResetInvoiceList());
         }
@@ -336,31 +263,8 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         });
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
-        this.onAddToReceipt.emit(this.partnerId.value);
+        this.onAddToReceipt.emit(this.partnerId);
         this.hide();
-    }
-
-    setDefaultValue() {
-        if (this.customerFromReceipt !== this.partnerId.value) {
-            this.listDebit = [];
-        }
-        if (!!this.dateFromReceipt && !!this.dateFromReceipt.startDate) {
-            this.date.setValue({ startDate: new Date(this.dateFromReceipt.startDate), endDate: new Date(this.dateFromReceipt.endDate) });
-        }
-        if (!!this.customerFromReceipt) {
-            this.partnerId.setValue(this.customerFromReceipt);
-        }
-    }
-
-    selelectedService(event: any) {
-        if (event.length > 0) {
-            if (event[event.length - 1].id === 'All') {
-                this.service.setValue([{ id: 'All', text: 'All' }]);
-            } else {
-                const arrNotIncludeAll = event.filter(x => x.id !== 'All');
-                this.service.setValue(arrNotIncludeAll);
-            }
-        }
     }
 
     switchToGroup() {
@@ -375,22 +279,10 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
         this.listDebit = this._sortService.sort(this.listDebit, sort, this.order);
     }
 
-    mapServiceId() {
-        let serviceId = '';
-        const serv = this.services.filter(service => service.id !== 'All');
-        serviceId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
-        return serviceId;
-    }
 
     reset() {
-        this.formSearch.reset();
         this.listDebit = [];
         this.agencyDebitModel = new AgencyReceiptModel();
-        this.service.setValue([this.services[0].id]);
-    }
-
-    clearData() {
-        this.partnerId.setValue(null);
     }
 
     removeAllChecked(groupShipment: any) {
@@ -438,12 +330,4 @@ export class CustomerAgentDebitPopupComponent extends PopupBase {
     }
 }
 
-interface IAcctCustomerDebitCredit {
-    partnerId: string;
-    searchType: string;
-    referenceNos: string[];
-    fromDate: string;
-    toDate: string;
-    dateType: string;
-    service: string;
-}
+

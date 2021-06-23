@@ -14,9 +14,9 @@ import { ComboGridVirtualScrollComponent } from '@common';
 
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
+import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { ReceiptTypeState } from '../../store/reducers';
-import { ResetInvoiceList } from '../../store/actions';
+import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate } from '../../store/actions';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -26,7 +26,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     @Input() isUpdate: boolean = false;
     @ViewChild('combogridAgreement') combogrid: ComboGridVirtualScrollComponent;
-    @ViewChild(CustomerAgentDebitPopupComponent) debitPopup: CustomerAgentDebitPopupComponent;
+    @ViewChild(ARCustomerPaymentCustomerAgentDebitPopupComponent) debitPopup: ARCustomerPaymentCustomerAgentDebitPopupComponent;
 
     formSearchInvoice: FormGroup;
     customerId: AbstractControl;
@@ -141,7 +141,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                     }
                     this.customerName = (data as Partner).shortName;
                     this.customerId.setValue((data as Partner).id);
-                    this._dataService.setData('customer', data);
 
                     this._catalogueRepo.getAgreement(
                         <IQueryAgreementCriteria>{
@@ -153,9 +152,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                     if (!!this.agreements.length) {
                                         this.agreementId.setValue(d[0].id);
                                         this.onSelectDataFormInfo(d[0], 'agreement');
+
+                                        this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerGroup }));
+
                                     } else {
                                         this.combogrid.displaySelectedStr = '';
                                         this.agreementId.setValue(null);
+                                        this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);
+
                                     }
                                 }
                             }
@@ -183,13 +187,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     getDebit() {
         this.debitPopup.show();
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.debitPopup.type = !!x ? x : 'Customer');
-        this.debitPopup.customerFromReceipt = this.customerId.value;
-        this.debitPopup.dateFromReceipt = this.date.value;
-        if (!this.debitPopup.partnerId.value) {
-            this.debitPopup.setDefaultValue();
+        if (!!this.date.value) {
+            this._store.dispatch(SelectReceiptDate({ date: this.date.value }));
         }
     }
 

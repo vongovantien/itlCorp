@@ -15,7 +15,7 @@
         <div class="collapse show" id="debit-list">
             <div class="table-horizontal">
                 <table class="table table-brand table-bordered">
-                    <thead app-table-header [headers]="receiptType ==='Customer' ? headers : agencyHeaders"
+                    <thead app-table-header [headers]="(receiptType$ | async) ==='CUSTOMER' ? headers : agencyHeaders"
                         class="text-center">
                         <th class="m--w-50 first">
                         </th>
@@ -59,9 +59,9 @@
                                     </div>
                                 </td>
 
-                                <td *ngIf="receiptType !=='Customer'">{{item.jobNo}}</td>
-                                <td *ngIf="receiptType !=='Customer'">{{item.mbl}}</td>
-                                <td *ngIf="receiptType !=='Customer'">{{item.hbl}}</td>
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.jobNo}}</td>
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.mbl}}</td>
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.hbl}}</td>
                                 <td ALIGN="right">
                                     {{item.amount | number}} {{item.currencyId}}
                                 </td>
@@ -131,7 +131,7 @@
                                 <td>Total</td>
                                 <td></td>
                                 <td></td>
-                                <ng-container *ngIf="receiptType !== 'Customer'">
+                                <ng-container *ngIf="(receiptType$ | async) !== 'CUSTOMER'">
                                     <td></td>
                                     <td></td>
                                     <td></td>

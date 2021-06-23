@@ -100,7 +100,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data) => {
-                    console.log(data);
                     this.creditList = data;
                 }
             )

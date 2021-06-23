@@ -8,6 +8,7 @@ import { RemoveInvoice } from "../../store/actions";
 import { takeUntil } from "rxjs/operators";
 import { DataService } from "@services";
 import { ToastrService } from "ngx-toastr";
+import { Observable } from "rxjs";
 
 @Component({
     selector: 'customer-payment-receipt-debit-list',
@@ -43,7 +44,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'Office', field: '' }
     ];
     selectedIndexItem: number;
-    receiptType: string = null;
+    receiptType$: Observable<string> = this._store.select(ReceiptTypeState);
 
     selectedCredit: ReceiptInvoiceModel;
 
@@ -76,10 +77,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
-
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.receiptType = x || 'Customer');
     }
 
     confirmDeleteInvoiceItem(index: number) {

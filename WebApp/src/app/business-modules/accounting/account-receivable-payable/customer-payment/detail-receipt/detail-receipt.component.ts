@@ -86,7 +86,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateDetailForm(res: ReceiptModel) {
         this.receiptDetail = res;
-        this._store.dispatch(RegistTypeReceipt({ data: res.type }));
+        this._store.dispatch(RegistTypeReceipt({ data: res.type.toUpperCase() }));
 
         this.updateFormCreate(this.receiptDetail);
         this.updateListInvoice(this.receiptDetail);
@@ -108,8 +108,8 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     updateListInvoice(res: ReceiptModel) {
         let valueUSD = 0;
         let valueVND = 0;
-        res.payments.filter((x: ReceiptInvoiceModel)=> x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueUSD += item.unpaidAmountUsd, 0);
-        res.payments.filter((x: ReceiptInvoiceModel)=> x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueVND += item.unpaidAmountVnd, 0);
+        res.payments.filter((x: ReceiptInvoiceModel) => x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueUSD += item.unpaidAmountUsd, 0);
+        res.payments.filter((x: ReceiptInvoiceModel) => x.type === 'CREDIT').reduce((amount: number, item: ReceiptInvoiceModel) => valueVND += item.unpaidAmountVnd, 0);
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
@@ -119,13 +119,13 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             paidAmountUSD: res.paidAmountUsd,
             paidAmountVND: res.paidAmountVnd,
             finalPaidAmountUSD: res.finalPaidAmountUsd,
-            finalPaidAmountVND: res.finalPaidAmountVnd,           
+            finalPaidAmountVND: res.finalPaidAmountVnd,
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
-        (this.listInvoice.customerInfo as any) = { id: res.customerId };
+        (this.listInvoice.partnerId as any) = { id: res.customerId };
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;

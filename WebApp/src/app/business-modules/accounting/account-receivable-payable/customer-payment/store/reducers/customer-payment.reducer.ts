@@ -5,24 +5,24 @@ import * as ReceiptActions from "../actions";
 
 export interface IReceiptState {
     list: Receipt[];
-    invoices: ReceiptInvoiceModel[];
     debitList: ReceiptInvoiceModel[],
     creditList: ReceiptInvoiceModel[],
-    debitInvoice: ReceiptInvoiceModel[];
     isLoading: boolean;
     isLoaded: boolean;
     type: string;
+    partnerId: string // * đối tượng của phiếu thu,
+    date: any; // * Ngày tím kiếm -> Điều kiện search
 }
 
 export const initialState: IReceiptState = {
     list: [],
     debitList: [],
     creditList: [],
-    invoices: [],
-    debitInvoice: [],
     isLoaded: false,
     isLoading: false,
-    type: null
+    partnerId: null,
+    type: "CUSTOMER",
+    date: null
 };
 
 export const receiptManagementReducer = createReducer(
@@ -36,7 +36,11 @@ export const receiptManagementReducer = createReducer(
         creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
         debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.type === 'ADV'), ...state.debitList]
     })),
-    on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({ ...state, type: payload.data })),
+    on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
+        ...state,
+        type: payload.data,
+        partnerId: !!payload.partnerId ? payload.partnerId : null
+    })),
     on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, creditList: [], debitList: [] })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -60,25 +64,15 @@ export const receiptManagementReducer = createReducer(
             const advData = newInvoiceWithAdv as ReceiptInvoiceModel;
             return { ...state, debitList: [...payload.data.invoices, advData] };
         }
-        return { ...state, debitList: [...payload.data.invoices] }// TODO implement
+        return { ...state, debitList: [...payload.data.invoices] }
     }),
-    on(ReceiptActions.ClearCredit, (state: IReceiptState, payload: { invoiceNo: string, creditNo: string }) => {
-        console.log(payload);
-        const currentIndexCredit = state.creditList.findIndex(x => x.refNo == payload.creditNo);
-        if (currentIndexCredit !== -1) {
-            return {
-                ...state, creditList: [
-                    ...state.creditList.slice(0, currentIndexCredit),
-                    {
-                        ...state.creditList[currentIndexCredit],
-                        invoiceNo: { payload }
-                    },
-                    ...state.creditList.slice(currentIndexCredit + 1)
-                ]
-            }
+    on(ReceiptActions.SelectPartnerReceipt, (state: IReceiptState, payload: { id: string, partnerGroup: string }) => ({
+        ...state, partnerId: payload.id, type: payload.partnerGroup
+    })),
+    on(ReceiptActions.SelectReceiptDate, (state: IReceiptState, payload: { date: any }) => ({
+        ...state, date: payload.date
+    }))
 
-        }
-    })
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {

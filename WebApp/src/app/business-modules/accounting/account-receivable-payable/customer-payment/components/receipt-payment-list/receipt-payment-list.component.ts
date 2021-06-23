@@ -11,7 +11,7 @@ import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCu
 import { Store } from '@ngrx/store';
 import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState } from '../../store/reducers';
+import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptPartnerCurrentState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
@@ -57,7 +57,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     paymentMethods: string[] = ['Cash', 'Bank Transfer', 'Other'];
 
-    customerInfo: Partner = null;
+    partnerId: any = null;
 
     isSubmitted: boolean = false;
     isReadonly: boolean = null;  // * DONE | CANCEL
@@ -78,13 +78,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     ];
 
     constructor(
-        private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _store: Store<IAppState>,
         private _fb: FormBuilder,
         private _dataService: DataService,
         private _catalogueRepo: CatalogueRepo,
-        private _toastService: ToastrService,
     ) {
         super();
     }
@@ -131,11 +129,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     }
 
     listenCustomerInfoData() {
-        this._dataService.currentMessage
-            .pipe(pluck('customer'), takeUntil(this.ngUnsubscribe))
+        this._store.select(ReceiptPartnerCurrentState)
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (data: Partner) => {
-                    data !== undefined && (this.customerInfo = data);
+                (data: string) => {
+                    data !== undefined && (this.partnerId = data);
                 }
             );
     }
@@ -328,7 +326,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             paidAmountVnd: this.finalPaidAmountVND.value,
             paidAmountUsd: this.finalPaidAmountUSD.value,
             list: listInvoice.filter(x => x.type !== 'ADV'),
-            customerId: this.customerInfo?.id
+            customerId: this.partnerId
         };
         // if (!body.customerId || !body.list.length || !body.paidAmount) {
         //     this._toastService.warning('Missing data to process', 'Warning');

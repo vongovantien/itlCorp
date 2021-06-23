@@ -18,8 +18,8 @@
                                     </button>
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item pointer"
-                                            (click)="gotoCreateReceipt('Customer')">Customer Receipt</a>
-                                        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('Agency')">Agency
+                                            (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
+                                        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
                                             Receipt</a>
                                     </div>
                                 </div>
@@ -79,7 +79,7 @@
                                                                     </span>
                                                                 </div>
                                                                 <ng-template #CancelNo>
-                                                                        <a class="text-muted pointer"
+                                                                    <a class="text-muted pointer"
                                                                         (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
                                                                     </a>
                                                                 </ng-template>
