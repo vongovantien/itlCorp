@@ -2042,7 +2042,16 @@ namespace eFMS.API.Setting.DL.Services
                     if (type == "Change Service Date")
                     {
                         ops.ServiceDate = newServiceDate;
+                        // Update unlock shipment
+                        if (newServiceDate.HasValue)
+                        {
+                            if (DateTime.Now.Month <= newServiceDate.Value.Month)
+                            {
+                                ops.IsLocked = false;
+                            }
+                        }
                     }
+
                     ops.UserModified = currentUser.UserID;
                     ops.DatetimeModified = DateTime.Now;
                     opsTransactionRepo.Update(ops, x => x.Id == ops.Id, false);
@@ -2057,25 +2066,28 @@ namespace eFMS.API.Setting.DL.Services
                     if (type == "Change Service Date")
                     {
                         //[CR: 15718 - 07/05/2021 - Andy]
-                        if (doc.TransactionType.Contains("E"))
-                        {
-                            //Export >> Update for ETD
-                            doc.Etd = newServiceDate;
-                        }
-                        else if (doc.TransactionType.Contains("I"))
-                        {
-                            //Import >> Update for ETA
-                            doc.Eta = newServiceDate;
-                        } 
-                        else
+                        //if (doc.TransactionType.Contains("E"))
+                        //{
+                        //    //Export >> Update for ETD
+                        //    doc.Etd = newServiceDate;
+                        //}
+                        //else if (doc.TransactionType.Contains("I"))
+                        //{
+                        //    //Import >> Update for ETA
+                        //    doc.Eta = newServiceDate;
+                        //} 
+                        //else
                         {
                             doc.ServiceDate = newServiceDate;
                         }
 
                         // Update unlock shipment
-                        if(DateTime.Now.Month <= newServiceDate.Value.Month)
+                        if (newServiceDate.HasValue)
                         {
-                            doc.IsLocked = false;
+                            if (DateTime.Now.Month <= newServiceDate.Value.Month)
+                            {
+                                doc.IsLocked = false;
+                            }
                         }
                     }
                     doc.UserModified = currentUser.UserID;
