@@ -4683,7 +4683,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                PaymentMethod = settlementPayment.PaymentMethod,
+                BankAccountName = settlementPayment.BankAccountName,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankCode = settlementPayment.BankCode,
+                DueDate = settlementPayment.DueDate
             };
             return infoSettlement;
         }
@@ -4776,13 +4782,16 @@ namespace eFMS.API.Accounting.DL.Services
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                 infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 //Quy đổi theo currency của Settlement
-                // infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;

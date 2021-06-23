@@ -135,6 +135,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.Where(x => (x.bank.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             else if (criteria.BankNameEn != null)
                 query = query.Where(x => (x.bank.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+            else if (criteria.Active != null)
+            {
+                query = (x => x.Active == criteria.Active);
+            }
             else
             {
                 query = query.Where(x => (x.bank.Code.ToString() ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1
@@ -168,6 +172,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         private IQueryable<CatBankModel> GetBy(CatBankCriteria criteria)
         {
+            ClearCache();
             Expression<Func<CatBankModel, bool>> query;
             if (criteria.Code != null)
                 query = (x => (x.Code ?? "").IndexOf(criteria.Code ?? "", StringComparison.OrdinalIgnoreCase) > -1);
@@ -175,6 +180,10 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = (x => (x.BankNameVn ?? "").IndexOf(criteria.BankNameVn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
             else if (criteria.BankNameEn != null)
                 query = (x => (x.BankNameEn ?? "").IndexOf(criteria.BankNameEn ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+            else if(criteria.Active != null)
+            {
+                query = (x => x.Active == criteria.Active);
+            }
             else
             {
                 query = (x => (x.Code.ToString() ?? "").IndexOf(criteria.All ?? "", StringComparison.OrdinalIgnoreCase) > -1

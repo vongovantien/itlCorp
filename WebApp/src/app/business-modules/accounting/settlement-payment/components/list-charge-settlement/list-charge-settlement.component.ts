@@ -103,6 +103,8 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'VAT', field: 'vatrate', sortable: true },
             { title: 'Amount', field: 'total', sortable: true },
+            { title: 'Net Amount VND', field: 'amountVnd', sortable: true },
+            { title: 'VAT Amount VND', field: 'vatAmountVnd', sortable: true },
             { title: 'Amount VND', field: '', sortable: true },
             { title: 'Payee', field: 'payer', sortable: true },
             { title: 'OBH Partner', field: 'obhPartnerName', sortable: true },
