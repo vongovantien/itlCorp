@@ -2167,6 +2167,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>();
             List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
+            var transDetailCopy = new List<CsTransactionDetail>();
             var siDetail = shippingInstructionServiceRepo.Get(x => x.JobId == model.Id).FirstOrDefault();
 
             try
@@ -2308,6 +2309,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (detailTrans != null && detailTrans.Count() > 0)
                     {
+                        transDetailCopy.AddRange(detailTrans);
                         HandleState hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
                     }
@@ -2377,6 +2379,18 @@ namespace eFMS.API.Documentation.DL.Services
                                     });
                                     var hsOtherCharges = shipmentOtherChargeService.Add(DataOtherCharge);
                                 }
+                            }
+                        }
+                    }
+
+                    //Send email to salesman
+                    if (transDetailCopy != null && transDetailCopy.Count() > 0)
+                    {
+                        foreach (var house in transDetailCopy)
+                        {
+                            if (!string.IsNullOrEmpty(house.SaleManId))
+                            {
+                                transactionDetailService.SendEmailNewHouseToSales(house);
                             }
                         }
                     }
