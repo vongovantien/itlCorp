@@ -5328,6 +5328,60 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return new List<string>();
         }
+
+        public HandleState CalculateBalanceSettle(List<string> settlementNo)
+        {
+            HandleState rs = new HandleState();
+            if(settlementNo.Count() == 0)
+            {
+                return rs;
+            }
+            foreach (var item in settlementNo)
+            {
+                AcctSettlementPayment currentSettle = DataContext.Get(x => x.SettlementNo == item)?.FirstOrDefault();
+
+                if (currentSettle != null)
+                {
+                    var charges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == item).ToList();
+
+                    if (charges.Count < 0)
+                    {
+                        return rs;
+                    }
+                    List<ShipmentChargeSettlement> shipmentSettleCharges = new List<ShipmentChargeSettlement>();
+
+                    foreach (var charge in charges)
+                    {
+                        ShipmentChargeSettlement shipmentSettleCharge = new ShipmentChargeSettlement
+                        {
+                            HBL = charge.Hblno,
+                            Hblid = charge.Hblid,
+                            MBL = charge.Mblno,
+                            ClearanceNo = charge.ClearanceNo,
+                            AdvanceNo = charge.AdvanceNo,
+                            JobId = charge.JobNo
+                        };
+                        shipmentSettleCharges.Add(shipmentSettleCharge);
+                    }
+
+                    decimal? advanceAmount = CalculateBalanceSettle(shipmentSettleCharges, currentSettle.SettlementNo, currentSettle.SettlementCurrency);
+                    if (advanceAmount != null)
+                    {
+                        currentSettle.AdvanceAmount = advanceAmount;
+                        currentSettle.BalanceAmount = currentSettle.AdvanceAmount - currentSettle.Amount;
+
+                        if (currentSettle.BalanceAmount == 0)
+                        {
+                            currentSettle.PaymentMethod = AccountingConstants.PAYMENT_METHOD_OTHER;
+                        }
+                    }
+
+                    rs = DataContext.Update(currentSettle, x => x.Id == currentSettle.Id);
+                }
+            }
+            
+            return rs;
+        }
     }
 }
 
