@@ -171,6 +171,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 dateType: this.dateType.value,
                 service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
             };
+            this.poupParentComponent.customerFromReceipt = this.customerFromReceipt;
             this.poupParentComponent.onApply(body);
         }
     }

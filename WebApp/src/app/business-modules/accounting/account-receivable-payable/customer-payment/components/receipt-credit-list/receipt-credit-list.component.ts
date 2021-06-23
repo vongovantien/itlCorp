@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter } from "@angular/core";
+import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
@@ -44,9 +44,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         return this._type;
     }
 
-    private _type: string = 'Customer' // Agent
+    private _type: string = 'Customer'
 
-    // creditList: Observable<ReceiptInvoiceModel[]>;
     creditList: ReceiptInvoiceModel[] = [];
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
 

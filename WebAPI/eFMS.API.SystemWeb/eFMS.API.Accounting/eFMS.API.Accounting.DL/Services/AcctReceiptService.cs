@@ -481,6 +481,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     ReceiptInvoiceModel payment = new ReceiptInvoiceModel();
+                    payment.Id = acctPayment.Id;
                     payment.PaymentId = acctPayment.Id;
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;

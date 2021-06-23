@@ -1,6 +1,7 @@
 import { Controller, Key } from "@decorators";
 
 export class ReceiptCreditDebitModel {
+    id: string;
     refNo: string;
     type: string;
     invoiceNo: string;
@@ -25,7 +26,7 @@ export class ReceiptCreditDebitModel {
 
     notes: string;
     paidAmountUsd: number;
-    paidAmountUVnd: number;
+    paidAmountVnd: number;
     balanceAmountUsd: number;
     balanceAmountVnd: number;
     totalPaidVnd: number;
@@ -52,6 +53,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     jobId?: string;
     mbl?: string;
     hbl?: string;
+
     constructor(object?: any) {
         super();
         const self = this;

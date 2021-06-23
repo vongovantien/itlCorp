@@ -25,9 +25,11 @@
                 <customer-payment-list-receipt></customer-payment-list-receipt>
 
                 <div class="c-button-actions text-center">
-                    <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'" (onClick)="submitClick('draft')">
+                    <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
+                        (onClick)="submitClick('draft')">
                     </app-permission-button>
-                    <app-permission-button type="save" title="Done" class="success" (onClick)="confirmDoneReceipt()">
+                    <app-permission-button type="save" title="Done" class="outline-success"
+                        (onClick)="confirmDoneReceipt()">
                     </app-permission-button>
                 </div>
             </div>

@@ -1,13 +1,17 @@
-import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild } from "@angular/core";
 import { AppList } from "@app";
-import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { Store } from "@ngrx/store";
-import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
-import { ReceiptInvoiceModel } from "@models";
-import { RemoveInvoice } from "../../store/actions";
-import { takeUntil } from "rxjs/operators";
 import { DataService } from "@services";
+import { ReceiptInvoiceModel } from "@models";
+import { ConfirmPopupComponent } from "@common";
+import { InjectViewContainerRefDirective } from "@directives";
 import { ToastrService } from "ngx-toastr";
+
+import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
+import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
+import { RemoveInvoice } from "../../store/actions";
+
+import { takeUntil } from "rxjs/operators";
 import { Observable } from "rxjs";
 
 @Component({
@@ -16,6 +20,7 @@ import { Observable } from "rxjs";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
+    @ViewChild(InjectViewContainerRefDirective) viewContainerInject: InjectViewContainerRefDirective;
     @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
 
@@ -63,24 +68,45 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'RefNo', field: '', sortable: true },
             { title: 'Type', field: '' },
             { title: 'Invoice No', field: '' },
-            { title: 'Credit No', field: '', width: 250 },
+            { title: 'Credit No', field: '', width: 150 },
             { title: 'Org Amount', field: '', align: this.right },
-            { title: 'Unpaid USD', field: '' },
-            { title: 'Unpaid VND', field: '' },
+            { title: 'Unpaid USD', field: '', width: 150 },
+            { title: 'Unpaid VND', field: '', width: 150 },
             { title: 'Paid Amount USD', field: '', width: 150, align: this.right },
             { title: 'Paid Amount VND', field: '', width: 150, align: this.right },
             { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
-            { title: 'Remain USD', field: '' },
-            { title: 'Remain VND', field: '' },
-            { title: 'Payment Note', field: '' },
+            { title: 'Remain USD', field: '', width: 150 },
+            { title: 'Remain VND', field: '', width: 150 },
+            { title: 'Payment Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
     }
 
-    confirmDeleteInvoiceItem(index: number) {
+    confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {
         this.selectedIndexItem = index;
+        if (item.type === "OBH") {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerInject.viewContainerRef, {
+                title: 'Confirm Remove Invoice',
+                body: 'Some Debit Values will change, do you want to remove you selections?',
+                labelConfirm: 'Yes',
+                labelCancel: 'No'
+            }, () => {
+                this.onDeleteInvoiceItem();
+            })
+        } else if (!!item.id) {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerInject.viewContainerRef, {
+                title: 'Confirm Remove Invoice',
+                body: 'Some Debit Values will change, do you want to remove you selections?',
+                labelConfirm: 'Yes',
+                labelCancel: 'No'
+            }, () => {
+                this.onDeleteInvoiceItem();
+            })
+        } else {
+            this.onDeleteInvoiceItem();
+        }
     }
 
     onDeleteInvoiceItem() {
@@ -91,10 +117,21 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         this.onChangeDebit.emit(true);
     }
 
-    formatAmount(event: any, receipt: ReceiptInvoiceModel) {
+    calculateTotalPaidAmount(event: any, item: ReceiptInvoiceModel, type: string) {
         if (!event.target.value.length) {
-            receipt[event.target.name] = 0;
+            item[event.target.name] = 0;
         }
+        switch (type) {
+            case 'paidVnd':
+                item.totalPaidVnd = item.paidAmountVnd;
+                break;
+            case 'paidUsd':
+                item.totalPaidUsd = item.paidAmountUsd;
+                break;
+            default:
+                break;
+        }
+
     }
 
     onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {

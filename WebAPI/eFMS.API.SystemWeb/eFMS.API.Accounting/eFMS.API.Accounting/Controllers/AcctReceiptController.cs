@@ -164,10 +164,10 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            //Check exists list invoice/adv
-            if (receiptModel.Payments.Count == 0)
+            string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel.Payments);
+            if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
             {
-                ResultHandle _result = new ResultHandle { Status = false, Message = "Receipt don't have any payment in this period, Please check it again!", Data = receiptModel };
+                ResultHandle _result = new ResultHandle { Status = false, Message = ListPaymentMessageInvalid, Data = receiptModel };
                 return BadRequest(_result);
             }
 
@@ -317,6 +317,49 @@ namespace eFMS.API.Accounting.Controllers
                 result = stringLocalizer[AccountingLanguageSub.MSG_RECEIPT_HAVE_PAYMENT_PAID].Value;
             }
             return result;
+        }
+
+        private string ValidatePaymentList(List<ReceiptInvoiceModel> payments)
+        {
+            string messageInValid = string.Empty;
+            if (payments.Count == 0)
+            {
+                messageInValid = "Receipt don't have any payment in this period, Please check it again!";
+            }
+            else
+            {
+                if (!payments.Any(x => (x.Type == "DEBIT" || x.Type == "OBH")))
+                {
+                    messageInValid = "You can't save without debit in this period, Please check it again!";
+                }
+
+                if (payments.Any(x => (x.Type == "CREDIT")))
+                {
+                    bool isHaveInvoice = payments.Any(x => x.Type == "DEBIT" && string.IsNullOrEmpty(x.InvoiceNo));
+                    if (isHaveInvoice == true)
+                    {
+                        messageInValid = "Some credit do not have net off invoice";
+                    }
+                }
+
+                if (payments.Any(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)))
+                {
+                    List<ReceiptInvoiceModel> invalidPayments = payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0
+                    && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList();
+                    List<string> messages = new List<string>();
+                    if(invalidPayments.Count > 0)
+                    {
+                        foreach (var item in invalidPayments)
+                        {
+                            messages.Add(string.Format(@"Invoice {0} Total Paid must <= Unpaid",item.InvoiceNo));
+                        }
+                    }
+
+                    messageInValid = string.Join(string.Format(@"\n"), messages.Select(x => x));
+                }
+            }
+
+            return messageInValid;
         }
 
         /// <summary>

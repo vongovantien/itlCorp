@@ -119,6 +119,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 return;
             }
         }
+        // if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == "DEBIT" && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
+        //     this._toastService.warning("Total Paid must <= Unpaid");
+        //     return;
+        // }
         receiptModel.payments = this.paymentList;
         this.onSaveDataReceipt(receiptModel, action);
     }

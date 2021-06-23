@@ -86,7 +86,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
     updateDetailForm(res: ReceiptModel) {
         this.receiptDetail = res;
-        this._store.dispatch(RegistTypeReceipt({ data: res.type.toUpperCase() }));
+        this._store.dispatch(RegistTypeReceipt({ data: res.type.toUpperCase(), partnerId: res.customerId }));
 
         this.updateFormCreate(this.receiptDetail);
         this.updateListInvoice(this.receiptDetail);
@@ -173,12 +173,9 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             )
     };
 
-    onSyncBravo() { }
-
     gotoList() {
         this._store.dispatch(ResetInvoiceList());
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
-
     }
 
     confirmSync() {

@@ -13,9 +13,7 @@ import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
 
 import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
-import { ReceiptTypeState } from '../../store/reducers';
 import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate } from '../../store/actions';
 
 @Component({
@@ -187,7 +185,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     getDebit() {
         this.debitPopup.show();
-        if (!!this.date.value) {
+        if (!!this.date.value?.startDate) {
             this._store.dispatch(SelectReceiptDate({ date: this.date.value }));
         }
     }
