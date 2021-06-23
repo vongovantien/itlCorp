@@ -97,5 +97,7 @@ namespace eFMS.API.Accounting.DL.IService
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
+
+        HandleState CalculateBalanceSettle(List<string> settlementNo);
     }
 }
