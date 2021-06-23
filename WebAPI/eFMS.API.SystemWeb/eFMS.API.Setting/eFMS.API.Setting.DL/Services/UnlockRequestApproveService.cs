@@ -2071,6 +2071,12 @@ namespace eFMS.API.Setting.DL.Services
                         {
                             doc.ServiceDate = newServiceDate;
                         }
+
+                        // Update unlock shipment
+                        if(DateTime.Now.Month <= newServiceDate.Value.Month)
+                        {
+                            doc.IsLocked = false;
+                        }
                     }
                     doc.UserModified = currentUser.UserID;
                     doc.DatetimeModified = DateTime.Now;
