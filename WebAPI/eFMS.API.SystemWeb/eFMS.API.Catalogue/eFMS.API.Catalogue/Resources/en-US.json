@@ -165,8 +165,15 @@
   "MSG_STAGE_CODE_DUPLICATE": "Code {0} has been duplicated!|wrong",
   "MSG_STAGE_STATUS_EMPTY": "Status is not allow empty!|wrong",
   //------------end  : STAGE
-  "DO_NOT_HAVE_PERMISSION": "Do not have permission"
+  "DO_NOT_HAVE_PERMISSION": "Do not have permission",
 
+  //------------start: Bank,
+  "MSG_BANK_NAME_EN_EMPTY": "Bank Name EN is not allow empty!|wrong",
+  "MSG_BANK_NAME_VN_EMPTY": "Bank Name VN is not allow empty!|wrong",
 
+  "MSG_BANK_CODE_EMPTY": "Bank Code is not allow empty!|wrong",
+  "MSG_BANK_CODE_EXISTED": "Bank Code {0} has been existed!|wrong",
+  "MSG_BANK_CODE_DUPLICATED": "Bank Code {0} has been duplicated!|wrong"
+  //------------end  : Charge
 
 }

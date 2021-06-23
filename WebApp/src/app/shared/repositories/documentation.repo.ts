@@ -1151,5 +1151,11 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
+    dowloadallAttach(body:any) {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`,body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
 }

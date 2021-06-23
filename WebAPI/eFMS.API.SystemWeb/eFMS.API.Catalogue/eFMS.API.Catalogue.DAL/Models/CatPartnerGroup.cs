@@ -10,7 +10,7 @@ namespace eFMS.API.Catalogue.Service.Models
         public string GroupNameEn { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public bool? Active { get; set; }
+        public bool? Inactive { get; set; }
         public DateTime? InactiveOn { get; set; }
     }
 }

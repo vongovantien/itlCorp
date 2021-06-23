@@ -390,7 +390,6 @@ namespace eFMS.API.ReportData
             }
             return null;
         }
-
         public void BindingFormatForCatCurrencyExcel(ExcelWorksheet worksheet, List<CatCurrency> listItems)
         {
             // Tạo header
@@ -418,7 +417,55 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 4].Value = inactivechar;
             }
         }
+        public Stream CreateBankExcelFile(List<CatBank> listObj, Stream stream = null)
+        {
+            try
+            {
+                var list = listObj;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("First Sheet");
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
+                    workSheet.Cells[1, 1].LoadFromCollection(list, true, TableStyles.Dark9);
+                    BindingFormatForCatBankExcel(workSheet, list);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
 
+            }
+            return null;
+        }
+
+        public void BindingFormatForCatBankExcel(ExcelWorksheet worksheet, List<CatBank> listItems)
+        {
+            // Tạo header
+            worksheet.Cells[1, 1].Value = "Code";
+            worksheet.Cells[1, 2].Value = "Bank Name VN";
+            worksheet.Cells[1, 3].Value = "Bank Name EN";
+            //worksheet.Cells[1, 4].Value = "Inactive";
+            worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
+            worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            for (int i = 0; i < listItems.Count; i++)
+            {
+                var item = listItems[i];
+                worksheet.Cells[i + 2, 1].Value = item.Code;
+                worksheet.Cells[i + 2, 2].Value = item.BankNameVn;
+                worksheet.Cells[i + 2, 3].Value = item.BankNameVn;
+                //string inactivechar = "";
+                //if (item.Active == true)
+                //{
+                //    inactivechar = "Active";
+                //}
+                //else
+                //{
+                //    inactivechar = "Inactive";
+                //}
+                //worksheet.Cells[i + 2, 4].Value = inactivechar;
+            }
+        }
         #endregion
 
 

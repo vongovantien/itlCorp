@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Common;
@@ -129,7 +130,7 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult CheckDetailPermission(Guid id)
         {
             var result = csTransactionService.CheckDetailPermission(id);
-            if (result == 403) return Ok(false);
+            if (result == 403 || result == 0) return Ok(false);
             return Ok(true);
         }
 
@@ -147,7 +148,10 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
-
+            if(statusCode == 0)
+            {
+                return Ok();
+            }
             var data = csTransactionService.GetDetails(id);//csTransactionService.GetById(id);
             return Ok(data);
         }
@@ -176,7 +180,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult Post(CsTransactionEditModel model)
-        {            
+        {
             if (!ModelState.IsValid) return BadRequest();
             string checkExistMessage = CheckExist(model.Id, model);
 
@@ -221,14 +225,22 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = checkExistMessage });
             }
 
-            string msgCheckUpdateEtdEta = CheckUpdateEtdEta(model, out string  type);
-            if(msgCheckUpdateEtdEta.Length > 0)
+            // Remove check etd, eta #15850
+            //string msgCheckUpdateEtdEta = CheckUpdateEtdEta(model, out string  type);
+            //if(msgCheckUpdateEtdEta.Length > 0)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateEtdEta, Data = new { errorCode = type } });
+            //}
+
+            // Is Service Date change month
+            var msgCheckUpdateServiceDate = CheckUpdateServiceDate(model);
+            if (!string.IsNullOrEmpty(msgCheckUpdateServiceDate))
             {
-                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateEtdEta, Data = new { errorCode = type } });
+                return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateServiceDate, Data = new { errorCode = "ServiceDate" } });
             }
 
             string msgCheckUpdateMawb = CheckHasMBLUpdatePermitted(model);
-            if(msgCheckUpdateMawb.Length > 0)
+            if (msgCheckUpdateMawb.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateMawb });
             }
@@ -265,7 +277,7 @@ namespace eFMS.API.Documentation.Controllers
         /// <returns></returns>
         [HttpPut("UploadMultiFiles/{jobId}/{isTemp}")]
         [Authorize]
-        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId,bool? isTemp)
+        public async Task<IActionResult> UploadMultiFiles(List<IFormFile> files, [Required]Guid jobId, bool? isTemp)
         {
             DocumentFileUploadModel model = new DocumentFileUploadModel
             {
@@ -521,6 +533,18 @@ namespace eFMS.API.Documentation.Controllers
             return Ok(result);
         }
 
+
+        [HttpPost("DowloadAllFileAttached")]
+        //[Authorize]
+        public async Task<ActionResult> DowloadAllFileAttached(FileDowloadZipModel m)
+        {
+            //Return memoryStream res.message
+            var res = await csTransactionService.CreateFileZip(m);
+            if (res.Success)
+                return File((MemoryStream)res.Message, "application/zip", m.FileName);
+            return BadRequest(res);
+        }
+
         #region -- METHOD PRIVATE --
         private string CheckExist(Guid id, CsTransactionEditModel model)
         {
@@ -538,7 +562,7 @@ namespace eFMS.API.Documentation.Controllers
                 if (!string.IsNullOrEmpty(model.Mawb?.Trim()))
                 {
                     if (csTransactionService.Any(x => (x.Mawb ?? "").ToLower() == (model.Mawb ?? "").ToLower()
-                    && x.TransactionType.Contains(model.TransactionType.Substring(0,1)) 
+                    && x.TransactionType.Contains(model.TransactionType.Substring(0, 1))
                     && x.OfficeId == currentUser.OfficeID
                     && x.CurrentStatus != TermData.Canceled))
                     {
@@ -648,7 +672,7 @@ namespace eFMS.API.Documentation.Controllers
 
             return message;
         }
-        
+
         private string CheckHasMBLUpdatePermitted(CsTransactionEditModel model)
         {
             string errorMsg = string.Empty;
@@ -700,6 +724,22 @@ namespace eFMS.API.Documentation.Controllers
             }
 
             type = _typeError;
+            return errorMsg;
+        }
+
+        /// <summary>
+        /// Check if Service date update with another month
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private string CheckUpdateServiceDate(CsTransactionEditModel model)
+        {
+            string errorMsg = string.Empty;
+            var currentJob = csTransactionService.Get(x => x.Id == model.Id).FirstOrDefault();
+            if (model.ServiceDate.HasValue)
+            {
+                errorMsg = model.ServiceDate.Value.Month != currentJob.ServiceDate.Value.Month ? stringLocalizer[DocumentationLanguageSub.MSG_SERVICE_DATE_CANNOT_CHANGE_MONTH].Value : errorMsg;
+            }
             return errorMsg;
         }
         #endregion -- METHOD PRIVATE --

@@ -8,6 +8,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.IService
 {
@@ -35,5 +36,12 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewShipmentCoverPage(Guid id);
         LinkAirSeaInfoModel GetLinkASInfomation(string mblNo, string hblNo, string serviceName, string serviceMode);
         int CheckUpdateMBL(CsTransactionEditModel model, out string mblNo, out List<string> advs);
+        Task<HandleState> CreateFileZip(FileDowloadZipModel m);
+    }
+    public class FileDowloadZipModel
+    {
+        public string FolderName { get; set; }
+        public string ObjectId { get; set; }
+        public string FileName { get; set; }
     }
 }

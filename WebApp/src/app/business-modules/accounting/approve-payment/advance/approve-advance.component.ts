@@ -103,7 +103,8 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                             bankAccountNo: this.advancePayment.bankAccountNo,
                             bankAccountName: this.advancePayment.bankAccountName,
                             bankName: this.advancePayment.bankName,
-                            payee: this.advancePayment.payee
+                            payee: this.advancePayment.payee,
+                            bankCode:this.advancePayment.bankCode
                         });
 
                         this.formCreateComponent.formCreate.disable();

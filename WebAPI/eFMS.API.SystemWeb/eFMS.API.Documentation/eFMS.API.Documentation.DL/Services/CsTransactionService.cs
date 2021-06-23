@@ -18,8 +18,11 @@ using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -56,7 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
-
+        private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -92,6 +95,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
+            ISysImageService imageService,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
             currentUser = user;
@@ -125,6 +129,7 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
             shippingInstructionServiceRepo = shippingInstruction;
+            sysImageService = imageService;
         }
 
         #region -- INSERT & UPDATE --
@@ -745,6 +750,10 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            if(detail == null)
+            {
+                return 0;
+            }
             var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
             var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
 
@@ -2217,7 +2226,7 @@ namespace eFMS.API.Documentation.DL.Services
                             CatPlace pod = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault();
 
                             string podCode = pod?.Code;
-                            
+
                             if (string.IsNullOrEmpty(podCode))
                             {
                                 item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -2243,10 +2252,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IssueHbldate = model.Etd;
                             }
                         }
-                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT || model.TransactionType == DocumentConstants.AI_SHIPMENT)
                         {
-                     
-                            if (item.Hwbno == "N/H") {
+                            item.Mawb = model.Mawb;
+                            if (item.Hwbno == "N/H")
+                            {
                                 item.Hwbno = item.Hwbno;
                             }
                             else
@@ -2259,14 +2269,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
                         }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                        {
-                            item.Mawb = model.Mawb;
-                        }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
-                        {
-                            item.Hwbno = null;
-                        }
+                        // [CR: 15787]
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        //{
+                        //    item.Mawb = model.Mawb;
+                        //}
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
+                        //{
+                        //    item.Hwbno = null;
+                        //}
 
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;
@@ -3345,6 +3356,51 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return errorCode;
+        }
+
+        public async Task<HandleState> CreateFileZip(FileDowloadZipModel m)
+        {
+            try
+            {
+                var pathFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.FileName);
+                string startPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.ObjectId);
+
+                var lstFile = sysImageService.Get(e => e.ObjectId == m.ObjectId && e.Folder == m.FolderName).ToList();
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                //Create File zip
+                using (FileStream zipToOpen = new FileStream(pathFile, FileMode.Create))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                    {
+                        for (int i = 0; i < lstFile.Count(); i++)
+                        {
+                            string url = lstFile[i].Url;
+                            int pos = url.LastIndexOf('/') + 1; string fileName = url.Substring(pos, url.Length - pos);
+                            string pathFileName = startPath + "\\" + fileName;
+                            if (!File.Exists(pathFileName))
+                                continue;
+                            ZipArchiveEntry readmeEntry = archive.CreateEntryFromFile(pathFileName, fileName, CompressionLevel.Optimal);
+                        }
+                    }
+                }
+
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(pathFile, FileMode.Open))
+                    await stream.CopyToAsync(memory);
+                memory.Position = 0L;
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                return new HandleState(true, memory);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(false, ex.ToString());
+            }
         }
     }
     #endregion

@@ -118,7 +118,8 @@ export class SeaFCLImportCreateJobComponent extends AppForm {
         if (!this.formCreateComponent.formCreate.valid
             || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
             || (!!this.formCreateComponent.polDescription.value && !this.formCreateComponent.pol.value)
-            || (!this.formCreateComponent.podDescription.value)
+            || (!this.formCreateComponent.podDescription.value
+            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
         ) {
             valid = false;
         }

@@ -563,6 +563,7 @@ namespace eFMS.API.System.DL.Services
             result.SysEmployeeModel.Tel = currEmployee?.Tel;
             result.SysEmployeeModel.StaffCode = currEmployee?.StaffCode;
             result.SysEmployeeModel.PersonalId = currEmployee?.PersonalId;
+            result.SysEmployeeModel.BankCode = currEmployee?.BankCode;
             // get avatar through last modified date.
             result.Avatar = currEmployee?.Photo;
 
@@ -599,6 +600,7 @@ namespace eFMS.API.System.DL.Services
             currEmployee.BankAccountNo = criteria.BankAccountNo?.Trim();
             currEmployee.BankName = criteria.BankName?.Trim();
             currEmployee.PersonalId = criteria.PersonalId?.Trim();
+            currEmployee.BankCode = criteria.BankCode?.Trim();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try

@@ -390,7 +390,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             return;
         }
         if (this.formGroup.valid) {
-            const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.some(x => x.contractNo === this.contractNo.value && x.contractType === "Official" && x.index !== this.selectedContract.index) : null;
+            const objCheckContract = !!this.contractNo.value && this.contracts.length >= 1 ? this.contracts.filter(x => x.contractNo === this.contractNo.value && x.contractType === "Official").length > 1 : null;
             if (objCheckContract) {
                 //this.contractNo.setValue(null);
                 this.isDuplicateContract = true;
