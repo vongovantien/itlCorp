@@ -2042,7 +2042,16 @@ namespace eFMS.API.Setting.DL.Services
                     if (type == "Change Service Date")
                     {
                         ops.ServiceDate = newServiceDate;
+                        // Update unlock shipment
+                        if (newServiceDate.HasValue)
+                        {
+                            if (DateTime.Now.Month <= newServiceDate.Value.Month)
+                            {
+                                ops.IsLocked = false;
+                            }
+                        }
                     }
+
                     ops.UserModified = currentUser.UserID;
                     ops.DatetimeModified = DateTime.Now;
                     opsTransactionRepo.Update(ops, x => x.Id == ops.Id, false);
@@ -2071,6 +2080,15 @@ namespace eFMS.API.Setting.DL.Services
                         //else
                         {
                             doc.ServiceDate = newServiceDate;
+                        }
+
+                        // Update unlock shipment
+                        if (newServiceDate.HasValue)
+                        {
+                            if (DateTime.Now.Month <= newServiceDate.Value.Month)
+                            {
+                                doc.IsLocked = false;
+                            }
                         }
                     }
                     doc.UserModified = currentUser.UserID;
