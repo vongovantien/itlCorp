@@ -57,6 +57,9 @@ export const getCatalogueCountryLoadingState = createSelector(catalogueState, (s
 export const getCatalogueCurrencyState = createSelector(catalogueState, (state: ICatalogueState) => state && state.currencies);
 export const getCatalogueCurrencyLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
 
+export const getCatalogueBankState = createSelector(catalogueState, (state: ICatalogueState) => state && state.banks);
+export const getCatalogueBankLoadingState = createSelector(catalogueState, (state: ICatalogueState) => state && state.isLoading);
+
 // * Menu
 export const getMenuPermissionState = createSelector(menuState, (state: IMenuState) => state);
 export const getMenuUserPermissionState = createSelector(menuState, (state: IMenuState) => state && state.permission);

@@ -17,7 +17,7 @@ import { map, tap, switchMap, skip, catchError, takeUntil, finalize, concatMap }
 
 import * as fromShareBussiness from './../../../share-business/store';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from '@decorators';
@@ -40,7 +40,7 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE','FILES'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';
@@ -239,6 +239,9 @@ export class SeaConsolImportDetailJobComponent extends SeaConsolImportCreateJobC
                 break;
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });

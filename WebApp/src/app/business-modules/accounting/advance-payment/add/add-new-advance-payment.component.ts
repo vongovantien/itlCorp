@@ -107,7 +107,9 @@ export class AdvancePaymentAddNewComponent extends AppPage {
             bankAccountNo: this.formCreateComponent.bankAccountNo.value,
             bankAccountName: this.formCreateComponent.bankAccountName.value,
             bankName: this.formCreateComponent.bankName.value,
-            payee: this.formCreateComponent.payee.value
+            payee: this.formCreateComponent.payee.value,
+            bankCode :this.formCreateComponent.bankCode.value
+            
         };
         return body;
     }

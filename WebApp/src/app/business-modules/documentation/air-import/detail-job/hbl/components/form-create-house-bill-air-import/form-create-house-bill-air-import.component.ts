@@ -108,7 +108,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
 
     jobId: string = SystemConstants.EMPTY_GUID;
     hblId: string = SystemConstants.EMPTY_GUID;
-    isHawb: boolean = null;
+    shipmentDetail: CsTransaction;
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -142,10 +142,11 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(takeUntil(this.ngUnsubscribe), catchError(this.catchError), skip(1),
             tap((shipment: CsTransaction) => {
+                this.shipmentDetail = new CsTransaction(shipment);
+
                 // * set default value for controls from shipment detail.
                 if (shipment && shipment.id !== SystemConstants.EMPTY_GUID) {
                     this.jobId = shipment.id;
-                    this.isHawb = shipment.isHawb;
                     this.formCreate.patchValue({
                         mawb: shipment.mawb,
                         pod: shipment.pod,
@@ -172,7 +173,9 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             )
             .subscribe(
                 (hawbNoGenerate: any) => {
-                    if (!!hawbNoGenerate) {
+                    if (this.shipmentDetail.isHawb) {
+                        this.hwbno.setValue('N/H');
+                    } else {
                         this.hwbno.setValue(hawbNoGenerate.hblNo);
                     }
                 }
@@ -226,7 +229,7 @@ export class AirImportHBLFormCreateComponent extends AppForm implements OnInit {
             warehouseId: [],
             route: [],
             packageQty: [],
-            desOfGoods: ['AS PER BIL'],
+            desOfGoods: ['AS PER BILL'],
             poinvoiceNo: [],
 
             // * Combogrid

@@ -287,7 +287,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportGeneralSettlementPayment")]
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId)
         {
             var accessToken = Request.Headers["Authorization"].ToString();

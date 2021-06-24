@@ -59,7 +59,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
     agentName: string = null;
 
     carries: Observable<Customer[]>;
-    agents: Observable<Customer[]>;
+    agents: Observable<Customer[]>; 
     ports: Observable<PortIndex[]>;
     listUsers: Observable<User[]>;
     csBookingNotes: csBookingNote[] = [];
@@ -137,6 +137,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                     res.serviceDate = null;
                                     res.atd = null;
                                     res.ata = null;
+                                    res.serviceDate = null;
                                 }
                             });
                             this.supplierName = res.supplierName;
@@ -191,7 +192,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
             ata: [],
             atd: [],
 
-            serviceDate: [],
+            serviceDate: [null, Validators.required],
 
             mawb: [],
             voyNo: [],

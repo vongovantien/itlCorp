@@ -23,12 +23,12 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> webUrl;
         public SysImageService(IContextBase<SysImage> repository,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment,
             ICurrentUser currUser,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
             currentUser = currUser;

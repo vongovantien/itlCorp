@@ -176,5 +176,8 @@
         public static readonly string RECEIPT_STATUS_DRAFT = "Draft";
         public static readonly string RECEIPT_STATUS_DONE = "Done";
         public static readonly string RECEIPT_STATUS_CANCEL = "Cancel";
+
+        public static readonly string SETTLEMENT_TYPE_DIRECT = "DIRECT";
+        public static readonly string SETTLEMENT_TYPE_EXISTING = "EXISTING";
     }
 }

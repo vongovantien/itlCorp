@@ -186,6 +186,16 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SettlementCurrency == criteria.CurrencyID);
             }
+
+            if (!string.IsNullOrEmpty(criteria.PayeeId))
+            {
+                query = query.And(x => x.Payee == criteria.PayeeId);
+            }
+
+            if (criteria.DepartmentId != null)
+            {
+                query = query.And(x => x.DepartmentId == criteria.DepartmentId);
+            }
             return query;
         }
 
@@ -898,7 +908,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid //into opst2
                                 //from opst in opst2.DefaultIfEmpty()
                                 where
-                                        sur.SettlementCode == settlementNo
+                                     sur.SettlementCode == settlementNo
                                      && opst.JobNo == JobId
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
@@ -945,7 +955,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     IsLocked = opst.IsLocked,
                                     KickBack = sur.KickBack,
                                     VatPartnerId = sur.VatPartnerId,
-                                    VatPartnerShortName = vatPgrp.ShortName
+                                    VatPartnerShortName = vatPgrp.ShortName,
+                                    SyncedFrom = sur.SyncedFrom,
+                                    Soano = sur.Soano,
+                                    PaySyncedFrom = sur.PaySyncedFrom,
+                                    PaySoano = sur.PaySoano,
+                                    DebitNo = sur.DebitNo,
+                                    CreditNo = sur.CreditNo
+
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -963,7 +980,7 @@ namespace eFMS.API.Accounting.DL.Services
                                join cst in csTrans on cstd.JobId equals cst.Id into cst2
                                from cst in cst2.DefaultIfEmpty()
                                where
-                                       sur.SettlementCode == settlementNo
+                                    sur.SettlementCode == settlementNo
                                     && cst.JobNo == JobId
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
@@ -1010,10 +1027,39 @@ namespace eFMS.API.Accounting.DL.Services
                                    IsLocked = cst.IsLocked,
                                    KickBack = sur.KickBack,
                                    VatPartnerId = sur.VatPartnerId,
-                                   VatPartnerShortName = vatPgrp.ShortName
+                                   VatPartnerShortName = vatPgrp.ShortName,
+                                   SyncedFrom = sur.SyncedFrom,
+                                   Soano = sur.Soano,
+                                   PaySyncedFrom = sur.PaySyncedFrom,
+                                   PaySoano = sur.PaySoano,
+                                   DebitNo = sur.DebitNo,
+                                   CreditNo = sur.CreditNo
                                };
-            var data = dataOperation.Union(dataDocument);
-            return data.ToList();
+            var data = dataOperation.Union(dataDocument).ToList();
+
+            foreach (var item in data)
+            {
+                string _syncedFromBy = string.Empty;
+
+                if (item.IsFromShipment == false && item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    switch (item.SyncedFrom)
+                    {
+                        case "SOA":
+                            _syncedFromBy = item.Soano;
+                            break;
+                        case "CDNOTE":
+                            _syncedFromBy = item.DebitNo;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                item.SyncedFromBy = _syncedFromBy;
+            }
+
+            return data;
         }
 
         public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
@@ -1090,7 +1136,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     PICName = user.Username,
                                     KickBack = sur.KickBack,
                                     VatPartnerId = sur.VatPartnerId,
-                                    VatPartnerShortName = vatPgrp.ShortName
+                                    VatPartnerShortName = vatPgrp.ShortName,
+                                    SyncedFrom = sur.SyncedFrom,
+                                    Soano = sur.Soano,
+                                    PaySyncedFrom = sur.PaySyncedFrom,
+                                    PaySoano = sur.PaySoano,
+                                    DebitNo = sur.DebitNo,
+                                    CreditNo = sur.CreditNo
+
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1109,8 +1162,7 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                from user in sysUser.DefaultIfEmpty()
-                               where
-                                    sur.SettlementCode == settlementNo
+                               where sur.SettlementCode == settlementNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1156,12 +1208,41 @@ namespace eFMS.API.Accounting.DL.Services
                                    PICName = user.Username,
                                    KickBack = sur.KickBack,
                                    VatPartnerId = sur.VatPartnerId,
-                                   VatPartnerShortName = vatPgrp.ShortName
+                                   VatPartnerShortName = vatPgrp.ShortName,
+                                   SyncedFrom = sur.SyncedFrom,
+                                   Soano = sur.Soano,
+                                   PaySyncedFrom = sur.PaySyncedFrom,
+                                   PaySoano = sur.PaySoano,
+                                   DebitNo = sur.DebitNo,
+                                   CreditNo = sur.CreditNo
+                                   
 
                                };
-            var data = dataOperation.Union(dataDocument);
-            data = data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
-            return data;
+            List<ShipmentChargeSettlement> data = dataOperation.Union(dataDocument).ToList();
+
+            foreach (var item in data)
+            {
+                string _syncedFromBy = string.Empty;
+
+                if (item.IsFromShipment == false && item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                {
+                    switch (item.SyncedFrom)
+                    {
+                        case "SOA":
+                            _syncedFromBy = item.Soano;
+                            break;
+                        case "CDNOTE":
+                            _syncedFromBy = item.DebitNo;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                item.SyncedFromBy = _syncedFromBy;
+            }
+
+            return data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
         }
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
@@ -1423,12 +1504,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
             }
-            // Data search = ETD/ETA(Air Sea Service) and Service Date(ops)
+            // Data search = ServiceDate
             if (criteria.serviceDateFrom != null || criteria.serviceDateTo != null)
             {
-                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom <= x.ServiceDate.Value && x.ServiceDate.Value <= criteria.serviceDateTo : false);
-                csTrans = csTrans.Where(x => x.TransactionType.Contains("E") ? (x.Etd.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Etd.Value.Date && x.Etd.Value.Date <= criteria.serviceDateTo.Value.Date : false)
-                                                                            : (x.Eta.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Eta.Value.Date && x.Eta.Value.Date <= criteria.serviceDateTo.Value.Date : false));
+                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date : false);
+                csTrans = csTrans.Where(x => x.ServiceDate.HasValue ? (criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date) : false);
             }
             // Data search = serviceType
             if (!string.IsNullOrEmpty(criteria.servicesType))
@@ -4603,7 +4683,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                PaymentMethod = settlementPayment.PaymentMethod,
+                BankAccountName = settlementPayment.BankAccountName,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankCode = settlementPayment.BankCode,
+                DueDate = settlementPayment.DueDate
             };
             return infoSettlement;
         }
@@ -4696,13 +4782,16 @@ namespace eFMS.API.Accounting.DL.Services
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                 infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 //Quy đổi theo currency của Settlement
-                // infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;

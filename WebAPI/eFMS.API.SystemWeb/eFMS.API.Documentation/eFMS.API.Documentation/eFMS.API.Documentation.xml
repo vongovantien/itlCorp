@@ -772,6 +772,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CheckUpdateServiceDate(eFMS.API.Documentation.DL.Models.CsTransactionEditModel)">
+            <summary>
+            Check if Service date update another month
+            </summary>
+            <param name="model"></param>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionDetailController.ReviewProofOfDelivery(System.Guid)">
             <summary>
             preview proof

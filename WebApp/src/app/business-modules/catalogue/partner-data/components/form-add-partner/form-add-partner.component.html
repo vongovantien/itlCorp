@@ -498,13 +498,26 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-12">
+                                        <div class="col-lg-8">
                                             <div class="form-group">
                                                 <label class="form-control-label" for="">
                                                     Bank Name
                                                 </label>
+                                                <app-combo-grid-virtual-scroll
+                                                    (itemSelected)="onSelectDataFormInfo($event, 'bank')"
+                                                    [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                                                    [displayFields]="displayFieldBank" (remove)="resetFormControl(bankCode)"
+                                                    placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
+                                                </app-combo-grid-virtual-scroll>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4">
+                                            <div class="form-group">
+                                                <label class="form-control-label" for="">
+                                                    Bank Code
+                                                </label>
                                                 <input type="text" class="form-control m-input m-input--square"
-                                                    placeholder="" name="bankName" formControlName="bankName">
+                                                    placeholder="" name="bankCode" formControlName="bankCode">
                                             </div>
                                         </div>
 

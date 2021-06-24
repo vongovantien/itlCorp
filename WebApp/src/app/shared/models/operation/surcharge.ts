@@ -63,6 +63,8 @@ export class Surcharge {
     kickBack: boolean = false;
     vatPartnerId: string = null;
     vatPartnerShortName: string = null;
+    syncedFrom: string = null;
+    syncedFromBy: string = null;
 
     // * Custom
     obhId: string = null;

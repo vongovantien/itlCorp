@@ -125,5 +125,14 @@
                 public static string ListName = "Units";
             }
         }
+        public struct CatBank
+        {
+            public static string ExcelImportFileName = "Bank";
+            public struct NameCaching
+            {
+                public static string ListName = "CatBank";
+            }
+        }
+
     }
 }
