@@ -117,8 +117,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                                 this.fclImportDetail.etd = null;
                                 this.fclImportDetail.mawb = null;
                                 this.fclImportDetail.eta = null;
-                                this.fclImportDetail.serviceDate = null
-
+                                this.fclImportDetail.serviceDate = null;
+                                this.fclImportDetail.ata = null;
+                                this.fclImportDetail.atd = null;
                             }
                         });
                         try {
