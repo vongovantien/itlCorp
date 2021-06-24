@@ -1,7 +1,7 @@
 ﻿using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
-﻿using eFMS.API.Accounting.DL.Common;
+using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
 using eFMS.API.Accounting.Service.Models;
@@ -30,12 +30,12 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctReceiptService acctReceiptService;
         private readonly ICurrentUser currentUser;
-      
+
 
         public AcctReceiptController(IStringLocalizer<LanguageSub> localizer,
             ICurrentUser curUser,
            IAcctReceiptService acctReceipt)
-        {   
+        {
             stringLocalizer = localizer;
             acctReceiptService = acctReceipt;
             currentUser = curUser;
@@ -75,7 +75,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria)
         {
             List<ReceiptInvoiceModel> results = acctReceiptService.GetInvoiceForReceipt(criteria);
-            return Ok(new ResultHandle { Data = results , Status = results.Count > 0 ? true : false });
+            return Ok(new ResultHandle { Data = results, Status = results.Count > 0 ? true : false });
         }
 
         /// <summary>
@@ -136,7 +136,7 @@ namespace eFMS.API.Accounting.Controllers
                 acctReceiptService.CalculatorReceivableForReceipt(id);
             }
             var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value};
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
         }
 
@@ -172,7 +172,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check exists invoice payment PAID
-            if(saveAction != SaveAction.SAVECANCEL)
+            if (saveAction != SaveAction.SAVECANCEL)
             {
                 string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
                 if (msgCheckPaidPayment.Length > 0)
@@ -187,13 +187,13 @@ namespace eFMS.API.Accounting.Controllers
             if (saveAction == SaveAction.SAVEDRAFT_ADD)
             {
                 var message = HandleError.GetMessage(hs, Crud.Insert);
-                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };           
+                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
             }
             else if (saveAction == SaveAction.SAVEDRAFT_UPDATE)
             {
                 var message = HandleError.GetMessage(hs, Crud.Update);
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
-            } 
+            }
             else if (saveAction == SaveAction.SAVEDONE)
             {
                 if (hs.Success)
@@ -202,7 +202,7 @@ namespace eFMS.API.Accounting.Controllers
                     acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
                 }
                 result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
-            } 
+            }
             else if (saveAction == SaveAction.SAVECANCEL)
             {
                 if (hs.Success)
@@ -248,7 +248,7 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
-        
+
         [HttpPost("ProcessInvoice")]
         public IActionResult ProcessInvoice(ProcessReceiptInvoice criteria)
         {
@@ -294,7 +294,7 @@ namespace eFMS.API.Accounting.Controllers
         private bool ValidateReceiptNo(Guid Id, string receiptNo)
         {
             bool valid = true;
-            if(Id == Guid.Empty)
+            if (Id == Guid.Empty)
             {
                 valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
             }
@@ -342,20 +342,22 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 }
 
-                if (payments.Any(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0 && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)))
+                if (payments.Any(x => x.Type == "DEBIT"
+                                && x.TotalPaidVnd > 0
+                                && string.IsNullOrEmpty(x.CreditNo)
+                                && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd))
+                                )
                 {
                     List<ReceiptInvoiceModel> invalidPayments = payments.Where(x => x.Type == "DEBIT" && x.TotalPaidVnd > 0
                     && (x.TotalPaidVnd > x.UnpaidAmountVnd || x.TotalPaidUsd > x.UnpaidAmountUsd)).ToList();
                     List<string> messages = new List<string>();
-                    if(invalidPayments.Count > 0)
+                    if (invalidPayments.Count > 0)
                     {
                         foreach (var item in invalidPayments)
                         {
-                            messages.Add(string.Format(@"Invoice {0} Total Paid must <= Unpaid",item.InvoiceNo));
+                            messageInValid += string.Format(@"Invoice {0} Total Paid must <= Unpaid", item.InvoiceNo) + "\n";
                         }
                     }
-
-                    messageInValid = string.Join(string.Format(@"\n"), messages.Select(x => x));
                 }
             }
 

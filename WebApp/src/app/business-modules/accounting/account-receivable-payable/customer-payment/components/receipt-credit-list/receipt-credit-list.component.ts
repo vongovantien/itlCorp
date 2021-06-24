@@ -1,4 +1,4 @@
-import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter } from "@angular/core";
+import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter, ViewChild } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
@@ -7,9 +7,10 @@ import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { distinctUntilChanged, skip, takeUntil, filter, pluck } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
-import { AppComboGridComponent } from "@common";
+import { AppComboGridComponent, ConfirmPopupComponent } from "@common";
 import { DataService } from "@services";
 import _cloneDeep from 'lodash/cloneDeep'
+import { InjectViewContainerRefDirective } from "@directives";
 @Component({
     selector: 'customer-payment-receipt-credit-list',
     templateUrl: './receipt-credit-list.component.html',
@@ -17,6 +18,7 @@ import _cloneDeep from 'lodash/cloneDeep'
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
+    @ViewChild(InjectViewContainerRefDirective) injectViewContainer: InjectViewContainerRefDirective;
     @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
 
@@ -51,21 +53,21 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '' },
-        { title: 'Job', field: '' },
-        { title: 'HBL', field: '' },
-        { title: 'MBL', field: '' },
         { title: 'Net Off Invoice No', field: '' },
-        { title: 'Org Amount', field: '', align: this.right },
-        { title: 'Amount USD', field: '', align: this.right },
-        { title: 'Amount VND', field: '', align: this.right },
-        { title: 'Payment Note', field: '' },
+        { title: 'Job', field: '', width: 150 },
+        { title: 'HBL', field: '', width: 150 },
+        { title: 'MBL', field: '', width: 150 },
+        { title: 'Org Amount', field: '', align: this.right, width: 150 },
+        { title: 'Amount USD', field: '', width: 150, align: this.right },
+        { title: 'Amount VND', field: '', width: 150, align: this.right },
+        { title: 'Note', field: '', width: 200 },
         { title: 'BU Handle', field: '' },
         { title: 'Office', field: '' },
     ];
     configDebitDisplayFields: CommonInterface.IComboGridDisplayField[] = [
         { field: 'invoiceNo', label: 'Invoice No' },
         { field: 'amount', label: 'Unpaid Invoice' }
-    ];;
+    ];
     isSubmitted: boolean = false;
     selectedInvoice: ReceiptInvoiceModel;
     selectedIndexInvoice: number = -1;
@@ -87,10 +89,10 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         this.headers = [
             { title: 'RefNo', field: '' },
             { title: 'Net Off Invoice No', field: '' },
-            { title: 'Org Amount', field: '', align: this.right },
+            { title: 'Org Amount', field: '', align: this.right, width: 150 },
             { title: 'Amount USD', field: '', width: 150, align: this.right },
             { title: 'Amount VND', field: '', width: 150, align: this.right },
-            { title: 'Note', field: '' },
+            { title: 'Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
@@ -100,10 +102,9 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .subscribe(
                 (data) => {
                     this.creditList = data;
+                    console.log(this.creditList);
                 }
             )
-
-        this.getInvoiceList();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -136,58 +137,35 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         );
     }
 
-
-    getInvoiceList() {
-        this.debitList.pipe(distinctUntilChanged(), takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                this.invoiceDatasource = [];
-                x.filter((element: ReceiptInvoiceModel) => (element.type !== 'ADV' && element.type !== 'OBH')).map((element: ReceiptInvoiceModel) => {
-                    const item = {
-                        invoiceNo: element.invoiceNo,
-                        amount: this.formatNumberCurrency(element.amount),
-                    };
-                    this.invoiceDatasource = [...this.invoiceDatasource, item];
-                })
-            });
-    }
-
-
     onSelectInvoice(data: any, invoiceItem: ReceiptInvoiceModel) {
         if (!!data) {
             invoiceItem.invoiceNo = data.invoiceNo;
         }
     }
 
-    loadDynamicComoGrid(item: ReceiptInvoiceModel, index: number) {
-        this.selectedInvoice = item;
+    confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {
         this.selectedIndexInvoice = index;
-        const containerRef: ViewContainerRef = this.widgetTargets.toArray()[index];
-        this.componentRef = this.renderDynamicComponent(AppComboGridComponent, containerRef);
-        if (!!this.componentRef) {
-            this.getInvoiceList();
-            this.componentRef.instance.headers = this.headerInvoice;
-            this.componentRef.instance.data = this.invoiceDatasource;
-            this.componentRef.instance.active = item.invoiceNo;
-
-            this.subscription = ((this.componentRef.instance) as AppComboGridComponent<ReceiptInvoiceModel>).onClick.subscribe(
-                (v: ReceiptInvoiceModel) => {
-                    this.onSelectInvoice(v, this.selectedInvoice);
-                    this.subscription.unsubscribe();
-
-                    containerRef.clear();
-                });
-            ((this.componentRef.instance) as AppComboGridComponent<ReceiptInvoiceModel>).clickOutSide
-                .pipe(skip(1))
-                .subscribe(
-                    () => {
-                        containerRef.clear();
-                    }
-                );
+        if (item.type === "OBH") {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainer.viewContainerRef, {
+                title: 'Confirm Remove Credit',
+                body: 'Some Credit Values will change, do you want to remove you selections?',
+                labelConfirm: 'Yes',
+                labelCancel: 'No'
+            }, () => {
+                this.onDeleteInvoiceItem();
+            })
+        } else if (!!item.id) {
+            this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainer.viewContainerRef, {
+                title: 'Confirm Remove Credit',
+                body: 'Some Credit Values will change, do you want to remove you selections?',
+                labelConfirm: 'Yes',
+                labelCancel: 'No'
+            }, () => {
+                this.onDeleteInvoiceItem();
+            })
+        } else {
+            this.onDeleteInvoiceItem();
         }
-    }
-
-    confirmDeleteInvoiceItem(index: number) {
-        this.selectedIndexInvoice = index;
     }
 
     onDeleteInvoiceItem() {
