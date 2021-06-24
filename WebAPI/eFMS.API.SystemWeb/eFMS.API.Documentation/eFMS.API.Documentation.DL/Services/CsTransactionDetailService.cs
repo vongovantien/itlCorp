@@ -2347,7 +2347,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// Send email when create house bill
         /// </summary>
         /// <param name="transDetail"></param>
-        private void SendEmailNewHouseToSales(CsTransactionDetail transDetail)
+        public void SendEmailNewHouseToSales(CsTransactionDetail transDetail)
         {
             var salesmanInfo = sysUserRepo.Get(x => x.Id == transDetail.SaleManId).FirstOrDefault();
             var employeeInfo = sysEmployeeRepository.Get(x => x.Id == salesmanInfo.EmployeeId).FirstOrDefault();
