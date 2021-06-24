@@ -48,4 +48,5 @@ DecimalNo	Number
 CurrDecimalNo	Number		
 ExtVND	Number		
 ETA	Date		
-LoadingDate	Date		
+LoadingDate	Date
+FlexID	String	255			

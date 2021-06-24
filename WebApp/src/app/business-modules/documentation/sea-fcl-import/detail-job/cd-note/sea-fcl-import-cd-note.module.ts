@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { ShareBussinessCdNoteListComponent } from 'src/app/business-modules/share-business/components/cd-note/cd-note-list/cd-note-list.component';
+import { ShareBussinessCdNoteListSeaComponent } from 'src/app/business-modules/share-business/components/cd-note-sea/cd-note-list/cd-note-list.component';
 import { ShareBussinessModule } from 'src/app/business-modules/share-business/share-bussines.module';
 
 @NgModule({
@@ -11,9 +11,9 @@ import { ShareBussinessModule } from 'src/app/business-modules/share-business/sh
     ],
     providers: [],
     entryComponents: [
-        ShareBussinessCdNoteListComponent
+        ShareBussinessCdNoteListSeaComponent
     ]
 })
 export class SeaFCLImportCDNoteModule {
-    static rootComponent = ShareBussinessCdNoteListComponent;
+    static rootComponent = ShareBussinessCdNoteListSeaComponent;
 }
