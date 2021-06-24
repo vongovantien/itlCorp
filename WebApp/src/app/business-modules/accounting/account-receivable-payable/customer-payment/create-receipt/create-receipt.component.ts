@@ -33,7 +33,6 @@ export enum SaveReceiptActionEnum {
 export class ARCustomerPaymentCreateReciptComponent extends AppForm implements OnInit {
     @ViewChild(ARCustomerPaymentFormCreateReceiptComponent) formCreate: ARCustomerPaymentFormCreateReceiptComponent;
     @ViewChild(ARCustomerPaymentReceiptPaymentListComponent) listInvoice: ARCustomerPaymentReceiptPaymentListComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
 
     invalidBalance: string = 'Total Paid Amount is not matched with Final Paid Amount, Please check it and Click Process Clear to update new value!';
@@ -63,7 +62,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.listInvoice.receiptDebitList.isSubmitted = true;
 
         if (!this.checkValidateForm()) {
-            this.infoPopup.show();
+            this.showPopupDynamicRender(InfoPopupComponent, this.viewContainerRef.viewContainerRef, {
+                body: this.invalidFormText
+            })
             return;
         }
 
@@ -118,6 +119,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
             }
+        }
+        if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == "DEBIT" && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
+            this._toastService.warning("Total Paid must <= Unpaid");
+            return;
         }
         receiptModel.payments = this.paymentList;
         this.onSaveDataReceipt(receiptModel, action);

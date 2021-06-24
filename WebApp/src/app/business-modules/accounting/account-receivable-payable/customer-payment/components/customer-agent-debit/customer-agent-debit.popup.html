@@ -15,7 +15,7 @@
                 <div class="m-portlet">
                     <div class="m-portlet__body">
                         <div class="table-horizontal" style="max-height:500px">
-                            <table class="table table-striped table-brand dataTable">
+                            <table class="table table-condensed table-brand dataTable table-hover pointer">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-50 first">
@@ -89,10 +89,10 @@
                                                 </ng-container>
                                             </td>
                                             <td>
-                                                <span class="text-sucess">{{debit.departmentName}} </span>
+                                                <span class="text-success">{{debit.departmentName}} </span>
                                             </td>
                                             <td>
-                                                <span class="text-sucess">{{debit.officeName}} </span>
+                                                <span class="text-success">{{debit.officeName}} </span>
                                             </td>
                                         </tr>
                                         <tr class="font-weight-bold">
@@ -124,7 +124,7 @@
                 </div>
             </ng-container>
 
-            <ng-container *ngIf="type === 'AGENCY'">
+            <ng-container *ngIf="type === 'AGENT'">
                 <div class="m-portlet">
                     <div class="m-portlet__body">
                         <div class="m-form m--margin-bottom-10">
@@ -142,7 +142,7 @@
                             </div>
                         </div>
                         <div class="table-horizontal" style="max-height:500px">
-                            <table class="table table-striped table-brand dataTable">
+                            <table class="table table-condensed table-brand dataTable table-hover pointer">
                                 <thead app-table-header [headers]="headersAgency"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
                                     <th class="m--w-50 first">

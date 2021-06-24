@@ -1,5 +1,5 @@
 <div class="m-portlet">
-    <div class="bg-pink m-portlet__head alert-block__heading pointer">
+    <div class="m-portlet__head alert-block__heading pointer bg-secondary">
         <div class="m-portlet__head-caption">
             <div class="m-portlet__head-title w-100">
                 <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#debit-list">
@@ -28,7 +28,7 @@
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
                                         <app-permission-button type="delete"
-                                            (onClick)="confirmDeleteInvoiceItem(i); confirmRemove.show()" class="icon"
+                                            (onClick)="confirmDeleteInvoiceItem(item,i);" class="icon"
                                             icon="la la-trash text-danger">
                                         </app-permission-button>
                                     </ng-container>
@@ -37,18 +37,6 @@
                                 <td ALIGN="center">{{item.type}}</td>
                                 <td class="text-primary">{{item.invoiceNo}}</td>
                                 <td>
-                                    <!-- <div class="form-group col-md-12 dropdown-partner" dropdown>
-                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
-                                            placeholder="Vat Partner" [(ngModel)]="item.creditNo"
-                                            (click)="loadDynamicComoGrid(item,i)" [disabled]="isReadonly">
-                                        <ng-container>
-                                            <div class="d-flex justify-content-end dropdown-partner__header">
-                                                <a class="text-primary text-underline m--margin-right-20 pointer"
-                                                    (click)="onSelectInvoice($event, item)"></a>
-                                            </div>
-                                            <ng-template #container></ng-template>
-                                        </ng-container>
-                                    </div> -->
                                     <div class="form-group" *ngIf="item.type === 'DEBIT'">
                                         <select class="form-control" [ngModel]="item.creditNo" [disabled]="isReadonly"
                                             (ngModelChange)="onChangeCalCredit($event, item)">
@@ -75,12 +63,12 @@
                                 <td ALIGN="right">
                                     <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd"
                                         name="paidAmountUsd" numeric autoFormatCurrency [disabled]="isReadonly"
-                                        (blur)="formatAmount($event, item)">
+                                        (blur)="calculateTotalPaidAmount($event, item,'paidUsd')">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountVnd"
                                         name="paidAmountVnd" numeric autoFormatCurrency [disabled]="isReadonly"
-                                        (blur)="formatAmount($event, item)">
+                                        (blur)="calculateTotalPaidAmount($event, item,'paidVnd')">
                                 </td>
 
                                 <td ALIGN="right">
@@ -167,7 +155,5 @@
     </div>
 </div>
 
-<confirm-popup #confirmRemove body="Some Debit Values will change, do you want to remove you selections?"
-    (onSubmit)="onDeleteInvoiceItem();confirmRemove.hide()" [labelCancel]="'No'" [labelConfirm]="'Yes'"
-    title="Confirm Remove">
-</confirm-popup>
+
+<ng-template inject></ng-template>

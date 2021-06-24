@@ -107,7 +107,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             status: this.status.value,
             type: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null,
         };
-        this._listReceipt.getCPs(body);
+        this._listReceipt.onSearchCPs(body);
 
     }
 

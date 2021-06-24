@@ -86,7 +86,12 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((type: string) => {
-                this.type = type;
+                const typeArr = (type || '').split(";").filter(x => Boolean(x)).map(x => x.trim());
+                if (typeArr.length === 1 && (typeArr.includes("CUSTOMER") || typeArr.includes("AGENT"))) {
+                    this.type = type;
+                } else {
+                    this.type = type[0];
+                }
                 console.log(this.type);
             })
 
@@ -236,11 +241,11 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         let datatoReceiptGroup = [];
         let datatoReceiptList = [];
         let datatoReceipt = this.listDebit;
-        if (this.TYPELIST === 'GROUP' && this.type === 'Agency') {
+        if (this.TYPELIST === 'GROUP' && this.type === 'AGENT') {
             datatoReceiptGroup = this.getAgencyDebitGroup();
             datatoReceipt = datatoReceiptGroup;
         }
-        if (this.TYPELIST === 'LIST' && this.type === 'Agency') {
+        if (this.TYPELIST === 'LIST' && this.type === 'AGENT') {
             datatoReceiptList = this.getAgencyDebitGroup();
             datatoReceipt = datatoReceiptList;
         }
@@ -288,7 +293,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     removeAllChecked(groupShipment: any) {
         this.checkAll = false;
         this.checkAllAgency = false;
-        if (this.type === 'Agency') {
+        if (this.type === 'AGENT') {
             groupShipment.isSelected = false;
             if (this.TYPELIST === 'GROUP') {
                 groupShipment.invoices.forEach(x => {
