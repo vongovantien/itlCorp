@@ -59,10 +59,6 @@ export * from './payment-method/payment-method.popup';
 export * from './job-detail-buttons/job-detail-button-list.component';
 
 
-export * from './cd-note-sea/add-cd-note/add-cd-note.popup';
-export * from './cd-note-sea/add-remaining-charge/add-remaining-charge.popup';
-export * from './cd-note-sea/cd-note-list/cd-note-list.component';
-export * from './cd-note-sea/detail-cd-note/detail-cd-note.popup';
 // TODO export components from shareBussiness.
 
 

@@ -63,10 +63,6 @@ import {
     ShareBussinessInputDailyExportPopupComponent,
     ShareBussinessPaymentMethodPopupComponent,
     ShareBussinessJobDetailButtonListComponent,
-    ShareBussinessCdNoteListSeaComponent,
-    ShareBussinessCdNoteAddSeaPopupComponent,
-    ShareBussinessCdNoteAddRemainingChargeSeaPopupComponent,
-    ShareBussinessCdNoteDetailSeaPopupComponent
 } from './components';
 
 
@@ -128,10 +124,6 @@ const COMPONENTS = [
     ShareBussinessPaymentMethodPopupComponent,
     ShareBussinessJobDetailButtonListComponent,
     ShareBusinessProofOfDelieveyComponent,
-    ShareBussinessCdNoteListSeaComponent,
-    ShareBussinessCdNoteAddSeaPopupComponent,
-    ShareBussinessCdNoteAddRemainingChargeSeaPopupComponent,
-    ShareBussinessCdNoteDetailSeaPopupComponent
 ];
 
 
