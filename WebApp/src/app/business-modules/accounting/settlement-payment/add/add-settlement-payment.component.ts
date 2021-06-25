@@ -164,7 +164,7 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
             bankName: this.formCreateSurcharge.bankNameDescription.value,
             bankCode: this.formCreateSurcharge.bankCode.value,
-            dueDate: !!this.formCreateSurcharge.dueDate && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
+            dueDate: !!this.formCreateSurcharge.dueDate.value && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };
 
         return dataSettle;

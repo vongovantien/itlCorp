@@ -112,10 +112,11 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         advanceAmount: this.settlementPayment.settlement.advanceAmount,
                         balanceAmount: this.settlementPayment.settlement.balanceAmount,
                         bankName: this.settlementPayment.settlement.bankName,
+                        bankNameDescription: this.settlementPayment.settlement.bankName,
                         beneficiaryName: this.settlementPayment.settlement.bankAccountName,
                         bankAccountNo: this.settlementPayment.settlement.bankAccountNo,
                         bankCode: this.settlementPayment.settlement.bankCode,
-                        dueDate: { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) }
+                        dueDate: !!this.settlementPayment.settlement.dueDate ? { startDate: new Date(this.settlementPayment.settlement.dueDate), endDate: new Date(this.settlementPayment.settlement.dueDate) } : null
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
