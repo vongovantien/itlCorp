@@ -4153,23 +4153,23 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATAmountVND;
                         it.NetAmount = it.AmountVND;
                     }
-                    if (it.VATRate > 0)
-                    {
-                        it.VATAmount = (it.VATRate * it.NetAmount) / 100;
-                    }
-                    else
-                    {
-                        it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
-                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            it.VATAmount = it.VATAmountUSD;
-                        }
-                        else
-                        {
-                            it.VATAmount = it.VATAmountVND;
-                        }
+                    //if (it.VATRate > 0)
+                    //{
+                    //    it.VATAmount = (it.VATRate * it.NetAmount) / 100;
+                    //}
+                    //else
+                    //{
+                    //    it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
+                    //    if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                    //    {
+                    //        it.VATAmount = it.VATAmountUSD;
+                    //    }
+                    //    else
+                    //    {
+                    //        it.VATAmount = it.VATAmountVND;
+                    //    }
 
-                    }
+                    //}
 
                 }
             }
@@ -4279,23 +4279,23 @@ namespace eFMS.API.Documentation.DL.Services
                         it.VATAmount = it.VATAmountVND;
                         it.NetAmount = it.AmountVND;
                     }
-                    if (it.VATRate > 0)
-                    {
-                        it.VATAmount = (it.VATRate * it.NetAmount) / 100;
-                    }
-                    else
-                    {
-                        it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
-                        if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                        {
-                            it.VATAmount = it.VATAmountUSD;
-                        }
-                        else
-                        {
-                            it.VATAmount = it.VATAmountVND;
-                        }
+                    //if (it.VATRate > 0)
+                    //{
+                    //    it.VATAmount = (it.VATRate * it.NetAmount) / 100;
+                    //}
+                    //else
+                    //{
+                    //    it.VATAmount = it.VATRate != null ? Math.Abs(it.VATRate.Value) : 0;
+                    //    if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                    //    {
+                    //        it.VATAmount = it.VATAmountUSD;
+                    //    }
+                    //    else
+                    //    {
+                    //        it.VATAmount = it.VATAmountVND;
+                    //    }
 
-                    }
+                    //}
 
                 }
             }
