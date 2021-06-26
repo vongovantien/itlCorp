@@ -1,4 +1,4 @@
-import { Component, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ViewChild, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { formatDate } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -17,6 +17,7 @@ import { AdvancePaymentListRequestComponent } from '../components/list-advance-p
 import { catchError, tap, switchMap, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { of } from 'rxjs/internal/observable/of';
+import { InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'app-advance-payment-detail',
@@ -28,7 +29,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent, { static: true }) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
-
+    @ViewChild(InjectViewContainerRefDirective) reportContainerRef: InjectViewContainerRefDirective;
     progress: any[] = [];
     advancePayment: AdvancePayment = null;
 
@@ -37,14 +38,15 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
     approveInfo: any = null;
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Advance';
-    
+    folderModuleName: string = 'Advance';
+
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
         private _toastService: ToastrService,
         private _router: Router,
         private _exportRepo: ExportRepo,
+        private _cd: ChangeDetectorRef
     ) {
         super();
     }
@@ -69,8 +71,9 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
 
     @delayTime(1000)
     showReport(): void {
-        this.previewPopup.frm.nativeElement.submit();
-        this.previewPopup.show();
+        this._cd.detectChanges();
+        this.componentRef.instance.frm.nativeElement.submit();
+        this.componentRef.instance.show();
     }
 
     onChangeCurrency(currency: string) {
@@ -192,10 +195,20 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
 
     previewAdvPayment() {
         this._accoutingRepo.previewAdvancePayment(this.advId)
+            .pipe(catchError(this.catchError))
             .subscribe(
                 (res: any) => {
-                    this.dataReport = res;
+                    this.componentRef = this.renderDynamicComponent(ReportPreviewComponent, this.reportContainerRef.viewContainerRef);
+                    (this.componentRef.instance as ReportPreviewComponent).data = res;
+
                     this.showReport();
+
+                    this.subscription = ((this.componentRef.instance) as ReportPreviewComponent).$invisible.subscribe(
+                        (v: any) => {
+                            this.subscription.unsubscribe();
+                            this.reportContainerRef.viewContainerRef.clear();
+                        });
+
                 },
             );
     }
@@ -230,7 +243,7 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
         this._exportRepo.exportAdvancePaymentDetail(this.advId, lang)
             .subscribe((response: ArrayBuffer) => { this.downLoadFile(response, "application/ms-excel", `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`); });
     }
- 
+
     getInfoApprove(advanceNo: string) {
         this._accoutingRepo.getInfoApprove(advanceNo).subscribe((res: any) => { this.approveInfo = res; });
     }

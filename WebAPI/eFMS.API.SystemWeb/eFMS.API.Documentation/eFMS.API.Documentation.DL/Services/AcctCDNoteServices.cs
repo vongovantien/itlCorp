@@ -1619,6 +1619,7 @@ namespace eFMS.API.Documentation.DL.Services
                     charge.Quantity = item.Quantity + _decimalNumber; //Cộng thêm phần thập phân
                     charge.Unit = item.UnitCode; //Unit Code
                     charge.QUnit = isOriginCurr ? item.CurrencyId : currency;
+                    charge.FlexID = data.FlexId;
 
                     var _unitPrice = (item.UnitPrice ?? 0) * _exchangeRate; //Unit Price đã được Exchange Rate theo Currency và không làm tròn
                     charge.UnitPrice = _unitPrice + _decimalNumber; //cộng thêm phần thập phân

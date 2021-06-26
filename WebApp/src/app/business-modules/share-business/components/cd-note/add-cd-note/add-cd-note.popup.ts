@@ -48,6 +48,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     partnerCurrent: any = {};
     isHouseBillID: boolean = false;
 
+    flexId: AbstractControl;
     note: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -77,9 +78,11 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     ngOnInit() {
         this.formCreate = this._fb.group({
+            flexId: [],
             note: []
         });
         this.note = this.formCreate.controls["note"];
+        this.flexId = this.formCreate.controls["flexId"];
     }
 
     setHeader() {
@@ -138,6 +141,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
+                    // Set value Flex Id when create CD Note
+                    this.setValueFlexId(data);
                     return data.map((item: any) => new ChargeCdNote(item));
                 })
             ).subscribe(
@@ -296,6 +301,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
+            this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
             this.CDNote.note = this.note.value;
             const arrayCharges = [];
@@ -473,5 +479,16 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     onCancelConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
+    }
+    setValueFlexId(data: any) {
+        if (this.action === 'create') {
+            let _flexId = '';
+            data.forEach(element => {
+                if (element.listCharges.length > 0 && element.flexId) {
+                    _flexId += element.flexId + '; ';
+                }
+            });
+            this.flexId.setValue(_flexId);
+        }
     }
 }
