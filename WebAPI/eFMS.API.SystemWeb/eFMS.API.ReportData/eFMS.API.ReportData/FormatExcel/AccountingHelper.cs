@@ -2715,11 +2715,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(6).Width = 20; //Cột F
             workSheet.Column(7).Width = 20; //Cột G
             workSheet.Column(8).Width = 20; //Cột H
-            workSheet.Column(9).Width = 12; //Cột G
-            workSheet.Column(10).Width = 12; //Cột H
-            workSheet.Column(11).Width = 20; //Cột I
-            workSheet.Column(12).Width = 12; //Cột J
-            workSheet.Column(13).Width = 18; //Cột K
+            workSheet.Column(9).Width = 12; //Cột I
+            workSheet.Column(10).Width = 12; //Cột J
+            workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 18; //Cột M
         }
 
         private List<string> GetHeaderExcelDetailSettlementPayment(string language)

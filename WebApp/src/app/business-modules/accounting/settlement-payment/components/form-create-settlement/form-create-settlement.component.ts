@@ -11,7 +11,8 @@ import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 @Component({
     selector: 'settle-payment-form-create',
-    templateUrl: './form-create-settlement.component.html'
+    templateUrl: './form-create-settlement.component.html',
+    styleUrls: ['./form-create-settlement.component.scss']
 })
 
 export class SettlementFormCreateComponent extends AppForm {
