@@ -118,7 +118,7 @@
                                 <span>{{custom.exportCountryName}}</span>
                             </td>
                         </tr>
-                        <tr class="loading-wrapper" *ngIf="isLoading">
+                        <tr class="loading-wrapper" *ngIf="(isLoading | async)">
                             <td colspan="100">
                                 <div class="on-loading">
                                     <div class="m-loader m-loader--brand">
@@ -126,7 +126,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr *ngIf="!isLoading && !listCustomDeclaration.length">
+                        <tr *ngIf="!(isLoading | async) && !listCustomDeclaration.length">
                             <td colspan="100">
                                 <div class="no-data">
                                     <i class="flaticon-coins"></i>
