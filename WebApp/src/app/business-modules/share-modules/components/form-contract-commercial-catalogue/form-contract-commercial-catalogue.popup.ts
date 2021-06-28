@@ -59,6 +59,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     currencyId: AbstractControl;
     creditCurrency: AbstractControl;
     partnerIds: AbstractControl;
+    creditLimit: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -235,6 +236,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.currencyId = this.formGroup.controls['currencyId'];
         this.partnerIds = this.formGroup.controls['partnerId'];
         this.creditCurrency = this.formGroup.controls['creditCurrency'];
+        this.creditLimit = this.formGroup.controls['creditLimit'];
     }
 
     initDataForm() {
