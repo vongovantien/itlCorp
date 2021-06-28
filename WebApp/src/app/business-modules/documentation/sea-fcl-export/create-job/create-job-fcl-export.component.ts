@@ -106,7 +106,8 @@ export class SeaFCLExportCreateJobComponent extends AppForm implements OnInit {
         if (!this.formCreateComponent.formGroup.valid
             || (!!this.formCreateComponent.etd.value && !this.formCreateComponent.etd.value.startDate)
             || (!!this.formCreateComponent.podDescription.value && !this.formCreateComponent.pod.value)
-            || (!this.formCreateComponent.polDescription.value)
+            || (!this.formCreateComponent.polDescription.value
+            || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate))
         ) {
             valid = false;
         }

@@ -77,7 +77,8 @@ export class AirImportCreateJobComponent extends AppForm implements OnInit {
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)) {
+        if (!this.formCreateComponent.formGroup.valid || (!!this.formCreateComponent.eta.value && !this.formCreateComponent.eta.value.startDate)
+                                                    || (!!this.formCreateComponent.serviceDate.value && !this.formCreateComponent.serviceDate.value.startDate)) {
             valid = false;
         }
         return valid;

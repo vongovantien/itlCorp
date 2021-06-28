@@ -174,7 +174,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             eta: [null, Validators.required],
             ata: [],
             atd: [],
-            serviceDate: [],
+            serviceDate: [null, Validators.required],
 
             subColoader: [],
             flightVesselName: [],
