@@ -775,11 +775,14 @@ namespace eFMS.API.Documentation.DL.Services
             // ServiceDate/DatetimeCreated Search
             if (criteria.ServiceDateFrom != null && criteria.ServiceDateTo != null)
             {
+                // [CR: 15857]
+                //queryTrans = q =>
+                //    q.TransactionType.Contains("E") ?
+                //    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
+                //    :
+                //    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
                 queryTrans = q =>
-                    q.TransactionType.Contains("E") ?
-                    (q.Etd.HasValue ? q.Etd.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Etd.Value.Date <= criteria.ServiceDateTo.Value.Date : false)
-                    :
-                    (q.Eta.HasValue ? q.Eta.Value.Date >= criteria.ServiceDateFrom.Value.Date && q.Eta.Value.Date <= criteria.ServiceDateTo.Value.Date : false);
+                    q.ServiceDate.HasValue ? (criteria.ServiceDateFrom.Value.Date <= q.ServiceDate.Value.Date && q.ServiceDate.Value.Date <= criteria.ServiceDateTo.Value.Date) : false;
             }
             else
             {
@@ -3891,7 +3894,7 @@ namespace eFMS.API.Documentation.DL.Services
                                           InvoiceNo = sur.InvoiceNo,
                                           Note = sur.Notes,
                                           CustomerID = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
-                                          ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                          ServiceDate = cst.ServiceDate,
                                           CreatedDate = cst.DatetimeCreated,
                                           TransactionType = cst.TransactionType,
                                           UserCreated = cst.UserCreated,
@@ -4016,7 +4019,7 @@ namespace eFMS.API.Documentation.DL.Services
                                           InvoiceNo = sur.InvoiceNo,
                                           Note = sur.Notes,
                                           CustomerID = sur.Type == "OBH" ? sur.PayerId : sur.PaymentObjectId,
-                                          ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                          ServiceDate = cst.ServiceDate,
                                           CreatedDate = cst.DatetimeCreated,
                                           TransactionType = cst.TransactionType,
                                           UserCreated = cst.UserCreated,
@@ -4400,7 +4403,7 @@ namespace eFMS.API.Documentation.DL.Services
                                           InvoiceNo = sur.InvoiceNo,
                                           Note = sur.Notes,
                                           CustomerID = sur.PaymentObjectId,
-                                          ServiceDate = (cst.TransactionType == "AI" || cst.TransactionType == "SFI" || cst.TransactionType == "SLI" || cst.TransactionType == "SCI" ? cst.Eta : cst.Etd),
+                                          ServiceDate = cst.ServiceDate,
                                           CreatedDate = cst.DatetimeCreated,
                                           TransactionType = cst.TransactionType,
                                           UserCreated = cst.UserCreated,
