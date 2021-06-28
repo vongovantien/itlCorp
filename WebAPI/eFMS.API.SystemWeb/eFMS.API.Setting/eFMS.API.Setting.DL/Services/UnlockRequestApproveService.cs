@@ -2056,18 +2056,19 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     if (type == "Change Service Date")
                     {
+                        //[CR: 15952]
                         //[CR: 15718 - 07/05/2021 - Andy]
-                        if (doc.TransactionType.Contains("E"))
-                        {
-                            //Export >> Update for ETD
-                            doc.Etd = newServiceDate;
-                        }
-                        else if (doc.TransactionType.Contains("I"))
-                        {
-                            //Import >> Update for ETA
-                            doc.Eta = newServiceDate;
-                        } 
-                        else
+                        //if (doc.TransactionType.Contains("E"))
+                        //{
+                        //    //Export >> Update for ETD
+                        //    doc.Etd = newServiceDate;
+                        //}
+                        //else if (doc.TransactionType.Contains("I"))
+                        //{
+                        //    //Import >> Update for ETA
+                        //    doc.Eta = newServiceDate;
+                        //} 
+                        //else
                         {
                             doc.ServiceDate = newServiceDate;
                         }

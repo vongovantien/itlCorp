@@ -6,7 +6,8 @@
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
                     <tab heading="Advance Info" [active]="true">
-                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                        </adv-payment-form-create>
                         <div class="row" *ngIf="!!advancePayment">
                             <div class="col-6">
                                 <div class="m--align-left">
@@ -27,9 +28,11 @@
                     <tab>
                         <ng-template tabHeading>
                             <span class="m--margin-right-10">Attach files</span>
-                            <span class="badge badge-success" *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
+                            <span class="badge badge-success"
+                                *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <accounting-attach-file-list *ngIf="!!advancePayment" (onChange)="attachFiles = $event"  [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName' >
+                        <accounting-attach-file-list *ngIf="!!advancePayment" (onChange)="attachFiles = $event"
+                            [fileNo]="advancePayment.advanceNo" [folderModuleName]='folderModuleName'>
                         </accounting-attach-file-list>
                     </tab>
                 </tabset>
@@ -70,11 +73,16 @@
                                     </app-default-button>
 
                                     <app-dropdown #dropdownMenu>
-                                        <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview single</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('VN')">Preview multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('ENG')">Preview multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="previewAdvPayment()">Preview
+                                            single</a>
+                                        <a class="dropdown-item pointer" (click)="previewExportAdvPayment('VN')">Preview
+                                            multiple (VN)</a>
+                                        <a class="dropdown-item pointer"
+                                            (click)="previewExportAdvPayment('ENG')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('VN')">Print multiple
+                                            (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportAdvPayment('ENG')">Print
+                                            multiple (ENG)</a>
                                     </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">
@@ -88,6 +96,4 @@
     </div>
 </div>
 
-<ng-container *ngIf="dataReport">
-    <app-report-preview [data]="dataReport"></app-report-preview>
-</ng-container>
+<ng-template inject></ng-template>

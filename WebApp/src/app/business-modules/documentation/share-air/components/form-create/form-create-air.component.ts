@@ -202,6 +202,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 res.etd = null;
                                 res.mawb = null;
                                 res.eta = null;
+                                res.serviceDate = null;
                             }
                         });
                         try {
@@ -268,7 +269,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
             // * Date
             etd: [null, this.type !== 'import' ? Validators.required : null],
             eta: [null, this.type === 'import' ? Validators.required : null],
-            serviceDate: [],
+            serviceDate: [null, Validators.required],
             flightDate: [],
 
             // * select
@@ -535,7 +536,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
     }
 
     setDefaultChargeWeight() {
-        if (this.type !== 'import') {
+        // if (this.type !== 'import') {
             let grossWeight = this.formGroup.controls['grossWeight'].value;
             let hw = this.formGroup.controls['hw'].value;
             if (grossWeight > hw) {
@@ -545,6 +546,5 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 hw = Number(hw.toFixed(2));
                 this.formGroup.patchValue({ chargeWeight: hw });
             }
-        }
     }
 }

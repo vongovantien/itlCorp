@@ -206,13 +206,13 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
-                            <label>Service Date</label>
+                        <div class="form-group" [ngClass]="{'m-form__group has-danger': (isSubmitted && (!serviceDate.valid || !serviceDate.value.startDate))}">
+                            <label required>Service Date</label>
                             <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                 <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                     [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
-                                    [alwaysShowCalendars]="true" name="daterange" readonly formControlName="serviceDate"
-                                    (remove)="resetFormControl(serviceDate)" calendar
+                                    [alwaysShowCalendars]="true" name="daterange" placeholder="Select Service Date" readonly
+                                    formControlName="serviceDate" (remove)="resetFormControl(serviceDate)" calendar
                                     [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate" />
                             </div>
                         </div>
@@ -256,7 +256,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>CW (KGS)</label>
-                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric
+                                    <input type="number" class="form-control" formControlName="chargeWeight" numeric placeholder="Charge weight"
                                         [decimals]="digitDecimal" autoFormatCurrency [digits]=2>
                                 </div>
                             </div>
@@ -341,7 +341,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-12" *ngIf="type === 'export'">
+                            <div class="col-md-12">
                                 <div class="form-group">
                                     <label>No HAWB</label>
                                     <div>

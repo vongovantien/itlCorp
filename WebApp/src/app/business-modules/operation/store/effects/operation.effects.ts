@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { EMPTY, Observable, of } from 'rxjs';
 import { Action } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { OPSActions, OPSActionTypes, OPSTransactionGetDetailSuccessAction, OPSTransactionGetDetailFailAction, OPSTransactionLoadListSuccessAction, OPSTransactionLoadListFailAction } from '../actions/operation.action';
-import { map, mergeMap, catchError } from 'rxjs/operators';
-import { DocumentationRepo } from '@repositories';
+import { map, mergeMap, catchError, switchMap } from 'rxjs/operators';
+import { DocumentationRepo, OperationRepo } from '@repositories';
 import { OpsTransaction } from '@models';
+import { ClearanceActionTypes, CustomsDeclarationLoadListSuccessAction } from '../actions/custom-clearance.action';
 
 @Injectable()
 export class OperationEffects {
@@ -37,9 +38,23 @@ export class OperationEffects {
                     )
             )
         );
+
+    @Effect()
+    getListCustomClearanceEffect$: Observable<Action> = this.actions$.
+            pipe(
+                ofType(ClearanceActionTypes.LOAD_LIST),
+                switchMap(
+                    (param: CommonInterface.IParamPaging) => this._operationRepo.getListCustomDeclaration(param.page, param.size, param.dataSearch)
+                        .pipe(
+                            catchError(() => EMPTY),
+                            map((data: CommonInterface.IResponsePaging) => CustomsDeclarationLoadListSuccessAction(data)),
+                        )
+                )
+            );
     constructor(
         private actions$: Actions,
-        private _documentRepo: DocumentationRepo
+        private _documentRepo: DocumentationRepo,
+        private _operationRepo: OperationRepo
     ) { }
 
 

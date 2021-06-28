@@ -1423,12 +1423,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
             }
-            // Data search = ETD/ETA(Air Sea Service) and Service Date(ops)
+            // Data search = ServiceDate
             if (criteria.serviceDateFrom != null || criteria.serviceDateTo != null)
             {
-                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom <= x.ServiceDate.Value && x.ServiceDate.Value <= criteria.serviceDateTo : false);
-                csTrans = csTrans.Where(x => x.TransactionType.Contains("E") ? (x.Etd.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Etd.Value.Date && x.Etd.Value.Date <= criteria.serviceDateTo.Value.Date : false)
-                                                                            : (x.Eta.HasValue ? criteria.serviceDateFrom.Value.Date <= x.Eta.Value.Date && x.Eta.Value.Date <= criteria.serviceDateTo.Value.Date : false));
+                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date : false);
+                csTrans = csTrans.Where(x => x.ServiceDate.HasValue ? (criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date) : false);
             }
             // Data search = serviceType
             if (!string.IsNullOrEmpty(criteria.servicesType))
