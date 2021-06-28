@@ -340,6 +340,15 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
     }
 
+    previewGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
+    }
+
     @delayTime(1000)
     showReport(): void {
         this.componentRef.instance.frm.nativeElement.submit();
