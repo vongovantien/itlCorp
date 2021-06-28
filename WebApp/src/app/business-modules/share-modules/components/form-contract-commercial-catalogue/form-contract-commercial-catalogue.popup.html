@@ -209,8 +209,7 @@
                                     <div class="form-group">
                                         <label>Trial Credit Limit
                                         </label>
-                                        <input type="number" min="0" numeric [decimals]="digitDecimal"
-                                            autoFormatCurrency
+                                        <input type="text" formatDecimalFormControl minimum='0'
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true ?  null : 'disabled'"
                                             class="form-control" formControlName="trialCreditLimit">
                                     </div>
@@ -289,7 +288,7 @@
                                         <label>Credit Limit</label>
                                         <input
                                             [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true || !isUpdate ?  null : 'disabled'"
-                                            type="text" class="form-control" formatDecimalFormControl minimum='1'
+                                            type="text" class="form-control" formatDecimalFormControl
                                             formControlName="creditLimit">
                                     </div>
                                 </div>
@@ -306,35 +305,35 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Debit Amount</label>
-                                        <input min="0" type="number" disabled class="form-control"
+                                        <input type="text" formatDecimalFormControl minimum="0" disabled class="form-control"
                                             formControlName="creditAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Billing Amount</label>
-                                        <input min="0" type="number" disabled class="form-control"
+                                        <input type="text" formatDecimalFormControl minimum="0" disabled class="form-control"
                                             formControlName="billingAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Paid Amount</label>
-                                        <input min="0" type="number" disabled class="form-control"
+                                        <input type="text" formatDecimalFormControl minimum="0" disabled class="form-control"
                                             formControlName="paidAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>UnPaid Amount</label>
-                                        <input type="number" disabled class="form-control"
+                                        <input type="text" formatDecimalFormControl disabled class="form-control"
                                             formControlName="unpaidAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Customer Advance Amount</label>
-                                        <input min="0" disabled type="number" class="form-control"
+                                        <input formatDecimalFormControl minimum="0" disabled type="text" class="form-control"
                                             formControlName="customerAmount">
                                     </div>
                                 </div>

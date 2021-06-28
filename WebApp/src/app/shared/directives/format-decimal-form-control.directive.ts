@@ -3,6 +3,8 @@ import { NgControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { takeUntil } from 'rxjs/operators';
 import { DestroyService } from '@services';
+import { isNumber } from 'lodash';
+import { isDecimal } from 'validator';
 
 @Directive({
     selector: '([formControl])[formatDecimalFormControl],([formControlName])[formatDecimalFormControl]',
@@ -26,9 +28,9 @@ export class FormatDecimalFormControlDirective {
             .subscribe(
                 (value: string) => {
                     if (!!value) {
-                        value = this.formatNumber(value);
-                        if (value.indexOf('.', value.length - 1) === -1) {
-                            this._el.nativeElement.value = this.decimalPipe.transform(value, '1.0-3');
+                        const result = this.formatNumber(value);
+                        if (result.indexOf('.', result.length - 1) === -1) {
+                            this._el.nativeElement.value = this.decimalPipe.transform(result, '.0-3');
                         }
                     }
                 }
@@ -43,11 +45,8 @@ export class FormatDecimalFormControlDirective {
     }
 
     private check(input) {
-        if (!!this.minValue && !isNaN(input)) {
-            input = input < this.minValue ? null : input;
-        }
-        if(!input){
-            return input;
+        if (!!this.minValue) {
+            input = input < this.minValue ? '' : input;
         }
         
         var index = input.indexOf('.');      
@@ -56,5 +55,11 @@ export class FormatDecimalFormControlDirective {
         }
     
         return input;
+    }
+
+    @HostListener("blur", ["$event.target.value"])
+    onBlur(value) {
+        const result = this.formatNumber(value);
+        this._el.nativeElement.value = this.decimalPipe.transform(result, '.0-3');
     }
 }
