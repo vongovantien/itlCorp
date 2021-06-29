@@ -389,26 +389,29 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
-            try
-            {
-                if (!hs.Success)
-                    return Ok(result);
+            if (!hs.Success)
                 return Ok(result);
-            }
-            finally
-            {
-                if (hs.Success)
-                {
-                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-                    Response.OnCompleted(async () =>
-                    {
-                        //Tính công nợ sau khi cancel invoice thành công
-                        var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
-                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
-                        await CalculatorReceivable(modelReceivable);
-                    });
-                }
-            }
+            return Ok(result);
+            //try
+            //{
+            //    if (!hs.Success)
+            //        return Ok(result);
+            //    return Ok(result);
+            //}
+            //finally
+            //{
+            //    if (hs.Success)
+            //    {
+            //        //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+            //        Response.OnCompleted(async () =>
+            //        {
+            //            //Tính công nợ sau khi cancel invoice thành công
+            //            var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+            //            var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+            //            await CalculatorReceivable(modelReceivable);
+            //        });
+            //    }
+            //}
         }
 
         /// <summary>

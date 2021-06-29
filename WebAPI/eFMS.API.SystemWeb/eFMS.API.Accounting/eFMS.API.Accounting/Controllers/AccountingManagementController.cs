@@ -79,12 +79,6 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Sau khi xóa thành công >> tính lại công nợ dựa vào id của accounting management
-                var cr = accountingService.CalculatorReceivableAcctMngt(id);
-            }
-
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
