@@ -59,6 +59,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     currencyId: AbstractControl;
     creditCurrency: AbstractControl;
     partnerIds: AbstractControl;
+    creditLimit: AbstractControl;
+    trialCreditLimit: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -235,6 +237,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.currencyId = this.formGroup.controls['currencyId'];
         this.partnerIds = this.formGroup.controls['partnerId'];
         this.creditCurrency = this.formGroup.controls['creditCurrency'];
+        this.creditLimit = this.formGroup.controls['creditLimit'];
+        this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
     }
 
     initDataForm() {
@@ -605,7 +609,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             paymentMethod: !!this.selectedContract.paymentMethod ? this.paymentMethods.find(type => type === this.selectedContract.paymentMethod) : null,
             baseOn: !!this.selectedContract.baseOn ? this.basesOn.find(type => type === this.selectedContract.baseOn) : null,
             currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null,
-            creditUnlimited: this.selectedContract.creditUnlimited
+            creditUnlimited: this.selectedContract.creditUnlimited,
+            creditCurrency: this.selectedContract.creditCurrency
         });
         this.contractTypeDetail = this.selectedContract.contractType;
         if (this.selectedContract.contractType === 'Trial') {
@@ -687,6 +692,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.creditUnlimited = this.formGroup.controls['creditUnlimited'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
+        this.selectedContract.creditCurrency = !!this.creditCurrency.value ? !!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value : null;
     }
 
     onSubmitActiveContract() {
