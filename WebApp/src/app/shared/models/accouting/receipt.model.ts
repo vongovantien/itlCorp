@@ -1,40 +1,68 @@
 import { Controller, Key } from "@decorators";
 
-@Controller()
-export class ReceiptInvoiceModel {
-    @Key
-    invoiceId: string = null;
-    invoiceNo: string = null;
-    currency: string = null;
-    serieNo: string = null;
-    invoiceDate: Date = null;
-    type: string = null;
-    paymentStatus: string = null;
-    partnerName: string = null;
-    billingDate: string = null;
-    taxCode: string = null;
-    refAmount: number = null;
-    refCurrency: string = null;
-    note: string = null;
+export class ReceiptCreditDebitModel {
+    id: string;
+    refNo: string;
+    type: string;
+    invoiceNo: string;
+    invoiceDate: Date;
+    partnerId: string;
+    partnerName: string;
+    taxCode: string;
+    amount: number;
+    unpaidAmount: number;
+    unpaidAmountVnd: number;
+    unpaidAmountUsd: number;
+    paymentTerm: number;
+    dueDate: Date;
+    paymentStatus: string;
+    departmentId: string;
+    departmentName: string;
+    officeId: string;
+    officeName: string;
+    companyId: string;
+    currencyId: string;
+    jobNo: string;
 
-    unpaidAmount: number = null;
-    receiptExcUnpaidAmount: number = null;//*  số tiền cần thu của invoice theo tỷ giá phiếu thu
+    notes: string;
+    paidAmountUsd: number;
+    paidAmountVnd: number;
+    balanceAmountUsd: number;
+    balanceAmountVnd: number;
+    totalPaidVnd: number;
+    totalPaidUsd: number;
+    creditNo: string; // * Số Credit dùng để cấn trừ trên hóa đơn
 
-    paidAmount: number = null;
-    receiptExcPaidAmount: number = null; // * Số tiền thu của invoice theo tỷ giá phiếu thu
+}
 
-    invoiceBalance: number = null;
-    receiptExcInvoiceBalance: number = null; // * Số tiền còn lại của inoice theo tỷ giá phiếu thu
+export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
 
     // * custom
     isSelected: boolean = false;
+    paymentId: string = null; //
+    notes: string = null;
+    paidAmountVnd: number = null;
+    paidAmountUsd: number = null;
+    remainUsd: number = null;
+    remainVnd: number = null;
+    typeInvoice: string = null;
+    partnerId: string = null;
+    groupShipmentsAgency: any[] = [];
 
+    hblid?: string = null;
+    jobId?: string;
+    mbl?: string;
+    hbl?: string;
 
     constructor(object?: any) {
+        super();
         const self = this;
         for (const key in object) {
             if (self.hasOwnProperty(key.toString())) {
                 self[key] = object[key];
+            }
+            if (key === 'typeInvoice') {
+                self['type'] = object[key];
             }
         }
     }
@@ -79,6 +107,13 @@ export class ReceiptModel extends Receipt {
     payments: ReceiptInvoiceModel[] = [];
     userNameCreated: string = null;
     userNameModified: string = null;
+    subRejectReceipt: string = null;
+    cusAdvanceAmount: number = null;
+    paidAmountUsd: number = null;
+    paidAmountVnd: number = null;
+    finalPaidAmountUsd: number = null;
+    finalPaidAmountVnd: number = null;
+
     constructor(object?: any) {
         super();
         const self = this;

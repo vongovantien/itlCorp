@@ -1041,13 +1041,20 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// Func Test (Get List Receipt)
         /// </summary>
-        /// <param name="Ids"></param>
+        /// <param name="ids"></param>
         /// <returns></returns>
         [HttpPut("GetListReceipt")]
-        public IActionResult GetListReceipt(List<Guid> Ids)
+        [Authorize]
+        public IActionResult GetListReceipt(List<Guid> ids)
         {
-            List<PaymentModel> list = (Ids.Count > 0) ? accountingService.GetListReceiptToAccountant(Ids) : new List<PaymentModel>();
-            return Ok(list);
+            List<AcctReceiptSyncModel> _receiptSyncs = new List<AcctReceiptSyncModel>();
+            List<PaymentModel> list = new List<PaymentModel>();
+            if (ids.Count > 0)
+            {
+                list = accountingService.GetListReceiptToAccountant(ids, out List<AcctReceiptSyncModel> receiptSyncs);
+                _receiptSyncs = receiptSyncs;
+            }
+            return Ok(new { list, _receiptSyncs });
         }
 
         /// <summary>
@@ -1076,8 +1083,25 @@ namespace eFMS.API.Accounting.Controllers
                     List<Guid> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
                     List<Guid> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
 
-                    List<PaymentModel> listAdd = (idsAdd.Count > 0) ? accountingService.GetListReceiptToAccountant(idsAdd) : new List<PaymentModel>();
-                    List<PaymentModel> listUpdate = (idsUpdate.Count > 0) ? accountingService.GetListReceiptToAccountant(idsUpdate) : new List<PaymentModel>();
+                    var receiptSyncs = new List<AcctReceiptSyncModel>();
+                    List<PaymentModel> listAdd = new List<PaymentModel>();
+                    if (idsAdd.Count > 0)
+                    {
+                        listAdd = accountingService.GetListReceiptToAccountant(idsAdd, out List<AcctReceiptSyncModel> addReceiptSyncs);
+                        if (addReceiptSyncs.Count > 0)
+                        {
+                            receiptSyncs.AddRange(addReceiptSyncs);
+                        }
+                    }
+                    List<PaymentModel> listUpdate = new List<PaymentModel>();
+                    if (idsUpdate.Count > 0)
+                    {
+                        listUpdate = accountingService.GetListReceiptToAccountant(idsUpdate, out List<AcctReceiptSyncModel> updateReceiptSyncs);
+                        if (updateReceiptSyncs.Count > 0)
+                        {
+                            receiptSyncs.AddRange(updateReceiptSyncs);
+                        }
+                    }
 
                     HttpResponseMessage resAdd = new HttpResponseMessage();
                     HttpResponseMessage resUpdate = new HttpResponseMessage();
@@ -1129,7 +1153,129 @@ namespace eFMS.API.Accounting.Controllers
                     if (responseAddModel.Success == "1"
                         || responseUpdateModel.Success == "1")
                     {
-                        HandleState hs = accountingService.SyncListReceiptToAccountant(ids);
+                        HandleState hs = accountingService.SyncListReceiptToAccountant(ids, receiptSyncs);
+                        string message = HandleError.GetMessage(hs, Crud.Update);
+                        ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
+                        if (!hs.Success)
+                        {
+                            result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = ids };
+                            return BadRequest(result);
+                        }
+                        return Ok(result);
+                    }
+                    else
+                    {
+                        ResultHandle result = new ResultHandle { Status = false, Message = responseAddModel.Msg + "\n" + responseUpdateModel.Msg, Data = ids };
+                        return BadRequest(result);
+                    }
+                }
+                new LogHelper("eFMS_SYNC_LOG", loginResponse.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_SYNC_LOG", ex.ToString());
+                return BadRequest(new ResultHandle { Message = "Sync fail" });
+            }
+        }
+
+        /// <summary>
+        /// Sync list Receipt to Accountant (Option - sync đc tất cả các type trong cùng 1 phiếu thu)
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut("SyncListReceiptAllInToAccountant")]
+        [Authorize]
+        public async Task<IActionResult> SyncListReceiptAllInToAccountant(List<RequestGuidListModel> request)
+        {
+            var _startDateProgress = DateTime.Now;
+            if (!ModelState.IsValid) return BadRequest();
+
+            try
+            {
+                // 1. Login
+                HttpResponseMessage responseFromApi = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api/Login", loginInfo, null);
+                BravoLoginResponseModel loginResponse = responseFromApi.Content.ReadAsAsync<BravoLoginResponseModel>().Result;
+
+                if (loginResponse.Success == "1")
+                {
+                    // 2. Get Data To Sync.
+                    List<Guid> ids = request.Select(x => x.Id).ToList();
+
+                    List<Guid> idsAdd = request.Where(x => x.Action == ACTION.ADD).Select(x => x.Id).ToList();
+                    List<Guid> idsUpdate = request.Where(x => x.Action == ACTION.UPDATE).Select(x => x.Id).ToList();
+
+                    var receiptSyncs = new List<AcctReceiptSyncModel>();
+                    List<PaymentModel> listAdd = new List<PaymentModel>();
+                    if (idsAdd.Count > 0)
+                    {
+                        listAdd = accountingService.GetListReceiptAllInToAccountant(idsAdd, out List<AcctReceiptSyncModel> addReceiptSyncs);
+                        if (addReceiptSyncs.Count > 0)
+                        {
+                            receiptSyncs.AddRange(addReceiptSyncs);
+                        }
+                    }
+                    List<PaymentModel> listUpdate = new List<PaymentModel>();
+                    if (idsUpdate.Count > 0)
+                    {
+                        listUpdate = accountingService.GetListReceiptAllInToAccountant(idsUpdate, out List<AcctReceiptSyncModel> updateReceiptSyncs);
+                        if (updateReceiptSyncs.Count > 0)
+                        {
+                            receiptSyncs.AddRange(updateReceiptSyncs);
+                        }
+                    }
+
+                    HttpResponseMessage resAdd = new HttpResponseMessage();
+                    HttpResponseMessage resUpdate = new HttpResponseMessage();
+                    BravoResponseModel responseAddModel = new BravoResponseModel();
+                    BravoResponseModel responseUpdateModel = new BravoResponseModel();
+
+                    // 3. Call Bravo to SYNC.
+                    if (listAdd.Count > 0)
+                    {
+                        resAdd = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSReceiptDataSyncAdd", listAdd, loginResponse.TokenKey);
+                        responseAddModel = await resAdd.Content.ReadAsAsync<BravoResponseModel>();
+
+                        #region -- Ghi Log --
+                        var modelLog = new SysActionFuncLogModel
+                        {
+                            FuncLocal = "GetListReceiptAllInToAccountant",
+                            FuncPartner = "EFMSReceiptDataSyncAdd",
+                            ObjectRequest = JsonConvert.SerializeObject(listAdd),
+                            ObjectResponse = JsonConvert.SerializeObject(responseAddModel),
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
+                        };
+                        var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                        #endregion
+                    }
+
+                    if (listUpdate.Count > 0)
+                    {
+                        resUpdate = await HttpService.PostAPI(webUrl.Value.Url + "/itl-bravo/Accounting/api?func=EFMSReceiptDataSyncUpdate", listUpdate, loginResponse.TokenKey);
+                        responseUpdateModel = await resUpdate.Content.ReadAsAsync<BravoResponseModel>();
+
+                        #region -- Ghi Log --
+                        var modelLog = new SysActionFuncLogModel
+                        {
+                            FuncLocal = "GetListReceiptAllInToAccountant",
+                            FuncPartner = "EFMSReceiptDataSyncUpdate",
+                            ObjectRequest = JsonConvert.SerializeObject(listUpdate),
+                            ObjectResponse = JsonConvert.SerializeObject(responseUpdateModel),
+                            Major = "Nghiệp Vụ Phiếu Thu",
+                            StartDateProgress = _startDateProgress,
+                            EndDateProgress = DateTime.Now
+                        };
+                        var hsAddLog = actionFuncLogService.AddActionFuncLog(modelLog);
+                        #endregion
+                    }
+
+                    // 4. Update STATUS
+                    if (responseAddModel.Success == "1"
+                        || responseUpdateModel.Success == "1")
+                    {
+                        HandleState hs = accountingService.SyncListReceiptToAccountant(ids, receiptSyncs);
                         string message = HandleError.GetMessage(hs, Crud.Update);
                         ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = ids };
                         if (!hs.Success)

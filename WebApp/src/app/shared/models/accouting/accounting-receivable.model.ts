@@ -4,6 +4,7 @@ export class TrialOfficialOtherModel {
     partnerCode: string = null;
 
     partnerNameAbbr: string = null;
+    parentNameAbbr: string = null;
 
     agreementNo: string = null;
     agreementType: string = null;
@@ -12,7 +13,8 @@ export class TrialOfficialOtherModel {
     expriedDate: Date = null;
     expriedDay: number = null;
     creditLimited: number = null;
-
+    creditCurrency: string = null;
+    
     debitAmount: number = null;
     obhAmount: number = null;
     debitRate: number = null;

@@ -6,13 +6,16 @@
         <div class="m-portlet">
             <div class="m-portlet__body">
                 <div class="d-flex align-items-center justify-content-between p-1">
-                    <h3>Create Customer Receipt</h3>
+                    <h3>
+                        <span>
+                            <i class="la la-edit"></i>
+                        </span>
+                        Create {{type === 'Customer' ? 'Customer': 'Agency'}} Receipt
+                    </h3>
                     <div>
                         <div class="c-button-actions">
-                            <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-check'"
-                                (onClick)="submitClick('draft')">
-                            </app-permission-button>
-                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="submitClick()">
+
+                            <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                             </app-default-button>
                         </div>
                     </div>
@@ -21,12 +24,18 @@
 
                 <customer-payment-list-receipt></customer-payment-list-receipt>
 
+                <div class="c-button-actions text-center">
+                    <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
+                        (onClick)="submitClick('draft')">
+                    </app-permission-button>
+                    <app-permission-button type="save" title="Done" class="outline-success"
+                        (onClick)="confirmDoneReceipt()">
+                    </app-permission-button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<info-popup [body]="invalidFormText"></info-popup>
-
-<confirm-popup #confirmCancelPopup body="Do you want to exit without saving?" (onSubmit)="gotoList()"></confirm-popup>
+<ng-template inject></ng-template>

@@ -190,5 +190,9 @@ namespace eFMS.API.Accounting.DL.Common
         public static readonly string MSG_SETTLE_NOT_ALLOW_DELETE = "MSG_SETTLE_NOT_ALLOW_DELETE";
         public static readonly string MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK = "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK";
         #endregion
+
+        #region Receipt
+        public static readonly string MSG_RECEIPT_HAVE_PAYMENT_PAID = "MSG_RECEIPT_HAVE_PAYMENT_PAID";
+        #endregion
     }
 }

@@ -86,9 +86,9 @@ namespace eFMS.API.Documentation.DL.Services
             }
             //***
 
-            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+            DateTime? maxDateCreated = DataContext.Get(x => x.Active == true).Max(s => s.DatetimeCreated);
             var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated.Value.Date : exchangeDate.Value.Date;
-            var LookupCurrentExchange = DataContext.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+            var LookupCurrentExchange = DataContext.Get(x => x.Active == true).ToLookup(x => x.DatetimeCreated.Value.Date);
             IQueryable<CatCurrencyExchange> currencyExchange = LookupCurrentExchange[exchargeDateSurcharge].AsQueryable();
             if (currencyExchange.Count() == 0)
             {
@@ -163,9 +163,9 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 roundCurr = 0;
             }
-            DateTime? maxDateCreated = DataContext.Get().Max(s => s.DatetimeCreated);
+            DateTime? maxDateCreated = DataContext.Get(x => x.Active == true).Max(s => s.DatetimeCreated);
             var exchargeDateSurcharge = exchangeDate == null ? maxDateCreated.Value.Date : exchangeDate.Value.Date;
-            var LookupCurrentExchange = DataContext.Get().ToLookup(x => x.DatetimeCreated.Value.Date);
+            var LookupCurrentExchange = DataContext.Get(x => x.Active == true).ToLookup(x => x.DatetimeCreated.Value.Date);
             IQueryable<CatCurrencyExchange> currencyExchange = LookupCurrentExchange[exchargeDateSurcharge].AsQueryable();
             if (currencyExchange.Count() == 0)
             {

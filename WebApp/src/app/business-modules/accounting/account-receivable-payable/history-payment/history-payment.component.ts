@@ -9,22 +9,30 @@ import { RoutingConstants } from '@constants';
 import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-payment/list-invoice-history-payment.component';
 
 
-type TAB = 'INVOICE' | 'OBH';
+type TAB = 'HISTORY' | 'OBH';
 
+enum PAYMENT_TAB {
+    CUSTOMER = 'CUSTOMER',
+    AGENCY = 'AGENCY',
+    ARSUMMARY = 'ARSUMMARY',
+    HISTORY = 'HISTORY'
 
+}
 @Component({
     selector: 'app-history-payment',
     templateUrl: './history-payment.component.html',
 
 })
+
 export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
     @ViewChild(ARHistoryPaymentListInvoiceComponent) invoiceListComponent: ARHistoryPaymentListInvoiceComponent;
 
-    selectedTab: TAB | string = "INVOICE";
+    //selectedTab: TAB | string = "HISTORY";
     selectedTabAR: string = 'payment';
 
     isAccountPaymentTab: boolean = true;
+    selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
     constructor(
         private _router: Router,
@@ -60,7 +68,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
         if (tab === 'payment') {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
-            this.selectedTab = 'INVOICE';
+            this.selectedTab = 'HISTORY';
             this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
         } else if (tab === 'receivable') {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
@@ -74,7 +82,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
     getPaymentType() {
         let paymentType: number;
-        if (this.selectedTab === "INVOICE") {
+        if (this.selectedTab === "HISTORY") {
             paymentType = 0;
         }
         return paymentType;
@@ -100,7 +108,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
                 })
             ).subscribe(
                 (res: CommonInterface.IResponsePaging) => {
-                    if (this.selectedTab === "INVOICE") {
+                    if (this.selectedTab === "HISTORY") {
                         this.invoiceListComponent.refPaymens = res.data || [];
                         this.invoiceListComponent.totalItems = res.totalItems;
                     }
@@ -112,18 +120,23 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
         this.requestSearchShipment();
     }
 
-    onSelectTab(tab: string) {
-        switch (tab) {
-            case 'customer':
+    onSelectTab(tabName: PAYMENT_TAB | string) {
+        switch (tabName) {
+            case 'CUSTOMER':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
                 break;
-            case 'agency':
+            case 'HISTORY':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
-            case 'summary':
-                break;
-            case 'history':
+            // case 'AGENCY':
+            //     this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`], { queryParams: { type: 'Agency' } });
+            //     break;
+            case 'ARSUMMARY':
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
             default:
                 break;
         }
+        this.selectedTab = tabName;
     }
 }

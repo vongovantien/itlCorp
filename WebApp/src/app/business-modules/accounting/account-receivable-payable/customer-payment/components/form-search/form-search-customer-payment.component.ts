@@ -25,6 +25,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     currency: AbstractControl;
     syncStatus: AbstractControl;
     status: AbstractControl;
+    typeReceipt: AbstractControl;
 
     customerIDs: Observable<Customer[]>;
     creators: Observable<User[]>;
@@ -36,7 +37,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     dateTypes: string[] = AccountingConstants.DATE_TYPE;
     syncStatuss = AccountingConstants.SYNC_STATUSS;
     statuss = AccountingConstants.STATUS;
-
+    typesReceipt: string[] = ['All', 'Customer', 'Agent'];
+    statusRecepit: string[] = ['Draft', 'Canceled', 'Done'];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,
@@ -64,8 +66,9 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             date: [{ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() }],
             dateType: [this.dateTypes[0]],
             currency: ['VND'],
+            status: [null],
             syncStatus: [this.syncStatuss[0]],
-            status: [this.statuss[0]],
+            typeReceipt: [this.typesReceipt[0]]
         });
         this.refNo = this.formSearch.controls['refNo'];
         this.paymentType = this.formSearch.controls['paymentType'];
@@ -74,6 +77,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType = this.formSearch.controls['dateType'];
         this.currency = this.formSearch.controls['currency'];
         this.syncStatus = this.formSearch.controls['syncStatus'];
+        this.typeReceipt = this.formSearch.controls['typeReceipt'];
         this.status = this.formSearch.controls['status'];
     }
 
@@ -100,10 +104,10 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             dateType: this.dateType.value !== this.dateTypes[0] ? this.dateType.value : null,
             currency: this.currency.value,
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
-            status: this.status.value !== this.statuss[0] ? this.status.value : null,
+            status: this.status.value,
+            type: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null,
         };
-        this._listReceipt.getCPs(body);
-        // this.onSearch.emit(body);
+        this._listReceipt.onSearchCPs(body);
 
     }
 
@@ -117,10 +121,9 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.dateType.reset(this.dateTypes[0]);
         this.currency.setValue('VND');
         this.syncStatus.reset(this.syncStatuss[0]);
-        this.status.reset(this.statuss[0]);
-        this._listReceipt.getCPs({});
+        this.status.reset();
 
-        // this.onSearch.emit(<any>{});
+        this._listReceipt.getCPs({});
     }
 
 }
@@ -134,4 +137,5 @@ interface IAcctReceiptCriteria {
     currency: string;
     syncStatus: string;
     status: string;
+    type: string;
 }

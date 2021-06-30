@@ -52,6 +52,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatContract> contractRepository;
         private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
+        private readonly IContextBase<AcctReceiptSync> receiptSyncReposotory;
         private readonly IUserBaseService userBaseService;
 
         private readonly IAcctSettlementPaymentService settlementPaymentService;
@@ -98,6 +99,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatContract> contractRepo,
             IContextBase<CatPartnerEmail> partnerEmailRepo,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
+            IContextBase<AcctReceiptSync> receiptSyncRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
@@ -134,6 +136,7 @@ namespace eFMS.API.Accounting.DL.Services
             contractRepository = contractRepo;
             partnerEmailRepository = partnerEmailRepo;
             customsDeclarationRepository = customsDeclarationRepo;
+            receiptSyncReposotory = receiptSyncRepo;
 
             settlementPaymentService = settlementService;
             // ---
@@ -2587,56 +2590,210 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion --- Send Mail & Push Notification to Accountant ---
 
-        public List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids)
+        #region -- Get Data & Sync Receipt --
+        /// <summary>
+        /// Get data sync từng type trong phiếu thu [15658]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
+        public List<PaymentModel> GetListReceiptToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
         {
             List<PaymentModel> data = new List<PaymentModel>();
+            receiptSyncs = new List<AcctReceiptSyncModel>();
             if (ids == null || ids.Count() == 0) return data;
 
             var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
             foreach (var receipt in receipts)
             {
-                PaymentModel sync = new PaymentModel();
-                sync.Stt = receipt.Id.ToString();
-                var officeCode = offices.Where(x => x.Id == receipt.OfficeId).FirstOrDefault()?.Code;
-                sync.BranchCode = officeCode;
-                sync.OfficeCode = officeCode;
-                sync.DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate; //Payment Date (Chỉ lấy Date, không lấy time)
-                sync.ReferenceNo = receipt.PaymentRefNo; //Receipt No
-                var invoicePartner = partners.Where(x => x.Id == receipt.CustomerId).FirstOrDefault();
-                sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
-                sync.CustomerName = invoicePartner?.PartnerNameVn; //Partner Local Name
-                sync.CurrencyCode = receipt.CurrencyId;
-                sync.ExchangeRate = receipt.ExchangeRate;
-                sync.Description0 = receipt.Description;
-                sync.PaymentMethod = receipt.PaymentMethod;
-                sync.DataType = "PAYMENT";
-
                 var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
-                var details = new List<PaymentDetailModel>();
-                foreach (var payment in payments)
+                var paymentsDebit = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH");
+                var paymentsCredit = payments.Where(x => x.Type == "CREDITSOA" || x.Type == "CREDITNOTE");
+                var paymentsAdv = payments.Where(x => x.Type == "ADV");
+                if (paymentsDebit.Count() > 0)
                 {
-                    var invoice = DataContext.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
-                    var detail = new PaymentDetailModel();
-                    detail.RowId = payment.Id.ToString();
-                    detail.OriginalAmount = payment.PaymentAmount;
-                    detail.Description = payment.Note;
-                    detail.ObhPartnerCode = string.Empty; //Để trống
-                    detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
-                    detail.Stt_Cd_Htt = invoice?.ReferenceNo; //ReferenceNo of Invoice (Bravo Updated)
-                    detail.ChargeType = payment.Type;
-                    detail.DebitAccount = invoice?.AccountNo; //Account No of Invoice
-                    detail.NganhCode = "FWD";
-
-                    details.Add(detail);
+                    var syncDebit = GenerateReceiptToAccountant("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
+                    receiptSyncs.Add(receiptSyncDebit);
+                    data.Add(syncDebit);
                 }
-                sync.Details = details;
-
-                data.Add(sync);
+                if (paymentsCredit.Count() > 0)
+                {
+                    var syncCredit = GenerateReceiptToAccountant("CREDIT", receipt, paymentsCredit, out AcctReceiptSyncModel receiptSyncCredit);
+                    receiptSyncs.Add(receiptSyncCredit);
+                    data.Add(syncCredit);
+                }
+                if (paymentsAdv.Count() > 0)
+                {
+                    var syncAdv = GenerateReceiptToAccountant("ADV", receipt, paymentsAdv, out AcctReceiptSyncModel receiptSyncAdv);
+                    receiptSyncs.Add(receiptSyncAdv);
+                    data.Add(syncAdv);
+                }
             }
             return data;
         }
 
-        public HandleState SyncListReceiptToAccountant(List<Guid> ids)
+        /// <summary>
+        /// Option: Get data sync đc tất cả các type trong cùng 1 phiếu thu [15817]
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
+        public List<PaymentModel> GetListReceiptAllInToAccountant(List<Guid> ids, out List<AcctReceiptSyncModel> receiptSyncs)
+        {
+            List<PaymentModel> data = new List<PaymentModel>();
+            receiptSyncs = new List<AcctReceiptSyncModel>();
+            if (ids == null || ids.Count() == 0) return data;
+
+            var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
+            foreach (var receipt in receipts)
+            {
+                var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
+                if (payments.Count() > 0)
+                {
+                    //Không phân biệt type (ADV, DEBIT, CREDIT) nên gán = null
+                    var syncPayment = GenerateReceiptToAccountant(null, receipt, payments, out AcctReceiptSyncModel receiptSync);
+                    receiptSyncs.Add(receiptSync);
+                    data.Add(syncPayment);
+                }                
+            }
+            return data;
+        }
+
+        private PaymentModel GenerateReceiptToAccountant(string type, AcctReceipt receipt, IQueryable<AccAccountingPayment> payments, out AcctReceiptSyncModel receiptSync)
+        {
+            var receiptSyncExist = receiptSyncReposotory.Get(x => x.ReceiptId == receipt.Id && x.Type == type).FirstOrDefault();
+            receiptSync = new AcctReceiptSyncModel();
+            receiptSync.Id = receiptSyncExist?.Id == null ? Guid.NewGuid() : receiptSyncExist.Id;
+            receiptSync.ReceiptId = receipt.Id;
+            receiptSync.Type = type;
+
+            PaymentModel sync = new PaymentModel();
+            sync.Stt = receiptSync.Id.ToString(); //Id of ReceiptSync (acctReceiptSync)
+            var officeCode = offices.Where(x => x.Id == receipt.OfficeId).FirstOrDefault()?.Code;
+            sync.BranchCode = officeCode;
+            sync.OfficeCode = officeCode;
+            sync.DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate; //Payment Date (Chỉ lấy Date, không lấy time)
+            sync.ReferenceNo = string.Format("{0}{1}", receipt.PaymentRefNo, (type == "CREDIT" ? "-NETOFF" : (type == "ADV" ? "-ADV" : ""))); //Receipt No
+
+            receiptSync.ReceiptSyncNo = sync.ReferenceNo;
+
+            var invoicePartner = partners.Where(x => x.Id == receipt.CustomerId).FirstOrDefault();
+            sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
+            sync.CustomerName = invoicePartner?.PartnerNameVn; //Partner Local Name
+            sync.CurrencyCode = receipt.CurrencyId;
+            sync.ExchangeRate = receipt.ExchangeRate;
+            sync.Description0 = string.Format("{0} {1}", "Công Nợ Phải Thu", receipt.Description);
+            sync.PaymentMethod = (type == "CREDIT") ? "Other" : receipt.PaymentMethod;
+            sync.DataType = "PAYMENT";
+
+            var details = new List<PaymentDetailModel>();
+            foreach (var payment in payments)
+            {
+                var invoice = DataContext.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
+                var detail = new PaymentDetailModel();
+                detail.RowId = payment.Id.ToString();
+                
+                //Paid Amount
+                decimal? _paidAmount = payment.PaymentAmount;
+                if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    _paidAmount = payment.PaymentAmountVnd;
+                }
+                else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
+                {
+                    _paidAmount = payment.PaymentAmountUsd;
+                }
+                detail.OriginalAmount = _paidAmount;
+
+                //Paid Amount VND
+                decimal? _paidAmountVnd = 0;
+                if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL) || receipt.CurrencyId != payment.CurrencyId)
+                {
+                    _paidAmountVnd = payment.PaymentAmountVnd;
+                }
+                detail.Amount = _paidAmountVnd;
+
+                string _description = string.Empty;
+                if (payment.Type == "DEBIT")
+                {
+                    _description = string.Format("{0} {1}", "Công Nợ Phải Thu", payment.InvoiceNo);
+                }
+                else if (payment.Type == "OBH")
+                {
+                    _description = "Công Nợ Phải Thu OBH";
+                }
+                else if (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE")
+                {
+                    _description = string.Format("{0} {1}", "Công Nợ Bù Trừ", payment.InvoiceNo);
+                }
+                else if (payment.Type == "ADV")
+                {
+                    _description = "Công Nợ Ứng Trước";
+                }
+                detail.Description = _description;
+
+                detail.ObhPartnerCode = type == "CREDIT" ? invoicePartner?.AccountNo : string.Empty; //Đối với công nợ Credit => Set đối tượng Partner của phiếu thu. Ngược lại để trống
+                detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
+                detail.Stt_Cd_Htt = (type != "ADV") ? payment.InvoiceNo : string.Empty;
+
+                detail.ChargeType = (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE") ? "NETOFF" : payment.Type;
+                detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
+                detail.NganhCode = "FWD";
+
+                details.Add(detail);
+            }
+            sync.Details = details;            
+            return sync;
+        }
+
+        /// <summary>
+        /// Add or Update Receipt Sync
+        /// </summary>
+        /// <param name="receiptSyncs">List receiptSyncs</param>
+        /// <returns></returns>
+        private HandleState AddOrUpdateReceiptSync(List<AcctReceiptSyncModel> receiptSyncs)
+        {
+            try
+            {
+                foreach (var receiptSync in receiptSyncs)
+                {
+                    var _receiptSync = mapper.Map<AcctReceiptSync>(receiptSync);
+                    _receiptSync.SyncStatus = AccountingConstants.STATUS_SYNCED;
+                    _receiptSync.LastSyncDate = DateTime.Now;
+
+                    var currentReceiptSync = receiptSyncReposotory.Get(x => x.Id == receiptSync.Id).FirstOrDefault();
+
+                    if (currentReceiptSync == null)
+                    {
+                        _receiptSync.UserCreated = _receiptSync.UserModified = currentUser.UserID;
+                        _receiptSync.DatetimeCreated = _receiptSync.DatetimeModified = DateTime.Now;
+                        var hsAdd = receiptSyncReposotory.Add(_receiptSync);
+                    }
+                    else
+                    {
+                        _receiptSync.UserCreated = currentReceiptSync.UserCreated;
+                        _receiptSync.DatetimeCreated = currentReceiptSync.DatetimeCreated;
+                        _receiptSync.UserModified = currentUser.UserID;
+                        _receiptSync.DatetimeModified = DateTime.Now;
+                        var hsUpdate = receiptSyncReposotory.Update(_receiptSync, x => x.Id == currentReceiptSync.Id);
+                    }
+                }
+                var sm = receiptSyncReposotory.SubmitChanges();
+                return sm;
+            }
+            catch (Exception ex)
+            {
+                return new HandleState((object)ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Sync Receipt & Insert Or Update ReceiptSync
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="receiptSyncs"></param>
+        /// <returns></returns>
+        public HandleState SyncListReceiptToAccountant(List<Guid> ids, List<AcctReceiptSyncModel> receiptSyncs)
         {
             var receipts = receiptRepository.Get(x => ids.Contains(x.Id));
             if (receipts == null) return new HandleState((object)"Không tìm thấy phiếu thu");
@@ -2653,6 +2810,9 @@ namespace eFMS.API.Accounting.DL.Services
                         var hsUpdateReceipt = receiptRepository.Update(receipt, x => x.Id == receipt.Id, false);
                     }
                     var sm = receiptRepository.SubmitChanges();
+                    //Insert or Update ReceiptSync
+                    var hsReceiptSync = AddOrUpdateReceiptSync(receiptSyncs);
+
                     trans.Commit();
                     return sm;
                 }
@@ -2667,6 +2827,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+        #endregion -- Get Data & Sync Receipt
 
         public bool CheckCdNoteSynced(Guid idCdNote)
         {

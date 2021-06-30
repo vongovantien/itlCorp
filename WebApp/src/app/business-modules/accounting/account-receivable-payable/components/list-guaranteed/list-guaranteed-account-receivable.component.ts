@@ -39,10 +39,10 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
             { title: 'Credit Limited', field: 'totalCreditLimited', sortable: true },
             { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
             { title: 'Debit Rate (%)', field: 'totalDebitRate', sortable: true },
-            { title: 'Billing', field: 'totalBillingAmount', sortable: true },
-            { title: 'Billing Unpaid', field: 'totalBillingUnpaid', sortable: true },
+            { title: 'Billing (Unpaid)', field: 'totalBillingAmount', sortable: true },
             { title: 'Paid', field: 'totalPaidAmount', sortable: true },
-            { title: 'OBH Amount', field: 'totalObhAmount', sortable: true },
+            { title: 'OutStanding Balance', field: 'totalBillingUnpaid', sortable: true },
+            // { title: 'OBH Amount', field: 'totalObhAmount', sortable: true },
             { title: 'Over 1-15 days', field: 'totalOver1To15Day', sortable: true },
             { title: 'Over 16-30 days', field: 'totalOver16To30Day', sortable: true },
             { title: 'Over 30 Days', field: 'totalOver30Day', sortable: true },
@@ -95,7 +95,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     }
 
     viewDetail(agreementId: string) {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
             queryParams: {
                 agreementId: agreementId,
                 subTab: 'guaranteed',

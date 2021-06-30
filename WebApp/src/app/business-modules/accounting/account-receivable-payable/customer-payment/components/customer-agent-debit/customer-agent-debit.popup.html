@@ -1,0 +1,393 @@
+<div class="modal fade" role="dialog" bsModal #popup="bs-modal">
+    <div class="modal-dialog c-modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Get {{type === 'CUSTOMER' ? "Customer's" : "Agency's"}} Debit</h5>
+                <button type="button" class="close" aria-label="Close" (click)=hide()>
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form-search-customer-agent-cd-invoice></form-search-customer-agent-cd-invoice>
+            </div>
+
+            <ng-container *ngIf="type === 'CUSTOMER'">
+                <div class="m-portlet">
+                    <div class="m-portlet__body">
+                        <div class="table-horizontal" style="max-height:500px">
+                            <table class="table table-condensed table-brand dataTable table-hover pointer">
+                                <thead app-table-header [headers]="headers"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="m--w-50 first">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" [checked]="checkAll"
+                                                (change)="checkAll=!checkAll; checkAllChange()">
+                                            <span></span>
+                                        </label>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngIf="!!listDebit.length">
+                                        <tr *ngFor="let debit of listDebit;let i = index;trackBy: trackByFn">
+                                            <td class="table-actions-col">
+                                                <div class="table-actions">
+                                                    <label class="m-checkbox">
+                                                        <input type="checkbox" name="" [checked]="debit.isSelected"
+                                                            (change)="debit.isSelected=!debit.isSelected; removeAllChecked();">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-primary">{{debit.refNo}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.type}}</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-primary">{{debit.invoiceNo}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.taxCode}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.partnerName}}</span>
+                                            </td>
+                                            <td ALIGN="right">
+                                                <span>{{debit.amount | number}} {{debit.currencyId}}</span>
+                                            </td>
+                                            <td ALIGN="right">
+                                                <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
+                                            </td>
+                                            <td ALIGN="right">
+                                                <span>{{debit.unpaidAmountVnd | number}} </span>
+                                            </td>
+                                            <td ALIGN="right">
+                                                <span>{{debit.unpaidAmountUsd | number}} </span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.invoiceDate | date :'dd/MM/yyyy'}} </span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.paymentTerm}} </span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.dueDate | date: 'dd/MM/yyyy'}} </span>
+                                            </td>
+
+                                            <td>
+                                                <ng-container [ngSwitch]="debit.paymentStatus">
+                                                    <span class="text-success" *ngSwitchCase="'Paid'">
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                    <span class="text-danger" *ngSwitchDefault>
+                                                        {{ debit.paymentStatus }}
+                                                    </span>
+                                                </ng-container>
+                                            </td>
+                                            <td>
+                                                <span class="text-success">{{debit.departmentName}} </span>
+                                            </td>
+                                            <td>
+                                                <span class="text-success">{{debit.officeName}} </span>
+                                            </td>
+                                        </tr>
+                                        <tr class="font-weight-bold">
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>Total</td>
+                                            <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}}
+                                                USD |
+                                                {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
+                                            <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' |
+                                                number}} USD |
+                                                {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
+                                            </td>
+                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountVnd'| number}}
+                                            </td>
+                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountUsd'| number}}
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                    <tr app-table-none-record *ngIf="!listDebit.length"></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
+                    </div>
+                </div>
+            </ng-container>
+
+            <ng-container *ngIf="type === 'AGENT'">
+                <div class="m-portlet">
+                    <div class="m-portlet__body">
+                        <div class="m-form m--margin-bottom-10">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="m--align-right foat-right">
+                                        <a class="pointer icon-switch" (click)="switchToGroup()">
+                                            <i class="la la-list" *ngIf="TYPELIST === 'GROUP' else list"></i>
+                                            <ng-template #list> <i class="la la-sitemap"></i></ng-template>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-horizontal" style="max-height:500px">
+                            <table class="table table-condensed table-brand dataTable table-hover pointer">
+                                <thead app-table-header [headers]="headersAgency"
+                                    (onClick)="sortBy($event.sortField ? $event.sortField : '')">
+                                    <th class="m--w-50 first">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" name="" [checked]="checkAllAgency"
+                                                (change)="checkAllAgency=!checkAllAgency; checkAllChangeAgency()">
+                                            <span></span>
+                                        </label>
+                                    </th>
+                                </thead>
+                                <tbody>
+                                    <ng-container *ngIf="TYPELIST === 'GROUP'">
+                                        <ng-container
+                                            *ngFor="let groupShipment of agencyDebitModel.groupShipmentsAgency ; let i = index; trackBy: trackByFn">
+
+                                            <tr class="collapse-toggle-row tgroup">
+                                                <td colspan="19">
+                                                    <div class="row align-items-center">
+                                                        <div class='col-1'>
+                                                            <label class="m-checkbox">
+                                                                <input type="checkbox" name=""
+                                                                    [checked]="groupShipment.isSelected"
+                                                                    (change)=" groupShipment.isSelected =!groupShipment.isSelected; checkAllChangeGroupAgency(groupShipment)">
+                                                                <span></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="col-2">
+                                                            Job No:
+                                                            <span class='text-info'>
+                                                                {{groupShipment.jobNo}}
+                                                            </span>
+                                                        </div>
+                                                        <div class="col-2">MBL: <span
+                                                                class='text-success'>{{groupShipment.mbl}}</span>
+                                                        </div>
+                                                        <div class="col-2">HBL: <span
+                                                                class='text-danger'>{{groupShipment.hbl}}</span>
+                                                        </div>
+                                                        <div class="col-2">Unpaid VND: <span
+                                                                class='text-primary'>{{groupShipment.unpaidAmountVnd |
+                                                                number}}</span>
+                                                        </div>
+                                                        <div class="col-2">Unpaid USD: <span
+                                                                class='text-primary'>{{groupShipment.unpaidAmountUsd |
+                                                                number}}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr class="child"
+                                                *ngFor="let invoice of groupShipment.invoices; let j = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" name=""
+                                                                [checked]="invoice.isSelected"
+                                                                (change)="invoice.isSelected=!invoice.isSelected; removeAllChecked(groupShipment);">
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-primary">{{invoice.refNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.type}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.jobNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.hbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.mbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.taxCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.partnerName}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.amount | number}} {{invoice.currencyId}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmount | number}}
+                                                        {{invoice.currencyId}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmountVnd | number}} </span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmountUsd | number}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.paymentTerm}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
+                                                </td>
+
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
+                                                </td>
+                                                <td class="text-success">{{invoice.departmentName}}</td>
+                                                <td class="text-success">{{invoice.officeName}}</td>
+                                            </tr>
+
+                                        </ng-container>
+                                        <tr app-table-none-record
+                                            *ngIf="agencyDebitModel.groupShipmentsAgency.length === 0"></tr>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="TYPELIST === 'LIST'">
+                                        <ng-container
+                                            *ngFor="let groupShipment of agencyDebitModel.groupShipmentsAgency ; let i = index; trackBy: trackByFn">
+                                            <tr
+                                                *ngFor="let invoice of groupShipment.invoices ; let i = index; trackBy: trackByFn">
+                                                <td class="table-actions-col">
+                                                    <div class="table-actions">
+                                                        <label class="m-checkbox">
+                                                            <input type="checkbox" name=""
+                                                                [checked]="invoice.isSelected"
+                                                                (change)="invoice.isSelected=!invoice.isSelected; removeAllChecked(groupShipment);">
+                                                            <span></span>
+                                                        </label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="text-primary">{{invoice.refNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.type}}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.jobNo}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.hbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.mbl}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.taxCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.partnerName}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.amount | number}} {{invoice.currencyId}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmount | number}}
+                                                        {{invoice.currencyId}}</span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmountVnd | number}} </span>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <span>{{invoice.unpaidAmountUsd | number}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.paymentTerm}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
+                                                </td>
+
+                                                <td>
+                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ invoice.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.departmentName}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.officeName}} </span>
+                                                </td>
+                                            </tr>
+
+
+                                        </ng-container>
+                                        <tr app-table-none-record *ngIf="!agencyDebitModel.groupShipmentsAgency.length">
+                                        </tr>
+
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                        </div>
+                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
+                    </div>
+                </div>
+            </ng-container>
+
+            <div class="modal-footer m--align-center">
+                <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="addToReceipt()">
+                    <span>
+                        <i class="la la-download"></i>
+                        <span>
+                            Add To Receipt
+                        </span>
+                    </span>
+                </button>
+                <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase" (click)="this.hide()">
+                    <span>
+                        <i class="la la-ban"></i>
+                        <span>
+                            Cancel
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

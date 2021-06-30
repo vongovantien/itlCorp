@@ -166,6 +166,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                     if (result.status) {
                         this._toastService.success(result.message);
 
+                        // // Tính công nợ
+                        // this.calculatorReceivable(this.charges);
+
                         this.getProfit();
 
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.SELLING_RATE);

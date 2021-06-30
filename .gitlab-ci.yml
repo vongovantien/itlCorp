@@ -1,6 +1,6 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/test/eFMS-en"
 
 image: node:12
 
@@ -11,8 +11,7 @@ cache:
 stages:
   - build
   # - deploy
-
-job_build:
+build_uat:
   stage: build
   script:
     - node --version
@@ -31,10 +30,23 @@ job_build:
     name: "angular_build"
     paths:
       - $APP_OUTPUT_PATH
-# job_deploy:
-#   stage: deploy
-#   script:
-#     - echo "deploying to iis",
-#     - mkdir $APP_OUTPUT_PATH/test
-#     - cp -R ./dist/init-angular-project $APP_OUTPUT_PATH/test
-#     - echo "done deploy"
+      
+build_test:      
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - cd WebApp
+    - npm install
+    - npm install -g @angular/cli
+    - ng version
+    #- node_modules/.bin/ng build --c=uat-en
+    - npm run build:test:en
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - feature/sprint25-15-04-2021
+  artifacts:
+    name: "angular_build"
+    paths:
+      - $APP_OUTPUT_PATH

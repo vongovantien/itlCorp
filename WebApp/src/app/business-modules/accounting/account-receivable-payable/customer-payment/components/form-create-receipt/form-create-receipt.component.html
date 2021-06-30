@@ -10,7 +10,7 @@
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(customerId)"
                         [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
+                        [selectedDisplayFields]="['shortName']" [dataSources]="customers"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
                         [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
@@ -35,7 +35,7 @@
             <div class="col-lg-6">
                 <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
                     <label required>
-                        Payment Reference No
+                        Receipt No
                     </label>
                     <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
                         [attr.disabled]="isReadonly">
@@ -49,27 +49,24 @@
                     <app-combo-grid-virtual-scroll #combogridAgreement
                         (itemSelected)="onSelectDataFormInfo($event, 'agreement')"
                         (remove)="resetFormControl(agreementId)"
-                        [currentActiveItemId]="{field:'id', value: agreementId.value}"
+                        [currentActiveItemId]="{field:'id', value: agreementId.value, hardValue:contractNo}"
                         [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
                         [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
                         [disabled]="isReadonly">
                     </app-combo-grid-virtual-scroll>
                 </div>
             </div>
-        </div>
-        <ng-container *ngIf="!isReadonly">
-            <div class="row">
-                <div class="col-lg-6"></div>
-                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
-                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
-                        type="button" (click)="getInvoiceList()">
-                        <span>
-                            <i class="la la-search"></i>
-                            <span>Apply </span>
-                        </span>
-                    </button>
+            <div class="col-lg-12">
+                <div class="m--align-right m--margin-top-10">
+                    <ng-container *ngIf="!isReadonly">
+                        <app-permission-button title="Get Debit" class="outline-info" [icon]="'la la-search'"
+                            (onClick)="getDebit()">
+                        </app-permission-button>
+                    </ng-container>
                 </div>
             </div>
-        </ng-container>
+        </div>
     </form>
 </div>
+
+<customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>

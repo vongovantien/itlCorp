@@ -176,6 +176,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            if (hs.Success)
+            {
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào settlement no
+                acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -411,6 +417,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi insert Settlement
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -495,6 +507,12 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi update Settlement
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -683,6 +701,10 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
+
+                // Tính công nợ sau khi Save And Send Request
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+
                 return Ok(result);
             }
             else

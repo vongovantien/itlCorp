@@ -3,8 +3,6 @@ import { NgModule } from '@angular/core';
 import { AccountReceivableTabComponent } from './account-receivable.component';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
 import { Routes, RouterModule } from '@angular/router';
 import { AccountReceivableListTrialOfficialComponent } from '../components/list-trial-official/list-trial-official-account-receivable.component';
 import { AccountReceivableListGuaranteedComponent } from '../components/list-guaranteed/list-guaranteed-account-receivable.component';
@@ -25,7 +23,7 @@ const routing: Routes = [
                 data: { name: '' },
             },
             {
-                path: ":key", component: AccountReceivableDetailComponent,
+                path: "detail", component: AccountReceivableDetailComponent,
                 data: { name: 'Detail' }
             },
         ]

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Infrastructure;
 using eFMS.API.Shipment.Infrastructure;
 using eFMS.API.Shipment.Infrastructure.Middlewares;
@@ -46,6 +47,10 @@ namespace eFMS.API.Shipment
             services.AddMemoryCache();
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+
+            services.Configure<ApiServiceUrl>(option => {
+                option.ApiUrlAccounting = Configuration.GetSection("ApiUrlAccounting").Value;
+            });
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

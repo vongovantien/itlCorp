@@ -1,0 +1,85 @@
+<div class="m-portlet">
+    <div class="m-portlet__head alert-block__heading pointer bg-secondary">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title w-100">
+                <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#credit-summary">
+                    <i class="la la-angle-up m--margin-right-5"></i> CREDIT
+                    <ng-container *ngIf="!!(creditList )?.length">
+                        <span class="badge badge-success">{{(creditList)?.length}}</span>
+                    </ng-container>
+                </h3>
+            </div>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="collapse show" id="credit-summary">
+            <div class="table-wrapper table-scrollabler">
+                <table class="table table-brand table-bordered">
+                    <thead app-table-header [headers]="receiptType ==='CUSTOMER' ? headers : agencyHeaders"
+                        class="text-center">
+                        <th class="m--w-50 first">
+                        </th>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngIf="!!(creditList)?.length">
+                            <tr *ngFor="let item of (creditList); let i = index; trackBy: trackByFn">
+                                <td>
+                                    <ng-container *ngIf="!isReadonly">
+                                        <app-permission-button type="delete"
+                                            (onClick)="confirmDeleteInvoiceItem(item, i)" class="icon"
+                                            icon="la la-trash text-danger">
+                                        </app-permission-button>
+                                    </ng-container>
+                                </td>
+                                <td class="text-primary">{{item.refNo}}</td>
+                                <td>
+                                    {{item.invoiceNo}}
+                                </td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.jobNo}}</td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.mbl}}</td>
+                                <td *ngIf="receiptType !=='CUSTOMER'">{{item.hbl}}</td>
+                                <td ALIGN="right">
+                                    {{item.amount | number}} {{item.currencyId}}
+                                </td>
+                                <td ALIGN="right">
+                                    {{item.unpaidAmountUsd | number:'1.3-3'}}
+                                </td>
+                                <td ALIGN="right">
+                                    {{item.unpaidAmountVnd | number:'1.0-3'}}
+                                </td>
+                                <td>
+                                    <input type="text" class="form-control" [(ngModel)]="item.notes"
+                                        [disabled]="isReadonly">
+                                </td>
+                                <td class="text-success">{{item.departmentName}}</td>
+                                <td class="text-success">{{item.officeName}}</td>
+                            </tr>
+                            <tr class="font-weight-bold font-15">
+                                <td></td>
+                                <td>Total</td>
+                                <td></td>
+                                <td class="text-right">{{creditList | sumAmount:'amount':'USD':'currencyId' |
+                                    number}} USD |
+                                    {{creditList | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
+                                <td class="text-right">{{creditList | sumAmount:'unpaidAmountUsd' |
+                                    number:'1.3-3'}}
+                                </td>
+                                <td class="text-right">{{creditList | sumAmount:'unpaidAmountVnd' |
+                                    number:'1.0-3'}}
+                                </td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </ng-container>
+                        <tr app-table-none-record *ngIf="!(creditList)?.length">
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<ng-template inject></ng-template>

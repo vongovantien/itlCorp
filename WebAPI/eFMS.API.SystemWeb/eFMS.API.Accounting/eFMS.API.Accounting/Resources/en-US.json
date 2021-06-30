@@ -143,5 +143,8 @@
 
   // -----------------start Settlement
   "MSG_SETTLE_NOT_ALLOW_DELETE": "Settlement {0} have charges has issued CDNote/SOA/Voucher",
-  "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK": "Settlement {0} have [{1}] has been locked"
+  "MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK": "Settlement {0} have [{1}] has been locked",
+
+  // ----------------Receipt
+  "MSG_RECEIPT_HAVE_PAYMENT_PAID": "Receipt existed Paid Invoice(s), Please you check and remove them!",
 }

@@ -3,17 +3,36 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Customer Payment" [active]="true">
+                <tab heading="Customer/Agency Payment" [active]="selectedTab === 'CUSTOMER'"
+                    (selectTab)="onSelectTab('CUSTOMER')">
+
                     <customer-payment-form-search></customer-payment-form-search>
 
                     <div class="m-portlet">
                         <div class="m-portlet__body">
                             <div class="m--align-right">
-                                <app-permission-button type="add" title="Create Receipt" routerLink="receipt/new">
-                                </app-permission-button>
+                                <div class="dropdown m-dropdown m-dropdown--inline">
+                                    <button class="btn btn-success dropdown-toggle" type="button"
+                                        data-toggle="dropdown">
+                                        <i class="la la-plus"></i>Create Receipt<span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item pointer"
+                                            (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
+                                        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
+                                            Receipt</a>
+                                    </div>
+                                </div>
+
                             </div>
                             <tabset class="custom-class-tab">
-                                <tab heading="Payment" [active]="true">
+                                <tab [active]="true">
+                                    <ng-template tabHeading>
+                                        <span class="m--margin-right-10">Payment</span>
+                                        <ng-container *ngIf="!!totalItems">
+                                            <span class="badge badge-success">{{totalItems}}</span>
+                                        </ng-container>
+                                    </ng-template>
                                     <div class="row">
                                         <div class="col-lg-12 ">
                                             <div class="table-wrapper table-scrollable m--margin-top-20"
@@ -21,45 +40,56 @@
                                                 <table class="table table-hover table-brand dataTable table-hover">
                                                     <thead app-table-header [headers]="headers"
                                                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                                        <th class="first table-actions-col">
+                                                        <th class="first table-actions-col" style="min-width:40px">
                                                         </th>
                                                     </thead>
                                                     <tbody>
                                                         <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
                                                         </tr>
                                                         <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
-                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'">
-                                                            <td class="table-actions-col">
+                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'"
+                                                            [ngClass]="{'bg-secondary font-italic': cps.status === 'Cancel'}">
+                                                            <td class="table-actions-col" style="min-width:40px">
                                                                 <div class="table-actions">
-                                                                    <app-permission-button
-                                                                        *ngIf="(cps.status === 'Draft')" type="delete"
-                                                                        (onClick)="checkAllowDelete(cps)">
+
+                                                                    <app-permission-button type="delete"
+                                                                        *ngIf="(cps.status === 'Draft')"
+                                                                        (onClick)="checkAllowDelete(cps)"
+                                                                        [user]="cps.userCreated" class="icon"
+                                                                        icon="la la-trash text-danger">
                                                                     </app-permission-button>
+
                                                                     <button type="button"
-                                                                        class="btn btn-warning btn-sm  m-btn--icon m-btn--icon-only"
-                                                                        title="Cancel" *ngIf="(cps.status === 'Done')">
-                                                                        <i class="la la-ban"></i>
+                                                                        (click)="cancelReceipt(cps.id)"
+                                                                        class="btn btn-icon m-btn--icon m-btn--icon-only"
+                                                                        title="Cancel"
+                                                                        *ngIf="(cps.status === 'Done' && cps.syncStatus !=='Synced')">
+                                                                        <i class="la la-times text-danger"></i>
                                                                     </button>
-                                                                    <button type="button"
-                                                                        class="btn btn-dark btn-sm  m-btn--icon m-btn--icon-only"
-                                                                        title="Lock" *ngIf="(cps.status === 'Cancel')">
-                                                                        <i class="la la-lock"></i>
-                                                                    </button>
+
                                                                 </div>
                                                             </td>
 
                                                             <td class="text-underline">
                                                                 <div *ngIf="cps.status != 'Cancel'; else CancelNo">
-                                                                    <span><a class="pointer"
-                                                                            (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}</a></span>
+                                                                    <span>
+                                                                        <a class="pointer"
+                                                                            (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
+                                                                        </a>
+                                                                    </span>
                                                                 </div>
                                                                 <ng-template #CancelNo>
-                                                                    <span>{{cps.paymentRefNo}}</span>
+                                                                    <a class="text-muted pointer"
+                                                                        (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
+                                                                    </a>
                                                                 </ng-template>
                                                             </td>
 
                                                             <td>
-                                                                <span>{{cps.customerName}}</span>
+                                                                <span class="text-info">{{cps.customerName}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.type}}</span>
                                                             </td>
                                                             <td class="text-right">
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
@@ -70,7 +100,7 @@
                                                             </td>
                                                             <td>
                                                                 <span>
-                                                                    {{cps.paymentDate | date :'dd/MM/yyyy HH:mm'}}
+                                                                    {{cps.paymentDate | date :'dd/MM/yyyy'}}
                                                                 </span>
                                                             </td>
                                                             <td>
@@ -93,7 +123,7 @@
                                                                 </span>
                                                             </td>
                                                             <td>
-                                                                <span>{{cps.lastSyncDate | date :'dd/MM/yyyy HH:mm' }}
+                                                                <span>{{cps.lastSyncDate | date :'dd/MM/yyyy' }}
                                                                 </span>
                                                             </td>
                                                             <td>
@@ -105,7 +135,7 @@
                                                                     {{cps.status}}</span>
                                                                 <span *ngSwitchCase="'Done'" class="text-success">
                                                                     {{cps.status}}</span>
-                                                                <span *ngSwitchCase="'Cancel'" class="text-gray">
+                                                                <span *ngSwitchCase="'Cancel'" class="text-muted">
                                                                     {{cps.status}}</span>
                                                             </td>
                                                             <td>
@@ -114,13 +144,13 @@
                                                             </td>
                                                             <td>
                                                                 <span>
-                                                                    {{cps.datetimeCreated | date :'dd/MM/yyyy HH:mm'}}
+                                                                    {{cps.datetimeCreated | date :'dd/MM/yyyy'}}
                                                                 </span>
                                                             </td>
 
                                                             <td>
                                                                 <span>
-                                                                    {{cps.datetimeModified | date: 'dd/MM/yyyy HH:mm'}}
+                                                                    {{cps.datetimeModified | date: 'dd/MM/yyyy'}}
                                                                 </span>
                                                             </td>
 
@@ -145,14 +175,10 @@
                         </div>
                     </div>
                 </tab>
-                <tab heading="Agency Payment" (selectTab)="onSelectTab('agency')">
-                    Agency Payment
-                </tab>
                 <tab heading="AR Summary" (selectTab)="onSelectTab('ar')">
-                    Summary
                 </tab>
-                <tab heading="Payment History" (selectTab)="onSelectTab('history')">
-                    History
+                <tab heading="Payment History" (selectTab)="onSelectTab('HISTORY')"
+                    [active]="selectedTab === 'HISTORY'">
                 </tab>
             </tabset>
         </div>
@@ -162,3 +188,5 @@
 <confirm-popup (onSubmit)="onConfirmDeleteCP()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>
+
+<ng-template inject></ng-template>

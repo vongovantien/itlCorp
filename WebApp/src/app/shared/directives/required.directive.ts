@@ -13,7 +13,7 @@ export class AppRequiredDirective {
         const span = this.renderer.createElement('span');
         this.renderer.appendChild(span, this.renderer.createText('(*)'));
         this.renderer.appendChild(this.el.nativeElement, span);
-
+        this.renderer.setAttribute(this.el.nativeElement, 'title', 'Field required');
     }
 
     ngAfterViewInit(): void {
