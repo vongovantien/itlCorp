@@ -43,7 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private IMapper mapper;
-        private readonly IOptions<ApiUrl> apiUrl;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
 
         /// <summary>
@@ -53,11 +53,14 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
+        /// <param name="currencyExchange"></param>
+        /// <param name="_mapper"></param>
+        /// <param name="serviceUrl"></param>
         public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, 
             ICurrentUser user, IHostingEnvironment hostingEnvironment, 
             ICurrencyExchangeService currencyExchange,
             IMapper _mapper,
-            IOptions<ApiUrl> aUrl)
+            IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
@@ -65,7 +68,7 @@ namespace eFMS.API.Documentation.Controllers
             _hostingEnvironment = hostingEnvironment;
             currencyExchangeService = currencyExchange;
             mapper = _mapper;
-            apiUrl = aUrl;
+            apiServiceUrl = serviceUrl;
 
         }
 
@@ -261,12 +264,10 @@ namespace eFMS.API.Documentation.Controllers
 
         private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
         {
-            Uri urlDocument = new Uri(apiUrl.Value.Url);
-            var urlApiAcct = "http://localhost:44368";
-            //var urlApiAcct = urlDocument + "Accounting"; 
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
             string accessToken = Request.Headers["Authorization"].ToString();
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
