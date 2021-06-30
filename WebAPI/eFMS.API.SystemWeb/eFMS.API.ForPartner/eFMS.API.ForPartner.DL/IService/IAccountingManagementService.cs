@@ -22,5 +22,7 @@ namespace eFMS.API.ForPartner.DL.IService
         CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action);
         List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo);
         HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey);
+
+        void CalculatorInvoiceReceivable(AccAccountingManagement invoice);
     }
 }

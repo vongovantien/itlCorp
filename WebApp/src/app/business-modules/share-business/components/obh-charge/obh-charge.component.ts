@@ -246,7 +246,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                         this._toastService.success(result.message);
 
                         // Tính công nợ
-                        this.calculatorReceivable(this.charges);
+                        // this.calculatorReceivable(this.charges);
 
                         this.getProfit();
                         this.getSurcharges(CommonEnum.SurchargeTypeEnum.OBH);
