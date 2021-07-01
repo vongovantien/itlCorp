@@ -42,6 +42,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<SysUserLevel> userlevelRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         private readonly IContextBase<SysImage> sysImageRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -65,6 +66,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysUserLevel> userlevelRepo,
             IOptions<WebUrl> url,
+            IOptions<ApiUrl> aUrl,
             IContextBase<SysImage> sysImageRepo,
             ICurrencyExchangeService currencyExchange
             ) : base(repository, mapper)
@@ -84,7 +86,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepo = sysOffice;
             companyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
-            webUrl = url;
+            apiUrl = aUrl;
             sysImageRepository = sysImageRepo;
             currencyExchangeService = currencyExchange;
         }
@@ -501,7 +503,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
 
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "SeaImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
@@ -669,7 +671,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
 
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "AirImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;

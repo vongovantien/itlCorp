@@ -31,7 +31,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> partnerRepository;
         readonly IContextBase<CsAirWayBill> airwayBillRepository;
         readonly IContextBase<SysOffice> officeRepository;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         public CsManifestService(IContextBase<CsManifest> repository,
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -45,7 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CsAirWayBill> airwaybillRepo,
             IContextBase<SysOffice> officeRepo,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -58,7 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             partnerRepository = partnerRepo;
             airwayBillRepository = airwaybillRepo;
             officeRepository = officeRepo;
-            webUrl = url;
+            apiUrl = url;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -507,7 +507,7 @@ namespace eFMS.API.Documentation.DL.Services
                 IsLandscape = true
             };
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
@@ -601,7 +601,7 @@ namespace eFMS.API.Documentation.DL.Services
                 IsLandscape = true
             };
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;

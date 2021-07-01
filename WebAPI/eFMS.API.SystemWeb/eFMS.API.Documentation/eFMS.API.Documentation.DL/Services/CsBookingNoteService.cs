@@ -26,7 +26,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         private readonly ICurrentUser currentUser;
         readonly IStringLocalizer stringLocalizer;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
 
         readonly IContextBase<CatCountry> countryRepo;
         public CsBookingNoteService(
@@ -38,7 +38,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUser> sysUser,
             ICurrentUser user,
             IContextBase<CatCountry> catCountry,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             catPartnerRepo = catPartner;
@@ -46,7 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserRepo = sysUser;
             currentUser = user;
             countryRepo = catCountry;
-            webUrl = url;
+            apiUrl = url;
         }
         #region CUD
         public HandleState UpdateCsBookingNote(CsBookingNoteEditModel model)
@@ -382,7 +382,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
 
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "HLSeaBooingNote" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;

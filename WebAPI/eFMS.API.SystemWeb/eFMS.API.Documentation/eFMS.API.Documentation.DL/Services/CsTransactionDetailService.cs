@@ -51,7 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -78,7 +78,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -103,7 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
-            webUrl = url;
+            apiUrl = url;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -1648,7 +1648,7 @@ namespace eFMS.API.Documentation.DL.Services
                 result.SetParameter(parameter);
             }
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
@@ -1806,7 +1806,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
