@@ -441,9 +441,10 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids)
         {
             var result = new HandleState();
+            Ids = new List<Guid>(); // ds các charge phí update công nợ.
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
 
             var surchargesAdd = new List<CsShipmentSurcharge>();
@@ -587,6 +588,8 @@ namespace eFMS.API.Documentation.DL.Services
                         surchargesUpdate.Add(surcharge);
                     }
                 }
+
+                Ids.Add(item.Id);
             }
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
