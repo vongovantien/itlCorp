@@ -42,6 +42,8 @@ export class SettlementPayment {
     advanceAmount: number = null;
     balanceAmount: number = null;
     departmentName: string = null;
+    bankCode: string = null;
+    dueDate: string = '';
 
     constructor(object?: any) {
         const self = this;

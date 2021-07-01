@@ -17,5 +17,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string StatusApproval { get; set; }
         public string CurrencyID { get; set; }
         public PermissionRange RangeSearch { get; set; }
+        public string PayeeId { get; set; }
+        public int? DepartmentId { get; set; }
     }
 }

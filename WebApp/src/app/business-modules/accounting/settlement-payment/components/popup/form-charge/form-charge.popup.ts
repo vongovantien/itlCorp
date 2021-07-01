@@ -95,6 +95,7 @@ export class SettlementFormChargePopupComponent extends PopupBase {
     settlementCode: string = '';
 
     isFromshipment: boolean = false;
+    isSynced: boolean = false // * Phí OBH đã sync đầu thu
 
     dataShipmentFromExistingCharge: Partial<{ jobId: string, mbl: string, hbl: string }> = {};
 

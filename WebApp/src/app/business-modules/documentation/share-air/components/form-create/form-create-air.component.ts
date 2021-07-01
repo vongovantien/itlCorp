@@ -202,6 +202,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 res.etd = null;
                                 res.mawb = null;
                                 res.eta = null;
+                                res.ata = null;
+                                res.atd = null;
                                 res.serviceDate = null;
                             }
                         });

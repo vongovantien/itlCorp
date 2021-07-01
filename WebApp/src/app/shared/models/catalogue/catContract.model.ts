@@ -49,6 +49,7 @@ export class Contract {
     arconfirmed: boolean = false;
     viewDetail: boolean = false;
     creditUnlimited: boolean = false;
+    creditCurrency: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

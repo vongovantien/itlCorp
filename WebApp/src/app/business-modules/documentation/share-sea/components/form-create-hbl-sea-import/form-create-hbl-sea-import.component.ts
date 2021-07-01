@@ -116,14 +116,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
         this.initForm();
         console.log(this.type);
         this.incoterms = this._catalogueRepo.getIncoterm({ service: [this.type] });
-        if (!this.isUpdate) {
-            this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (res: CsTransaction) => {
-                        this.shipmentDetail = res;
-                        this.jobId = this.shipmentDetail.id;
 
+        this._store.select(fromShareBussiness.getTransactionDetailCsTransactionState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: CsTransaction) => {
+                    this.shipmentDetail = res;
+                    this.jobId = this.shipmentDetail.id;
+                    if (!this.isUpdate) {
                         const formData = {
                             masterBill: this.shipmentDetail.mawb,
                             servicetype: this.shipmentDetail.typeOfService,
@@ -144,8 +144,8 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
                         };
                         this.formGroup.patchValue(formData);
                     }
-                );
-        }
+                }
+            );
     }
 
     getConfigComboGrid() {

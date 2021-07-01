@@ -34,9 +34,14 @@
                         </div>
                         <div class="col-lg-12">
                             <div class="form-group">
-                                <label for="">Currency</label>
-                                <ng-select formControlName="currencyId" [items]="currencies | async" class="custom"
-                                    bindLabel="id" bindValue="id" placeholder="All"></ng-select>
+                                <label>Payee</label>
+                                <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id', value: payeeId.value}"
+                                    (itemSelected)="payeeId.setValue($event.id);" [dataSources]="partners | async" [displayFields]="[
+                                                                { field: 'shortName', label: 'Name ABBR' },
+                                                                { field: 'accountNo', label: 'Partner Code' }]"
+                                    [selectedDisplayFields]="['shortName']" placeholder="Select Payee"
+                                    (remove)="resetFormControl(payeeId)">
+                                </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
                     </div>
@@ -57,10 +62,29 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="form-group">
+                                        <label for="">Payment Method</label>
+                                        <ng-select formControlName="paymentMethod" [items]="paymentMethods" class="custom"
+                                            bindLabel="title" bindValue="value" placeholder="All">
+                                        </ng-select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="form-group">
+                                        <label for="">Currency</label>
+                                        <ng-select formControlName="currencyId" [items]="currencies | async" class="custom"
+                                            bindLabel="id" bindValue="id" placeholder="All"></ng-select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
                             <div class="form-group">
-                                <label for="">Payment Method</label>
-                                <ng-select formControlName="paymentMethod" [items]="paymentMethods" class="custom"
-                                    bindLabel="title" bindValue="value" placeholder="All">
+                                <label>Department</label>
+                                <ng-select class="custom" [items]="departments" bindLabel="name" bindValue="id"
+                                    [clearable]="true" formControlName="departmentId" placeholder="Select Department">
                                 </ng-select>
                             </div>
                         </div>

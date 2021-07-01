@@ -1,14 +1,15 @@
 import { Component, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
-import { User, Currency } from 'src/app/shared/models';
+import { User, Currency, Partner } from 'src/app/shared/models';
 import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { getSettlementPaymentSearchParamsState, ISettlementPaymentState, SearchListSettlePayment } from '../store';
 import { Store } from '@ngrx/store';
+import { CommonEnum } from '@enums';
 
 @Component({
     selector: 'settle-payment-form-search',
@@ -27,12 +28,16 @@ export class SettlementFormSearchComponent extends AppForm {
     statusApproval: AbstractControl;
     paymentMethod: AbstractControl;
     currencyId: AbstractControl;
+    payeeId: AbstractControl;
+    departmentId: AbstractControl;
 
     statusApprovals: CommonInterface.ICommonTitleValue[];
     statusPayments: CommonInterface.ICommonTitleValue[];
     paymentMethods: CommonInterface.ICommonTitleValue[] = [];
 
     userLogged: User;
+    partners: Observable<Partner[]>;
+    departments: Observable<any[]>;
 
     currencies: Observable<Currency[]>;
     requesters: Observable<User[]>;
@@ -64,6 +69,8 @@ export class SettlementFormSearchComponent extends AppForm {
                 !this.isUpdateRequesterFromRedux && rq && this.requester.setValue(!!rq ? rq.id : null);
             })
         );
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.getDepartments();
 
         this._store.select(getSettlementPaymentSearchParamsState)
             .pipe(
@@ -99,7 +106,8 @@ export class SettlementFormSearchComponent extends AppForm {
             statusApproval: [],
             paymentMethod: [],
             currencyId: [],
-
+            payeeId: [],
+            departmentId: []
         });
 
         this.referenceNo = this.formSearch.controls['referenceNo'];
@@ -109,6 +117,8 @@ export class SettlementFormSearchComponent extends AppForm {
         this.statusApproval = this.formSearch.controls['statusApproval'];
         this.paymentMethod = this.formSearch.controls['paymentMethod'];
         this.currencyId = this.formSearch.controls['currencyId'];
+        this.payeeId = this.formSearch.controls['payeeId'];
+        this.departmentId = this.formSearch.controls['departmentId'];
     }
 
     onSubmit() {
@@ -121,7 +131,9 @@ export class SettlementFormSearchComponent extends AppForm {
             paymentMethod: !!this.paymentMethod.value ? this.paymentMethod.value : 'All',
             statusApproval: !!this.statusApproval.value ? this.statusApproval.value : 'All',
             currencyId: !!this.currencyId.value ? this.currencyId.value : 'All',
-            requester: !!this.requester.value ? this.requester.value : this.userLogged.id
+            requester: !!this.requester.value ? this.requester.value : this.userLogged.id,
+            payeeId: !!this.payeeId.value ? this.payeeId.value : null,
+            departmentId: !!this.departmentId.value ? this.departmentId.value: null
         };
         this._store.dispatch(SearchListSettlePayment(body));
     }
@@ -153,6 +165,16 @@ export class SettlementFormSearchComponent extends AppForm {
         ];
     }
 
+    getDepartments() {
+        this._systemRepo.getAllDepartment()
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (data: any) => {
+                    this.departments = data.map(x => ({ "name": x.deptNameAbbr, "id": x.id }));
+                },
+            );
+    }
+    
     reset() {
         this.resetFormControl(this.requestDate);
         this.resetFormControl(this.modifiedDate);
@@ -160,6 +182,8 @@ export class SettlementFormSearchComponent extends AppForm {
         this.resetFormControl(this.paymentMethod);
         this.resetFormControl(this.statusApproval);
         this.resetFormControl(this.currencyId);
+        this.resetFormControl(this.payeeId);
+        this.resetFormControl(this.departmentId);
 
         this._store.dispatch(SearchListSettlePayment({ requester: this.userLogged.id }));
     }
@@ -175,4 +199,6 @@ export interface ISearchSettlePayment {
     paymentMethod: string;
     statusApproval: string;
     currencyId: string;
+    payeeId: string;
+    departmentId: string;
 }
