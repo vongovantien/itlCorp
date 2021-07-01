@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -10,6 +11,7 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +31,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> partnerRepository;
         readonly IContextBase<CsAirWayBill> airwayBillRepository;
         readonly IContextBase<SysOffice> officeRepository;
+        private readonly IOptions<WebUrl> webUrl;
         public CsManifestService(IContextBase<CsManifest> repository,
             IMapper mapper,
             IContextBase<CsTransactionDetail> transactionDetailRepo,
@@ -41,7 +44,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsTransactionDetailService transDetailService,
             IContextBase<CatPartner> partnerRepo,
             IContextBase<CsAirWayBill> airwaybillRepo,
-            IContextBase<SysOffice> officeRepo) : base(repository, mapper)
+            IContextBase<SysOffice> officeRepo,
+            IOptions<WebUrl> url) : base(repository, mapper)
         {
             transactionDetailRepository = transactionDetailRepo;
             placeRepository = placeRepo;
@@ -54,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
             partnerRepository = partnerRepo;
             airwayBillRepository = airwaybillRepo;
             officeRepository = officeRepo;
+            webUrl = url;
         }
 
         public HandleState AddOrUpdateManifest(CsManifestEditModel model)
@@ -501,8 +506,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(manifests);
@@ -592,8 +600,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true,
                 IsLandscape = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaCargoManifest" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(manifests);

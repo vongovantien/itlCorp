@@ -499,8 +499,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\SeaImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -663,8 +667,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\AirImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "AirImportArrivalNotice" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

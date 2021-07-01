@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -11,6 +12,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +26,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<SysUser> sysUserRepo;
         private readonly ICurrentUser currentUser;
         readonly IStringLocalizer stringLocalizer;
+        private readonly IOptions<WebUrl> webUrl;
 
         readonly IContextBase<CatCountry> countryRepo;
         public CsBookingNoteService(
@@ -34,7 +37,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPlace> catPlace,
             IContextBase<SysUser> sysUser,
             ICurrentUser user,
-            IContextBase<CatCountry> catCountry) : base(repository, mapper)
+            IContextBase<CatCountry> catCountry,
+            IOptions<WebUrl> url) : base(repository, mapper)
         {
             stringLocalizer = localizer;
             catPartnerRepo = catPartner;
@@ -42,6 +46,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserRepo = sysUser;
             currentUser = user;
             countryRepo = catCountry;
+            webUrl = url;
         }
         #region CUD
         public HandleState UpdateCsBookingNote(CsBookingNoteEditModel model)
@@ -375,8 +380,12 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\HLSeaBooingNote" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "HLSeaBooingNote" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(bookingNotes);

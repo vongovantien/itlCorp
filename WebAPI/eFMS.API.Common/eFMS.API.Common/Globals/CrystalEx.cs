@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -6,6 +7,7 @@ namespace eFMS.API.Common.Globals
 {
     public static class CrystalEx
     {
+        public static string _apiUrl;
         public static string GetLogoEFMS()
         {
             string folderReportPreview = GetFolderReportPreview().FirstOrDefault();
@@ -28,6 +30,10 @@ namespace eFMS.API.Common.Globals
             return folderResult;
         }
 
+        /// <summary>
+        /// Get disk path folder DownloadReports
+        /// </summary>
+        /// <returns></returns>
         public static string GetFolderDownloadReports()
         {
             string folderReportPreview = GetFolderReportPreview().FirstOrDefault();
@@ -37,6 +43,21 @@ namespace eFMS.API.Common.Globals
                 folderDownloadReport = Directory.GetDirectories(folderReportPreview).Where(s => s.Contains("DownloadReports")).FirstOrDefault();
             }
             return folderDownloadReport;
+        }
+
+        /// <summary>
+        /// Get link to DownloadReports with web url
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLinkDownloadReports()
+        {
+            var _webUrl = string.Empty;
+            var folderReportPreview = string.Empty;
+            var uriAddress = new Uri(_apiUrl);
+            _webUrl = uriAddress.GetLeftPart(UriPartial.Authority);
+            var _web = new Uri(new Uri(_webUrl), "ReportPreview/DownloadReports");
+            folderReportPreview = _web.ToString();
+            return folderReportPreview;
         }
 
         public static IEnumerable<string> GetFolderReportPreview()

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
@@ -17,6 +18,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -49,6 +51,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IOptions<WebUrl> webUrl;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -74,7 +77,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IOptions<WebUrl> url) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -99,6 +103,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            webUrl = url;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -1642,8 +1647,11 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             return result;
@@ -1797,8 +1805,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(housebills);
