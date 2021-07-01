@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -10,9 +11,9 @@ using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -27,7 +28,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatCountry> countryRepo;
         readonly IContextBase<CatUnit> unitRepository;
-
+        private readonly IOptions<WebUrl> webUrl;
         public CsAirWayBillService(IContextBase<CsAirWayBill> repository, 
             IMapper mapper,
             ICsDimensionDetailService dimensionService,
@@ -37,7 +38,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CsTransaction> csTransaction,
             IContextBase<CatPartner> catPartner,
             IContextBase<CatUnit> unitRepo,
-            IContextBase<CatCountry> catCountry) : base(repository, mapper)
+            IContextBase<CatCountry> catCountry,
+            IOptions<WebUrl> url) : base(repository, mapper)
         {
             dimensionDetailService = dimensionService;
             shipmentOtherChargeService = otherChargeService;
@@ -47,6 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             catPartnerRepo = catPartner;
             countryRepo = catCountry;
             unitRepository = unitRepo;
+            webUrl = url;
         }
 
         public CsAirWayBillModel GetBy(Guid jobId)
@@ -512,9 +515,14 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\MAWBITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+
+            // Get path link to report
+            CrystalEx._apiUrl = webUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "MAWBITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(airWayBills);
             result.FormatType = ExportFormatType.PortableDocFormat;
             var parameter = new MasterAirwayBillReportParams()
