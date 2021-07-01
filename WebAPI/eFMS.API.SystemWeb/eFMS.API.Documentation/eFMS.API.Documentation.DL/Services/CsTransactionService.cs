@@ -57,7 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
 
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
@@ -95,7 +95,7 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -128,7 +128,7 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
             shippingInstructionServiceRepo = shippingInstruction;
-            webUrl = url;
+            apiUrl = url;
         }
 
         #region -- INSERT & UPDATE --
@@ -2922,7 +2922,7 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowExport = true
             };
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;

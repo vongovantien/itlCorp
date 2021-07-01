@@ -51,13 +51,15 @@ namespace eFMS.API.Common.Globals
         /// <returns></returns>
         public static string GetLinkDownloadReports()
         {
-            var _webUrl = string.Empty;
+            if (string.IsNullOrEmpty(_apiUrl))
+            {
+                return GetFolderDownloadReports();
+            }
             var folderReportPreview = string.Empty;
-            var uriAddress = new Uri(_apiUrl);
-            _webUrl = uriAddress.GetLeftPart(UriPartial.Authority);
-            var _web = new Uri(new Uri(_webUrl), "ReportPreview/DownloadReports");
-            folderReportPreview = _web.ToString();
-            return folderReportPreview;
+            Uri fullUrl = new Uri(_apiUrl);
+            var _orginUrl = fullUrl.GetLeftPart(UriPartial.Authority); //
+            var _linkToFolder = new Uri(new Uri(_orginUrl), "ReportPreview/DownloadReports");
+            return _linkToFolder.ToString();
         }
 
         public static IEnumerable<string> GetFolderReportPreview()

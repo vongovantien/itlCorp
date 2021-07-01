@@ -28,7 +28,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatPartner> catPartnerRepo;
         readonly IContextBase<CatCountry> countryRepo;
         readonly IContextBase<CatUnit> unitRepository;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         public CsAirWayBillService(IContextBase<CsAirWayBill> repository, 
             IMapper mapper,
             ICsDimensionDetailService dimensionService,
@@ -39,7 +39,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatPartner> catPartner,
             IContextBase<CatUnit> unitRepo,
             IContextBase<CatCountry> catCountry,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             dimensionDetailService = dimensionService;
             shipmentOtherChargeService = otherChargeService;
@@ -49,7 +49,7 @@ namespace eFMS.API.Documentation.DL.Services
             catPartnerRepo = catPartner;
             countryRepo = catCountry;
             unitRepository = unitRepo;
-            webUrl = url;
+            apiUrl = url;
         }
 
         public CsAirWayBillModel GetBy(Guid jobId)
@@ -517,7 +517,7 @@ namespace eFMS.API.Documentation.DL.Services
             };
 
             // Get path link to report
-            CrystalEx._apiUrl = webUrl.Value.Url;
+            CrystalEx._apiUrl = apiUrl.Value.Url;
             string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
             var reportName = "MAWBITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
             var _pathReportGenerate = folderDownloadReport + "/" + reportName;
