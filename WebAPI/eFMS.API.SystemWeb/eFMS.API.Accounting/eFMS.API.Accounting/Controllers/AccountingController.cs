@@ -1068,6 +1068,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             var _startDateProgress = DateTime.Now;
             if (!ModelState.IsValid) return BadRequest();
+            currentUser.Action = "SyncListReceiptToAccountant";
 
             try
             {
