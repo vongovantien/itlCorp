@@ -7,8 +7,10 @@ import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState, IAppState } from '@store';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html',
@@ -20,7 +22,7 @@ export class SettlementFormCreateComponent extends AppForm {
     @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
 
     users: Observable<User[]>;
-    userLogged: User;
+    userLogged: Partial<SystemInterface.IClaimUser>;
 
     form: FormGroup;
     settlementNo: AbstractControl;
@@ -54,7 +56,8 @@ export class SettlementFormCreateComponent extends AppForm {
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IAppState>
     ) {
         super();
     }
@@ -119,8 +122,13 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.requester.setValue(this.userLogged.id);
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((res: any)=>{
+            if(!!res){
+                this.userLogged = res;
+                this.requester.setValue(this.userLogged.id);
+            }
+        })
     }
 
     getSystemUser() {
@@ -160,7 +168,7 @@ export class SettlementFormCreateComponent extends AppForm {
             if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
                 const beneficiary = this.getPartnerById(this.payee.value);
                 if (!!beneficiary) {
-                    this.beneficiaryName.setValue(beneficiary.partnerNameEn);
+                    this.beneficiaryName.setValue(beneficiary.partnerNameVn);
                     this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                     this.setBankInfo(beneficiary);
                 }
@@ -171,6 +179,8 @@ export class SettlementFormCreateComponent extends AppForm {
             this.resetBankInfo();
             if(this.paymentMethod.value === this.methods[1]){
                 if (!!this.userLogged) {
+                    this.beneficiaryName.setValue(this.userLogged.nameVn);
+                    this.bankAccountNo.setValue(this.userLogged.bankAccountNo);
                     this.setBankInfo(this.userLogged);
                 }
             }
@@ -185,10 +195,10 @@ export class SettlementFormCreateComponent extends AppForm {
 
     resetBankInfo(){
         this.beneficiaryName.setValue(null);
-            this.bankAccountNo.setValue(null);
-            this.bankName.setValue(null);
-            this.bankNameDescription.setValue(null);
-            this.mapBankCode(null);
+        this.bankAccountNo.setValue(null);
+        this.bankName.setValue(null);
+        this.bankNameDescription.setValue(null);
+        this.mapBankCode(null);
     }
 
     getPartnerById(id: string) {
