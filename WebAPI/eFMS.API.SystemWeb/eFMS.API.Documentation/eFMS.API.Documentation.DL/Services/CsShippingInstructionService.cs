@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
@@ -9,6 +10,7 @@ using eFMS.API.Documentation.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatUnit> catUnitRepository;
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<SysEmployee> employeeRepository;
-
+        private readonly IOptions<ApiUrl> apiUrl;
         readonly ICsTransactionDetailService transactionDetailService;
 
         public CsShippingInstructionService(IContextBase<CsShippingInstruction> repository,
@@ -40,7 +42,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatUnit> catUnitRepo,
             IContextBase<SysOffice> officeRepo,
             IContextBase<SysEmployee> employeeRepo,
-            ICsTransactionDetailService transDetailService) : base(repository, mapper)
+            ICsTransactionDetailService transDetailService,
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             partnerRepository = partnerRepo;
             placeRepository = placeRepo;
@@ -52,6 +55,7 @@ namespace eFMS.API.Documentation.DL.Services
             officeRepository = officeRepo;
             transactionDetailService = transDetailService;
             employeeRepository = employeeRepo;
+            apiUrl = url;
         }
 
         public HandleState AddOrUpdate(CsShippingInstructionModel model)
@@ -250,9 +254,13 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowPrint = true,
                     AllowExport = true
                 };
-                string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionFCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                // Get path link to report
+                CrystalEx._apiUrl = apiUrl.Value.Url;
+                string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+                var reportName = "SeaShippingInstructionFCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "/" + reportName;
                 result.PathReportGenerate = _pathReportGenerate;
+
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
                 result.SetParameter(parameter);
@@ -341,9 +349,13 @@ namespace eFMS.API.Documentation.DL.Services
                     AllowPrint = true,
                     AllowExport = true
                 };
-                string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-                var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionLCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                // Get path link to report
+                CrystalEx._apiUrl = apiUrl.Value.Url;
+                string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+                var reportName = "SeaShippingInstructionLCLCont" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+                var _pathReportGenerate = folderDownloadReport + "/" + reportName;
                 result.PathReportGenerate = _pathReportGenerate;
+
                 result.AddDataSource(instructions);
                 result.FormatType = ExportFormatType.PortableDocFormat;
                 result.SetParameter(parameter);
@@ -534,8 +546,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstruction" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaShippingInstruction" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(instructions);
@@ -693,9 +708,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\SeaShippingInstructionSummary" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "SeaShippingInstructionSummary" + DateTime.Now.ToString("yyyyMMddHHmmssFFF") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
+
             result.AddDataSource(instructions);
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);

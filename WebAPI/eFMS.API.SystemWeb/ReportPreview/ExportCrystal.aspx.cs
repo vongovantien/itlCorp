@@ -96,7 +96,8 @@ namespace ReportPerview
                 }
 
                 DiskFileDestinationOptions CrDiskFileDestinationOptions = new DiskFileDestinationOptions();
-                CrDiskFileDestinationOptions.DiskFileName = pathReportGenerate;
+                // edit: export file with path combine disk path and file name
+                CrDiskFileDestinationOptions.DiskFileName = Path.Combine(downloadReportPath, Path.GetFileName(pathReportGenerate));
                 ExportOptions CrExportOptions = cryRpt.ExportOptions;
                 {
                     CrExportOptions.ExportDestinationType = ExportDestinationType.DiskFile;

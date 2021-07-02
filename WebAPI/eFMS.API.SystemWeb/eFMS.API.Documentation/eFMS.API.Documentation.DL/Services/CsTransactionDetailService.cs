@@ -53,6 +53,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IOptions<ApiUrl> apiUrl;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
@@ -83,6 +84,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IOptions<ApiUrl> url) : base(repository, mapper)
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
@@ -111,6 +113,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            apiUrl = url;
             sysEmployeeRepository = sysEmployeeRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
         }
@@ -1668,8 +1671,11 @@ namespace eFMS.API.Documentation.DL.Services
                 };
                 result.SetParameter(parameter);
             }
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "HouseBillOfLadingITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             return result;
@@ -1823,8 +1829,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "HouseAirwayBillLastestITL" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(housebills);
