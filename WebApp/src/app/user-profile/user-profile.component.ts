@@ -18,7 +18,7 @@ import UUID from 'validator/lib/isUUID';
 
 
 declare var $: any;
-import { GetCatalogueBankAction, getCatalogueBankState } from '@store';
+import { GetCatalogueBankAction, getCatalogueBankState, UpdateCurrentUser } from '@store';
 @Component({
     selector: 'user-profile-page',
     templateUrl: './user-profile.component.html',
@@ -63,7 +63,7 @@ export class UserProfilePageComponent extends AppForm {
         private _toastService: ToastrService,
         private _zone: NgZone,
         private _globalState: GlobalState,
-        private _store: Store<fromShare.IShareBussinessState>,
+        private _store: Store<any>,
 
     ) {
         super();
@@ -241,10 +241,11 @@ export class UserProfilePageComponent extends AppForm {
         this._systemRepo.updateProfile(body)
             .pipe(catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
-            ).subscribe((body: CommonInterface.IResult) => {
-                if (body.status) {
+            ).subscribe((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this.updateStoreUser(body);
                     this._toastService.success("Upload profile successful");
-                    this._globalState.notifyDataChanged('profile', body.data as Employee);
+                    this._globalState.notifyDataChanged('profile', res.data as Employee);
                 } else {
                     this._toastService.error("Upload profile fail");
                 }
@@ -255,5 +256,18 @@ export class UserProfilePageComponent extends AppForm {
             this.bankName.setValue(data.bankNameEn);
             this.bankCode.setValue(data.code);
         }      
+    }
+
+    // Update value changes on user profile to store
+    updateStoreUser(body: any){
+        const user = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        user.email = body.email;
+        user.phone_number = body.tel;
+        user.nameEn = body.employeeNameEn;
+        user.nameVn = body.employeeNameVn;
+        user.bankAccountNo = body.bankAccountNo;
+        user.bankName = body.bankName;
+        user.bankCode = body.bankCode;
+        this._store.dispatch(UpdateCurrentUser(user));
     }
 }

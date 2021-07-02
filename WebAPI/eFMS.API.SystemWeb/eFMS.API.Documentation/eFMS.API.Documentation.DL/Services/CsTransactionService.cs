@@ -16,6 +16,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
+        private readonly IOptions<ApiUrl> apiUrl;
         private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
@@ -95,6 +97,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
+            IContextBase<CatCommodity> commodityRepo,
+            IOptions<ApiUrl> url) : base(repository, mapper)
             ISysImageService imageService,
             IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
         {
@@ -129,6 +133,7 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
             shippingInstructionServiceRepo = shippingInstruction;
+            apiUrl = url;
             sysImageService = imageService;
         }
 
@@ -2940,8 +2945,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

@@ -64,7 +64,11 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     isChangeCharge: boolean = false;
     messageValidate: string = '';
-
+    referenceNoLst:any[]=[];
+    displayFieldFlexID: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'hblNo', label: 'HBL No' },
+        { field: 'referenceNo', label: 'ReferenceNo' },
+    ];
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -83,6 +87,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         });
         this.note = this.formCreate.controls["note"];
         this.flexId = this.formCreate.controls["flexId"];
+        this.referenceNoLst = [];
     }
 
     setHeader() {
@@ -111,6 +116,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.initGroup = [];
         this.isChangeCharge = false;
         this.isCheckAllCharge = false;
+        this.referenceNoLst = [];
     }
 
     getListSubjectPartner(mblId: any) {
@@ -137,6 +143,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     getListCharges(mblId: string, partnerId: string, isHouseBillID: boolean, cdNoteCode: string) {
+        this.referenceNoLst = [];
+
         this._documentationRepo.getChargesByPartner(mblId, partnerId, isHouseBillID, cdNoteCode)
             .pipe(
                 catchError(this.catchError),
@@ -161,8 +169,19 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                                     ele.canEdit = false;
                                 }
                             }
+
                         });
+
+                        //[ADD][01/07/2021][15924][Flexport ID dropdown sẽ load list referenc No của các HBL]
+                        if(element.referenceNoHBL )
+                            this.referenceNoLst.find(x=>x.referenceNo === element.referenceNoHBL.trim())
+                            || this.referenceNoLst.push({
+                                hblNo:element.hwbno,
+                                referenceNo:element.referenceNoHBL
+                            });
+                        //[END]
                     });
+
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
                     this.listCharges = [];
@@ -367,7 +386,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                 listCharge.push(charge);
             }
         }
-        // List currency unique      
+        // List currency unique
         const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
@@ -490,5 +509,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             });
             this.flexId.setValue(_flexId);
         }
+    }
+    onSelectDataFlexID(data:any){
+        this.flexId.setValue(data.referenceNo);
     }
 }
