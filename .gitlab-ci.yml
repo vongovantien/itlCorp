@@ -30,8 +30,8 @@ build_uat:
     name: "angular_build"
     paths:
       - $APP_OUTPUT_PATH
-      
-build_test:      
+
+build_test:
   stage: build
   script:
     - node --version
@@ -45,7 +45,7 @@ build_test:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - feature/sprint25-15-04-2021
+    - feature/dev
   artifacts:
     name: "angular_build"
     paths:
