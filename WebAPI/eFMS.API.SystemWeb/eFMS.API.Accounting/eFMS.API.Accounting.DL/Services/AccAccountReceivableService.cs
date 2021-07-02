@@ -243,7 +243,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                         .Select(se => se.Invoices.AsQueryable())
                         .FirstOrDefault();
-
+                if(invGrps == null)
+                {
+                    return;
+                }
                 // Group By InvoiceID
                 IQueryable<AccAccountingManagement> invoiceQ = invGrps.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                 {
@@ -366,7 +369,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                         .Select(se => se.Invoices.AsQueryable())
                         .FirstOrDefault();
-
+                if (invGrps == null)
+                {
+                    return;
+                }
                 // Group By InvoiceID
                 IQueryable<AccAccountingManagement> invoiceQ = invGrps.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                 {
@@ -459,7 +465,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                         .Select(se => se.Invoices.AsQueryable())
                         .FirstOrDefault();
-
+                if (invGrps == null)
+                {
+                    return;
+                }
                 // Group By InvoiceID
                 IQueryable<AccAccountingManagement> invoiceQ = invGrps.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                 {
@@ -529,7 +538,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                          .Select(se => se.Invoices.AsQueryable())
                          .FirstOrDefault();
-
+                if (invGrps == null)
+                {
+                    return;
+                }
                 // Group By InvoiceID
                 IQueryable<AccAccountingManagement> invoiceQ = invGrps.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                 {
@@ -598,7 +610,10 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                         .Select(se => se.Invoices.AsQueryable())
                         .FirstOrDefault();
-
+                if (invGrps == null)
+                {
+                    return;
+                }
                 // Group By InvoiceID
                 IQueryable<AccAccountingManagement> invoiceQ = invGrps.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                 {

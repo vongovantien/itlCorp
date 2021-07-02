@@ -2783,6 +2783,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_Sync_Receipt", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -2819,6 +2820,7 @@ namespace eFMS.API.Accounting.DL.Services
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    new LogHelper("eFMS_Sync_Receipt", ex.ToString());
                     return new HandleState((object)ex.Message);
                 }
                 finally

@@ -1205,6 +1205,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     catch (Exception ex)
                     {
+                        new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                         trans.Rollback();
                         return new HandleState((object)ex.Message);
                     }
@@ -1216,6 +1217,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -1311,6 +1313,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
+                        new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -1323,7 +1326,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
+                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
 
@@ -1364,7 +1367,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
-                        new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
+                        new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -1375,7 +1378,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
-                new LogHelper("eFMS_AR_SaveDoneReceipt_LOG", ex.ToString());
+                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
@@ -1442,7 +1445,7 @@ namespace eFMS.API.Accounting.DL.Services
                     catch (Exception ex)
                     {
                         trans.Rollback();
-                        new LogHelper("eFMS_AR_SaveCancel_LOG", ex.ToString());
+                        new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                         return new HandleState((object)ex.Message);
                     }
                     finally
@@ -1453,6 +1456,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_AR_SaveReceipt_LOG", ex.ToString());
                 return new HandleState((object)ex.Message);
             }
         }
