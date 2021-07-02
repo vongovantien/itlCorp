@@ -7,6 +7,7 @@ export class ChargeCdNote {
     listCharges: CsShipmentSurchargeDetail[] = new Array<CsShipmentSurchargeDetail>();
     isSelected: boolean = false;
     isDeleted: boolean = false;
+    referenceNoHBL: string = "";
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

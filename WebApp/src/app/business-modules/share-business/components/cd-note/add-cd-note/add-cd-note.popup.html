@@ -39,8 +39,11 @@
                                     <label class="form-control-label">
                                         Flex ID
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square"
-                                        formControlName="flexId">
+                                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFlexID($event)"
+                                            [displayFields]="displayFieldFlexID" [selectedDisplayFields]="['referenceNo']"
+                                            [dataSources]="referenceNoLst" (remove)="resetFormControl(flexId)"
+                                            placeholder="Please Select FlexId" allowFreeText formControlName="flexId">
+                                        </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-3">
