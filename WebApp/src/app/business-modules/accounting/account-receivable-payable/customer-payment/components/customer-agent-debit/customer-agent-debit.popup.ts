@@ -90,7 +90,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                 if (typeArr.length === 1 && (typeArr.includes("CUSTOMER") || typeArr.includes("AGENT"))) {
                     this.type = type;
                 } else {
-                    this.type = type[0];
+                    this.type = typeArr[0];
                 }
                 console.log(this.type);
             })

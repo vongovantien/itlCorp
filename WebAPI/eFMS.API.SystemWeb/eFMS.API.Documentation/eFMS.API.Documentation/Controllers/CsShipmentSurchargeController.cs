@@ -221,7 +221,7 @@ namespace eFMS.API.Documentation.Controllers
             //});
             currentUser.Action = "AddAndUpdate";
 
-            var hs = csShipmentSurchargeService.AddAndUpdate(list);
+            var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
@@ -234,8 +234,7 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     //Tính công nợ sau khi tạo mới hóa đơn thành công
-                    var surchargeIds = list.Select(s => s.Id).ToList();
-                    List<ObjectReceivableModel> modelReceivableList = GetListObjectReceivableBySurchargeIds(surchargeIds);
+                    List<ObjectReceivableModel> modelReceivableList = GetListObjectReceivableBySurchargeIds(Ids);
                     await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
                 });
             }

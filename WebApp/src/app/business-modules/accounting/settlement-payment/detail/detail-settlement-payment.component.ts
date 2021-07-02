@@ -114,7 +114,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        if(this.formCreateSurcharge.checkStaffPartner()){
+        if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
             return;
         }
@@ -226,7 +226,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        if(this.formCreateSurcharge.checkStaffPartner()){
+        if (this.formCreateSurcharge.checkStaffPartner()) {
             this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
             return;
         }
@@ -336,17 +336,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
-    }
 
-    previewGeneralPreview() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "", 'Settlement_General');
     }
 
     @delayTime(1000)

@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
-import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { DataService } from '@services';
 import { formatDate } from '@angular/common';
@@ -16,7 +15,7 @@ import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
-import { cloneDeep, isNumber } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -78,11 +77,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     ];
 
     constructor(
-        private _accountingRepo: AccountingRepo,
-        private _store: Store<IAppState>,
-        private _fb: FormBuilder,
-        private _dataService: DataService,
-        private _catalogueRepo: CatalogueRepo,
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _store: Store<IAppState>,
+        private readonly _fb: FormBuilder,
+        private readonly _dataService: DataService,
+        private readonly _catalogueRepo: CatalogueRepo,
+        private readonly _toastService: ToastrService
     ) {
         super();
     }
@@ -95,6 +95,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.initForm();
         this.listenCusAdvanceData();
         this.listenCustomerInfoData();
+
+
+        this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en'))
+            .then(
+                (exchangeRate: IExchangeRate) => {
+                    if (!!exchangeRate) {
+                        this.exchangeRateUsd = exchangeRate.rate;
+                        console.log(this.exchangeRateUsd);
+
+                    } else {
+                        this.exchangeRateUsd = 0;
+                    }
+                }
+            );
+
+
     }
 
     formatNumberCurrency(input: number, digit: number) {
@@ -115,8 +131,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                             (exchangeRate: IExchangeRate) => {
                                 if (!!exchangeRate) {
                                     this.exchangeRateUsd = exchangeRate.rate;
-                                    console.log(this.exchangeRateUsd);
-
                                 } else {
                                     this.exchangeRateUsd = 0;
                                 }
@@ -133,7 +147,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: string) => {
-                    data !== undefined && (this.partnerId = data);
+                    console.log(data);
+                    if (!!data) {
+                        this.partnerId = data;
+                    }
                 }
             );
     }
@@ -231,7 +248,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 if (!data.target.value.length) {
                     this.paidAmountUSD.setValue(0);
                 }
-                this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 2));
+                if (this.isAutoConvert.value) {
+                    this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 2));
+                }
                 this.getFinalPaidAmount();
                 break;
             case 'currency':
@@ -318,7 +337,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         let listInvoice = [];
         this.debitList
             .subscribe((x: ReceiptInvoiceModel[]) => {
-                listInvoice = cloneDeep(x);
+                listInvoice = cloneDeep<ReceiptInvoiceModel[]>(x);
             });
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
@@ -326,16 +345,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             paidAmountVnd: this.finalPaidAmountVND.value,
             paidAmountUsd: this.finalPaidAmountUSD.value,
             list: listInvoice.filter(x => x.type !== 'ADV'),
-            customerId: this.partnerId
         };
-        // if (!body.customerId || !body.list.length || !body.paidAmount) {
-        //     this._toastService.warning('Missing data to process', 'Warning');
-        //     return;
-        // }
-        // if (this.getCurrencyInvoice(body.list).length === 2) {
-        //     this._toastService.warning('List invoice should only have one currency', 'Warning');
-        //     return;
-        // }
+        if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
+            this._toastService.warning('Missing data to process', 'Warning');
+            return;
+        }
+
         this._accountingRepo.processInvoiceReceipt(body)
             .subscribe(
                 (data: ProcessClearInvoiceModel) => {
@@ -401,7 +416,6 @@ interface IProcessClearInvoiceModel {
     paidAmountUsd: number;
     list: ReceiptInvoiceModel[];
     finalExchangeRate: number;
-    customerId: string;
 }
 
 interface IExchangeRate {
