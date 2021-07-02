@@ -10,9 +10,9 @@ import { ChargeOfAccountingManagementModel } from '@models';
 import { InjectViewContainerRefDirective } from '@directives';
 import { AccountingRepo } from '@repositories';
 import { AppList } from '@app';
-import { IAccountingManagementState, getAccountingManagementPartnerChargeState, getAccoutingManagementPartnerState, IAccountingManagementPartnerState } from '../../store';
+import { IAccountingManagementState, getAccountingManagementPartnerChargeState, getAccoutingManagementPartnerState, IAccountingManagementPartnerState, getAccountingManagementGeneralExchangeRate } from '../../store';
 
-import { switchMap, takeUntil, withLatestFrom, map } from 'rxjs/operators';
+import { switchMap, takeUntil, withLatestFrom, map, filter, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 
@@ -162,21 +162,29 @@ export class AccountingManagementListChargeComponent extends AppList implements 
     }
 
     listenGeneralExchangeRateChange() {
-        this._dataService.currentMessage
+        this._store.select(getAccountingManagementGeneralExchangeRate)
             .pipe(
-                switchMap((res: { [key: string]: any }) => {
-                    if (res.generalExchangeRate) {
-                        if (!!this.charges.length) {
-                            this.charges.forEach(c => {
-                                // Chỉ Update ExcRate cho những charge có Currency != VND && Type != OBH
-                                if (c.currency !== 'VND' && c.chargeType !== 'OBH') {
-                                    c.exchangeRate = res.generalExchangeRate; // * for Display
-                                    c.finalExchangeRate = res.generalExchangeRate; // * for Calculating
-                                }
-                            });
-                            return this._accountingRepo.calculateListChargeAccountingMngt(this.charges);
-                        }
-                        return of(false);
+                filter(x => x !== null),
+                switchMap((res: any) => {
+                    if (!!this.charges.length) {
+                        const chargesCpyToModified = cloneDeep(this.charges);
+                        chargesCpyToModified.forEach(c => {
+                            // * From mask to model
+                            if (!!c.invoiceDate) {
+                                const [day, month, year]: string[] = c.invoiceDate.split("/");
+                                c.invoiceDate = formatDate(new Date(+year, +month - 1, +day), 'yyyy-MM-dd', 'en');
+                            } else {
+                                c.invoiceDate = null;
+                            }
+                            // ? Chỉ Update ExcRate cho những charge có Currency != VND && Type != OBH
+                            if (c.currency !== 'VND' && c.chargeType !== 'OBH') {
+                                c.exchangeRate = res; // * for Display
+                                c.finalExchangeRate = res; // * for Calculating
+                            }
+                        });
+                        return this._accountingRepo.calculateListChargeAccountingMngt(chargesCpyToModified).pipe(
+                            catchError(error => of(false))
+                        );
                     }
                     return of(false);
                 }),
@@ -184,22 +192,25 @@ export class AccountingManagementListChargeComponent extends AppList implements 
             ).subscribe(
                 (data: IChargeAccountingMngtTotal) => {
                     if (!!data) {
-                        if (data.charges.length) {
+                        if (data?.charges?.length) {
                             data.charges.forEach(c => {
                                 if (!!c.invoiceDate) {
                                     if (new Date(c.invoiceDate).toString() !== "Invalid Date") {
-                                        c.invoiceDate = formatDate(new Date(c.invoiceDate), 'MM/dd/yyyy', 'en');
+                                        c.invoiceDate = formatDate(new Date(c.invoiceDate), 'dd/MM/yyyy', 'en');
                                     }
                                 }
                             })
+                            this.charges = [...data.charges];
+                            this.totalAmountVnd = data.totalAmountVnd;
+                            this.totalAmountVat = data.totalAmountVat;
+                            this._toastService.success("Exchange Rate synced successfully");
                         }
-                        this.charges = [...data.charges];
-                        this.totalAmountVnd = data.totalAmountVnd;
-                        this.totalAmountVat = data.totalAmountVat;
-                        this._toastService.success("Exchange Rate synced successfully");
-
                     } else {
+                        this._toastService.success("Exchange Rate synced fail, please check again!");
                     }
+                },
+                (err) => {
+                    console.log(err);
                 }
             );
     }

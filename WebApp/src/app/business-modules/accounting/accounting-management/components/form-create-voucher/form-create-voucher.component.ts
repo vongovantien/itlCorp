@@ -8,9 +8,8 @@ import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { Store } from '@ngrx/store';
 import { IAppState, GetCatalogueCurrencyAction, getCatalogueCurrencyState } from '@store';
 import { CommonEnum } from '@enums';
-import { DataService } from '@services';
 
-import { getAccoutingManagementPartnerState } from '../../store';
+import { getAccoutingManagementPartnerState, UpdateExchangeRate } from '../../store';
 
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -60,7 +59,6 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
-        private _dataService: DataService,
         private _accountingRepo: AccountingRepo,
     ) {
         super();
@@ -176,7 +174,7 @@ export class AccountingManagementFormCreateVoucherComponent extends AppForm impl
 
     syncExchangeRateCharge() {
         if (!!this.totalExchangeRate.value) {
-            this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
+            this._store.dispatch(UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }));
         }
     }
 
