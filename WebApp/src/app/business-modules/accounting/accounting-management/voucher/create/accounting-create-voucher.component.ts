@@ -17,6 +17,7 @@ import { AccountingManagementListChargeComponent } from '../../components/list-c
 
 import _merge from 'lodash/merge';
 import { catchError } from 'rxjs/operators';
+import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'app-accounting-create-voucher',
@@ -69,7 +70,7 @@ export class AccountingManagementCreateVoucherComponent extends AppForm implemen
         const modelAdd: AccAccountingManagementModel = this.onSubmitData();
         modelAdd.type = AccountingConstants.ISSUE_TYPE.VOUCHER;
 
-        modelAdd.charges = [...this.listChargeComponent.charges];
+        modelAdd.charges = cloneDeep(this.listChargeComponent.charges);
 
         // * Format lại invoice date trước khi gửi lên do Ngx-Mask đổi format.
         modelAdd.charges.forEach(c => {

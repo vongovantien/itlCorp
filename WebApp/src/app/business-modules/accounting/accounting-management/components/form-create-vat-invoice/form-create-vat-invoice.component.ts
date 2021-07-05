@@ -8,9 +8,8 @@ import { AccountingConstants } from '@constants';
 import { ChartOfAccounts, Currency, Partner } from '@models';
 import { CommonEnum } from '@enums';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction } from '@store';
-import { DataService } from '@services';
 
-import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, getAccoutingManagementPaymentTermState } from '../../store';
+import { getAccoutingManagementPartnerState, IAccountingManagementPartnerState, getAccoutingManagementPaymentTermState, UpdateExchangeRate } from '../../store';
 
 import { Observable, forkJoin } from 'rxjs';
 import { map, debounceTime, takeUntil, distinctUntilChanged, startWith } from 'rxjs/operators';
@@ -71,7 +70,6 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
         private _catalogueRepo: CatalogueRepo,
         private _store: Store<IAppState>,
         private _accountingRepo: AccountingRepo,
-        private _dataService: DataService
     ) {
         super();
     }
@@ -221,7 +219,9 @@ export class AccountingManagementFormCreateVATInvoiceComponent extends AppForm i
 
     syncExchangeRateCharge() {
         if (!!this.totalExchangeRate.value) {
-            this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
+            // this._dataService.setData("generalExchangeRate", this.totalExchangeRate.value);
+            this._store.dispatch(UpdateExchangeRate({ exchangeRate: this.totalExchangeRate.value }));
+
         }
     }
 
