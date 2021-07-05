@@ -52,6 +52,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
         private readonly IOptions<ApiUrl> apiUrl;
+        private readonly IContextBase<SysEmployee> sysEmployeeRepository;
+        private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -78,7 +80,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
-            IOptions<ApiUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url,
+            IContextBase<SysEmployee> sysEmployeeRepo,
+            IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -104,6 +108,8 @@ namespace eFMS.API.Documentation.DL.Services
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             apiUrl = url;
+            sysEmployeeRepository = sysEmployeeRepo;
+            sendEmailHistoryRepository = sendEmailHistoryRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
