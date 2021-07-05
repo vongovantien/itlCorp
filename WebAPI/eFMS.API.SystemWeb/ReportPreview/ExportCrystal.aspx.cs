@@ -24,6 +24,8 @@ namespace ReportPerview
                 }
                 catch (Exception ex)
                 {
+                    Utility.WriteToFile("Log Export Crystall fail" , ex.ToString());
+
                     crystal = null;
                     Response.Redirect("~/NotFound.aspx");
                 }
@@ -105,11 +107,13 @@ namespace ReportPerview
                     CrExportOptions.DestinationOptions = CrDiskFileDestinationOptions;
                     CrExportOptions.FormatOptions = formatOption;
                 }
+                Utility.WriteToFile("Log Export Crystall OPtion", JsonConvert.SerializeObject(CrExportOptions).ToString());
+
                 cryRpt.Export();
             }
             catch (Exception ex)
             {
-
+                Utility.WriteToFile("Log Export Crystall fail", ex.ToString());
             }
         }
 

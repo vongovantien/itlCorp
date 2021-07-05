@@ -112,7 +112,6 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
-            apiUrl = url;
             sysEmployeeRepository = sysEmployeeRepo;
             sendEmailHistoryRepository = sendEmailHistoryRepo;
         }
