@@ -98,9 +98,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
             IContextBase<CatCommodity> commodityRepo,
-            IOptions<ApiUrl> url) : base(repository, mapper)
-            ISysImageService imageService,
-            IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
+            IOptions<ApiUrl> url,
+            ISysImageService imageService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
