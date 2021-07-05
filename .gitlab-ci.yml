@@ -25,7 +25,7 @@ build_uat:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - uat/29-05-2021-sprint24
+    - dev
   artifacts:
     name: "angular_build"
     paths:
