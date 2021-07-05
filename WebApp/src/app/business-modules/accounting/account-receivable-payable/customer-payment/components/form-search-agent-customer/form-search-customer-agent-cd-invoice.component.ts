@@ -8,7 +8,7 @@ import { Partner } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
-import { ReceiptPartnerCurrentState, ReceiptDateState } from '../../store/reducers';
+import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '../../store/reducers';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
@@ -51,6 +51,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
     customers: Observable<Partner[]>;
     customerFromReceipt: string;
+    partnerTypeState: string;
 
     constructor(
         private readonly _fb: FormBuilder,
@@ -109,6 +110,16 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                     }
                 }
             )
+
+        this._store.select(ReceiptTypeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (partnerGroup) => {
+                    if (!!partnerGroup) {
+                        this.partnerTypeState = partnerGroup;
+                    }
+                }
+            )
     }
 
     onSelectDataFormInfo(data: any) {
@@ -125,7 +136,13 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                             this.poupParentComponent.customerFromReceipt = this.customerFromReceipt;
                         }
 
-                        this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerGroup }));
+                        // * Check partner group của đối tượng đang chọn có # với đối tượng phiếu thu muốn tạo
+                        if (data.partnerType === this.partnerTypeState) {
+                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
+                            return;
+                        }
+                        this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
+
                     } else {
                         this.partnerId.setValue(null);
                         this._toastService.warning(`Partner ${data.shortName} does not have any agreement`);

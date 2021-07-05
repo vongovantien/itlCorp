@@ -1998,7 +1998,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 CoLoaderCode = x.CoLoaderCode,
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
-                AccountNo = x.AccountNo
+                AccountNo = x.AccountNo,
+                PartnerType = x.PartnerType
             }).ToList();
             results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
             return results.AsQueryable();
@@ -2037,7 +2038,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 BankAccountName = x.BankAccountName,
                 TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName,
                 BankName = x.BankName,
-                BankCode = x.BankCode
+                BankCode = x.BankCode,
+                PartnerType = x.PartnerType
             });
 
             return results;
