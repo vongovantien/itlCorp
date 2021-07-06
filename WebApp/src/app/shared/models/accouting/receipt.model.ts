@@ -31,6 +31,7 @@ export class ReceiptCreditDebitModel {
     balanceAmountVnd: number;
     totalPaidVnd: number;
     totalPaidUsd: number;
+    negative: boolean;
     creditNo: string; // * Số Credit dùng để cấn trừ trên hóa đơn
 
 }

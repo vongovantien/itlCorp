@@ -204,7 +204,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 (res: CommonInterface.IResult) => {
                     if (((res as CommonInterface.IResult).status)) {
                         this._toastService.success("Send Data to Accountant System Successful");
-
+                        this._store.dispatch(ResetInvoiceList());
                         this.getDetailReceipt(this.receiptId);
                     } else {
                         this._toastService.error("Send Data Fail");
