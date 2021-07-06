@@ -375,7 +375,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             + (this.amountUSD.value ?? 0) + (this.paidAmountUSD.value ?? 0);
 
         this.finalPaidAmountVND.setValue(_finalPaidAmountVnd ?? 0);
-        this.finalPaidAmountUSD.setValue(_finalPaidAmountUsd ?? 0);
+        this.finalPaidAmountUSD.setValue(+(_finalPaidAmountUsd.toFixed(2)) ?? 0);
     }
 
     caculateAmountFromDebitList() {
@@ -405,7 +405,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.paidAmountUSD.setValue(paidUSD);
         this.paidAmountVND.setValue(paidVND);
 
-        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : +((((cusAdvanceAmount / exChangeRateUSD) * 100) / 100).toFixed(3)) + valueUSD + paidUSD));
+        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : +((((cusAdvanceAmount / exChangeRateUSD) * 100) / 100).toFixed(2)) + valueUSD + paidUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + valueVND + paidVND);
     }
 }
