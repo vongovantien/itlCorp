@@ -102,7 +102,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .subscribe(
                 (data) => {
                     this.creditList = data;
-                    console.log(this.creditList);
                 }
             )
 
@@ -119,6 +118,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                 takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: { invoiceNo: string, creditNo: string }) => {
+                    console.log(data);
                     if (data.creditNo) {
 
                         const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)

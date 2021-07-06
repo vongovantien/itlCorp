@@ -72,7 +72,7 @@ namespace eFMS.API.Accounting.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<AccAccountReceivable>(entity =>
             {
@@ -290,6 +290,14 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.CompanyInvoiceId).HasColumnName("CompanyInvoiceID");
 
+                entity.Property(e => e.CreditAmountUsd)
+                    .HasColumnName("CreditAmountUSD")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditAmountVnd)
+                    .HasColumnName("CreditAmountVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.CreditNo)
                     .HasMaxLength(150)
                     .IsUnicode(false);
@@ -396,6 +404,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.BankAccountName).HasMaxLength(150);
 
                 entity.Property(e => e.BankAccountNo).HasMaxLength(150);
+
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.BankName).HasMaxLength(150);
 
@@ -1611,6 +1623,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.BankAccountNo)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.BankName).HasMaxLength(200);
@@ -3365,6 +3381,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankName)
                     .HasMaxLength(500)
                     .IsUnicode(false);
@@ -3806,6 +3826,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserRole)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 

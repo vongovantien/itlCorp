@@ -102,8 +102,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 (exchangeRate: IExchangeRate) => {
                     if (!!exchangeRate) {
                         this.exchangeRateUsd = exchangeRate.rate;
-                        console.log(this.exchangeRateUsd);
-
                     } else {
                         this.exchangeRateUsd = 0;
                     }
@@ -147,7 +145,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: string) => {
-                    console.log(data);
                     if (!!data) {
                         this.partnerId = data;
                     }
@@ -239,7 +236,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.paidAmountVND.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
-                    console.log("Ty gia USD", this.exchangeRateUsd);
                     this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : +(((this.paidAmountVND.value / this.exchangeRateUsd) * 100)) / 100).toFixed(3));
                 }
                 this.getFinalPaidAmount();

@@ -858,6 +858,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
                 _payment.BalanceVnd = invoice.UnpaidAmountVnd - _payment.PaymentAmountVnd;
                 _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
+                _payment.TotalPaidVnd = -payment.TotalPaidVnd;
+                _payment.TotalPaidUsd = -payment.TotalPaidUsd;
 
                 _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
                 _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
@@ -1417,7 +1419,7 @@ namespace eFMS.API.Accounting.DL.Services
                             List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
                             HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
                             // Cập nhật invoice cho những payment DEBIT, OBH
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
+                             HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
                             // Cập nhật Netoff cho CREDIT or SOA.
                             List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
                             if (paymentCredit.Count > 0)
@@ -1478,7 +1480,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
-                    paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
+
+                    paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
                 }
                 if (paidUsd > 0)
                 {
@@ -1490,7 +1493,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                     }
-                    paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
+                    paidUsd = paidUsd - (invoice.TotalPaidUsd ?? 0);
                 }
             }
             return new ProcessClearInvoiceModel

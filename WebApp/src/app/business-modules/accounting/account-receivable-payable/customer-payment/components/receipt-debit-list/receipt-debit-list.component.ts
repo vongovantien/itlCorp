@@ -123,10 +123,18 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         }
         switch (type) {
             case 'paidVnd':
-                item.totalPaidVnd = item.paidAmountVnd;
+                if (!!item.creditNo) {
+                    item.totalPaidVnd = +item.paidAmountVnd + (item.creditAmountVnd ?? 0);
+                } else {
+                    item.totalPaidVnd = +item.paidAmountVnd;
+                }
                 break;
             case 'paidUsd':
-                item.totalPaidUsd = item.paidAmountUsd;
+                if (item.creditNo) {
+                    item.totalPaidUsd = +item.paidAmountUsd + (item.creditAmountUsd ?? 0);
+                } else {
+                    item.totalPaidUsd = +item.paidAmountUsd;
+                }
                 break;
             default:
                 break;
@@ -149,6 +157,13 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                                     return;
                                 }
                                 curr.creditNo = _refNo;
+
+                                curr.creditAmountVnd = currentCredit.unpaidAmountVnd;
+                                curr.creditAmountUsd = currentCredit.unpaidAmountUsd;
+
+                                curr.paidAmountVnd = curr.unpaidAmountVnd - currentCredit?.unpaidAmountVnd;
+                                curr.paidAmountUsd = curr.unpaidAmountUsd - currentCredit?.unpaidAmountUsd;
+
                                 curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
                                 curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
 

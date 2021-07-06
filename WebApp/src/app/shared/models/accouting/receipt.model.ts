@@ -33,7 +33,8 @@ export class ReceiptCreditDebitModel {
     totalPaidUsd: number;
     negative: boolean;
     creditNo: string; // * Số Credit dùng để cấn trừ trên hóa đơn
-
+    creditAmountVnd: number;
+    creditAmountUsd: number;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
