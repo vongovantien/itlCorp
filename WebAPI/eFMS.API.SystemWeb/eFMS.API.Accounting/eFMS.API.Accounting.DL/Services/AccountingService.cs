@@ -2707,9 +2707,14 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Paid Amount VND
                 decimal? _paidAmountVnd = 0;
-                if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL) || receipt.CurrencyId != payment.CurrencyId)
+                //if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL) || receipt.CurrencyId != payment.CurrencyId)
+                //{
+                //    _paidAmountVnd = payment.PaymentAmountVnd;
+                //}
+                // Theo currency của hóa đơn
+                if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _paidAmountVnd = payment.PaymentAmountVnd;
+                    _paidAmountVnd = payment.PaymentAmountVnd; 
                 }
                 detail.Amount = _paidAmountVnd;
 
@@ -2734,7 +2739,21 @@ namespace eFMS.API.Accounting.DL.Services
 
                 detail.ObhPartnerCode = type == "CREDIT" ? invoicePartner?.AccountNo : string.Empty; //Đối với công nợ Credit => Set đối tượng Partner của phiếu thu. Ngược lại để trống
                 detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
-                detail.Stt_Cd_Htt = (type != "ADV") ? payment.InvoiceNo : string.Empty;
+
+                string _Stt_Cd_Htt = string.Empty;
+                if(type == "DEBIT")
+                {
+                    _Stt_Cd_Htt = invoice.ReferenceNo;
+                }
+                else if(type == "CREDIT")
+                {
+                    // Số ref của invoice cấn trừ
+                    var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo
+                    && payment.RefId == x.Id.ToString()).FirstOrDefault();
+                    _Stt_Cd_Htt = invoiceRef.ReferenceNo;
+
+                }
+                detail.Stt_Cd_Htt = _Stt_Cd_Htt;
 
                 detail.ChargeType = (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE") ? "NETOFF" : payment.Type;
                 detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
