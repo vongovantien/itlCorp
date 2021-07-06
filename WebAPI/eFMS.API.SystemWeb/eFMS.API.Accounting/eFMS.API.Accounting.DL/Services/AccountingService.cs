@@ -2706,7 +2706,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
                     var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                    if (surchargeDebitObhs.Any() && surchargeDebits.Any())
+                    if (surchargeDebitObhs.Any() || surchargeDebits.Any())
                     {
                         return true;
                     }
