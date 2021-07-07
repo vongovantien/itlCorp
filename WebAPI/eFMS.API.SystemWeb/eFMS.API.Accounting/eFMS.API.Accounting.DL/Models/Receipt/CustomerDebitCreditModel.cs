@@ -33,7 +33,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public List<string> RefIds { get; set; }
         public string CreditType { get; set; }
         public string CreditNo { get; set; }
-        public decimal? CreditAmountVnv { get; set; }
+        public decimal? CreditAmountVnd { get; set; }
         public decimal? CreditAmountUsd { get; set; }
 
     }

@@ -2712,9 +2712,13 @@ namespace eFMS.API.Accounting.DL.Services
                 //    _paidAmountVnd = payment.PaymentAmountVnd;
                 //}
                 // Theo currency của hóa đơn
-                if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                if (invoice != null && invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
                 {
                     _paidAmountVnd = payment.PaymentAmountVnd; 
+                }
+                if(type == "CREDIT")
+                {
+                    _paidAmountVnd = payment.UnpaidPaymentAmountVnd; // Số tiền nợ trên credit note, credit SOA
                 }
                 detail.Amount = _paidAmountVnd;
 
@@ -2748,8 +2752,7 @@ namespace eFMS.API.Accounting.DL.Services
                 else if(type == "CREDIT")
                 {
                     // Số ref của invoice cấn trừ
-                    var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo
-                    && payment.RefId == x.Id.ToString()).FirstOrDefault();
+                    var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault();
                     _Stt_Cd_Htt = invoiceRef.ReferenceNo;
 
                 }

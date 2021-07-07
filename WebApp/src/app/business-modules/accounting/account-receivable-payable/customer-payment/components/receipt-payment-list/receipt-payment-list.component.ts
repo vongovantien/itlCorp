@@ -371,7 +371,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             + (this.amountUSD.value ?? 0) + (this.paidAmountUSD.value ?? 0);
 
         this.finalPaidAmountVND.setValue(_finalPaidAmountVnd ?? 0);
-        this.finalPaidAmountUSD.setValue(+(_finalPaidAmountUsd.toFixed(2)) ?? 0);
+        this.finalPaidAmountUSD.setValue(+(+(_finalPaidAmountUsd)).toFixed(2) ?? 0);
     }
 
     caculateAmountFromDebitList() {

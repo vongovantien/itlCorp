@@ -451,7 +451,11 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
                     CompanyId = s.FirstOrDefault().CompanyInvoiceId,
                     RefIds = listOBH.Select(x => x.RefId).ToList(),
-                    CreditNo = s.FirstOrDefault().CreditNo
+                    CreditNo = s.FirstOrDefault().CreditNo,
+                    Hblid = s.FirstOrDefault().Hblid,
+                    Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
+                    Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
+                    JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
                 }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -508,7 +512,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.Hbl = _Hbl;
                     payment.Hblid = acctPayment.Hblid;
                     payment.CreditNo = acctPayment.CreditNo;
-
+                    payment.CreditAmountVnd = acctPayment.CreditAmountVnd;
+                    payment.CreditAmountUsd = acctPayment.CreditAmountUsd;
                     paymentReceipts.Add(payment);
                 }
             }
@@ -524,6 +529,24 @@ namespace eFMS.API.Accounting.DL.Services
             if (totalRejectReceiptSync > 0)
             {
                 result.SubRejectReceipt = receipt.SyncStatus != "Rejected" ? " - Rejected(" + totalRejectReceiptSync + ")" : string.Empty;
+            }
+            return result;
+        }
+
+        private HBLInfo GetHBLInfo(Guid? hblId)
+        {
+            HBLInfo result = new HBLInfo();
+            if(hblId == Guid.Empty)
+            {
+                return result;
+            }
+            CsTransactionDetail hbl = csTransactionDetailRepository.Get(x => x.Id == hblId)?.FirstOrDefault();
+            if (hbl != null)
+            {
+                CsTransaction job = csTransactionRepository.Get(x => x.Id == hbl.JobId)?.FirstOrDefault();
+                result.HBLNo = hbl.Hwbno;
+                result.MBL = hbl.Mawb;
+                result.JobNo = job?.JobNo;
             }
             return result;
         }
@@ -741,10 +764,16 @@ namespace eFMS.API.Accounting.DL.Services
                 if (payment.Type == "CREDIT")
                 {
                     _payment.Type = payment.CreditType;
+
+                    _payment.PaymentAmountUsd = (payment.UnpaidAmountUsd ?? 0);
+                    _payment.PaymentAmountVnd = (payment.UnpaidAmountVnd ?? 0);
                 }
                 else
                 {
                     _payment.Type = payment.Type;  // OBH/DEBIT
+
+                    _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
+                    _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
                 }
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
@@ -777,6 +806,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
                 _payment.CreditNo = payment.CreditNo;
+                _payment.CreditAmountVnd = payment.CreditAmountVnd;
+                _payment.CreditAmountUsd = payment.CreditAmountUsd;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -1091,13 +1122,12 @@ namespace eFMS.API.Accounting.DL.Services
             decimal? totalAdv = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
                 .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
                 .Sum();
-            // var receiptCusAdvance = receiptModel.CusAdvanceAmount;
 
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
             if (agreement != null)
             {
-                decimal _cusAdv = totalAdv + agreement.CustomerAdvanceAmount ?? 0;
-                agreement.CustomerAdvanceAmount = _cusAdv < 0 ? 0 : _cusAdv;
+                decimal _cusAdv = (totalAdv + (agreement.CustomerAdvanceAmount ?? 0)) ?? 0;
+                agreement.CustomerAdvanceAmount = _cusAdv < 0 ? 0 : (_cusAdv - receipt.CusAdvanceAmount); // trừ cho cus advance đã cấn trừ trên phiếu thu
                 agreement.UserModified = currentUser.UserID;
                 agreement.DatetimeModified = DateTime.Now;
 

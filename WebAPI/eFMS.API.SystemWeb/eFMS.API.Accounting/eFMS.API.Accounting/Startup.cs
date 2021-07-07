@@ -38,6 +38,12 @@ namespace eFMS.API.Accounting
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o => o.AddPolicy("AllowOrigin", builder => {
+                builder
+                .SetIsOriginAllowed((host) => true)
+                .WithOrigins("https://localhost:4200");
+
+            }));
             services.AddAutoMapper();
             services.AddSession();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -91,7 +97,7 @@ namespace eFMS.API.Accounting
                         description.GroupName.ToUpperInvariant());
                 }
             });
-
+            app.UseCors("AllowOrigin");
             app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

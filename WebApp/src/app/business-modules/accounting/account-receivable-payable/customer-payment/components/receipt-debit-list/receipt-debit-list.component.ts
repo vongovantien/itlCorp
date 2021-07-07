@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild, ChangeDetectorRef } from "@angular/core";
 import { AppList } from "@app";
 import { Store } from "@ngrx/store";
 import { DataService } from "@services";
@@ -56,9 +56,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     isSubmitted: boolean = false;
 
     constructor(
-        private _store: Store<IReceiptState>,
-        private _dataService: DataService,
-        private readonly _toastService: ToastrService
+        private readonly _store: Store<IReceiptState>,
+        private readonly _dataService: DataService,
+        private readonly _toastService: ToastrService,
     ) {
         super();
     }
@@ -139,7 +139,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             default:
                 break;
         }
-
     }
 
     onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {

@@ -55,6 +55,11 @@
                                 <td class="text-success">{{item.officeName}}</td>
                             </tr>
                             <tr class="font-weight-bold font-15">
+                                <ng-container *ngIf="receiptType !=='CUSTOMER'">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </ng-container>
                                 <td></td>
                                 <td>Total</td>
                                 <td></td>
@@ -80,6 +85,5 @@
         </div>
     </div>
 </div>
-
 
 <ng-template inject></ng-template>

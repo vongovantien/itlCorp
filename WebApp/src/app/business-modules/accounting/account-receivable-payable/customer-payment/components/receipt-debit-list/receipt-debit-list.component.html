@@ -62,7 +62,7 @@
 
                                 <td ALIGN="right">
                                     <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd"
-                                        name="paidAmountUsd" numeric autoFormatCurrency [disabled]="isReadonly"
+                                        name="paidAmountUsd" autoFormatCurrency [disabled]="isReadonly"
                                         (blur)="calculateTotalPaidAmount($event, item,'paidUsd')">
                                 </td>
                                 <td>
