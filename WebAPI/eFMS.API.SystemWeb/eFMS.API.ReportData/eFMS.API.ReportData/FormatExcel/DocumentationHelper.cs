@@ -1382,6 +1382,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("referenceNo", item.BKRefNo);
                     listKeyData.Add("service", item.ServiceName);
                     listKeyData.Add("jobNo", item.JobNo);
+                    listKeyData.Add("servicedate", item.ServiceDate?.ToString("dd/MM/yyyy"));
                     listKeyData.Add("etd", item.etd?.ToString("dd/MM/yyyy"));
                     listKeyData.Add("eta", item.eta?.ToString("dd/MM/yyyy"));
                     listKeyData.Add("vessel", item.FlightNo);
@@ -1431,7 +1432,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("obhr", item.AmountOBH);
                     excel.SetData(listKeyData);
 
-                    excel.Worksheet.Cells[j + startRow, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
@@ -1453,6 +1453,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     excel.Worksheet.Cells[j + startRow, 46].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 47].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     excel.Worksheet.Cells[j + startRow, 48].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    excel.Worksheet.Cells[j + startRow, 49].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                     j++;
                 }
 
@@ -1480,6 +1481,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "PRO SERVICE",
                 "JOB NO",
                 "CUSTOM NO",
+                "Service Data",
                 "ETD",
                 "ETA",
                 "VESSEL/FLIGHT",
@@ -1558,15 +1560,15 @@ namespace eFMS.API.ReportData.FormatExcel
             // Tạo header
             for (int i = 0; i < headersTable.Count; i++)
             {
-                if (i == 26)
+                if (i == 27)
                 {
                     workSheet.Cells[9, i + 6].Value = headersTable[i];
                 }
-                if (i < 26)
+                if (i < 27)
                 {
                     workSheet.Cells[9, i + 1].Value = headersTable[i];
                 }
-                if (i > 26)
+                if (i > 27)
                 {
                     workSheet.Cells[9, i + 12].Value = headersTable[i];
                     workSheet.Cells[9, i + 12].Style.Font.Bold = true;
@@ -1577,87 +1579,26 @@ namespace eFMS.API.ReportData.FormatExcel
 
             }
 
-            //for (int i = 28; i < headersTable.Count; i++)
-            //{
-            //    workSheet.Cells[9, i + 10].Value = headersTable[i];
-            //    workSheet.Cells[9, i + 10].Style.Font.Bold = true;
-            //    workSheet.Cells[9, i + 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            //    workSheet.Cells[9, i + 10].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            //}
-            //workSheet.Cells["AD9:AI9"].Merge = true;
-            //workSheet.Cells["AA9:AE9"].Merge = true;
-            //workSheet.Cells["AA9"].Value = headersTable[24];
-            //workSheet.Cells["AD9"].Value = headersTable[27];
+            for (int i = 1; i < headers.Count; i++)
+            {
+                if (i <= 27 || i >= 41)
+                {
+                    workSheet.Cells[9, i, 10, i].Merge = true;
+                }
+            }
 
-            workSheet.Cells["A9:A10"].Merge = true;
-            workSheet.Cells["B9:B10"].Merge = true;
-            workSheet.Cells["C9:C10"].Merge = true;
-            workSheet.Cells["D9:D10"].Merge = true;
-            workSheet.Cells["E9:E10"].Merge = true;
-            workSheet.Cells["F9:F10"].Merge = true;
-
-            workSheet.Cells["G9:G10"].Merge = true;
-            workSheet.Cells["H9:H10"].Merge = true;
-            workSheet.Cells["I9:I10"].Merge = true;
-            workSheet.Cells["J9:J10"].Merge = true;
-            workSheet.Cells["J9:J10"].Merge = true;
-            workSheet.Cells["K9:K10"].Merge = true;
-
-
-            workSheet.Cells["L9:L10"].Merge = true;
-            workSheet.Cells["M9:M10"].Merge = true;
-            workSheet.Cells["N9:N10"].Merge = true;
-            workSheet.Cells["O9:O10"].Merge = true;
-            workSheet.Cells["P9:P10"].Merge = true;
-            workSheet.Cells["Q9:Q10"].Merge = true;
-
-            workSheet.Cells["R9:R10"].Merge = true;
-            workSheet.Cells["S9:S10"].Merge = true;
-            workSheet.Cells["T9:T10"].Merge = true;
-            workSheet.Cells["U9:U10"].Merge = true;
-            workSheet.Cells["V9:V10"].Merge = true;
-            workSheet.Cells["W9:W10"].Merge = true;
-            workSheet.Cells["X9:X10"].Merge = true;
-            workSheet.Cells["Y9:Y10"].Merge = true;
-            workSheet.Cells["Z9:Z10"].Merge = true;
-
-            //workSheet.Cells["AJ9:AJ10"].Merge = true;
-            //workSheet.Cells["AK9:AK10"].Merge = true;
-            //workSheet.Cells["AL9:AL10"].Merge = true;
-            //workSheet.Cells["AM9:AM10"].Merge = true;
-            workSheet.Cells["AN9:AN10"].Merge = true;
-            workSheet.Cells["AO9:AO10"].Merge = true;
-            workSheet.Cells["AP9:AP10"].Merge = true;
-            workSheet.Cells["AQ9:AQ10"].Merge = true;
-            workSheet.Cells["AR9:AR10"].Merge = true;
-            workSheet.Cells["AS9:AS10"].Merge = true;
-            workSheet.Cells["AT9:AT10"].Merge = true;
-            workSheet.Cells["AU9:AU10"].Merge = true;
-            workSheet.Cells["AV9:AV10"].Merge = true;
-            workSheet.Cells["AW9:AW10"].Merge = true;
-            workSheet.Cells["AX9:AX10"].Merge = true;
-            workSheet.Cells["AY9:AY10"].Merge = true;
-            workSheet.Cells["AZ9:AZ10"].Merge = true;
-            workSheet.Cells["BA9:BA10"].Merge = true;
-            workSheet.Cells["BB9:BB10"].Merge = true;
-            workSheet.Cells["BC9:BC10"].Merge = true;
-            workSheet.Cells["BD9:BD10"].Merge = true;
-            workSheet.Cells["BE9:BE10"].Merge = true;
-            //workSheet.Cells["Y10"].Value = subheadersTable[0];
-            //workSheet.Cells["Z10"].Value = subheadersTable[1];
-            //workSheet.Cells["AA10"].Value = subheadersTable[2];
-            //workSheet.Cells["AB10"].Value = subheadersTable[3];
-            //workSheet.Cells["AC10"].Value = subheadersTable[4];
-
-            workSheet.Cells["AA10"].Value = subheadersTable[0];
-            workSheet.Cells["AB10"].Value = subheadersTable[1];
-            workSheet.Cells["AC10"].Value = subheadersTable[2];
-            workSheet.Cells["AD10"].Value = subheadersTable[3];
-            workSheet.Cells["AE10"].Value = subheadersTable[4];
-            workSheet.Cells["AF10"].Value = subheadersTable[5];
-            //workSheet.Cells["AI10"].Value = subheadersTable[4];
-
-            //workSheet.Cells["Y10:AI10"].Style.Font.Bold = true;
+            int revenueCol = 28;
+            for(int i= 0; i <= 5; i++)
+            {
+                workSheet.Cells[9, revenueCol].Value = subheadersTable[i];
+                revenueCol++;
+            }
+            //workSheet.Cells["AA10"].Value = subheadersTable[0];
+            //workSheet.Cells["AB10"].Value = subheadersTable[1];
+            //workSheet.Cells["AC10"].Value = subheadersTable[2];
+            //workSheet.Cells["AD10"].Value = subheadersTable[3];
+            //workSheet.Cells["AE10"].Value = subheadersTable[4];
+            //workSheet.Cells["AF10"].Value = subheadersTable[5];
 
             workSheet.Cells["AU9:BE9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["AU9:BE9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -1666,38 +1607,20 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AA10:AM10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["AA10:AM10"].Style.Font.Bold = true;
 
-            workSheet.Cells["AG10"].Value = subheadersTable[0];
-            workSheet.Cells["AH10"].Value = subheadersTable[1];
-            workSheet.Cells["AI10"].Value = subheadersTable[2];
-            workSheet.Cells["AJ10"].Value = subheadersTable[3];
+            workSheet.Cells["AH10"].Value = subheadersTable[0];
+            workSheet.Cells["AI10"].Value = subheadersTable[1];
+            workSheet.Cells["AJ10"].Value = subheadersTable[2];
+            workSheet.Cells["AK10"].Value = subheadersTable[3];
 
-            workSheet.Cells["AK10"].Value = subheadersTable[6];
+            workSheet.Cells["AL10"].Value = subheadersTable[6];
             //workSheet.Cells["AM10"].Value = subheadersTable[6];
-            workSheet.Cells["AL10"].Value = subheadersTable[4];
-            workSheet.Cells["AM10"].Value = subheadersTable[5];
-            workSheet.Cells["AA9:AF9"].Merge = true;
-            workSheet.Cells["AG9:AM9"].Merge = true;
-            ////workSheet.Cells["AM9:AM10"].Merge = true;
-            //workSheet.Cells["AN9:AN10"].Merge = true;
-            //workSheet.Cells["AO9:AO10"].Merge = true;
-            //workSheet.Cells["AP9:AP10"].Merge = true;
-            //workSheet.Cells["AQ9:AQ10"].Merge = true;
-            //workSheet.Cells["AR9:AR10"].Merge = true;
-            //workSheet.Cells["AS9:AS10"].Merge = true;
-            //workSheet.Cells["AT9:AT10"].Merge = true;
-            //workSheet.Cells["AU9:AU10"].Merge = true;
-            //workSheet.Cells["AV9:AV10"].Merge = true;
-            //workSheet.Cells["AW9:AW10"].Merge = true;
-            //workSheet.Cells["AX9:AX10"].Merge = true;
-            //workSheet.Cells["AY9:AY10"].Merge = true;
-            //workSheet.Cells["AZ9:AZ10"].Merge = true;
-            //workSheet.Cells["BA9:BA10"].Merge = true;
-            //workSheet.Cells["BB9:BB10"].Merge = true;
-            //workSheet.Cells["BC9:BC10"].Merge = true;
-            //workSheet.Cells["BD9:BD10"].Merge = true;
+            workSheet.Cells["AM10"].Value = subheadersTable[4];
+            workSheet.Cells["AN10"].Value = subheadersTable[5];
+            workSheet.Cells["AB9:AG9"].Merge = true;
+            workSheet.Cells["AH9:AN9"].Merge = true;
 
-            workSheet.Cells["AA9"].Value = headersTable[26];
-            workSheet.Cells["AG9"].Value = headersTable[27];
+            workSheet.Cells["AB9"].Value = headersTable[26];
+            workSheet.Cells["AH9"].Value = headersTable[27];
 
             //Cố định dòng thứ 10 (Freeze Row 10 and no column)
             workSheet.View.FreezePanes(11, 1);
@@ -1714,91 +1637,92 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j + addressStartContent, 4].Value = item.JobNo;
                 workSheet.Cells[j + addressStartContent, 5].Value = item.CustomNo;
 
-                workSheet.Cells[j + addressStartContent, 6].Value = item.etd.HasValue ? item.etd.Value.ToString("dd/MM/yyyy") : "";
-                workSheet.Cells[j + addressStartContent, 7].Value = item.eta.HasValue ? item.eta.Value.ToString("dd/MM/yyyy") : "";
-                workSheet.Cells[j + addressStartContent, 8].Value = item.FlightNo;
-                workSheet.Cells[j + addressStartContent, 9].Value = item.MblMawb;
-                workSheet.Cells[j + addressStartContent, 10].Value = item.HblHawb;
-                workSheet.Cells[j + addressStartContent, 11].Value = item.PolPod;
-                workSheet.Cells[j + addressStartContent, 12].Value = item.Carrier;
-                workSheet.Cells[j + addressStartContent, 13].Value = item.Agent;
-                workSheet.Cells[j + addressStartContent, 14].Value = item.Shipper;
-                workSheet.Cells[j + addressStartContent, 15].Value = item.Consignee;
-                workSheet.Cells[j + addressStartContent, 16].Value = item.ShipmentType;
-                workSheet.Cells[j + addressStartContent, 17].Value = item.Salesman;
-                workSheet.Cells[j + addressStartContent, 18].Value = item.AgentName;
-                workSheet.Cells[j + addressStartContent, 19].Value = item.QTy;
-                workSheet.Cells[j + addressStartContent, 20].Value = item.Cont20;
-                workSheet.Cells[j + addressStartContent, 21].Value = item.Cont40;
-                workSheet.Cells[j + addressStartContent, 22].Value = item.Cont40HC;
-                workSheet.Cells[j + addressStartContent, 23].Value = item.Cont45;
-                workSheet.Cells[j + addressStartContent, 24].Value = item.GW;
-                workSheet.Cells[j + addressStartContent, 25].Value = item.CW;
-                workSheet.Cells[j + addressStartContent, 26].Value = item.CBM;
-                workSheet.Cells[j + addressStartContent, 27].Value = item.TotalSellFreight;
-                workSheet.Cells[j + addressStartContent, 27].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
-
-                workSheet.Cells[j + addressStartContent, 28].Value = item.TotalSellTrucking;
-                workSheet.Cells[j + addressStartContent, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
-
-                workSheet.Cells[j + addressStartContent, 29].Value = item.TotalSellHandling;
+                workSheet.Cells[j + addressStartContent, 6].Value = item.ServiceDate.HasValue ? item.ServiceDate.Value.ToString("dd/MM/yyyy") : "";
+                workSheet.Cells[j + addressStartContent, 7].Value = item.etd.HasValue ? item.etd.Value.ToString("dd/MM/yyyy") : "";
+                workSheet.Cells[j + addressStartContent, 8].Value = item.eta.HasValue ? item.eta.Value.ToString("dd/MM/yyyy") : "";
+                workSheet.Cells[j + addressStartContent, 9].Value = item.FlightNo;
+                workSheet.Cells[j + addressStartContent, 10].Value = item.MblMawb;
+                workSheet.Cells[j + addressStartContent, 11].Value = item.HblHawb;
+                workSheet.Cells[j + addressStartContent, 12].Value = item.PolPod;
+                workSheet.Cells[j + addressStartContent, 13].Value = item.Carrier;
+                workSheet.Cells[j + addressStartContent, 14].Value = item.Agent;
+                workSheet.Cells[j + addressStartContent, 15].Value = item.Shipper;
+                workSheet.Cells[j + addressStartContent, 16].Value = item.Consignee;
+                workSheet.Cells[j + addressStartContent, 17].Value = item.ShipmentType;
+                workSheet.Cells[j + addressStartContent, 18].Value = item.Salesman;
+                workSheet.Cells[j + addressStartContent, 19].Value = item.AgentName;
+                workSheet.Cells[j + addressStartContent, 20].Value = item.QTy;
+                workSheet.Cells[j + addressStartContent, 21].Value = item.Cont20;
+                workSheet.Cells[j + addressStartContent, 22].Value = item.Cont40;
+                workSheet.Cells[j + addressStartContent, 23].Value = item.Cont40HC;
+                workSheet.Cells[j + addressStartContent, 24].Value = item.Cont45;
+                workSheet.Cells[j + addressStartContent, 25].Value = item.GW;
+                workSheet.Cells[j + addressStartContent, 26].Value = item.CW;
+                workSheet.Cells[j + addressStartContent, 27].Value = item.CBM;
+                workSheet.Cells[j + addressStartContent, 28].Value = item.TotalSellFreight;
                 workSheet.Cells[j + addressStartContent, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 30].Value = item.TotalCustomSell;
+                workSheet.Cells[j + addressStartContent, 29].Value = item.TotalSellTrucking;
+                workSheet.Cells[j + addressStartContent, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+                workSheet.Cells[j + addressStartContent, 30].Value = item.TotalSellHandling;
                 workSheet.Cells[j + addressStartContent, 30].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 31].Value = item.TotalSellOthers;
+                workSheet.Cells[j + addressStartContent, 31].Value = item.TotalCustomSell;
                 workSheet.Cells[j + addressStartContent, 31].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 32].Value = item.TotalSell;
+                workSheet.Cells[j + addressStartContent, 32].Value = item.TotalSellOthers;
                 workSheet.Cells[j + addressStartContent, 32].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 33].Value = item.TotalBuyFreight;
+                workSheet.Cells[j + addressStartContent, 33].Value = item.TotalSell;
                 workSheet.Cells[j + addressStartContent, 33].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 34].Value = item.TotalBuyTrucking;
+                workSheet.Cells[j + addressStartContent, 34].Value = item.TotalBuyFreight;
                 workSheet.Cells[j + addressStartContent, 34].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 35].Value = item.TotalBuyHandling;
+                workSheet.Cells[j + addressStartContent, 35].Value = item.TotalBuyTrucking;
                 workSheet.Cells[j + addressStartContent, 35].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 36].Value = item.TotalCustomBuy;
+                workSheet.Cells[j + addressStartContent, 36].Value = item.TotalBuyHandling;
                 workSheet.Cells[j + addressStartContent, 36].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 37].Value = item.TotalBuyKB;
+                workSheet.Cells[j + addressStartContent, 37].Value = item.TotalCustomBuy;
                 workSheet.Cells[j + addressStartContent, 37].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 38].Value = item.TotalBuyOthers;
+                workSheet.Cells[j + addressStartContent, 38].Value = item.TotalBuyKB;
                 workSheet.Cells[j + addressStartContent, 38].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 39].Value = item.TotalBuy;
+                workSheet.Cells[j + addressStartContent, 39].Value = item.TotalBuyOthers;
                 workSheet.Cells[j + addressStartContent, 39].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 40].Value = item.Profit;
+                workSheet.Cells[j + addressStartContent, 40].Value = item.TotalBuy;
                 workSheet.Cells[j + addressStartContent, 40].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 41].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 41].Value = item.Profit;
                 workSheet.Cells[j + addressStartContent, 41].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
                 workSheet.Cells[j + addressStartContent, 42].Value = item.AmountOBH;
                 workSheet.Cells[j + addressStartContent, 42].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-                workSheet.Cells[j + addressStartContent, 43].Value = item.Destination;
-                workSheet.Cells[j + addressStartContent, 44].Value = item.CustomerId;
-                workSheet.Cells[j + addressStartContent, 45].Value = item.CustomerName;
-                workSheet.Cells[j + addressStartContent, 46].Value = item.RalatedHblHawb;
-                workSheet.Cells[j + addressStartContent, 47].Value = item.RalatedJobNo;
-                workSheet.Cells[j + addressStartContent, 48].Value = item.HandleOffice;
-                workSheet.Cells[j + addressStartContent, 49].Value = item.SalesOffice;
-                workSheet.Cells[j + addressStartContent, 50].Value = item.Creator;
-                workSheet.Cells[j + addressStartContent, 51].Value = item.POINV;
-                workSheet.Cells[j + addressStartContent, 52].Value = item.BKRefNo;
-                workSheet.Cells[j + addressStartContent, 53].Value = item.Commodity;
-                workSheet.Cells[j + addressStartContent, 54].Value = item.ReferenceNo;
+                workSheet.Cells[j + addressStartContent, 43].Value = item.AmountOBH;
+                workSheet.Cells[j + addressStartContent, 43].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+
+                workSheet.Cells[j + addressStartContent, 44].Value = item.Destination;
+                workSheet.Cells[j + addressStartContent, 45].Value = item.CustomerId;
+                workSheet.Cells[j + addressStartContent, 46].Value = item.CustomerName;
+                workSheet.Cells[j + addressStartContent, 47].Value = item.RalatedHblHawb;
+                workSheet.Cells[j + addressStartContent, 48].Value = item.RalatedJobNo;
+                workSheet.Cells[j + addressStartContent, 49].Value = item.HandleOffice;
+                workSheet.Cells[j + addressStartContent, 50].Value = item.SalesOffice;
+                workSheet.Cells[j + addressStartContent, 51].Value = item.Creator;
+                workSheet.Cells[j + addressStartContent, 52].Value = item.POINV;
+                workSheet.Cells[j + addressStartContent, 53].Value = item.BKRefNo;
+                workSheet.Cells[j + addressStartContent, 54].Value = item.Commodity;
+                workSheet.Cells[j + addressStartContent, 55].Value = item.ReferenceNo;
                 //workSheet.Cells[i + addressStartContent, 53].Value = item.ShipmentType;
-                workSheet.Cells[j + addressStartContent, 55].Value = item.PMTerm;
-                workSheet.Cells[j + addressStartContent, 56].Value = item.ShipmentNotes;
-                workSheet.Cells[j + addressStartContent, 57].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
+                workSheet.Cells[j + addressStartContent, 56].Value = item.PMTerm;
+                workSheet.Cells[j + addressStartContent, 57].Value = item.ShipmentNotes;
+                workSheet.Cells[j + addressStartContent, 58].Value = item.Created.HasValue ? item.Created.Value.ToString("dd/MM/yyyy") : "";
               
                 j++;
                 positionStart++;
@@ -1813,89 +1737,89 @@ namespace eFMS.API.ReportData.FormatExcel
               .Start
               .Address;
             string addressTotalMerge = workSheet
-             .Cells[address, 19].Start.Address;
+             .Cells[address, 20].Start.Address;
             string addressToMerge = addressTotal + ":" + addressTotalMerge;
             workSheet.Cells[addressToMerge].Merge = true;
             workSheet.Cells[addressToMerge].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[addressToMerge].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells[addressToMerge].Style.Font.Bold = true;
 
-            string addressTotalCont20 = workSheet.Cells[address, 20].Start.Address;
+            string addressTotalCont20 = workSheet.Cells[address, 21].Start.Address;
             workSheet.Cells[addressTotalCont20].Value = overview.Select(t => t.Cont20).Sum();
-            string addressTotalCont40 = workSheet.Cells[address, 21].Start.Address;
+            string addressTotalCont40 = workSheet.Cells[address, 22].Start.Address;
             workSheet.Cells[addressTotalCont40].Value = overview.Select(t => t.Cont40).Sum();
-            string addressTotalCont40HC = workSheet.Cells[address, 22].Start.Address;
+            string addressTotalCont40HC = workSheet.Cells[address, 23].Start.Address;
             workSheet.Cells[addressTotalCont40HC].Value = overview.Select(t => t.Cont40HC).Sum();
-            string addressTotalCont45 = workSheet.Cells[address, 23].Start.Address;
+            string addressTotalCont45 = workSheet.Cells[address, 24].Start.Address;
             workSheet.Cells[addressTotalCont45].Value = overview.Select(t => t.Cont45).Sum();
-            string addressTotalGW = workSheet.Cells[address, 24].Start.Address;
+            string addressTotalGW = workSheet.Cells[address, 25].Start.Address;
             workSheet.Cells[addressTotalGW].Value = overview.Select(t => t.GW).Sum();
-            string addressTotalCW = workSheet.Cells[address, 25].Start.Address;
+            string addressTotalCW = workSheet.Cells[address, 26].Start.Address;
             workSheet.Cells[addressTotalCW].Value = overview.Select(t => t.CW).Sum();
-            string addressTotalCBM = workSheet.Cells[address, 26].Start.Address;
+            string addressTotalCBM = workSheet.Cells[address, 27].Start.Address;
             workSheet.Cells[addressTotalCBM].Value = overview.Select(t => t.CBM).Sum();
-            string addressTotalSellFreight = workSheet.Cells[address, 27].Start.Address;
+            string addressTotalSellFreight = workSheet.Cells[address, 28].Start.Address;
             workSheet.Cells[addressTotalSellFreight].Value = overview.Select(t => t.TotalSellFreight).Sum();
             workSheet.Cells[addressTotalSellFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSellTrucking = workSheet.Cells[address, 28].Start.Address;
+            string addressTotalSellTrucking = workSheet.Cells[address, 29].Start.Address;
             workSheet.Cells[addressTotalSellTrucking].Value = overview.Select(t => t.TotalSellTrucking).Sum();
             workSheet.Cells[addressTotalSellTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSellHandling = workSheet.Cells[address, 29].Start.Address;
+            string addressTotalSellHandling = workSheet.Cells[address, 30].Start.Address;
             workSheet.Cells[addressTotalSellHandling].Value = overview.Select(t => t.TotalSellHandling).Sum();
             workSheet.Cells[addressTotalSellHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSellCustom = workSheet.Cells[address, 30].Start.Address;
+            string addressTotalSellCustom = workSheet.Cells[address, 31].Start.Address;
             workSheet.Cells[addressTotalSellCustom].Value = overview.Select(t => t.TotalCustomSell).Sum();
             workSheet.Cells[addressTotalSellCustom].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSellOther = workSheet.Cells[address, 31].Start.Address;
+            string addressTotalSellOther = workSheet.Cells[address, 32].Start.Address;
             workSheet.Cells[addressTotalSellOther].Value = overview.Select(t => t.TotalSellOthers).Sum();
             workSheet.Cells[addressTotalSellOther].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalSell = workSheet.Cells[address, 32].Start.Address;
+            string addressTotalSell = workSheet.Cells[address, 33].Start.Address;
             workSheet.Cells[addressTotalSell].Value = overview.Select(t => t.TotalSell).Sum();
             workSheet.Cells[addressTotalSell].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyFreight = workSheet.Cells[address, 33].Start.Address;
+            string addressTotalBuyFreight = workSheet.Cells[address, 34].Start.Address;
             workSheet.Cells[addressTotalBuyFreight].Value = overview.Select(t => t.TotalBuyFreight).Sum();
             workSheet.Cells[addressTotalBuyFreight].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyTrucking = workSheet.Cells[address, 34].Start.Address;
+            string addressTotalBuyTrucking = workSheet.Cells[address, 35].Start.Address;
             workSheet.Cells[addressTotalBuyTrucking].Value = overview.Select(t => t.TotalBuyTrucking).Sum();
             workSheet.Cells[addressTotalBuyTrucking].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyHandling = workSheet.Cells[address, 35].Start.Address;
+            string addressTotalBuyHandling = workSheet.Cells[address, 36].Start.Address;
             workSheet.Cells[addressTotalBuyHandling].Value = overview.Select(t => t.TotalBuyHandling).Sum();
             workSheet.Cells[addressTotalBuyHandling].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyCustom= workSheet.Cells[address, 36].Start.Address;
+            string addressTotalBuyCustom= workSheet.Cells[address, 37].Start.Address;
             workSheet.Cells[addressTotalBuyCustom].Value = overview.Select(t => t.TotalCustomBuy).Sum();
             workSheet.Cells[addressTotalBuyCustom].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
 
-            string addressTotalBuyKB = workSheet.Cells[address, 37].Start.Address;
+            string addressTotalBuyKB = workSheet.Cells[address, 38].Start.Address;
             workSheet.Cells[addressTotalBuyKB].Value = overview.Select(t => t.TotalBuyKB).Sum();
             workSheet.Cells[addressTotalBuyKB].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuyOthers = workSheet.Cells[address, 38].Start.Address;
+            string addressTotalBuyOthers = workSheet.Cells[address, 39].Start.Address;
             workSheet.Cells[addressTotalBuyOthers].Value = overview.Select(t => t.TotalBuyOthers).Sum();
             workSheet.Cells[addressTotalBuyOthers].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressTotalBuy = workSheet.Cells[address, 39].Start.Address;
+            string addressTotalBuy = workSheet.Cells[address, 40].Start.Address;
             workSheet.Cells[addressTotalBuy].Value = overview.Select(t => t.TotalBuy).Sum();
             workSheet.Cells[addressTotalBuy].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressProfit = workSheet.Cells[address, 40].Start.Address;
+            string addressProfit = workSheet.Cells[address, 41].Start.Address;
             workSheet.Cells[addressProfit].Value = overview.Select(t => t.Profit).Sum();
             workSheet.Cells[addressProfit].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressAmountOBH = workSheet.Cells[address, 41].Start.Address;
+            string addressAmountOBH = workSheet.Cells[address, 42].Start.Address;
             workSheet.Cells[addressAmountOBH].Value = overview.Select(t => t.AmountOBH).Sum();
             workSheet.Cells[addressAmountOBH].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            string addressAmountOBHR = workSheet.Cells[address, 42].Start.Address;
+            string addressAmountOBHR = workSheet.Cells[address, 43].Start.Address;
             workSheet.Cells[addressAmountOBHR].Value = overview.Select(t => t.AmountOBH).Sum();
             workSheet.Cells[addressAmountOBHR].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
@@ -1907,12 +1831,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(2).Width = 20;
             workSheet.Column(3).Width = 20;
             workSheet.Column(4).Width = 20;
-            workSheet.Column(8).Width = 20;
-            workSheet.Column(16).Width = 20;
+            workSheet.Column(9).Width = 20;
+            workSheet.Column(17).Width = 20;
 
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 57].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[9, 1, addressStartContent + positionStart + 1, 58].Style.Border.Top.Style = ExcelBorderStyle.Thin;
         }
 
         #endregion
@@ -2712,6 +2636,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKey.Add("FlexId", shipment.ReferenceNo);
                     listKey.Add("Service", shipment.ServiceName);
                     listKey.Add("JobNo", shipment.JobNo);
+                    listKey.Add("servicedate", shipment.ServiceDate?.ToString("dd/MM/yyyy"));
                     listKey.Add("ETD", shipment.etd?.ToString("dd/MM/yyyy"));
                     listKey.Add("ETA", shipment.eta?.ToString("dd/MM/yyyy"));
                     listKey.Add("Vessel", shipment.FlightNo); // VESSEL/FLIGHT
