@@ -885,6 +885,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.ReferenceId).HasColumnName("ReferenceID");
+
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
