@@ -63,6 +63,11 @@
                             (onClick)="confirmDoneReceipt()">
                         </app-permission-button>
                     </ng-container>
+                    <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee">
+                        <app-permission-button type="add" title="Create Bank Fee Receipt" class="outline-primary"
+                            icon="la la-bank" (onClick)="confirmCreateReceiptBankFee()">
+                        </app-permission-button>
+                    </ng-container>
                     <ng-container
                         *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button title="Cancel Receipt" type="reject" class="danger" icon="la la-times"

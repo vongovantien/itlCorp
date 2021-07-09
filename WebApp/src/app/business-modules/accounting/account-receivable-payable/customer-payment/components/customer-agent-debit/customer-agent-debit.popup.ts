@@ -42,7 +42,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
         { title: 'Payment Term', field: 'paymentTerm', sortable: true },
         { title: 'Due Date', field: 'dueDate', sortable: true },
-        { title: 'Payment Status', field: 'paymentStatus', sortable: true },
         { title: 'Bu Handle', field: 'departmentName', sortable: true },
         { title: 'Office', field: 'officeName', sortable: true },
     ];
@@ -78,7 +77,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Payment Term', field: 'paymentTerm', sortable: true },
             { title: 'Due Date', field: 'dueDate', sortable: true },
-            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
             { title: 'Bu Handle', field: 'departmentName', sortable: true },
             { title: 'Office', field: 'officeName', sortable: true },
         ];

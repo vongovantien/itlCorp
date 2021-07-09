@@ -45,7 +45,26 @@
                                                 <span>{{debit.type}}</span>
                                             </td>
                                             <td>
-                                                <span class="text-primary">{{debit.invoiceNo}}</span>
+                                                <span class="text-primary">
+                                                    {{debit.invoiceNo}}
+                                                    <ng-container *ngIf="debit.type === 'DEBIT'">
+                                                        <ng-container [ngSwitch]="debit.paymentStatus">
+                                                            <span class="m-badge m-badge--success m-badge--wide"
+                                                                *ngSwitchCase="'Paid'">
+                                                                {{debit.paymentStatus}}
+                                                            </span>
+                                                            <span
+                                                                class="m-badge m-badge--warning m-badge--wide text-white"
+                                                                *ngSwitchCase="'Paid A Part'">
+                                                                {{debit.paymentStatus}}
+                                                            </span>
+                                                            <span class="m-badge m-badge--danger m-badge--wide"
+                                                                *ngSwitchDefault>
+                                                                {{debit.paymentStatus}}
+                                                            </span>
+                                                        </ng-container>
+                                                    </ng-container>
+                                                </span>
                                             </td>
                                             <td>
                                                 <span>{{debit.taxCode}}</span>
@@ -73,20 +92,6 @@
                                             </td>
                                             <td>
                                                 <span>{{debit.dueDate | date: 'dd/MM/yyyy'}} </span>
-                                            </td>
-
-                                            <td>
-                                                <ng-container [ngSwitch]="debit.paymentStatus">
-                                                    <span class="text-success" *ngSwitchCase="'Paid'">
-                                                        {{ debit.paymentStatus }}
-                                                    </span>
-                                                    <span class="text-warning" *ngSwitchCase="'Paid A Part'">
-                                                        {{ debit.paymentStatus }}
-                                                    </span>
-                                                    <span class="text-danger" *ngSwitchDefault>
-                                                        {{ debit.paymentStatus }}
-                                                    </span>
-                                                </ng-container>
                                             </td>
                                             <td>
                                                 <span class="text-success">{{debit.departmentName}} </span>
@@ -211,7 +216,26 @@
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
+                                                    <span class="text-primary">
+                                                        {{invoice.invoiceNo}}
+                                                        <ng-container *ngIf="invoice.type === 'DEBIT'">
+                                                            <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                                <span class="m-badge m-badge--success m-badge--wide"
+                                                                    *ngSwitchCase="'Paid'">
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                                <span
+                                                                    class="m-badge m-badge--warning m-badge--wide text-white"
+                                                                    *ngSwitchCase="'Paid A Part'">
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                                <span class="m-badge m-badge--danger m-badge--wide"
+                                                                    *ngSwitchDefault>
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                            </ng-container>
+                                                        </ng-container>
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.jobNo}}</span>
@@ -249,20 +273,6 @@
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
-                                                </td>
-
-                                                <td>
-                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
-                                                        <span class="text-success" *ngSwitchCase="'Paid'">
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                        <span class="text-danger" *ngSwitchDefault>
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                    </ng-container>
                                                 </td>
                                                 <td class="text-success">{{invoice.departmentName}}</td>
                                                 <td class="text-success">{{invoice.officeName}}</td>
@@ -295,7 +305,26 @@
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-primary">{{invoice.invoiceNo}}</span>
+                                                    <span class="text-primary">
+                                                        {{invoice.invoiceNo}}
+                                                        <ng-container *ngIf="invoice.type === 'DEBIT'">
+                                                            <ng-container [ngSwitch]="invoice.paymentStatus">
+                                                                <span class="m-badge m-badge--success m-badge--wide"
+                                                                    *ngSwitchCase="'Paid'">
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                                <span
+                                                                    class="m-badge m-badge--warning m-badge--wide text-white"
+                                                                    *ngSwitchCase="'Paid A Part'">
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                                <span class="m-badge m-badge--danger m-badge--wide"
+                                                                    *ngSwitchDefault>
+                                                                    {{invoice.paymentStatus}}
+                                                                </span>
+                                                            </ng-container>
+                                                        </ng-container>
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.jobNo}}</span>
@@ -334,25 +363,11 @@
                                                 <td>
                                                     <span>{{invoice.dueDate | date: 'dd/MM/yyyy'}} </span>
                                                 </td>
-
                                                 <td>
-                                                    <ng-container [ngSwitch]="invoice.paymentStatus">
-                                                        <span class="text-success" *ngSwitchCase="'Paid'">
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                        <span class="text-danger" *ngSwitchDefault>
-                                                            {{ invoice.paymentStatus }}
-                                                        </span>
-                                                    </ng-container>
+                                                    <span class="text-success">{{invoice.departmentName}} </span>
                                                 </td>
                                                 <td>
-                                                    <span>{{invoice.departmentName}} </span>
-                                                </td>
-                                                <td>
-                                                    <span>{{invoice.officeName}} </span>
+                                                    <span class="text-success">{{invoice.officeName}} </span>
                                                 </td>
                                             </tr>
 

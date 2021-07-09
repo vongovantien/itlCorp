@@ -71,10 +71,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
-            { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
-            { title: 'Status', field: 'status', sortable: true },
             { title: 'Creator', field: 'userNameCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
@@ -133,6 +131,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         })
     }
     getCPs(dataSearch) {
+        console.log(dataSearch);
         this.isLoading = true;
         this._progressRef.start();
         this._accountingRepo

@@ -3,7 +3,7 @@ import { formatDate } from '@angular/common';
 import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
 import { Router, ActivatedRoute } from '@angular/router';
-import { RoutingConstants, SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -12,12 +12,12 @@ import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { ResetInvoiceList } from '../store/actions';
+import { ResetInvoiceList, RegistTypeReceipt, GetInvoiceListSuccess } from '../store/actions';
 import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
 import { InjectViewContainerRefDirective } from '@directives';
 import { HttpErrorResponse } from '@angular/common/http';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, pluck, tap, switchMap } from 'rxjs/operators';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -39,12 +39,16 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     type: string = null;
     paymentList: ReceiptInvoiceModel[] = [];
 
+    receiptRefId: string = null;
+    receiptRefDetail: ReceiptModel;
+
     constructor(
-        protected _router: Router,
-        protected _toastService: ToastrService,
-        protected _accountingRepo: AccountingRepo,
-        protected _activedRoute: ActivatedRoute,
-        protected _store: Store<IAppState>,
+        protected readonly _router: Router,
+        protected readonly _toastService: ToastrService,
+        protected readonly _accountingRepo: AccountingRepo,
+        protected readonly _activedRoute: ActivatedRoute,
+        protected readonly _store: Store<IAppState>,
+
     ) {
         super();
     }
@@ -54,6 +58,27 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => this.type = x || 'Customer');
+
+        // * Listen Bank Fee Receipt     
+        this._activedRoute.queryParams
+            .pipe(
+                pluck('id'),
+                tap((id: string) => { this.receiptRefId = id }),
+                switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId)),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: ReceiptModel) => {
+                    if (!!res) {
+                        if (res.id === SystemConstants.EMPTY_GUID) {
+                            this.gotoList();
+                            return;
+                        }
+                        this.setFormBankReceipt(res);
+                    } else this.gotoList();
+                },
+                (err) => this.gotoList()
+            );
     }
 
     saveReceipt(actionString: string) {
@@ -100,7 +125,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .subscribe(x => {
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     if (element.length > 0) {
-                        element.map(item => this.paymentList.push(item))
+                        element.map(item => {
+                            this.paymentList.push(item);
+                        })
                     }
                 });
             }
@@ -152,6 +179,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
+        model.referenceId = this.receiptRefId; // * Set Id cho phiếu ngân hàng.
         this._accountingRepo.saveReceipt(model, action)
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -225,5 +253,63 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }, () => {
             this.submitClick('cancel');
         })
+    }
+
+    setFormBankReceipt(receiptModel: ReceiptModel) {
+        this.receiptRefDetail = receiptModel;
+        this._store.dispatch(RegistTypeReceipt({ data: receiptModel.type.toUpperCase(), partnerId: receiptModel.customerId }));
+
+        this.setFormCreate(this.receiptRefDetail);
+        this.setListInvoice(this.receiptRefDetail);
+    }
+
+    setFormCreate(res: ReceiptModel) {
+        const formMapping = {
+            date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
+            customerId: res.customerId,
+            agreementId: res.agreementId,
+        };
+
+        this.formCreate.formSearchInvoice.patchValue(formMapping);
+        this.formCreate.customerName = res.customerName;
+        this.formCreate.getContract();
+    }
+
+    setListInvoice(res: ReceiptModel) {
+        const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH") && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
+
+        let paidUSD = 0;
+        let paidVND = 0;
+        for (let index = 0; index < listPaymentWithUnpaid.length; index++) {
+            const element = listPaymentWithUnpaid[index];
+            paidVND += element.unpaidAmountVnd;
+            paidUSD += element.unpaidAmountUsd;
+        }
+        const formMapping = {
+            type: res.type?.split(","),
+            paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
+            cusAdvanceAmount: 0,
+            amountUSD: 0,
+            amountVND: 0,
+            paidAmountUSD: paidUSD,
+            paidAmountVND: paidVND,
+            finalPaidAmountUSD: paidUSD,
+            finalPaidAmountVND: paidVND,
+            description: 'Bank Fee Receipt',
+            paymentMethod: 'Other'
+
+        };
+
+        this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+
+        listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
+            x.paidAmountVnd = x.unpaidAmountVnd,
+                x.paidAmountUsd = x.unpaidAmountUsd,
+                x.notes = "Bank Fee Receipt",
+                x.id = SystemConstants.EMPTY_GUID // ? Reset ID Trường hợp phiếu ngân hàng.
+        })
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: listPaymentWithUnpaid }));
+        (this.listInvoice.partnerId as any) = { id: res.customerId };
+
     }
 }

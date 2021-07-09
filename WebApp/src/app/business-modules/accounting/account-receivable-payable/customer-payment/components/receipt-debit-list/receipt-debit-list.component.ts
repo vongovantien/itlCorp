@@ -30,7 +30,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '', sortable: true },
         { title: 'Type', field: '' },
-        { title: 'Invoice No', field: '', width: 150 },
+        { title: 'Invoice No', field: '' },
         { title: 'Credit No', field: '', width: 250 },
         { title: 'Job No', field: '', width: 150 },
         { title: 'MBL No', field: '', width: 150 },

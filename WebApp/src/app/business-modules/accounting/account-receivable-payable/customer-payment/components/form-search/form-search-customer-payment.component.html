@@ -21,8 +21,8 @@
                         <app-combo-grid-virtual-scroll [currentActiveItemId]=" {  field:'id', value: customerID.value}"
                             (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
-                            [displayFields]="displayFilesPartners" [height]="150"
-                            (remove)="resetFormControl(customerID)" placeholder="Select Partner">
+                            [displayFields]="displayFilesPartners" (remove)="resetFormControl(customerID)"
+                            placeholder="Select Partner">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>

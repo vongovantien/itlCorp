@@ -38,7 +38,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
     syncStatuss = AccountingConstants.SYNC_STATUSS;
     statuss = AccountingConstants.STATUS;
     typesReceipt: string[] = ['All', 'Customer', 'Agent'];
-    statusRecepit: string[] = ['Draft', 'Canceled', 'Done'];
+    statusRecepit: string[] = ['Draft', 'Cancel', 'Done'];
 
     constructor(
         private _catalogueRepo: CatalogueRepo,

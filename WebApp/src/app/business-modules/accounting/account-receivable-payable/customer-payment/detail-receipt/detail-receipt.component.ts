@@ -9,7 +9,7 @@ import { SystemConstants, AccountingConstants, RoutingConstants } from '@constan
 import { ARCustomerPaymentCreateReciptComponent } from '../create-receipt/create-receipt.component';
 
 import { of } from 'rxjs';
-import { pluck, switchMap, tap, concatMap, takeUntil } from 'rxjs/operators';
+import { pluck, switchMap, tap, concatMap, takeUntil, filter } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt } from '../store/actions';
@@ -48,6 +48,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     subscriptRouterChangeToGetDetailReceipt() {
         this._activedRoute.params
             .pipe(
+                filter(x => !!x),
                 pluck('id'),
                 tap((id: string) => { this.receiptId = id }),
                 switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId)),
@@ -57,13 +58,12 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 (res: ReceiptModel) => {
                     if (!!res) {
                         if (res.id === SystemConstants.EMPTY_GUID) {
-                            this.gotoList();
+                            //this.gotoList();
                             return;
                         }
                         this.updateDetailForm(res);
-                    } else this.gotoList();
+                    }
                 },
-                (err) => this.gotoList()
             );
     }
 
@@ -226,5 +226,24 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 this.gotoList();
             })
         }
+    }
+
+    confirmCreateReceiptBankFee() {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Create Bank Fee Receipt',
+            body: `Are you sure you want to create bank fee receipt for <span class="text-primary font-weight-bold">${this.receiptDetail.customerName} </span>?`,
+            iconConfirm: 'la la-save',
+            labelConfirm: 'Yes'
+        }, () => {
+            this.createReceiptBankFee();
+        });
+    }
+
+    createReceiptBankFee() {
+        // * Go to create 
+        this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(RegistTypeReceipt({ data: this.receiptDetail.type.toUpperCase() }));
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { id: this.receiptId } });
+
     }
 }

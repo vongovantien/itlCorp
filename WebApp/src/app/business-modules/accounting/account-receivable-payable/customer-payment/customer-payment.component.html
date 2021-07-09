@@ -30,7 +30,7 @@
                                     <ng-template tabHeading>
                                         <span class="m--margin-right-10">Payment</span>
                                         <ng-container *ngIf="!!totalItems">
-                                            <span class="badge badge-success">{{totalItems}}</span>
+                                            <span class="badge badge-info">{{totalItems}}</span>
                                         </ng-container>
                                     </ng-template>
                                     <div class="row">
@@ -74,13 +74,34 @@
                                                                 <div *ngIf="cps.status != 'Cancel'; else CancelNo">
                                                                     <span>
                                                                         <a class="pointer"
-                                                                            (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
+                                                                            (click)="checkAllowDetail(cps)">
+                                                                            {{cps.paymentRefNo}}
                                                                         </a>
+                                                                        <ng-container [ngSwitch]="cps.status">
+                                                                            <span *ngSwitchCase="'Done'"
+                                                                                class="badge badge-success m--margin-left-10">
+                                                                                {{cps.status}}</span>
+                                                                            <span *ngSwitchCase="'Cancel'"
+                                                                                class="badge badge-default m--margin-left-10">
+                                                                                {{cps.status}}</span>
+                                                                        </ng-container>
+
+                                                                        <ng-container [ngSwitch]="cps.syncStatus">
+                                                                            <span *ngSwitchCase="'Synced'"
+                                                                                class="badge badge-success m--margin-left-10">
+                                                                                {{cps.syncStatus}}</span>
+                                                                            <span *ngSwitchCase="'Rejected'"
+                                                                                class="badge badge-danger m--margin-left-10">
+                                                                                {{cps.syncStatus}}</span>
+                                                                        </ng-container>
                                                                     </span>
                                                                 </div>
                                                                 <ng-template #CancelNo>
                                                                     <a class="text-muted pointer"
                                                                         (click)="checkAllowDetail(cps)">{{cps.paymentRefNo}}
+                                                                        <span
+                                                                            class="badge badge-dark m--margin-left-10">
+                                                                            Cancel</span>
                                                                     </a>
                                                                 </ng-template>
                                                             </td>
@@ -113,15 +134,6 @@
 
                                                                 <ng-template #DateNo></ng-template>
                                                             </td>
-                                                            <td [ngSwitch]="cps.syncStatus">
-                                                                <span *ngSwitchCase="'Synced'" class="text-success">
-                                                                    {{cps.syncStatus}}</span>
-                                                                <span *ngSwitchCase="'Rejected'" class="text-danger">
-                                                                    {{cps.syncStatus}}</span>
-                                                                <span *ngSwitchDefault>
-                                                                    {{cps.syncStatus}}
-                                                                </span>
-                                                            </td>
                                                             <td>
                                                                 <span>{{cps.lastSyncDate | date :'dd/MM/yyyy' }}
                                                                 </span>
@@ -129,18 +141,9 @@
                                                             <td>
                                                                 <span>{{cps.description}}</span>
                                                             </td>
-
-                                                            <td [ngSwitch]="cps.status">
-                                                                <span *ngSwitchCase="'Draft'" class="text-danger">
-                                                                    {{cps.status}}</span>
-                                                                <span *ngSwitchCase="'Done'" class="text-success">
-                                                                    {{cps.status}}</span>
-                                                                <span *ngSwitchCase="'Cancel'" class="text-muted">
-                                                                    {{cps.status}}</span>
-                                                            </td>
                                                             <td>
                                                                 <span
-                                                                    class="text-primary">{{cps.userNameCreated}}</span>
+                                                                    class="text-success">{{cps.userNameCreated}}</span>
                                                             </td>
                                                             <td>
                                                                 <span>
@@ -162,7 +165,7 @@
                                                     </tbody>
                                                 </table>
                                             </div>
-                                            <app-pagination [total]="totalItems" [pageNum]="page"
+                                            <app-pagination [total]="totalItems" [pageNum]="page" [data]="dataSearch"
                                                 [itemPerPage]="pageSize" (onChange)="updatePagingData($event)">
                                             </app-pagination>
                                         </div>
