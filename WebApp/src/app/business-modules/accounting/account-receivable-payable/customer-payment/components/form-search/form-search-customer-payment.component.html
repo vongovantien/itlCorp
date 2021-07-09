@@ -22,7 +22,7 @@
                             (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customerIDs |async"
                             [displayFields]="displayFilesPartners" (remove)="resetFormControl(customerID)"
-                            placeholder="Select Partner">
+                            placeholder="Select Customer/Agent">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -57,16 +57,16 @@
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
-                        <label for="form-control-label">Status</label>
-                        <ng-select [items]="statusRecepit" formControlName="status" class="custom" placeholder="All">
+                        <label for="form-control-label">Type Receipt</label>
+                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
+                            class="custom">
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
-                        <label for="form-control-label">Type Receipt</label>
-                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
-                            class="custom">
+                        <label for="form-control-label">Status</label>
+                        <ng-select [items]="statusRecepit" formControlName="status" class="custom" placeholder="All">
                         </ng-select>
                     </div>
                 </div>

@@ -90,7 +90,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                 } else {
                     this.type = typeArr[0];
                 }
-                console.log(this.type);
             })
 
         this._store.select(ReceiptPartnerCurrentState)

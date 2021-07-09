@@ -131,7 +131,6 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         })
     }
     getCPs(dataSearch) {
-        console.log(dataSearch);
         this.isLoading = true;
         this._progressRef.start();
         this._accountingRepo

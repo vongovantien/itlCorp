@@ -7,17 +7,18 @@ import { RoutingConstants, SystemConstants, AccountingConstants } from '@constan
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
+import { IAppState } from '@store';
+import { Store } from '@ngrx/store';
+import { InjectViewContainerRefDirective } from '@directives';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
-import { IAppState } from '@store';
-import { Store } from '@ngrx/store';
 import { ResetInvoiceList, RegistTypeReceipt, GetInvoiceListSuccess } from '../store/actions';
-import { combineLatest } from 'rxjs';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
-import { InjectViewContainerRefDirective } from '@directives';
-import { HttpErrorResponse } from '@angular/common/http';
+
 import { takeUntil, pluck, tap, switchMap } from 'rxjs/operators';
+import { combineLatest, EMPTY } from 'rxjs';
 
 export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
@@ -64,20 +65,24 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .pipe(
                 pluck('id'),
                 tap((id: string) => { this.receiptRefId = id }),
-                switchMap((receiptId: string) => this._accountingRepo.getDetailReceipt(receiptId)),
+                switchMap((receiptId: string) => {
+                    if (!!receiptId) {
+                        return this._accountingRepo.getDetailReceipt(receiptId)
+                    }
+                    return EMPTY;
+                }),
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
                 (res: ReceiptModel) => {
                     if (!!res) {
-                        if (res.id === SystemConstants.EMPTY_GUID) {
-                            this.gotoList();
-                            return;
-                        }
                         this.setFormBankReceipt(res);
-                    } else this.gotoList();
+                    }
                 },
-                (err) => this.gotoList()
+                (err) => {
+                    console.log(err);
+                }
+
             );
     }
 
@@ -273,6 +278,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
+
+        this.formCreate.isReadonly = true;
     }
 
     setListInvoice(res: ReceiptModel) {
