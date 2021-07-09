@@ -456,6 +456,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
                     Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
+                    PaymentStatus = GetPaymentStatus(listOBH.Select(x => x.RefId).ToList())
                 }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -506,7 +507,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.DepartmentName = dept?.DeptNameAbbr;
                     payment.OfficeName = office?.ShortName;
                     payment.RefIds = string.IsNullOrEmpty(acctPayment.RefId) ? null : acctPayment.RefId.Split(',').ToList();
-                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(acctPayment.RefId) : null;
+                    payment.PaymentStatus = acctPayment.Type == "DEBIT" ? GetPaymentStatus(new List<string> { acctPayment.RefId }) : null;
                     payment.JobNo = _jobNo;
                     payment.Mbl = _Mbl;
                     payment.Hbl = _Hbl;
@@ -523,6 +524,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             result.CustomerName = partnerInfo?.ShortName;
+
+            // Check có tồn tại 1 invoice thu chưa hết.
+            result.IsReceiptBankFee = result.Payments.Any(x => !string.IsNullOrEmpty(x.PaymentStatus) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
 
             //Số phiếu con đã reject
             var totalRejectReceiptSync = receiptSyncRepository.Get(x => x.ReceiptId == receipt.Id && x.SyncStatus == AccountingConstants.STATUS_REJECTED).Count();
@@ -551,13 +555,28 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        private string GetPaymentStatus(string Id)
+        private string GetPaymentStatus(List<string> Ids)
         {
             string _paymentStatus = string.Empty;
-            AccAccountingManagement inv = acctMngtRepository.Get(x => x.Id.ToString() == Id).FirstOrDefault();
-            if (inv != null)
+            var inv = acctMngtRepository.Get(x => Ids.Contains(x.Id.ToString())).ToList();
+            if(inv.Count > 0)
             {
-                _paymentStatus = inv.PaymentStatus;
+                if(inv.Count == 1)
+                {
+                    _paymentStatus = inv.FirstOrDefault().PaymentStatus;
+                }
+                else
+                {
+                    bool isPaid = inv.All(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                    if (isPaid == true)
+                    {
+                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                    }
+                    else if (inv.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART))
+                    {
+                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                    }
+                }
             }
             return _paymentStatus;
         }
