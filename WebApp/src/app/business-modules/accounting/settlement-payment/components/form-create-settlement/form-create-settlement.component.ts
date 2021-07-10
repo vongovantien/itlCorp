@@ -163,12 +163,12 @@ export class SettlementFormCreateComponent extends AppForm {
                     this.bankAccountNo.setValue(beneficiary.bankAccountNo);
                     this.setBankInfo(beneficiary);
                 }
-            }else{
+            } else {
                 this.resetBankInfo();
             }
         } else {
             this.resetBankInfo();
-            if(this.paymentMethod.value === this.methods[1]){
+            if (this.paymentMethod.value === this.methods[1]) {
                 if (!!this.userLogged) {
                     this.setBankInfo(this.userLogged);
                 }
@@ -176,18 +176,18 @@ export class SettlementFormCreateComponent extends AppForm {
         }
     }
 
-    setBankInfo(data: any){
+    setBankInfo(data: any) {
         this.bankName.setValue(data.bankCode);
         this.bankNameDescription.setValue(data.bankName);
         this.mapBankCode(data.bankCode);
     }
 
-    resetBankInfo(){
+    resetBankInfo() {
         this.beneficiaryName.setValue(null);
-            this.bankAccountNo.setValue(null);
-            this.bankName.setValue(null);
-            this.bankNameDescription.setValue(null);
-            this.mapBankCode(null);
+        this.bankAccountNo.setValue(null);
+        this.bankName.setValue(null);
+        this.bankNameDescription.setValue(null);
+        this.mapBankCode(null);
     }
 
     getPartnerById(id: string) {
@@ -195,22 +195,22 @@ export class SettlementFormCreateComponent extends AppForm {
         return partner || null;
     }
 
-    mapBankCode(data: any){
+    mapBankCode(data: any) {
         this.bankCode.setValue(data);
     }
 
-    onSelectDataFormInfo(data: any, type: string){
+    onSelectDataFormInfo(data: any, type: string) {
         switch (type) {
-        case 'bankName':
-            this.bankName.setValue(data.code);
-            this.bankNameDescription.setValue(data.bankNameEn);
-            break;
+            case 'bankName':
+                this.bankName.setValue(data.code);
+                this.bankNameDescription.setValue(data.bankNameEn);
+                break;
         }
     }
 
-    checkStaffPartner(){
+    checkStaffPartner() {
         const payeeInfo = this.getPartnerById(this.payee.value);
-        if((!this.payee.value || payeeInfo.partnerGroup.indexOf('STAFF') !== -1) && this.paymentMethod.value === this.methods[2]){
+        if ((!this.payee.value || payeeInfo.partnerGroup.indexOf('STAFF') !== -1) && this.paymentMethod.value === this.methods[2]) {
             return true;
         }
         return false;
