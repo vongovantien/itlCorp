@@ -1,5 +1,5 @@
 import { CatalogueActionTypes, CatalogueActions } from "../actions/catalogue.action";
-import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency, Warehouse, CommodityGroup } from "@models";
+import { PortIndex, Customer, Unit, Commodity, CountryModel, Currency, Warehouse, CommodityGroup, Bank } from "@models";
 
 
 export interface ICatalogueState {
@@ -14,6 +14,7 @@ export interface ICatalogueState {
     commodities: Commodity[];
     commodityGroups: CommodityGroup[];
     currencies: Currency[];
+    banks: Bank[],
     isLoading: boolean;
 
 }
@@ -30,6 +31,7 @@ const initialState: ICatalogueState = {
     commodityGroups: [],
     countries: [],
     currencies: [],
+    banks: [],
     isLoading: false
 };
 
