@@ -203,6 +203,8 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                                 res.mawb = null;
                                 res.eta = null;
                                 res.serviceDate = null;
+                                res.ata = null;
+                                res.atd = null;
                             }
                         });
                         try {
@@ -537,14 +539,14 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
 
     setDefaultChargeWeight() {
         // if (this.type !== 'import') {
-            let grossWeight = this.formGroup.controls['grossWeight'].value;
-            let hw = this.formGroup.controls['hw'].value;
-            if (grossWeight > hw) {
-                grossWeight = Number(grossWeight.toFixed(2));
-                this.formGroup.patchValue({ chargeWeight: grossWeight });
-            } else {
-                hw = Number(hw.toFixed(2));
-                this.formGroup.patchValue({ chargeWeight: hw });
-            }
+        let grossWeight = this.formGroup.controls['grossWeight'].value;
+        let hw = this.formGroup.controls['hw'].value;
+        if (grossWeight > hw) {
+            grossWeight = Number(grossWeight.toFixed(2));
+            this.formGroup.patchValue({ chargeWeight: grossWeight });
+        } else {
+            hw = Number(hw.toFixed(2));
+            this.formGroup.patchValue({ chargeWeight: hw });
+        }
     }
 }
