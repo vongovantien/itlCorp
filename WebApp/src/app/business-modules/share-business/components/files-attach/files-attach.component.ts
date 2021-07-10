@@ -1,13 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
 import { DocumentationRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
 import { Params, ActivatedRoute } from '@angular/router';
 import { ConfirmPopupComponent } from '@common';
-import { getTransactionLocked, getTransactionPermission } from '../../store';
+import { getTransactionDetailCsTransactionState, getTransactionLocked, getTransactionPermission } from '../../store';
+import { CsTransaction } from '@models';
 
 
 @Component({
@@ -23,6 +24,8 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
 
     files: IShipmentAttachFile[] = [];
     selectedFile: IShipmentAttachFile;
+
+    fileNo: string;
 
     constructor(
         private _documentRepo: DocumentationRepo,
@@ -48,6 +51,14 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                     this.getFileShipment(this.jobId);
                 }
             });
+        
+        this._store.select(getTransactionDetailCsTransactionState)
+            .pipe(skip(1), takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (res: CsTransaction) => {
+                   this.fileNo = res.jobNo;
+                }
+            );
     }
 
     chooseFile(event: any) {
@@ -89,6 +100,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
             .subscribe(
                 (res: IShipmentAttachFile[] = []) => {
                     this.files = res;
+                    this.filterViewFile();
                     this.files.forEach(f => f.extension = f.name.split("/").pop().split('.').pop());
                 }
             );
@@ -118,6 +130,38 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 }
             );
     }
+    dowloadAllAttach() {
+        if (this.fileNo) {
+            let arr = this.fileNo.split("/");
+            let model = {
+                folderName: "Shipment",
+                objectId: this.jobId,
+                fileName: arr[0] + "_" + arr[1] + ".zip"
+            }
+            this._documentRepo.dowloadallAttach(model)
+                .subscribe(
+                    (res: any) => {
+                        this.downLoadFile(res, "application/zip", model.fileName);
+                    }
+                )
+        }
+    }
+    filterViewFile() {
+        if (this.files) {
+            let type = ["xlsx", "xls", "doc", "docx"];
+            for (let i = 0; i < this.files.length; i++) {
+                let f = this.files[i];
+                if (type.includes(f.name.split('.').pop())) {
+                    f.dowFile = true
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                }
+                else {
+                    f.dowFile = false;
+                    f.viewFileUrl = f.url;
+                }
+            }
+        }
+    }
 }
 
 
@@ -132,5 +176,6 @@ interface IShipmentAttachFile {
     userCreated: string;
     dateTimeCreated: string;
     fileName: string;
-
+    dowFile :boolean;
+    viewFileUrl:string;
 }
