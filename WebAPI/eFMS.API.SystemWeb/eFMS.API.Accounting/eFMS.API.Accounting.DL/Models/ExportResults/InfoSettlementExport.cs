@@ -24,5 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string BankAccountName { get; set; }
         public string AmountInWords { get; set; }
         public string Note { get; set; }
+        public string BankCode { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

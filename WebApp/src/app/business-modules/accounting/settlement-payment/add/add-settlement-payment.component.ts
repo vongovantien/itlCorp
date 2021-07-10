@@ -67,6 +67,11 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
+
+        if(this.formCreateSurcharge.checkStaffPartner()){
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
+            return;
+        }
         // this.requestSurchargeListComponent.surcharges.forEach(s => {
         //     if (!!s.invoiceDate && typeof s.invoiceDate !== 'string') {
         //         s.invoiceDate = formatDate(s.invoiceDate, 'yyyy-MM-dd', 'en');
@@ -106,6 +111,11 @@ export class SettlementPaymentAddNewComponent extends AppPage {
     saveAndSendRequest() {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        if(this.formCreateSurcharge.checkStaffPartner()){
+            this._toastService.warning('Payment Method "Net Off Shipment" not use for Staff, Please check again!');
             return;
         }
 
@@ -152,7 +162,9 @@ export class SettlementPaymentAddNewComponent extends AppPage {
             settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             bankAccountNo: this.formCreateSurcharge.bankAccountNo.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
-            bankName: this.formCreateSurcharge.bankName.value
+            bankName: this.formCreateSurcharge.bankNameDescription.value,
+            bankCode: this.formCreateSurcharge.bankCode.value,
+            dueDate: !!this.formCreateSurcharge.dueDate && !!this.formCreateSurcharge.dueDate.value.startDate ? formatDate(this.formCreateSurcharge.dueDate.value.startDate, 'yyyy-MM-dd', 'en') : null
         };
 
         return dataSettle;
