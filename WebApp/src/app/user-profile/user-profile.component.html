@@ -59,7 +59,7 @@
                 <div class="p-3">
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="form-group row"
+                            <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (employeeNameVn.dirty && !employeeNameVn.valid) || (isSubmitted && !employeeNameVn.valid)}">
                                 <label required>Full name: </label>
                                 <input type="input" class="form-control m-input m-input--square"
@@ -71,7 +71,7 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row"
+                            <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (employeeNameEn.dirty && !employeeNameEn.valid) || (isSubmitted && !employeeNameEn.valid)}">
                                 <label required>English name: </label>
                                 <input type="input" class="form-control m-input m-input--square"
@@ -83,14 +83,14 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group">
                                 <label>Title: </label>
                                 <input type="input" class="form-control m-input m-input--square" formControlName="title"
                                     placeholder="Please Enter Title">
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row"
+                            <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger': (email.dirty && !email.valid) || (isSubmitted && !email.valid)}">
                                 <label required>Email: </label>
                                 <input type="email" class="form-control m-input m-input--square" formControlName="email"
@@ -105,35 +105,46 @@
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group">
                                 <label>Bank Account No: </label>
                                 <input type="input" class="form-control m-input m-input--square"
                                     formControlName="bankAccountNo" placeholder="Please Enter Bank Account No">
                             </div>
                         </div>
-                        <div class="col-lg-12">
-                            <div class="form-group row">
-                                <label>Bank Name: </label>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label> Bank Name : </label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event)"
+                                    [selectedDisplayFields]="['bankNameEn']" [dataSources]="banks | async"
+                                    [displayFields]="displayFieldPort" (remove)="resetFormControl(bankCode)"
+                                    placeholder="Please Select Bank Name" allowFreeText formControlName="bankName">
+                                </app-combo-grid-virtual-scroll>
+
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="form-group">
+                                <label>Bank Code: </label>
                                 <input type="input" class="form-control m-input m-input--square"
-                                    formControlName="bankName" placeholder="Please Enter Bank Name">
+                                    formControlName="bankCode" placeholder="Please Enter Bank Code">
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group">
                                 <label>Phone Number: </label>
                                 <input type="input" class="form-control" formControlName="tel"
                                     placeholder="Please Enter Phone Number">
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group">
                                 <label>Personal ID: </label>
                                 <input type="input" class="form-control" formControlName="personalId"
                                     placeholder="Please Enter Personal ID">
                             </div>
                         </div>
                         <div class="col-lg-12">
-                            <div class="form-group row">
+                            <div class="form-group">
                                 <label>Description: </label>
                                 <textarea class="form-control" rows="5" formControlName="description"></textarea>
                             </div>
