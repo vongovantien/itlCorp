@@ -1,15 +1,19 @@
-import { Directive, ElementRef } from '@angular/core';
+import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { NgControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { takeUntil } from 'rxjs/operators';
 import { DestroyService } from '@services';
+import { isNumber } from 'lodash';
+import { isDecimal } from 'validator';
 
 @Directive({
     selector: '([formControl])[formatDecimalFormControl],([formControlName])[formatDecimalFormControl]',
     providers: [DecimalPipe, DestroyService]
 })
 export class FormatDecimalFormControlDirective {
-
+    @Input() set minimum(c: string) { this.minValue = c; }
+    
+    minValue: string = null;
     constructor(
         private ngControl: NgControl,
         private decimalPipe: DecimalPipe,
@@ -23,8 +27,39 @@ export class FormatDecimalFormControlDirective {
             .pipe(takeUntil(this._destroyService))
             .subscribe(
                 (value: string) => {
-                    this._el.nativeElement.value = this.decimalPipe.transform(value, '.0-3');
+                    if (!!value) {
+                        const result = this.formatNumber(value);
+                        if (result.indexOf('.', result.length - 1) === -1) {
+                            this._el.nativeElement.value = this.decimalPipe.transform(result, '.0-3');
+                        }
+                    }
                 }
             );
+    }
+
+    private formatNumber(value: any) {
+        if(!!value){
+            value = value.toString().replace(/[^-0-9.]+/g, '');
+        }
+        return this.check(value);
+    }
+
+    private check(input) {
+        if (!!this.minValue) {
+            input = input < this.minValue ? '' : input;
+        }
+        
+        var index = input.indexOf('.');      
+        if ( index > -1 ) {
+            input = input.substr( 0, index + 1 ) + input.slice( index ).replace( /\./g, '' );
+        }
+    
+        return input;
+    }
+
+    @HostListener("blur", ["$event.target.value"])
+    onBlur(value) {
+        const result = this.formatNumber(value);
+        this._el.nativeElement.value = this.decimalPipe.transform(result, '.0-3');
     }
 }

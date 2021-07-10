@@ -469,12 +469,15 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.CreditAmount).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.CreditCurrency)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CreditLimit).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CreditRate).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CurrencyId)
-                    .HasColumnName("CurrencyID")
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
