@@ -178,6 +178,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
                 this.bankAccountName.setValue(this.userLogged.nameVn || null);
                 this.bankAccountNo.setValue(this.userLogged.bankAccountNo || null);
                 this.bankName.setValue(this.userLogged.bankName || null);
+                this.bankCode.setValue(this.userLogged.bankCode || null);
             } else if (!!this.selectedPayee) {
                 this.setBankInfoForPayee(this.selectedPayee);
             }
@@ -186,6 +187,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
             this.bankAccountName.setValue(null);
             this.bankAccountNo.setValue(null);
             this.bankName.setValue(null);
+            this.bankCode.setValue(null);
         }
     }
 
