@@ -8,9 +8,11 @@ import { NgProgressModule } from '@ngx-progressbar/core';
 import { BankComponent } from './bank.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormCreateBankPopupComponent } from './components/form-create/form-create-bank.popup';
+import { BankImportComponent } from './import/bank-import.component';
 
 const routing: Routes = [
-    { path: '', component: BankComponent, data: { name: "", title: 'eFMS Bank' } }
+    { path: '', component: BankComponent, data: { name: "", title: 'eFMS Bank' } },
+    { path: 'import', component: BankImportComponent, data: { name: "Import" } }
 ];
 
 @NgModule({
@@ -24,7 +26,8 @@ const routing: Routes = [
     exports: [],
     declarations: [
         BankComponent,
-        FormCreateBankPopupComponent
+        FormCreateBankPopupComponent,
+        BankImportComponent
     ],
     providers: [],
 })
