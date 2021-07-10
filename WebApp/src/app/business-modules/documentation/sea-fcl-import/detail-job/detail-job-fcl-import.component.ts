@@ -14,7 +14,7 @@ import { map, tap, switchMap, skip, catchError, takeUntil, finalize, concatMap }
 
 import * as fromShareBussiness from './../../../share-business/store';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 import isUUID from 'validator/lib/isUUID';
 import { CsTransaction } from '@models';
@@ -40,7 +40,7 @@ export class SeaFCLImportDetailJobComponent extends SeaFCLImportCreateJobCompone
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     ACTION: CommonType.ACTION_FORM | string = 'UPDATE';

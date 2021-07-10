@@ -21,7 +21,7 @@ import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' |'FILES';
 
 @Component({
     selector: 'app-detail-job-fcl-export',
@@ -41,7 +41,7 @@ export class SeaFCLExportDetailJobComponent extends SeaFCLExportCreateJobCompone
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE','FILES'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};

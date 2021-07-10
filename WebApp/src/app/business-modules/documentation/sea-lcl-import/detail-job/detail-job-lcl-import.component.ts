@@ -21,7 +21,7 @@ import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 @Component({
     selector: 'app-sea-lcl-import-detail-job',
@@ -40,7 +40,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE' , 'FILES'];
     jobId: string;
 
     shipmentDetail: CsTransaction;
@@ -210,7 +210,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
                 break;
             case 'files':
-                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_LCL_IMPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });

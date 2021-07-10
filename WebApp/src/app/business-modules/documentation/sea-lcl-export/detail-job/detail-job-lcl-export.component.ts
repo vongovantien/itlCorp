@@ -21,7 +21,7 @@ import { tap, map, switchMap, catchError, takeUntil, skip, finalize, concatMap }
 
 import isUUID from 'validator/lib/isUUID';
 import { HttpErrorResponse } from '@angular/common/http';
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL' | 'FILES';
 
 @Component({
     selector: 'app-detail-job-lcl-export',
@@ -50,7 +50,7 @@ export class SeaLCLExportDetailJobComponent extends SeaLCLExportCreateJobCompone
     nextState: RouterStateSnapshot;
     isCancelFormPopupSuccess: boolean = false;
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
 
     constructor(
         private _store: Store<fromShareBussiness.TransactionActions>,

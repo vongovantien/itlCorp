@@ -22,7 +22,7 @@ import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES'| 'HBL';
 
 @Component({
     selector: 'app-detail-job-consol-export',
@@ -41,7 +41,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE','FILES'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
@@ -243,6 +243,9 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
                 break;
             case 'assignment':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ASSIGNMENT' } });
+                break;
+            case 'files':
+                this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'FILES' } });
                 break;
             case 'advance-settle':
                 this._router.navigate([`${RoutingConstants.DOCUMENTATION.SEA_CONSOL_EXPORT}/${this.jobId}`], { queryParams: { tab: 'ADVANCE-SETTLE' } });
