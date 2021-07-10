@@ -16,6 +16,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,6 +57,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
+        private readonly IOptions<ApiUrl> apiUrl;
 
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
@@ -92,7 +94,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
-            IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
+            IContextBase<CatCommodity> commodityRepo,
+            IOptions<ApiUrl> url,
+            ISysImageService imageService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -125,6 +129,7 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
             shippingInstructionServiceRepo = shippingInstruction;
+            apiUrl = url;
         }
 
         #region -- INSERT & UPDATE --
@@ -2217,7 +2222,7 @@ namespace eFMS.API.Documentation.DL.Services
                             CatPlace pod = catPlaceRepo.Get(x => x.Id == model.Pod)?.FirstOrDefault();
 
                             string podCode = pod?.Code;
-                            
+
                             if (string.IsNullOrEmpty(podCode))
                             {
                                 item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
@@ -2243,10 +2248,11 @@ namespace eFMS.API.Documentation.DL.Services
                                 item.IssueHbldate = model.Etd;
                             }
                         }
-                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        else if (model.TransactionType == DocumentConstants.AE_SHIPMENT || model.TransactionType == DocumentConstants.AI_SHIPMENT)
                         {
-                     
-                            if (item.Hwbno == "N/H") {
+                            item.Mawb = model.Mawb;
+                            if (item.Hwbno == "N/H")
+                            {
                                 item.Hwbno = item.Hwbno;
                             }
                             else
@@ -2259,14 +2265,15 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             item.Hwbno = GenerateID.GenerateHousebillNo(generatePrefixHouse, countDetail);
                         }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
-                        {
-                            item.Mawb = model.Mawb;
-                        }
-                        if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
-                        {
-                            item.Hwbno = null;
-                        }
+                        // [CR: 15787]
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT || model.TransactionType == DocumentConstants.AE_SHIPMENT)
+                        //{
+                        //    item.Mawb = model.Mawb;
+                        //}
+                        //if (model.TransactionType == DocumentConstants.AI_SHIPMENT)
+                        //{
+                        //    item.Hwbno = null;
+                        //}
 
                         item.Active = true;
                         item.UserCreated = transaction.UserCreated;
@@ -2915,8 +2922,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);

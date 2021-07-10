@@ -70,8 +70,21 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
         if (this._readonly) {
             return;
         }
-        const fileList: FileList[] = event.target['files'];
+        const fileList = event.target['files'];
         if (fileList.length > 0 && !!this._id) {
+            let validSize: boolean = true;
+
+            for (let i = 0; i <= fileList.length - 1; i++) {
+                const fileSize: number = fileList[i].size / Math.pow(1024, 2); //TODO Verify BE
+                if (fileSize >= 100) {
+                    validSize = false;
+                    break;
+                }
+            }
+            if (!validSize) {
+                this._toastService.warning("maximum file size < 100Mb");
+                return;
+            }
             this._accountingRepo.uploadAttachedFiles(this.folderModuleName, this._id, fileList)
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -122,7 +135,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
             let model = {
                 folderName: this.folderModuleName,
                 objectId: this._id,
-                chillId:this.chillId,
+                chillId: this.chillId,
                 fileName: arr[0] + "_" + arr[1] + ".zip"
             }
             this._accountingRepo.dowloadallAttach(model)

@@ -117,8 +117,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
                                 this.fclImportDetail.etd = null;
                                 this.fclImportDetail.mawb = null;
                                 this.fclImportDetail.eta = null;
-                                this.fclImportDetail.serviceDate = null
-
+                                this.fclImportDetail.serviceDate = null;
+                                this.fclImportDetail.ata = null;
+                                this.fclImportDetail.atd = null;
                             }
                         });
                         try {
@@ -174,7 +175,7 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             eta: [null, Validators.required],
             ata: [],
             atd: [],
-            serviceDate: [],
+            serviceDate: [null, Validators.required],
 
             subColoader: [],
             flightVesselName: [],

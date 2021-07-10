@@ -190,7 +190,8 @@
                                                 || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
-                                                        {{!!charge.quantityType ? (charge.quantityType | uppercase) :
+                                                        {{(!!charge.quantityType && charge.quantityType !== 'null') ?
+                                                        (charge.quantityType | uppercase) :
                                                         '-'}}
                                                     </option>
                                                 </select>
@@ -383,7 +384,7 @@
                                                 [selectedDisplayFields]="['shortName']" [dataSources]="listPartner"
                                                 [displayFields]="[{'field':'shortName','label':'Name'},{'field':'taxCode','label':'Code'}]"
                                                 (remove)="charge.vatPartnerId = null" placeholder="VAT Partner"
-                                                [clearable]="false" size="15">
+                                                size="15">
                                             </app-combo-grid-virtual-scroll>
                                         </div>
                                     </ng-template>

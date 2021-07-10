@@ -14,7 +14,7 @@
   "EF_ANNOTATIONS_REQUIRED": "Field [{0}] là bắt buộc",
   "EF_ANNOTATIONS_STRING_LENGTH": "Trường [{0}] phải là chuỗi và có {2}-{1} ký tự",
   "FILE_NOT_FOUND": "Không tìm thấy file!",
-  "MSG_MAWB_EXISTED": "MAWB đã tồn tại",
+  "MSG_MAWB_EXISTED": "MAWB {0} đã tồn tại",
   "MSG_HBNO_EXISTED": "HAWB đã tồn tại",
   "MSG_MBLNO_HBNO_EXISTED": "MBL No and HBL No has existed",
   "MSG_NOT_ALLOW_DELETED": "This shipment has payment informations. Not allow deleted",

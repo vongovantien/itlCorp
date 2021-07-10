@@ -23,16 +23,16 @@ namespace eFMS.API.Documentation.DL.Services
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
-        private readonly IOptions<WebUrl> webUrl;
+        private readonly IOptions<ApiUrl> apiUrl;
         public SysImageService(IContextBase<SysImage> repository,
             IMapper mapper,
             IHostingEnvironment hostingEnvironment,
             ICurrentUser currUser,
-            IOptions<WebUrl> url) : base(repository, mapper)
+            IOptions<ApiUrl> url) : base(repository, mapper)
         {
             _hostingEnvironment = hostingEnvironment;
             currentUser = currUser;
-            webUrl = url;
+            apiUrl = url;
         }
 
         public async Task<HandleState> DeleteFile(Guid id)
@@ -102,7 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             string fileName = "";
             //string folderName = "images";
-            string path = this.webUrl.Value.Url;
+            string path = this.apiUrl.Value.Url;
             try
             {
                 var list = new List<SysImage>();

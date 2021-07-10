@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router, Params, ActivatedRoute } from '@angular/router';
@@ -36,6 +36,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     srcReportPDF: any = `${environment.HOST.EXPORT_CRYSTAL}`;
     valuePDF: any = null;
+    numOfFileExp: number = 1;
 
     form: FormGroup;
     files: IShipmentAttachFile[] = [];
@@ -91,7 +92,8 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
         private _activedRouter: ActivatedRoute,
         private _fb: FormBuilder,
         private _spinner: NgxSpinnerService,
-        private _router: Router) {
+        private _router: Router,
+        private _cd: ChangeDetectorRef) {
         super();
         this._progressRef = this._ngProgressService.ref();
     }
@@ -337,6 +339,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
         this.attachedFile = [];
         if (!!streamUploadFile.length) {
+            this.numOfFileExp = streamUploadFile.length;
             this.uploadFileStream(streamUploadFile);
         } else {
             this.sendMail()
@@ -345,7 +348,6 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
 
     uploadFileStream(streamUploadFile: Observable<any>[]) {
         let dataStreamCount = 0;
-        console.log(streamUploadFile);
         this._spinner.show();
 
         forkJoin([...streamUploadFile])
@@ -359,7 +361,7 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
                         catchError((err, caught) => of(err)),
                         retryWhen(errors => errors.pipe(
                             delayWhen(val => timer(1000)),
-                            take(3)
+                            take(this.numOfFileExp)
                         ))
                     )
                 }),
@@ -368,17 +370,20 @@ export class ShareBusinessReAlertComponent extends AppForm implements ICrystalRe
             .subscribe(
                 (res) => {
                     this.valuePDF = JSON.stringify(res);
-                    setTimeout(() => {
+                    this._cd.markForCheck();
+                    Promise.resolve(setTimeout(()=>{
                         this.formRp.nativeElement.submit();
-                        this.attachedFile.push(res.pathReportGenerate);
-                        dataStreamCount++;
-                        if (dataStreamCount === streamUploadFile.length) {
-                            if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
-                                return;
-                            }
-                            this.sendMail()
-                        }
-                    }, 500);
+                    }, 500)).then(
+                        ()=> {
+                                this.attachedFile.push(res.pathReportGenerate);
+                                dataStreamCount++;
+                                if (dataStreamCount === streamUploadFile.length) {
+                                    if (res instanceof HttpErrorResponse && res.status === SystemConstants.HTTP_CODE.NOT_FOUND) {
+                                        return;
+                                    }
+                                    this.sendMail()
+                                }
+                            });
                 },
             );
     }

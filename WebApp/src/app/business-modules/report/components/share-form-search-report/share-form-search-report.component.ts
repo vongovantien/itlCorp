@@ -7,7 +7,7 @@ import { CatalogueRepo, SystemRepo } from "@repositories";
 import { Store } from "@ngrx/store";
 import { IAppState, getMenuUserPermissionState } from "@store";
 import { formatDate } from "@angular/common";
-import { catchError, finalize, map, takeUntil } from "rxjs/operators";
+import { catchError, finalize, takeUntil } from "rxjs/operators";
 import { CommonEnum } from "@enums";
 import { SystemConstants } from "src/constants/system.const";
 import { ReportInterface } from "src/app/shared/interfaces/report-interface";
@@ -151,18 +151,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     ngOnInit() {
         this.initDataInform();
         this.initFormSearch();
-        if (this.isSheetDebitRpt) { // Partner for Accountant Report
-            // Get All Partner
-            this.customers = this._catalogueRepo.getPartnerByGroups(null, null)
-        } else {
-            this.customers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
-            this.agents = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
-            this.carriers = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
-        }
         this.ports = this._catalogueRepo.getListPort({ placeType: CommonEnum.PlaceTypeEnum.Port });
-        if (this.isCommissionIncentive) {
-            this.partners = this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
-        }
 
         this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this._store.select(getMenuUserPermissionState)
@@ -647,7 +636,7 @@ export class ShareFormSearchReportComponent extends AppForm {
 
     searchReport() {
         this.isSubmitted = true;
-        if (this.isCommissionIncentive && (!this.customer.value || (!this.partnerAccount.value && this.typeReport.value !== this.typeComReportList[2].id))) {
+        if (this.isCommissionIncentive && (!this.customerActive.length || (!this.partnerAccount.value && this.typeReport.value !== this.typeComReportList[2].id))) {
             return;
         }
         if (this.isGeneralReport) {
@@ -917,6 +906,32 @@ export class ShareFormSearchReportComponent extends AppForm {
             }
         }
         return _shipment;
+    }
+
+    async getPartnerData(type: string) {
+        if (this.isSheetDebitRpt) { // Partner for Accountant Report
+            // Get All Partner
+            if (type === 'customer') {
+                this.customers = await this._catalogueRepo.getPartnerByGroups(null, null);
+            }
+        } else {
+            switch (type) {
+                case 'customer':
+                    this.customers = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
+                    break;
+                case 'agent':
+                    this.agents = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
+                    break;
+                case 'carrier':
+                    this.carriers = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
+                    break;
+                case 'partner':
+                    if (this.isCommissionIncentive) {
+                        this.partners = await this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
+                    }
+                    break;
+            }
+        }
     }
 }
 

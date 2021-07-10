@@ -673,6 +673,7 @@ namespace eFMS.API.Documentation.DL.Services
                         cdNote.balanceCdNote = _balanceByCurrency;
                         cdNote.SyncStatus = cdNote.SyncStatus;
                         cdNote.LastSyncDate = cdNote.LastSyncDate;
+                        cdNote.TransactionTypeEnum = DataTypeEx.GetEnumType(listCharges.FirstOrDefault()?.TransactionType);
                         listCDNote.Add(cdNote);
                     }
 

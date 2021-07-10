@@ -180,6 +180,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                         bankName: this.settlementPayment.settlement.bankName,
                         beneficiaryName: this.settlementPayment.settlement.bankAccountName,
                         bankAccountNo: this.settlementPayment.settlement.bankAccountNo,
+                        advanceAmount: this.settlementPayment.settlement.advanceAmount,
+                        balanceAmount: this.settlementPayment.settlement.balanceAmount,
                     });
                     // this.formCreateSurcharge.getBeneficiaryInfo();
 
@@ -309,6 +311,15 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         }
         
         this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
+    }
+
+    previewGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
     }
 
     @delayTime(1000)

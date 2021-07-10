@@ -109,9 +109,12 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                         amount: this.settlementPayment.settlement.amount,
                         currency: this.settlementPayment.settlement.settlementCurrency,
                         payee: this.settlementPayment.settlement.payee,
+                        advanceAmount: this.settlementPayment.settlement.advanceAmount,
+                        balanceAmount: this.settlementPayment.settlement.balanceAmount,
                         bankName: this.settlementPayment.settlement.bankName,
                         beneficiaryName: this.settlementPayment.settlement.bankAccountName,
                         bankAccountNo: this.settlementPayment.settlement.bankAccountNo
+
                     });
 
                     this.requestSurchargeListComponent.surcharges = this.settlementPayment.chargeNoGrpSettlement;
@@ -263,6 +266,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
                 },
             );
+    }
+
+    previewGeneralPreview() {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+        
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
     }
     
     recall() {

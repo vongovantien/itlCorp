@@ -11,6 +11,7 @@ export interface IAccountingManagementPartnerState {
     inputRefNo: string;
     paymentTerm: number;
     charges: ChargeOfAccountingManagementModel[];
+    generalExchangeRate: number;
 }
 
 export const initialState: IAccountingManagementPartnerState = {
@@ -21,7 +22,8 @@ export const initialState: IAccountingManagementPartnerState = {
     settlementRequester: null,
     inputRefNo: null,
     charges: [],
-    paymentTerm: null
+    paymentTerm: null,
+    generalExchangeRate: null
 };
 
 const accountingManagementPartnerReducer = createReducer(
@@ -39,20 +41,15 @@ const accountingManagementPartnerReducer = createReducer(
         return { ...state, charges: [...payload.charges] };
     }),
     on(accountingManagementActions.UpdateExchangeRate, (state: IAccountingManagementPartnerState, payload: accountingManagementActions.ISyncExchangeRate) => {
-        if (!!state.charges.length) {
-            state.charges.forEach(c => {
-                c.exchangeRate = payload.exchangeRate;
-            });
-        }
         return {
-            ...state, charges: state.charges
+            ...state, generalExchangeRate: payload.exchangeRate
         };
     }),
     on(accountingManagementActions.GetAgreementForInvoice, (state: IAccountingManagementPartnerState, payload: accountingManagementActions.IAgreementInvoice) => {
         return {
             ...state, paymentTerm: payload.paymentTerm != null ? payload.paymentTerm : 30 // * default 30 days
         };
-    })
+    }),
 
 
 );

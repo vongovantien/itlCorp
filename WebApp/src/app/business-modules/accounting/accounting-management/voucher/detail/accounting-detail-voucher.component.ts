@@ -19,6 +19,7 @@ import { Observable, of } from 'rxjs';
 import { isUUID } from 'validator';
 import _merge from 'lodash/merge';
 import { tap, switchMap, catchError, finalize, concatMap } from 'rxjs/operators';
+import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'app-accounting-detail-voucher',
     templateUrl: './accounting-detail-voucher.component.html',
@@ -45,7 +46,6 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
         private _spinner: NgxSpinnerService
     ) {
         super(_toastService, _accountingRepo, _store, _router);
-        this._progressRef = this._ngProgressService.ref();
     }
 
 
@@ -133,7 +133,7 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                             return of({ data: null, message: "Voucher ID " + this.formCreateComponent.voucherId.value + " existed in " + (new Date()).getFullYear(), status: false });
                         } else {
                             const modelAdd: AccAccountingManagementModel = this.onSubmitData();
-                            modelAdd.charges = [...this.listChargeComponent.charges];
+                            modelAdd.charges = cloneDeep(this.listChargeComponent.charges);
 
                             modelAdd.charges.forEach(c => {
                                 if (!!c.invoiceDate) {
@@ -157,11 +157,9 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
                             modelAdd.lastSyncDate = this.accountingManagement.lastSyncDate;
                             modelAdd.reasonReject = this.accountingManagement.reasonReject;
 
-                            this._progressRef.start();
                             return this._accountingRepo.updateAcctMngt(modelAdd)
                                 .pipe(
                                     catchError(this.catchError),
-                                    finalize(() => this._progressRef.complete()),
                                     concatMap((data: CommonInterface.IResult) => {
                                         if (data.status) {
                                             this._toastService.success(data.message);
@@ -191,11 +189,9 @@ export class AccountingManagementDetailVoucherComponent extends AccountingManage
     }
 
     saveVoucher(body: AccAccountingManagementModel) {
-        this._progressRef.start();
         this._accountingRepo.updateAcctMngt(body)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => this._progressRef.complete()),
                 concatMap((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);

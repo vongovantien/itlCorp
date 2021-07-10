@@ -1,4 +1,5 @@
-﻿using eFMS.API.System.Infrastructure.Extensions;
+﻿using eFMS.API.Common.Helpers;
+using eFMS.API.System.Infrastructure.Extensions;
 using eFMS.API.System.Service.Models;
 using Microsoft.AspNetCore.SignalR;
 using System;
@@ -33,6 +34,8 @@ namespace eFMS.API.System.Infrastructure.Hubs
             }
             catch (Exception ex)
             {
+                new LogHelper("NotificationHub", ex.ToString());
+
                 Console.WriteLine(ex.ToString());
             }
         }
@@ -50,6 +53,7 @@ namespace eFMS.API.System.Infrastructure.Hubs
 
         private void TableDependency_OnError(object sender, ErrorEventArgs e)
         {
+            new LogHelper("NotificationHub", e.Error.Message);
             Console.WriteLine($"SqlTableDependency error: {e.Error.Message}");
         }
 
