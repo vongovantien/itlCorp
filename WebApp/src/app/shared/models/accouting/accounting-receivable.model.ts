@@ -14,7 +14,7 @@ export class TrialOfficialOtherModel {
     expriedDay: number = null;
     creditLimited: number = null;
     creditCurrency: string = null;
-    
+
     debitAmount: number = null;
     obhAmount: number = null;
     debitRate: number = null;
@@ -84,6 +84,9 @@ export class AccReceivableDetailModel {
     expriedDate: Date = null;
     expriedDay: number = null;
     obhAmount: number = null;
+    obhBillingAmount: number = null;
+    obhUnpaidAmount: number = null;
+    obhPaidAmount: number = null;
     officeId: string = null;
     over1To15Day: number = null;
     over16To30Day: number = null;
@@ -120,6 +123,7 @@ export class AccReceivableOfficesDetailModel {
     totalOver15To30Day: number = null;
     totalOver30Day: number = null;
     totalPaidAmount: number = null;
+    currency: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

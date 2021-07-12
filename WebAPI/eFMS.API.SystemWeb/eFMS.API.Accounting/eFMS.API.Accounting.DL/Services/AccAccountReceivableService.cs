@@ -1060,7 +1060,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 receivables.ForEach(fe => {
                     //Calculator Debit Amount
-                    fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0 );
+                    fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0 ); // Công nợ chưa billing
                     fe.DatetimeCreated = DateTime.Now;
                     fe.DatetimeModified = DateTime.Now;
                 });
@@ -1228,7 +1228,10 @@ namespace eFMS.API.Accounting.DL.Services
                     SaleDebitAmount = contractsGuaranteed.Where(w => w.AgreementSalesmanId == s.First().contract.SaleManId).Sum(su => su.DebitAmount),
                     SaleDebitRate = null, //Tính toán bên dưới
                     DebitAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : 0).Sum(),
+                    ObhUnPaidAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhUnpaid : 0).Sum(),
                     ObhAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhAmount : 0).Sum(),
+                    ObhPaidAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhPaid : 0).Sum(),
+                    ObhBillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.ObhBilling : 0).Sum(),
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round(((s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ? s.First().contract.TrialCreditLimited : 1)) * 100 ?? 0, 2) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
@@ -1284,6 +1287,9 @@ namespace eFMS.API.Accounting.DL.Services
                            SaleDebitRate = (contract.SaleDebitAmount / (user.CreditLimit != null && user.CreditLimit != 0 ? user.CreditLimit : 1)) * 100,
                            DebitAmount = contract.DebitAmount,
                            ObhAmount = contract.ObhAmount,
+                           ObhBillingAmount = contract.ObhBillingAmount,
+                           ObhPaidAmount = contract.ObhPaidAmount,
+                           ObhUnPaidAmount = contract.ObhUnPaidAmount,
                            DebitRate = contract.DebitRate,
                            CusAdvance = contract.CusAdvance,
                            BillingAmount = contract.BillingAmount,
@@ -1728,6 +1734,7 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalOver1To15Day = se.Select(sel => sel.Over1To15Day).Sum(),
                     TotalOver15To30Day = se.Select(sel => sel.Over16To30Day).Sum(),
                     TotalOver30Day = se.Select(sel => sel.Over30Day).Sum(),
+                    Currency = se.FirstOrDefault().ArCurrency,
                     AccountReceivableGrpServices = se.Select(sel => new AccountReceivableServiceResult
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
@@ -1739,7 +1746,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhAmount = sel.ObhAmount,
                         Over1To15Day = sel.Over1To15Day,
                         Over16To30Day = sel.Over16To30Day,
-                        Over30Day = sel.Over30Day
+                        Over30Day = sel.Over30Day,
+                        Currency = sel.ArCurrency
                     }).ToList()
                 });
             var offices = officeRepo.Get();
@@ -1757,6 +1765,7 @@ namespace eFMS.API.Accounting.DL.Services
                            TotalOver1To15Day = ar.TotalOver1To15Day,
                            TotalOver15To30Day = ar.TotalOver15To30Day,
                            TotalOver30Day = ar.TotalOver30Day,
+                           Currency= ar.Currency,
                            AccountReceivableGrpServices = ar.AccountReceivableGrpServices
                        };
             return data.ToList();
@@ -1805,6 +1814,9 @@ namespace eFMS.API.Accounting.DL.Services
                 SaleDebitRate = s.Select(se => se.SaleDebitRate).FirstOrDefault(),
                 DebitAmount = s.Sum(sum => sum.DebitAmount),
                 ObhAmount = s.Sum(sum => sum.ObhAmount),
+                ObhBillingAmount = s.Sum(sum => sum.ObhBillingAmount),
+                ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
+                ObhUnPaidAmount= s.Sum(sum => sum.ObhUnPaidAmount),
                 DebitRate = s.Sum(sum => sum.DebitRate),
                 CusAdvance = s.Select(se => se.CusAdvance).FirstOrDefault(),
                 BillingAmount = s.Sum(sum => sum.BillingAmount),
