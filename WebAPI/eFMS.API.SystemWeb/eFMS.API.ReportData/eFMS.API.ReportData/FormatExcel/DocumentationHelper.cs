@@ -1591,7 +1591,7 @@ namespace eFMS.API.ReportData.FormatExcel
             int revenueCol = 28;
             for(int i= 0; i <= 5; i++)
             {
-                workSheet.Cells[9, revenueCol].Value = subheadersTable[i];
+                workSheet.Cells[10, revenueCol].Value = subheadersTable[i];
                 revenueCol++;
             }
             //workSheet.Cells["AA10"].Value = subheadersTable[0];
@@ -1604,9 +1604,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AU9:BF9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["AU9:BF9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
-            workSheet.Cells["AA10:AM10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["AA10:AM10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["AA10:AM10"].Style.Font.Bold = true;
+            workSheet.Cells["AB10:AN10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["AB10:AN10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["AB10:AN10"].Style.Font.Bold = true;
 
             workSheet.Cells["AH10"].Value = subheadersTable[0];
             workSheet.Cells["AI10"].Value = subheadersTable[1];
@@ -1620,8 +1620,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["AB9:AG9"].Merge = true;
             workSheet.Cells["AH9:AN9"].Merge = true;
 
-            workSheet.Cells["AB9"].Value = headersTable[26];
-            workSheet.Cells["AH9"].Value = headersTable[27];
+            workSheet.Cells["AB9"].Value = headersTable[27];
+            workSheet.Cells["AH9"].Value = headersTable[28];
 
             //Cố định dòng thứ 10 (Freeze Row 10 and no column)
             workSheet.View.FreezePanes(11, 1);
