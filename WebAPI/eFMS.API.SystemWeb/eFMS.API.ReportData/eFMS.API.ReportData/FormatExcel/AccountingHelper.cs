@@ -118,7 +118,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(10).Width = 15; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
             workSheet.Column(12).Width = 13; //Cột L
-            workSheet.Column(13).Width = 12; //Cột M            
+            workSheet.Column(13).Width = 12; //Cột M
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
@@ -139,7 +139,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Approve Date",
                 "Settle Date",
             };
-            
+
             try
             {
                 int addressStartContent = 4;
@@ -360,7 +360,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             List<string> headers = new List<string>()
             {
-                
+
                 "Reference No",
                 "Partner Name",
                 "Invoice Amount",
@@ -369,7 +369,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Serie No",
                 "Paid Amount",
                 "Unpaid Amount",
-                
+
                 "Due Date",
                 "Overdue Days",
                 "Payment Status",
@@ -388,16 +388,16 @@ namespace eFMS.API.ReportData.FormatExcel
                     for(int i = 0; i < listObj.Count; i++)
                     {
                         var item = listObj[i];
-                       
+
                         worksheet.Cells[addressStartContent, 1].Value = item.InvoiceNoReal;
-                        
+
                         worksheet.Cells[addressStartContent, 2].Value = item.PartnerName;
                         worksheet.Cells[addressStartContent, 3].Value = item.Amount.HasValue ? item.Amount.Value : 0;
                         worksheet.Cells[addressStartContent, 3].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[addressStartContent, 4].Value = item.Currency;
                         worksheet.Cells[addressStartContent, 5].Value = item.IssuedDate.HasValue ? item.IssuedDate.Value.ToString("dd/MM/yyyy") : "";
                         worksheet.Cells[addressStartContent, 6].Value = item.Serie;
-                        
+
                         worksheet.Cells[addressStartContent, 7].Value = item.PaidAmount.HasValue ? item.PaidAmount.Value : 0 ;
                         worksheet.Cells[addressStartContent, 7].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[addressStartContent, 8].Value = item.UnpaidAmount.HasValue ? item.UnpaidAmount.Value : 0;
@@ -412,7 +412,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
-                
+
             }
             catch(Exception ex)
             {
@@ -423,14 +423,14 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             List<string> headers = new List<string>()
             {
-                
+
                 "Reference No",
-                
+
                 "Partner Name",
                 "OBH Amount",
                 "Currency",
                 "Issue Date",
-                
+
                 "Paid Amount",
                 "Unpaid Amount",
                 "Due Date",
@@ -451,15 +451,15 @@ namespace eFMS.API.ReportData.FormatExcel
                     for (int i = 0; i < listObj.Count; i++)
                     {
                         var item = listObj[i];
-                        
+
                         worksheet.Cells[addressStartContent, 1].Value = item.SOANo;
-                        
+
                         worksheet.Cells[addressStartContent, 2].Value = item.PartnerName;
                         worksheet.Cells[addressStartContent, 3].Value = item.Amount.HasValue ? item.Amount.Value : 0;
                         worksheet.Cells[addressStartContent, 3].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[addressStartContent, 4].Value = item.Currency;
                         worksheet.Cells[addressStartContent, 5].Value = item.IssuedDate.HasValue ? item.IssuedDate.Value.ToString("dd/MM/yyyy") : "";
-                        
+
                         worksheet.Cells[addressStartContent, 6].Value = item.PaidAmount.HasValue ? item.PaidAmount.Value : 0;
                         worksheet.Cells[addressStartContent, 6].Style.Numberformat.Format = numberFormat;
                         worksheet.Cells[addressStartContent, 7].Value = item.UnpaidAmount.HasValue ? item.UnpaidAmount.Value : 0;
@@ -595,7 +595,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số cont - Loại cont", //10
                 "C.W (Kgs)", //11
                 "Số kiện\n(Pcs)", //12
-                "Số CBM\n(CBM)", //13                
+                "Số CBM\n(CBM)", //13
                 "Định mức", //14
                 "Chi phí có hóa đơn", //15
                 "Chi phí khác", //16
@@ -646,7 +646,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Con't", //10
                 "C.W (Kgs)", //11
                 "Packages\n(PCS)", //12
-                "CBM", //13                
+                "CBM", //13
                 "Costs according to tariff", //14
                 "Costs with reasonable vouchers", //15
                 "Others", //16
@@ -712,7 +712,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["H2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 10));
             workSheet.Cells["H2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
-            
+
             //Title
             workSheet.Cells["A4:K4"].Merge = true;
             workSheet.Cells["A4"].Value = headers[2]; //Phiếu đề nghị tạm ứng
@@ -737,26 +737,30 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A6"].Style.Font.Bold = true;
             workSheet.Cells["C6"].Value = advanceExport.InfoAdvance.Department;
 
-            workSheet.Cells["A9"].Value = headers[36]; 
+            workSheet.Cells["A9"].Value = headers[36];
             workSheet.Cells["A9"].Style.Font.Bold = true;
             workSheet.Cells["C9"].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
 
             workSheet.Cells["J9"].Value = headers[41];
             workSheet.Cells["J9"].Style.Font.Bold = true;
 
-            var check = workSheet.Drawings.AddCheckBoxControl("");
+            //var check = workSheet.Drawings.AddCheckBoxControl("");
 
             if (advanceExport.InfoAdvance.PaymentMethod == "Cash")
             {
-                check.SetPosition(7, 15, 2, 0);
-                check.Checked = eCheckState.Checked;
+                //check.SetPosition(7, 15, 2, 0);
+                //check.Checked = eCheckState.Checked;
+                workSheet.Cells["K9"].Value = "X";
+                workSheet.Cells["K9"].Style.Font.Bold = true;
             }
             else if (advanceExport.InfoAdvance.PaymentMethod == "Bank")
             {
-                check.SetPosition(7, 15, 10, 0);
-                check.Checked = eCheckState.Checked;
+                // check.SetPosition(7, 15, 10, 0);
+                // check.Checked = eCheckState.Checked;
+                workSheet.Cells["C9"].Value = "X";
+                workSheet.Cells["C9"].Style.Font.Bold = true;
             }
-              
+
 
             workSheet.Cells["A10"].Value = headers[37];
             workSheet.Cells["A10"].Style.Font.Bold = true;
@@ -805,15 +809,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[16, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[16, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[16, 4].Value = headers[10]; //Số cont - Loại cont           
-            workSheet.Cells[16, 5].Value = headers[11]; // C.W           
-            workSheet.Cells[16, 6].Value = headers[12]; //Số kiện            
+            workSheet.Cells[16, 4].Value = headers[10]; //Số cont - Loại cont
+            workSheet.Cells[16, 5].Value = headers[11]; // C.W
+            workSheet.Cells[16, 6].Value = headers[12]; //Số kiện
             workSheet.Cells[16, 7].Value = headers[13]; //số CBM
 
             workSheet.Cells[15, 1, 15, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[15, 8, 15, 11].Merge = true;
-            workSheet.Cells[15, 8, 15, 11].Value = headers[9];//Số tiến tạm ứng           
+            workSheet.Cells[15, 8, 15, 11].Value = headers[9];//Số tiến tạm ứng
             workSheet.Cells[15, 8, 15, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[15, 8, 15, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -823,9 +827,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[16, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[16, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[16, 8].Value = headers[14]; //Định mức           
-            workSheet.Cells[16, 9].Value = headers[15]; // Chi phí có hóa đơn           
-            workSheet.Cells[16, 10].Value = headers[16]; //Chi phí khác            
+            workSheet.Cells[16, 8].Value = headers[14]; //Định mức
+            workSheet.Cells[16, 9].Value = headers[15]; // Chi phí có hóa đơn
+            workSheet.Cells[16, 10].Value = headers[16]; //Chi phí khác
             workSheet.Cells[16, 11].Value = headers[17]; //Tổng cộng
 
             int p = 17;
@@ -988,8 +992,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[p, 2].Value = headers[30]; //Người tạm ứng           
-            workSheet.Cells[p, 3].Value = headers[31]; //Người chứng từ            
+            workSheet.Cells[p, 2].Value = headers[30]; //Người tạm ứng
+            workSheet.Cells[p, 3].Value = headers[31]; //Người chứng từ
             workSheet.Cells[p, 4].Value = headers[32]; //Trưởng bộ phận
 
             workSheet.Cells[p, 7, p, 8].Merge = true;
@@ -1035,7 +1039,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, x].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             }
-            workSheet.Cells[p, 2].Value = advanceExport.InfoAdvance.Requester; //Value Người tạm ứng            
+            workSheet.Cells[p, 2].Value = advanceExport.InfoAdvance.Requester; //Value Người tạm ứng
             workSheet.Cells[p, 3].Value = string.Empty; //Value Người chứng từ
             workSheet.Cells[p, 4].Value = advanceExport.InfoAdvance.Manager; //Value Trưởng bộ phận
 
@@ -1045,7 +1049,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 7, p, 8].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
             workSheet.Cells[p, 10, p, 11].Merge = true;
-            workSheet.Cells[p, 10, p, 11].Value = string.Empty; //Giám đốc            
+            workSheet.Cells[p, 10, p, 11].Value = string.Empty; //Giám đốc
         }
         #endregion --- ADVANCE PAYMENT ---
         #region --- SOA ---
@@ -1187,7 +1191,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["I8"].Style.Font.Bold = true;
             workSheet.Cells["K8"].Value = headers[15]; //Currency
             workSheet.Cells["K8"].Style.Font.Bold = true;
-            workSheet.Cells["L8"].Value = headers[16]; //Exchange Total Amount	
+            workSheet.Cells["L8"].Value = headers[16]; //Exchange Total Amount
             workSheet.Cells["L8"].Style.Font.Bold = true;
             workSheet.Cells["I9"].Value = headers[17]; //Revenue
             workSheet.Cells["I9"].Style.Font.Bold = true;
@@ -1590,7 +1594,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[4, 1, 8, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             decimal? totalALLValue = 0;
-           
+
             workSheet.Cells["A9:A10"].Merge = true;
             workSheet.Cells["B9:B10"].Merge = true;
             workSheet.Cells["C9:C10"].Merge = true;
@@ -2461,7 +2465,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 10; //Cột G
-            workSheet.Column(8).Width = 15; //Cột H            
+            workSheet.Column(8).Width = 15; //Cột H
             workSheet.Column(9).Width = 15; //Cột I
             workSheet.Column(10).Width = 12; //Cột J
             workSheet.Column(10).Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -2739,7 +2743,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số tiền", //10
                 "Số hóa đơn", //11
                 "Ghi chú", //12
-                "Số tiền đã tạm ứng", //13                
+                "Số tiền đã tạm ứng", //13
                 "Ngày tạm ứng", //14
                 "Chênh lệch", //15
                 "Số lô hàng:", //16
@@ -2792,7 +2796,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Amount", //10
                 "Invoice No", //11
                 "Remark", //12
-                "Advanced Amount", //13                
+                "Advanced Amount", //13
                 "Date Advanced", //14
                 "Difference", //15
                 "Job ID:", //16
@@ -3294,12 +3298,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 2].Style.WrapText = true;
             workSheet.Cells[p, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[p, 2].Value = headers[32]; //Người tạm ứng    
+            workSheet.Cells[p, 2].Value = headers[32]; //Người tạm ứng
 
             workSheet.Cells[p, 3].Style.WrapText = true;
             workSheet.Cells[p, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 3].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[p, 3].Value = headers[33]; //Người chứng từ 
+            workSheet.Cells[p, 3].Value = headers[33]; //Người chứng từ
 
             workSheet.Cells[p, 4, p, 5].Merge = true;
             workSheet.Cells[p, 4, p, 5].Style.WrapText = true;
@@ -3318,7 +3322,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 11, p, 13].Style.WrapText = true;
             workSheet.Cells[p, 11, p, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 11, p, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            
+
             workSheet.Row(p).Height = 50;
 
             p = p + 1;
@@ -3330,7 +3334,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             if (settlementExport.InfoSettlement.IsManagerApproved)
             {
-                workSheet.Cells[p, 4, p, 5].Merge = true; 
+                workSheet.Cells[p, 4, p, 5].Merge = true;
                 AddIconTick(workSheet, p, 4); //Tick Manager Dept
             }
 
@@ -3339,7 +3343,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 8, p, 10].Merge = true;
                 AddIconTick(workSheet, p, 8); //Tick Accountant
             }
-            
+
             if (settlementExport.InfoSettlement.IsBODApproved)
             {
                 workSheet.Cells[p, 11, p, 13].Merge = true;
@@ -3351,11 +3355,11 @@ namespace eFMS.API.ReportData.FormatExcel
             p = p + 1;
 
             workSheet.Cells[p, 2].Style.WrapText = true;
-            workSheet.Cells[p, 2].Value = settlementExport.InfoSettlement.Requester; //Value Người tạm ứng    
+            workSheet.Cells[p, 2].Value = settlementExport.InfoSettlement.Requester; //Value Người tạm ứng
             workSheet.Cells[p, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells[p, 3].Style.WrapText = true;
-            workSheet.Cells[p, 3].Value = string.Empty; //Value Người chứng từ 
+            workSheet.Cells[p, 3].Value = string.Empty; //Value Người chứng từ
 
             workSheet.Cells[p, 4, p, 5].Merge = true;
             workSheet.Cells[p, 4, p, 5].Style.WrapText = true;
@@ -3370,7 +3374,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 11, p, 13].Merge = true;
             workSheet.Cells[p, 11, p, 13].Value = string.Empty; //Value Giám đốc
         }
-        
+
         private void AddIconTick(ExcelWorksheet workSheet, int row, int col)
         {
             workSheet.Cells[row, col].Value = char.ConvertFromUtf32(0x0050); //Mã code của Symbol tick
@@ -3568,7 +3572,7 @@ namespace eFMS.API.ReportData.FormatExcel
             int rowStart = 1;
             for(int i = 0; i < headers.Count; i++)
             {
-                workSheet.Cells[rowStart, i + 1].Value = headers[i];                
+                workSheet.Cells[rowStart, i + 1].Value = headers[i];
                 workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
                 workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             }
@@ -3578,11 +3582,11 @@ namespace eFMS.API.ReportData.FormatExcel
 
             rowStart += 1;
             foreach(var item in acctMngts)
-            {               
+            {
                 workSheet.Cells[rowStart, 1].Value = item.Date; //Ngày chứng từ
                 workSheet.Cells[rowStart, 1].Style.Numberformat.Format = "dd/MM/yyyy";
 
-                workSheet.Cells[rowStart, 2].Value = item.VoucherId; //Số chứng từ 
+                workSheet.Cells[rowStart, 2].Value = item.VoucherId; //Số chứng từ
                 workSheet.Cells[rowStart, 3].Value = (typeOfAcctMngt == "Invoice") ? "HD" : item.VoucherId?.Substring(0, 2); //2 ký tự đầu của số chứng từ
                 workSheet.Cells[rowStart, 4].Value = item.ChargeName;
                 // workSheet.Cells[rowStart, 5].Value = item.VatPartnerCode; //Mã số thuế của partner của charge
