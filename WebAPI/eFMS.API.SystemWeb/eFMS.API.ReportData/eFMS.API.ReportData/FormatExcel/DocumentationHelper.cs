@@ -1481,7 +1481,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "PRO SERVICE",
                 "JOB NO",
                 "CUSTOM NO",
-                "Service Data",
+                "SERVICE DATE",
                 "ETD",
                 "ETA",
                 "VESSEL/FLIGHT",
@@ -1579,11 +1579,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
             }
 
-            for (int i = 1; i < headers.Count; i++)
+            for (int i = 1; i < 59; i++)
             {
                 if (i <= 27 || i >= 41)
                 {
                     workSheet.Cells[9, i, 10, i].Merge = true;
+                    workSheet.Cells[9, i, 10, i].Style.WrapText = true;
                 }
             }
 
@@ -1600,8 +1601,8 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Cells["AE10"].Value = subheadersTable[4];
             //workSheet.Cells["AF10"].Value = subheadersTable[5];
 
-            workSheet.Cells["AU9:BE9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["AU9:BE9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["AU9:BF9"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["AU9:BF9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells["AA10:AM10"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells["AA10:AM10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -1831,6 +1832,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(2).Width = 20;
             workSheet.Column(3).Width = 20;
             workSheet.Column(4).Width = 20;
+            workSheet.Column(5).Width = 15;
             workSheet.Column(9).Width = 20;
             workSheet.Column(17).Width = 20;
 
