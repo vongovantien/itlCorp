@@ -37,17 +37,19 @@
                                 <td ALIGN="center">{{item.type}}</td>
                                 <td class="text-primary">
                                     {{item.invoiceNo}}
-                                    <ng-container [ngSwitch]="item.paymentStatus">
-                                        <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
-                                            {{item.paymentStatus}}
-                                        </span>
-                                        <span class="m-badge m-badge--warning m-badge--wide text-white"
-                                            *ngSwitchCase="'Paid A Part'">
-                                            {{item.paymentStatus}}
-                                        </span>
-                                        <span class="m-badge m-badge--danger m-badge--wide" *ngSwitchDefault>
-                                            {{item.paymentStatus}}
-                                        </span>
+                                    <ng-container *ngIf="item.type !== 'ADV' ">
+                                        <ng-container [ngSwitch]="item.paymentStatus">
+                                            <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
+                                                {{item.paymentStatus}}
+                                            </span>
+                                            <span class="m-badge m-badge--warning m-badge--wide text-white"
+                                                *ngSwitchCase="'Paid A Part'">
+                                                {{item.paymentStatus}}
+                                            </span>
+                                            <span class="m-badge m-badge--danger m-badge--wide" *ngSwitchDefault>
+                                                {{item.paymentStatus}}
+                                            </span>
+                                        </ng-container>
                                     </ng-container>
                                 </td>
                                 <td>

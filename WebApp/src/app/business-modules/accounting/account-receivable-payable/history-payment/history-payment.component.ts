@@ -122,16 +122,10 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
 
     onSelectTab(tabName: PAYMENT_TAB | string) {
         switch (tabName) {
-            case 'CUSTOMER':
+            case 'PAYMENT':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`]);
                 break;
-            case 'HISTORY':
-                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
-                break;
-            // case 'AGENCY':
-            //     this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}`], { queryParams: { type: 'Agency' } });
-            //     break;
-            case 'ARSUMMARY':
+            case 'AR':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
             default:

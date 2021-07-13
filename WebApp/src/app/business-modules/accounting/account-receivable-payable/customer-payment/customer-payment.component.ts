@@ -187,7 +187,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     onSelectTab(tabName: PAYMENT_TAB | string) {
         switch (tabName) {
-            case 'ar':
+            case 'AR':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
             case 'HISTORY':

@@ -3,12 +3,21 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Customer/Agency Payment" (selectTab)="onSelectTab('CUSTOMER')">
+                <tab (selectTab)="onSelectTab('PAYMENT')">
+                    <ng-template tabHeading>
+                        <a routerLink="/home/accounting/account-receivable-payable" style="color:#6f727d">
+                            Customer/Agency Payment
+                        </a>
+                    </ng-template>
                 </tab>
-                <tab heading="AR Summary" (selectTab)="onSelectTab('ARSUMMARY')">
-                    Summary
+                <tab (selectTab)="onSelectTab('AR')">
+                    <ng-template tabHeading>
+                        <a routerLink="/home/accounting/account-receivable-payable/summary" style="color:#6f727d">
+                            AR Summary
+                        </a>
+                    </ng-template>
                 </tab>
-                <tab heading="Payment History" (selectTab)="onSelectTab('HISTORY')" [active]="true">
+                <tab heading="Payment History" [active]="true">
                     <form-search-history-payment (onSearch)="onSearchPayment($event)">
                     </form-search-history-payment>
 

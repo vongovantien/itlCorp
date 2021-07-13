@@ -289,9 +289,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         let paidVND = 0;
         for (let index = 0; index < listPaymentWithUnpaid.length; index++) {
             const element = listPaymentWithUnpaid[index];
-            paidVND += element.unpaidAmountVnd;
-            paidUSD += element.unpaidAmountUsd;
+            paidVND += (element.unpaidAmountVnd - element.paidAmountVnd);
+            paidUSD += (+(element.unpaidAmountUsd - element.paidAmountUsd).toFixed(2));
         }
+
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,

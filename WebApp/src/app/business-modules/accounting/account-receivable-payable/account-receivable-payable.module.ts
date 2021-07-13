@@ -11,19 +11,15 @@ const routing: Routes = [
             },
             {
                 path: '', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
-                data: { name: 'Customer/Agency Payment' }
+                data: { name: 'Customer/Agency Payment', title: 'eFMS AR Payment' }
             },
-            // {
-            //     path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
-            //     data: { name: 'Agency Payment' }
-            // },
             {
                 path: 'summary', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
-                data: { name: 'A.R Summary' }
+                data: { name: 'A.R Summary', title: 'eFMS AR Summary' }
             },
             {
                 path: 'history-payment', loadChildren: () => import('./history-payment/history-payment.module').then(m => m.ARHistoryPaymentModule),
-                data: { name: 'history Payment' }
+                data: { name: 'History Payment', title: 'eFMS AR History Payment' }
             },
 
         ]
