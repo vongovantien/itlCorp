@@ -3624,11 +3624,11 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var shipmentsAdvance = new List<InfoShipmentAdvanceExport>();
             var groupJobByHbl = advancePayment.AdvanceRequests
-                .GroupBy(g => new { g.Hbl })
+                .GroupBy(g => new { g.Hblid })
                 .Select(s => new AcctAdvanceRequestModel
                 {
                     JobId = s.First().JobId,
-                    Hbl = s.Key.Hbl,
+                    Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo
                 });
