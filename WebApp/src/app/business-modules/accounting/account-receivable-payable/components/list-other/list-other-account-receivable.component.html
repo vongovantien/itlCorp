@@ -23,24 +23,25 @@
                                                 </div>
                                             </td>
                                             <td><a class="pointer"
-                                                    (click)="viewDetail(item.agreementId, item.partnerId)">{{ item.partnerCode }}</a>
+                                                    (click)="viewDetail(item.agreementId, item.partnerId)">{{
+                                                    item.partnerCode }}</a>
                                             </td>
-                                            <td>{{ item.partnerNameAbbr }} </td>
-                                            <td>{{ item.parentNameAbbr }}</td>
+                                            <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}
+                                            </td>
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
 
                                             <td class="text-right">{{ item.billingAmount | number: '.0-3' }}
                                             </td>
                                             <td class="text-right">{{ item.paidAmount | number: '.0-3'}}</td>
                                             <td class="text-right">{{ item.billingUnpaid | number: '.0-3' }}</td>
-                                            
-                                            <!-- <td class="text-right">{{ item.obhAmount | number: '.0-3'}}</td> -->
+
                                             <td>
                                                 <span
                                                     [ngClass]="item.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
                                                     {{ item.agreementStatus }}
                                                 </span>
                                             </td>
+                                            <td>{{ item.parentNameAbbr }}</td>
 
 
                                         </tr>

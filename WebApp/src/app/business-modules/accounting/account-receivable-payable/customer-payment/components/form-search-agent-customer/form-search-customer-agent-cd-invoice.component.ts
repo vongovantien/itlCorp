@@ -133,7 +133,6 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                         //*  Check đối tượng đang search có khác với đối tượng bên ngoài receipt
                         if (this.partnerId.value !== this.customerFromReceipt) {
                             this.poupParentComponent.listDebit = [];
-                            this.poupParentComponent.customerFromReceipt = this.customerFromReceipt;
                         }
 
                         // * Check partner group của đối tượng đang chọn có # với đối tượng phiếu thu muốn tạo
@@ -188,7 +187,6 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 dateType: this.dateType.value,
                 service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
             };
-            this.poupParentComponent.customerFromReceipt = this.customerFromReceipt;
             this.poupParentComponent.onApply(body);
         }
     }

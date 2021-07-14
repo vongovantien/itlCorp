@@ -23,13 +23,13 @@
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a class="pointer"
-                                                    (click)="viewDetail(item.agreementId)">{{ item.partnerCode }}</a>
+                                            <td><a class="pointer" (click)="viewDetail(item.agreementId)">{{
+                                                    item.partnerCode }}</a>
                                             </td>
-                                            <td>{{ item.partnerNameAbbr }} </td>
-                                            <td>{{ item.parentNameAbbr }}</td>
-                                            <td class="text-right">{{ item.creditLimited | number: '.0-3' }}</td>
-                                            <td class="text-center">{{ item.creditCurrency }}</td>
+                                            <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}
+                                            </td>
+
+
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
                                             <td class="text-right">
                                                 <span
@@ -37,10 +37,13 @@
                                                     {{ item.debitRate | number: '.0-3'}}%
                                                 </span>
                                             </td>
-                                            <td class="text-right">{{ item.billingAmount | number: '.0-3' }}
+                                            <td class="text-right">{{ item.billingAmount + item.obhBillingAmount |
+                                                number: '.0-3' }}
                                             </td>
-                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}}</td>
-                                            <td class="text-right">{{ item.billingUnpaid | number: '.0-3' }}</td>
+                                            <td class="text-right">{{ (item.paidAmount+ item.obhPaidAmount) | number:
+                                                '.0-3'}}</td>
+                                            <td class="text-right">{{ (item.billingUnpaid + item.obhUnpaidAmount) |
+                                                number: '.0-3' }}</td>
                                             <!-- <td>{{ item.obhAmount | number: '.0-3'}}</td> -->
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
@@ -57,22 +60,29 @@
                                                     {{ item.over30Day | number: '.0-3' }}
                                                 </span>
                                             </td>
-                                            <td>{{ item.agreementNo}}</td>
-                                            <td><span [ngClass]="item.agreementType === 'Trial' ? 'text-warning': 
-                                                'text-info'">{{ item.agreementType}}</span></td>
+                                            <td class="text-center">{{ item.creditCurrency }}</td>
+                                            <td class="text-right">{{ item.creditLimited | number: '.0-3' }}</td>
+                                            <td>
+                                                {{ item.agreementNo}}
+                                                <span class="m--margin-right-5 badge "
+                                                    [ngClass]="item.agreementStatus === 'Active' ? 'badge-success' : 'badge-danger'">
+                                                    {{ item.agreementStatus }}
+                                                </span>
+                                                <span class="badge "
+                                                    [ngClass]="item.agreementType === 'Trial' ? 'badge-warning' : 'badge-info'">
+                                                    {{ item.agreementType }}
+                                                </span>
+
+                                            </td>
+
                                             <td>{{ item.expriedDate | date: 'dd/MM/yyyy'}}</td>
                                             <td>
                                                 <span [ngClass]="'text-danger'">
                                                     {{ item.expriedDay }}
                                                 </span>
                                             </td>
-                                            <td>
-                                                <span
-                                                    [ngClass]="item.agreementStatus === 'Active' ? 'text-success' : 'text-danger'">
-                                                    {{ item.agreementStatus }}
-                                                </span>
+                                            <td style="min-width: 200px; white-space:initial">{{ item.parentNameAbbr }}
                                             </td>
-
 
                                         </tr>
 

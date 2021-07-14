@@ -95,6 +95,7 @@ export class Receipt {
     agreementId: string = null;
     reasonReject: string = null;
     referenceId: string = null; // * ID của receipt cha (trường hợp có receipt banking)
+    paymentMethod: string = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

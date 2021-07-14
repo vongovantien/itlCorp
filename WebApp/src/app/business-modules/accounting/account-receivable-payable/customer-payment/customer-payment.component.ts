@@ -1,5 +1,4 @@
 import { Component, ViewChild } from "@angular/core";
-import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
@@ -50,13 +49,11 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService,
-        private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
         protected _store: Store<IAppState>
     ) {
         super();
-        this._progressRef = this._progressService.ref();
         this.requestList = this.getCPs;
         this.requestSort = this.sortLocal;
     }
@@ -69,6 +66,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
@@ -132,20 +130,13 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
     getCPs(dataSearch) {
         this.isLoading = true;
-        this._progressRef.start();
         this._accountingRepo
             .getListCustomerPayment(
                 this.page,
                 this.pageSize,
                 Object.assign({}, dataSearch)
             )
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                    this._progressRef.complete();
-                })
-            )
+            .pipe(finalize(() => this.isLoading = false))
             .subscribe((res: any) => {
                 this.CPs = (res.data || []).map((item: ReceiptModel) => new ReceiptModel(item));
                 this.totalItems = res.totalItems || 0;
@@ -164,14 +155,12 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     onConfirmDeleteCP() {
-        this._progressRef.start();
         this._accountingRepo
             .deleteCusPayment(this.selectedCPs.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => {
                     this.confirmPopup.hide();
-                    this._progressRef.complete();
                 })
             )
             .subscribe((res: any) => {
