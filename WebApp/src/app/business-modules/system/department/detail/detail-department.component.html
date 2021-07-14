@@ -1,5 +1,5 @@
 <app-sub-header></app-sub-header>
-<div class="m-content">
+<div class="m-content form-department">
     <div class="m-form m-form--state">
         <div class="m-portlet">
             <div class="row m--padding-top-10">
@@ -147,15 +147,39 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-4">
-                            <div class="form-group">
-                                <label class="form-control-label">Status:</label>
-                                <div>
-                                    <app-switch formControlName="status">
-                                    </app-switch>
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label">Status:</label>
+                                        <div>
+                                            <app-switch formControlName="status">
+                                            </app-switch>
+                                        </div>
+                                    </div>
+                                </div>
+                        
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <div class="mx-auto text-center upload-image-wp">
+                                            <div class="image-upload-content">
+                                                <div class="image-upload-content">
+                                                    <img #image [src]="photoUrl" alt="" class="img-responsive img-inputImage" id="imageUpload"
+                                                        onerror="this.src = 'assets/app/media/img/emptydata.png'">
+                                                </div>
+                                                <!-- <div class="text-primary pointer">
+                                                    {{!!photoUrl ? 'Click to change image' : 'Upload Signature Image'}}</div> -->
+                                                    <label for="upload" class="text-primary pointer" (click)="image.click()">
+                                                        {{!!photoUrl ? 'Click to change image' : 'Upload Signature Image'}}
+                                                    </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <div class="row" *ngIf="!!department">
                         <div class="col-6" *ngIf="!!department.datetimeCreated">

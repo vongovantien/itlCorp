@@ -20,6 +20,7 @@ using Microsoft.Extensions.Localization;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 
 namespace eFMS.API.Documentation.DL.Services
@@ -49,6 +50,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         readonly IContextBase<SysUserLevel> userlevelRepository;
+        readonly IContextBase<CatDepartment> catDepartmentRepository;
 
         public CsTransactionDetailService(IContextBase<CsTransactionDetail> repository,
             IMapper mapper,
@@ -74,7 +76,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysCompany> sysCompany,
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
-            IContextBase<SysUserLevel> userlevelRepo) : base(repository, mapper)
+            IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<CatDepartment> catDepartmentRepo) : base(repository, mapper)
         {
             csTransactionRepo = csTransaction;
             csMawbcontainerRepo = csMawbcontainer;
@@ -99,6 +102,7 @@ namespace eFMS.API.Documentation.DL.Services
             userlevelRepository = userlevelRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            catDepartmentRepository = catDepartmentRepo;
         }
 
         #region -- INSERT & UPDATE HOUSEBILLS --
@@ -496,6 +500,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
+                    detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId).FirstOrDefault()?.SignPath;
                     return detail;
                 }
             }
@@ -1856,8 +1861,9 @@ namespace eFMS.API.Documentation.DL.Services
                     DeliveryOrderNote = string.Empty,//data.DeliveryOrderNo?.ToUpper(),
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
-                    Notify = data.NotifyPartyDescription?.ToUpper()
-                };
+                    Notify = data.NotifyPartyDescription?.ToUpper(),
+                    SignPath = data.DeptSign ?? string.Empty
+            };
                 authorizeLetters.Add(authorizeLetter);
             }
 

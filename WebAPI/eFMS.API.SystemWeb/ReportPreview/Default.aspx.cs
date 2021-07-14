@@ -51,7 +51,7 @@ namespace ReportPerview
                 {
                     rptViewer.HasPrintButton = crystal.AllowPrint;
                     rptViewer.HasExportButton = crystal.AllowExport;
-                    rptViewer.DisplayGroupTree = false;
+                    rptViewer.ToolPanelView = ToolPanelViewType.None;
                     Session["report"] = rpt;
                     Session["allowPrint"] = crystal.AllowPrint;
                     Session["allowExport"] = crystal.AllowExport;
@@ -79,6 +79,7 @@ namespace ReportPerview
                 {
                     rptViewer.HasPrintButton = allowPrint;
                     rptViewer.HasExportButton = allowExport;
+                    rptViewer.ToolPanelView = ToolPanelViewType.None;
                     rptViewer.ReportSource = rpt;
                 }
             }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Common.Helpers;
 using eFMS.API.System.DL.Common;
 using eFMS.API.System.DL.IService;
 using eFMS.API.System.DL.Models;
@@ -9,6 +10,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace eFMS.API.System.DL.Services
@@ -161,6 +163,7 @@ namespace eFMS.API.System.DL.Services
                 var today = DateTime.Now;
                 var modelUpdate = mapper.Map<CatDepartment>(model);
                 var deptCurrent = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+                var oldPhoto = deptCurrent.SignPath;
                 modelUpdate.UserCreated = deptCurrent.UserCreated;
                 modelUpdate.DatetimeCreated = deptCurrent.DatetimeCreated;
                 modelUpdate.Code = deptCurrent.Code;
@@ -172,6 +175,14 @@ namespace eFMS.API.System.DL.Services
                     modelUpdate.InactiveOn = today;
                 }
                 var hs = DataContext.Update(modelUpdate, x => x.Id == model.Id);
+                if (hs.Success && string.IsNullOrEmpty(oldPhoto))
+                {
+                    if (oldPhoto != model.SignPath)
+                    {
+                        var fileName = Path.GetFileName(oldPhoto);
+                        ImageHelper.DeleteFile(fileName, "Department", "images");
+                    }
+                }
                 return hs;
             }
             catch (Exception ex)
