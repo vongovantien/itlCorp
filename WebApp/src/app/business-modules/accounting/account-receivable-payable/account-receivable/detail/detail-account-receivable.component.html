@@ -613,13 +613,16 @@
                                                             }}
                                                         </td>
 
-                                                        <td class="text-right">{{ item.totalBillingAmount | number:
+                                                        <td class="text-right">{{ (item.totalBillingAmount +
+                                                            item.totalObhBillingAmount) | number:
                                                             '.0-3'}}
                                                         </td>
-                                                        <td class="text-right">{{ item.totalPaidAmount | number:
+                                                        <td class="text-right">{{ (item.totalPaidAmount +
+                                                            item.totalObhPaidAmount) | number:
                                                             '.0-3'}}
                                                         </td>
-                                                        <td class="text-right">{{ item.totalBillingUnpaid | number:
+                                                        <td class="text-right">{{ (item.totalBillingUnpaid +
+                                                            item.totalObhPaidAmount) | number:
                                                             '.0-3'}}
                                                         </td>
 
@@ -659,13 +662,16 @@
                                                                             number: '.0-3'}}
                                                                         </td>
 
-                                                                        <td class="text-right">{{ element.billingAmount
+                                                                        <td class="text-right">{{ (element.billingAmount
+                                                                            + element.obhBillingAmount)
                                                                             | number: '.0-3'}}
                                                                         </td>
-                                                                        <td class="text-right">{{ element.paidAmount |
+                                                                        <td class="text-right">{{ (element.paidAmount +
+                                                                            element.obhPaidAmount) |
                                                                             number: '.0-3' }}
                                                                         </td>
-                                                                        <td class="text-right">{{ element.billingUnpaid
+                                                                        <td class="text-right">{{ (element.billingUnpaid
+                                                                            + element.obhUnPaidAmount)
                                                                             | number: '.0-3'}}
                                                                         </td>
                                                                         <!-- <td class="text-right">{{ element.obhAmount | number: '.0-3' }}

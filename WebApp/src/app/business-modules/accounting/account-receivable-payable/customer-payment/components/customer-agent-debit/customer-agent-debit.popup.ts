@@ -20,7 +20,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     @Output() onAddToReceipt: EventEmitter<any> = new EventEmitter<any>();
 
     type: string = null;
-    customerFromReceipt: string = null;
 
     listDebit: ReceiptInvoiceModel[] = [];
     listCreditInvoice: ReceiptInvoiceModel[] = [];
@@ -252,10 +251,9 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             return;
         }
 
-        if (this.customerFromReceipt !== this.partnerId
-            && ((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== this.partnerId)
-                || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== this.partnerId)
-            )) {
+        if (((this.listDebitInvoice.length > 0 && this.listDebitInvoice[0].partnerId !== this.partnerId)
+            || (this.listCreditInvoice.length > 0 && this.listCreditInvoice[0].partnerId !== this.partnerId)
+        )) {
             this._store.dispatch(ResetInvoiceList());
         }
 
@@ -266,7 +264,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
         this.onAddToReceipt.emit(this.partnerId);
-        this.hide();
+        // this.hide();
     }
 
     switchToGroup() {

@@ -42,7 +42,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     receiptRefId: string = null;
     receiptRefDetail: ReceiptModel;
-
+    titleReceipt: string;
     constructor(
         protected readonly _router: Router,
         protected readonly _toastService: ToastrService,
@@ -58,7 +58,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.type = x || 'Customer');
+            .subscribe(x => {
+                this.type = x || 'Customer'
+                this.titleReceipt = `Create ${this.type} Receipt`;
+            });
 
         // * Listen Bank Fee Receipt     
         this._activedRoute.queryParams
@@ -76,6 +79,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .subscribe(
                 (res: ReceiptModel) => {
                     if (!!res) {
+                        this.titleReceipt = "Create Bank Fee Receipt";
                         this.setFormBankReceipt(res);
                     }
                 },
@@ -284,13 +288,24 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     setListInvoice(res: ReceiptModel) {
         const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH") && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
-
+        if (!listPaymentWithUnpaid.length) {
+            return;
+        }
+        listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
+            if (c.currencyId === 'VND') {
+                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
+            } else {
+                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
+            }
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
+        })
         let paidUSD = 0;
         let paidVND = 0;
         for (let index = 0; index < listPaymentWithUnpaid.length; index++) {
             const element = listPaymentWithUnpaid[index];
-            paidVND += (element.unpaidAmountVnd - element.paidAmountVnd);
-            paidUSD += (+(element.unpaidAmountUsd - element.paidAmountUsd).toFixed(2));
+            paidVND += (element.unpaidAmountVnd);
+            paidUSD += +(element.unpaidAmountUsd).toFixed(2);
         }
 
         const formMapping = {
