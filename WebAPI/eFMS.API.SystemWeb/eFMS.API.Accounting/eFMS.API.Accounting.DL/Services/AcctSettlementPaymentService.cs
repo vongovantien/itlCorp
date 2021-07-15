@@ -1447,7 +1447,8 @@ namespace eFMS.API.Accounting.DL.Services
             // Data search = PIC
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
-                surcharge = surcharge.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                csTrans = csTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
 
             var userRepo = sysUserRepo.Get();
