@@ -10,6 +10,7 @@ import { AccountReceivableListOtherComponent } from '../components/list-other/li
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { AccountReceivableDetailComponent } from './detail/detail-account-receivable.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { AccountReceivableFormDetailSummaryComponent } from './components/form-detail/form-detail-ar-summary.component';
 
 
 const routing: Routes = [
@@ -47,7 +48,8 @@ const routing: Routes = [
         AccountReceivableListGuaranteedComponent,
         AccountReceivableListOtherComponent,
         AccountReceivableFormSearchComponent,
-        AccountReceivableDetailComponent
+        AccountReceivableDetailComponent,
+        AccountReceivableFormDetailSummaryComponent
     ],
     providers: [],
 

@@ -4,15 +4,13 @@ import { AppList } from '@app';
 import { SortService } from '@services';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AccountingRepo } from '@repositories';
-import { NgProgress } from '@ngx-progressbar/core';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
 import { RoutingConstants } from '@constants';
 
-import _merge from 'lodash/merge';
 import { takeUntil, switchMap } from 'rxjs/operators';
 @Component({
     selector: 'detail-account-receivable',
-    templateUrl: 'detail-account-receivable.component.html'
+    templateUrl: 'detail-account-receivable.component.html',
 })
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
     subTab: string;
@@ -23,15 +21,12 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
     constructor(
         private _sortService: SortService,
-        private _progressService: NgProgress,
         private _accoutingRepo: AccountingRepo,
         private _activedRoute: ActivatedRoute,
         private _router: Router,
     ) {
         super();
-        this._progressRef = this._progressService.ref();
         this.requestSort = this.sortDetailList;
-        this.requestList = this.getPagingGuaranteed;
     }
     ngOnInit() {
         this.initHeaders();
@@ -52,7 +47,6 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
                 }
             );
-
     }
 
     initHeaders() {
@@ -87,12 +81,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     }
 
     sortDetailMoreGuaranteed(item: any, sortField: string, order: boolean) {
-
         item.accountReceivableGrpServices = this._sortService.sort(item.accountReceivableGrpServices, sortField, order);
-    }
-
-    getPagingGuaranteed() {
-
     }
 
     goBack() {
