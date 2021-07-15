@@ -1444,10 +1444,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
             }
-            // Data search = PIC
+            // Data search = PIC (PIC = UserCreated of job)
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
-                surcharge = surcharge.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                csTrans = csTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
 
             var userRepo = sysUserRepo.Get();
