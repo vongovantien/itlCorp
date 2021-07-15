@@ -789,7 +789,10 @@ namespace eFMS.API.Accounting.DL.Services
                                Service = surcharge.TransactionType,
                                Invoice = acctMngt
                            };
-
+            if (invoices.Count() == 0)
+            {
+                return models;
+            }
             //Group by Office, PartnerId, Service
             var grpInvoices = invoices.ToList()
                 .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
@@ -803,7 +806,27 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                fe.Over1To15Day = SumUnpaidAmountOfInvoices(invs, fe.ContractCurrency);
+
+                // Group By InvoiceID
+                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                {
+                    Id = s.Key.Id,
+                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                    TotalAmount = s.FirstOrDefault().TotalAmount,
+                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+
+                    PaidAmount = s.FirstOrDefault().PaidAmount,
+                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+
+                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                    ServiceType = s.FirstOrDefault().ServiceType
+
+                });
+                fe.Over1To15Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
             });
 
             return models;
@@ -837,6 +860,10 @@ namespace eFMS.API.Accounting.DL.Services
                                Invoice = acctMngt
                            };
 
+            if (invoices.Count() == 0)
+            {
+                return models;
+            }
             //Group by Office, PartnerId, Service
             var grpInvoices = invoices.ToList()
                 .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
@@ -850,7 +877,26 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                fe.Over16To30Day = SumUnpaidAmountOfInvoices(invs, fe.ContractCurrency);
+                // Group By InvoiceID
+                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                {
+                    Id = s.Key.Id,
+                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                    TotalAmount = s.FirstOrDefault().TotalAmount,
+                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+
+                    PaidAmount = s.FirstOrDefault().PaidAmount,
+                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+
+                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                    ServiceType = s.FirstOrDefault().ServiceType
+
+                });
+                fe.Over16To30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
             });
 
             return models;
@@ -882,7 +928,10 @@ namespace eFMS.API.Accounting.DL.Services
                                Service = surcharge.TransactionType,
                                Invoice = acctMngt
                            };
-
+            if (invoices.Count() == 0)
+            {
+                return models;
+            }
             //Group by Office, PartnerId, Service
             var grpInvoices = invoices.ToList()
                 .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
@@ -896,7 +945,26 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                fe.Over30Day = SumUnpaidAmountOfInvoices(invs, fe.ContractCurrency);
+                // Group By InvoiceID
+                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                {
+                    Id = s.Key.Id,
+                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                    TotalAmount = s.FirstOrDefault().TotalAmount,
+                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+
+                    PaidAmount = s.FirstOrDefault().PaidAmount,
+                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+
+                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                    ServiceType = s.FirstOrDefault().ServiceType
+
+                });
+                fe.Over30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
             });
 
             return models;

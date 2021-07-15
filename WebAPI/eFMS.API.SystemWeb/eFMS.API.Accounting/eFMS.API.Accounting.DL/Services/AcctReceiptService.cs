@@ -1557,11 +1557,22 @@ namespace eFMS.API.Accounting.DL.Services
 
         public List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
-            var data = new List<CustomerDebitCreditModel>();
-            var debits = GetDebitForIssueCustomerPayment(criteria);
-            var obhs = GetObhForIssueCustomerPayment(criteria);
-            var soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
-            var creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
+            List<CustomerDebitCreditModel> data = new List<CustomerDebitCreditModel>();
+            IQueryable<CustomerDebitCreditModel> creditNotes = null;
+            IQueryable<CustomerDebitCreditModel> debits = null;
+            IQueryable<CustomerDebitCreditModel> obhs = null;
+            IQueryable<CustomerDebitCreditModel> soaCredits = null;
+            if (criteria.SearchType.Equals("Credit Note"))
+            {
+                creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
+            }
+            else
+            {
+                debits = GetDebitForIssueCustomerPayment(criteria);
+                obhs = GetObhForIssueCustomerPayment(criteria);
+                soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
+            }
+            
             if (debits != null)
             {
                 data.AddRange(debits);
@@ -2082,7 +2093,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     query = query.And(x => criteria.ReferenceNos.Contains(x.Soano));
                 }
-                else if (criteria.SearchType.Equals("Debit Note/Invoice"))
+                else if (criteria.SearchType.Equals("Debit Note/Invoice") || criteria.SearchType.Equals("Credit Note"))
                 {
                     soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
                 }
@@ -2205,7 +2216,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.PaySoano, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
                 }
-                else if (criteria.SearchType.Equals("Debit Note/Invoice"))
+                else if (criteria.SearchType.Equals("Credit Note"))
                 {
                     query = query.And(x => criteria.ReferenceNos.Contains(x.Code));
                 }

@@ -31,7 +31,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     dateType: AbstractControl;
     service: AbstractControl;
 
-    searchOptions: string[] = ['SOA', 'Debit Note/Invoice', 'VAT Invoice', 'JOB NO', 'HBL', 'MBL', 'Customs No'];
+    searchOptions: string[] = ['SOA', 'Debit Note/Invoice', 'Credit Note', 'VAT Invoice', 'Job No', 'HBL', 'MBL', 'Customs No'];
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
     services: CommonInterface.INg2Select[] = [
         { text: 'All', id: 'All' },
