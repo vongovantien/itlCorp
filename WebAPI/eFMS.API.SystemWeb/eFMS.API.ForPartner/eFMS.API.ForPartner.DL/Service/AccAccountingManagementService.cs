@@ -1289,6 +1289,10 @@ namespace eFMS.API.ForPartner.DL.Service
                                     if (item.Type == ForPartnerConstants.TYPE_CHARGE_BUY)
                                     {
                                         item.SyncedFrom = null;
+
+                                        // Reset nếu kt đã update UpdateVoucherExpense
+                                        item.VoucherId = null;
+                                        item.VoucherIddate = null;
                                     }
 
                                     var hsUpdateSurcharge = surchargeRepo.Update(item, x => x.Id == item.Id, false);
