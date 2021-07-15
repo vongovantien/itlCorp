@@ -1444,7 +1444,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
             }
-            // Data search = PIC
+            // Data search = PIC (PIC = UserCreated of job)
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
                 opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
