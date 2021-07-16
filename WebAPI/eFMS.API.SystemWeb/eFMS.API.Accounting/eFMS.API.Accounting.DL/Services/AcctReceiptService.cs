@@ -485,6 +485,19 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
+                    string _voucherId = string.Empty;
+                    string _voucherIdre = string.Empty;
+                    if (acctPayment.Type == "CREDITNOTE")
+                    {
+                        CsShipmentSurcharge surcharge = surchargeRepository.Get(x => x.CreditNo == acctPayment.BillingRefNo)?.FirstOrDefault();
+                        if(surcharge != null)
+                        {
+                            _voucherId = surcharge.VoucherId;
+                            _voucherIdre = surcharge.VoucherIdre;
+                        }
+
+                    }
+
                     ReceiptInvoiceModel payment = new ReceiptInvoiceModel();
                     payment.Id = acctPayment.Id;
                     payment.PaymentId = acctPayment.Id;
@@ -515,6 +528,9 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CreditNo = acctPayment.CreditNo;
                     payment.CreditAmountVnd = acctPayment.CreditAmountVnd;
                     payment.CreditAmountUsd = acctPayment.CreditAmountUsd;
+                    payment.VoucherId = acctPayment.Type == "CREDITNOTE" ? _voucherId : null;
+                    payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
+
                     paymentReceipts.Add(payment);
                 }
             }
@@ -1599,10 +1615,22 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var data = new AgencyDebitCreditDetailModel();
             data.Invoices = new List<AgencyDebitCreditModel>();
-            var creditNote = GetCreditNoteForIssueAgencyPayment(criteria);
-            var soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
-            var debits = GetDebitForIssueAgentPayment(criteria);
-            var obhs = GetObhForIssueAgencyPayment(criteria);
+
+            IQueryable<AgencyDebitCreditModel> creditNote = null;
+            IQueryable<AgencyDebitCreditModel> debits = null;
+            IQueryable<AgencyDebitCreditModel> obhs = null;
+            IQueryable<AgencyDebitCreditModel> soaCredit = null;
+            if (criteria.SearchType.Equals("Credit Note"))
+            {
+                creditNote = GetCreditNoteForIssueAgencyPayment(criteria);
+            }
+            else
+            {
+                debits = GetDebitForIssueAgentPayment(criteria);
+                obhs = GetObhForIssueAgencyPayment(criteria);
+                soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
+            }
+           
             if (creditNote != null)
             {
                 data.Invoices.AddRange(creditNote);
@@ -1670,7 +1698,9 @@ namespace eFMS.API.Accounting.DL.Services
                 JobNo = se.Job.JobNo,
                 Mbl = se.Job.Mblno,
                 Hbl = se.Job.Hblno,
-                Hblid = se.Job.Hblid
+                Hblid = se.Job.Hblid,
+                VoucherId = se.Surcharge.FirstOrDefault().VoucherId,
+                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1706,7 +1736,9 @@ namespace eFMS.API.Accounting.DL.Services
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
                                CreditType = "CREDITNOTE",
-                               Hblid = inv.Hblid
+                               Hblid = inv.Hblid,
+                               VoucherId = inv.VoucherId,
+                               VoucherIdre = inv.VoucherIdre
                            };
             return joinData;
         }
@@ -2581,7 +2613,9 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.CreditNote.DepartmentId,
                 OfficeId = se.CreditNote.OfficeId,
                 CompanyId = se.CreditNote.CompanyId,
-                RefIds = new List<string> { se.CreditNote.Id.ToString() }
+                RefIds = new List<string> { se.CreditNote.Id.ToString() },
+                VoucherId = se.Surcharge.FirstOrDefault().VoucherId,
+                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2612,7 +2646,9 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "CREDITNOTE"
+                               CreditType = "CREDITNOTE",
+                               VoucherId = inv.VoucherId,
+                               VoucherIdre = inv.VoucherIdre
                            };
 
             return joinData;

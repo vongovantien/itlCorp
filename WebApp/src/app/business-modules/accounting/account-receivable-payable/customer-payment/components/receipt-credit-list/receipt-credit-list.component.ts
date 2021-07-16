@@ -17,36 +17,12 @@ import { InjectViewContainerRefDirective } from "@directives";
     // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
+
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChild(InjectViewContainerRefDirective) injectViewContainer: InjectViewContainerRefDirective;
+
     @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
-
-    @Input() set type(t: string) {
-        if (!!t) {
-            this._type = t;
-            if (this._type !== 'Customer') {
-                this.headers = Array.from([
-                    { title: 'RefNo', field: 'refNo', sortable: true },
-                    { title: 'Net Off Invoice No', field: '', width: 250 },
-                    { title: 'Org Amount', field: '' },
-                    { title: 'Amount USD', field: '' },
-                    { title: 'Amount VND', field: '' },
-                    { title: 'Payment Note', field: '' },
-                    { title: 'BU Handle', field: '' },
-                    { title: 'Office', field: '' },
-                ]);
-            }
-        }
-    }
-
-    totalOrgAmount: number;
-
-    get type() {
-        return this._type;
-    }
-
-    private _type: string = 'Customer'
 
     creditList: ReceiptInvoiceModel[] = [];
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
@@ -54,6 +30,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '' },
         { title: 'Net Off Invoice No', field: '' },
+        { title: 'Acct Doc', field: '', },
         { title: 'Job', field: '', width: 150 },
         { title: 'HBL', field: '', width: 150 },
         { title: 'MBL', field: '', width: 150 },
@@ -89,6 +66,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         this.headers = [
             { title: 'RefNo', field: '' },
             { title: 'Net Off Invoice No', field: '' },
+            { title: 'Acct Doc', field: '', },
             { title: 'Org Amount', field: '', align: this.right, width: 150 },
             { title: 'Amount USD', field: '', width: 150, align: this.right },
             { title: 'Amount VND', field: '', width: 150, align: this.right },
@@ -118,9 +96,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                 takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data: { invoiceNo: string, creditNo: string }) => {
-                    console.log(data);
                     if (data.creditNo) {
-
                         const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)
                         if (indexCreditCurrent !== -1) {
                             this.creditList[indexCreditCurrent].invoiceNo = data.invoiceNo;
@@ -128,19 +104,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                     }
                 }
             )
-    }
-
-    formatNumberCurrency(input: number) {
-        return input.toLocaleString(
-            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
-            { minimumFractionDigits: 2 }
-        );
-    }
-
-    onSelectInvoice(data: any, invoiceItem: ReceiptInvoiceModel) {
-        if (!!data) {
-            invoiceItem.invoiceNo = data.invoiceNo;
-        }
     }
 
     confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {

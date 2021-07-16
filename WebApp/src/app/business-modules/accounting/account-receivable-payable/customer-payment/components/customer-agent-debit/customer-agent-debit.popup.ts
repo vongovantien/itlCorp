@@ -27,6 +27,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
 
     headersAgency: CommonInterface.IHeaderTable[] = [
         { title: 'Reference No', field: 'referenceNo', sortable: true },
+        { title: 'VoucherId', field: 'voucherId', sortable: true },
         { title: 'Type', field: 'type', sortable: true },
         { title: 'Invoice No', field: 'invoiceNo', sortable: true },
         { title: 'JOB', field: 'jobNo', sortable: true },
@@ -65,6 +66,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     ngOnInit() {
         this.headers = [
             { title: 'Reference No', field: 'referenceNo', sortable: true },
+            { title: 'VoucherId', field: 'voucherId', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },

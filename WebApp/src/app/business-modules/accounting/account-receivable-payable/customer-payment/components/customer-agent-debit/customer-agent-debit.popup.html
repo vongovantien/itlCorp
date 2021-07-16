@@ -42,6 +42,10 @@
                                                 <span class="text-primary">{{debit.refNo}}</span>
                                             </td>
                                             <td>
+                                                {{!!debit.voucherId ? debit.voucherId : (!!debit.voucherIdre ?
+                                                debit.voucherIdre: '')}}
+                                            </td>
+                                            <td>
                                                 <span>{{debit.type}}</span>
                                             </td>
                                             <td>
@@ -66,6 +70,7 @@
                                                     </ng-container>
                                                 </span>
                                             </td>
+
                                             <td>
                                                 <span>{{debit.taxCode}}</span>
                                             </td>
@@ -213,6 +218,10 @@
                                                     <span class="text-primary">{{invoice.refNo}}</span>
                                                 </td>
                                                 <td>
+                                                    {{!!invoice.voucherId ? invoice.voucherId : (!!invoice.voucherIdre ?
+                                                    invoice.voucherIdre: '')}}
+                                                </td>
+                                                <td>
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
@@ -300,6 +309,10 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-primary">{{invoice.refNo}}</span>
+                                                </td>
+                                                <td>
+                                                    {{!!invoice.voucherId ? invoice.voucherId : (!!invoice.voucherIdre ?
+                                                    invoice.voucherIdre: '')}}
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.type}}</span>

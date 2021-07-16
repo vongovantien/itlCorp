@@ -55,7 +55,8 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     jobId?: string;
     mbl?: string;
     hbl?: string;
-
+    voucherId: string = null;
+    voucherIdre: string = null;
     constructor(object?: any) {
         super();
         const self = this;
