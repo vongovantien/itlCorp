@@ -1803,9 +1803,9 @@ namespace eFMS.API.Accounting.DL.Services
                     TotalOver15To30Day = se.Select(sel => sel.Over16To30Day).Sum(),
                     TotalOver30Day = se.Select(sel => sel.Over30Day).Sum(),
                     Currency = se.FirstOrDefault().ArCurrency,
-                    TotalObhBillingAmount = se.Sum(x => x.ObhBillingAmount),
-                    TotalObhUnPaidAmount = se.Sum(x => x.ObhUnPaidAmount),
-                    TotalObhPaidAmount = se.Sum(x => x.ObhPaidAmount),
+                    TotalObhBillingAmount = se.Select(sel => sel.ObhBillingAmount).Sum(),
+                    TotalObhUnPaidAmount = se.Select(sel => sel.ObhUnPaidAmount).Sum(),
+                    TotalObhPaidAmount = se.Select(sel => sel.ObhPaidAmount).Sum(),
                     AccountReceivableGrpServices = se.Select(sel => new AccountReceivableServiceResult
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
@@ -1840,6 +1840,9 @@ namespace eFMS.API.Accounting.DL.Services
                            TotalOver15To30Day = ar.TotalOver15To30Day,
                            TotalOver30Day = ar.TotalOver30Day,
                            Currency= ar.Currency,
+                           TotalObhBillingAmount = ar.TotalObhBillingAmount,
+                           TotalObhPaidAmount = ar.TotalObhPaidAmount,
+                           TotalObhUnPaidAmount = ar.TotalObhUnPaidAmount,
                            AccountReceivableGrpServices = ar.AccountReceivableGrpServices
                        };
             return data.ToList();
