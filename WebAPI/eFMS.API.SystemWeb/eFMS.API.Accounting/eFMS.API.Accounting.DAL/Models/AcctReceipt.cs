@@ -39,5 +39,6 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
         public Guid? ReferenceId { get; set; }
+        public string Class { get; set; }
     }
 }

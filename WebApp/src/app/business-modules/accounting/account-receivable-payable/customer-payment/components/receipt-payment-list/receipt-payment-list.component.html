@@ -40,12 +40,23 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">Cus Advance Amount</label>
-                    <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly"
-                        (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="form-group">
+                            <label class="form-control-label">Cus Advance Amount</label>
+                            <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric
+                                [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
+                                (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-right">
+                        <div class="form-group">
+                            <label for="">As Paid Amount</label>
+                            <app-switch size="sm" class="success" formControlName="isAsPaidAmount"></app-switch>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <div class="col-lg-4">
                 <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
@@ -95,7 +106,7 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">Auto convert</label>
-                            <app-switch size="md" class="success" formControlName="isAutoConvert"></app-switch>
+                            <app-switch size="sm" class="success" formControlName="isAutoConvert"></app-switch>
                         </div>
                     </div>
                 </div>

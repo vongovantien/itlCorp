@@ -1587,6 +1587,7 @@ namespace eFMS.API.Accounting.DL.Services
                 debits = GetDebitForIssueCustomerPayment(criteria);
                 obhs = GetObhForIssueCustomerPayment(criteria);
                 soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
+                creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
             }
             
             if (debits != null)
@@ -2012,7 +2013,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
                 }
-                else if (criteria.SearchType.Equals("Debit Note/Invoice"))
+                else if (criteria.SearchType.Equals("Debit/Credit/Invoice"))
                 {
                     acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
                 }
@@ -2125,7 +2126,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     query = query.And(x => criteria.ReferenceNos.Contains(x.Soano));
                 }
-                else if (criteria.SearchType.Equals("Debit Note/Invoice") || criteria.SearchType.Equals("Credit Note"))
+                else if (criteria.SearchType.Equals("Debit/Credit/Invoice"))
                 {
                     soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
                 }

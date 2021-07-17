@@ -1,6 +1,8 @@
 import { createReducer, on, Action } from "@ngrx/store";
 import { ReceiptInvoiceModel, Receipt } from "@models";
 import * as ReceiptActions from "../actions";
+import { state } from "@angular/animations";
+import { IAgreementReceipt } from "../../components/form-create-receipt/form-create-receipt.component";
 
 
 export interface IReceiptState {
@@ -12,7 +14,9 @@ export interface IReceiptState {
     type: string;
     partnerId: string // * đối tượng của phiếu thu,
     date: any; // * Ngày tím kiếm -> Điều kiện search
+    agreement: Partial<IAgreementReceipt>;
 }
+
 
 export const initialState: IReceiptState = {
     list: [],
@@ -22,7 +26,8 @@ export const initialState: IReceiptState = {
     isLoading: false,
     partnerId: null,
     type: "CUSTOMER",
-    date: null
+    date: null,
+    agreement: {}
 };
 
 export const receiptManagementReducer = createReducer(
@@ -71,6 +76,9 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptDate, (state: IReceiptState, payload: { date: any }) => ({
         ...state, date: payload.date
+    })),
+    on(ReceiptActions.SelectReceiptAgreement, (state: IReceiptState, payload: { [key: string]: any }) => ({
+        ...state, agreement: { ...payload }
     }))
 
 );

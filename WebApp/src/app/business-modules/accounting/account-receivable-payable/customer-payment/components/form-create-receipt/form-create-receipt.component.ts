@@ -14,7 +14,7 @@ import { ComboGridVirtualScrollComponent } from '@common';
 
 import { Observable } from 'rxjs';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
-import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate } from '../../store/actions';
+import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement } from '../../store/actions';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -31,6 +31,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     date: AbstractControl;
     paymentRefNo: AbstractControl;
     agreementId: AbstractControl;
+    class: AbstractControl;
 
     $customers: Observable<Partner[]>;
     customers: Partner[] = [];
@@ -48,6 +49,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     isReadonly = null;
     customerName: string;
     contractNo: string;
+
+    classReceipt: string[] = ['Clear Debit', 'Advance', 'Other'];
 
     constructor(
         private _fb: FormBuilder,
@@ -90,12 +93,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             customerId: new FormControl(null, Validators.required),
             date: [],
             paymentRefNo: new FormControl(null, Validators.required),
-            agreementId: [null, Validators.required]
+            agreementId: [null, Validators.required],
+            class: [this.classReceipt[0]]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
         this.paymentRefNo = this.formSearchInvoice.controls['paymentRefNo'];
         this.agreementId = this.formSearchInvoice.controls['agreementId'];
+        this.class = this.formSearchInvoice.controls['class'];
 
     }
 
@@ -165,9 +170,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 }
                 break;
             case 'agreement':
+                console.log(data);
                 this.agreementId.setValue((data as IAgreementReceipt).id);
-                this._dataService.setData('cus-advance', (data as IAgreementReceipt).cusAdvanceAmount);
-                this._dataService.setData('currency', (data as IAgreementReceipt).creditCurrency);
+                this._store.dispatch(SelectReceiptAgreement({ ...data }));
                 break;
             default:
                 break;
@@ -199,7 +204,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
 }
 
-interface IAgreementReceipt {
+export interface IAgreementReceipt {
     id: string;
     contractNo: string;
     contractType: string;

@@ -35,8 +35,8 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         { title: 'MBL', field: 'mbl', sortable: true },
         { title: 'PartnerId', field: 'taxCode', sortable: true },
         { title: 'Partner Name', field: 'partnerName', sortable: true },
-        { title: 'Amount', field: 'amount', sortable: true },
-        { title: 'Unpaid Amount', field: 'unpaid', sortable: true },
+        // { title: 'Amount', field: 'amount', sortable: true },
+        // { title: 'Unpaid Amount', field: 'unpaid', sortable: true },
         { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true },
         { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true },
         { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
@@ -53,6 +53,16 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     TYPELIST: string = 'LIST';
     partnerId: string;
 
+    sumTotalObj = {
+        totalDebitVnd: 0,
+        totalDebitUsd: 0,
+        totalDebitOBHVnd: 0,
+        totalDebitOBHUsd: 0,
+        totalCreditVnd: 0,
+        totalCreditUsd: 0,
+        totalBalanceVnd: 0,
+        totalBalanceUsd: 0,
+    }
     constructor(
         private _sortService: SortService,
         private _accountingRepo: AccountingRepo,
@@ -71,8 +81,8 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Unpaid', field: 'unpaid', sortable: true },
+            // { title: 'Amount', field: 'amount', sortable: true },
+            // { title: 'Unpaid', field: 'unpaid', sortable: true },
             { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true },
             { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
@@ -122,6 +132,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                     (res: ReceiptInvoiceModel[]) => {
                         if (!!res) {
                             this.listDebit = res || [];
+                            this.calculateSumDataObject(this.listDebit);
                             this.filterList();
                         }
                     },
@@ -329,6 +340,33 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                 x.isSelected = false;
             }
         })
+    }
+
+    calculateSumDataObject(model: ReceiptInvoiceModel[]) {
+        if (!model.length) {
+            return;
+        }
+        for (let index = 0; index < model.length; index++) {
+            const element = model[index];
+            switch (element.type) {
+                case 'CREDIT':
+                    this.sumTotalObj.totalCreditVnd += element.unpaidAmountVnd;
+                    this.sumTotalObj.totalCreditUsd += element.unpaidAmountUsd;
+                    break;
+                case 'DEBIT':
+                    this.sumTotalObj.totalDebitVnd += element.unpaidAmountVnd;
+                    this.sumTotalObj.totalDebitUsd += element.unpaidAmountUsd;
+                    break;
+                case 'OBH':
+                    this.sumTotalObj.totalDebitOBHVnd += element.unpaidAmountVnd;
+                    this.sumTotalObj.totalDebitOBHUsd += element.unpaidAmountUsd;
+                    break;
+                default:
+                    break;
+            }
+            this.sumTotalObj.totalBalanceVnd = (this.sumTotalObj.totalDebitOBHVnd + this.sumTotalObj.totalDebitVnd) - this.sumTotalObj.totalCreditVnd;
+            this.sumTotalObj.totalBalanceUsd = (this.sumTotalObj.totalDebitOBHUsd + this.sumTotalObj.totalDebitUsd) - this.sumTotalObj.totalCreditUsd;
+        }
     }
 }
 

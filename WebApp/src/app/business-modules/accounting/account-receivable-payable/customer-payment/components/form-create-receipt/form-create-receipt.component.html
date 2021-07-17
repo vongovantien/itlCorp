@@ -33,13 +33,27 @@
         </div>
         <div class="row">
             <div class="col-lg-6">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
-                    <label required>
-                        Receipt No
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
-                        [attr.disabled]="isReadonly">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
+                            <label required>
+                                Receipt No
+                            </label>
+                            <input type="text" class="form-control m-input m-input--square"
+                                formControlName="paymentRefNo" [attr.disabled]="isReadonly">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label">Receipt Type</label>
+                            <ng-select formControlName="class" class="custom" [items]="classReceipt" [clearable]="false"
+                                [readonly]="isReadonly">
+                            </ng-select>
+                        </div>
+                    </div>
                 </div>
+
             </div>
             <div class="col-lg-6">
                 <div class="form-group" class="form-group"
