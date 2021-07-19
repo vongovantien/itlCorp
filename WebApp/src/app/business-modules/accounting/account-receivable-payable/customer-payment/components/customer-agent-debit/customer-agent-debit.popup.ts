@@ -107,6 +107,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (id) => {
+                    this.resetTotalObj();
                     this.partnerId = id;
                 }
             )
@@ -125,6 +126,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     }
 
     onApply(body) {
+        this.resetTotalObj();
         if (this.type.includes("CUSTOMER")) {
             this._accountingRepo.getDataIssueCustomerPayment(body)
                 .pipe(catchError(this.catchError))
@@ -132,6 +134,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                     (res: ReceiptInvoiceModel[]) => {
                         if (!!res) {
                             this.listDebit = res || [];
+
                             this.calculateSumDataObject(this.listDebit);
                             this.filterList();
                         }
@@ -366,6 +369,14 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             }
             this.sumTotalObj.totalBalanceVnd = (this.sumTotalObj.totalDebitOBHVnd + this.sumTotalObj.totalDebitVnd) - this.sumTotalObj.totalCreditVnd;
             this.sumTotalObj.totalBalanceUsd = (this.sumTotalObj.totalDebitOBHUsd + this.sumTotalObj.totalDebitUsd) - this.sumTotalObj.totalCreditUsd;
+        }
+
+        console.log(this.sumTotalObj);
+    }
+
+    resetTotalObj() {
+        for (const key in this.sumTotalObj) {
+            this.sumTotalObj[key] = 0;
         }
     }
 }
