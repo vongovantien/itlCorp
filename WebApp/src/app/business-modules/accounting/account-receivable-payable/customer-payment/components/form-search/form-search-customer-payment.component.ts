@@ -9,7 +9,7 @@ import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
 import { AppForm } from '@app';
 import { Store } from '@ngrx/store';
-import {  SearchListCustomerPayment } from '../../store/actions';
+import { SearchListCustomerPayment } from '../../store/actions';
 import { getCustomerPaymentSearchState, ICustomerPaymentState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
 
@@ -49,7 +49,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
         private _listReceipt: ARCustomerPaymentComponent,
-        private _store : Store<ICustomerPaymentState>
+        private _store: Store<ICustomerPaymentState>
     ) {
         super();
         this.requestReset = this.requestSearch;
@@ -130,7 +130,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.syncStatus.reset(this.syncStatuss[0]);
         this.status.reset();
 
-        this._listReceipt.getCPs({});
+        this._store.dispatch(SearchListCustomerPayment({}))
     }
 
     subscriptionSearchParamState() {
@@ -143,14 +143,14 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
                     if (data) {
                         let formData: any = {
                             refNo: data?.refNo?.toString().replace(/[,]/g, "\n") || null,
-                            paymentType: data.paymentType?data.paymentType:this.paymentTypes[0],
+                            paymentType: data.paymentType ? data.paymentType : this.paymentTypes[0],
                             customerID: data?.customerID,
                             date: (!!data?.dateFrom && !!data?.dateTo) ? { startDate: new Date(data?.dateFrom), endDate: new Date(data?.dateTo) } : null,
-                            dateType: data.dateType?data.dateType:this.dateTypes[0],
-                            currency:data.currency?data.currency:'VND',
-                            status: data.status?data.status:null,
-                            syncStatus: data.syncStatus?data.syncStatus: this.syncStatuss[0],
-                            typeReceipt: data.typeReceipt?data.typeReceipt:this.typesReceipt[0]
+                            dateType: data.dateType ? data.dateType : this.dateTypes[0],
+                            currency: data.currency ? data.currency : 'VND',
+                            status: data.status ? data.status : null,
+                            syncStatus: data.syncStatus ? data.syncStatus : this.syncStatuss[0],
+                            typeReceipt: data.typeReceipt ? data.typeReceipt : this.typesReceipt[0]
                         };
 
                         this.formSearch.patchValue(formData);
