@@ -41,24 +41,8 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     ngOnInit() {
-        this._store.select(getAccountReceivableSearchState)
-            .pipe(
-                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
-                takeUntil(this.ngUnsubscribe),
-                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-            )
-            .subscribe(
-                (data) => {
-                    if (!!data.dataSearch) {
-                        this.dataSearch = data.dataSearch;
-                    }
 
-                    this.page = data.page;
-                    this.pageSize = data.pageSize;
 
-                    this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-                }
-            );
     }
     ngAfterViewInit() {
         this._activeRouter
@@ -137,7 +121,41 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
         this.accountReceivableFormComponent.arType = tab;
 
-        this._store.dispatch(SearchListAccountReceivable(this.dataSearch))
+        this._store.select(getAccountReceivableSearchState)
+        .pipe(
+            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                if (data.dataSearch) {
+                    this.dataSearch = data.dataSearch;
+                    this.dataSearch.arType = tab;
+                } else {
+                    let body: AccountingInterface.IAccReceivableSearch = {
+                        arType: tab,
+                        acRefId: null,
+                        overDueDay: 0,
+                        debitRateFrom: null,
+                        debitRateTo: null,
+                        agreementStatus: "All",
+                        agreementExpiredDay: 'All',
+                        salesmanId: null,
+                        officeId: null,
+                        fromOverdueDays: null,
+                        toOverdueDays: null,
+                        debitRate: 0
+                    };
+                    this.dataSearch = body;
+                }
+
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+                this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+            }
+        );
+
         tabComponent.getPagingList();
     }
 }
