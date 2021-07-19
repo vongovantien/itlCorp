@@ -125,8 +125,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.salemans = this._systemRepo.getListSystemUser();
         this.offices = this._systemRepo.getAllOffice();
-
-        this.subscriptionSearchParamState();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -155,6 +153,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.agreementExpiredDays = this.formSearch.controls["agreementExpiredDays"];
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
+
+        this.subscriptionSearchParamState();
     }
 
     // tslint:disable-next-line:no-any
