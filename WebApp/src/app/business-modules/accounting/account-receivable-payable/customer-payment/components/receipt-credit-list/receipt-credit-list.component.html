@@ -35,6 +35,9 @@
                                 <td>
                                     {{item.invoiceNo}}
                                 </td>
+                                <td>
+                                    {{!!item.voucherId ? item.voucherId : (!!item.voucherIdre ? item.voucherIdre: '')}}
+                                </td>
                                 <td *ngIf="receiptType !=='CUSTOMER'">{{item.jobNo}}</td>
                                 <td *ngIf="receiptType !=='CUSTOMER'">{{item.mbl}}</td>
                                 <td *ngIf="receiptType !=='CUSTOMER'">{{item.hbl}}</td>

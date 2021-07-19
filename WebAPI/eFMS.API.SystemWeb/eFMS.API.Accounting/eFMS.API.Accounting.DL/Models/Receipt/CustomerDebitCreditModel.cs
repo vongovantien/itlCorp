@@ -35,6 +35,8 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public string CreditNo { get; set; }
         public decimal? CreditAmountVnd { get; set; }
         public decimal? CreditAmountUsd { get; set; }
+        public string VoucherId { get; set; }
+        public string VoucherIdre { get; set; }
 
     }
 }

@@ -9,12 +9,10 @@
             </div>
             <div class="modal-body">
                 <form-search-customer-agent-cd-invoice></form-search-customer-agent-cd-invoice>
-            </div>
 
-            <ng-container *ngIf="type === 'CUSTOMER'">
-                <div class="m-portlet">
-                    <div class="m-portlet__body">
-                        <div class="table-horizontal" style="max-height:500px">
+                <ng-container *ngIf="type === 'CUSTOMER'">
+                    <div class="m--margin-top-20">
+                        <div class="table-horizontal" style="max-height:400px">
                             <table class="table table-condensed table-brand dataTable table-hover pointer">
                                 <thead app-table-header [headers]="headers"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -42,6 +40,10 @@
                                                 <span class="text-primary">{{debit.refNo}}</span>
                                             </td>
                                             <td>
+                                                {{!!debit.voucherId ? debit.voucherId : (!!debit.voucherIdre ?
+                                                debit.voucherIdre: '')}}
+                                            </td>
+                                            <td>
                                                 <span>{{debit.type}}</span>
                                             </td>
                                             <td>
@@ -66,18 +68,19 @@
                                                     </ng-container>
                                                 </span>
                                             </td>
+
                                             <td>
                                                 <span>{{debit.taxCode}}</span>
                                             </td>
                                             <td>
                                                 <span>{{debit.partnerName}}</span>
                                             </td>
-                                            <td ALIGN="right">
+                                            <!-- <td ALIGN="right">
                                                 <span>{{debit.amount | number}} {{debit.currencyId}}</span>
                                             </td>
                                             <td ALIGN="right">
                                                 <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
-                                            </td>
+                                            </td> -->
                                             <td ALIGN="right">
                                                 <span>{{debit.unpaidAmountVnd | number}} </span>
                                             </td>
@@ -109,14 +112,18 @@
                                             <td>Total</td>
                                             <td>{{listDebit | sumAmount:'amount':'USD':'currencyId' | number}}
                                                 USD |
-                                                {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND</td>
+                                                {{listDebit | sumAmount:'amount':'VND':'currencyId' | number}} VND
+                                            </td>
                                             <td>{{listDebit | sumAmount:'unpaidAmount':'USD':'currencyId' |
                                                 number}} USD |
-                                                {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}} VND
+                                                {{listDebit | sumAmount:'unpaidAmount':'VND':'currencyId' | number}}
+                                                VND
                                             </td>
-                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountVnd'| number}}
+                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountVnd'|
+                                                number}}
                                             </td>
-                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountUsd'| number}}
+                                            <td class="text-right">{{listDebit | sumAmount:'unpaidAmountUsd'|
+                                                number}}
                                             </td>
                                         </tr>
                                     </ng-container>
@@ -124,14 +131,47 @@
                                 </tbody>
                             </table>
                         </div>
-                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
+                        <div class="row">
+                            <div class="col-lg-12 font-15 m--margin-top-20">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <span class="font-weight-bold">Debit (Debit + OBH) : </span>
+                                        {{(sumTotalObj.totalDebitVnd + sumTotalObj.totalDebitUsd) | number:'1.0-3'}}
+                                        <span class="font-weight-bold">VND |</span>
+                                        {{(sumTotalObj.totalDebitUsd + sumTotalObj.totalDebitOBHUsd) | number:'1.3-3'}}
+                                        <span class="font-weight-bold">USD</span>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span class="font-weight-bold">Credit : </span>
+                                        {{sumTotalObj.totalCreditVnd | number:'1.0-3'}}
+                                        <span class="font-weight-bold">VND |</span>
+                                        {{sumTotalObj.totalCreditUsd | number:'1.3-3'}} USD
+                                    </li>
+                                    <li class="list-group-item">
+                                        <span class="font-weight-bold">Balance: </span>
+                                        <ng-container *ngIf="sumTotalObj.totalBalanceVnd < 0;else balanceVndPositive">
+                                            {{sumTotalObj.totalBalanceVnd | negativeNumber}}
+                                        </ng-container>
+                                        <ng-template #balanceVndPositive>
+                                            {{sumTotalObj.totalBalanceVnd | number:'1.0-3' }}
+                                        </ng-template>
+                                        <span class="font-weight-bold">VND |</span>
+                                        <ng-container *ngIf="sumTotalObj.totalBalanceUsd < 0;else balanceUsdPositive">
+                                            {{sumTotalObj.totalBalanceUsd | negativeNumber}}
+                                        </ng-container>
+                                        <ng-template #balanceUsdPositive>
+                                            {{sumTotalObj.totalBalanceUsd | number:'1.3-3' }}
+                                        </ng-template>
+                                        <span class="font-weight-bold">USD</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </ng-container>
+                </ng-container>
 
-            <ng-container *ngIf="type === 'AGENT'">
-                <div class="m-portlet">
-                    <div class="m-portlet__body">
+                <ng-container *ngIf="type === 'AGENT'">
+                    <div class="m--margin-top-20">
                         <div class="m-form m--margin-bottom-10">
                             <div class="row">
                                 <div class="col-lg-6">
@@ -146,7 +186,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="table-horizontal" style="max-height:500px">
+                        <div class="table-horizontal" style="max-height:400px">
                             <table class="table table-condensed table-brand dataTable table-hover pointer">
                                 <thead app-table-header [headers]="headersAgency"
                                     (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -162,7 +202,6 @@
                                     <ng-container *ngIf="TYPELIST === 'GROUP'">
                                         <ng-container
                                             *ngFor="let groupShipment of agencyDebitModel.groupShipmentsAgency ; let i = index; trackBy: trackByFn">
-
                                             <tr class="collapse-toggle-row tgroup">
                                                 <td colspan="19">
                                                     <div class="row align-items-center">
@@ -187,11 +226,13 @@
                                                                 class='text-danger'>{{groupShipment.hbl}}</span>
                                                         </div>
                                                         <div class="col-2">Unpaid VND: <span
-                                                                class='text-primary'>{{groupShipment.unpaidAmountVnd |
+                                                                class='text-primary'>{{groupShipment.unpaidAmountVnd
+                                                                |
                                                                 number}}</span>
                                                         </div>
                                                         <div class="col-2">Unpaid USD: <span
-                                                                class='text-primary'>{{groupShipment.unpaidAmountUsd |
+                                                                class='text-primary'>{{groupShipment.unpaidAmountUsd
+                                                                |
                                                                 number}}</span>
                                                         </div>
                                                     </div>
@@ -211,6 +252,11 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-primary">{{invoice.refNo}}</span>
+                                                </td>
+                                                <td>
+                                                    {{!!invoice.voucherId ? invoice.voucherId :
+                                                    (!!invoice.voucherIdre ?
+                                                    invoice.voucherIdre: '')}}
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.type}}</span>
@@ -252,13 +298,13 @@
                                                 <td>
                                                     <span>{{invoice.partnerName}}</span>
                                                 </td>
-                                                <td ALIGN="right">
+                                                <!-- <td ALIGN="right">
                                                     <span>{{invoice.amount | number}} {{invoice.currencyId}}</span>
                                                 </td>
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmount | number}}
                                                         {{invoice.currencyId}}</span>
-                                                </td>
+                                                </td> -->
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmountVnd | number}} </span>
                                                 </td>
@@ -277,7 +323,6 @@
                                                 <td class="text-success">{{invoice.departmentName}}</td>
                                                 <td class="text-success">{{invoice.officeName}}</td>
                                             </tr>
-
                                         </ng-container>
                                         <tr app-table-none-record
                                             *ngIf="agencyDebitModel.groupShipmentsAgency.length === 0"></tr>
@@ -302,6 +347,11 @@
                                                     <span class="text-primary">{{invoice.refNo}}</span>
                                                 </td>
                                                 <td>
+                                                    {{!!invoice.voucherId ? invoice.voucherId :
+                                                    (!!invoice.voucherIdre ?
+                                                    invoice.voucherIdre: '')}}
+                                                </td>
+                                                <td>
                                                     <span>{{invoice.type}}</span>
                                                 </td>
                                                 <td>
@@ -341,13 +391,13 @@
                                                 <td>
                                                     <span>{{invoice.partnerName}}</span>
                                                 </td>
-                                                <td ALIGN="right">
+                                                <!-- <td ALIGN="right">
                                                     <span>{{invoice.amount | number}} {{invoice.currencyId}}</span>
                                                 </td>
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmount | number}}
                                                         {{invoice.currencyId}}</span>
-                                                </td>
+                                                </td> -->
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmountVnd | number}} </span>
                                                 </td>
@@ -370,20 +420,16 @@
                                                     <span class="text-success">{{invoice.officeName}} </span>
                                                 </td>
                                             </tr>
-
-
                                         </ng-container>
                                         <tr app-table-none-record *ngIf="!agencyDebitModel.groupShipmentsAgency.length">
                                         </tr>
-
                                     </ng-container>
                                 </tbody>
                             </table>
                         </div>
-                        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
                     </div>
-                </div>
-            </ng-container>
+                </ng-container>
+            </div>
 
             <div class="modal-footer m--align-center">
                 <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="addToReceipt()">

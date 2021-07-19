@@ -17,6 +17,7 @@ export enum ReceiptActionTypes {
     INSERT_ADVANCE = '[AR Receipt] Insert Advance',
     SELECT_PARTNER_RECEIPT = '[AR Receipt] Select Partner',
     SELECT_DATE_RECEIPT = '[AR Receipt] Select Partner',
+    SELECT_AGREEMENT = '[AR Receipt] select Agreement'
 
 
     // TODO another action receipt.
@@ -36,6 +37,7 @@ export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, pro
 
 export const SelectPartnerReceipt = createAction(ReceiptActionTypes.SELECT_PARTNER_RECEIPT, props<{ id: string, partnerGroup: string }>());
 export const SelectReceiptDate = createAction(ReceiptActionTypes.SELECT_DATE_RECEIPT, props<{ date: any }>());
+export const SelectReceiptAgreement = createAction(ReceiptActionTypes.SELECT_AGREEMENT, props<{ [key: string]: any; }>());
 export interface ProcessClearInvoiceModel {
     invoices: ReceiptInvoiceModel[],
     cusAdvanceAmountVnd: number,

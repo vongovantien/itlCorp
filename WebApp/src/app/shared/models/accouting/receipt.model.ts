@@ -55,7 +55,8 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     jobId?: string;
     mbl?: string;
     hbl?: string;
-
+    voucherId: string = null;
+    voucherIdre: string = null;
     constructor(object?: any) {
         super();
         const self = this;
@@ -96,6 +97,8 @@ export class Receipt {
     reasonReject: string = null;
     referenceId: string = null; // * ID của receipt cha (trường hợp có receipt banking)
     paymentMethod: string = null;
+    class: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

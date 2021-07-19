@@ -31,11 +31,15 @@
                                     <label class="form-control-label" for="">
                                         Date
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                        [ranges]="ranges" [alwaysShowCalendars]="true"
-                                        [formControl]="formSearch.controls['date']" name="daterange"
-                                        placeholder="From date - to date" readonly />
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" ngxDaterangepickerMd [autoApply]="true" class="form-control"
+                                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [ranges]="ranges"
+                                            [alwaysShowCalendars]="true" [formControl]="formSearch.controls['date']"
+                                            name="daterange" placeholder="From date - to date" readonly calendar
+                                            [allowRemove]="!!formSearch.controls['date'].value && !!formSearch.controls['date'].value.startDate"
+                                            (remove)="resetFormControl(formSearch.controls['date'])" />
+                                    </div>
+
                                 </div>
                             </div>
                             <div class="col-lg-6">

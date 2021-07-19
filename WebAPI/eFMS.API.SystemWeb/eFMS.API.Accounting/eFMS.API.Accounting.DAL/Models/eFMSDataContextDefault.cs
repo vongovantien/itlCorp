@@ -836,6 +836,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Class)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.CurrencyId)
@@ -1583,6 +1587,8 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.Email).HasMaxLength(150);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.SignPath).HasMaxLength(1000);
 
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
