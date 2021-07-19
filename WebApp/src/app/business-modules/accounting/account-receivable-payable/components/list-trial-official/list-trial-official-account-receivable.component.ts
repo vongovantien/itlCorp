@@ -3,11 +3,13 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo } from '@repositories';
 import { SortService } from '@services';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants } from '@constants';
+import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
@@ -22,6 +24,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
+        private _store:Store<IAccountReceivableState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -57,22 +60,21 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     getPagingList() {
-        this._progressRef.start();
-        this.isLoading = true;
-
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
-                })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.trialOfficialList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
+        this._store.select(getAccountReceivableListState)
+        .pipe(
+            catchError(this.catchError),
+            map((data: any) => {
+                return {
+                    data: !!data.data ? data.data.map((item: any) => new TrialOfficialOtherModel(item)) : [],
+                    totalItems: data.totalItems,
+                };
+            })
+        ).subscribe(
+            (res: any) => {
+                    this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
-                },
-            );
+            },
+        );
     }
 
     //

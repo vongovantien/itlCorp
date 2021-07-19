@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { ReceiptInvoiceModel } from "@models";
+import { IAcctReceiptCriteria } from "../../components/form-search/form-search-customer-payment.component";
 
 export enum ReceiptActionTypes {
     INIT_INVOICE = '[AR Receipt] Init Invoice List',
@@ -17,9 +18,11 @@ export enum ReceiptActionTypes {
     INSERT_ADVANCE = '[AR Receipt] Insert Advance',
     SELECT_PARTNER_RECEIPT = '[AR Receipt] Select Partner',
     SELECT_DATE_RECEIPT = '[AR Receipt] Select Partner',
-    SELECT_AGREEMENT = '[AR Receipt] select Agreement'
+    SELECT_AGREEMENT = '[AR Receipt] select Agreement',
 
-
+    INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
+    LOAD_LIST = '[AR Receipt] Load List',
+    LOAD_LIST_SUCCESS = '[AR Receipt] Load List Success'
     // TODO another action receipt.
 }
 
@@ -38,6 +41,11 @@ export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, pro
 export const SelectPartnerReceipt = createAction(ReceiptActionTypes.SELECT_PARTNER_RECEIPT, props<{ id: string, partnerGroup: string }>());
 export const SelectReceiptDate = createAction(ReceiptActionTypes.SELECT_DATE_RECEIPT, props<{ date: any }>());
 export const SelectReceiptAgreement = createAction(ReceiptActionTypes.SELECT_AGREEMENT, props<{ [key: string]: any; }>());
+
+export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
+export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
+export const LoadListCustomerPaymentSuccess = createAction(ReceiptActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
+
 export interface ProcessClearInvoiceModel {
     invoices: ReceiptInvoiceModel[],
     cusAdvanceAmountVnd: number,

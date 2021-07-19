@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
-import { takeUntil } from 'rxjs/operators';
+import { map, takeUntil, withLatestFrom } from 'rxjs/operators';
 
 import { CommonEnum } from '@enums';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,9 @@ import { AccountReceivableListGuaranteedComponent } from '../components/list-gua
 import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { RoutingConstants } from '@constants';
+import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
+import { Store } from '@ngrx/store';
+import { LoadListAccountReceivable, SearchListAccountReceivable } from './store/actions';
 
 @Component({
     selector: 'app-account-receivable',
@@ -31,13 +34,31 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     constructor(
         private _router: Router,
         private _activeRouter: ActivatedRoute,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        private _store:Store<IAccountReceivableState>
     ) {
         super();
     }
 
     ngOnInit() {
+        this._store.select(getAccountReceivableSearchState)
+            .pipe(
+                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
 
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                }
+            );
     }
     ngAfterViewInit() {
         this._activeRouter
@@ -48,6 +69,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 if (param.subTab) {
                     this.selectedSubTab = param.subTab.toUpperCase();
                 } else {
+                    debugger
                     this.selectedSubTab = 'trial_official'.toUpperCase();
                     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
                 }
@@ -89,7 +111,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     }
 
     onSelectTabAccountReceivable(tabname: string) {
-
         this.selectedSubTab = tabname;
 
         if (tabname === 'TRIAL_OFFICIAL') {
@@ -116,16 +137,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToPagingTab(tab: CommonEnum.TabTypeAccountReceivableEnum, tabComponent: any) {
         this.accountReceivableFormComponent.arType = tab;
 
-        const dataSearch: AccountingInterface.IAccReceivableSearch = {
-            arType: tab,
-            acRefId: null,
-            agreementStatus: null,
-            agreementExpiredDay: 'All',
-            overDueDay: 0,
-            salesmanId: null,
-            officeId: null,
-        };
-        tabComponent.dataSearch = dataSearch;
+        this._store.dispatch(SearchListAccountReceivable(this.dataSearch))
         tabComponent.getPagingList();
     }
 }

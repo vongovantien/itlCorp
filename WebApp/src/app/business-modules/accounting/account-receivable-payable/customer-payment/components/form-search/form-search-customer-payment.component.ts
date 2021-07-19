@@ -8,6 +8,10 @@ import { Currency, Customer, Partner, User } from '@models';
 import { CatalogueRepo, SystemRepo } from '@repositories';
 import { Observable } from 'rxjs';
 import { AppForm } from '@app';
+import { Store } from '@ngrx/store';
+import {  SearchListCustomerPayment } from '../../store/actions';
+import { getCustomerPaymentSearchState, ICustomerPaymentState } from '../../store/reducers';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'customer-payment-form-search',
@@ -44,7 +48,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
         private _fb: FormBuilder,
-        private _listReceipt: ARCustomerPaymentComponent
+        private _listReceipt: ARCustomerPaymentComponent,
+        private _store : Store<ICustomerPaymentState>
     ) {
         super();
         this.requestReset = this.requestSearch;
@@ -56,6 +61,8 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.customerIDs = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
         this.creators = this._systemRepo.getSystemUsers();
         this.Currencys = this._catalogueRepo.getListCurrency();
+
+        this.subscriptionSearchParamState();
     }
 
     initForm() {
@@ -105,10 +112,10 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             currency: this.currency.value,
             syncStatus: this.syncStatus.value !== this.syncStatuss[0] ? this.syncStatus.value : null,
             status: this.status.value,
-            type: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null,
+            typeReceipt: !!this.typeReceipt.value ? this.typeReceipt.value === 'All' ? null : this.typeReceipt.value : null
         };
-        this._listReceipt.onSearchCPs(body);
-
+        //this._listReceipt.onSearchCPs(body);
+        this._store.dispatch(SearchListCustomerPayment(body))
     }
 
     reset() {
@@ -126,8 +133,34 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this._listReceipt.getCPs({});
     }
 
+    subscriptionSearchParamState() {
+        this._store.select(getCustomerPaymentSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (data) {
+                        let formData: any = {
+                            refNo: data?.refNo?.toString().replace(/[,]/g, "\n") || null,
+                            paymentType: data.paymentType?data.paymentType:this.paymentTypes[0],
+                            customerID: data?.customerID,
+                            date: (!!data?.dateFrom && !!data?.dateTo) ? { startDate: new Date(data?.dateFrom), endDate: new Date(data?.dateTo) } : null,
+                            dateType: data.dateType?data.dateType:this.dateTypes[0],
+                            currency:data.currency?data.currency:'VND',
+                            status: data.status?data.status:null,
+                            syncStatus: data.syncStatus?data.syncStatus: this.syncStatuss[0],
+                            typeReceipt: data.typeReceipt?data.typeReceipt:this.typesReceipt[0]
+                        };
+
+                        this.formSearch.patchValue(formData);
+                    }
+                }
+            );
+    }
 }
-interface IAcctReceiptCriteria {
+
+export interface IAcctReceiptCriteria {
     refNo: string;
     paymentType: string;
     customerID: string;
@@ -137,5 +170,5 @@ interface IAcctReceiptCriteria {
     currency: string;
     syncStatus: string;
     status: string;
-    type: string;
+    typeReceipt: string;
 }

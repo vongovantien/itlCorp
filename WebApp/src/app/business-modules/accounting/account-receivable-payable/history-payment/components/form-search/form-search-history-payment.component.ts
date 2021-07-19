@@ -10,6 +10,10 @@ import { CommonEnum } from '@enums';
 import { AppForm } from 'src/app/app.form';
 
 import { Observable } from 'rxjs';
+import { SearchListHistoryPayment } from '../../store/actions';
+import { getDataSearchHistoryPaymentState, IHistoryPaymentState } from '../../store/reducers';
+import { Store } from '@ngrx/store';
+import { takeUntil } from 'rxjs/operators';
 
 enum OverDueDays {
     All,
@@ -58,7 +62,8 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
     constructor(
         private _fb: FormBuilder,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IHistoryPaymentState>
     ) {
         super();
         this.requestSearch = this.submitSearch;
@@ -69,6 +74,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
 
         this.initForm();
+        this.subscriptionSearchParamState();
     }
 
     initForm() {
@@ -120,7 +126,8 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             paymentType: PaymentType.Invoice
         };
 
-        this.onSearch.emit(body);
+        //this.onSearch.emit(body);
+        this._store.dispatch(SearchListHistoryPayment(body));
     }
     getSearchStatus(paymentStatus: []) {
         let strStatus = null;
@@ -157,6 +164,31 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             this.paymentStatus.setValue(['All']);
         }
 
+    }
+    subscriptionSearchParamState() {
+        this._store.select(getDataSearchHistoryPaymentState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (data) {
+                        let formData: any = {
+                            referenceNo:data.referenceNos?data.referenceNos:null,
+                            partnerId:data.partnerId?data.partnerId:null,
+                            paymentStatus:(data.paymentStatus&&data.paymentStatus !== [])?data.paymentStatus:['All'],
+                            overdueDate:data.overDueDays?data.overDueDays:this.overDueDays[0].id,
+                            updatedDate :(!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
+                            { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
+                            dueDate:(!!data?.fromDueDate && !!data?.toDueDate) ?
+                            { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
+                            issuedDate:(!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
+                            { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
+                        };
+                        this.formSearch.patchValue(formData);
+                    }
+                }
+            );
     }
 }
 

@@ -117,9 +117,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => (x.PaymentRefNo ?? "").IndexOf(criteria.RefNo ?? "", StringComparison.OrdinalIgnoreCase) >= 0);
             }
-            if (!string.IsNullOrEmpty(criteria.Type))
+            if (!string.IsNullOrEmpty(criteria.TypeReceipt))
             {
-                query = query.And(x => x.Type == criteria.Type);
+                query = query.And(x => x.Type == criteria.TypeReceipt);
 
             }
             if (!string.IsNullOrEmpty(criteria.PaymentType) && criteria.PaymentType == "Invoice")

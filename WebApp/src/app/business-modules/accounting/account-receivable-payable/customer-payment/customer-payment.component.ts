@@ -9,12 +9,13 @@ import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants } from "@constants";
 
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
+import { LoadListCustomerPayment, RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
+import { getCustomerPaymentListState, getCustomerPaymentPagingState, getCustomerPaymentSearchState } from "./store/reducers";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -54,7 +55,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         protected _store: Store<IAppState>
     ) {
         super();
-        this.requestList = this.getCPs;
+        this.requestList = this.requestLoadListCustomerPayment;
         this.requestSort = this.sortLocal;
     }
 
@@ -76,7 +77,26 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        this.getCPs(this.dataSearch);
+        this.getCPs();
+
+        this._store.select(getCustomerPaymentSearchState)
+            .pipe(
+                withLatestFrom(this._store.select(getCustomerPaymentPagingState)),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch })),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestLoadListCustomerPayment();
+                }
+            );
     }
 
     checkAllowDetail(data: ReceiptModel) {
@@ -120,7 +140,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
                             this._toastService.success('Cancel Receipt Success!');
-                            this.getCPs(this.dataSearch);
+                            this.requestLoadListCustomerPayment();
                         } else {
                             this._toastService.warning(res.message);
                         }
@@ -128,26 +148,26 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 );
         })
     }
-    getCPs(dataSearch) {
-        this.isLoading = true;
-        this._accountingRepo
-            .getListCustomerPayment(
-                this.page,
-                this.pageSize,
-                Object.assign({}, dataSearch)
-            )
-            .pipe(finalize(() => this.isLoading = false))
-            .subscribe((res: any) => {
-                this.CPs = (res.data || []).map((item: ReceiptModel) => new ReceiptModel(item));
-                this.totalItems = res.totalItems || 0;
-            });
-    }
 
-    onSearchCPs(data: any) {
+    getCPs() {
         this.page = 1;
-        this.dataSearch = data;
-        this.getCPs(this.dataSearch);
-
+        this._store.select(getCustomerPaymentListState)
+            .pipe(
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new ReceiptModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                }),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (res: any) => {
+                    this.CPs = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
     }
 
     sortCPsList(sortField: string, order: boolean) {
@@ -166,7 +186,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .subscribe((res: any) => {
                 this._toastService.success(res.message);
                 // * search cps when success.
-                this.onSearchCPs(this.dataSearch);
+
+                this.requestLoadListCustomerPayment();
             });
     }
 
@@ -194,4 +215,10 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this._store.dispatch(RegistTypeReceipt({ data: type }));
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`]);
     }
+
+    requestLoadListCustomerPayment() {
+        this._store.dispatch(LoadListCustomerPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
 }
+

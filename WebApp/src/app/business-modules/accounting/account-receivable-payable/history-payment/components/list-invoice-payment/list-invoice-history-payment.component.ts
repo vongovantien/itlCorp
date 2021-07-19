@@ -6,7 +6,7 @@ import { SortService } from '@services';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { SystemConstants } from 'src/constants/system.const';
-import { catchError, finalize, concatMap } from 'rxjs/operators';
+import { catchError, finalize, concatMap, withLatestFrom, takeUntil, map } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
@@ -16,6 +16,8 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
+import { getDataSearchHistoryPaymentState, getHistoryPaymentPagingState } from '../../store/reducers';
+import { LoadListHistoryPayment } from '../../store/actions';
 
 
 
@@ -92,20 +94,20 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     getPagingData() {
-        this._progressRef.start();
-        this.isLoading = true;
-        this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.select(getDataSearchHistoryPaymentState)
             .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
-                })
-            ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.refPaymens = res.data || [];
-                    this.totalItems = res.totalItems;
-                },
+                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch]) => ({  dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+                }
             );
     }
 

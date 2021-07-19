@@ -12,6 +12,10 @@ import { AccountReceivableDetailComponent } from './detail/detail-account-receiv
 import { NgSelectModule } from '@ng-select/ng-select';
 import { AccountReceivableFormDetailSummaryComponent } from './components/form-detail/form-detail-ar-summary.component';
 
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { effects } from './store/effects';
 
 const routing: Routes = [
     {
@@ -37,7 +41,9 @@ const routing: Routes = [
         TabsModule.forRoot(),
         RouterModule.forChild(routing),
         SharedModule,
-        NgSelectModule
+        NgSelectModule,
+        StoreModule.forFeature('account-receivable', reducers),
+        EffectsModule.forFeature(effects),
     ],
     exports: [
 

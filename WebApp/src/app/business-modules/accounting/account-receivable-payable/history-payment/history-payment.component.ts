@@ -2,11 +2,15 @@ import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 
 import { Router, ActivatedRoute } from '@angular/router';
 import { RoutingConstants } from '@constants';
 import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-payment/list-invoice-history-payment.component';
+import { Store } from '@ngrx/store';
+import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, IHistoryPaymentState } from './store/reducers';
+import { LoadListHistoryPayment, LoadListHistoryPaymentSuccess } from './store/actions';
+import { AccountingPaymentModel } from '@models';
 
 
 type TAB = 'HISTORY' | 'OBH';
@@ -39,9 +43,11 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
         private _activeRouter: ActivatedRoute,
         private _ngProgessSerice: NgProgress,
         private _cd: ChangeDetectorRef,
-        private _accountingRepo: AccountingRepo) {
+        private _accountingRepo: AccountingRepo,
+        private _store: Store<IHistoryPaymentState>) {
         super();
         this._progressRef = this._ngProgessSerice.ref();
+        this.requestList = this.requestLoadListHistoryPayment;
     }
 
     ngOnInit() {
@@ -53,6 +59,31 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
                     this.selectedTabAR = param.tab;
                 }
             });
+
+        this.requestSearchShipment();
+
+        this._store.select(getDataSearchHistoryPaymentState)
+            .pipe(
+                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestLoadListHistoryPayment();
+                }
+            );
+    }
+
+    requestLoadListHistoryPayment() {
+        this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
     }
 
     ngAfterViewInit() {
@@ -74,7 +105,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable`]);
 
         } else if (tab === 'customer-payment') {
-            //// huy 
+            //// huy
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer-payment`]);
         }
 
@@ -89,6 +120,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     onSearchPayment(event) {
+        debugger
         this.dataSearch = event;
         this.dataSearch.paymentType = this.getPaymentType();
         if (this.dataSearch.paymentType === 0) {
@@ -98,16 +130,35 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     requestSearchShipment() {
-        this._progressRef.start();
+        debugger
+        // this._progressRef.start();
 
-        this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        // this._accountingRepo.paymentPaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        //     .pipe(
+        //         catchError(this.catchError),
+        //         finalize(() => {
+        //             this._progressRef.complete();
+        //         })
+        //     ).subscribe(
+        //         (res: CommonInterface.IResponsePaging) => {
+        //             if (this.selectedTab === "HISTORY") {
+        //                 this.invoiceListComponent.refPaymens = res.data || [];
+        //                 this.invoiceListComponent.totalItems = res.totalItems;
+        //             }
+        //         },
+        //     );
+
+        this._store.select(getHistoryPaymentListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new AccountingPaymentModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
                 })
             ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
+                (res: any) => {
                     if (this.selectedTab === "HISTORY") {
                         this.invoiceListComponent.refPaymens = res.data || [];
                         this.invoiceListComponent.totalItems = res.totalItems;

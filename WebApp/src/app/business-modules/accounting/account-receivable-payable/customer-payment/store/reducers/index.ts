@@ -1,4 +1,4 @@
-import { IReceiptState, receiptReducer } from './customer-payment.reducer';
+import {  IReceiptState, receiptReducer } from './customer-payment.reducer';
 import { createFeatureSelector, ActionReducerMap, createSelector } from '@ngrx/store';
 
 export interface ICustomerPaymentState {
@@ -20,6 +20,10 @@ export const ReceiptPartnerCurrentState = createSelector(customerPaymentState, (
 export const ReceiptDateState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.date);
 export const ReceiptAgreementCreditCurrencyState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.creditCurrency);
 export const ReceiptAgreementCusAdvanceState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.cusAdvanceAmount);
+
+export const getCustomerPaymentSearchState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.dataSearch);
+export const getCustomerPaymentPagingState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.pagingData);
+export const getCustomerPaymentListState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.list);
 
 export const reducers: ActionReducerMap<ICustomerPaymentState> = {
     receipt: receiptReducer,

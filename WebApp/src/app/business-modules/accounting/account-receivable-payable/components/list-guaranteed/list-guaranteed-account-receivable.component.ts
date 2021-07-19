@@ -5,10 +5,12 @@ import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo } from '@repositories';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { GuaranteedModel } from '@models';
 import { RoutingConstants } from '@constants';
+import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { Store } from '@ngrx/store';
 
 
 @Component({
@@ -25,6 +27,7 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _router: Router,
+        private _store:Store<IAccountReceivableState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -76,20 +79,19 @@ export class AccountReceivableListGuaranteedComponent extends AppList implements
     }
 
     getPagingList() {
-        this._progressRef.start();
-        this.isLoading = true;
-
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.select(getAccountReceivableListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new GuaranteedModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
                 })
             ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.guaranteedList = (res.data || []).map((item: GuaranteedModel) => new GuaranteedModel(item));
-                    this.totalItems = res.totalItems;
+                (res: any) => {
+                        this.guaranteedList = res.data || [];
+                        this.totalItems = res.totalItems;
                 },
             );
     }

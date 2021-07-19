@@ -1,12 +1,11 @@
 import { createReducer, on, Action } from "@ngrx/store";
 import { ReceiptInvoiceModel, Receipt } from "@models";
 import * as ReceiptActions from "../actions";
-import { state } from "@angular/animations";
 import { IAgreementReceipt } from "../../components/form-create-receipt/form-create-receipt.component";
 
 
 export interface IReceiptState {
-    list: Receipt[];
+    list: { data: Receipt[], totalItems };
     debitList: ReceiptInvoiceModel[],
     creditList: ReceiptInvoiceModel[],
     isLoading: boolean;
@@ -15,11 +14,14 @@ export interface IReceiptState {
     partnerId: string // * đối tượng của phiếu thu,
     date: any; // * Ngày tím kiếm -> Điều kiện search
     agreement: Partial<IAgreementReceipt>;
+    dataSearch: any;
+    pagingData: any;
 }
 
 
 export const initialState: IReceiptState = {
-    list: [],
+    //list:[],
+    list: { data: [], totalItems: 0, },
     debitList: [],
     creditList: [],
     isLoaded: false,
@@ -27,7 +29,9 @@ export const initialState: IReceiptState = {
     partnerId: null,
     type: "CUSTOMER",
     date: null,
-    agreement: {}
+    agreement: {},
+    dataSearch: null,
+    pagingData: { page: 1, pageSize: 15 }
 };
 
 export const receiptManagementReducer = createReducer(
@@ -79,8 +83,16 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptAgreement, (state: IReceiptState, payload: { [key: string]: any }) => ({
         ...state, agreement: { ...payload }
+    })),
+    on(ReceiptActions.SearchListCustomerPayment, (state: IReceiptState, payload: any) => ({
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
+    })),
+    on(ReceiptActions.LoadListCustomerPayment, (state: IReceiptState, payload: CommonInterface.IParamPaging) => ({
+        ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }
+    })),
+    on(ReceiptActions.LoadListCustomerPaymentSuccess, (state: IReceiptState, payload: CommonInterface.IResponsePaging) => ({
+        ...state, list: payload, isLoading: false, isLoaded: true
     }))
-
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {

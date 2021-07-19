@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from '@app';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
@@ -8,6 +8,8 @@ import { AccountingRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants } from '@constants';
+import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -22,6 +24,7 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _router: Router,
+        private _store:Store<IAccountReceivableState>
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -47,20 +50,20 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     }
 
     getPagingList() {
-        this._progressRef.start();
-        this.isLoading = true;
 
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.select(getAccountReceivableListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new TrialOfficialOtherModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
                 })
             ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.otherList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
-                    this.totalItems = res.totalItems;
+                (res: any) => {
+                        this.otherList = res.data || [];
+                        this.totalItems = res.totalItems;
                 },
             );
     }
