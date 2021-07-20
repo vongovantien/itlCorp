@@ -1630,8 +1630,10 @@ namespace eFMS.API.Accounting.DL.Services
                 debits = GetDebitForIssueAgentPayment(criteria);
                 obhs = GetObhForIssueAgencyPayment(criteria);
                 soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
+                creditNote = GetCreditNoteForIssueAgencyPayment(criteria);
+
             }
-           
+
             if (creditNote != null)
             {
                 data.Invoices.AddRange(creditNote);
@@ -2015,7 +2017,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else if (criteria.SearchType.Equals("Debit/Credit/Invoice"))
                 {
-                    acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                    acctManagementIds = surchargeRepository.Get(x => (criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase))
+                    || (criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)
+                    || (criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase))
+                    )).Select(se => se.AcctManagementId).Distinct().ToList();
                 }
                 else if (criteria.SearchType.Equals("VAT Invoice"))
                 {
@@ -2249,7 +2254,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.PaySoano, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
                 }
-                else if (criteria.SearchType.Equals("Credit Note"))
+                else if (criteria.SearchType.Equals("Credit Note") || criteria.SearchType.Equals("Debit/Credit/Invoice"))
                 {
                     query = query.And(x => criteria.ReferenceNos.Contains(x.Code));
                 }
