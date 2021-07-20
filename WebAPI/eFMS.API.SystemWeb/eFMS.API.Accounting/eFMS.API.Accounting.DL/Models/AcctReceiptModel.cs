@@ -20,6 +20,8 @@ namespace eFMS.API.Accounting.DL.Models
         SAVEDRAFT_ADD = 0,
         SAVEDRAFT_UPDATE = 1,
         SAVEDONE = 2,
-        SAVECANCEL = 3
+        SAVECANCEL = 3,
+        SAVEBANK_ADD = 4,
+        SAVEBANK_DONE = 5
     }
 }

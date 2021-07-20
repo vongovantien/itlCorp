@@ -573,7 +573,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GetPaymentStatus(List<string> Ids)
         {
-            string _paymentStatus = string.Empty;
+            string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
             var inv = acctMngtRepository.Get(x => Ids.Contains(x.Id.ToString())).ToList();
             if(inv.Count > 0)
             {
@@ -617,6 +617,14 @@ namespace eFMS.API.Accounting.DL.Services
                 case SaveAction.SAVECANCEL:
                     currentUser.Action = "ReceiptSaveCancel";
                     hs = SaveCancel(receiptModel.Id);
+                    break;
+                case SaveAction.SAVEBANK_ADD:
+                    currentUser.Action = "ReceiptSaveBankFee";
+                    hs = AddDraft(receiptModel, true);
+                    break;
+                case SaveAction.SAVEBANK_DONE:
+                    currentUser.Action = "ReceiptSaveBankFeeDone";
+                    hs = SaveDone(receiptModel, true);
                     break;
             }
             return hs;
@@ -683,25 +691,36 @@ namespace eFMS.API.Accounting.DL.Services
             return _payment;
         }
 
-        private List<AccAccountingPayment> GenerateListPaymentOBH(AcctReceipt receipt, List<ReceiptInvoiceModel> paymentOBHGrps)
+        private List<AccAccountingPayment> GenerateListPaymentOBH(AcctReceipt receipt, List<ReceiptInvoiceModel> paymentOBHGrps, bool IsCreateBankFee = false)
         {
             List<AccAccountingPayment> results = new List<AccAccountingPayment>();
 
             foreach (ReceiptInvoiceModel paymentOBH in paymentOBHGrps)
             {
-                // lấy ra tất cả các hóa đơn tạm theo group
-                List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && paymentOBH.RefIds.Contains(x.Id.ToString()))
-                     .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
-                     .ToList(); // xắp xếp theo unpaidAmount
-
+                List<AccAccountingManagement> invoicesTemp = new List<AccAccountingManagement>();
+                
+                if(IsCreateBankFee == true)
+                {
+                    // lấy ra tất cả các hóa đơn tạm theo group và # paid nếu đang thu phiếu thu ngân hàng
+                    invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE 
+                            && paymentOBH.RefIds.Contains(x.Id.ToString()) 
+                            && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                         .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
+                         .ToList(); // xắp xếp theo unpaidAmount
+                }
+                else
+                {
+                    // lấy ra tất cả các hóa đơn tạm theo group
+                    invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && paymentOBH.RefIds.Contains(x.Id.ToString()))
+                         .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
+                         .ToList(); // xắp xếp theo unpaidAmount
+                }
                 decimal remainOBHAmountVnd = paymentOBH.PaidAmountVnd ?? 0; // Tổng tiền thu VND trên group OBH
                 decimal remainOBHAmountUsd = paymentOBH.PaidAmountUsd ?? 0;// Tổng tiền thu USD trên group OBH
 
                 foreach (var invTemp in invoicesTemp)
                 {
                     // Tổng Số tiền amount OBH đã thu trên group.
-
-
                     if (invTemp.Currency == AccountingConstants.CURRENCY_LOCAL)
                     {
                         if (invTemp.UnpaidAmount <= remainOBHAmountVnd && invTemp.UnpaidAmountVnd <= remainOBHAmountVnd)
@@ -857,7 +876,7 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
         }
 
-        private HandleState AddPayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt)
+        private HandleState AddPayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt, bool IsCreateBankFee = false)
         {
             HandleState hs = new HandleState();
 
@@ -867,7 +886,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (paymentOBHGrps.Count > 0)
             {
-                listPaymentOBH = GenerateListPaymentOBH(receipt, paymentOBHGrps);
+                listPaymentOBH = GenerateListPaymentOBH(receipt, paymentOBHGrps, IsCreateBankFee);
             }
 
             List<ReceiptInvoiceModel> paymentDebitAndCredit = listReceiptInvoice.Where(x => x.Type != "OBH").ToList();
@@ -1171,7 +1190,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hsAgreementUpdate;
         }
 
-        public HandleState AddDraft(AcctReceiptModel receiptModel)
+        public HandleState AddDraft(AcctReceiptModel receiptModel, bool IsCreateBankFee = false)
         {
             try
             {
@@ -1200,7 +1219,7 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Add(receipt, false);
                         if (hs.Success)
                         {
-                            HandleState hsPayment = AddPayments(receiptModel.Payments, receipt);
+                            HandleState hsPayment = AddPayments(receiptModel.Payments, receipt, IsCreateBankFee);
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1289,7 +1308,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState SaveDone(AcctReceiptModel receiptModel)
+        public HandleState SaveDone(AcctReceiptModel receiptModel, bool IsCreateBankFee = false)
         {
             try
             {
@@ -1328,7 +1347,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
 
                                 // Phát sinh Payment
-                                HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
+                                HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent, IsCreateBankFee);
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
                                 // Cập nhật CusAdvance cho hợp đồng
@@ -1347,7 +1366,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
-                            HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
+                            HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent, IsCreateBankFee);
 
                             HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
 
@@ -1947,7 +1966,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
-                RefIds = se.Invoice.Select(s => s.Id.ToString()).ToList(),
+                RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList(),
                 JobNo = se.Job.JobNo,
                 Mbl = se.Job.Mblno,
                 Hbl = se.Job.Hblno,
@@ -2472,7 +2491,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
-                RefIds = se.Invoice.Select(s => s.Id.ToString()).ToList()
+                RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList()
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp

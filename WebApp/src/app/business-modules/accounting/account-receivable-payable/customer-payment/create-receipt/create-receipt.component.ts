@@ -24,7 +24,9 @@ export enum SaveReceiptActionEnum {
     DRAFT_CREATE = 0,
     DRAFT_UPDATE = 1,
     DONE = 2,
-    CANCEL = 3
+    CANCEL = 3,
+    BANK_CREATE = 4,
+    BANK_DONE = 5,
 }
 
 @Component({
@@ -43,6 +45,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     receiptRefId: string = null;
     receiptRefDetail: ReceiptModel;
     titleReceipt: string;
+
+    isCreateBankFee: boolean = false;
+
     constructor(
         protected readonly _router: Router,
         protected readonly _toastService: ToastrService,
@@ -80,13 +85,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 (res: ReceiptModel) => {
                     if (!!res) {
                         this.titleReceipt = "Create Bank Fee Receipt";
+                        this.isCreateBankFee = true;
                         this.setFormBankReceipt(res);
                     }
                 },
                 (err) => {
                     console.log(err);
                 }
-
             );
     }
 
@@ -109,16 +114,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         let action: number;
         switch (actionString) {
             case 'draft':
-                action = SaveReceiptActionEnum.DRAFT_CREATE
+                !this.isCreateBankFee ? (action = SaveReceiptActionEnum.DRAFT_CREATE) : (action = SaveReceiptActionEnum.BANK_CREATE);
                 break;
             case 'update':
-                action = SaveReceiptActionEnum.DRAFT_UPDATE
+                action = SaveReceiptActionEnum.DRAFT_UPDATE;
                 break;
             case 'done':
-                action = SaveReceiptActionEnum.DONE
+                action = SaveReceiptActionEnum.DONE;
+                !this.isCreateBankFee ? (action = SaveReceiptActionEnum.DONE) : (action = SaveReceiptActionEnum.BANK_DONE);
                 break;
             case 'cancel':
-                action = SaveReceiptActionEnum.CANCEL
+                action = SaveReceiptActionEnum.CANCEL;
                 break;
             default:
                 break;

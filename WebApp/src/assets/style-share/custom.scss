@@ -412,16 +412,16 @@ a {
             }
         }
     }
-    tfoot {
-        tr {
-            th,
-            td {
-                color: white;
-                background-color: #53b0f8;
-                border-color: #45aaf8;
-            }
-        }
-    }
+    // tfoot {
+    //     tr {
+    //         th,
+    //         td {
+    //             color: white;
+    //             background-color: #53b0f8;
+    //             border-color: #45aaf8;
+    //         }
+    //     }
+    // }
     &.table-brand {
         thead {
             th {

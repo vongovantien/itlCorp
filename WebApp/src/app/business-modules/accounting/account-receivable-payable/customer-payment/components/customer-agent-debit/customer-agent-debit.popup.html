@@ -113,44 +113,34 @@
                                                 <span class="text-success">{{debit.officeName}} </span>
                                             </td>
                                         </tr>
-                                        <tr class="font-weight-bold bg-locked">
-                                            <td rowspan="5" colspan="7" ALIGN="center">Total</td>
-                                            <td class="text-right" rowspan="5" ALIGN="center">
-                                                <ng-container
-                                                    *ngIf="sumTotalObj.totalBalanceVnd >= 0;else balanceVndPositive">
-                                                    {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
-                                                </ng-container>
-                                            </td>
-                                            <td class="text-right" rowspan="5" ALIGN="center">
-                                                <ng-container
-                                                    *ngIf="sumTotalObj.totalBalanceUsd >= 0;else balanceUsdPositive">
-                                                    {{sumTotalObj.totalBalanceUsd | number:'1.3-3'}}
-                                                </ng-container>
-                                            </td>
-                                            <td rowspan="5" colspan="5"></td>
-                                        </tr>
-                                        <tr class="bg-locked">
-                                            <td rowspan="5"></td>
-                                        </tr>
-                                        <tr class="bg-locked">
-                                            <td rowspan="5"></td>
-                                        </tr>
-                                        <tr class="bg-locked">
-                                            <td rowspan="5"></td>
-                                        </tr>
-                                        <tr class="bg-locked">
-                                            <td rowspan="5"></td>
-                                        </tr>
                                     </ng-container>
                                     <tr app-table-none-record *ngIf="!listDebit.length"></tr>
                                 </tbody>
+                                <tfoot *ngIf="!!listDebit.length">
+                                    <tr class="font-weight-bold bg-locked">
+                                        <td rowspan="6" colspan="7" ALIGN="right">Total</td>
+                                        <td class="text-right" rowspan="6" ALIGN="center">
+                                            <ng-container
+                                                *ngIf="sumTotalObj.totalBalanceVnd >= 0;else balanceVndPositive">
+                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}} VND
+                                            </ng-container>
+                                        </td>
+                                        <td class="text-right" rowspan="6" ALIGN="center">
+                                            <ng-container
+                                                *ngIf="sumTotalObj.totalBalanceUsd >= 0;else balanceUsdPositive">
+                                                {{sumTotalObj.totalBalanceUsd | number:'1.3-3'}} USD
+                                            </ng-container>
+                                        </td>
+                                        <td rowspan="6" colspan="5"></td>
+                                    </tr>
+                                </tfoot>
                             </table>
                         </div>
                         <div class="row">
                             <div class="col-lg-12 font-14 m--margin-top-20">
                                 <ul class="list-group list-group-flush">
                                     <li class="list-group-item">
-                                        <span class="font-weight-bold">Debit : </span>
+                                        <span class="font-weight-bold"> Debit : </span>
                                         {{(sumTotalObj.totalDebitVnd + sumTotalObj.totalDebitUsd) | number:'1.0-3'}}
                                         <span class="font-weight-bold">VND |</span>
                                         {{(sumTotalObj.totalDebitUsd + sumTotalObj.totalDebitOBHUsd) | number:'1.3-3'}}
@@ -450,7 +440,7 @@
             <div class="modal-footer m--align-center">
                 <button class="btn btn-brand  m-btn--icon m-btn--uppercase" (click)="addToReceipt()">
                     <span>
-                        <i class="la la-download"></i>
+                        <i class="la la-plus"></i>
                         <span>
                             Add To Receipt
                         </span>
