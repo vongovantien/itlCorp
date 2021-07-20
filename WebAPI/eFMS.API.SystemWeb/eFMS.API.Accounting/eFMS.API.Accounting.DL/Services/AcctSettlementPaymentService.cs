@@ -1311,7 +1311,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         public IQueryable<ChargeSettlementPaymentMngt> GetListChargeSettlementPaymentMngt(string settlementNo, string jobId, string hbl, string mbl)
         {
-            var settlement = DataContext.Get();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
             var payee = catPartnerRepo.Get();
@@ -1319,6 +1319,11 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
+            // get settlement status
+            var settleStatus = settlement.StatusApproval;
+            // get requester name
+            var userRequest = sysUserRepo.Get(x => x.Id == settlement.Requester).FirstOrDefault().EmployeeId;
+            var requester = sysEmployeeRepo.Get(em => em.Id == userRequest).FirstOrDefault()?.EmployeeNameVn;
 
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1338,11 +1343,15 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     SettlementNo = settlementNo,
                                     AdvanceNo = sur.AdvanceNo,
+                                    ChargeCode = cc.Code,
                                     ChargeName = cc.ChargeNameEn,
                                     TotalAmount = sur.Total,
                                     SettlementCurrency = sur.CurrencyId,
                                     OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),
+                                    InvoiceNo = sur.InvoiceNo,
+                                    SettlementStatus = settleStatus,
+                                    Requester = requester
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1364,11 +1373,15 @@ namespace eFMS.API.Accounting.DL.Services
                                {
                                    SettlementNo = settlementNo,
                                    AdvanceNo = sur.AdvanceNo,
+                                   ChargeCode = cc.Code,
                                    ChargeName = cc.ChargeNameEn,
                                    TotalAmount = sur.Total,
                                    SettlementCurrency = sur.CurrencyId,
                                    OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),
+                                   InvoiceNo = sur.InvoiceNo,
+                                   SettlementStatus = settleStatus,
+                                   Requester = requester
                                };
             var data = dataOperation.Union(dataDocument);
             return data;

@@ -223,6 +223,8 @@ namespace eFMS.API.Accounting.Controllers
         {
             var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL, requester);
             var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL, requester);
+            // List Charges Detail
+            var listChargeDetail = new List<ChargeSettlementPaymentMngt>();
 
             //Lấy ra list các currency của cả 2 (không trùng currency)
             List<string> currencies = new List<string>();
@@ -242,6 +244,11 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     currencies.Add(item.SettlementCurrency);
                 }
+                foreach(var sp in settlementPayment)
+                {
+                    listChargeDetail.AddRange(sp.ChargeSettlementPaymentMngts);
+                }
+                listChargeDetail = listChargeDetail.OrderBy(x => x.SettlementNo).ThenBy(x => x.AdvanceNo).ToList();
             }
 
             var totalAdvance = "";
@@ -272,7 +279,8 @@ namespace eFMS.API.Accounting.Controllers
                 totalSettlement = totalSettlement,
                 balance = balance,
                 AdvancePayment = advancePayment,
-                SettlementPayment = settlementPayment
+                SettlementPayment = settlementPayment,
+                ChargesSettlementPayment = listChargeDetail
             };
             return Ok(result);
         }
