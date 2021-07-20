@@ -5,7 +5,7 @@ import { AppList } from '@app';
   selector: 'detail-charges-payment',
   templateUrl: './detail-charges-payment.component.html'
 })
-export class DetailChargesPaymentComponent extends AppList implements OnInit {
+export class SettlementDetailChargesPaymentComponent extends AppList implements OnInit {
   headers: CommonInterface.IHeaderTable[];
   chargesSettlementPayment: any = [];
   

@@ -3,7 +3,7 @@ import { PopupBase } from 'src/app/popup.base';
 import { AccountingRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
-import { DetailChargesPaymentComponent } from './detail-charges-payment/detail-charges-payment.component';
+import { SettlementDetailChargesPaymentComponent } from './detail-charges-payment/detail-charges-payment.component';
 
 @Component({
     selector: 'payment-management-popup',
@@ -11,7 +11,7 @@ import { DetailChargesPaymentComponent } from './detail-charges-payment/detail-c
 })
 
 export class SettlementPaymentManagementPopupComponent extends PopupBase {
-    @ViewChild(DetailChargesPaymentComponent) detailChargesPaymentComponent: DetailChargesPaymentComponent;
+    @ViewChild(SettlementDetailChargesPaymentComponent) detailChargesPaymentComponent: SettlementDetailChargesPaymentComponent;
     data: IPaymentManagement = null;
     constructor(
         private _accountingRepo: AccountingRepo,

@@ -40,7 +40,7 @@ import { SettlePaymentEffect } from './components/store/effects/settlement-payme
 import { NgxMaskModule, IConfig } from 'ngx-mask';
 
 import { SettlementShipmentAttachFilePopupComponent } from './components/popup/shipment-attach-files/shipment-attach-file-settlement.popup';
-import { DetailChargesPaymentComponent } from './components/popup/payment-management/detail-charges-payment/detail-charges-payment.component';
+import { SettlementDetailChargesPaymentComponent } from './components/popup/payment-management/detail-charges-payment/detail-charges-payment.component';
 
 const routing: Routes = [
     {
@@ -80,7 +80,8 @@ const COMPONENT = [
     SettlementTableListChargePopupComponent,
     SettlementChargeFromShipmentPopupComponent,
     SettlementPaymentsPopupComponent,
-    SettlementShipmentAttachFilePopupComponent
+    SettlementShipmentAttachFilePopupComponent,
+    SettlementDetailChargesPaymentComponent
 ];
 
 const customCurrencyMaskConfig = {
@@ -127,7 +128,6 @@ const maskConfig: Partial<IConfig> = {
         SettlementPaymentAddNewComponent,
         SettlementPaymentDetailComponent,
         ApporveSettlementPaymentComponent,
-        DetailChargesPaymentComponent,
         ...COMPONENT
     ],
     entryComponents: [
