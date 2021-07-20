@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
 import { AccountingRepo } from 'src/app/shared/repositories';
 import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, finalize } from 'rxjs/operators';
+import { SettlementDetailChargesPaymentComponent } from './detail-charges-payment/detail-charges-payment.component';
 
 @Component({
     selector: 'payment-management-popup',
@@ -10,6 +11,7 @@ import { catchError, finalize } from 'rxjs/operators';
 })
 
 export class SettlementPaymentManagementPopupComponent extends PopupBase {
+    @ViewChild(SettlementDetailChargesPaymentComponent) detailChargesPaymentComponent: SettlementDetailChargesPaymentComponent;
     data: IPaymentManagement = null;
     constructor(
         private _accountingRepo: AccountingRepo,
@@ -29,7 +31,8 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
             totalSettlement: '',
             totalAdvance: '',
             advancePayment: [],
-            settlementPayment: []
+            settlementPayment: [],
+            chargesSettlementPayment: []
         };
     }
 
@@ -44,6 +47,14 @@ export class SettlementPaymentManagementPopupComponent extends PopupBase {
                 }
             );
     }
+
+    viewTabDetail(){
+        this.detailChargesPaymentComponent.chargesSettlementPayment = this.data.chargesSettlementPayment;
+    }
+
+    closePopup() {
+        this.hide();
+    }
 }
 
 
@@ -56,4 +67,5 @@ interface IPaymentManagement {
     totalSettlement: string;
     settlementPayment: any[];
     advancePayment: any[];
+    chargesSettlementPayment: any[];
 }
