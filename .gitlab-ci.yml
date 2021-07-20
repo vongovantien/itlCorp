@@ -25,7 +25,7 @@ job_build:
         - echo "job_build doing something..."
         - echo "end job_build"
     only:
-        - prod/11-07-2021-sprint24
+        - uat/12-07-2021-sprint24
     artifacts:
         name: "angular_build"
         paths:
