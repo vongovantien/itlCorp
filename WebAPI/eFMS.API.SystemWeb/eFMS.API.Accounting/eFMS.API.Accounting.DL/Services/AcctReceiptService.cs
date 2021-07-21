@@ -542,7 +542,23 @@ namespace eFMS.API.Accounting.DL.Services
             result.CustomerName = partnerInfo?.ShortName;
 
             // Check có tồn tại 1 invoice thu chưa hết.
-            result.IsReceiptBankFee = result.Payments.Any(x => !string.IsNullOrEmpty(x.PaymentStatus) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
+            if(result.Status == AccountingConstants.RECEIPT_STATUS_DONE)
+            {
+                result.IsReceiptBankFee = result.Payments.Any(x => !string.IsNullOrEmpty(x.PaymentStatus) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
+                if (result.IsReceiptBankFee == true)
+                {
+                    var obhPaidAprt = result.Payments.Where(x => x.Type == "OBH" && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
+                    if (obhPaidAprt.Count() > 0)
+                    {
+                        foreach (var item in obhPaidAprt)
+                        {
+                            // filter ID without Paid
+                            item.RefIds = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && item.RefIds.Contains(x.Id.ToString())
+                           && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).Select(x => x.Id.ToString()).ToList();
+                        }
+                    }
+                }
+            }
 
             //Số phiếu con đã reject
             var totalRejectReceiptSync = receiptSyncRepository.Get(x => x.ReceiptId == receipt.Id && x.SyncStatus == AccountingConstants.STATUS_REJECTED).Count();
@@ -618,14 +634,6 @@ namespace eFMS.API.Accounting.DL.Services
                     currentUser.Action = "ReceiptSaveCancel";
                     hs = SaveCancel(receiptModel.Id);
                     break;
-                case SaveAction.SAVEBANK_ADD:
-                    currentUser.Action = "ReceiptSaveBankFee";
-                    hs = AddDraft(receiptModel, true);
-                    break;
-                case SaveAction.SAVEBANK_DONE:
-                    currentUser.Action = "ReceiptSaveBankFeeDone";
-                    hs = SaveDone(receiptModel, true);
-                    break;
             }
             return hs;
         }
@@ -691,30 +699,18 @@ namespace eFMS.API.Accounting.DL.Services
             return _payment;
         }
 
-        private List<AccAccountingPayment> GenerateListPaymentOBH(AcctReceipt receipt, List<ReceiptInvoiceModel> paymentOBHGrps, bool IsCreateBankFee = false)
+        private List<AccAccountingPayment> GenerateListPaymentOBH(AcctReceipt receipt, List<ReceiptInvoiceModel> paymentOBHGrps)
         {
             List<AccAccountingPayment> results = new List<AccAccountingPayment>();
 
             foreach (ReceiptInvoiceModel paymentOBH in paymentOBHGrps)
             {
-                List<AccAccountingManagement> invoicesTemp = new List<AccAccountingManagement>();
-                
-                if(IsCreateBankFee == true)
-                {
-                    // lấy ra tất cả các hóa đơn tạm theo group và # paid nếu đang thu phiếu thu ngân hàng
-                    invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE 
-                            && paymentOBH.RefIds.Contains(x.Id.ToString()) 
-                            && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                // lấy ra tất cả các hóa đơn tạm theo group
+                List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE 
+                && paymentOBH.RefIds.Contains(x.Id.ToString()) && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID )
                          .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
                          .ToList(); // xắp xếp theo unpaidAmount
-                }
-                else
-                {
-                    // lấy ra tất cả các hóa đơn tạm theo group
-                    invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && paymentOBH.RefIds.Contains(x.Id.ToString()))
-                         .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
-                         .ToList(); // xắp xếp theo unpaidAmount
-                }
+
                 decimal remainOBHAmountVnd = paymentOBH.PaidAmountVnd ?? 0; // Tổng tiền thu VND trên group OBH
                 decimal remainOBHAmountUsd = paymentOBH.PaidAmountUsd ?? 0;// Tổng tiền thu USD trên group OBH
 
@@ -876,7 +872,7 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
         }
 
-        private HandleState AddPayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt, bool IsCreateBankFee = false)
+        private HandleState AddPayments(List<ReceiptInvoiceModel> listReceiptInvoice, AcctReceipt receipt)
         {
             HandleState hs = new HandleState();
 
@@ -886,7 +882,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (paymentOBHGrps.Count > 0)
             {
-                listPaymentOBH = GenerateListPaymentOBH(receipt, paymentOBHGrps, IsCreateBankFee);
+                listPaymentOBH = GenerateListPaymentOBH(receipt, paymentOBHGrps);
             }
 
             List<ReceiptInvoiceModel> paymentDebitAndCredit = listReceiptInvoice.Where(x => x.Type != "OBH").ToList();
@@ -1190,7 +1186,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hsAgreementUpdate;
         }
 
-        public HandleState AddDraft(AcctReceiptModel receiptModel, bool IsCreateBankFee = false)
+        public HandleState AddDraft(AcctReceiptModel receiptModel)
         {
             try
             {
@@ -1219,7 +1215,7 @@ namespace eFMS.API.Accounting.DL.Services
                         HandleState hs = DataContext.Add(receipt, false);
                         if (hs.Success)
                         {
-                            HandleState hsPayment = AddPayments(receiptModel.Payments, receipt, IsCreateBankFee);
+                            HandleState hsPayment = AddPayments(receiptModel.Payments, receipt);
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1308,7 +1304,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public HandleState SaveDone(AcctReceiptModel receiptModel, bool IsCreateBankFee = false)
+        public HandleState SaveDone(AcctReceiptModel receiptModel)
         {
             try
             {
@@ -1347,7 +1343,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
 
                                 // Phát sinh Payment
-                                HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent, IsCreateBankFee);
+                                HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
                                 // Cập nhật CusAdvance cho hợp đồng
@@ -1366,7 +1362,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                             // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
-                            HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent, IsCreateBankFee);
+                            HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
 
                             HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
 

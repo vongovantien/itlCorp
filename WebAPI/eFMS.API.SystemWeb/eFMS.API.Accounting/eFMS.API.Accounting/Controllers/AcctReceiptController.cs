@@ -172,7 +172,7 @@ namespace eFMS.API.Accounting.Controllers
             }
 
             //Check exists invoice payment PAID
-            if (saveAction != SaveAction.SAVECANCEL && saveAction != SaveAction.SAVEBANK_ADD)
+            if (saveAction != SaveAction.SAVECANCEL)
             {
                 string msgCheckPaidPayment = CheckInvoicePaid(receiptModel);
                 if (msgCheckPaidPayment.Length > 0)
@@ -194,7 +194,7 @@ namespace eFMS.API.Accounting.Controllers
                 var message = HandleError.GetMessage(hs, Crud.Update);
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
             }
-            else if (saveAction == SaveAction.SAVEDONE || saveAction == SaveAction.SAVEBANK_DONE)
+            else if (saveAction == SaveAction.SAVEDONE)
             {
                 if (hs.Success)
                 {

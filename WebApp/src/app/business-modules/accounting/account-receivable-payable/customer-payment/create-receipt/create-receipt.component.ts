@@ -46,8 +46,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     receiptRefDetail: ReceiptModel;
     titleReceipt: string;
 
-    isCreateBankFee: boolean = false;
-
     constructor(
         protected readonly _router: Router,
         protected readonly _toastService: ToastrService,
@@ -85,7 +83,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 (res: ReceiptModel) => {
                     if (!!res) {
                         this.titleReceipt = "Create Bank Fee Receipt";
-                        this.isCreateBankFee = true;
                         this.setFormBankReceipt(res);
                     }
                 },
@@ -114,14 +111,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         let action: number;
         switch (actionString) {
             case 'draft':
-                !this.isCreateBankFee ? (action = SaveReceiptActionEnum.DRAFT_CREATE) : (action = SaveReceiptActionEnum.BANK_CREATE);
+                action = SaveReceiptActionEnum.DRAFT_CREATE;
                 break;
             case 'update':
                 action = SaveReceiptActionEnum.DRAFT_UPDATE;
                 break;
             case 'done':
                 action = SaveReceiptActionEnum.DONE;
-                !this.isCreateBankFee ? (action = SaveReceiptActionEnum.DONE) : (action = SaveReceiptActionEnum.BANK_DONE);
                 break;
             case 'cancel':
                 action = SaveReceiptActionEnum.CANCEL;
