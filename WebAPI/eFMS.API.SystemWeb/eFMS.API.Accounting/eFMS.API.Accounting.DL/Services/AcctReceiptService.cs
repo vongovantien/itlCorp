@@ -450,13 +450,13 @@ namespace eFMS.API.Accounting.DL.Services
                     OfficeId = s.FirstOrDefault().OfficeInvoiceId,
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
                     CompanyId = s.FirstOrDefault().CompanyInvoiceId,
-                    RefIds = listOBH.Select(x => x.RefId).ToList(),
+                    RefIds = listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList(),
                     CreditNo = s.FirstOrDefault().CreditNo,
                     Hblid = s.FirstOrDefault().Hblid,
                     Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
                     Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
-                    PaymentStatus = GetPaymentStatus(listOBH.Select(x => x.RefId).ToList())
+                    PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList())
                 }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -553,8 +553,10 @@ namespace eFMS.API.Accounting.DL.Services
                         foreach (var item in obhPaidAprt)
                         {
                             // filter ID without Paid
-                            item.RefIds = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && item.RefIds.Contains(x.Id.ToString())
+                            var ids = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && item.RefIds.Contains(x.Id.ToString())
                            && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).Select(x => x.Id.ToString()).ToList();
+
+                            item.RefIds = ids;
                         }
                     }
                 }
