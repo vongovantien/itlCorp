@@ -170,8 +170,8 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 }
                 break;
             case 'agreement':
-                console.log(data);
                 this.agreementId.setValue((data as IAgreementReceipt).id);
+                this._store.dispatch(SelectReceiptAgreement({ cusAdvanceAmount: null })) // ! Dispatch action to Trigger new state to call caculateAmountFromDebitList 
                 this._store.dispatch(SelectReceiptAgreement({ ...data }));
                 break;
             default:

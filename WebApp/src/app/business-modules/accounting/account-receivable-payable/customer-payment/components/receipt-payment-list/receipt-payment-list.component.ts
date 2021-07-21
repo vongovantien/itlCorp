@@ -420,7 +420,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 this.paidAmountVND.setValue(cusAdvanceAmount);
             }
         } else {
-            this.paidAmountUSD.setValue(paidUSD);
+            this.paidAmountUSD.setValue(+(+(paidUSD)).toFixed(2) ?? 0);
             this.paidAmountVND.setValue(paidVND);
         }
 

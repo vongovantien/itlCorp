@@ -75,12 +75,6 @@
                                             <td>
                                                 <span>{{debit.partnerName}}</span>
                                             </td>
-                                            <!-- <td ALIGN="right">
-                                                <span>{{debit.amount | number}} {{debit.currencyId}}</span>
-                                            </td>
-                                            <td ALIGN="right">
-                                                <span>{{debit.unpaidAmount | number}} {{debit.currencyId}}</span>
-                                            </td> -->
                                             <td ALIGN="right">
                                                 <ng-container *ngIf="debit.type === 'CREDIT';else notCredit1">
                                                     {{(-debit.unpaidAmountVnd) | number}}
@@ -121,13 +115,13 @@
                                         <td rowspan="6" colspan="7" ALIGN="right">Total</td>
                                         <td class="text-right" rowspan="6" ALIGN="center">
                                             <ng-container
-                                                *ngIf="sumTotalObj.totalBalanceVnd >= 0;else balanceVndPositive">
+                                                *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
                                                 {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}} VND
                                             </ng-container>
                                         </td>
                                         <td class="text-right" rowspan="6" ALIGN="center">
                                             <ng-container
-                                                *ngIf="sumTotalObj.totalBalanceUsd >= 0;else balanceUsdPositive">
+                                                *ngIf="sumTotalObj.totalBalanceUsd >= 0;else TplTotalObjectBalanceUsdNegative">
                                                 {{sumTotalObj.totalBalanceUsd | number:'1.3-3'}} USD
                                             </ng-container>
                                         </td>
@@ -136,42 +130,99 @@
                                 </tfoot>
                             </table>
                         </div>
-                        <div class="row">
-                            <div class="col-lg-12 font-14 m--margin-top-20">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <span class="font-weight-bold"> Debit : </span>
-                                        {{(sumTotalObj.totalDebitVnd + sumTotalObj.totalDebitUsd) | number:'1.0-3'}}
-                                        <span class="font-weight-bold">VND |</span>
-                                        {{(sumTotalObj.totalDebitUsd + sumTotalObj.totalDebitOBHUsd) | number:'1.3-3'}}
-                                        <span class="font-weight-bold">USD</span>
-                                    </li>
-                                    <li class="list-group-item">
-                                        <span class="font-weight-bold">Credit : </span>
-                                        {{(sumTotalObj.totalCreditVnd) | number:'1.0-3'}}
-                                        <span class="font-weight-bold">VND |</span>
-                                        {{(sumTotalObj.totalCreditUsd) | number:'1.3-3'}} USD
-                                    </li>
-                                    <li class="list-group-item">
-                                        <span class="font-weight-bold">Balance: </span>
-                                        <ng-container *ngIf="sumTotalObj.totalBalanceVnd >= 0;else balanceVndPositive">
-                                            {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
-                                        </ng-container>
-                                        <ng-template #balanceVndPositive>
-                                            {{sumTotalObj.totalBalanceVnd | negativeNumber:'1.0-3' }}
-                                        </ng-template>
-                                        <span class="font-weight-bold">VND |</span>
-                                        <ng-container *ngIf="sumTotalObj.totalBalanceUsd >= 0;else balanceUsdPositive">
-                                            {{sumTotalObj.totalBalanceUsd | number:'1.3-3'}}
-                                        </ng-container>
-                                        <ng-template #balanceUsdPositive>
-                                            {{sumTotalObj.totalBalanceUsd | negativeNumber:'1.3-3' }}
-
-                                        </ng-template>
-                                        <span class="font-weight-bold">USD</span>
-                                    </li>
-                                </ul>
-                            </div>
+                        <div class="table-horizontal m--margin-top-30">
+                            <table class="table table-bordered table-brand dataTable table-hover pointer">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="text-center" colspan="2">In Receipt</th>
+                                        <th class="text-center" colspan="2">In Get Debit/Invoice/Credit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="font-weight-bold text-center">
+                                        <td class="font-weight-normal text-left">
+                                            Debit (Debit + OBH)
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            {{(sumTotalObjectPaymentReceipt.totalDebitVnd +
+                                            sumTotalObjectPaymentReceipt.totalDebitOBHVnd)
+                                            | number:'1.0-3'}}
+                                            VND
+                                        </td>
+                                        <td>
+                                            {{(sumTotalObjectPaymentReceipt.totalDebitUsd +
+                                            sumTotalObjectPaymentReceipt.totalDebitOBHUsd)
+                                            | number:'1.3-3'}}
+                                            USD
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            {{(sumTotalObj.totalDebitVnd + sumTotalObj.totalDebitOBHVnd)
+                                            | number:'1.0-3'}}
+                                            VND
+                                        </td>
+                                        <td>
+                                            {{(sumTotalObj.totalDebitUsd + sumTotalObj.totalDebitOBHUsd)
+                                            | number:'1.3-3'}}
+                                            USD
+                                        </td>
+                                    </tr>
+                                    <tr class="font-weight-bold text-center">
+                                        <td class="font-weight-normal text-left">
+                                            Credit
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            {{sumTotalObjectPaymentReceipt.totalCreditVnd | number:'1.0-3'}}
+                                            VND
+                                        </td>
+                                        <td>
+                                            {{sumTotalObjectPaymentReceipt.totalCreditUsd | number:'1.3-3'}}
+                                            USD
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            {{sumTotalObj.totalCreditVnd | number:'1.0-3'}}
+                                            VND
+                                        </td>
+                                        <td>
+                                            {{sumTotalObj.totalCreditUsd | number:'1.3-3'}}
+                                            USD
+                                        </td>
+                                    </tr>
+                                    <tr class="font-weight-bold text-center">
+                                        <td class="font-weight-normal text-left">
+                                            Balance
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            <ng-container
+                                                *ngIf="sumTotalObjectPaymentReceipt.totalBalanceVnd >= 0;else TplTotalObjectPaymentReceiptBalanceVndNegative">
+                                                {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}}
+                                            </ng-container>
+                                            VND
+                                        </td>
+                                        <td>
+                                            <ng-container
+                                                *ngIf="sumTotalObjectPaymentReceipt.totalBalanceUsd >= 0;else TplTotalObjectPaymentReceiptBalanceUsdNegative">
+                                                {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}}
+                                            </ng-container>
+                                            USD
+                                        </td>
+                                        <td style="border-right-color:#d5d5d5">
+                                            <ng-container
+                                                *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
+                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
+                                            </ng-container>
+                                            VND
+                                        </td>
+                                        <td>
+                                            <ng-container
+                                                *ngIf="sumTotalObj.totalBalanceUsd >= 0;else TplTotalObjectBalanceUsdNegative">
+                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
+                                            </ng-container>
+                                            USD
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </ng-container>
@@ -435,6 +486,7 @@
                         </div>
                     </div>
                 </ng-container>
+
             </div>
 
             <div class="modal-footer m--align-center">
@@ -458,3 +510,18 @@
         </div>
     </div>
 </div>
+
+<ng-template #TplTotalObjectBalanceVndNegative>
+    {{sumTotalObj.totalBalanceVnd | negativeNumber:'1.0-3' }}
+</ng-template>
+
+<ng-template #TplTotalObjectBalanceUsdNegative>
+    {{sumTotalObj.totalBalanceUsd | negativeNumber:'1.3-3' }}
+</ng-template>
+<ng-template #TplTotalObjectPaymentReceiptBalanceVndNegative>
+    {{sumTotalObjectPaymentReceipt.totalBalanceVnd | negativeNumber:'1.0-3' }}
+</ng-template>
+
+<ng-template #TplTotalObjectPaymentReceiptBalanceUsdNegative>
+    {{sumTotalObjectPaymentReceipt.totalBalanceUsd | negativeNumber:'1.3-3' }}
+</ng-template>

@@ -126,7 +126,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 break;
         }
 
-
         const receiptModel: ReceiptModel = this.getDataForm();
 
         this.paymentList = [];
@@ -141,8 +140,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                         })
                     }
                 });
-            }
-            )
+            })
+
         if (this.paymentList.length === 0) {
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;

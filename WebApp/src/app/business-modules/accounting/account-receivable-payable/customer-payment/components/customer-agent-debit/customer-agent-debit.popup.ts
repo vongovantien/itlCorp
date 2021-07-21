@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState } from '../../store/reducers';
 import { SortService } from '@services';
 import { AgencyReceiptModel } from 'src/app/shared/models/accouting/agency-receipt.model';
+import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 @Component({
     selector: 'customer-agent-debit-popup',
@@ -35,8 +36,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         { title: 'MBL', field: 'mbl', sortable: true },
         { title: 'PartnerId', field: 'taxCode', sortable: true },
         { title: 'Partner Name', field: 'partnerName', sortable: true },
-        // { title: 'Amount', field: 'amount', sortable: true },
-        // { title: 'Unpaid Amount', field: 'unpaid', sortable: true },
         { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true, width: 150 },
         { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true, width: 150 },
         { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
@@ -53,7 +52,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     TYPELIST: string = 'LIST';
     partnerId: string;
 
-    sumTotalObj = {
+    sumTotalObj: ITotalObject = {
         totalDebitVnd: 0,
         totalDebitUsd: 0,
         totalDebitOBHVnd: 0,
@@ -62,12 +61,24 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         totalCreditUsd: 0,
         totalBalanceVnd: 0,
         totalBalanceUsd: 0,
-    }
+    };
+    sumTotalObjectPaymentReceipt: ITotalObject = {
+        totalDebitVnd: 0,
+        totalDebitUsd: 0,
+        totalDebitOBHVnd: 0,
+        totalDebitOBHUsd: 0,
+        totalCreditVnd: 0,
+        totalCreditUsd: 0,
+        totalBalanceVnd: 0,
+        totalBalanceUsd: 0,
+    };
+    currentPaymentReceiptCurrent: ReceiptInvoiceModel[] = [];
+
     constructor(
-        private _sortService: SortService,
-        private _accountingRepo: AccountingRepo,
-        private _store: Store<IAppState>,
-        private _toastService: ToastrService,
+        private readonly _sortService: SortService,
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _store: Store<IAppState>,
+        private readonly _toastService: ToastrService,
     ) {
         super();
         this.requestSort = this.sortDebit;
@@ -81,8 +92,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
             { title: 'Tax Code', field: 'taxCode', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
-            // { title: 'Amount', field: 'amount', sortable: true },
-            // { title: 'Unpaid', field: 'unpaid', sortable: true },
             { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true, width: 150 },
             { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true, width: 150 },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
@@ -107,10 +116,25 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (id) => {
-                    this.resetTotalObj();
+                    this.sumTotalObj = this.resetTotalObj(this.sumTotalObj);
+                    this.sumTotalObjectPaymentReceipt = this.resetTotalObj(this.sumTotalObjectPaymentReceipt);
                     this.partnerId = id;
                 }
             )
+
+        combineLatest([
+            this._store.select(ReceiptDebitListState),
+            this._store.select(ReceiptCreditListState)])
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(x => {
+                this.currentPaymentReceiptCurrent.length = 0;
+                x.forEach((element: ReceiptInvoiceModel[]) => {
+                    this.currentPaymentReceiptCurrent.push(...element);
+                });
+                if (!!this.currentPaymentReceiptCurrent.length) {
+                    this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
+                }
+            })
     }
 
     checkAllChange() {
@@ -126,7 +150,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     }
 
     onApply(body) {
-        this.resetTotalObj();
         if (this.type.includes("CUSTOMER")) {
             this._accountingRepo.getDataIssueCustomerPayment(body)
                 .pipe(catchError(this.catchError))
@@ -134,8 +157,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                     (res: ReceiptInvoiceModel[]) => {
                         if (!!res) {
                             this.listDebit = res || [];
-
-                            this.calculateSumDataObject(this.listDebit);
                             this.filterList();
                         }
                     },
@@ -163,32 +184,37 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     filterListCredit() {
         this._store.select(ReceiptCreditListState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((result: any) => {
-                if (!!result) {
+            .subscribe((result: ReceiptInvoiceModel[]) => {
+                if (!!result.length) {
                     this.listCreditInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        result.every((t: { [x: string]: string; }) => {
-                            return s["refNo"] !== t["refNo"]
-                        }));
-                    this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
-                        x.invoices.forEach(invoice => {
-                            for (let i = 0; i < result.length; i++) {
+                        // result.every((t: { [x: string]: string; }) => {
+                        //     return s["refNo"] !== t["refNo"]
+                        // })
+                        result.filter(x => x.refNo === s.refNo).length == 0
+                    );
+                    if (this.type === "AGENT") {
+                        this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
+                        this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
+                            x.invoices.forEach(invoice => {
+                                for (let i = 0; i < result.length; i++) {
 
-                                if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) {
-                                    invoice.isSelected = true;
+                                    if (result[i].isSelected === true && invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) {
+                                        invoice.isSelected = true;
+                                    }
+                                    if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) || invoice.refNo === result[i].refNo) {
+                                        const index = x.invoices.indexOf(invoice);
+                                        x.invoices.splice(index, 1);
+                                    }
+                                    if (invoice.isSelected === true && this.checkAllAgency) {
+                                        const index = x.invoices.indexOf(invoice);
+                                        x.invoices.splice(index, 1);
+                                    }
                                 }
-                                if ((invoice.refNo === result[i].refNo && invoice.jobNo === result[i].jobNo && invoice.mbl === result[i].mbl && invoice.hbl === result[i].hbl) || invoice.refNo === result[i].refNo) {
-                                    const index = x.invoices.indexOf(invoice);
-                                    x.invoices.splice(index, 1);
-                                }
-                                if (invoice.isSelected === true && this.checkAllAgency) {
-                                    const index = x.invoices.indexOf(invoice);
-                                    x.invoices.splice(index, 1);
-                                }
-                            }
+                            });
                         });
-                    });
-                    this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+                        this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+                    }
                 }
             });
     }
@@ -196,39 +222,45 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     filterListDebit() {
         this._store.select(ReceiptDebitListState)
             .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((result: any) => {
-                if (!!result) {
+            .subscribe((result: ReceiptInvoiceModel[]) => {
+                if (!!result.length) {
                     this.listDebitInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        result.every((t: { [x: string]: string; }) => {
-                            return s["refNo"] !== t["refNo"];
-                        }));
+                        // result.every((t: { [x: string]: string; }) => {
+                        //     return s["refNo"] !== t["refNo"];
+                        // })
+                        result.filter(x => x.refNo === s.refNo).length == 0
+                    );
+                    this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
 
-                    this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
-                        x.invoices.forEach(invoice => {
-                            result.forEach(t => {
-                                if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl) {
-                                    invoice.isSelected = true;
-                                }
-                                if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl)) {
-                                    const index = x.invoices.indexOf(invoice);
-                                    x.invoices.splice(index, 1);
-                                }
-                                if (invoice.isSelected === true && this.checkAllAgency) {
-                                    const index = x.invoices.indexOf(invoice);
-                                    x.invoices.splice(index, 1);
-                                }
-                            })
+                    if (this.type === "AGENT") {
+                        this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
+                            x.invoices.forEach(invoice => {
+                                result.forEach(t => {
+                                    if (t.isSelected === true && invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl) {
+                                        invoice.isSelected = true;
+                                    }
+                                    if ((invoice.refNo === t.refNo && invoice.jobNo === t.jobNo && invoice.mbl === t.mbl && invoice.hbl === t.hbl)) {
+                                        const index = x.invoices.indexOf(invoice);
+                                        x.invoices.splice(index, 1);
+                                    }
+                                    if (invoice.isSelected === true && this.checkAllAgency) {
+                                        const index = x.invoices.indexOf(invoice);
+                                        x.invoices.splice(index, 1);
+                                    }
+                                })
+                            });
                         });
-                    });
 
-                    this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
-                        if (x.isSelected) {
-                            x.invoices = [];
-                        }
-                    })
+                        this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
+                            if (x.isSelected) {
+                                x.invoices = [];
+                            }
+                        })
 
-                    this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+                        this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+                    }
+
                 }
             })
     }
@@ -345,40 +377,63 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         })
     }
 
-    calculateSumDataObject(model: ReceiptInvoiceModel[]) {
+    calculateSumDataObject(model: ReceiptInvoiceModel[]): ITotalObject {
+        const totalObject: ITotalObject = {
+            totalDebitVnd: 0,
+            totalDebitUsd: 0,
+            totalDebitOBHVnd: 0,
+            totalDebitOBHUsd: 0,
+            totalCreditVnd: 0,
+            totalCreditUsd: 0,
+            totalBalanceVnd: 0,
+            totalBalanceUsd: 0,
+        };
         if (!model.length) {
-            return;
+            return totalObject;
         }
         for (let index = 0; index < model.length; index++) {
             const element = model[index];
             switch (element.type) {
                 case 'CREDIT':
-                    this.sumTotalObj.totalCreditVnd += element.unpaidAmountVnd;
-                    this.sumTotalObj.totalCreditUsd += element.unpaidAmountUsd;
+                    totalObject.totalCreditVnd += element.unpaidAmountVnd;
+                    totalObject.totalCreditUsd += element.unpaidAmountUsd;
                     break;
                 case 'DEBIT':
-                    this.sumTotalObj.totalDebitVnd += element.unpaidAmountVnd;
-                    this.sumTotalObj.totalDebitUsd += element.unpaidAmountUsd;
+                    totalObject.totalDebitVnd += element.unpaidAmountVnd;
+                    totalObject.totalDebitUsd += element.unpaidAmountUsd;
                     break;
                 case 'OBH':
-                    this.sumTotalObj.totalDebitOBHVnd += element.unpaidAmountVnd;
-                    this.sumTotalObj.totalDebitOBHUsd += element.unpaidAmountUsd;
+                    totalObject.totalDebitOBHVnd += element.unpaidAmountVnd;
+                    totalObject.totalDebitOBHUsd += element.unpaidAmountUsd;
                     break;
                 default:
                     break;
             }
-            this.sumTotalObj.totalBalanceVnd = (this.sumTotalObj.totalDebitOBHVnd + this.sumTotalObj.totalDebitVnd) - this.sumTotalObj.totalCreditVnd;
-            this.sumTotalObj.totalBalanceUsd = (this.sumTotalObj.totalDebitOBHUsd + this.sumTotalObj.totalDebitUsd) - this.sumTotalObj.totalCreditUsd;
+            totalObject.totalBalanceVnd = (totalObject.totalDebitOBHVnd + totalObject.totalDebitVnd) - totalObject.totalCreditVnd;
+            totalObject.totalBalanceUsd = (totalObject.totalDebitOBHUsd + totalObject.totalDebitUsd) - totalObject.totalCreditUsd;
         }
 
-        console.log(this.sumTotalObj);
+        return totalObject;
     }
 
-    resetTotalObj() {
-        for (const key in this.sumTotalObj) {
-            this.sumTotalObj[key] = 0;
+    resetTotalObj(totalObject: ITotalObject): ITotalObject {
+        for (const key in totalObject) {
+            totalObject[key] = 0;
         }
+
+        return totalObject;
     }
+}
+
+interface ITotalObject {
+    totalDebitVnd: number,
+    totalDebitUsd: number,
+    totalDebitOBHVnd: number,
+    totalDebitOBHUsd: number,
+    totalCreditVnd: number,
+    totalCreditUsd: number,
+    totalBalanceVnd: number,
+    totalBalanceUsd: number,
 }
 
 
