@@ -33,7 +33,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
     partner: AbstractControl;
     searchText: AbstractControl;
     creator: AbstractControl;
-    issuedDate: AbstractControl;
+    exportDate: AbstractControl;
+    accountingDate: AbstractControl;
     filterType: AbstractControl;
     filterStatus: AbstractControl;
 
@@ -60,7 +61,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.formSearch = this._fb.group({
             searchText: [],
             partner: [],
-            issuedDate: [],
+            exportDate: [],
+            accountingDate: [],
             creator: [],
             filterType: [this.filterTypes[0]],
             filterStatus: []
@@ -70,7 +72,8 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
         this.creator = this.formSearch.controls['creator'];
         this.searchText = this.formSearch.controls['searchText'];
         this.filterType = this.formSearch.controls['filterType'];
-        this.issuedDate = this.formSearch.controls['issuedDate'];
+        this.exportDate = this.formSearch.controls['exportDate'];
+        this.accountingDate = this.formSearch.controls['accountingDate'];
         this.filterStatus = this.formSearch.controls['filterStatus'];
 
     }
@@ -89,14 +92,17 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
     }
 
     searchInvoiceCDnote() {
-        const s = (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
+        const s = (!!this.exportDate.value && !!this.exportDate.value.startDate) ? formatDate(this.exportDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         const body: ISearchDataInvoiceCDNote = {
             referenceNos: this.searchText.value,
             partnerId: this.partner.value,
-            issuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             creatorId: this.creator.value,
             type: this.filterType.value === 'All' ? null : this.filterType.value,
-            status: this.filterStatus.value
+            status: this.filterStatus.value,
+            fromExportDate: this.exportDate.value ? (this.exportDate.value.startDate !== null ? formatDate(this.exportDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            toExportDate: this.exportDate.value ? (this.exportDate.value.endDate !== null ? formatDate(this.exportDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
+            fromAccountingDate: this.accountingDate.value ? (this.accountingDate.value.startDate !== null ? formatDate(this.accountingDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+            toAccountingDate: this.accountingDate.value ? (this.accountingDate.value.endDate !== null ? formatDate(this.accountingDate.value.endDate, 'yyyy-MM-dd', 'en') : null) : null,
         };
         this.onSearch.emit(body);
     }
@@ -113,8 +119,11 @@ export class AccountingManagementFormSearchComponent extends AppForm implements 
 interface ISearchDataInvoiceCDNote {
     referenceNos: string;
     partnerId: string;
-    issuedDate: string;
     creatorId: string;
     type: string;
     status: string;
+    fromExportDate:string;
+    toExportDate:string;
+    fromAccountingDate:string;
+    toAccountingDate:string;
 }

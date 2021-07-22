@@ -419,6 +419,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
+
+        public Stream GenerateAccountingManagementDebCreInvExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
+                    BindingDataAccoutingManagementDebCreInvExcel(workSheet, acctMngts, typeOfAcctMngt);
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+
         public Stream GenerateOBHPaymentShipmentExcel(List<AccountingPaymentModel> listObj, Stream stream = null)
         {
             List<string> headers = new List<string>()
@@ -3641,6 +3663,67 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 38].Value = item.StatusInvoice; //Tình trạng hóa đơn
                 workSheet.Cells[rowStart, 39].Value = item.VatPartnerEmail;
                 workSheet.Cells[rowStart, 40].Value = item.ReleaseDateEInvoice;
+                rowStart += 1;
+            }
+
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+        private void BindingDataAccoutingManagementDebCreInvExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
+        {
+            SetWidthColumnExcelAccoutingManagement(workSheet);
+            List<string> headers = new List<string>
+            {
+                "JobNo",//0
+                "InvoiceNo",//1
+                "MBLNo",//2
+                "HBLNo",//3
+                "VoucherID",//4
+                "CDNote_Code",//5
+                "Code_Type",//6
+                "ChargeType",//7
+                "PayerID",//8
+                "Payer_Name",//9
+                "PartnerType",//10
+                "Curr",//10
+                "Amount",//11
+                "Issued_by",//12
+                "BU",//13
+                "Service Date"//14
+            };
+            int rowStart = 1;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                workSheet.Cells[rowStart, i + 1].Value = headers[i];
+                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+
+            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            workSheet.View.FreezePanes(2, 1);
+
+            rowStart += 1;
+            foreach (var item in acctMngts)
+            {
+                workSheet.Cells[rowStart, 1].Value = item.JobNo;
+                workSheet.Cells[rowStart, 2].Value = item.InvoiceNo; 
+                workSheet.Cells[rowStart, 3].Value = item.Mbl;
+                workSheet.Cells[rowStart, 4].Value = item.Hbl;
+                workSheet.Cells[rowStart, 5].Value = item.VoucherId; 
+                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo; 
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteType; 
+                workSheet.Cells[rowStart, 8].Value = item.ChargeType; 
+                workSheet.Cells[rowStart, 9].Value = item.PayerId; 
+                workSheet.Cells[rowStart, 10].Value = item.PayerName; 
+                workSheet.Cells[rowStart, 11].Value = item.PayerType; 
+                workSheet.Cells[rowStart, 12].Value = item.Currency; 
+                workSheet.Cells[rowStart, 13].Value = item.Amount; 
+                workSheet.Cells[rowStart, 14].Value = item.IssueBy; 
+                workSheet.Cells[rowStart, 15].Value = item.Bu; 
+                workSheet.Cells[rowStart, 16].Value = item.ServiceDate; 
+                workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
 

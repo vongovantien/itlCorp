@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common;
+﻿using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
@@ -314,6 +315,20 @@ namespace eFMS.API.Documentation.Controllers
         public IActionResult PreviewCombineBilling([FromBody]List<CombineBillingCriteria> criteria)
         {
             var result = cdNoteServices.PreviewCombineBilling(criteria);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// get invoice - cd note
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetDataAcctMngtDebCretInvExport")]
+        //[Authorize]
+        public IActionResult GetDataAcctMngtDebCretInvExport(AccAccountingManagementCriteria criteria)
+        {
+            var result = cdNoteServices.GetDataAcctMngtDebCretInvExport(criteria);
             return Ok(result);
         }
     }

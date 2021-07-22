@@ -1,4 +1,5 @@
-﻿using eFMS.API.Common.Globals;
+﻿using eFMS.API.Accounting.DL.Models.ExportResults;
+using eFMS.API.Common.Globals;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.DL.Models.Exports;
@@ -28,5 +29,6 @@ namespace eFMS.API.Documentation.DL.IService
         AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
         Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria);
         Crystal PreviewCombineBilling(List<CombineBillingCriteria> criteria);
+        List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(AccAccountingManagementCriteria criteria);
     }
 }

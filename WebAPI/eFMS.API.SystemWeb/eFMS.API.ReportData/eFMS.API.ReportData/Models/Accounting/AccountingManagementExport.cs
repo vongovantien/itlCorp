@@ -4,6 +4,7 @@ namespace eFMS.API.ReportData.Models.Accounting
 {
     public class AccountingManagementExport
     {
+
         public Guid SurchargeId { get; set; }
         public Guid ChargeId { get; set; }
         public string ChargeCode { get; set; }
@@ -55,5 +56,14 @@ namespace eFMS.API.ReportData.Models.Accounting
         public DateTime? ReleaseDateEInvoice { get; set; } //Ngày phát hành E-Invoice
         public string TkNoVat { get; set; } //Tài khoản Nợ VAT
         public string TkCoVat { get; set; } //Tài khoản Có VAT
+        public string CdNoteType { get;  set; }
+        public string ChargeType { get; set; }
+        public string PayerId { get;set; }
+        public string PayerName { get; set; }
+        public string PayerType { get; set; }
+        public string Amount { get; set; }
+        public string IssueBy { get; set; }
+        public string Bu { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }

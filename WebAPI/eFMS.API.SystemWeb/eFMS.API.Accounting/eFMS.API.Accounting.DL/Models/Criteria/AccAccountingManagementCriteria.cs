@@ -14,5 +14,9 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public DateTime? FromIssuedDate { get; set; }
         public DateTime? ToIssuedDate { get; set; }
 
+        public DateTime? FromExportDate { get; set; }
+        public DateTime? ToExportDate { get; set; }
+        public DateTime? FromAccountingDate { get; set; }
+        public DateTime? ToAccountingDate { get; set; }
     }
 }

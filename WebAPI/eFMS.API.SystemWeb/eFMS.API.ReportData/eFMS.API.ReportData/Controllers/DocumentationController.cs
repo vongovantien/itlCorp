@@ -10,6 +10,7 @@ using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
 using eFMS.API.ReportData.Models;
+using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Criteria;
 using eFMS.API.ReportData.Models.Documentation;
 using Microsoft.AspNetCore.Authorization;
@@ -747,6 +748,29 @@ namespace eFMS.API.ReportData.Controllers
             }
             string fileName = "Export OPS CD Note.xlsx";
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export accounting management
+        /// </summary>
+        /// <param name="criteria">List Voucher or Invoices</param>
+        /// <returns></returns>
+        [Route("ExportAccountingManagementDebCreInvoice")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingManagementDebCreInvoice(AccAccountingManagementCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExporDebCretInvUrl);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+
+            var stream = new AccountingHelper().GenerateAccountingManagementDebCreInvExcel(dataObjects.Result, criteria.TypeOfAcctManagement);
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, (criteria.TypeOfAcctManagement == "Invoice" ? "VAT INVOICE" : "VOUCHER") + " - eFMS.xlsx");
             return fileContent;
         }
     }
