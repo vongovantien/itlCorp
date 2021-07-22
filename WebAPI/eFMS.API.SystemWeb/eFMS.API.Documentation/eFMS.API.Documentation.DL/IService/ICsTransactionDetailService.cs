@@ -63,5 +63,7 @@ namespace eFMS.API.Documentation.DL.IService
         HandleState UpdateSurchargeOfHousebill(CsTransactionDetailModel model);
 
         int CheckUpdateHBL(CsTransactionDetailModel model, out string hblNo, out List<string> advs);
+
+        void SendEmailNewHouseToSales(CsTransactionDetail transDetail);
     }
 }

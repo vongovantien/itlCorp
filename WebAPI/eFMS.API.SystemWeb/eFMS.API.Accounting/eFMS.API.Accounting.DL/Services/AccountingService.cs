@@ -882,7 +882,7 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.OBHPartnerCode = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? _partnerPaymentObject?.AccountNo : string.Empty;
                     charge.ChargeType = surcharge.Type.ToUpper() == AccountingConstants.TYPE_CHARGE_SELL ? AccountingConstants.ACCOUNTANT_TYPE_DEBIT : (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : surcharge.Type);
 
-                    //Đối với phí DEBIT - Quy đổi theo currency của SOA (Type Debit)
+                    //Đối với phí DEBIT - SOA là USD thì lấy tỷ giá trong phí
                     if (surcharge.Type == AccountingConstants.TYPE_CHARGE_SELL)
                     {
                         if (sync.CurrencyCode0 != AccountingConstants.CURRENCY_LOCAL)
@@ -891,7 +891,8 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         charge.CurrencyCode = sync.CurrencyCode0; //Set Currency Charge = Currency SOA
-                        charge.ExchangeRate = sync.ExchangeRate0; //Set Exchange Rate of Charge = Exchange Rate of SOA
+                        // charge.ExchangeRate = sync.ExchangeRate0; //Set Exchange Rate of Charge = Exchange Rate of SOA
+                        charge.ExchangeRate = sync.CurrencyCode0 == AccountingConstants.CURRENCY_LOCAL ? sync.ExchangeRate0 : surcharge.FinalExchangeRate;  // CR - 16012
                         // Exchange Rate from currency original charge to currency SOA
                         var _exchargeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, sync.CurrencyCode0);
                         var _unitPrice = surcharge.UnitPrice * _exchargeRate;
@@ -2706,7 +2707,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     var surchargeDebitObhs = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
                     var surchargeDebits = SurchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.Soano == soa.Soano && (!string.IsNullOrEmpty(x.SyncedFrom) || x.AcctManagementId != null));
-                    if (surchargeDebitObhs.Any() && surchargeDebits.Any())
+                    if (surchargeDebitObhs.Any() || surchargeDebits.Any())
                     {
                         return true;
                     }

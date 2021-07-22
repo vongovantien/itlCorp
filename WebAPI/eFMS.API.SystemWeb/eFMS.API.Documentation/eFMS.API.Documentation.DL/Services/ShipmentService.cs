@@ -1157,6 +1157,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.JobNo = item.JobNo;
                 data.etd = item.Etd;
                 data.eta = item.Eta;
+                data.ServiceDate = item.ServiceDate;
                 data.FlightNo = item.FlightNo;
                 data.MblMawb = item.Mawb;
                 data.HblHawb = item.HwbNo;
@@ -1500,6 +1501,7 @@ namespace eFMS.API.Documentation.DL.Services
                     data.ServiceName = API.Common.Globals.CustomData.Services.Where(x => x.Value == "CL").FirstOrDefault()?.DisplayName;
                 }
                 data.JobNo = item.JobNo;
+                data.ServiceDate = item.ServiceDate;
                 data.etd = item.Etd;
                 data.eta = item.Eta;
                 data.FlightNo = item.FlightNo;
@@ -1908,6 +1910,7 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ReferenceNo = shipment.ReferenceNo;
                 data.ServiceName = CustomData.Services.Where(x => x.Value == shipment.TransactionType).Select(x => x.DisplayName).FirstOrDefault();
                 data.JobNo = shipment.JobNo;
+                data.ServiceDate = shipment.ServiceDate;
                 data.etd = shipment.Etd;
                 data.eta = shipment.Eta;
                 data.FlightNo = shipment.FlightNo;

@@ -20,7 +20,5 @@ namespace eFMS.API.Catalogue.Service.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-
-        public virtual SysOffice Branch { get; set; }
     }
 }

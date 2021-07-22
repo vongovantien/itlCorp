@@ -22,6 +22,7 @@
         public const string UserName = "User List.xlsx";
         public const string IncotermList = "Incoterm List.xlsx";
         public const string PotentialList = "Potential Customer List.xlsx";
+        public const string BankName = "Bank List.xlsx";
 
     }
 }

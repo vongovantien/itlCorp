@@ -3609,7 +3609,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
                 IsBODApproved = _advanceApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                BankAccountNo = advancePayment.BankAccountNo,
+                BankAccountName = advancePayment.BankAccountName,
+                BankName = advancePayment.BankName,
+                BankCode = advancePayment.BankCode,
+                PaymentMethod = advancePayment.PaymentMethod,
+                DeadlinePayment = advancePayment?.DeadlinePayment
             };
             return infoAdvance;
         }
@@ -3618,11 +3624,11 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var shipmentsAdvance = new List<InfoShipmentAdvanceExport>();
             var groupJobByHbl = advancePayment.AdvanceRequests
-                .GroupBy(g => new { g.Hbl })
+                .GroupBy(g => new { g.Hblid })
                 .Select(s => new AcctAdvanceRequestModel
                 {
                     JobId = s.First().JobId,
-                    Hbl = s.Key.Hbl,
+                    Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo
                 });

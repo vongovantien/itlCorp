@@ -860,7 +860,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (criteria.StrServices.Contains("CL"))
                     {
                         operations = operations.Where(x => salesMans.Where(w => w == x.SalemanId).Any());
-                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("A"))
+                        if (criteria.StrServices.Contains("I") || criteria.StrServices.Contains("E"))
                         {
                             transactions = transactions.Where(x => jobIdTrans.Where(w => w == x.Id).Any());
                         }

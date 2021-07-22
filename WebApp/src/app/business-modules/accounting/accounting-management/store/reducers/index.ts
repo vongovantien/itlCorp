@@ -20,6 +20,7 @@ export const accountingManagementListLoadingState = createSelector(accountingMan
 export const getAccoutingManagementPartnerState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state.partner);
 export const getAccoutingManagementPaymentTermState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state.partner.paymentTerm);
 export const getAccountingManagementPartnerChargeState = createSelector(accountingManagementState, (state: IAccountingManagementState) => state.partner.charges);
+export const getAccountingManagementGeneralExchangeRate = createSelector(accountingManagementState, (state: IAccountingManagementState) => state && state?.partner.generalExchangeRate);
 
 export const reducers: ActionReducerMap<IAccountingManagementState> = {
     partner: reducer,

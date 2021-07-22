@@ -16,10 +16,14 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -56,7 +60,8 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctAdvancePayment> accAdvancePaymentRepository;
         private readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private IContextBase<CsShippingInstruction> shippingInstructionServiceRepo;
-
+        private readonly IOptions<ApiUrl> apiUrl;
+        private ISysImageService sysImageService;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -92,7 +97,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> accAdvancePaymentRepo,
             ICsShipmentOtherChargeService otherChargeService,
             IContextBase<CsShippingInstruction> shippingInstruction,
-            IContextBase<CatCommodity> commodityRepo) : base(repository, mapper)
+            IContextBase<CatCommodity> commodityRepo,
+            IOptions<ApiUrl> url,
+            ISysImageService imageService) : base(repository, mapper)
         {
             currentUser = user;
             stringLocalizer = localizer;
@@ -125,6 +132,8 @@ namespace eFMS.API.Documentation.DL.Services
             shipmentOtherChargeService = otherChargeService;
             dimensionDetailService = dimensionService;
             shippingInstructionServiceRepo = shippingInstruction;
+            apiUrl = url;
+            sysImageService = imageService;
         }
 
         #region -- INSERT & UPDATE --
@@ -745,6 +754,10 @@ namespace eFMS.API.Documentation.DL.Services
         public int CheckDetailPermission(Guid id)
         {
             var detail = GetById(id);
+            if(detail == null)
+            {
+                return 0;
+            }
             var lstGroups = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
             var lstDepartments = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
 
@@ -2163,6 +2176,7 @@ namespace eFMS.API.Documentation.DL.Services
             List<CsDimensionDetail> dimensionDetails = new List<CsDimensionDetail>();
             List<CsShipmentSurcharge> surcharges = new List<CsShipmentSurcharge>();
             List<CsArrivalFrieghtCharge> freightCharges = new List<CsArrivalFrieghtCharge>();
+            var transDetailCopy = new List<CsTransactionDetail>();
             var siDetail = shippingInstructionServiceRepo.Get(x => x.JobId == model.Id).FirstOrDefault();
 
             try
@@ -2306,6 +2320,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     if (detailTrans != null && detailTrans.Count() > 0)
                     {
+                        transDetailCopy.AddRange(detailTrans);
                         HandleState hsTransDetails = csTransactionDetailRepo.Add(detailTrans, false);
                         HandleState hs = csTransactionDetailRepo.SubmitChanges();
                     }
@@ -2375,6 +2390,18 @@ namespace eFMS.API.Documentation.DL.Services
                                     });
                                     var hsOtherCharges = shipmentOtherChargeService.Add(DataOtherCharge);
                                 }
+                            }
+                        }
+                    }
+
+                    //Send email to salesman
+                    if (transDetailCopy != null && transDetailCopy.Count() > 0)
+                    {
+                        foreach (var house in transDetailCopy)
+                        {
+                            if (!string.IsNullOrEmpty(house.SaleManId))
+                            {
+                                transactionDetailService.SendEmailNewHouseToSales(house);
                             }
                         }
                     }
@@ -2917,8 +2944,11 @@ namespace eFMS.API.Documentation.DL.Services
                 AllowPrint = true,
                 AllowExport = true
             };
-            string folderDownloadReport = CrystalEx.GetFolderDownloadReports();
-            var _pathReportGenerate = folderDownloadReport + "\\PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            // Get path link to report
+            CrystalEx._apiUrl = apiUrl.Value.Url;
+            string folderDownloadReport = CrystalEx.GetLinkDownloadReports();
+            var reportName = "PLSheet" + DateTime.Now.ToString("ddMMyyHHssmm") + ".pdf";
+            var _pathReportGenerate = folderDownloadReport + "/" + reportName;
             result.PathReportGenerate = _pathReportGenerate;
 
             result.AddDataSource(listCharge);
@@ -3347,6 +3377,51 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return errorCode;
+        }
+
+        public async Task<HandleState> CreateFileZip(FileDowloadZipModel m)
+        {
+            try
+            {
+                var pathFile = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.FileName);
+                string startPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\" + m.FolderName + "\\files\\" + m.ObjectId);
+
+                var lstFile = sysImageService.Get(e => e.ObjectId == m.ObjectId && e.Folder == m.FolderName).ToList();
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                //Create File zip
+                using (FileStream zipToOpen = new FileStream(pathFile, FileMode.Create))
+                {
+                    using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Update))
+                    {
+                        for (int i = 0; i < lstFile.Count(); i++)
+                        {
+                            string url = lstFile[i].Url;
+                            int pos = url.LastIndexOf('/') + 1; string fileName = url.Substring(pos, url.Length - pos);
+                            string pathFileName = startPath + "\\" + fileName;
+                            if (!File.Exists(pathFileName))
+                                continue;
+                            ZipArchiveEntry readmeEntry = archive.CreateEntryFromFile(pathFileName, fileName, CompressionLevel.Optimal);
+                        }
+                    }
+                }
+
+                MemoryStream memory = new MemoryStream();
+                using (FileStream stream = new FileStream(pathFile, FileMode.Open))
+                    await stream.CopyToAsync(memory);
+                memory.Position = 0L;
+
+                if (File.Exists(pathFile))
+                    File.Delete(pathFile);
+
+                return new HandleState(true, memory);
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(false, ex.ToString());
+            }
         }
     }
     #endregion

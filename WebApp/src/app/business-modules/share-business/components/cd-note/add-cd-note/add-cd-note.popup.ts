@@ -48,6 +48,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     partnerCurrent: any = {};
     isHouseBillID: boolean = false;
 
+    flexId: AbstractControl;
     note: AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -63,7 +64,11 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     isChangeCharge: boolean = false;
     messageValidate: string = '';
-
+    referenceNoLst: any[] = [];
+    displayFieldFlexID: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'hblNo', label: 'HBL No' },
+        { field: 'referenceNo', label: 'ReferenceNo' },
+    ];
     constructor(
         private _documentationRepo: DocumentationRepo,
         private _sortService: SortService,
@@ -77,9 +82,12 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     ngOnInit() {
         this.formCreate = this._fb.group({
+            flexId: [],
             note: []
         });
         this.note = this.formCreate.controls["note"];
+        this.flexId = this.formCreate.controls["flexId"];
+        this.referenceNoLst = [];
     }
 
     setHeader() {
@@ -108,6 +116,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
         this.initGroup = [];
         this.isChangeCharge = false;
         this.isCheckAllCharge = false;
+        this.referenceNoLst = [];
     }
 
     getListSubjectPartner(mblId: any) {
@@ -134,10 +143,14 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     getListCharges(mblId: string, partnerId: string, isHouseBillID: boolean, cdNoteCode: string) {
+        this.referenceNoLst = [];
+
         this._documentationRepo.getChargesByPartner(mblId, partnerId, isHouseBillID, cdNoteCode)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
+                    // Set value Flex Id when create CD Note
+                    this.setValueFlexId(data);
                     return data.map((item: any) => new ChargeCdNote(item));
                 })
             ).subscribe(
@@ -147,7 +160,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
                             ele.canEdit = true;
-                            const setEdit= ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo): (!!ele.creditNo || !!ele.debitNo);
+                            const setEdit = ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo) : (!!ele.creditNo || !!ele.debitNo);
                             if (setEdit) {
                                 if (!!ele.creditNo && !!ele.paySoano) {
                                     ele.canEdit = false;
@@ -156,8 +169,19 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                                     ele.canEdit = false;
                                 }
                             }
+
                         });
+
+                        //[ADD][01/07/2021][15924][Flexport ID dropdown sẽ load list referenc No của các HBL]
+                        if (element.referenceNoHBL)
+                            this.referenceNoLst.find(x => x.referenceNo === element.referenceNoHBL.trim())
+                                || this.referenceNoLst.push({
+                                    hblNo: element.hwbno,
+                                    referenceNo: element.referenceNoHBL
+                                });
+                        //[END]
                     });
+
                     this.listChargePartner = dataCharges;
                     this.initGroup = dataCharges;
                     this.listCharges = [];
@@ -296,6 +320,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.CDNote.partnerId = this.selectedPartner.value;
             this.CDNote.type = this.selectedNoteType;
             // this.CDNote.currencyId = "VND"; // in the future , this id must be local currency of each country
+            this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
             this.CDNote.note = this.note.value;
             const arrayCharges = [];
@@ -361,7 +386,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                 listCharge.push(charge);
             }
         }
-        // List currency unique      
+        // List currency unique
         const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
@@ -473,5 +498,20 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     onCancelConfirmCloseAdd() {
         this.confirmCloseAddPopup.hide();
+    }
+    setValueFlexId(data: any) {
+        if (this.action === 'create') {
+            let _flexId = '';
+            data.forEach(element => {
+                if (element.listCharges.length > 0 && element.flexId) {
+                    _flexId += element.flexId + '; ';
+                }
+            });
+            this.flexId.setValue(_flexId);
+        }
+    }
+
+    onSelectDataFlexID(data: any) {
+        this.flexId.setValue(data.referenceNo);
     }
 }

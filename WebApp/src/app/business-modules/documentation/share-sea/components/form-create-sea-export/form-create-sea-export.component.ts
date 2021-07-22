@@ -137,6 +137,7 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
                                     res.serviceDate = null;
                                     res.atd = null;
                                     res.serviceDate = null;
+                                    res.ata = null;
                                 }
                             });
                             this.supplierName = res.supplierName;

@@ -8,6 +8,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string JobNo { get; set; }
         public DateTime? etd { get; set; }
         public DateTime? eta { get; set; }
+        public DateTime? ServiceDate { get; set; }
         public string FlightNo { get; set; }
         public string MblMawb { get; set; }
         public string HblHawb { get; set; }

@@ -24,6 +24,8 @@ namespace ReportPerview
                 }
                 catch (Exception ex)
                 {
+                    Utility.WriteToFile("Log Export Crystall fail" , ex.ToString());
+
                     crystal = null;
                     Response.Redirect("~/NotFound.aspx");
                 }
@@ -96,7 +98,8 @@ namespace ReportPerview
                 }
 
                 DiskFileDestinationOptions CrDiskFileDestinationOptions = new DiskFileDestinationOptions();
-                CrDiskFileDestinationOptions.DiskFileName = pathReportGenerate;
+                // edit: export file with path combine disk path and file name
+                CrDiskFileDestinationOptions.DiskFileName = Path.Combine(downloadReportPath, Path.GetFileName(pathReportGenerate));
                 ExportOptions CrExportOptions = cryRpt.ExportOptions;
                 {
                     CrExportOptions.ExportDestinationType = ExportDestinationType.DiskFile;
@@ -104,11 +107,13 @@ namespace ReportPerview
                     CrExportOptions.DestinationOptions = CrDiskFileDestinationOptions;
                     CrExportOptions.FormatOptions = formatOption;
                 }
+                Utility.WriteToFile("Log Export Crystall OPtion", JsonConvert.SerializeObject(CrExportOptions).ToString());
+
                 cryRpt.Export();
             }
             catch (Exception ex)
             {
-
+                Utility.WriteToFile("Log Export Crystall fail", ex.ToString());
             }
         }
 

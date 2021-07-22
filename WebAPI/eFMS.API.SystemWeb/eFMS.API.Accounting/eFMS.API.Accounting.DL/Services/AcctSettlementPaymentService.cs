@@ -186,6 +186,16 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.SettlementCurrency == criteria.CurrencyID);
             }
+
+            if (!string.IsNullOrEmpty(criteria.PayeeId))
+            {
+                query = query.And(x => x.Payee == criteria.PayeeId);
+            }
+
+            if (criteria.DepartmentId != null)
+            {
+                query = query.And(x => x.DepartmentId == criteria.DepartmentId);
+            }
             return query;
         }
 
@@ -1434,10 +1444,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
             }
-            // Data search = PIC
+            // Data search = PIC (PIC = UserCreated of job)
             if (!string.IsNullOrEmpty(criteria.personInCharge))
             {
-                surcharge = surcharge.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+                csTrans = csTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
             }
 
             var userRepo = sysUserRepo.Get();
@@ -4602,7 +4613,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
-                ContactOffice = _contactOffice
+                ContactOffice = _contactOffice,
+                PaymentMethod = settlementPayment.PaymentMethod,
+                BankAccountName = settlementPayment.BankAccountName,
+                BankAccountNo = settlementPayment.BankAccountNo,
+                BankName = settlementPayment.BankName,
+                BankCode = settlementPayment.BankCode,
+                DueDate = settlementPayment.DueDate
             };
             return infoSettlement;
         }
@@ -4695,13 +4712,16 @@ namespace eFMS.API.Accounting.DL.Services
                 var infoShipmentCharge = new InfoShipmentChargeSettlementExport();
                 infoShipmentCharge.ChargeName = catChargeRepo.Get(x => x.Id == sur.ChargeId).FirstOrDefault()?.ChargeNameEn;
                 //Quy đổi theo currency của Settlement
-                // infoShipmentCharge.ChargeAmount = sur.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, sur.CurrencyId, settlementCurrency);
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
+                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
@@ -4783,7 +4803,8 @@ namespace eFMS.API.Accounting.DL.Services
                                             join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc // Join Surcharge.
                                             from sur in sc.DefaultIfEmpty()
                                             join ops in opsTransations on sur.Hblid equals ops.Hblid // Join OpsTranstion
-                                            join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                            //join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                            join cus in custom on ops.JobNo equals cus.JobNo into cus1
                                             from cus in cus1.DefaultIfEmpty()
                                                 //join ar in advRequest on sur.JobNo equals ar.JobId
                                             where sur.SettlementCode == settleCode
@@ -4811,8 +4832,8 @@ namespace eFMS.API.Accounting.DL.Services
                                           join cstd in csTranstionDetails on sur.Hblid equals cstd.Id // Join HBL
                                           join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
                                           from cst in cs.DefaultIfEmpty()
-                                          join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
-                                          from cus in cus1.DefaultIfEmpty()
+                                          //join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                          //from cus in cus1.DefaultIfEmpty()
 
                                           where sur.SettlementCode == settleCode
                                           select new SettlementExportDefault
@@ -4821,7 +4842,7 @@ namespace eFMS.API.Accounting.DL.Services
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
                                               SettlementAmount = sur.Total,
-                                              CustomNo = cus.ClearanceNo,
+                                              CustomNo = string.Empty,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
                                               AdvanceNo = sur.AdvanceNo,

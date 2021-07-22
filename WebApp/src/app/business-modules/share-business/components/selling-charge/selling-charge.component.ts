@@ -69,7 +69,7 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
         this.isShowLoadingPartner = true;
         this._spinner.show(this.spinnerpartner);
 
-        this._catalogueRepo.getListPartner(null, null, { active: true })
+        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER])
             .pipe(
                 catchError(this.catchError), finalize(() => {
                     this._spinner.hide(this.spinnerpartner);
@@ -238,7 +238,9 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
                         c.invoiceDate = null;
                         c.finalExchangeRate = null;
                         c.acctManagementId = null;
-
+                        c.kickBack = null;
+                        c.paySoano = null;
+                        c.syncedFrom = null;
                         // Mặc định lấy customer name của HBL
                         c.paymentObjectId = this.service === 'logistic' ? this.shipment.customerId : this.hbl.customerId;
                         c.partnerName = this.service === 'logistic' ? this.shipment.customerName : this.hbl.customerName;

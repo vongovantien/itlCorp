@@ -7,8 +7,10 @@ import { CatalogueRepo, SystemRepo } from '@repositories';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { getCurrentUserState, IAppState } from '@store';
 @Component({
     selector: 'settle-payment-form-create',
     templateUrl: './form-create-settlement.component.html'
@@ -19,7 +21,7 @@ export class SettlementFormCreateComponent extends AppForm {
     @Output() onChangeCurrency: EventEmitter<Currency> = new EventEmitter<Currency>();
 
     users: Observable<User[]>;
-    userLogged: User;
+    userLogged: Partial<SystemInterface.IClaimUser>;
 
     form: FormGroup;
     settlementNo: AbstractControl;
@@ -34,18 +36,27 @@ export class SettlementFormCreateComponent extends AppForm {
     beneficiaryName: AbstractControl;
     bankAccountNo: AbstractControl;
     bankName: AbstractControl;
+    bankNameDescription: AbstractControl;
     advanceAmount: AbstractControl;
     balanceAmount: AbstractControl;
+    bankCode: AbstractControl;
+    dueDate: AbstractControl;
 
     currencyList: any[] = [{ id: 'VND' }, { id: 'USD' }];
+    displayFieldBank: CommonInterface.IComboGridDisplayField[] = [
+        { field: 'code', label: 'Bank Code' },
+        { field: 'bankNameEn', label: 'Bank Name' }
+    ];
     methods: CommonInterface.ICommonTitleValue[];
 
     customers: any;
+    banks: Observable<any[]>;
 
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
-        private _catalogueRepo: CatalogueRepo
+        private _catalogueRepo: CatalogueRepo,
+        private _store: Store<IAppState>
     ) {
         super();
     }
@@ -56,6 +67,7 @@ export class SettlementFormCreateComponent extends AppForm {
         this.getUserLogged();
         this.getSystemUser();
         this.getCustomer();
+        this.banks = this._catalogueRepo.getListBank(null, null, { active: true });
 
     }
 
@@ -73,8 +85,11 @@ export class SettlementFormCreateComponent extends AppForm {
             'beneficiaryName': [],
             'bankAccountNo': [],
             'bankName': [],
+            'bankNameDescription': [],
             'advanceAmount': [],
-            'balanceAmount': []
+            'balanceAmount': [],
+            'bankCode': [],
+            'dueDate': []
         });
 
 
@@ -90,8 +105,11 @@ export class SettlementFormCreateComponent extends AppForm {
         this.beneficiaryName = this.form.controls['beneficiaryName'];
         this.bankAccountNo = this.form.controls['bankAccountNo'];
         this.bankName = this.form.controls['bankName'];
+        this.bankNameDescription = this.form.controls['bankNameDescription'];
         this.advanceAmount = this.form.controls['advanceAmount'];
         this.balanceAmount = this.form.controls['balanceAmount'];
+        this.bankCode = this.form.controls['bankCode'];
+        this.dueDate = this.form.controls['dueDate'];
 
         this.currency.valueChanges.pipe(
             map((data: any) => data)
@@ -103,8 +121,13 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getUserLogged() {
-        this.userLogged = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.requester.setValue(this.userLogged.id);
+        this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((res: any)=>{
+            if(!!res){
+                this.userLogged = res;
+                this.requester.setValue(this.userLogged.id);
+            }
+        })
     }
 
     getSystemUser() {
@@ -140,18 +163,41 @@ export class SettlementFormCreateComponent extends AppForm {
     }
 
     getBeneficiaryInfo() {
-        if (this.paymentMethod.value === this.methods[1] && !!this.payee.value) {
-            const beneficiary = this.getPartnerById(this.payee.value);
-            if (!!beneficiary) {
-                this.beneficiaryName.setValue(beneficiary.partnerNameEn);
-                this.bankAccountNo.setValue(beneficiary.bankAccountNo);
-                this.bankName.setValue(beneficiary.bankName);
+        if (!!this.payee.value) {
+            if (this.paymentMethod.value === this.methods[1] || this.paymentMethod.value === this.methods[3]) {
+                const beneficiary = this.getPartnerById(this.payee.value);
+                if (!!beneficiary) {
+                    this.beneficiaryName.setValue(beneficiary.partnerNameVn);
+                    this.bankAccountNo.setValue(beneficiary.bankAccountNo);
+                    this.setBankInfo(beneficiary);
+                }
+            } else {
+                this.resetBankInfo();
             }
         } else {
-            this.beneficiaryName.setValue(null);
-            this.bankAccountNo.setValue(null);
-            this.bankName.setValue(null);
+            this.resetBankInfo();
+            if (this.paymentMethod.value === this.methods[1]) {
+                if (!!this.userLogged) {
+                    this.beneficiaryName.setValue(this.userLogged.nameVn);
+                    this.bankAccountNo.setValue(this.userLogged.bankAccountNo);
+                    this.setBankInfo(this.userLogged);
+                }
+            }
         }
+    }
+
+    setBankInfo(data: any) {
+        this.bankName.setValue(data.bankCode);
+        this.bankNameDescription.setValue(data.bankName);
+        this.mapBankCode(data.bankCode);
+    }
+
+    resetBankInfo() {
+        this.beneficiaryName.setValue(null);
+        this.bankAccountNo.setValue(null);
+        this.bankName.setValue(null);
+        this.bankNameDescription.setValue(null);
+        this.mapBankCode(null);
     }
 
     getPartnerById(id: string) {
@@ -159,4 +205,24 @@ export class SettlementFormCreateComponent extends AppForm {
         return partner || null;
     }
 
+    mapBankCode(data: any) {
+        this.bankCode.setValue(data);
+    }
+
+    onSelectDataFormInfo(data: any, type: string) {
+        switch (type) {
+            case 'bankName':
+                this.bankName.setValue(data.code);
+                this.bankNameDescription.setValue(data.bankNameEn);
+                break;
+        }
+    }
+
+    checkStaffPartner() {
+        const payeeInfo = this.getPartnerById(this.payee.value);
+        if ((!this.payee.value || payeeInfo.partnerGroup.indexOf('STAFF') !== -1) && this.paymentMethod.value === this.methods[2]) {
+            return true;
+        }
+        return false;
+    }
 }

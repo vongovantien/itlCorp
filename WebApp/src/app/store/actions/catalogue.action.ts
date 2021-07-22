@@ -46,6 +46,10 @@ export enum CatalogueActionTypes {
     GET_COUNTRY = '[Catalogue] Get Country',
     GET_COUNTRY_SUCCESS = '[Catalogue] Get Country Success',
     GET_COUNTRY_FAIL = '[Catalogue] Get Country Fail',
+
+    GET_BANK = '[Catalogue] Get Bank',
+    GET_BANK_SUCCESS = '[Catalogue] Get Bank Success',
+    GET_BANK_FAIL = '[Catalogue] Get Bank Fail',
 }
 
 export class GetCataloguePartnerAction implements Action {
@@ -208,6 +212,22 @@ export class GetCatalogueCurrencyFailAction implements Action {
 }
 //#endregion
 
+//#region Bank
+export class GetCatalogueBankAction implements Action {
+    readonly type = CatalogueActionTypes.GET_BANK;
+    constructor(public payload: any = { active: true }) { }
+}
+export class GetCatalogueBankSuccessAction implements Action {
+    readonly type = CatalogueActionTypes.GET_BANK_SUCCESS;
+    constructor(public payload: any) { }
+}
+export class GetCatalogueBankFailAction implements Action {
+    readonly type = CatalogueActionTypes.GET_BANK_FAIL;
+    constructor(public payload: any) { }
+}
+//#endregion
+
+
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
     | GetCataloguePortSuccessAction
@@ -239,4 +259,7 @@ export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePackageAction
     | GetCataloguePackageSuccessAction
     | GetCataloguePackageFailAction
+    | GetCatalogueBankAction
+    | GetCatalogueBankSuccessAction
+    | GetCatalogueBankFailAction
     ;

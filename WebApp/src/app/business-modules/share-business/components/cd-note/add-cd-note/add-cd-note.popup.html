@@ -5,9 +5,10 @@
                 <h5 class="modal-title" *ngIf="action !== 'update' else updateTitle">Create Credit/Debit Note</h5>
                 <ng-template #updateTitle class="modal-title">
                     <h5 class="modal-title">Edit
-                        <b><span
-                                class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type === 'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
-                        No: <b class="text-warning">{{CDNote.code}}</b></h5>
+                        <b><span class="text-warning">{{CDNote.type === 'CREDIT' ? 'Credit Note': CDNote.type ===
+                                'DEBIT' ? 'Debit Note' : 'Invoice'}}</span></b>
+                        No: <b class="text-warning">{{CDNote.code}}</b>
+                    </h5>
                 </ng-template>
 
                 <button type="button" (click)="closePopup()" class="close">
@@ -18,7 +19,7 @@
                 <div class="m-form m-form--state">
                     <form class="div-inside bg-secondary m--margin-bottom-15" [formGroup]="formCreate">
                         <div class="row">
-                            <div class="col-lg-9">
+                            <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Subject to Partner
@@ -32,6 +33,18 @@
                                         [placeholder]="'Select subject to partner'">
                                     </app-combo-grid-virtual-scroll>
 
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Flex ID
+                                    </label>
+                                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFlexID($event)"
+                                        [displayFields]="displayFieldFlexID" [selectedDisplayFields]="['referenceNo']"
+                                        [dataSources]="referenceNoLst" (remove)="flexId.setValue(null)"
+                                        placeholder="Please Select FlexId" allowFreeText formControlName="flexId">
+                                    </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-3">
