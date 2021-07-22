@@ -64,7 +64,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
 
     isChangeCharge: boolean = false;
     messageValidate: string = '';
-    referenceNoLst:any[]=[];
+    referenceNoLst: any[] = [];
     displayFieldFlexID: CommonInterface.IComboGridDisplayField[] = [
         { field: 'hblNo', label: 'HBL No' },
         { field: 'referenceNo', label: 'ReferenceNo' },
@@ -160,7 +160,7 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                             ele.debit = (ele.type === 'SELL' || (ele.type === 'OBH' && partnerId === ele.paymentObjectId)) ? ele.total : null;
                             ele.credit = (ele.type === 'BUY' || (ele.type === 'OBH' && partnerId === ele.payerId)) ? ele.total : null;
                             ele.canEdit = true;
-                            const setEdit= ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo): (!!ele.creditNo || !!ele.debitNo);
+                            const setEdit = ele.type === "OBH" ? (!!ele.creditNo && !!ele.debitNo) : (!!ele.creditNo || !!ele.debitNo);
                             if (setEdit) {
                                 if (!!ele.creditNo && !!ele.paySoano) {
                                     ele.canEdit = false;
@@ -173,12 +173,12 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
                         });
 
                         //[ADD][01/07/2021][15924][Flexport ID dropdown sẽ load list referenc No của các HBL]
-                        if(element.referenceNoHBL )
-                            this.referenceNoLst.find(x=>x.referenceNo === element.referenceNoHBL.trim())
-                            || this.referenceNoLst.push({
-                                hblNo:element.hwbno,
-                                referenceNo:element.referenceNoHBL
-                            });
+                        if (element.referenceNoHBL)
+                            this.referenceNoLst.find(x => x.referenceNo === element.referenceNoHBL.trim())
+                                || this.referenceNoLst.push({
+                                    hblNo: element.hwbno,
+                                    referenceNo: element.referenceNoHBL
+                                });
                         //[END]
                     });
 
@@ -510,7 +510,8 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
             this.flexId.setValue(_flexId);
         }
     }
-    onSelectDataFlexID(data:any){
-        console.log(data);
+
+    onSelectDataFlexID(data: any) {
+        this.flexId.setValue(data);
     }
 }
