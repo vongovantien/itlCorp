@@ -18,7 +18,7 @@
                 <div class="m-form m-form--state">
                     <form class="div-inside bg-secondary m--margin-bottom-15" [formGroup]="formCreate">
                         <div class="row">
-                            <div class="col-lg-9">
+                            <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label" for="">
                                         Subject to Partner
@@ -32,6 +32,18 @@
                                         [placeholder]="'Select subject to partner'">
                                     </app-combo-grid-virtual-scroll>
 
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Flex ID
+                                    </label>
+                                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFlexID($event)"
+                                            [displayFields]="displayFieldFlexID" [selectedDisplayFields]="['referenceNo']"
+                                            [dataSources]="referenceNoLst" (remove)="resetFormControl(flexId)"
+                                            placeholder="Please Select FlexId" allowFreeText formControlName="flexId">
+                                        </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
                             <div class="col-lg-3">

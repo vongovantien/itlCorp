@@ -54,6 +54,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public decimal DecimalNo { get; set; }
         public decimal CurrDecimalNo { get; set; }
         public decimal ExtVND { get; set; }
+        public string FlexID { get; set; }
     }
 
     public class SeaDebitAgentsNewReportParams
