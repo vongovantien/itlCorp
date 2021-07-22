@@ -326,7 +326,7 @@ namespace eFMS.API.Documentation.Controllers
         [HttpPost]
         [Route("GetDataAcctMngtDebCretInvExport")]
         //[Authorize]
-        public IActionResult GetDataAcctMngtDebCretInvExport(AccAccountingManagementCriteria criteria)
+        public IActionResult GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
         {
             var result = cdNoteServices.GetDataAcctMngtDebCretInvExport(criteria);
             return Ok(result);

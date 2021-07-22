@@ -29,6 +29,6 @@ namespace eFMS.API.Documentation.DL.IService
         AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
         Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria);
         Crystal PreviewCombineBilling(List<CombineBillingCriteria> criteria);
-        List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(AccAccountingManagementCriteria criteria);
+        List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria);
     }
 }

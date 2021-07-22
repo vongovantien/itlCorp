@@ -2772,7 +2772,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(AccAccountingManagementCriteria criteria)
+        public List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
         {
             var cdNotes = Query(criteria).Select(s => new AcctCdnote
             {
