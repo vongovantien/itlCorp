@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -51,6 +52,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<SysUserNotification> sysUserNotificationRepository;
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
+        IContextBase<CatDepartment> departmentRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -80,7 +82,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<CatCommodityGroup> catCommodityGroupRepo,
-            IContextBase<AccAccountingManagement> accountingManagementRepo
+            IContextBase<AccAccountingManagement> accountingManagementRepo,
+            IContextBase<CatDepartment> catDepManagementRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -110,6 +113,7 @@ namespace eFMS.API.Documentation.DL.Services
             sysUserNotificationRepository = sysUsernotifyRepo;
             catCommodityGroupRepository = catCommodityGroupRepo;
             accountingManagementRepository = accountingManagementRepo;
+            departmentRepository = catDepManagementRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -432,7 +436,7 @@ namespace eFMS.API.Documentation.DL.Services
                 entity.ExcRateUsdToLocal = cdNote.ExcRateUsdToLocal;
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-                
+
                 #region --- Set Currency For CD Note ---
                 CatPartner _partnerAcRef = new CatPartner();
                 var _partner = partnerRepositoty.Get(x => x.Id == model.PartnerId).FirstOrDefault();
@@ -706,7 +710,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var cdNoList = new List<string>();
             if (string.IsNullOrEmpty(cdNo))
-            {               
+            {
                 foreach (var item in acctCdNoteList)
                 {
                     cdNoList.Add(item.Code);
@@ -2119,7 +2123,7 @@ namespace eFMS.API.Documentation.DL.Services
             SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
             return result;
         }
-        #endregion -- PREVIEW CD NOTE --        
+        #endregion -- PREVIEW CD NOTE --
 
         private IQueryable<AcctCdnote> Query(CDNoteCriteria criteria)
         {
@@ -2130,10 +2134,13 @@ namespace eFMS.API.Documentation.DL.Services
             Expression<Func<AcctCdnote, bool>> query = x => (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
                                             && (x.UserCreated == criteria.CreatorId || string.IsNullOrEmpty(criteria.CreatorId))
                                             && (x.Type == criteria.Type || string.IsNullOrEmpty(criteria.Type));
-            if (criteria.IssuedDate != null)
-            {
-                query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
-            }
+            //if (criteria.IssuedDate != null)
+            //{
+            //    query = query.And(x => x.DatetimeCreated.Value.Date == criteria.IssuedDate.Value.Date);
+            //}
+
+            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
 
             if (perQuery != null)
             {
@@ -2143,7 +2150,7 @@ namespace eFMS.API.Documentation.DL.Services
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno)).Select(s => s.DebitNo ?? s.CreditNo).ToList();                
+                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno)).Select(s => s.DebitNo ?? s.CreditNo).ToList();
                 if (surchargesCdNote.Count > 0)
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code) || surchargesCdNote.Any(a => a == x.Code));
@@ -2215,13 +2222,13 @@ namespace eFMS.API.Documentation.DL.Services
                 LastSyncDate = s.LastSyncDate,
                 SyncStatus = s.SyncStatus
             }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
-            
+
             if (cdNotes == null)
             {
                 rowsCount = 0;
                 return results;
             }
-            
+
             var charges = surchargeRepository.Get().Select(s => new CsShipmentSurcharge
             {
                 CurrencyId = s.CurrencyId,
@@ -2234,10 +2241,13 @@ namespace eFMS.API.Documentation.DL.Services
                 CreditNo = s.CreditNo,
                 DebitNo = s.DebitNo
             });
-            
+
             var query = from cdnote in cdNotes
                         join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
                         select new { cdnote, charge };
+
+            if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
+                query.Where(x => x.charge.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.charge.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date);
 
             var grpQuery = query.GroupBy(g => new {
                 ReferenceNo = g.charge.DebitNo ?? g.charge.CreditNo,
@@ -2260,7 +2270,7 @@ namespace eFMS.API.Documentation.DL.Services
                 HBLNo = string.Join("; ", se.Charge.Select(s => s.Hblno).Distinct()),
                 Total = se.Charge.Sum(x => x.Total),
                 Currency = se.Currency,
-                IssuedDate = se.CdNote.FirstOrDefault().DatetimeCreated,
+                IssuedDate = se.CdNote.FirstOrDefault().DatetimeCreated, //export date
                 Creator = se.CdNote.FirstOrDefault().UserCreated,
                 Status = se.Charge.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",
                 InvoiceNo = se.Charge.FirstOrDefault().InvoiceNo,
@@ -2285,7 +2295,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                 var partners = partnerRepositoty.Get();
                 var users = sysUserRepo.Get();
-                
+
                 //Join to get info PartnerName, Username create CDNote
                 var joinData = from cd in take
                                join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
@@ -2341,7 +2351,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (cdNote.Type == "CREDIT")
                 {
-                    surcharges = surchargeCredits[cdNote.Code].AsQueryable();               
+                    surcharges = surchargeCredits[cdNote.Code].AsQueryable();
                 }
                 else
                 {
@@ -2349,10 +2359,10 @@ namespace eFMS.API.Documentation.DL.Services
                 }
 
                 if (surcharges != null)
-                {                    
+                {
                     var _partnerName = partnersLookup[cdNote.PartnerId].FirstOrDefault()?.PartnerNameEn;
                     var _creatorCdNote = usersLookup[cdNote.UserCreated].FirstOrDefault()?.Username;
-                    
+
                     var chargeGrps = surcharges.GroupBy(x => new { ReferenceNo = (cdNote.Type == "CREDIT") ? x.CreditNo : x.DebitNo, Currency = x.CurrencyId }).Select(se => new CDNoteModel
                     {
                         Id = cdNote.Id,
@@ -2655,7 +2665,7 @@ namespace eFMS.API.Documentation.DL.Services
         private List<CombineBillingReport> GetDataCombineBilling(IQueryable<CsShipmentSurcharge> surcharges, string partnerId, string currencyCombine)
         {
             var cdNoteCharges = new List<CombineBillingReport>();
-            
+
             var partner = partnerRepositoty.Get(x => x.Id == partnerId).FirstOrDefault();
 
             var grpInvoiceCdNote = surcharges.GroupBy(g => new { CdCode = !string.IsNullOrEmpty(g.CreditNo) ? g.CreditNo : g.DebitNo, InvoiceNo = g.InvoiceNo }).Select(se => new { CdCode = se.Key.CdCode, InvoiceNo = se.Key.InvoiceNo });
@@ -2761,6 +2771,157 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
             return result;
+        }
+
+        public List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
+        {
+            var cdNotes = Query(criteria).Select(s => new AcctCdnote
+            {
+               Id = s.Id,
+               Code = s.Code,
+               JobId = s.JobId,
+               PartnerId = s.PartnerId,
+               UserCreated = s.UserCreated,
+               DatetimeCreated = s.DatetimeCreated,
+               DatetimeModified = s.DatetimeModified,
+               LastSyncDate = s.LastSyncDate,
+               SyncStatus = s.SyncStatus
+            }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
+
+            var charges = surchargeRepository.Get().Select(s => new CsShipmentSurcharge
+            {
+               CurrencyId = s.CurrencyId,
+               Total = s.Total,
+               JobNo = s.JobNo,
+               InvoiceNo = s.InvoiceNo,
+               VoucherId = s.VoucherId,
+               AcctManagementId = s.AcctManagementId,
+               Hblno = s.Hblno,
+               CreditNo = s.CreditNo,
+               DebitNo = s.DebitNo,
+               Type = s.Type,
+               PayerId = s.PayerId,
+
+            });
+
+            var query = from cdnote in cdNotes
+                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
+                       select new { cdnote, charge };
+
+            if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
+               query.Where(x => x.charge.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.charge.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date);
+
+            var grpQuery = query.GroupBy(g => new {
+               ReferenceNo = g.charge.DebitNo ?? g.charge.CreditNo,
+               Currency = g.charge.CurrencyId
+            }).Select(se => new {
+               ReferenceNo = se.Key.ReferenceNo,
+               Currency = se.Key.Currency,
+               CdNote = se.Select(s => s.cdnote),
+               Charge = se.Select(s => s.charge)
+            });
+
+            var selectData = grpQuery.Select(se => new CDNoteModel
+            {
+               Id = se.CdNote.FirstOrDefault().Id,
+               JobId = se.CdNote.FirstOrDefault().JobId,
+               PartnerId = se.CdNote.FirstOrDefault().PartnerId,
+               PartnerName = string.Empty,
+               ReferenceNo = se.ReferenceNo,
+               JobNo = se.Charge.FirstOrDefault().JobNo,
+               HBLNo = string.Join("; ", se.Charge.Select(s => s.Hblno).Distinct()),
+               MBLNo = string.Join("; ", se.Charge.Select(s => s.Mblno).Distinct()),
+               Total = se.Charge.Sum(x => x.Total),
+               Currency = se.Currency,
+               IssuedDate = se.CdNote.FirstOrDefault().DatetimeCreated, //export date
+               Creator = se.CdNote.FirstOrDefault().UserCreated,
+               Status = se.Charge.FirstOrDefault().AcctManagementId != null ? "Issued" : "New",
+               InvoiceNo = se.Charge.FirstOrDefault().InvoiceNo,
+               VoucherId = se.Charge.FirstOrDefault().VoucherId,
+               IssuedStatus = se.Charge.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : se.Charge.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
+               SyncStatus = se.CdNote.FirstOrDefault().SyncStatus,
+               LastSyncDate = se.CdNote.FirstOrDefault().LastSyncDate,
+               DatetimeModified = se.CdNote.FirstOrDefault().DatetimeModified,
+               CodeNo = se.CdNote.FirstOrDefault().Code,
+               CodeType = se.CdNote.FirstOrDefault().Type,
+               ChargeType =se.Charge.FirstOrDefault().Type,
+               PayerId = se.Charge.FirstOrDefault().PayerId,
+               DepartmentId = se.CdNote.FirstOrDefault().DepartmentId,
+            });
+
+            var _resultDatas = GetByStatus(criteria.Status, selectData).ToArray();
+
+            var partners = partnerRepositoty.Get();
+            var users = sysUserRepo.Get();
+            var departments = departmentRepository.Get();
+            var transaction = cstransRepository.Get();
+            var opstransaction = opstransRepository.Get();
+
+            //Join to get info PartnerName, Username create CDNote
+            var dataTrans = from cd in _resultDatas
+                          join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
+                          from partner in partnerGrp.DefaultIfEmpty()
+                          join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
+                          from creator in creatorGrp.DefaultIfEmpty()
+                          join payer in partners on cd.PayerId equals payer.Id into payerGrp
+                          from payer in payerGrp.DefaultIfEmpty()
+                          join departs in departments on cd.DepartmentId equals departs.Id into departGrp
+                          from departs in departGrp.DefaultIfEmpty()
+                          join trans in transaction on cd.JobNo equals trans.JobNo into transGrp
+                          from trans in transGrp.DefaultIfEmpty()
+                          select new AccAccountingManagementResult
+                          {
+                              JobNo = cd.JobNo,
+                              InvoiceNo = cd.InvoiceNo,
+                              Hbl = cd.HBLNo,
+                              Mbl = cd.MBLNo,
+                              VoucherId = cd.VoucherId,
+                              CdNoteNo = cd.CodeNo,
+                              CdNoteType = cd.CodeType,
+                              ChargeType = cd.ChargeType,
+                              PayerId = payer?.Id,
+                              PayerName = payer?.PartnerNameEn,
+                              PayerType = payer?.PartnerType,
+                              Currency= cd.Currency,
+                              Amount= cd.Total,
+                              IssueBy=cd.Creator,
+                              Bu= departs?.DeptNameEn,
+                              ServiceDate=trans?.ServiceDate
+                          };
+
+            var dataOps = from cd in _resultDatas
+                          join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
+                          from partner in partnerGrp.DefaultIfEmpty()
+                          join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
+                          from creator in creatorGrp.DefaultIfEmpty()
+                          join payer in partners on cd.PayerId equals payer.Id into payerGrp
+                          from payer in payerGrp.DefaultIfEmpty()
+                          join departs in departments on cd.DepartmentId equals departs.Id into departGrp
+                          from departs in departGrp.DefaultIfEmpty()
+                          join trans in opstransaction on cd.JobNo equals trans.JobNo into transGrp
+                          from trans in transGrp.DefaultIfEmpty()
+                          select new AccAccountingManagementResult
+                          {
+                              JobNo = cd.JobNo,
+                              InvoiceNo = cd.InvoiceNo,
+                              Hbl = cd.HBLNo,
+                              Mbl = cd.MBLNo,
+                              VoucherId = cd.VoucherId,
+                              CdNoteNo = cd.CodeNo,
+                              CdNoteType = cd.CodeType,
+                              ChargeType = cd.ChargeType,
+                              PayerId = payer?.Id,
+                              PayerName = payer?.PartnerNameEn,
+                              PayerType = payer?.PartnerType,
+                              Currency = cd.Currency,
+                              Amount = cd.Total,
+                              IssueBy = cd.Creator,
+                              Bu = departs?.DeptNameEn,
+                              ServiceDate = trans.ServiceDate
+                          };
+
+            var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();
+            return res;
         }
     }
 }

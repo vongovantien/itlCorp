@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 
-import { DocumentationRepo, AccountingRepo } from '@repositories';
+import { DocumentationRepo, AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { PartnerOfAcctManagementResult, CDNoteViewModel, CombineBillingCriteria, Crystal } from '@models';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
@@ -50,7 +50,8 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         private _ngProgressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -67,7 +68,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Total Amount', field: 'total', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Issue Date', field: 'issuedDate', sortable: true },
+            { title: 'Export Date', field: 'issuedDate', sortable: true },
             { title: 'Creator', field: 'creator', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Issued for Voucher No', field: 'voucherId', sortable: true },
@@ -233,7 +234,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         const cdNotes: CDNoteViewModel[] = this.cdNotes.filter(x => x.isSelected);
         if (!!cdNotes.length) {
             this.cdNoteCombine = cdNotes.map(i => new CombineBillingCriteria({ cdNoteCode: i.referenceNo, partnerId: i.partnerId, partnerName: i.partnerName, currencyCombine: currency })).filter((g, i, arr) => arr.findIndex(t => t.cdNoteCode === g.cdNoteCode) === i); // Distinct CdNote Code;
-            const partners: CombineBillingCriteria[] = this.cdNoteCombine.filter((g, i, arr) => arr.findIndex(t => t.partnerId === g.partnerId) === i); //Distinct PartnerId           
+            const partners: CombineBillingCriteria[] = this.cdNoteCombine.filter((g, i, arr) => arr.findIndex(t => t.partnerId === g.partnerId) === i); //Distinct PartnerId
             if (partners.length > 1) {
                 this.selectPartnerCombinePopup.listPartners = partners;
                 this.selectPartnerCombinePopup.selectedPartner = null;
@@ -266,6 +267,23 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
                         }, 1000);
                     } else {
                         this._toastService.warning('There is no data to display preview');
+                    }
+                },
+            );
+    }
+    exportInvoice(){
+        this._progressRef.start();
+        this._exportRepo.exportAccountingManagementDebCreInvoice(this.dataSearch)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'INVOICE - eFMS.xlsx');
+                    } else {
+                        this._toastService.warning('There is no data to export', '');
                     }
                 },
             );

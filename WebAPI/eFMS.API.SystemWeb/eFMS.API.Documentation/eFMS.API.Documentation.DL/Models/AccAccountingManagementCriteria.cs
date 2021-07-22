@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
 
-namespace eFMS.API.ReportData.Models.Criteria
+namespace eFMS.API.Accounting.DL.Models.ExportResults
 {
     public class AccAccountingManagementCriteria
     {
