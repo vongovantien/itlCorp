@@ -404,3 +404,4 @@ WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server
 WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server/sqlite3/storage.ide
 WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server/sqlite3/storage.ide-shm
 WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server/sqlite3/storage.ide-wal
+.gitlab-ci.yml

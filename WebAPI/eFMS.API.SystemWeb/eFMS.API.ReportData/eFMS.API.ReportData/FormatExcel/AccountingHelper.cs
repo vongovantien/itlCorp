@@ -3344,7 +3344,6 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 11, p, 13].Style.WrapText = true;
             workSheet.Cells[p, 11, p, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 11, p, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-
             workSheet.Row(p).Height = 50;
 
             p = p + 1;

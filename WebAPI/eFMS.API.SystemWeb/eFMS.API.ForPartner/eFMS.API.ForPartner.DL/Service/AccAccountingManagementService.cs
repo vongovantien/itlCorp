@@ -22,6 +22,7 @@ using System.Data.SqlClient;
 using eFMS.API.ForPartner.Service.ViewModels;
 using System.Data;
 using eFMS.API.ForPartner.DL.ViewModel;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -47,6 +48,8 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<SysCompany> companyRepository;
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
+        private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
+        private readonly IContextBase<AccAccountReceivable> accReceivableRepository;
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -71,7 +74,9 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctReceipt> receiptRepo,
             IContextBase<SysCompany> companyRepo,
             IContextBase<CatContract> catContractRepo,
-            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
+            IContextBase<AcctReceiptSync> receiptSyncRepo,
+            IContextBase<AccAccountReceivable> accReceivableRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -94,6 +99,8 @@ namespace eFMS.API.ForPartner.DL.Service
             companyRepository = companyRepo;
             catContractRepository = catContractRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
+            receiptSyncRepository = receiptSyncRepo;
+            accReceivableRepository = accReceivableRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -639,10 +646,20 @@ namespace eFMS.API.ForPartner.DL.Service
                             UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
 
+
                         var smSoa = acctSOARepository.SubmitChanges();
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
                         var smSur = surchargeRepo.SubmitChanges();
                         var sm = DataContext.SubmitChanges();
+
+                        // Tính lại công nợ của hđ vừa hủy từ bravo.
+                        if(sm.Success)
+                        {
+                            CalculatorInvoiceReceivable(data);
+                            accReceivableRepository.SubmitChanges();
+                        }
+                        
+
                         trans.Commit();
                     }
                     return hs;
@@ -657,6 +674,101 @@ namespace eFMS.API.ForPartner.DL.Service
                     trans.Dispose();
                 }
             }
+        }
+
+        public void CalculatorInvoiceReceivable(AccAccountingManagement invoice)
+        {
+            AccAccountReceivableModel receivable = new AccAccountReceivableModel();
+            CatPartner partner = partnerRepo.Get(x => x.Id == invoice.PartnerId).FirstOrDefault();
+            // Hđ của đối tượng này đang cho bao nhiêu service.
+
+            var totalInvoiceServices = invoice.ServiceType.Split(";").ToList();
+            //Không tính công nợ cho đối tượng Internal
+            if (partner != null && partner.PartnerMode != "Internal")
+            {
+                receivable.PartnerId = invoice.PartnerId;
+                receivable.Office = invoice.OfficeId;
+                receivable.Service = invoice.ServiceType;
+                receivable.AcRef = partner.ParentId ?? partner.Id;
+                CatContract contractPartner = catContractRepository.Get(x => x.Active == true
+                                                                && x.PartnerId == invoice.PartnerId
+                                                                && x.OfficeId.Contains(invoice.OfficeId.ToString())
+                                                                && x.SaleService.Contains(invoice.ServiceType)).FirstOrDefault();
+                if (contractPartner == null)
+                {
+                    // Lấy currency local và use created of partner gán cho Receivable
+                    receivable.ContractId = null;
+                    receivable.ContractCurrency = ForPartnerConstants.CURRENCY_LOCAL;
+                    receivable.SaleMan = null;
+                    receivable.UserCreated = partner.UserCreated;
+                    receivable.UserModified = partner.UserCreated;
+                    receivable.GroupId = partner.GroupId;
+                    receivable.DepartmentId = partner.DepartmentId;
+                    receivable.OfficeId = partner.OfficeId;
+                    receivable.CompanyId = partner.CompanyId;
+                }
+                else
+                {
+                    // Lấy currency của contract & user created of contract gán cho Receivable
+                    receivable.ContractId = contractPartner.Id;
+                    receivable.ContractCurrency = contractPartner.CurrencyId;
+                    receivable.SaleMan = contractPartner.SaleManId;
+                    receivable.UserCreated = contractPartner.UserCreated;
+                    receivable.UserModified = contractPartner.UserCreated;
+                    receivable.GroupId = null;
+                    receivable.DepartmentId = null;
+                    receivable.OfficeId = invoice.OfficeId;
+                    receivable.CompanyId = contractPartner.CompanyId;
+                }
+            }
+
+            // lấy thông tin + Cập nhật lại công nợcủa đối tượng
+            var receivables = accReceivableRepository.Get(x => x.PartnerId == invoice.PartnerId);
+            if (receivables.Count() > 0)
+            {
+                decimal? _totalAmount = invoice.Currency != ForPartnerConstants.CURRENCY_LOCAL ? invoice.TotalAmountUsd : invoice.TotalAmountVnd;
+                decimal? _totalUnpaid = invoice.Currency != ForPartnerConstants.CURRENCY_LOCAL ? invoice.UnpaidAmountUsd : invoice.UnpaidAmountVnd;
+                decimal? _totalPaid = invoice.Currency != ForPartnerConstants.CURRENCY_LOCAL ? invoice.PaidAmountUsd : invoice.PaidAmountVnd;
+
+                if (totalInvoiceServices.Count == 1)
+                {
+                    AccAccountReceivable receivableCurrent = receivables.Where(x => x.Service == totalInvoiceServices.First())?.FirstOrDefault();
+                    if (receivableCurrent != null)
+                    {
+                        receivableCurrent.BillingAmount = (receivableCurrent.BillingAmount ?? 0) - _totalAmount;
+                        receivableCurrent.BillingUnpaid = (receivableCurrent.BillingUnpaid ?? 0) - _totalUnpaid;
+                        receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
+                        receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) + _totalAmount;
+
+                        receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+                        accReceivableRepository.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
+                    }
+                }
+
+                if (totalInvoiceServices.Count > 1)
+                {
+                    // Chi đều cho các service.
+                    _totalAmount /= totalInvoiceServices.Count;
+                    _totalPaid /= totalInvoiceServices.Count;
+                    _totalUnpaid /= totalInvoiceServices.Count;
+                    foreach (var service in totalInvoiceServices)
+                    {
+                        AccAccountReceivable receivableCurrent = receivables.Where(x => x.Service == service)?.FirstOrDefault();
+                        if (receivableCurrent != null)
+                        {
+                            receivableCurrent.BillingAmount = (receivableCurrent.BillingAmount ?? 0) - _totalAmount;
+                            receivableCurrent.BillingUnpaid = (receivableCurrent.BillingUnpaid ?? 0) - _totalUnpaid;
+                            receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
+                            receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) + _totalAmount;
+
+                            receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+
+                            accReceivableRepository.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
+                        }
+                    }
+                }
+            }
+
         }
 
         private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
@@ -1647,32 +1759,42 @@ namespace eFMS.API.ForPartner.DL.Service
             }
         }
 
+        /// <summary>
+        /// Reject ReceiptSync
+        /// </summary>
+        /// <param name="id">id of receiptSync</param>
+        /// <param name="reason">reason reject</param>
+        /// <returns></returns>
         private HandleState RejectPayment(string id, string reason)
         {
-            return new HandleState();
-            //Tạm thời comment, khi nào xong phần receipt sẽ mở lại
-            /*
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
                     var _id = Guid.Empty;
                     Guid.TryParse(id, out _id);
-                    var receipt = receiptRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    var receiptSync = receiptSyncRepository.Get(x => x.Id == _id).FirstOrDefault();
+                    if (receiptSync == null) return new HandleState((object)"Không tìm thấy phiếu thu");
+                    var receipt = receiptRepository.Get(x => x.Id == receiptSync.ReceiptId).FirstOrDefault();
                     if (receipt == null) return new HandleState((object)"Không tìm thấy phiếu thu");
 
-                    receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
-                    receipt.UserModified = currentUser.UserID;
-                    receipt.DatetimeModified = DateTime.Now;
-                    receipt.ReasonReject = reason;
+                    receiptSync.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                    receiptSync.UserModified = currentUser.UserID;
+                    receiptSync.DatetimeModified = DateTime.Now;
+                    receiptSync.ReasonReject = reason;
 
-                    HandleState hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id, false);
+                    HandleState hs = receiptSyncRepository.Update(receiptSync, x => x.Id == receiptSync.Id, false);
                     if (hs.Success)
                     {
-                        HandleState smReceipt = receiptRepository.SubmitChanges();
+                        HandleState smReceipt = receiptSyncRepository.SubmitChanges();
                         if (smReceipt.Success)
                         {
-                            string title = string.Format(@"Accountant Rejected Data Receipt {0}", receipt.PaymentRefNo);
+                            //Update Reject Receipt                            
+                            var receiptSyncs = receiptSyncRepository.Get(x => x.ReceiptId == receiptSync.ReceiptId).ToList();
+                            var hsUpdateRejectReceipt = UpdateRejectReceipt(receipt, receiptSyncs);
+
+                            //Push Notification ReceiptSync
+                            string title = string.Format(@"Accountant Rejected Data Receipt {0}", receiptSync.ReceiptSyncNo);
                             SysNotifications sysNotify = new SysNotifications
                             {
                                 Id = Guid.NewGuid(),
@@ -1717,7 +1839,24 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     trans.Dispose();
                 }
-            }*/
+            }
+        }
+
+        private HandleState UpdateRejectReceipt(AcctReceipt receipt, List<AcctReceiptSync> receiptSyncs)
+        {
+            HandleState hs = new HandleState();
+            //Các phiếu ReceiptSync của Receipt đã reject hết >> Update status Rejected cho Receipt
+            var totalReceiptSync = receiptSyncs.Count();
+            var receiptSyncRejected = receiptSyncs.Where(x => x.SyncStatus == ForPartnerConstants.STATUS_REJECTED).Count();
+            if (totalReceiptSync == receiptSyncRejected && totalReceiptSync != 0)
+            {
+                receipt.SyncStatus = ForPartnerConstants.STATUS_REJECTED;
+                receipt.UserModified = currentUser.UserID;
+                receipt.DatetimeModified = DateTime.Now;
+                receipt.ReasonReject = string.Join("; ", receiptSyncs.Select(s => string.Format("{0} ({1})", s.ReasonReject, s.ReceiptSyncNo))); //Cộng dồn Reason của từng ReceiptSync
+                hs = receiptRepository.Update(receipt, x => x.Id == receipt.Id);
+            }
+            return hs;
         }
 
         /// <summary>
@@ -1883,6 +2022,43 @@ namespace eFMS.API.ForPartner.DL.Service
 
         #endregion --- REJECT & REMOVE DATA ---
 
+        private List<ObjectReceivableModel> GetListObjectReceivableBySurchargeIds(List<Guid> surchargeIds)
+        {
+            var surcharges = surchargeRepo.Get(x => surchargeIds.Any(a => a == x.Id));
+            var objPO = from surcharge in surcharges
+                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
+                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
+            var objPR = from surcharge in surcharges
+                        where !string.IsNullOrEmpty(surcharge.PayerId)
+                        select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
+            var objMerge = objPO.Union(objPR).ToList();
+            var objectReceivables = objMerge.GroupBy(g => new { Service = g.Service, PartnerId = g.PartnerId, Office = g.Office })
+                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
+            return objectReceivables.ToList();
+        }
+        
+        public CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action)
+        {
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            CalculatorReceivableNotAuthorizeModel modelReceivable = new CalculatorReceivableNotAuthorizeModel
+            {
+                UserID = _currentUser.UserID,
+                GroupId = _currentUser.GroupId,
+                DepartmentId = _currentUser.DepartmentId,
+                OfficeID = _currentUser.OfficeID,
+                CompanyID = _currentUser.CompanyID,
+                Action = action,
+                ObjectReceivable = GetListObjectReceivableBySurchargeIds(surchargeIds)
+            };
+            return modelReceivable;
+        }
+
+        public List<Guid> GetSurchargeIdsByRefNoInvoice(string referenceNo)
+        {
+            var surchargeIds = surchargeRepo.Get(x => x.ReferenceNo == referenceNo).Select(s => s.Id).ToList();
+            return surchargeIds;
+        }
+        
         public HandleState UpdateVoucherExpense(VoucherExpense voucherExpense, string apiKey)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);

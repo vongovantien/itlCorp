@@ -227,7 +227,6 @@ export class GetCatalogueBankFailAction implements Action {
 }
 //#endregion
 
-
 export type CatalogueActions = GetCataloguePartnerAction
     | GetCataloguePortAction
     | GetCataloguePortSuccessAction

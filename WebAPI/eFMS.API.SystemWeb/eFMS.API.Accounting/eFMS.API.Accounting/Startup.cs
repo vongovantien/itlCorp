@@ -91,7 +91,6 @@ namespace eFMS.API.Accounting
                         description.GroupName.ToUpperInvariant());
                 }
             });
-
             app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));

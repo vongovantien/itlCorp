@@ -20,7 +20,7 @@ namespace eFMS.API.Documentation.DL.IService
         HousbillProfit GetHouseBillTotalProfit(Guid hblid);
         List<HousbillProfit> GetShipmentTotalProfit(Guid jobId);
         HandleState DeleteMultiple(List<Guid> listId);
-        HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list);
+        HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids);
         IQueryable<CsShipmentSurchargeDetailsModel> GetRecentlyCharges(RecentlyChargeCriteria criteria);
         object CheckAccountReceivable(List<CsShipmentSurchargeModel> list);
         HandleState NotificationCreditTerm(List<CsShipmentSurchargeModel> list);

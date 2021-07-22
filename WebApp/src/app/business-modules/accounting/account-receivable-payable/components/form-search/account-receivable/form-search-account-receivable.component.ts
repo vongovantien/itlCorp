@@ -7,6 +7,10 @@ import { CommonEnum } from '@enums';
 import { User } from 'src/app/shared/models';
 import { AppForm } from 'src/app/app.form';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { SearchListAccountReceivable } from '../../../account-receivable/store/actions';
+import { getAccountReceivableSearchState, IAccountReceivableState } from '../../../account-receivable/store/reducers';
+import { takeUntil } from 'rxjs/operators';
 
 const OverDueDaysValues = [
     { from: null, to: null },
@@ -109,6 +113,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
         private _systemRepo: SystemRepo,
+        private _store: Store<IAccountReceivableState>,
     ) {
         super();
         this.requestSearch = this.submitSearch;
@@ -120,7 +125,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.salemans = this._systemRepo.getListSystemUser();
         this.offices = this._systemRepo.getAllOffice();
-
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -149,6 +153,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.agreementExpiredDays = this.formSearch.controls["agreementExpiredDays"];
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
+
+        this.subscriptionSearchParamState();
     }
 
     // tslint:disable-next-line:no-any
@@ -206,8 +212,41 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
+            fromOverdueDays: dataForm.fromOverdueDays,
+            toOverdueDays: dataForm.toOverdueDays,
+            debitRate: dataForm.debitRate
         };
+
+        this._store.dispatch(SearchListAccountReceivable(body))
         this.onSearch.emit(body);
+    }
+
+    subscriptionSearchParamState() {
+        this._store.select(getAccountReceivableSearchState)
+            .pipe(
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    if (data) {
+                        let formData: any = {
+                            partnerId: data.acRefId ? data.acRefId : null,
+                            overdueDays: data.overDueDay ? data.overDueDay : this.overDueDays[0].id,
+                            fromDebitRate: data.debitRateFrom ? data.debitRateFrom : null,
+                            toDebitRate: data.debitRateTo ? data.debitRateTo : null,
+                            agreementStatus: data.agreementStatus ? data.agreementStatus : this.agreementStatusList[0].id,
+                            agreementExpiredDays: data.agreementExpiredDay ? data.agreementExpiredDay : this.agreementExpiredDayList[0].id,
+                            salesManId: data.salesmanId ? data.salesmanId : null,
+                            officalId: data.officeId ? data.officeId : null,
+                            fromOverdueDays: data.fromOverdueDays ? data.fromOverdueDays : null,
+                            toOverdueDays: data.toOverdueDays ? data.toOverdueDays : null,
+                            debitRate: data.debitRate ? data.debitRate : this.debitRates[0].id
+                        };
+
+                        this.formSearch.patchValue(formData);
+                    }
+                }
+            );
     }
 }
 

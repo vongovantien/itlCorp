@@ -3,17 +3,29 @@ import { NgControl } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { takeUntil } from 'rxjs/operators';
 import { DestroyService } from '@services';
-import { isNumber } from 'lodash';
-import { isDecimal } from 'validator';
+
 
 @Directive({
     selector: '([formControl])[formatDecimalFormControl],([formControlName])[formatDecimalFormControl]',
     providers: [DecimalPipe, DestroyService]
 })
 export class FormatDecimalFormControlDirective {
-    @Input() set minimum(c: string) { this.minValue = c; }
-    
-    minValue: string = null;
+    @Input() set minimum(c: string) { this._minValue = c; }
+
+    private _minValue: string = null;
+
+    @Input() set(format: string) {
+        this._format = format;
+    }
+    private _format = '.0-3';
+
+    get format() {
+        return this._format;
+    }
+
+    get minValue() {
+        return this._minValue;
+    }
     constructor(
         private ngControl: NgControl,
         private decimalPipe: DecimalPipe,
@@ -30,7 +42,7 @@ export class FormatDecimalFormControlDirective {
                     if (!!value) {
                         const result = this.formatNumber(value);
                         if (result.indexOf('.', result.length - 1) === -1) {
-                            this._el.nativeElement.value = this.decimalPipe.transform(result, '.0-3');
+                            this._el.nativeElement.value = this.decimalPipe.transform(result, this.format);
                         }
                     }
                 }
@@ -38,7 +50,7 @@ export class FormatDecimalFormControlDirective {
     }
 
     private formatNumber(value: any) {
-        if(!!value){
+        if (!!value) {
             value = value.toString().replace(/[^-0-9.]+/g, '');
         }
         return this.check(value);
@@ -48,12 +60,12 @@ export class FormatDecimalFormControlDirective {
         if (!!this.minValue) {
             input = input < this.minValue ? '' : input;
         }
-        
-        var index = input.indexOf('.');      
-        if ( index > -1 ) {
-            input = input.substr( 0, index + 1 ) + input.slice( index ).replace( /\./g, '' );
+
+        var index = input.indexOf('.');
+        if (index > -1) {
+            input = input.substr(0, index + 1) + input.slice(index).replace(/\./g, '');
         }
-    
+
         return input;
     }
 

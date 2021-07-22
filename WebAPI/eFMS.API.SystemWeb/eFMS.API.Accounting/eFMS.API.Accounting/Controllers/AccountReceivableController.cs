@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
-using eFMS.API.Common;
 using eFMS.API.Common.Globals;
-using eFMS.API.Common.Infrastructure.Common;
-using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 
@@ -65,15 +60,27 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
-        /// Insert Or Update Receivable
+        /// Calculator Receivable Not Authorize
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
+        [HttpPost("CalculatorReceivableNotAuthorize")]
+        public IActionResult CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        {
+            var calculatorReceivable = accountReceivableService.CalculatorReceivableNotAuthorize(model);
+            return Ok(calculatorReceivable);
+        }
+
+        /// <summary>
+        /// Insert Or Update Receivable
+        /// </summary>
+        /// <param name="models"></param>
+        /// <returns></returns>
         [HttpPost("InsertOrUpdateReceivable")]
         [Authorize]
-        public IActionResult InsertOrUpdateReceivable(ObjectReceivableModel model)
+        public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
         {
-            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(model);
+            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
             return Ok(insertOrUpdateReceivable);
         }
 

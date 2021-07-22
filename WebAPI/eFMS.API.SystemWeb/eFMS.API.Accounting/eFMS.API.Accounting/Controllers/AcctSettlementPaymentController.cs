@@ -150,15 +150,20 @@ namespace eFMS.API.Accounting.Controllers
             var isAllowDelete = acctSettlementPaymentService.CheckDeletePermissionBySettlementNo(settlementNo);
             if (isAllowDelete == false)
             {
-               return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
-
-            if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+            var _settleType = acctSettlementPaymentService.Get(x => x.SettlementNo == settlementNo)?.FirstOrDefault().SettlementType;
+            if (_settleType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+
+                if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",", shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                }
             }
+            
 
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
@@ -169,6 +174,12 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Sau khi xóa thành công >> tính lại công nợ dựa vào settlement no
+                acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
@@ -414,6 +425,12 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi insert Settlement
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+            }
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
@@ -498,6 +515,12 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (hs.Success)
+            {
+                // Tính công nợ sau khi update Settlement
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
             }
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -686,6 +709,10 @@ namespace eFMS.API.Accounting.Controllers
                     ResultHandle _result = new ResultHandle { Status = false, Message = resultInsertUpdateApprove.Exception.Message };
                     return BadRequest(_result);
                 }
+
+                // Tính công nợ sau khi Save And Send Request
+                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+
                 return Ok(result);
             }
             else

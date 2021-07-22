@@ -11,6 +11,8 @@ namespace eFMS.API.Accounting.DL.Models
         public List<ReceiptInvoiceModel> Payments { get; set; }
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
+        public string SubRejectReceipt { get; set; }
+        public bool IsReceiptBankFee { get; set; } // cho phép tạo phiếu thu ngân hàng.
     }
 
     public enum SaveAction
@@ -18,6 +20,8 @@ namespace eFMS.API.Accounting.DL.Models
         SAVEDRAFT_ADD = 0,
         SAVEDRAFT_UPDATE = 1,
         SAVEDONE = 2,
-        SAVECANCEL = 3
+        SAVECANCEL = 3,
+        SAVEBANK_ADD = 4,
+        SAVEBANK_DONE = 5
     }
 }

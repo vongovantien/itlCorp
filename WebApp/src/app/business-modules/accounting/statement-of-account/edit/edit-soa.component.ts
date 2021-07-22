@@ -264,9 +264,6 @@ export class StatementOfAccountEditComponent extends AppList {
                             // * get detail again
                             // this.getDetailSOA(this.soaNO, this.currencyLocal);
 
-                            // Tính công nợ
-                            //this.calculatorReceivable(this.soa.chargeShipments);
-
                             // * init checkbox all
                             this.isCheckAllCharge = false;
                             this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
@@ -299,11 +296,6 @@ export class StatementOfAccountEditComponent extends AppList {
         this.addChargePopup.configCharge = this.configCharge;
 
         this.addChargePopup.show();
-    }
-
-    calculatorReceivable(surcharges: any[]) {
-        /*const objReceivable = surcharges.map((item: any) => ({ surchargeId: item.id }));
-        this._accoutingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();*/
     }
 
     selectJobId(charge: SoaCharge) {

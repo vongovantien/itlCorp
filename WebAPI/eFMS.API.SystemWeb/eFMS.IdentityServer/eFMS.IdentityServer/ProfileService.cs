@@ -22,17 +22,20 @@ namespace eFMS.IdentityServer
         readonly ISysEmployeeService employeeService;
         private readonly IContextBase<SysUserLevel> userLevelRepository;
         private readonly IContextBase<SysCompany> sysCompanyRepository;
+        private readonly IContextBase<SysOffice> sysOfficeRepository;
 
         public ProfileService(IAuthenUserService service, 
             ISysEmployeeService emService,
             IContextBase<SysUserLevel> userLevelRepo,
-            IContextBase<SysCompany> sysCompanyRepo
+            IContextBase<SysCompany> sysCompanyRepo,
+            IContextBase<SysOffice> sysOfficeRepo
             )
         {
             authenUserService = service;
             employeeService = emService;
             userLevelRepository = userLevelRepo;
             sysCompanyRepository = sysCompanyRepo;
+            sysOfficeRepository = sysOfficeRepo;
         }
         public async Task GetProfileDataAsync(ProfileDataRequestContext context)
         {
@@ -46,6 +49,8 @@ namespace eFMS.IdentityServer
             var user = authenUserService.GetUserById(subjectId);
             var employee = employeeService.First(x => x.Id == user.EmployeeId);
             SysCompany company = sysCompanyRepository.Get(x => x.Id.ToString() == companyClaim.Value.ToString())?.FirstOrDefault();
+            SysOffice office = sysOfficeRepository.Get(x => x.Id.ToString() == officeClaim.Value)?.FirstOrDefault();
+
             var claims = new List<Claim>
                 {
                     new Claim(JwtClaimTypes.Id, user.Id),
@@ -61,6 +66,8 @@ namespace eFMS.IdentityServer
                     new Claim("code", employee.StaffCode ?? ""),
                     new Claim("bankAccountNo", employee.BankAccountNo ?? ""),
                     new Claim("bankName", employee.BankName ?? ""),
+                    new Claim("bankOfficeAccountNoVnd", office?.BankAccountVnd ?? ""),
+                    new Claim("bankOfficeAccountNoUsd", office?.BankAccountUsd ?? ""),
                     new Claim("bankCode", employee.BankCode?? ""),
                     new Claim("kbExchangeRate", company.KbExchangeRate != null ? company.KbExchangeRate.ToString() : "0"),
                     companyClaim,

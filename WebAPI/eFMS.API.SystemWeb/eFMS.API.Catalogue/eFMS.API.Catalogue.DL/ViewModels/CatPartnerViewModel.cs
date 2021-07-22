@@ -37,6 +37,8 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string TaxCodeAbbrName { get; set; }
         public string BankAccountNo { get; set; }
         public string BankAccountName { get; set; }
+        public string BankName { get; set; }
+        public string BankCode { get; set; }
         public string PartnerMode { get; set; }
         public string PartnerLocation { get; set; }
         public string Email { get; set; }

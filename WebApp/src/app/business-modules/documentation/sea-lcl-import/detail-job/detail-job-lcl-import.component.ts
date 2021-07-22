@@ -40,7 +40,7 @@ export class SeaLCLImportDetailJobComponent extends SeaLCLImportCreateJobCompone
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE' , 'FILES'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
 
     shipmentDetail: CsTransaction;

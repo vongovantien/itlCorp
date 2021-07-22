@@ -130,26 +130,30 @@
             <div class="col-lg-8">
                 <div class="row">
                     <div class="col-lg-6">
-                        <div class="form-group">
-                            <label>Payment Method:</label>
-                            <select formControlName="paymentMethod" class="form-control"
-                                (change)="getBeneficiaryInfo()">
-                                <option *ngFor="let method of methods" [ngValue]="method">{{method.title}}</option>
-                            </select>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Payment Method:</label>
+                                    <select formControlName="paymentMethod" class="form-control"
+                                        (change)="getBeneficiaryInfo()">
+                                        <option *ngFor="let method of methods" [ngValue]="method">{{method.title}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Status Approval:
+                                    </label>
+                                    <input type="text"
+                                        class="form-control m-input m-input--square text-{{statusApproval.value | classStatusApproval}}"
+                                        placeholder="Status Approval" formControlName="statusApproval" readonly>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <label class="form-control-label">
-                                Status Approval:
-                            </label>
-                            <input type="text"
-                                class="form-control m-input m-input--square text-{{statusApproval.value | classStatusApproval}}"
-                                placeholder="Status Approval" formControlName="statusApproval" readonly>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
+
                     <div class="col-lg-6">
                         <div class="form-group">
                             <label class="form-control-label">
@@ -159,22 +163,36 @@
                                 name="beneficiaryName" autocomplete="nope" formControlName="beneficiaryName">
                         </div>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label class="form-control-label">
+                                Bank Name:
+                            </label>
+                            <app-combo-grid-virtual-scroll
+                                (itemSelected)="onSelectDataFormInfo($event, 'bankName'); mapBankCode($event.code)"
+                                [dataSources]="banks | async" formControlName="bankNameDescription"
+                                [displayFields]="displayFieldBank" [selectedDisplayFields]="['bankNameEn']"
+                                allowFreeText [disabled]="isDisabled" placeholder="Select partner"
+                                (remove)="resetFormControl(bankName);resetFormControl(bankNameDescription)">
+                            </app-combo-grid-virtual-scroll>
+                        </div>
+                    </div>
                     <div class="col-lg-6">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label">
-                                        Bank Account No:
+                                        Bank Code
                                     </label>
-                                    <input type="text" class="form-control m-input m-input--square text-success"
-                                        placeholder="" name="bankAccountNo" autocomplete="nope"
-                                        formControlName="bankAccountNo">
+                                    <input type="text" formControlName="bankCode" class="form-control">
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label class="form-control-label">
-                                        Bank Name:
+                                        Bank Account No:
                                     </label>
                                     <!-- <input type="text" class="form-control m-input m-input--square" placeholder=""
                                         name="bankName" autocomplete="nope" formControlName="bankName"> -->

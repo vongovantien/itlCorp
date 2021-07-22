@@ -16,5 +16,9 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? Over1To15Day { get; set; }
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
+        public string Currency { get; set; }
+        public decimal? ObhBillingAmount { get; set; }
+        public decimal? ObhPaidAmount { get; set; }
+        public decimal? ObhUnPaidAmount { get; set; }
     }
 }
