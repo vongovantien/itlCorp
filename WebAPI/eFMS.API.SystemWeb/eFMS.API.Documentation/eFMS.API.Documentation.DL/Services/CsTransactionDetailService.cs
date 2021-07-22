@@ -1840,7 +1840,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal PreviewAirImptAuthorisedLetter(Guid housbillId)
+        public Crystal PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
         {
             Crystal result = null;
             var data = GetById(housbillId);
@@ -1862,7 +1862,7 @@ namespace eFMS.API.Documentation.DL.Services
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     Notify = data.NotifyPartyDescription?.ToUpper(),
-                    SignPath = data.DeptSign ?? string.Empty
+                    SignPath = printSign ? "Department" : string.Empty
             };
                 authorizeLetters.Add(authorizeLetter);
             }
@@ -1905,7 +1905,7 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        public Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId)
+        public Crystal PreviewAirImptAuthorisedLetterConsign(Guid housbillId, bool printSign)
         {
             Crystal result = null;
             var data = GetById(housbillId);
@@ -1926,7 +1926,8 @@ namespace eFMS.API.Documentation.DL.Services
                     FirstDestination = data.DosentTo1?.ToUpper(),//data.FirstCarrierTo?.ToUpper(),
                     SecondDestination = data.SubAbbr?.ToUpper(),//data.TransitPlaceTo1?.ToUpper(),
                     CBM = data.ChargeWeight,//data.Cbm, (change: khối lượng sẽ lấy Charge Weight)
-                    Notify = data.NotifyPartyDescription?.ToUpper()
+                    Notify = data.NotifyPartyDescription?.ToUpper(),
+                    SignPath = printSign ? "Department" : string.Empty
                 };
                 authorizeLetters.Add(authorizeLetter);
             }
