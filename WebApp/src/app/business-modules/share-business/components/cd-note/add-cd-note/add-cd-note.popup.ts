@@ -512,6 +512,6 @@ export class ShareBussinessCdNoteAddPopupComponent extends PopupBase {
     }
 
     onSelectDataFlexID(data: any) {
-        this.flexId.setValue(data);
+        this.flexId.setValue(data.referenceNo);
     }
 }
