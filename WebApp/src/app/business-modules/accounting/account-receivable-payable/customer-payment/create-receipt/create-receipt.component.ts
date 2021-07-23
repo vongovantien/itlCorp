@@ -288,7 +288,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     setListInvoice(res: ReceiptModel) {
-        const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH") && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
+        const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH")
+            && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
         if (!listPaymentWithUnpaid.length) {
             return;
         }
@@ -301,13 +302,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
             c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
         })
-        let paidUSD = 0;
-        let paidVND = 0;
-        for (let index = 0; index < listPaymentWithUnpaid.length; index++) {
-            const element = listPaymentWithUnpaid[index];
-            paidVND += (element.unpaidAmountVnd);
-            paidUSD += +(element.unpaidAmountUsd).toFixed(2);
-        }
 
         const formMapping = {
             type: res.type?.split(","),
@@ -315,10 +309,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             cusAdvanceAmount: 0,
             amountUSD: 0,
             amountVND: 0,
-            paidAmountUSD: paidUSD,
-            paidAmountVND: paidVND,
-            finalPaidAmountUSD: paidUSD,
-            finalPaidAmountVND: paidVND,
+
             description: 'Bank Fee Receipt',
             paymentMethod: 'Other'
 
@@ -333,6 +324,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 x.id = SystemConstants.EMPTY_GUID // ? Reset ID Trường hợp phiếu ngân hàng.
         })
         this._store.dispatch(GetInvoiceListSuccess({ invoices: listPaymentWithUnpaid }));
+
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
     }

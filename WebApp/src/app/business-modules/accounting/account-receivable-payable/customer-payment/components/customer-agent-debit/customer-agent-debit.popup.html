@@ -195,30 +195,26 @@
                                         <td style="border-right-color:#d5d5d5">
                                             <ng-container
                                                 *ngIf="sumTotalObjectPaymentReceipt.totalBalanceVnd >= 0;else TplTotalObjectPaymentReceiptBalanceVndNegative">
-                                                {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}}
+                                                {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}} VND
                                             </ng-container>
-                                            VND
                                         </td>
                                         <td>
                                             <ng-container
                                                 *ngIf="sumTotalObjectPaymentReceipt.totalBalanceUsd >= 0;else TplTotalObjectPaymentReceiptBalanceUsdNegative">
-                                                {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}}
+                                                {{sumTotalObjectPaymentReceipt.totalBalanceUsd | number:'1.0-3'}} USD
                                             </ng-container>
-                                            USD
                                         </td>
                                         <td style="border-right-color:#d5d5d5">
                                             <ng-container
                                                 *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
-                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
+                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}} VND
                                             </ng-container>
-                                            VND
                                         </td>
                                         <td>
                                             <ng-container
                                                 *ngIf="sumTotalObj.totalBalanceUsd >= 0;else TplTotalObjectBalanceUsdNegative">
-                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}}
+                                                {{sumTotalObj.totalBalanceUsd | number:'1.0-3'}} USD
                                             </ng-container>
-                                            USD
                                         </td>
                                     </tr>
                                 </tbody>

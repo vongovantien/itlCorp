@@ -2,7 +2,7 @@ import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy, ViewChi
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
 import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { DataService } from '@services';
-import { formatDate } from '@angular/common';
+import { formatDate, formatCurrency } from '@angular/common';
 import { AppList } from '@app';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
@@ -125,18 +125,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             .subscribe(
                 (data) => {
                     data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
-                    if (data !== undefined) {
-                        this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en')).then(
-                            (exchangeRate: IExchangeRate) => {
-                                if (!!exchangeRate) {
-                                    this.exchangeRateUsd = exchangeRate.rate;
-                                } else {
-                                    this.exchangeRateUsd = 0;
-                                }
-                                this.caculateAmountFromDebitList();
-                            }
-                        );
-                    }
                 }
             );
     }
@@ -240,7 +228,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.paidAmountVND.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
-                    this.paidAmountUSD.setValue((this.exchangeRateUsd === 0 ? 0 : +(((this.paidAmountVND.value / this.exchangeRateUsd) * 100)) / 100).toFixed(3));
+                    if (this.exchangeRateUsd === 0) {
+                        this.paidAmountUSD.setValue(0);
+                    } else {
+                        this.paidAmountUSD.setValue(+((this.paidAmountVND.value / this.exchangeRateUsd).toFixed(2)));
+                    }
                 }
                 if (!!this.isAsPaidAmount.value) {
                     this.cusAdvanceAmount.setValue(this.form.controls[`paidAmount${this.currencyId.value}`].value);
@@ -252,7 +244,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.paidAmountUSD.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
-                    this.paidAmountVND.setValue(this.formatNumberCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 2));
+                    this.paidAmountVND.setValue(formatCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 'en', ',0-3'));
                 }
                 if (!!this.isAsPaidAmount.value) {
                     this.cusAdvanceAmount.setValue(this.form.controls[`paidAmount${this.currencyId.value}`].value);
@@ -317,7 +309,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     getListReceiptChange(onChange: boolean) {
         if (onChange) {
-            this.caculateAmountFromDebitList();
+            // this.caculateAmountFromDebitList(); // ? 16056
         }
     }
 
@@ -390,6 +382,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.finalPaidAmountUSD.setValue(+(+(_finalPaidAmountUsd)).toFixed(2) ?? 0);
     }
 
+    // ! Decrepracated
     caculateAmountFromDebitList() {
         let creditAmountUSD = 0;
         let creditAmountVND = 0;
