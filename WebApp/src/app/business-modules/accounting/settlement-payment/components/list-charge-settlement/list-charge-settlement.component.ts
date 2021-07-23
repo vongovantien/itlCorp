@@ -115,6 +115,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
+            { title: 'Synced From', field: 'syncFrom', sortable: true },
         ];
         this.selectedSurcharge = this.surcharges[0];
 
@@ -233,9 +234,11 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
             this.formChargePopup.isFromshipment = surcharge.isFromShipment;
             /*
-                Phí hiện trường của lô lock thì logic không cho edit các field giống phí chứng từ.
+                Phí hiện trường của lô lock | phí OBH đã sync đầu thu
+                ? thì logic không cho edit các field giống phí chứng từ.
             */
             this.formChargePopup.isLocked = surcharge.isLocked;
+            this.formChargePopup.isSynced = !!surcharge.syncedFromBy;
             this.formChargePopup.show();
         }
     }
