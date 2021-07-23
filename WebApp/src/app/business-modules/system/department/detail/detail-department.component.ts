@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { ToastrService } from 'ngx-toastr';
@@ -13,13 +13,18 @@ import { SystemLoadUserLevelAction, IShareSystemState, checkShareSystemUserLevel
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RoutingConstants } from '@constants';
+import { environment } from 'src/environments/environment';
 
+declare var $: any;
 @Component({
     selector: 'app-department-detail',
-    templateUrl: './detail-department.component.html'
+    templateUrl: './detail-department.component.html',
+    styleUrls: ['./../department.component.scss']
 })
 
 export class DepartmentDetailComponent extends AppList {
+    @ViewChild('image') el: ElementRef;
+    
     formDetail: FormGroup;
     departmentCode: AbstractControl;
     nameEn: AbstractControl;
@@ -44,6 +49,7 @@ export class DepartmentDetailComponent extends AppList {
 
     groups: Group[] = [];
     SelectedDepartment: any;
+    photoUrl: string = '';
 
     isReadonly: Observable<boolean>;
 
@@ -55,7 +61,8 @@ export class DepartmentDetailComponent extends AppList {
         private _fb: FormBuilder,
         private _progressService: NgProgress,
         private _sortService: SortService,
-        private _store: Store<IShareSystemState>
+        private _store: Store<IShareSystemState>,
+        private _zone: NgZone
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -88,6 +95,10 @@ export class DepartmentDetailComponent extends AppList {
             }
         });
         this.isReadonly = this._store.select(checkShareSystemUserLevel);
+    }
+
+    ngAfterViewInit() {
+        this.initImageLibary();
     }
 
     initForm() {
@@ -157,7 +168,8 @@ export class DepartmentDetailComponent extends AppList {
                 inactiveOn: '',
                 companyId: null,
                 userNameCreated: '',
-                userNameModified: ''
+                userNameModified: '',
+                signPath: this.photoUrl
             };
 
             this._progressRef.start();
@@ -217,6 +229,7 @@ export class DepartmentDetailComponent extends AppList {
                             departmentType: res.deptType,
                             email: res.email
                         });
+                        this.photoUrl = res.signPath;
 
                     } else {
                         // Reset 
@@ -259,6 +272,49 @@ export class DepartmentDetailComponent extends AppList {
                     this.departmentTypeList = data.map((item: any) => ({ id: item.value, text: item.displayName }));
                 },
             );
+    }
+
+    initImageLibary() {
+        let selectImg = null;
+        this._zone.run(() => {
+            $(this.el.nativeElement).froalaEditor({
+                requestWithCORS: true,
+                language: 'vi',
+                imageEditButtons: ['imageReplace'],
+                imageMaxSize: 5 * 1024 * 1024,
+                imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+                requestHeaders: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                    Module: 'Department'
+                },
+                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Department`,
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
+            }).on('froalaEditor.contentChanged', (e: any) => {
+                this.photoUrl = e.target.src;
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Xóa thất bại");
+                } else
+                    this._toastService.success("Xóa thành công");
+
+            }).on('froalaEditor.image.error', (e, editor, error, response) => {
+                console.log(error);
+                switch (error.code) {
+                    case 5:
+                        this._toastService.error("Your image must under 5MB!");
+                        break;
+                    case 6:
+                        this._toastService.error("Image invalid");
+                        break;
+                    default:
+                        this._toastService.error(error.message);
+                        break;
+                }
+            });
+        });
     }
 }
 

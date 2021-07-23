@@ -75,6 +75,16 @@ namespace eFMS.API.System.Controllers
             return Ok(response);
 
         }
+
+        [HttpGet]
+        [Route("Department")]
+        public IActionResult GetImageDepartment()
+        {
+            var response = imageService.GetImageDepartment();
+            return Ok(response);
+
+        }
+
         [HttpDelete]
         [Route("Delete")]
         [Authorize]
