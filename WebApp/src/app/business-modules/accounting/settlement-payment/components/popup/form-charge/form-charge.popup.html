@@ -23,7 +23,7 @@
                                             class="form-control m-input m-input--square dropdown-toggle" type="text"
                                             placeholder="Input keyword" (click)="isShow = !isShow"
                                             formControlName="chargeName"
-                                            [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                            [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                         <div class="dropdown e--combogrid combogrid-autocomplete" *ngIf="isShow">
                                             <div class="dropdown-menu e--combogrid-content d-block">
                                                 <div class="tabel-wrapper table-fixed">
@@ -75,7 +75,7 @@
                                         [dataSources]="configShipment.dataSource"
                                         [displayFields]="configShipment.displayFields"
                                         [selectedDisplayFields]="configShipment.selectedDisplayFields"
-                                        [disabled]="(isFromshipment || isLocked)">
+                                        [disabled]="(isFromshipment || isLocked || isSynced)">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
                                         [displayFields]="configPartner.displayFields"
-                                        [disabled]="(isFromshipment || isLocked)">
+                                        [disabled]="(isFromshipment || isLocked || isSynced)">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
                             </div>
@@ -100,14 +100,14 @@
                                             <label for="">Qty <span class="text-danger">(*)</span></label>
                                             <input type="number" class="form-control" formControlName="qty"
                                                 placeholder="Quantity" (ngModelChange)="calculateTotalAmount()"
-                                                [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                                [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-group">
                                             <label for="">Unit <span class="text-danger">(*)</span></label>
                                             <select class="form-control" formControlName="unit"
-                                                [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                                [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                                 <option [ngValue]="null" disabled>Select Unit</option>
                                                 <option *ngFor="let unit of units; trackBy: trackByFn" [ngValue]="unit">
                                                     {{unit.code}}</option>
@@ -121,7 +121,7 @@
                                     <label for="">Unit Price <span class="text-danger">(*)</span></label>
                                     <input class="form-control" formControlName="price" placeholder="Unit Price"
                                         (ngModelChange)="calculateTotalAmount()"
-                                        [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                        [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                 </div>
                             </div>
                             <div class="col-lg-4">
@@ -131,7 +131,7 @@
                                             <label for="">Currency</label>
                                             <input type="text" class="form-control" value="VND" disabled
                                                 formControlName="currency"
-                                                [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                                [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                         </div>
                                     </div>
                                     <div class="col-6">
@@ -139,7 +139,7 @@
                                             <label for="">VAT </label>
                                             <input type="number" class="form-control" formControlName="vat"
                                                 placeholder="VAT" (ngModelChange)="calculateTotalAmount()"
-                                                [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                                [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                         </div>
                                     </div>
                                 </div>
@@ -158,7 +158,7 @@
                                     <label class="m-checkbox m-checkbox--bold "
                                         [class.m-checkbox--disabled]="isDisabledOBH">
                                         <input type="checkbox" formControlName="isOBH"
-                                            [attr.disabled]="(isFromshipment || isLocked) ? '' : null"
+                                            [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null"
                                             (change)="onChangeOBHPartnerCheckBox()">
                                         OBH for Customer
                                         <span></span>
@@ -176,7 +176,7 @@
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
                                         [displayFields]="configPartner.displayFields"
-                                        [disabled]="isDisabledOBHPartner || (isFromshipment || isLocked)"
+                                        [disabled]="isDisabledOBHPartner || (isFromshipment || isLocked || isSynced)"
                                         placeholder="OBH Partner">
                                     </app-combo-grid-virtual-scroll>
                                 </div>
@@ -189,7 +189,7 @@
                                         <div class="form-group">
                                             <label for="">Type</label>
                                             <select class="form-control" formControlName="type"
-                                                [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                                [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                                 <option *ngFor="let type of types; trackBy: trackByFn" [ngValue]="type">
                                                     {{type.title}}</option>
                                             </select>
@@ -241,7 +241,7 @@
                                 <div class="form-group">
                                     <label for="">Custom No</label>
                                     <select class="form-control" name="type" formControlName="customNo"
-                                        [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                        [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                         <option [ngValue]="null" disabled>Choose CustomNo</option>
                                         <option
                                             *ngFor="let customDeclaration of customDeclarations; let i = index; trackBy: trackByFn"
@@ -256,7 +256,7 @@
                                     <label for="">Cont No</label>
                                     <input type="text" class="form-control" formControlName="contNo"
                                         placeholder="Cont No"
-                                        [attr.disabled]="(isFromshipment || isLocked) ? '' : null">
+                                        [attr.disabled]="(isFromshipment || isLocked || isSynced) ? '' : null">
                                 </div>
                             </div>
                             <div class="col-8">

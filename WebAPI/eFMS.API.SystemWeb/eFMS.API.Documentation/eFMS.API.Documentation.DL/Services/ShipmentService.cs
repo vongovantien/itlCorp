@@ -257,6 +257,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 shipmentOperation = from ops in opstran
+                                    join cd in customsDeclarationRepo.Get() on ops.JobNo equals cd.JobNo into cdGrps
+                                    from cdgrp in cdGrps.DefaultIfEmpty()
                                     join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
                                     from sur in sur2.DefaultIfEmpty()
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
@@ -274,7 +276,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         MBL = ops.Mblno,
                                         HBL = ops.Hwbno,
                                         HBLID = ops.Hblid,
-                                        CustomNo = sur.ClearanceNo,
+                                        CustomNo = cdgrp.ClearanceNo,
                                         Service = "CL"
                                     };
             }

@@ -40,7 +40,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
     settlementPayment: ISettlementPaymentData;
 
     attachFiles: SysImage[] = [];
-    folderModuleName:string='Settlement';
+    folderModuleName: string = 'Settlement';
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -86,6 +86,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             userCreated: this.settlementPayment.settlement.userCreated,
             datetimeCreated: this.settlementPayment.settlement.datetimeCreated,
             statusApproval: this.settlementPayment.settlement.statusApproval,
+            settlementType: this.requestSurchargeListComponent.isDirectSettlement ? 'DIRECT' : (this.requestSurchargeListComponent.isExistingSettlement ? 'EXISTING' : null),
             payee: this.formCreateSurcharge.payee.value,
             bankName: this.formCreateSurcharge.bankNameDescription.value,
             bankAccountName: this.formCreateSurcharge.beneficiaryName.value,
@@ -320,14 +321,14 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                 },
             );
     }
-    
+
     previewExportSettlementPayment(language: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
+
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement');
     }
 
     previewGeneralPreview() {
