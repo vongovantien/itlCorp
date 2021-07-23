@@ -259,7 +259,7 @@
     <form-charge-popup (onRequest)="onRequestSurcharge($event)" [state]="stateFormCharge"
         (onUpdateChange)="onUpdateRequestSurcharge($event)"></form-charge-popup>
 
-    <copy-settlement-popup (onCopy)="onRequestSurcharge($event)"></copy-settlement-popup>
+    <copy-settlement-popup (onCopy)="onRequestSurcharge($event, true)"></copy-settlement-popup>
 
     <table-list-charge-popup (onChange)="onRequestSurcharge($event)"
         (onUpdate)="onUpdateSurchargeFromTableChargeList($event)"></table-list-charge-popup>
