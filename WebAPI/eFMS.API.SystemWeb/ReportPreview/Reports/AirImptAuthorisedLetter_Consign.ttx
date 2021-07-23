@@ -21,3 +21,4 @@ CBM	Number
 KilosUnit	String	50	
 AgentName	String	250	
 Notify	String	255	
+SignPath	String	255	

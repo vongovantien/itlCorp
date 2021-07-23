@@ -256,6 +256,14 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
+    showPreviewSignature(type: string, withSign: boolean){
+        if (type === 'AUTHORIZE_LETTER1') {
+            this.previewAuthorizeLetter1(withSign);
+        }
+        if (type === 'AUTHORIZE_LETTER2') {
+            this.previewAuthorizeLetter2(withSign);
+        }
+    }
 
     onPreview(type: string) {
         this.isClickSubMenu = false;
@@ -269,15 +277,16 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
         if (type === 'DOCUMENT_RELEASE_FORM') {
             this.previewAirDocumentRelease();
         }
-        if (type === 'AUTHORIZE_LETTER1') {
-            this.previewAuthorizeLetter1();
-        }
-        if (type === 'AUTHORIZE_LETTER2') {
-            this.previewAuthorizeLetter2();
-        }
+        // if (type === 'AUTHORIZE_LETTER1') {
+        //     this.previewAuthorizeLetter1();
+        // }
+        // if (type === 'AUTHORIZE_LETTER2') {
+        //     this.previewAuthorizeLetter2();
+        // }
     }
-    previewAuthorizeLetter2() {
-        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId)
+    
+    previewAuthorizeLetter2(withSign: boolean) {
+        this._documentationRepo.previewAirImportAuthorizeLetter2(this.hblId, withSign)
             .pipe(
                 catchError(this.catchError),
             )
@@ -288,8 +297,8 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
                 },
             );
     }
-    previewAuthorizeLetter1() {
-        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId)
+    previewAuthorizeLetter1(withSign: boolean) {
+        this._documentationRepo.previewAirImportAuthorizeLetter1(this.hblId, withSign)
             .pipe(
                 catchError(this.catchError),
             )

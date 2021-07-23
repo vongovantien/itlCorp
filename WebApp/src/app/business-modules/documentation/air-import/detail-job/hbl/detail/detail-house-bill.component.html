@@ -20,16 +20,20 @@
                                     (click)="onPreview('ARRIVAL_VND')">VND</a></li>
                         </ul>
                     </li>
-                    <li role="menuitem" dropdown placement="right" container="body">
+                    <li role="menuitem" dropdown placement="top-left" container="body">
                         <a dropdownToggle class="dropdown-item dropdown-toggle pointer"
                             (click)="isClickSubMenu = true">Authorize Letter
                             <span class="caret"></span>
                         </a>
                         <ul *dropdownMenu class="dropdown-menu dropdown-sub-menu" role="menu">
-                            <li role="menuitem"><a class="dropdown-item pointer"
-                                    (click)="onPreview('AUTHORIZE_LETTER1')">A.L (Form 1)</a></li>
-                            <li role="menuitem"><a class="dropdown-item pointer"
-                                    (click)="onPreview('AUTHORIZE_LETTER2')">A.L (Form 2)</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER1', false)">A.L (Form
+                                    1) without Signature</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER1', true)">A.L (Form
+                                    1) with Signature</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER2', false)">A.L (Form
+                                    2) without Signature</a></li>
+                            <li role="menuitem"><a class="dropdown-item pointer" (click)="showPreviewSignature('AUTHORIZE_LETTER2', true)">A.L (Form
+                                    2) with Signature</a></li>
                         </ul>
                     </li>
                     <li role="menuitem"><a class="dropdown-item pointer" (click)="onPreview('PROOF_OF_DELIVERY')">Proof
