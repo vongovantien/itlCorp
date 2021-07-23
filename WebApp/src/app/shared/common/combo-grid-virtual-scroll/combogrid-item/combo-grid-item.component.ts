@@ -11,6 +11,7 @@ import { Highlightable, FocusableOption, FocusOrigin } from '@angular/cdk/a11y';
         `:host:focus {
         background: lightblue;
         color: #000;
+        outline: none;
      }`
     ],
     changeDetection: ChangeDetectionStrategy.OnPush
