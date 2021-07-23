@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import { SystemRepo } from 'src/app/shared/repositories';
 import { catchError, finalize } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -8,13 +8,18 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { Department } from 'src/app/shared/models/system/department';
 import { AppForm } from 'src/app/app.form';
 import { RoutingConstants } from '@constants';
+import { environment } from 'src/environments/environment';
 
+declare var $: any;
 @Component({
     selector: 'app-department-new',
-    templateUrl: './add-department.component.html'
+    templateUrl: './add-department.component.html',
+    styleUrls: ['./../department.component.scss']
 })
 
 export class DepartmentAddNewComponent extends AppForm {
+    @ViewChild('image') el: ElementRef;
+    
     formAdd: FormGroup;
     departmentCode: AbstractControl;
     nameEn: AbstractControl;
@@ -29,6 +34,7 @@ export class DepartmentAddNewComponent extends AppForm {
     departmentTypeList: any[] = [];
 
     isSubmited: boolean = false;
+    photoUrl: string = '';
 
     constructor(
         private _systemRepo: SystemRepo,
@@ -36,6 +42,7 @@ export class DepartmentAddNewComponent extends AppForm {
         private _router: Router,
         private _progressService: NgProgress,
         private _fb: FormBuilder,
+        private _zone: NgZone
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -119,7 +126,8 @@ export class DepartmentAddNewComponent extends AppForm {
                 inactiveOn: '',
                 companyId: null,
                 userNameCreated: '',
-                userNameModified: ''
+                userNameModified: '',
+                signPath: this.photoUrl
             };
             this._progressRef.start();
             // Add new Department
@@ -169,6 +177,52 @@ export class DepartmentAddNewComponent extends AppForm {
         this._router.navigate([`${RoutingConstants.SYSTEM.DEPARTMENT}`]);
     }
 
+    ngAfterViewInit() {
+        this.initImageLibary();
+    }
+
+    initImageLibary() {
+        let selectImg = null;
+        this._zone.run(() => {
+            $(this.el.nativeElement).froalaEditor({
+                requestWithCORS: true,
+                language: 'vi',
+                imageEditButtons: ['imageReplace'],
+                imageMaxSize: 5 * 1024 * 1024,
+                imageAllowedTypes: ['jpeg', 'jpg', 'png'],
+                requestHeaders: {
+                    Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+                    Module: 'Department'
+                },
+                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Department`,
+                imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
+                imageManagerDeleteMethod: 'DELETE',
+                imageManagerDeleteParams: { id: selectImg?.id }
+            }).on('froalaEditor.contentChanged', (e: any) => {
+                this.photoUrl = e.target.src;
+            }).on('froalaEditor.imageManager.imageDeleted', (e, editor, data) => {
+                if (e.error) {
+                    this._toastService.error("Xóa thất bại");
+                } else
+                    this._toastService.success("Xóa thành công");
+
+            }).on('froalaEditor.image.error', (e, editor, error, response) => {
+                console.log(error);
+                switch (error.code) {
+                    case 5:
+                        this._toastService.error("Your image must under 5MB!");
+                        break;
+                    case 6:
+                        this._toastService.error("Image invalid");
+                        break;
+                    default:
+                        this._toastService.error(error.message);
+                        break;
+                }
+            });
+        });
+    }
 }
 
 

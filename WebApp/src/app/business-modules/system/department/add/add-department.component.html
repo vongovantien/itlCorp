@@ -1,5 +1,5 @@
 <app-sub-header></app-sub-header>
-<div class="m-content">
+<div class="m-content form-department">
     <div class="m-portlet">
         <div class="m-form m-form--state">
             <div class="m-portlet__body">
@@ -120,6 +120,21 @@
                                 <div>
                                     <app-switch formControlName="status">
                                     </app-switch>
+                                </div>
+                            </div>
+                        </div>
+            
+                        <div class="col-4">
+                            <div class="form-group">
+                                <div class="mx-auto text-center upload-image-wp">
+                                    <div class="image-upload-content">
+                                        <div class="image-upload-content">
+                                            <img #image [src]="photoUrl" alt="" class="img-responsive img-inputImage"
+                                                id="imageUpload" onerror="this.src = 'assets/app/media/img/emptydata.png'">
+                                        </div>
+                                        <div class="text-primary pointer">
+                                            {{!!photoUrl ? 'Click to change image' : 'Upload Signature Image'}}</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

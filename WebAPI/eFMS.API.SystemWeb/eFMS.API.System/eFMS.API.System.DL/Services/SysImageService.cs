@@ -128,6 +128,12 @@ namespace eFMS.API.System.DL.Services
             var result = DataContext.Where(x => x.Folder == "User" && x.ObjectId == userId);
             return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
         }
+
+        public IQueryable<SysImageModel> GetImageDepartment()
+        {
+            var result = DataContext.Where(x => x.Folder == "Department");
+            return result.ProjectTo<SysImageModel>(mapper.ConfigurationProvider);
+        }
     }
 
 }
