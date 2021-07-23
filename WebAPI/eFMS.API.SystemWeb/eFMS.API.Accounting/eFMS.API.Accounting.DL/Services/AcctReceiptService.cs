@@ -456,7 +456,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = GetHBLInfo(s.FirstOrDefault().Hblid).MBL,
                     Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
-                    PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList())
+                    PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()),
+                    ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling
                 }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -490,7 +491,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (acctPayment.Type == "CREDITNOTE")
                     {
                         CsShipmentSurcharge surcharge = surchargeRepository.Get(x => x.CreditNo == acctPayment.BillingRefNo)?.FirstOrDefault();
-                        if(surcharge != null)
+                        if (surcharge != null)
                         {
                             _voucherId = surcharge.VoucherId;
                             _voucherIdre = surcharge.VoucherIdre;
@@ -530,6 +531,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.CreditAmountUsd = acctPayment.CreditAmountUsd;
                     payment.VoucherId = acctPayment.Type == "CREDITNOTE" ? _voucherId : null;
                     payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
+                    payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
 
                     paymentReceipts.Add(payment);
                 }
@@ -542,7 +544,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.CustomerName = partnerInfo?.ShortName;
 
             // Check có tồn tại 1 invoice thu chưa hết.
-            if(result.Status == AccountingConstants.RECEIPT_STATUS_DONE)
+            if (result.Status == AccountingConstants.RECEIPT_STATUS_DONE)
             {
                 result.IsReceiptBankFee = result.Payments.Any(x => !string.IsNullOrEmpty(x.PaymentStatus) && x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART);
                 if (result.IsReceiptBankFee == true)
@@ -574,7 +576,7 @@ namespace eFMS.API.Accounting.DL.Services
         private HBLInfo GetHBLInfo(Guid? hblId)
         {
             HBLInfo result = new HBLInfo();
-            if(hblId == Guid.Empty)
+            if (hblId == Guid.Empty)
             {
                 return result;
             }
@@ -593,9 +595,9 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
             var inv = acctMngtRepository.Get(x => Ids.Contains(x.Id.ToString())).ToList();
-            if(inv.Count > 0)
+            if (inv.Count > 0)
             {
-                if(inv.Count == 1)
+                if (inv.Count == 1)
                 {
                     _paymentStatus = inv.FirstOrDefault().PaymentStatus;
                 }
@@ -690,6 +692,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.CompanyInvoiceId = paymentGroupOBH.CompanyId;
             _payment.Hblid = paymentGroupOBH.Hblid;
             _payment.CreditNo = paymentGroupOBH.CreditNo;
+            _payment.ExchangeRateBilling = paymentGroupOBH.ExchangeRateBilling;
 
             _payment.UserCreated = _payment.UserModified = currentUser.UserID;
             _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
@@ -708,8 +711,8 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (ReceiptInvoiceModel paymentOBH in paymentOBHGrps)
             {
                 // lấy ra tất cả các hóa đơn tạm theo group
-                List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE 
-                && paymentOBH.RefIds.Contains(x.Id.ToString()) && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID )
+                List<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE
+                && paymentOBH.RefIds.Contains(x.Id.ToString()) && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
                          .OrderBy(x => (paymentOBH.CurrencyId == AccountingConstants.CURRENCY_LOCAL) ? x.UnpaidAmountVnd : x.UnpaidAmountUsd)
                          .ToList(); // xắp xếp theo unpaidAmount
 
@@ -850,6 +853,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
+                _payment.ExchangeRateBilling = payment.ExchangeRateBilling; //Exchange Rate trên payment (SOADebit,DebitNote,Invoice)
                 _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
                 _payment.RefCurrency = payment.CurrencyId; // currency của hóa đơn
                 _payment.RefAmount = payment.Amount; // Số tiền unpaid của hóa đơn
@@ -952,6 +956,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
                 _payment.Type = payment.Type;
                 _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
+                _payment.ExchangeRateBilling = payment.ExchangeRateBilling; //Exchange Rate trên payment (SOADebit,DebitNote,Invoice)
+
                 _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
                 _payment.RefAmount = payment.RefAmount;
                 _payment.RefCurrency = payment.RefCurrency;
@@ -959,8 +965,11 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DeptInvoiceId = payment.DeptInvoiceId;
                 _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
                 _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
-
+                _payment.CreditNo = payment.CreditNo;
+                _payment.CreditAmountVnd = -payment.CreditAmountVnd;
+                _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                 _payment.Hblid = payment.Hblid;
+
                 _payment.Negative = true;
 
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -1501,7 +1510,7 @@ namespace eFMS.API.Accounting.DL.Services
                             List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
                             HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
                             // Cập nhật invoice cho những payment DEBIT, OBH
-                             HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
+                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
                             // Cập nhật Netoff cho CREDIT or SOA.
                             List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
                             if (paymentCredit.Count > 0)
@@ -1586,8 +1595,6 @@ namespace eFMS.API.Accounting.DL.Services
             };
         }
 
-        #region -- Get Customers Debit --
-
         public List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
             List<CustomerDebitCreditModel> data = new List<CustomerDebitCreditModel>();
@@ -1606,7 +1613,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
                 creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
             }
-            
+
             if (debits != null)
             {
                 data.AddRange(debits);
@@ -1681,7 +1688,6 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        #region Agency credit notes
         private IQueryable<AgencyDebitCreditModel> GetCreditNoteForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = CreditNoteExpressionQuery(criteria);
@@ -1694,7 +1700,8 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from credit in creditNotes
                         join sur in surcharges on credit.Code equals sur.CreditNo
                         select new { credit, sur };
-            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno, g.credit, g.sur.Hblid }).Select(s => new { Job = s.Key, Surcharge = s.Select(se => se.sur) });
+            var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno, g.credit, g.sur.Hblid })
+                .Select(s => new { Job = s.Key, Surcharge = s.Select(se => se.sur), credit = s.Select(x => x.credit )});
 
             var data = grpCreditNoteCharge.Select(se => new AgencyDebitCreditModel
             {
@@ -1720,7 +1727,8 @@ namespace eFMS.API.Accounting.DL.Services
                 Hbl = se.Job.Hblno,
                 Hblid = se.Job.Hblid,
                 VoucherId = se.Surcharge.FirstOrDefault().VoucherId,
-                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre
+                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre,
+                ExchangeRateBilling = se.Job.credit.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? se.Job.credit.ExcRateUsdToLocal : se.Job.credit.ExchangeRate
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1758,17 +1766,12 @@ namespace eFMS.API.Accounting.DL.Services
                                CreditType = "CREDITNOTE",
                                Hblid = inv.Hblid,
                                VoucherId = inv.VoucherId,
-                               VoucherIdre = inv.VoucherIdre
+                               VoucherIdre = inv.VoucherIdre,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
             return joinData;
         }
 
-
-        /// <summary>
-        /// Get list Credit Note/ SOA type Credit by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<AgencyDebitCreditModel> GetSoaCreditForIssueAgentPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = SoaCreditExpressionQuery(criteria);
@@ -1804,7 +1807,8 @@ namespace eFMS.API.Accounting.DL.Services
                 JobNo = se.Soa.JobNo,
                 Mbl = se.Soa.Mblno,
                 Hbl = se.Soa.Hblno,
-                Hblid = se.Soa.Hblid
+                Hblid = se.Soa.Hblid,
+                ExchangeRateBilling = se.Soa.soa.ExcRateUsdToLocal
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1840,16 +1844,12 @@ namespace eFMS.API.Accounting.DL.Services
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
                                CreditType = "SOA",
-                               Hblid = inv.Hblid
+                               Hblid = inv.Hblid,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
             return joinData;
         }
 
-        /// <summary>
-        /// Get list Invoice by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<AgencyDebitCreditModel> GetDebitForIssueAgentPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
@@ -1865,7 +1865,9 @@ namespace eFMS.API.Accounting.DL.Services
             var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
-                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
+                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) 
+                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() 
+                : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
                 Type = "DEBIT",
                 InvoiceNo = se.Invoice.inv.InvoiceNoReal,
                 InvoiceDate = se.Invoice.inv.Date,
@@ -1885,7 +1887,8 @@ namespace eFMS.API.Accounting.DL.Services
                 JobNo = se.Invoice.JobNo,
                 Mbl = se.Invoice.Mblno,
                 Hbl = se.Invoice.Hblno,
-                Hblid = se.Invoice.Hblid
+                Hblid = se.Invoice.Hblid,
+                ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo)
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -1922,16 +1925,12 @@ namespace eFMS.API.Accounting.DL.Services
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
                                JobNo = inv.JobNo,
-                               Hblid = inv.Hblid
+                               Hblid = inv.Hblid,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
             return joinData;
         }
 
-        /// <summary>
-        /// Get list Invoice Temp by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<AgencyDebitCreditModel> GetObhForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
@@ -1944,8 +1943,8 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
-                .Select(s => new { PartnerId = s.Key.PartnerId, RefNo = s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
+            var grpInvoiceCharge = query.GroupBy(g => new {g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
+                .Select(s => new {s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.RefNo,
@@ -1968,7 +1967,8 @@ namespace eFMS.API.Accounting.DL.Services
                 JobNo = se.Job.JobNo,
                 Mbl = se.Job.Mblno,
                 Hbl = se.Job.Hblno,
-                Hblid = se.Job.Hblid
+                Hblid = se.Job.Hblid,
+                ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo)
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2005,12 +2005,11 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = inv.JobNo,
                                Hbl = inv.Hbl,
                                Mbl = inv.Mbl,
-                               Hblid = inv.Hblid
+                               Hblid = inv.Hblid,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
             return joinData;
         }
-
-        #endregion
 
         private Expression<Func<AccAccountingManagement, bool>> InvoiceExpressionQuery(CustomerDebitCreditCriteria criteria, string type)
         {
@@ -2378,11 +2377,6 @@ namespace eFMS.API.Accounting.DL.Services
             return query;
         }
 
-        /// <summary>
-        /// Get list Invoice by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<CustomerDebitCreditModel> GetDebitForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
@@ -2395,10 +2389,12 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => g.inv).Select(s => new { Invoice = s.Key, Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
+            var grpInvoiceCharge = query.GroupBy(g => g.inv).Select(s => new { Invoice = s.Key, Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }), Surcharge = s.Select(se => se.sur) });
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
             {
-                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
+                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano))
+                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault()
+                : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
                 Type = "DEBIT",
                 InvoiceNo = se.Invoice.InvoiceNoReal,
                 InvoiceDate = se.Invoice.Date,
@@ -2415,6 +2411,7 @@ namespace eFMS.API.Accounting.DL.Services
                 OfficeId = se.Invoice.OfficeId,
                 CompanyId = se.Invoice.CompanyId,
                 RefIds = new List<string> { se.Invoice.Id.ToString() },
+                ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo)
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2446,17 +2443,61 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
-                               RefIds = inv.RefIds
+                               RefIds = inv.RefIds,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
-          
+
             return joinData;
         }
 
-        /// <summary>
-        /// Get list Invoice Temp by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
+        private decimal? GetExchangeRateDebitBilling(IEnumerable<object> soa_debit)
+        {
+            decimal? exchangeRate = null;
+            var data = soa_debit.ToList().First();
+            string _soaNo = ObjectHelper.GetValueBy(data, "Soano");
+            string _debitNo = ObjectHelper.GetValueBy(data, "DebitNo");
+            if (!string.IsNullOrEmpty(_soaNo))
+            {
+                var soa = soaRepository.Get(x => x.Soano == _soaNo)?.FirstOrDefault();
+                if (soa != null)
+                {
+                    exchangeRate = soa.ExcRateUsdToLocal;
+                }
+            }
+            else if (!string.IsNullOrEmpty(_debitNo))
+            {
+                {
+                    var debit = cdNoteRepository.Get(x => x.Code == _debitNo)?.FirstOrDefault();
+                    if (debit != null)
+                    {
+                        exchangeRate = debit.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? debit.ExcRateUsdToLocal : debit.ExchangeRate;
+                    }
+                }
+            }
+            return exchangeRate;
+
+        }
+
+        private decimal? GetExchangeRateDebitOBHBilling(string refNo)
+        {
+            decimal? exchangeRate = null;
+
+            var debit = cdNoteRepository.Get(x => x.Code == refNo)?.FirstOrDefault();
+            if (debit != null)
+            {
+                exchangeRate = debit.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? debit.ExcRateUsdToLocal : debit.ExchangeRate;
+            }
+            else
+            {
+                var soa = soaRepository.Get(x => x.Soano == refNo)?.FirstOrDefault();
+                if (soa != null)
+                {
+                    exchangeRate = soa.ExcRateUsdToLocal;
+                }
+            }
+            return exchangeRate;
+        }
+
         private IQueryable<CustomerDebitCreditModel> GetObhForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
@@ -2469,8 +2510,8 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            var grpInvoiceCharge = query.GroupBy(g => new { PartnerId = g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)) })
-                .Select(s => new { PartnerId = s.Key.PartnerId, RefNo = s.Key.RefNo, Invoice = s.Select(se => se.inv) });
+            var grpInvoiceCharge = query.GroupBy(g => new { g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)) })
+                .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(x => x.sur) });
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.RefNo,
@@ -2489,7 +2530,9 @@ namespace eFMS.API.Accounting.DL.Services
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
-                RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList()
+                RefIds = se.Invoice.Select(s => s.Id.ToString()).Distinct().ToList(),
+                ExchangeRateBilling = GetExchangeRateDebitOBHBilling(se.RefNo)
+
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2521,17 +2564,13 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeId = inv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
-                               RefIds = inv.RefIds
+                               RefIds = inv.RefIds,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
 
             return joinData;
         }
 
-        /// <summary>
-        /// Get list SOA type Credit by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<CustomerDebitCreditModel> GetSoaCreditForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = SoaCreditExpressionQuery(criteria);
@@ -2564,6 +2603,7 @@ namespace eFMS.API.Accounting.DL.Services
                 OfficeId = se.Soa.OfficeId,
                 CompanyId = se.Soa.CompanyId,
                 RefIds = new List<string> { se.Soa.Id },
+                ExchangeRateBilling = se.Soa.ExcRateUsdToLocal
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2594,17 +2634,13 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "CREDITSOA"
+                               CreditType = "CREDITSOA",
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
 
             return joinData;
         }
 
-        /// <summary>
-        /// Get list Credit Note by Criteria
-        /// </summary>
-        /// <param name="criteria"></param>
-        /// <returns></returns>
         private IQueryable<CustomerDebitCreditModel> GetCreditNoteForIssueCustomerPayment(CustomerDebitCreditCriteria criteria)
         {
             var expQuery = CreditNoteExpressionQuery(criteria);
@@ -2638,7 +2674,8 @@ namespace eFMS.API.Accounting.DL.Services
                 CompanyId = se.CreditNote.CompanyId,
                 RefIds = new List<string> { se.CreditNote.Id.ToString() },
                 VoucherId = se.Surcharge.FirstOrDefault().VoucherId,
-                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre
+                VoucherIdre = se.Surcharge.FirstOrDefault().VoucherIdre,
+                ExchangeRateBilling = se.CreditNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? se.CreditNote.ExcRateUsdToLocal : se.CreditNote.ExchangeRate
             });
             var joinData = from inv in data
                            join par in partners on inv.PartnerId equals par.Id into parGrp
@@ -2671,18 +2708,13 @@ namespace eFMS.API.Accounting.DL.Services
                                RefIds = inv.RefIds,
                                CreditType = "CREDITNOTE",
                                VoucherId = inv.VoucherId,
-                               VoucherIdre = inv.VoucherIdre
+                               VoucherIdre = inv.VoucherIdre,
+                               ExchangeRateBilling = inv.ExchangeRateBilling
                            };
 
             return joinData;
         }
-        #endregion -- Get Customers Debit --
 
-        /// <summary>
-        /// Tính công nợ dựa vào id của Receipt
-        /// </summary>
-        /// <param name="receiptId"></param>
-        /// <returns></returns>
         public HandleState CalculatorReceivableForReceipt(Guid receiptId)
         {
             //Get list payment of Receipt

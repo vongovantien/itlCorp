@@ -191,7 +191,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         // result.every((t: { [x: string]: string; }) => {
                         //     return s["refNo"] !== t["refNo"]
                         // })
-                        result.filter(x => x.refNo === s.refNo).length == 0
+                        result.filter(x => x.refNo === s.refNo && x.type == s.type).length == 0
                     );
                     if (this.type === "AGENT") {
                         this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
@@ -229,7 +229,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         // result.every((t: { [x: string]: string; }) => {
                         //     return s["refNo"] !== t["refNo"];
                         // })
-                        result.filter(x => x.refNo === s.refNo).length == 0
+                        result.filter(x => x.refNo === s.refNo && x.type == s.type).length == 0
                     );
                     this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
 

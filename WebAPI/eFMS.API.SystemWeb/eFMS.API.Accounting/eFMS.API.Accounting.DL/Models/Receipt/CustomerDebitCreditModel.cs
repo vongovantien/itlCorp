@@ -37,6 +37,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? CreditAmountUsd { get; set; }
         public string VoucherId { get; set; }
         public string VoucherIdre { get; set; }
+        public decimal? ExchangeRateBilling { get; set; } // tỷ giá của SOA DEBIT hoặc DEBIT hoặc vatInvoice(phí đầu  tiên)
 
     }
 }

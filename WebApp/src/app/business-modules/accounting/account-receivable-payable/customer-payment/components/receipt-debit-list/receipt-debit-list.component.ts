@@ -35,7 +35,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'Job No', field: '', width: 150 },
         { title: 'MBL No', field: '', width: 150 },
         { title: 'HBL No', field: '', width: 150 },
-        // { title: 'Org Amount', field: '', align: this.right },
         { title: 'Unpaid USD', field: '', width: 150 },
         { title: 'Unpaid VND', field: '', width: 150 },
         { title: 'Paid Amount USD', field: '', width: 150, align: this.right },
@@ -54,7 +53,16 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     selectedCredit: ReceiptInvoiceModel;
 
     isSubmitted: boolean = false;
-
+    sumTotalObj = {
+        totalUnpaidAmountUsd: 0,
+        totalUnpaidAmountVnd: 0,
+        totalPaidAmountVnd: 0,
+        totalPaidAmountUsd: 0,
+        totalPaidVnd: 0,
+        totalPaidUsd: 0,
+        totalRemainVnd: 0,
+        totalRemainUsd: 0
+    };
     constructor(
         private readonly _store: Store<IReceiptState>,
         private readonly _dataService: DataService,
@@ -69,19 +77,29 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Type', field: '' },
             { title: 'Invoice No', field: '' },
             { title: 'Credit No', field: '', width: 180 },
-            // { title: 'Org Amount', field: '', align: this.right },
             { title: 'Unpaid USD', field: '', width: 150 },
             { title: 'Unpaid VND', field: '', width: 150 },
             { title: 'Paid Amount USD', field: '', width: 150, align: this.right },
             { title: 'Paid Amount VND', field: '', width: 150, align: this.right },
-            { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
+            { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Remain USD', field: '', width: 150 },
             { title: 'Remain VND', field: '', width: 150 },
             { title: 'Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
         ];
+
+        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (debitList: ReceiptInvoiceModel[]) => {
+                    if (!!debitList.length) {
+                        console.log(debitList);
+                        this.sumTotalObj = this.calculateTotal(debitList);
+                        // calculateTotal();
+                    }
+                }
+            )
     }
 
     confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {
@@ -117,15 +135,15 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         this.onChangeDebit.emit(true);
     }
 
-    calculateTotalPaidAmount(event: any, item: ReceiptInvoiceModel, type: string) {
-        if (!event.target.value.length) {
-            item[event.target.name] = 0;
-        }
+    calculateTotalPaidAmount(item: ReceiptInvoiceModel, type: string) {
         switch (type) {
             case 'paidVnd':
                 if (!!item.creditNo) {
                     item.totalPaidVnd = +item.paidAmountVnd + (item.creditAmountVnd ?? 0);
                 } else {
+                    if (!!item.exchangeRateBilling) {
+                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                    }
                     item.totalPaidVnd = +item.paidAmountVnd;
                 }
                 break;
@@ -133,12 +151,27 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 if (item.creditNo) {
                     item.totalPaidUsd = +item.paidAmountUsd + (item.creditAmountUsd ?? 0);
                 } else {
+                    //* [16056]
+                    if (!!item.exchangeRateBilling) {
+                        item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling);
+
+                    }
                     item.totalPaidUsd = +item.paidAmountUsd;
                 }
                 break;
             default:
+
                 break;
         }
+
+        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (debitList: ReceiptInvoiceModel[]) => {
+                    if (!!debitList.length) {
+                        this.sumTotalObj = this.calculateTotal(debitList);
+                    }
+                }
+            )
     }
 
     onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {
@@ -172,5 +205,36 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     }
                 )
         }
+    }
+
+    calculateTotal(model: ReceiptInvoiceModel[]) {
+        const totalData = {
+            totalUnpaidAmountUsd: 0,
+            totalUnpaidAmountVnd: 0,
+            totalPaidAmountVnd: 0,
+            totalPaidAmountUsd: 0,
+            totalPaidVnd: 0,
+            totalPaidUsd: 0,
+            totalRemainVnd: 0,
+            totalRemainUsd: 0
+        };
+
+        for (let index = 0; index < model.length; index++) {
+            const item: ReceiptInvoiceModel = model[index];
+            if (model[index].type !== 'CREDIT') {
+                totalData.totalUnpaidAmountUsd += (+item.unpaidAmountUsd ?? 0);
+                totalData.totalUnpaidAmountVnd += (+item.unpaidAmountVnd ?? 0);
+                totalData.totalPaidAmountUsd += (+item.paidAmountUsd ?? 0);
+                totalData.totalPaidAmountVnd += (+item.paidAmountVnd ?? 0);
+                totalData.totalPaidUsd += (+item.totalPaidUsd ?? 0);
+                totalData.totalPaidVnd += (+item.totalPaidVnd ?? 0);
+                totalData.totalRemainUsd = (+totalData.totalUnpaidAmountUsd ?? 0) - (+totalData.totalPaidUsd ?? 0);
+                totalData.totalRemainVnd = (totalData.totalUnpaidAmountVnd ?? 0) - (+totalData.totalPaidVnd ?? 0);
+            }
+
+        }
+
+
+        return totalData
     }
 }

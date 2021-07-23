@@ -317,6 +317,8 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.ExchangeRateBilling).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
