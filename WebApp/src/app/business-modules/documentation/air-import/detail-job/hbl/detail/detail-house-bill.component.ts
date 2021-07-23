@@ -257,6 +257,7 @@ export class AirImportDetailHBLComponent extends AirImportCreateHBLComponent imp
             );
     }
     showPreviewSignature(type: string, withSign: boolean){
+        this.isClickSubMenu = false;
         if (type === 'AUTHORIZE_LETTER1') {
             this.previewAuthorizeLetter1(withSign);
         }
