@@ -18,6 +18,7 @@ export class Department {
     inactiveOn: string = '';
     userNameCreated: string = '';
     userNameModified: string = '';
+    signPath: string = '';
     constructor(object?: any) {
         const self = this;
         for (const key in object) {

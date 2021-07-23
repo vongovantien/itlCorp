@@ -37,6 +37,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string PackageTypeName { get; set; }
         public string ShipmentPIC { get; set; }
         public string JobNo { get; set; }
+        public string DeptSign { get; set; }
 
         public PermissionAllowBase Permission { get; set; }
     }
