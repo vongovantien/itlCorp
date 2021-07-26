@@ -2608,7 +2608,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var receipt in receipts)
             {
                 var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
-                var paymentsDebit = payments.Where(x => x.Type == "DEBIT" || x.Type == "OBH");
+                var paymentsDebit = payments.Where(x => (x.Type == "DEBIT" || x.Type == "OBH") && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 var paymentsCredit = payments.Where(x => x.Type == "CREDITSOA" || x.Type == "CREDITNOTE");
                 var paymentsAdv = payments.Where(x => x.Type == "ADV");
                 if (paymentsDebit.Count() > 0)
