@@ -135,7 +135,11 @@
                                 <thead>
                                     <tr>
                                         <th></th>
-                                        <th class="text-center" colspan="2">In Receipt</th>
+                                        <th class="text-center" colspan="2">In Receipt
+                                            <span class="badge badge-success"
+                                                *ngIf="!!currentPaymentReceiptCurrent.length">{{currentPaymentReceiptCurrent.length}}
+                                            </span>
+                                        </th>
                                         <th class="text-center" colspan="2">In Get Debit/Invoice/Credit</th>
                                     </tr>
                                 </thead>

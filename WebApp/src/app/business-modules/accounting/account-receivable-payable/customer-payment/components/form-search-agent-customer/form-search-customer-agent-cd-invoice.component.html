@@ -4,7 +4,7 @@
             <div class="col-lg-5">
                 <div class="form-group">
                     <label for="form-control-label">Search Option</label>
-                    <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom">
+                    <ng-select [items]="searchOptions" formControlName="typeSearch" class="custom" [clearable]="false">
                     </ng-select>
                 </div>
                 <div class="form-group">
@@ -21,7 +21,7 @@
                             [currentActiveItemId]="{ field: 'id', value: partnerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="customers | async"
                             [displayFields]="displayFilesPartners" (remove)="resetFormControl(partnerId)"
-                            placeholder="Please select partner">
+                            placeholder="Please select partner" [clearable]="false">
                         </app-combo-grid-virtual-scroll>
                     </div>
                     <div class="form-group">

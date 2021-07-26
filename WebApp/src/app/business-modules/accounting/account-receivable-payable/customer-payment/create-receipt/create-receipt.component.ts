@@ -157,6 +157,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 return;
             }
         }
+
+        if (this.paymentList.some(x => x.isChangeValue == true)) {
+            this._toastService.warning('Please you do Process Clear firstly!');
+            return;
+        }
         if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == "DEBIT" && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
             this._toastService.warning("Total Paid must <= Unpaid");
             return;
