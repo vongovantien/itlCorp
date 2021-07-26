@@ -157,6 +157,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                     (res: ReceiptInvoiceModel[]) => {
                         if (!!res) {
                             this.listDebit = res || [];
+                            this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
                             this.filterList();
                         }
                     },
@@ -193,8 +194,8 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         // })
                         result.filter(x => x.refNo === s.refNo && x.type == s.type).length == 0
                     );
+                    this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
                     if (this.type === "AGENT") {
-                        this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
                         this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                             x.invoices.forEach(invoice => {
                                 for (let i = 0; i < result.length; i++) {

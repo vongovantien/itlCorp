@@ -12,7 +12,7 @@ import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptPartnerCurrentState, ReceiptAgreementCreditCurrencyState, ReceiptAgreementCusAdvanceState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
-import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess } from '../../store/actions';
+import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess, ToggleAutoConvertPaid } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 import cloneDeep from 'lodash/cloneDeep';
@@ -422,6 +422,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
         this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : +((((cusAdvanceAmount / exChangeRateUSD) * 100) / 100).toFixed(2)) + creditAmountUSD + paidUSD));
         this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + creditAmountVND + paidVND);
+    }
+
+    onToggleAutoConvertPaid(isAuto: boolean) {
+        if (!this.isAutoConvert.dirty) {
+            return;
+        }
+        this._store.dispatch(ToggleAutoConvertPaid({ isAutoConvert: isAuto }));
     }
 }
 

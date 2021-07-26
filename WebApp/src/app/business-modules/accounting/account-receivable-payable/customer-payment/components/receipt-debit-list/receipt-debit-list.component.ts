@@ -8,7 +8,7 @@ import { InjectViewContainerRefDirective } from "@directives";
 import { ToastrService } from "ngx-toastr";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
-import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState } from "../../store/reducers";
+import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState } from "../../store/reducers";
 import { RemoveInvoice } from "../../store/actions";
 
 import { takeUntil } from "rxjs/operators";
@@ -63,6 +63,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         totalRemainVnd: 0,
         totalRemainUsd: 0
     };
+
+    isAutoConvert: boolean;
     constructor(
         private readonly _store: Store<IReceiptState>,
         private readonly _dataService: DataService,
@@ -94,10 +96,16 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             .subscribe(
                 (debitList: ReceiptInvoiceModel[]) => {
                     if (!!debitList.length) {
-                        console.log(debitList);
                         this.sumTotalObj = this.calculateTotal(debitList);
-                        // calculateTotal();
                     }
+                }
+            )
+
+        this._store.select(ReceiptIsAutoConvertPaidState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (isAutoConvert) => {
+                    this.isAutoConvert = isAutoConvert;
                 }
             )
     }
@@ -136,12 +144,13 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     }
 
     calculateTotalPaidAmount(item: ReceiptInvoiceModel, type: string) {
+        item.isChangeValue = true; // ! Detect user changed -> Flag to Force Process Clear
         switch (type) {
             case 'paidVnd':
                 if (!!item.creditNo) {
                     item.totalPaidVnd = +item.paidAmountVnd + (item.creditAmountVnd ?? 0);
                 } else {
-                    if (!!item.exchangeRateBilling) {
+                    if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
                         item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
                     }
                     item.totalPaidVnd = +item.paidAmountVnd;
@@ -152,9 +161,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     item.totalPaidUsd = +item.paidAmountUsd + (item.creditAmountUsd ?? 0);
                 } else {
                     //* [16056]
-                    if (!!item.exchangeRateBilling) {
+                    if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
                         item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling);
-
                     }
                     item.totalPaidUsd = +item.paidAmountUsd;
                 }

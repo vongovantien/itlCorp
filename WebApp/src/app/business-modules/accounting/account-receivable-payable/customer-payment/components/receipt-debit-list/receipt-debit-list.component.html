@@ -75,13 +75,15 @@
                                 </td>
 
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountUsd"
-                                        name="paidAmountUsd" autoFormatCurrency [disabled]="isReadonly"
+                                    <input type="text" class="form-control text-right text-success font-15"
+                                        [(ngModel)]="item.paidAmountUsd" name="paidAmountUsd" autoFormatCurrency
+                                        [disabled]="isReadonly"
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidUsd')">
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control text-right" [(ngModel)]="item.paidAmountVnd"
-                                        name="paidAmountVnd" numeric autoFormatCurrency [disabled]="isReadonly"
+                                    <input type="text" class="form-control text-right text-success font-15"
+                                        [(ngModel)]="item.paidAmountVnd" name="paidAmountVnd" numeric autoFormatCurrency
+                                        [disabled]="isReadonly"
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
                                 </td>
 

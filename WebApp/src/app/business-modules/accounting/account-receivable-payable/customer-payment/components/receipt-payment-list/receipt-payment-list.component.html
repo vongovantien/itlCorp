@@ -106,7 +106,8 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label for="">Auto convert</label>
-                            <app-switch size="sm" class="success" formControlName="isAutoConvert"></app-switch>
+                            <app-switch size="sm" class="success" formControlName="isAutoConvert"
+                                (toggleChange)="onToggleAutoConvertPaid($event)"></app-switch>
                         </div>
                     </div>
                 </div>

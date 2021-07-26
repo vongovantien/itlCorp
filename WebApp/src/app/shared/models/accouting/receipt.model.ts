@@ -36,6 +36,8 @@ export class ReceiptCreditDebitModel {
     creditAmountVnd: number;
     creditAmountUsd: number;
     exchangeRateBilling: number;
+    voucherId: string = null;
+    voucherIdre: string = null;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -56,8 +58,9 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     jobId?: string;
     mbl?: string;
     hbl?: string;
-    voucherId: string = null;
-    voucherIdre: string = null;
+
+    isChangeValue: boolean = false;
+
     constructor(object?: any) {
         super();
         const self = this;

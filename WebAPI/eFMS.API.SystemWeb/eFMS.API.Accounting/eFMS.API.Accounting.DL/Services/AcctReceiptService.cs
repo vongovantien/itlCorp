@@ -457,7 +457,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Hbl = GetHBLInfo(s.FirstOrDefault().Hblid).HBLNo,
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
                     PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()),
-                    ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling
+                    ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
+                    PartnerId = s.FirstOrDefault().PartnerId.ToString()
                 }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -532,7 +533,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.VoucherId = acctPayment.Type == "CREDITNOTE" ? _voucherId : null;
                     payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
                     payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
-
+                    payment.PartnerId = acctPayment.PartnerId.ToString();
                     paymentReceipts.Add(payment);
                 }
             }
@@ -693,6 +694,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.Hblid = paymentGroupOBH.Hblid;
             _payment.CreditNo = paymentGroupOBH.CreditNo;
             _payment.ExchangeRateBilling = paymentGroupOBH.ExchangeRateBilling;
+            _payment.PartnerId = paymentGroupOBH.PartnerId;
 
             _payment.UserCreated = _payment.UserModified = currentUser.UserID;
             _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
@@ -864,6 +866,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditNo = payment.CreditNo;
                 _payment.CreditAmountVnd = payment.CreditAmountVnd;
                 _payment.CreditAmountUsd = payment.CreditAmountUsd;
+                _payment.PartnerId = payment.PartnerId;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -969,6 +972,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditAmountVnd = -payment.CreditAmountVnd;
                 _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                 _payment.Hblid = payment.Hblid;
+                _payment.PartnerId = payment.PartnerId;
 
                 _payment.Negative = true;
 
