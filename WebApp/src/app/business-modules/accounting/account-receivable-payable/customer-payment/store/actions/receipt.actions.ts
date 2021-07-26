@@ -1,5 +1,5 @@
 import { createAction, props } from "@ngrx/store";
-import { ReceiptInvoiceModel } from "@models";
+import { ReceiptInvoiceModel, Receipt } from "@models";
 import { IAcctReceiptCriteria } from "../../components/form-search/form-search-customer-payment.component";
 
 export enum ReceiptActionTypes {
@@ -19,6 +19,7 @@ export enum ReceiptActionTypes {
     SELECT_PARTNER_RECEIPT = '[AR Receipt] Select Partner',
     SELECT_DATE_RECEIPT = '[AR Receipt] Select Partner',
     SELECT_AGREEMENT = '[AR Receipt] select Agreement',
+    TOGGLE_AUTO_CONVERT_PAID = '[AR Receipt] Toggle Auto Convert Paid',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -41,6 +42,7 @@ export const InsertAdvance = createAction(ReceiptActionTypes.INSERT_ADVANCE, pro
 export const SelectPartnerReceipt = createAction(ReceiptActionTypes.SELECT_PARTNER_RECEIPT, props<{ id: string, partnerGroup: string }>());
 export const SelectReceiptDate = createAction(ReceiptActionTypes.SELECT_DATE_RECEIPT, props<{ date: any }>());
 export const SelectReceiptAgreement = createAction(ReceiptActionTypes.SELECT_AGREEMENT, props<{ [key: string]: any; }>());
+export const ToggleAutoConvertPaid = createAction(ReceiptActionTypes.TOGGLE_AUTO_CONVERT_PAID, props<{ isAutoConvert: boolean }>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());

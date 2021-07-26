@@ -16,6 +16,7 @@ export interface IReceiptState {
     agreement: Partial<IAgreementReceipt>;
     dataSearch: any;
     pagingData: any;
+    isAutoConvertPaid: boolean;
 }
 
 
@@ -31,7 +32,8 @@ export const initialState: IReceiptState = {
     date: null,
     agreement: {},
     dataSearch: null,
-    pagingData: { page: 1, pageSize: 15 }
+    pagingData: { page: 1, pageSize: 15 },
+    isAutoConvertPaid: true
 };
 
 export const receiptManagementReducer = createReducer(
@@ -92,6 +94,9 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.LoadListCustomerPaymentSuccess, (state: IReceiptState, payload: CommonInterface.IResponsePaging) => ({
         ...state, list: payload, isLoading: false, isLoaded: true
+    })),
+    on(ReceiptActions.ToggleAutoConvertPaid, (state: IReceiptState, payload: { isAutoConvert: boolean }) => ({
+        ...state, isAutoConvertPaid: payload.isAutoConvert
     }))
 );
 
