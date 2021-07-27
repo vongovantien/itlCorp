@@ -1,4 +1,4 @@
-import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild, ChangeDetectorRef } from "@angular/core";
+import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild } from "@angular/core";
 import { AppList } from "@app";
 import { Store } from "@ngrx/store";
 import { DataService } from "@services";
@@ -37,8 +37,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'HBL No', field: '', width: 150 },
         { title: 'Unpaid USD', field: '', width: 150 },
         { title: 'Unpaid VND', field: '', width: 150 },
-        { title: 'Paid Amount USD', field: '', width: 150, align: this.right },
-        { title: 'Paid Amount VND', field: '', width: 150, align: this.right },
+        { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
+        { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
         { title: 'Total Paid VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
         { title: 'Remain USD', field: '', width: 150 },
@@ -81,8 +81,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Credit No', field: '', width: 180 },
             { title: 'Unpaid USD', field: '', width: 150 },
             { title: 'Unpaid VND', field: '', width: 150 },
-            { title: 'Paid Amount USD', field: '', width: 150, align: this.right },
-            { title: 'Paid Amount VND', field: '', width: 150, align: this.right },
+            { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
+            { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
             { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Remain USD', field: '', width: 150 },
@@ -229,7 +229,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
         for (let index = 0; index < model.length; index++) {
             const item: ReceiptInvoiceModel = model[index];
-            if (model[index].type !== 'CREDIT') {
+            if (model[index].type !== 'CREDIT' && model[index].negative !== true) {
                 totalData.totalUnpaidAmountUsd += (+item.unpaidAmountUsd ?? 0);
                 totalData.totalUnpaidAmountVnd += (+item.unpaidAmountVnd ?? 0);
                 totalData.totalPaidAmountUsd += (+item.paidAmountUsd ?? 0);
