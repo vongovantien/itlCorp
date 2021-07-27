@@ -3435,6 +3435,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 // footer
                 listKeyData = new Dictionary<string, object>();
+                listKeyData.Add("SettlementNote", string.IsNullOrEmpty(settlementExport.Note?.Trim()) ? "Thanh toán cước vận chuyển" : settlementExport.Note);
                 listKeyData.Add("SettlementAmount", settlementExport.SettlementAmount);
                 listKeyData.Add("SettlementAmountVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
                 listKeyData.Add("SettlementAmountSumVND", settlementExport.SettlementCurrency == "VND" ? settlementExport.SettlementAmount : null);
@@ -3445,7 +3446,20 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("SettlementAmountTotalUSD", settlementExport.SettlementCurrency != "VND" ? settlementExport.SettlementAmount : null);
 
                 listKeyData.Add("AmountInWord", "In word (Thành tiền): " + settlementExport.AmountInWords);
-                listKeyData.Add("Requester", settlementExport.Requester);
+                // Họ tên người ký
+                listKeyData.Add("Requester", settlementExport.Requester); // Requester
+                listKeyData.Add("Manager", settlementExport.Manager); // trưởng bộ phận
+                listKeyData.Add("Accountant", settlementExport.Accountant); // kế toàn trưởng
+
+                // Tick Requester
+                listKeyData.Add("tick1", settlementExport.IsRequesterApproved ? char.ConvertFromUtf32(0x0050) : string.Empty); //Mã code của Symbol tick;
+                // Tick trưởng bộ phận
+                listKeyData.Add("tick2", settlementExport.IsManagerApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
+                // Tick thủ trưởng
+                listKeyData.Add("tick3", settlementExport.IsBODApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
+                // Tick kế toán trưởng
+                listKeyData.Add("tick4", settlementExport.IsAccountantApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
+
                 excel.SetData(listKeyData);
 
                 excel.SetData(listKeyData);

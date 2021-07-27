@@ -5060,7 +5060,7 @@ namespace eFMS.API.Accounting.DL.Services
             var settlementPayment = GetSettlementPaymentById(settlementId);
             if (settlementPayment == null) return null;
 
-            string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameEn;
+            string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
 
             #region -- Info Manager, Accoutant & Department --
             var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
