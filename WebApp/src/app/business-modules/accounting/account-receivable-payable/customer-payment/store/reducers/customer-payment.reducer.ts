@@ -17,6 +17,7 @@ export interface IReceiptState {
     dataSearch: any;
     pagingData: any;
     isAutoConvertPaid: boolean;
+    currency: string;
 }
 
 
@@ -33,7 +34,8 @@ export const initialState: IReceiptState = {
     agreement: {},
     dataSearch: null,
     pagingData: { page: 1, pageSize: 15 },
-    isAutoConvertPaid: true
+    isAutoConvertPaid: true,
+    currency: 'VND'
 };
 
 export const receiptManagementReducer = createReducer(
@@ -64,17 +66,30 @@ export const receiptManagementReducer = createReducer(
         ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
     })),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
-        if (payload.data.cusAdvanceAmountVnd > 0 || payload.data.cusAdvanceAmountUsd > 0) {
-            const newInvoiceWithAdv: any = {
-                typeInvoice: 'ADV',
-                type: 'ADV',
-                paidAmountVnd: payload.data.cusAdvanceAmountVnd,
-                paidAmountUsd: payload.data.cusAdvanceAmountUsd,
-                refNo: null
+        if (state.currency === 'VND') {
+            if (payload.data.cusAdvanceAmountVnd > 0) {
+                return {
+                    ...state, debitList: [...payload.data.invoices, {
+                        typeInvoice: 'ADV',
+                        type: 'ADV',
+                        paidAmountVnd: payload.data.cusAdvanceAmountVnd,
+                        paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                        refNo: null
+                    }]
+                };
+            }
+        } else if (payload.data.cusAdvanceAmountVnd > 0) {
+            return {
+                ...state, debitList: [...payload.data.invoices, {
+                    typeInvoice: 'ADV',
+                    type: 'ADV',
+                    paidAmountVnd: payload.data.cusAdvanceAmountVnd,
+                    paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                    refNo: null
+                }]
             };
-            const advData = newInvoiceWithAdv as ReceiptInvoiceModel;
-            return { ...state, debitList: [...payload.data.invoices, advData] };
         }
+
         return { ...state, debitList: [...payload.data.invoices] }
     }),
     on(ReceiptActions.SelectPartnerReceipt, (state: IReceiptState, payload: { id: string, partnerGroup: string }) => ({
@@ -97,6 +112,9 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.ToggleAutoConvertPaid, (state: IReceiptState, payload: { isAutoConvert: boolean }) => ({
         ...state, isAutoConvertPaid: payload.isAutoConvert
+    })),
+    on(ReceiptActions.SelectReceiptCurrency, (state: IReceiptState, payload: { currency: string }) => ({
+        ...state, currency: payload.currency
     }))
 );
 

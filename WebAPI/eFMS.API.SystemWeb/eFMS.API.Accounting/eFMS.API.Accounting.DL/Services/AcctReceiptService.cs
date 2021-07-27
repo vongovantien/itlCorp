@@ -458,8 +458,9 @@ namespace eFMS.API.Accounting.DL.Services
                     JobNo = GetHBLInfo(s.FirstOrDefault().Hblid).JobNo,
                     PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()),
                     ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
-                    PartnerId = s.FirstOrDefault()?.PartnerId?.ToString()
-                }).ToList();
+                    PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
+                    Negative = s.FirstOrDefault()?.Negative
+            }).ToList();
 
                 paymentReceipts.AddRange(items);
             }
@@ -534,6 +535,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.VoucherIdre = acctPayment.Type == "CREDITNOTE" ? _voucherIdre : null;
                     payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
+                    payment.Negative = acctPayment.Negative;
                     paymentReceipts.Add(payment);
                 }
             }

@@ -20,6 +20,7 @@ export enum ReceiptActionTypes {
     SELECT_DATE_RECEIPT = '[AR Receipt] Select Partner',
     SELECT_AGREEMENT = '[AR Receipt] select Agreement',
     TOGGLE_AUTO_CONVERT_PAID = '[AR Receipt] Toggle Auto Convert Paid',
+    SELECT_CURRENCY = '[AR Receipt] Select Receipt Currency',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -43,6 +44,7 @@ export const SelectPartnerReceipt = createAction(ReceiptActionTypes.SELECT_PARTN
 export const SelectReceiptDate = createAction(ReceiptActionTypes.SELECT_DATE_RECEIPT, props<{ date: any }>());
 export const SelectReceiptAgreement = createAction(ReceiptActionTypes.SELECT_AGREEMENT, props<{ [key: string]: any; }>());
 export const ToggleAutoConvertPaid = createAction(ReceiptActionTypes.TOGGLE_AUTO_CONVERT_PAID, props<{ isAutoConvert: boolean }>());
+export const SelectReceiptCurrency = createAction(ReceiptActionTypes.SELECT_CURRENCY, props<{ currency: string }>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());

@@ -12,7 +12,7 @@ import { takeUntil, pluck } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptPartnerCurrentState, ReceiptAgreementCreditCurrencyState, ReceiptAgreementCusAdvanceState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
-import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess, ToggleAutoConvertPaid } from '../../store/actions';
+import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess, ToggleAutoConvertPaid, SelectReceiptCurrency } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 import cloneDeep from 'lodash/cloneDeep';
@@ -261,6 +261,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                         this.exchangeRate.setValue(1);
                     }
                 }
+                this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.getFinalPaidAmount();
                 break;
             case 'amountVND':
