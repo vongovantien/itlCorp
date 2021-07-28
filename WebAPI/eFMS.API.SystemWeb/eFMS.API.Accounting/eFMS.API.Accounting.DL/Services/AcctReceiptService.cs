@@ -1183,23 +1183,33 @@ namespace eFMS.API.Accounting.DL.Services
 
             return hsInvoiceUpdate;
         }
-        private HandleState UpdateCusAdvanceOfAgreement(AcctReceipt receipt)
+        private HandleState UpdateCusAdvanceOfAgreement(AcctReceipt receipt, SaveAction action)
         {
             HandleState hsAgreementUpdate = new HandleState();
-            decimal? totalAdv = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
-                .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
-                .Sum();
-
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            if (agreement != null)
-            {
-                decimal _cusAdv = (totalAdv + (agreement.CustomerAdvanceAmount ?? 0)) ?? 0;
-                agreement.CustomerAdvanceAmount = _cusAdv < 0 ? 0 : (_cusAdv - receipt.CusAdvanceAmount); // trừ cho cus advance đã cấn trừ trên phiếu thu
-                agreement.UserModified = currentUser.UserID;
-                agreement.DatetimeModified = DateTime.Now;
+            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
+              .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
+              .Sum();
 
-                hsAgreementUpdate = catContractRepository.Update(agreement, x => x.Id == agreement.Id);
+            if (action != SaveAction.SAVECANCEL){
+                if (agreement != null)
+                {
+                    decimal _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmount ?? 0);
+                    agreement.CustomerAdvanceAmount = _cusAdv;
+                }
             }
+            else
+            {
+                if (agreement != null)
+                {
+                    agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmount ?? 0) - (totalAdvPayment ?? 0); 
+                }
+            }
+
+            agreement.UserModified = currentUser.UserID;
+            agreement.DatetimeModified = DateTime.Now;
+
+            hsAgreementUpdate = catContractRepository.Update(agreement, x => x.Id == agreement.Id);
             return hsAgreementUpdate;
         }
 
@@ -1364,7 +1374,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
                                 // Cập nhật CusAdvance cho hợp đồng
-                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel);
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel, SaveAction.SAVEDONE);
 
                                 //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
                                 trans.Commit();
@@ -1401,7 +1411,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
 
                                 // Cập nhật CusAdvance cho hợp đồng
-                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE);
                                 //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
                                 trans.Commit();
                             }
@@ -1456,7 +1466,7 @@ namespace eFMS.API.Accounting.DL.Services
                             hs = UpdateInvoiceOfPayment(receiptId);
                             //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
                             // Cập nhật Cus Advance của Agreement
-                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
+                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE);
 
                             DataContext.SubmitChanges();
                             trans.Commit();
@@ -1534,7 +1544,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                             }
                             // Cập nhật Cus Advance của Agreement
-                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent);
+                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVECANCEL);
 
                             DataContext.SubmitChanges();
                             trans.Commit();
