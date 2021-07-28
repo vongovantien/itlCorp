@@ -3472,19 +3472,16 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyData.Add("Requester", settlementExport.Requester); // Requester
                 listKeyData.Add("Manager", settlementExport.Manager); // trưởng bộ phận
                 listKeyData.Add("Accountant", settlementExport.Accountant); // kế toàn trưởng
+                excel.SetData(listKeyData);
 
                 // Tick Requester
-                listKeyData.Add("tick1", settlementExport.IsRequesterApproved ? char.ConvertFromUtf32(0x0050) : string.Empty); //Mã code của Symbol tick;
+                excel.Worksheet.Cells["B46"].Value = settlementExport.IsRequesterApproved ? char.ConvertFromUtf32(0x0050) : string.Empty; //Mã code của Symbol tick;
                 // Tick trưởng bộ phận
-                listKeyData.Add("tick2", settlementExport.IsManagerApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
+                excel.Worksheet.Cells["D46"].Value = settlementExport.IsManagerApproved ? char.ConvertFromUtf32(0x0050) : string.Empty;
                 // Tick thủ trưởng
-                listKeyData.Add("tick3", settlementExport.IsBODApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
+                excel.Worksheet.Cells["F46"].Value = settlementExport.IsBODApproved ? char.ConvertFromUtf32(0x0050) : string.Empty;
                 // Tick kế toán trưởng
-                listKeyData.Add("tick4", settlementExport.IsAccountantApproved ? char.ConvertFromUtf32(0x0050) : string.Empty);
-
-                excel.SetData(listKeyData);
-
-                excel.SetData(listKeyData);
+                excel.Worksheet.Cells["H46"].Value = settlementExport.IsAccountantApproved ? char.ConvertFromUtf32(0x0050) : string.Empty;
                 return excel.ExcelStream();
             }
             catch (Exception ex)
