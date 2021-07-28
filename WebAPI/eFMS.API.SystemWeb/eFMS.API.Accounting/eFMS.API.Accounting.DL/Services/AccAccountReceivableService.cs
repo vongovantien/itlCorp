@@ -1728,7 +1728,7 @@ namespace eFMS.API.Accounting.DL.Services
                         Over30Day = s.Sum(sum => sum.Over30Day),
                         ArCurrency = s.First().ArCurrency,
                         ParentNameAbbr = s.First().ParentNameAbbr
-                    }).AsQueryable();
+                    }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
 
@@ -1946,6 +1946,11 @@ namespace eFMS.API.Accounting.DL.Services
             return detail;
         }
 
+        public IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria)
+        {
+            IEnumerable<object> data = GetDataARByCriteria(criteria);
+            return data;
+        }
         #endregion --- DETAIL ---
     }
 }

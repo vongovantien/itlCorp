@@ -4,12 +4,13 @@ import { catchError, finalize, map } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState } from '@store';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -24,7 +25,8 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _router: Router,
-        private _store:Store<IAccountReceivableState>
+        private _store:Store<IAccountReceivableState>,
+        private _exportRepo: ExportRepo,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -34,15 +36,17 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     ngOnInit() {
         this.headers = [
             { title: 'Partner Id', field: 'partnerCode', sortable: true },
-            { title: 'Parent Partner', field: 'partnerNameAbbr', sortable: true },
+            { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
-            { title: 'Billing (Unpaid)', field: 'billingAmount', sortable: true },
+            { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Paid', field: 'paidAmount', sortable: true },
             { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
             { title: 'Status', field: 'agreementStatus', sortable: true },
-            { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
+            { title: 'Parent Partner', field: 'partnerNameAbbr', sortable: true },
+
         ];
 
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
     }
 
     sortOtherList(sortField: string, order: boolean) {
@@ -84,6 +88,17 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
                 }
             });
         }
+
+    }
+
+
+    exportExcel(){
+        this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
+        .subscribe(
+            (res: Blob) => {
+                this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Cash.xlsx');
+            }
+        );
 
     }
 }

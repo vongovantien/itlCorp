@@ -137,5 +137,14 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountReceivableService.GetDataARByCriteria(criteria);
             return Ok(data);
         }
+
+
+        [HttpPost("GetDataARSumaryExport")]
+        [Authorize]
+        public IActionResult GetDataARSumaryExport(AccountReceivableCriteria criteria)
+        {
+            var data = accountReceivableService.GetDataARSumaryExport(criteria);
+            return Ok(data);
+        }
     }
 }

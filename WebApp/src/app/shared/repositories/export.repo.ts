@@ -408,5 +408,11 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+    exportAccountingReceivableArSumary(searchObject: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingReceivableArSumary`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

@@ -20,5 +20,6 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> GetDataARByCriteria(AccountReceivableCriteria criteria);
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
         List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
+        IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
     }
 }
