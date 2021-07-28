@@ -53,7 +53,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 if (param.subTab) {
                     this.selectedSubTab = param.subTab.toUpperCase();
                 } else {
-                    debugger
                     this.selectedSubTab = 'trial_official'.toUpperCase();
                     this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
                 }
@@ -155,7 +154,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
             }
         );
-
+        tabComponent.dataSearch = this.dataSearch;
         tabComponent.getPagingList();
     }
 }

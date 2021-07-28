@@ -175,18 +175,28 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
     // tslint:disable-next-line:no-any
     onSelectBindingInput(item: any, fieldName: string) {
-        switch (fieldName) {
-            case 'OverDueDays':
-                this.fromOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
-                this.toOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
-                break;
-            case 'DebitRates':
-                this.fromDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
-                this.toDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
-                break;
-            default:
-                break;
-        }
+            switch (fieldName) {
+                case 'OverDueDays':
+                    if(item){
+                        this.fromOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
+                        this.toOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
+                    }else{
+                        this.fromOverdueDays.setValue(null);
+                        this.toOverdueDays.setValue(null);
+                    }
+                    break;
+                case 'DebitRates':
+                    if(item){
+                        this.fromDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
+                        this.toDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
+                    }else{
+                        this.fromDebitRate.setValue(null);
+                        this.toDebitRate.setValue(null);
+                    }
+                    break;
+                default:
+                    break;
+            }
     }
 
     resetSearch() {
@@ -247,6 +257,23 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                     }
                 }
             );
+    }
+
+    collapsed() {
+        this.resetFormControl(this.overdueDays)
+        this.resetFormControl(this.fromOverdueDays)
+        this.resetFormControl(this.toOverdueDays)
+        this.resetFormControl(this.debitRate)
+        this.resetFormControl(this.fromDebitRate)
+        this.resetFormControl(this.toDebitRate)
+        this.resetFormControl(this.agreementStatus)
+        this.resetFormControl(this.agreementExpiredDays)
+        this.resetFormControl(this.salesManId)
+        this.resetFormControl(this.officalId)
+    }
+
+    expanded() {
+        this.subscriptionSearchParamState();
     }
 }
 
