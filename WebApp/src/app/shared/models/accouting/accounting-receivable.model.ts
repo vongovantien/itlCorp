@@ -31,6 +31,8 @@ export class TrialOfficialOtherModel {
     obhUnpaidAmount: number = 0;
     obhPaidAmount: number = 0;
 
+    agreementSalesmanName: string = null;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

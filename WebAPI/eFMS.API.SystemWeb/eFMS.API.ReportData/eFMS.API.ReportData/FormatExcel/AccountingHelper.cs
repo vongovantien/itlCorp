@@ -3721,21 +3721,21 @@ namespace eFMS.API.ReportData.FormatExcel
             foreach (var item in acctMngts)
             {
                 workSheet.Cells[rowStart, 1].Value = item.JobNo;
-                workSheet.Cells[rowStart, 2].Value = item.InvoiceNo; 
+                workSheet.Cells[rowStart, 2].Value = item.InvoiceNo;
                 workSheet.Cells[rowStart, 3].Value = item.Mbl;
                 workSheet.Cells[rowStart, 4].Value = item.Hbl;
-                workSheet.Cells[rowStart, 5].Value = item.VoucherId; 
-                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo; 
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteType; 
-                workSheet.Cells[rowStart, 8].Value = item.ChargeType; 
-                workSheet.Cells[rowStart, 9].Value = item.PayerId; 
-                workSheet.Cells[rowStart, 10].Value = item.PayerName; 
-                workSheet.Cells[rowStart, 11].Value = item.PayerType; 
-                workSheet.Cells[rowStart, 12].Value = item.Currency; 
-                workSheet.Cells[rowStart, 13].Value = item.Amount; 
-                workSheet.Cells[rowStart, 14].Value = item.IssueBy; 
-                workSheet.Cells[rowStart, 15].Value = item.Bu; 
-                workSheet.Cells[rowStart, 16].Value = item.ServiceDate; 
+                workSheet.Cells[rowStart, 5].Value = item.VoucherId;
+                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo;
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 8].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 9].Value = item.PayerId;
+                workSheet.Cells[rowStart, 10].Value = item.PayerName;
+                workSheet.Cells[rowStart, 11].Value = item.PayerType;
+                workSheet.Cells[rowStart, 12].Value = item.Currency;
+                workSheet.Cells[rowStart, 13].Value = item.Amount;
+                workSheet.Cells[rowStart, 14].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 15].Value = item.Bu;
+                workSheet.Cells[rowStart, 16].Value = item.ServiceDate;
                 workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
@@ -3744,6 +3744,179 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
             workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells["A1:AN" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+
+        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
+        {
+            try
+            {
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("Sheet1");
+                    var workSheet = excelPackage.Workbook.Worksheets.First();
+                    if (arType == ARTypeEnum.TrialOrOffical)
+                    {
+                        BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
+                    }else if (arType == ARTypeEnum.Other)
+                    {
+                        BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return null;
+        }
+
+        private void BindingDataAccoutingReceivableListTrialExcel(ExcelWorksheet workSheet, List<AccountReceivableResultExport> acctMngts)
+        {
+            SetWidthColumnExcelAccoutingManagement(workSheet);
+
+            workSheet.Column(2).Width = 38;
+            for (int i = 4; i <= 14; i++)
+                workSheet.Column(i).Width = 19;
+            workSheet.Column(15).Width = 26;
+            workSheet.Column(16).Width = 41;
+            workSheet.Column(21).Width = 63;
+
+            List<string> headers = new List<string>
+            {
+                 "No",//0
+                 "Partner ID",//1
+                 "Partner Name",//2
+                 "Rate",//3
+                 "Debit Amount",//4
+                 "Billing",//5
+                 "Paid A Part",//6
+                 "Outstanding",//7
+                 "Over 1-15 Days",//8
+                 "Over 16-30 Days",//9
+                 "Over 30 days",//10
+                 "Credit Limited",//11
+                 "Over Amount",//12
+                 "Currency",//13
+                 "Saleman",//14
+                 "Contract No",//15
+                 "Contract Type",//16
+                 "Status",//17
+                 "Expired Date",//18
+                 "Expired Days",//19
+                 "Parent Partner"//20
+            };
+
+            int rowStart = 1;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                workSheet.Cells[rowStart, i + 1].Value = headers[i];
+                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+
+            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            workSheet.View.FreezePanes(2, 1);
+
+            rowStart += 1;
+            foreach (var item in acctMngts)
+            {
+                workSheet.Cells[rowStart, 1].Value = rowStart;
+                workSheet.Cells[rowStart, 2].Value = item.PartnerId;
+                workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
+
+                workSheet.Cells[rowStart, 4].Value = item.DebitRate;
+                workSheet.Cells[rowStart, 5].Value = item.DebitAmount;
+                workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
+                workSheet.Cells[rowStart, 7].Value = item.PaidAmount;
+                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid;
+                workSheet.Cells[rowStart, 9].Value = item.Over1To15Day;
+                workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
+                workSheet.Cells[rowStart, 11].Value = item.Over30Day;
+                workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditAmount;
+                workSheet.Cells[rowStart, 13].Value = item.CreditCurrency;
+                workSheet.Cells[rowStart, 14].Value = item.CreditLimited;
+
+                for (int i = 4; i <= 14; i++)
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
+
+                workSheet.Cells[rowStart, 15].Value = item.AgreementSalesmanName;
+                workSheet.Cells[rowStart, 16].Value = item.AgreementNo;
+                workSheet.Cells[rowStart, 17].Value = item.AgreementType;
+                workSheet.Cells[rowStart, 18].Value = item.AgreementStatus;
+                workSheet.Cells[rowStart, 19].Value = item.ExpriedDate;
+                workSheet.Cells[rowStart, 19].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 20].Value = item.ExpriedDay;
+                workSheet.Cells[rowStart, 21].Value = item.ParentNameAbbr;
+
+                rowStart += 1;
+            }
+
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+        }
+
+        private void BindingDataAccoutingReceivableListOrtherExcel(ExcelWorksheet workSheet, List<AccountReceivableResultExport> acctMngts)
+        {
+            SetWidthColumnExcelAccoutingManagement(workSheet);
+
+            workSheet.Column(2).Width = 38;
+            for (int i = 4; i <= 7; i++)
+                workSheet.Column(i).Width = 19;
+            workSheet.Column(8).Width = 26;
+            workSheet.Column(9).Width = 63;
+
+            List<string> headers = new List<string>
+            {
+                 "No",//0
+                 "Partner ID",//1
+                 "Partner Name",//2
+                 "Debit Amount",//3
+                 "Billing",//4
+                 "Paid",//5
+                 "OutStanding Balance",//6
+                 "Status",//7
+                 "Parent Partner"
+            };
+
+            int rowStart = 1;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                workSheet.Cells[rowStart, i + 1].Value = headers[i];
+                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
+                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            }
+
+            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+            workSheet.View.FreezePanes(2, 1);
+
+            rowStart += 1;
+            foreach (var item in acctMngts)
+            {
+                workSheet.Cells[rowStart, 1].Value = rowStart-1;
+                workSheet.Cells[rowStart, 2].Value = item.PartnerId;
+                workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
+                workSheet.Cells[rowStart, 4].Value = item.DebitAmount;
+                workSheet.Cells[rowStart, 5].Value = item.BillingAmount;
+                workSheet.Cells[rowStart, 6].Value = item.PaidAmount;
+                workSheet.Cells[rowStart, 7].Value = item.BillingUnpaid;
+
+                for (int i = 4; i <= 7; i++)
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
+
+                workSheet.Cells[rowStart, 8].Value = item.AgreementStatus;
+                workSheet.Cells[rowStart, 9].Value = item.ParentNameAbbr;
+
+                rowStart += 1;
+            }
+
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
         #endregion --- ACCOUTING MANAGEMENT ---
     }

@@ -16,6 +16,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { effects } from './store/effects';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 const routing: Routes = [
     {
@@ -44,6 +45,7 @@ const routing: Routes = [
         NgSelectModule,
         StoreModule.forFeature('account-receivable', reducers),
         EffectsModule.forFeature(effects),
+        CollapseModule.forRoot()
     ],
     exports: [
 

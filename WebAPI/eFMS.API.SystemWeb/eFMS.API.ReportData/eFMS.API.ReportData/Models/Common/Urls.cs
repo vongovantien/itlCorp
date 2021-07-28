@@ -53,6 +53,7 @@
             public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
             public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
             public const string AccountingManagementExportUrl = "/api/v1/en-US/AccountingManagement/GetDataAcctMngtExport";
+            public const string AccountingGetDataARSumaryExportUrl = "/api/v1/en-US/AccountReceivable/GetDataARSumaryExport";
         }
 
         public class Documentation
