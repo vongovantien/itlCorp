@@ -745,7 +745,7 @@ export class AccountingRepo {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
                 page: '' + page,
                 size: '' + size
-            }).pipe(
+            }, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
@@ -881,8 +881,8 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body:any) {
-        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`,body).pipe(
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

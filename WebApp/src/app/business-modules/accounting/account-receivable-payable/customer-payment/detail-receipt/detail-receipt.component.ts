@@ -217,7 +217,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     }
 
     confirmCancel() {
-        if (this.receiptDetail.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
+        if (this.receiptDetail.status === AccountingConstants.RECEIPT_STATUS.CANCEL || this.receiptDetail.status === AccountingConstants.RECEIPT_STATUS.DONE) {
             this.gotoList();
         } else {
             this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {

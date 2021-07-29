@@ -244,7 +244,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                     this.paidAmountUSD.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
-                    this.paidAmountVND.setValue(formatCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 'en', ',0-3'));
+                    this.paidAmountVND.setValue(formatCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 'en', ''));
                 }
                 if (!!this.isAsPaidAmount.value) {
                     this.cusAdvanceAmount.setValue(this.form.controls[`paidAmount${this.currencyId.value}`].value);
@@ -372,9 +372,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         let _finalPaidAmountVnd: number = (this.amountVND.value ?? 0) + (this.paidAmountVND.value ?? 0);
         let _finalPaidAmountUsd: number = (this.amountUSD.value ?? 0) + (this.paidAmountUSD.value ?? 0);
 
-        if (!!this.isAsPaidAmount.value) {
-
-        }
         if (!this.isAsPaidAmount.value) {
             _finalPaidAmountVnd += ((this.cusAdvanceAmount.value ?? 0) * exChangeRate);
             _finalPaidAmountUsd += ((this.cusAdvanceAmount.value ?? 0) / exChangeRate)
