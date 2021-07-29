@@ -128,5 +128,7 @@
   //----------start: User Permission
   "MSG_ITEM_DUPLICATE_ROLE_ON_USER": "Duplicate role on user {0}!Please Check hight field!!",
   //-- end
-  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện" //403
+  "DO_NOT_HAVE_PERMISSION": "Bạn không có quyền để thực hiện", //403
+  "MSG_USER_USERROLE_EMPTY": "User Role không được để trống",
+  "MSG_USER_USERROLE_NOTFOUND": "User Role {0} bạn nhập không có trong hệ thống"
 }
