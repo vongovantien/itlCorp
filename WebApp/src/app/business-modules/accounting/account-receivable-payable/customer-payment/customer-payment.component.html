@@ -46,8 +46,7 @@
                                                         <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
                                                         </tr>
                                                         <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
-                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'"
-                                                            [ngClass]="{'bg-secondary font-italic': cps.status === 'Cancel'}">
+                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                             <td class="table-actions-col" style="min-width:40px">
                                                                 <div class="table-actions">
 
@@ -81,7 +80,7 @@
                                                                                 class="badge badge-success m--margin-left-10">
                                                                                 {{cps.status}}</span>
                                                                             <span *ngSwitchCase="'Cancel'"
-                                                                                class="badge badge-default m--margin-left-10">
+                                                                                class="badge badge-secondary m--margin-left-10">
                                                                                 {{cps.status}}</span>
                                                                             <span *ngSwitchCase="'Draft'"
                                                                                 class="badge badge-danger m--margin-left-10">
