@@ -101,7 +101,8 @@ export namespace CommonEnum {
     export enum CHARGE_TYPE {
         DEBIT = 'DEBIT',  // * BUYING - Phí chi
         CREDIT = 'CREDIT', // * SELLING - Phí thu
-        OBH = "OBH", // * OBH - Phí thu hộ
+        OBH = "OBH", // * OBH - Phí thu hộ,
+        OTHER = "OTHER"
     }
 
     export enum TRANSPORT_MODE {

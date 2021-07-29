@@ -44,7 +44,8 @@ namespace eFMS.API.Common.Globals
         public static readonly List<string> ChargeTypes = new List<string> {
             "CREDIT",
             "DEBIT",
-            "OBH"
+            "OBH",
+            "OTHER"
         };
 
         public static readonly List<CommonDataEx> NumberOfOriginBls = new List<CommonDataEx>
