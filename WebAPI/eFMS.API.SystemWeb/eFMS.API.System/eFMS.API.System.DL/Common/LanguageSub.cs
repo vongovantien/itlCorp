@@ -146,7 +146,8 @@ namespace eFMS.API.System.DL.Common
         public static readonly string MSG_USER_EMAIL_EMPTY = "MSG_USER_EMAIL_EMPTY";
         public static readonly string MSG_USER_STATUS_NOTFOUND = "MSG_USER_STATUS_NOTFOUND";
         public static readonly string MSG_USER_TEL_EMPTY = "MSG_USER_TEL_EMPTY";
-
+        public static readonly string MSG_USER_USERROLE_EMPTY = "MSG_USER_USERROLE_EMPTY";
+        public static readonly string MSG_USER_USERROLE_NOTFOUND = "MSG_USER_USERROLE_NOTFOUND";
 
 
 

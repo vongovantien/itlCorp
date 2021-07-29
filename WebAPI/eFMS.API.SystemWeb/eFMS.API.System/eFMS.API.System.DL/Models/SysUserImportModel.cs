@@ -20,6 +20,8 @@ namespace eFMS.API.System.DL.Models
 
 
         public bool IsValid { get; set; }
+        public string UserRole { get; set; }
+        public bool UserRoleValid { get; set; }
 
     }
 }

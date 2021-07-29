@@ -433,7 +433,20 @@ namespace eFMS.API.System.DL.Services
                     item.Username = stringLocalizer[SystemLanguageSub.MSG_USER_USERNAME_DUPLICATE, item.Username].Value;
 
                 }
-
+                string userRole = item.UserRole;
+                item.UserRoleValid = true;
+                if (string.IsNullOrEmpty(userRole))
+                {
+                    item.UserRole = stringLocalizer[SystemLanguageSub.MSG_USER_USERROLE_EMPTY];
+                    item.IsValid = false;
+                    item.UserRoleValid = false;
+                }
+                else if (!userRole.Equals("CS") && !userRole.Equals("Sale") && !userRole.Equals("FIN")&& !userRole.Equals("IA")&& !userRole.Equals("AR")&& !userRole.Equals("BOD"))
+                {
+                    item.UserRole = stringLocalizer[SystemLanguageSub.MSG_USER_USERROLE_NOTFOUND];
+                    item.IsValid = false;
+                    item.UserRoleValid = false;
+                }
             });
             return list;
         }
@@ -506,6 +519,7 @@ namespace eFMS.API.System.DL.Services
                     objUser.Description = item.Description;
                     objUser.Password = SystemConstants.Password;
                     objUser.Password = BCrypt.Net.BCrypt.HashPassword(objUser.Password);
+                    objUser.UserRole = item.UserRole;
                     sysUsers.Add(objUser);
                 }
 
@@ -545,7 +559,8 @@ namespace eFMS.API.System.DL.Services
                 Username = y.Username,
                 UserType = y.UserType,
                 WorkingStatus = y.WorkingStatus,
-                WorkPlaceId = y.WorkPlaceId
+                WorkPlaceId = y.WorkPlaceId,
+                UserRole = y.UserRole
             }).FirstOrDefault();
             var userCreate = DataContext.Get(x => x.Id == result.UserCreated).FirstOrDefault();
             var userModified = DataContext.Get(x => x.Id == result.UserModified).FirstOrDefault();
