@@ -12,7 +12,7 @@ import { IAddUser } from '../addnew/user.addnew.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { DataService } from '@services';
-
+import { HttpClient } from "@angular/common/http";
 
 @Component({
     selector: 'app-user-details',
@@ -33,7 +33,7 @@ export class UserDetailsComponent extends AppPage {
         //
         creditLimit: null,
         creditRate: null,
-
+        userRole: ''
     };
     userId: string = '';
 
@@ -49,6 +49,7 @@ export class UserDetailsComponent extends AppPage {
     selectedUserLevel: UserLevel;
 
     userDetail: any;
+    dataUseRole:any=[];
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -56,13 +57,17 @@ export class UserDetailsComponent extends AppPage {
         private _systemRepo: SystemRepo,
         private _progressService: NgProgress,
         private _toastService: ToastrService,
-        private _dataService: DataService
+        private _dataService: DataService,
+        private _httpClient: HttpClient
     ) {
         super();
         this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
+        this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
+            if (data) {this.dataUseRole = data["DropDownUserRole"]}
+        })
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.userId = param.id;
@@ -102,7 +107,7 @@ export class UserDetailsComponent extends AppPage {
                 //
                 creditLimit: this.formAdd.creditLimit.value,
                 creditRate: this.formAdd.creditRate.value,
-
+                userRole: this.formAdd.userRole.value.value,
             };
             this._systemRepo.updateUser(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -137,6 +142,7 @@ export class UserDetailsComponent extends AppPage {
                         this.formData.username = res.data.username;
                         this.formData.userType = res.data.userType;
                         this.formData.workingStatus = res.data.workingStatus;
+                        this.formData.userRole = res.data.userRole;
                         if (!!res.data.sysEmployeeModel) {
                             this.formAdd.employeeNameEn.setValue(res.data.sysEmployeeModel.employeeNameEn);
                             this.formAdd.employeeNameVn.setValue(res.data.sysEmployeeModel.employeeNameVn);
@@ -157,7 +163,7 @@ export class UserDetailsComponent extends AppPage {
                         //
                         this.formAdd.creditLimit.setValue(res.data.creditLimit);
                         this.formAdd.creditRate.setValue(res.data.creditRate);
-
+                        this.formAdd.userRole.setValue(this.formAdd.userRoles.filter(i => i.value === res.data.userRole)[0]);
                     }
                 },
             );
