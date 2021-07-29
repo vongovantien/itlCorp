@@ -381,6 +381,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         newSurCharge.paySoano = null;
         newSurCharge.finalExchangeRate = null;
         newSurCharge.acctManagementId = null;
+        newSurCharge.syncedFrom = null;
+        newSurCharge.paySyncFrom = null;
 
         if (type === CommonEnum.SurchargeTypeEnum.SELLING_RATE) {
             newSurCharge.invoiceDate = null;
