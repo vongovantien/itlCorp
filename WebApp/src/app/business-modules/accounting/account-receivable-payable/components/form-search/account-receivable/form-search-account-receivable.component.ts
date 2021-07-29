@@ -181,8 +181,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                         this.fromOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].from : OverDueDaysValues[item.id].from);
                         this.toOverdueDays.setValue(item.id === 0 ? OverDueDaysValues[0].to : OverDueDaysValues[item.id].to);
                     }else{
-                        this.fromOverdueDays.setValue(null);
-                        this.toOverdueDays.setValue(null);
+                        this.fromOverdueDays.setValue("");
+                        this.toOverdueDays.setValue("");
                     }
                     break;
                 case 'DebitRates':
@@ -190,8 +190,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                         this.fromDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].from : DebitRatesValues[item.id].from);
                         this.toDebitRate.setValue(item.id === 0 ? DebitRatesValues[0].to : DebitRatesValues[item.id].to);
                     }else{
-                        this.fromDebitRate.setValue(null);
-                        this.toDebitRate.setValue(null);
+                        this.fromDebitRate.setValue("");
+                        this.toDebitRate.setValue("");
                     }
                     break;
                 default:
@@ -215,7 +215,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,
-            overDueDay: dataForm.overdueDays === 0 ? 0 : dataForm.overdueDays,
+            overDueDay: dataForm.overdueDays? dataForm.overdueDays : 0,
             debitRateFrom: dataForm.fromDebitRate,
             debitRateTo: dataForm.toDebitRate,
             agreementStatus: dataForm.agreementStatus,
