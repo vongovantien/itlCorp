@@ -74,6 +74,7 @@ export class CsShipmentSurcharge {
     finalExchangeRate: string = null;
     acctManagementId: string = null;
     syncedFrom: string = null;
+    paySyncFrom: string = null;
 
     quantityType: any = null;
     creditNo: string = null;
