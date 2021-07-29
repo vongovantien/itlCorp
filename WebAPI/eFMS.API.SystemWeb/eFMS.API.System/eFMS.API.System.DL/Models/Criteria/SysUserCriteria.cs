@@ -15,5 +15,9 @@ namespace eFMS.API.System.DL.Models.Criteria
         public bool? Active { get; set; }
         public string CompanyId { get; set; }
         //public string 
+
+        public string Title { get; set; }
+        public string Company { get; set; }
+        public string Office { get; set; }
     }
 }

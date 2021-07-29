@@ -1371,6 +1371,7 @@ namespace eFMS.API.ReportData
                         worksheet.Cells[i + addressStartContent, 3].Value = item.EmployeeNameEN;
                         worksheet.Cells[i + addressStartContent, 4].Value = item.EmployeeNameVN;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.UserType;
+                        worksheet.Cells[i + addressStartContent, 6].Value = item.UserRole;
 
                         string status = "";
                         if (item.Active == true)
@@ -1381,7 +1382,7 @@ namespace eFMS.API.ReportData
                         {
                             status = "Inactive";
                         }
-                        worksheet.Cells[i + addressStartContent, 6].Value = status;
+                        worksheet.Cells[i + addressStartContent, 7].Value = status;
 
                         no++;
                     }

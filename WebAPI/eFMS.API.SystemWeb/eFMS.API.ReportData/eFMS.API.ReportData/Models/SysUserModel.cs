@@ -20,5 +20,6 @@ namespace eFMS.API.ReportData.Models
         public string Group { get; set; }
         public string WorkingStatus { get; set; }
         public bool? Active { get; set; }
+        public string UserRole { get; set; }
     }
 }
