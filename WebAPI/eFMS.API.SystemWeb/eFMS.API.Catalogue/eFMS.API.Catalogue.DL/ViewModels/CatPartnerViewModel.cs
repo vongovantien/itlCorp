@@ -45,7 +45,5 @@ namespace eFMS.API.Catalogue.DL.ViewModels
         public string BillingEmail { get; set; }
         public string ContactPerson { get; set; }
         public string Note { get; set; }
-        public string BankName { get; set; }
-        public string BankCode { get; set; }
     }
 }
