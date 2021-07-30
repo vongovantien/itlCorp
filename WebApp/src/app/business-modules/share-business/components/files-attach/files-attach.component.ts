@@ -51,7 +51,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                     this.getFileShipment(this.jobId);
                 }
             });
-        
+
         this._store.select(getTransactionDetailCsTransactionState)
             .pipe(skip(1), takeUntil(this.ngUnsubscribe))
             .subscribe(
@@ -153,7 +153,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 let f = this.files[i];
                 if (type.includes(f.name.split('.').pop())) {
                     f.dowFile = true
-                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${f.url}`;
                 }
                 else {
                     f.dowFile = false;
