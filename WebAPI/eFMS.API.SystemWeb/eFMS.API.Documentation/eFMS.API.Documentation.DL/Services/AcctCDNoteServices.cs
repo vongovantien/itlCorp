@@ -2881,14 +2881,14 @@ namespace eFMS.API.Documentation.DL.Services
                               CdNoteNo = cd.CodeNo,
                               CdNoteType = cd.CodeType,
                               ChargeType = cd.ChargeType,
-                              PayerId = payer?.Id,
-                              PayerName = payer?.PartnerNameEn,
-                              PayerType = payer?.PartnerType,
+                              PayerId = payer != null? payer.Id:"",
+                              PayerName = payer != null?payer.PartnerNameEn:"",
+                              PayerType = payer != null? payer.PartnerType:"",
                               Currency= cd.Currency,
                               Amount= cd.Total,
-                              IssueBy=cd.Creator,
-                              Bu= departs?.DeptNameEn,
-                              ServiceDate=trans?.ServiceDate
+                              IssueBy= creator!= null?creator.Username:"",
+                              Bu= departs != null? departs.DeptNameEn:"",
+                              ServiceDate=trans != null ?trans.ServiceDate:null
                           };
 
             var dataOps = from cd in _resultDatas
@@ -2912,14 +2912,14 @@ namespace eFMS.API.Documentation.DL.Services
                               CdNoteNo = cd.CodeNo,
                               CdNoteType = cd.CodeType,
                               ChargeType = cd.ChargeType,
-                              PayerId = payer?.Id,
-                              PayerName = payer?.PartnerNameEn,
-                              PayerType = payer?.PartnerType,
+                              PayerId = payer != null ? payer.Id : "",
+                              PayerName = payer != null ? payer.PartnerNameEn : "",
+                              PayerType = payer != null ? payer.PartnerType : "",
                               Currency = cd.Currency,
                               Amount = cd.Total,
-                              IssueBy = cd.Creator,
-                              Bu = departs?.DeptNameEn,
-                              ServiceDate = trans.ServiceDate
+                              IssueBy = creator != null ? creator.Username : "",
+                              Bu = departs!=null?departs.DeptNameEn:"",
+                              ServiceDate = trans != null ? trans.ServiceDate : null
                           };
 
             var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();

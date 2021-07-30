@@ -876,38 +876,46 @@ namespace eFMS.API.ForPartner.DL.Service
 
         private string GenerateVoucherId(string acctMngtType, string voucherType)
         {
-            if (string.IsNullOrEmpty(acctMngtType)) return string.Empty;
-            int monthCurrent = DateTime.Now.Month;
-            string year = DateTime.Now.Year.ToString();
-            string month = monthCurrent.ToString().PadLeft(2, '0');//Nếu tháng < 10 thì gắn thêm số 0 phía trước, VD: 09
-            string no = "001";
+            //if (string.IsNullOrEmpty(acctMngtType)) return string.Empty;
+            //int monthCurrent = DateTime.Now.Month;
+            //string year = DateTime.Now.Year.ToString();
+            //string month = monthCurrent.ToString().PadLeft(2, '0');//Nếu tháng < 10 thì gắn thêm số 0 phía trước, VD: 09
+            //string no = "001";
 
-            IQueryable<string> voucherNewests = null;
-            string _prefixVoucher = string.Empty;
-            if (acctMngtType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
-            {
-                _prefixVoucher = "FDT";
-            }
-            else if (acctMngtType == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
-            {
-                if (string.IsNullOrEmpty(voucherType)) return string.Empty;
-                _prefixVoucher = GetPrefixVoucherByVoucherType(voucherType);
-            }
-            voucherNewests = Get(x => x.Type == acctMngtType && x.VoucherId.Contains(_prefixVoucher) && x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month)
-                .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
+            //IQueryable<string> voucherNewests = null;
+            //string _prefixVoucher = string.Empty;
+            //if (acctMngtType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
+            //{
+            //    _prefixVoucher = "FDT";
+            //}
+            //else if (acctMngtType == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE)
+            //{
+            //    if (string.IsNullOrEmpty(voucherType)) return string.Empty;
+            //    _prefixVoucher = GetPrefixVoucherByVoucherType(voucherType);
+            //}
+            //voucherNewests = Get(x => x.Type == acctMngtType && x.VoucherId.Contains(_prefixVoucher) && x.VoucherId.Substring(0, 4) == year && x.VoucherId.Substring(11, 2) == month)
+            //    .OrderByDescending(o => o.VoucherId).Select(s => s.VoucherId);
 
-            string voucherNewest = voucherNewests.FirstOrDefault();
-            if (!string.IsNullOrEmpty(voucherNewest))
-            {
-                var _noNewest = voucherNewest.Substring(7, 3);
-                if (_noNewest != "999")
-                {
-                    no = (Convert.ToInt32(_noNewest) + 1).ToString();
-                    no = no.PadLeft(3, '0');
-                }
-            }
-            string voucher = year + _prefixVoucher + no + "/" + month;
-            return voucher;
+            //string voucherNewest = voucherNewests.FirstOrDefault();
+            //if (!string.IsNullOrEmpty(voucherNewest))
+            //{
+            //    var _noNewest = voucherNewest.Substring(7, 3);
+            //    if (_noNewest != "999")
+            //    {
+            //        no = (Convert.ToInt32(_noNewest) + 1).ToString();
+            //        no = no.PadLeft(3, '0');
+            //    }
+            //}
+            //string voucher = year + _prefixVoucher + no + "/" + month;
+            //return voucher;
+
+            string funcName = "dbo.fnc_GenerateVoucherID";
+            SqlParameter[] parameters = new[] { new SqlParameter("@Type", acctMngtType), new SqlParameter("@VoucherType", voucherType) };
+
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteFuncScalar(funcName, parameters);
+
+
+            return result.ToString();
         }
 
         private string GetPrefixVoucherByVoucherType(string voucherType)
