@@ -133,7 +133,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
     dowloadAllAttach() {
         if (this.fileNo) {
             let fileName = "";
-            
+
             if (this.fileNo.includes("/")) {
                 let arr = this.fileNo.split("/");
                 fileName = arr[0] + "_" + arr[1] + ".zip";
@@ -162,7 +162,7 @@ export class AccoutingAttachFileListComponent extends AppForm implements OnInit 
                 let f = this.files[i];
                 if (type.includes(f.name.split('.').pop())) {
                     f.dowFile = true
-                    f.viewFileUrl = `https://view.officeapps.live.com/op/view.aspx?src=${f.url}`;
+                    f.viewFileUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${f.url}`;
                 }
                 else {
                     f.dowFile = false;
