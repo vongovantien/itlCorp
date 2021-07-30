@@ -5090,13 +5090,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             string _payeeName = string.Empty;
 
-            if (settlementPayment.PaymentMethod == AccountingConstants.PAYMENT_METHOD_BANK && !string.IsNullOrEmpty(settlementPayment.Payee))
+            if (!string.IsNullOrEmpty(settlementPayment.Payee))
             {
                 var payeeInfo = catPartnerRepo.Get(x => x.Id == settlementPayment.Payee).FirstOrDefault();
-                if (payeeInfo != null)
-                {
-                    _payeeName = payeeInfo.PartnerNameEn;
-                }
+                _payeeName = payeeInfo?.PartnerNameVn;
             }
             string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
                     :
@@ -5121,7 +5118,7 @@ namespace eFMS.API.Accounting.DL.Services
                 BankAccountNo = settlementPayment.BankAccountNo,
                 BankName = settlementPayment.BankName,
                 BankAccountName = settlementPayment.BankAccountName,
-                PayeeName = settlementPayment.BankAccountName,
+                PayeeName = _payeeName,
                 Note = settlementPayment.Note
             };
             return infoSettlement;
