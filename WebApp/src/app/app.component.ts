@@ -16,7 +16,6 @@ declare var gtag;
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.css'],
     providers: [DestroyService],
-    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
 
