@@ -15,7 +15,6 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
-import { NgxCurrencyModule } from 'ngx-currency';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { ARCustomerPaymentReceiptCreditListComponent } from './components/receipt-credit-list/receipt-credit-list.component';
 import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt-debit-list/receipt-debit-list.component';
@@ -56,17 +55,7 @@ const routing: Routes = [
         ModalModule.forRoot(),
         StoreModule.forFeature('customer-payment', reducers),
         EffectsModule.forFeature(effects),
-        NgxCurrencyModule.forRoot({
-            align: "left",
-            allowNegative: false,
-            allowZero: true,
-            decimal: ".",
-            precision: 2,
-            prefix: "",
-            suffix: "",
-            thousands: ",",
-            nullable: true
-        }),
+
     ],
     exports: [],
     providers: [],

@@ -42,8 +42,8 @@ export class AccountingConstants {
         DENIED: 'Denied'
     }
 
-    public static DATE_TYPE: string[] = <string[]>['All', 'Create Date', 'Paid Date', 'Last Sync'];
-    public static PAYMENT_TYPE: string[] = <string[]>['All', 'Payment', 'Invoice'];
-    public static STATUS: string[] = <string[]>['All', 'Draft', 'Done', 'Cancel'];
-    public static SYNC_STATUSS: string[] = <string[]>['All', 'Synced', 'Rejected'];
+    public static DATE_TYPE: string[] = <string[]>['Create Date', 'Paid Date', 'Last Sync'];
+    public static PAYMENT_TYPE: string[] = <string[]>['Payment', 'Invoice'];
+    public static STATUS: string[] = <string[]>['Draft', 'Done', 'Cancel'];
+    public static SYNC_STATUSS: string[] = <string[]>['Synced', 'Rejected'];
 }
