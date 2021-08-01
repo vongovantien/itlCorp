@@ -15,6 +15,8 @@ import { ComboGridVirtualScrollComponent } from '@common';
 import { Observable } from 'rxjs';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement } from '../../store/actions';
+import { ReceiptTypeState } from '../../store/reducers';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'customer-payment-form-create-receipt',
@@ -51,7 +53,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     contractNo: string;
 
     classReceipt: string[] = ['Clear Debit', 'Advance', 'Other'];
-
+    partnerTypeState: string;
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
@@ -70,6 +72,16 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         if (!this.isUpdate) {
             this.generateReceiptNo();
         }
+
+        this._store.select(ReceiptTypeState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (partnerGroup) => {
+                    if (!!partnerGroup) {
+                        this.partnerTypeState = partnerGroup;
+                    }
+                }
+            )
     }
 
     getCustomerAgent() {
@@ -156,7 +168,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                                         this.agreementId.setValue(d[0].id);
                                         this.onSelectDataFormInfo(d[0], 'agreement');
 
-                                        this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerGroup }));
+                                        // * Check partner group của đối tượng đang chọn có # với đối tượng phiếu thu muốn tạo
+                                        if (data.partnerType === this.partnerTypeState) {
+                                            this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: this.partnerTypeState }));
+                                            return;
+                                        }
+                                        this._store.dispatch(SelectPartnerReceipt({ id: data.id, partnerGroup: data.partnerType.toUpperCase() }));
 
                                     } else {
                                         this.combogrid.displaySelectedStr = '';
