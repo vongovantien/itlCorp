@@ -1904,9 +1904,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(30).Width = 19; //Cột AD
             workSheet.Column(31).Width = 19; //Cột AE
             workSheet.Column(32).Width = 24; //Cột AF
-            workSheet.Column(33).Width = 25; //Cột AF
-            workSheet.Column(34).Width = 24; //Cột AF
-            workSheet.Column(35).Width = 24; //Cột AF
+            workSheet.Column(33).Width = 25; //Cột AG
+            workSheet.Column(34).Width = 24; //Cột AH
+            workSheet.Column(35).Width = 24; //Cột AI
+            workSheet.Column(36).Width = 24; //Cột AJ
+            workSheet.Column(37).Width = 24; //Cột AK
         }
         /// <summary>
         /// 
@@ -2117,14 +2119,16 @@ namespace eFMS.API.ReportData.FormatExcel
                "Balance", //25
                "Payment on behalf", //26
                "Inv.No", //27
-               "Amount", //28
-               "Paid Date", //29
-               "A/C Voucher No.", //30
-               "P/M Voucher No.", //31
-               "Service" ,//32
-               "Cd Note", //33,
-               "Creator", //33,
-               "Synced"
+               "Net Amount", //28
+               "Amount", //29
+               "Paid Date", //30
+               "A/C Voucher No.", //31
+               "P/M Voucher No.", //32
+               "Service" ,//33
+               "Cd Note", //34,
+               "Creator", //35,
+               "Synced", //36,
+               "Vat Partner" //37
             };
 
             using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
@@ -2160,9 +2164,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             //Header table
-            workSheet.Cells["A7:AI8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells["A7:AI8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            workSheet.Cells["A7:AI8"].Style.Font.Bold = true;
+            workSheet.Cells["A7:AK8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells["A7:AK8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A7:AK8"].Style.Font.Bold = true;
 
             workSheet.Cells["A7:A8"].Merge = true;
             workSheet.Cells["A7"].Value = headers[3]; // Date
@@ -2224,28 +2228,35 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["Z7:Z8"].Merge = true;
             workSheet.Cells["Z7"].Value = headers[25]; //Balance
 
-            workSheet.Cells["AA7:AB7"].Merge = true;
+            workSheet.Cells["AA7:AC7"].Merge = true;
             workSheet.Cells["AA7"].Value = headers[26]; //Payment on Behalf
             workSheet.Cells["AA8"].Value = headers[27]; //Inv.No
-            workSheet.Cells["AB8"].Value = headers[28]; //Amount
-
-            workSheet.Cells["AC7:AC8"].Merge = true;
-            workSheet.Cells["AC7"].Value = headers[29]; //Paid Date
+            workSheet.Cells["AB8"].Value = headers[28]; //Net Amount
+            workSheet.Cells["AC8"].Value = headers[29]; //Amount
 
             workSheet.Cells["AD7:AD8"].Merge = true;
-            workSheet.Cells["AD7"].Value = headers[30]; //A/C Voucher No.
+            workSheet.Cells["AD7"].Value = headers[30]; //Paid Date
 
             workSheet.Cells["AE7:AE8"].Merge = true;
-            workSheet.Cells["AE7"].Value = headers[31]; //P/M Voucher No.
+            workSheet.Cells["AE7"].Value = headers[31]; //A/C Voucher No.
 
             workSheet.Cells["AF7:AF8"].Merge = true;
+            workSheet.Cells["AF7"].Value = headers[32]; //P/M Voucher No.
+
             workSheet.Cells["AG7:AG8"].Merge = true;
+            workSheet.Cells["AG7"].Value = headers[33]; //Service
+
             workSheet.Cells["AH7:AH8"].Merge = true;
+            workSheet.Cells["AH7"].Value = headers[34]; //CD NOTE
+
             workSheet.Cells["AI7:AI8"].Merge = true;
-            workSheet.Cells["AF7"].Value = headers[32]; //Service
-            workSheet.Cells["AG7"].Value = headers[33]; //CD NOTE
-            workSheet.Cells["AH7"].Value = headers[34]; //Creator
             workSheet.Cells["AI7"].Value = headers[35]; //Creator
+
+            workSheet.Cells["AJ7:AJ8"].Merge = true;
+            workSheet.Cells["AJ7"].Value = headers[36]; //Synced
+
+            workSheet.Cells["AK7:AK8"].Merge = true;
+            workSheet.Cells["AK7"].Value = headers[37]; //Vat Parter
             //Header table
 
             //Cố định dòng thứ 8 (Freeze Row 8 and no column)
@@ -2344,17 +2355,21 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 if (listData[i].AmountObh != null && listData[i].AmountObh != 0)
                 {
-                    workSheet.Cells[rowStart, 28].Value = listData[i].AmountObh;
+                    workSheet.Cells[rowStart, 28].Value = listData[i].OBHNetAmount;
+                    workSheet.Cells[rowStart, 29].Value = listData[i].AmountObh;
+
                     workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
+                    workSheet.Cells[rowStart, 29].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
                 }
 
-                workSheet.Cells[rowStart, 29].Value = listData[i].PaidDate;
-                workSheet.Cells[rowStart, 30].Value = listData[i].AcVoucherNo;
-                workSheet.Cells[rowStart, 31].Value = listData[i].PmVoucherNo;
-                workSheet.Cells[rowStart, 32].Value = listData[i].Service;
-                workSheet.Cells[rowStart, 33].Value = listData[i].CdNote;
-                workSheet.Cells[rowStart, 34].Value = listData[i].Creator;
-                workSheet.Cells[rowStart, 35].Value = listData[i].SyncedFrom;
+                workSheet.Cells[rowStart, 30].Value = listData[i].PaidDate;
+                workSheet.Cells[rowStart, 31].Value = listData[i].AcVoucherNo;
+                workSheet.Cells[rowStart, 32].Value = listData[i].PmVoucherNo;
+                workSheet.Cells[rowStart, 33].Value = listData[i].Service;
+                workSheet.Cells[rowStart, 34].Value = listData[i].CdNote;
+                workSheet.Cells[rowStart, 35].Value = listData[i].Creator;
+                workSheet.Cells[rowStart, 36].Value = listData[i].SyncedFrom;
+                workSheet.Cells[rowStart, 37].Value = listData[i].VatPartnerName;
                 rowStart += 1;
 
             }
@@ -2387,9 +2402,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[rowStart, 28].Value = listData.Select(s => s.AmountObh).Sum(); // Sum Total Amount OBH
             workSheet.Cells[rowStart, 28].Style.Numberformat.Format = criteria.Currency == "VND" ? numberFormats : numberFormatVND;
 
-            workSheet.Cells[6, 1, 6, 35].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 35].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[7, 1, rowStart, 35].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[6, 1, 6, 37].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 37].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[7, 1, rowStart, 37].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             workSheet.Cells[rowStart + 2, 1, rowStart + 2, 32].Merge = true;
             workSheet.Cells[rowStart + 2, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;

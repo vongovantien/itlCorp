@@ -33,7 +33,7 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal ExchangeRate { get; set; }
         public decimal? Balance { get; set; }
         public string InvNoObh { get; set; }
-        public decimal? AmountObh { get; set; }
+        public decimal? AmountObh { get; set; } // tiền trước thuế
         public DateTime? PaidDate { get; set; }
         public string AcVoucherNo { get; set; }
         public string PmVoucherNo { get; set; }
@@ -49,5 +49,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string CdNote { get; set; }
         public string Creator { get; set; }
         public string SyncedFrom { get; set; }
+        public string VatPartnerName { get; set; }
+        public decimal? OBHNetAmount { get; set; }
+
     }
 }
