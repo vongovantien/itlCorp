@@ -43,8 +43,6 @@
                                                         </th>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngIf="!isLoading && !CPs.length" app-table-none-record>
-                                                        </tr>
                                                         <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
                                                             [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                             <td class="table-actions-col" style="min-width:40px">
@@ -161,10 +159,12 @@
                                                             </td>
 
                                                         </tr>
-                                                        <tr class="loading-wrapper" *ngIf="isLoading"
+                                                        <tr class="loading-wrapper" *ngIf="(isLoading | async) "
                                                             app-table-row-loading>
                                                         </tr>
-
+                                                        <tr *ngIf="!(isLoading | async)  && !CPs.length"
+                                                            app-table-none-record>
+                                                        </tr>
                                                     </tbody>
                                                 </table>
                                             </div>

@@ -11,7 +11,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="form-control-label">Payment Type</label>
-                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom">
+                        <ng-select [items]="paymentTypes" formControlName="paymentType" class="custom"
+                            placeholder="All">
                         </ng-select>
                     </div>
                 </div>
@@ -39,7 +40,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="form-control-label">Date Type</label>
-                        <ng-select [items]="dateTypes" formControlName="dateType" class="custom"></ng-select>
+                        <ng-select [items]="dateTypes" formControlName="dateType" class="custom" placeholder="All">
+                        </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
@@ -58,8 +60,8 @@
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="form-control-label">Type Receipt</label>
-                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" [clearable]="false"
-                            class="custom">
+                        <ng-select [items]="typesReceipt" formControlName="typeReceipt" class="custom"
+                            placeholder="All">
                         </ng-select>
                     </div>
                 </div>
@@ -67,13 +69,17 @@
                     <div class="form-group">
                         <label for="form-control-label">Status</label>
                         <ng-select [items]="statusRecepit" formControlName="status" class="custom" placeholder="All">
+
                         </ng-select>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="form-group">
                         <label for="form-control-label">Sync Status</label>
-                        <ng-select [items]="syncStatuss" formControlName="syncStatus" class="custom">
+                        <ng-select [items]="syncStatuss" formControlName="syncStatus" class="custom" placeholder="All">
+                            <ng-template ng-label-tmp let-item="item">
+                                <div class="text-{{item | classStatusSync}}"> {{item}} </div>
+                            </ng-template>
                         </ng-select>
                     </div>
                 </div>

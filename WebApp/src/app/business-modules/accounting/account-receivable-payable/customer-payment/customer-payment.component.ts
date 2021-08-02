@@ -15,7 +15,7 @@ import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { LoadListCustomerPayment, RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
-import { getCustomerPaymentListState, getCustomerPaymentPagingState, getCustomerPaymentSearchState } from "./store/reducers";
+import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -31,7 +31,6 @@ enum PAYMENT_TAB {
 export class ARCustomerPaymentComponent extends AppList implements IPermissionBase {
 
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
 
@@ -48,11 +47,11 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     constructor(
-        private _sortService: SortService,
-        private _toastService: ToastrService,
-        private _router: Router,
-        private _accountingRepo: AccountingRepo,
-        protected _store: Store<IAppState>
+        private readonly _sortService: SortService,
+        private readonly _toastService: ToastrService,
+        private readonly _router: Router,
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _store: Store<IAppState>
     ) {
         super();
         this.requestList = this.requestLoadListCustomerPayment;
@@ -77,11 +76,13 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
+        this.isLoading = this._store.select(customerPaymentReceipLoadingState)
         this.getCPs();
 
-        this._store.select(getCustomerPaymentSearchState)
+
+        this._store.select(customerPaymentReceipSearchState)
             .pipe(
-                withLatestFrom(this._store.select(getCustomerPaymentPagingState)),
+                withLatestFrom(this._store.select(customerPaymentReceipPagingState)),
                 map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch })),
                 takeUntil(this.ngUnsubscribe),
             )
@@ -119,7 +120,13 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 if (value) {
                     this.selectedCPs = new ReceiptModel(data);
                     this.messageDelete = `Do you want to delete Receipt ${data.paymentRefNo} ? `;
-                    this.confirmPopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+                        title: 'Delete Receipt',
+                        body: this.messageDelete,
+                        labelConfirm: 'Yes',
+                        classConfirmButton: 'btn-danger',
+                        iconConfirm: 'la la-trash'
+                    }, () => this.onConfirmDeleteCP())
                 } else {
                     this.permissionPopup.show();
                 }
@@ -150,8 +157,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     getCPs() {
-        this.page = 1;
-        this._store.select(getCustomerPaymentListState)
+        // this.page = 1;
+        this._store.select(customerPaymentReceipListState)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
@@ -177,12 +184,6 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     onConfirmDeleteCP() {
         this._accountingRepo
             .deleteCusPayment(this.selectedCPs.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmPopup.hide();
-                })
-            )
             .subscribe((res: any) => {
                 this._toastService.success(res.message);
                 // * search cps when success.
