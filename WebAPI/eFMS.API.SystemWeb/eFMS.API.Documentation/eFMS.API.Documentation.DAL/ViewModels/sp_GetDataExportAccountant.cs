@@ -31,6 +31,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ClearanceNo { get; set; }
         public string UserCreated { get; set; }
         public string SyncedFrom { get; set; }
+        public string VatPartnerID { get; set; }
 
     }
 }
