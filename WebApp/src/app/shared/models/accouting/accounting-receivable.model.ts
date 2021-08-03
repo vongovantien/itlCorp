@@ -168,3 +168,26 @@ export class AccReceivableServicesDetailModel {
         }
     }
 }
+
+export class AccReceivableDebitDetailModel {
+    billingNo :string = null
+    type :string = null
+    invoiceNo :string = null
+    totalAmountVND:number = 0;
+    totalAmountUSD:number = 0;
+    paidAmountVND:number = 0;
+    paidAmountUSD:number = 0;
+    unpaidAmountVND:number = 0;
+    unpaidAmountUSD:number = 0;
+    overdueDays :string = null;
+    code :string = null
+
+    constructor(data?: any) {
+        const self = this;
+        for (const key in data) {
+            if (self.hasOwnProperty(key)) {
+                self[key] = data[key];
+            }
+        }
+    }
+}

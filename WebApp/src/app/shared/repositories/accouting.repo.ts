@@ -723,7 +723,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    /// Search Customer Payment 
+    /// Search Customer Payment
 
     getListConfirmBilling(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ConfirmBillingPaging`, body, {
@@ -883,6 +883,13 @@ export class AccountingRepo {
     }
     dowloadallAttach(body:any) {
         return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`,body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getDataDebitDetail(agreementId: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`,{ argeementId: agreementId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
