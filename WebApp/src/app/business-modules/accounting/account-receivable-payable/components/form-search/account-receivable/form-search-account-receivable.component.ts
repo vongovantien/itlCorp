@@ -227,7 +227,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             toOverdueDays: dataForm.toOverdueDays,
             debitRate: dataForm.debitRate
         };
-        debugger
 
         this._store.dispatch(SearchListAccountReceivable(body))
         this.onSearch.emit(body);
