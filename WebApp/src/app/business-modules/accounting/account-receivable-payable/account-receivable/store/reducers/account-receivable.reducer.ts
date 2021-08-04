@@ -14,13 +14,13 @@ export const initialState: IAccountReceivableReducerState = {
     isLoaded: false,
     isLoading: false,
     dataSearch: null,
-    pagingData: { page: 1, pageSize: 15 }
+    pagingData: { page: 1, pageSize: 50 }
 };
 
 export const accountReceivableMangReducer = createReducer(
     initialState,
     on(AccountReceivableActions.SearchListAccountReceivable, (state: IAccountReceivableReducerState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 50 }
     })),
     on(AccountReceivableActions.LoadListAccountReceivable, (state: IAccountReceivableReducerState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }

@@ -151,7 +151,6 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
 
                 this.page = data.page;
                 this.pageSize = data.pageSize;
-                this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
             }
         );
         tabComponent.dataSearch = this.dataSearch;

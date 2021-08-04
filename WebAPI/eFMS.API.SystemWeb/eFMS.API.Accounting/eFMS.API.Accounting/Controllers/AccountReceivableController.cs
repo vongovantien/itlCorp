@@ -146,5 +146,12 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountReceivableService.GetDataARSumaryExport(criteria);
             return Ok(data);
         }
+
+        [HttpGet("GetDebitDetail")]
+        public IActionResult GetDebitDetail(Guid argeementId)
+        {
+            var data = accountReceivableService.GetDataDebitDetail(argeementId);
+            return Ok(data);
+        }
     }
 }
