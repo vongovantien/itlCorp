@@ -3,15 +3,16 @@ import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
+import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
@@ -60,6 +61,20 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getAccountReceivableSearchState)
+        .pipe(
+            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                this.dataSearch = data.dataSearch;
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+            }
+        );
+
     }
 
     sortTrialOfficalList(sortField: string, order: boolean) {
@@ -67,22 +82,15 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     getPagingList() {
+        this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this._store.select(getAccountReceivableListState)
         .pipe(
             catchError(this.catchError),
-            map((store: any) => {
-                return {
-                    data: !!store.list.data ? store.list.data.map((item: any) => new TrialOfficialOtherModel(item)) : [],
-                    totalItems: store.list.totalItems,
-                    pagingData:store.pagingData
-                };
-            })
+            map((store: any) => {return store})
         ).subscribe(
             (res: any) => {
                     this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
-                    this.page=res.pagingData.page;
-                    this.pageSize=res.pagingData.pageSize;
             },
         );
     }

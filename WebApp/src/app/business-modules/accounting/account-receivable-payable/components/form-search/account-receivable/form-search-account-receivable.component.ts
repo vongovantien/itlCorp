@@ -125,6 +125,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
         this.salemans = this._systemRepo.getListSystemUser();
         this.offices = this._systemRepo.getAllOffice();
+        this.submitSearch();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -226,6 +227,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             toOverdueDays: dataForm.toOverdueDays,
             debitRate: dataForm.debitRate
         };
+        debugger
 
         this._store.dispatch(SearchListAccountReceivable(body))
         this.onSearch.emit(body);

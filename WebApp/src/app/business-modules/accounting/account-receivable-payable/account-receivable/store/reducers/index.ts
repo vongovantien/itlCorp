@@ -9,7 +9,7 @@ export interface IAccountReceivableState {
 export const accountReceivableState = createFeatureSelector<IAccountReceivableState>('account-receivable');
 export const getAccountReceivableSearchState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.dataSearch);
 export const getAccountReceivablePagingState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.pagingData);
-export const getAccountReceivableListState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account);
+export const getAccountReceivableListState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.list);
 
 export const reducers: ActionReducerMap<IAccountReceivableState> = {
     account:accountReceivableReducer,
