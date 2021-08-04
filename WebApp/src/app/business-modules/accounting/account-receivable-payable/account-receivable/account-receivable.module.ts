@@ -17,6 +17,8 @@ import { reducers } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { effects } from './store/effects';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { AccReceivableDebitDetailPopUpComponent } from '../components/popup/account-receivable-debit-detail-popup.component';
+import { ModalModule } from 'ngx-bootstrap/modal';
 
 const routing: Routes = [
     {
@@ -45,7 +47,8 @@ const routing: Routes = [
         NgSelectModule,
         StoreModule.forFeature('account-receivable', reducers),
         EffectsModule.forFeature(effects),
-        CollapseModule.forRoot()
+        CollapseModule.forRoot(),
+        ModalModule
     ],
     exports: [
 
@@ -57,7 +60,8 @@ const routing: Routes = [
         AccountReceivableListOtherComponent,
         AccountReceivableFormSearchComponent,
         AccountReceivableDetailComponent,
-        AccountReceivableFormDetailSummaryComponent
+        AccountReceivableFormDetailSummaryComponent,
+        AccReceivableDebitDetailPopUpComponent
     ],
     providers: [],
 
