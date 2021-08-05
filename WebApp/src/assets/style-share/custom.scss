@@ -133,6 +133,14 @@ a {
 .dropdown-menu {
     border-radius: 0;
 }
+.dropdown-menu-wrapper {
+    .dropdown-item {
+        &:active,
+        .active {
+            background: none;
+        }
+    }
+}
 
 .m-body {
     width: 100%;
