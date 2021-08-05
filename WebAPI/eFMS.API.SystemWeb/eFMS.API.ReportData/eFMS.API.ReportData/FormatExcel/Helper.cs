@@ -1172,26 +1172,33 @@ namespace eFMS.API.ReportData
 
         public void BuildHeader(ExcelWorksheet worksheet, List<String> headers, string title)
         {
-            worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
-            worksheet.Cells["A1"].Value = title;
-            worksheet.Cells["A1"].Style.Font.Size = 16;
-            worksheet.Cells["A1"].Style.Font.Bold = true;
-            worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-            worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            int startIndexTableRow = 1;
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                worksheet.Cells[1, 1, 1, headers.Count].Merge = true;
+                worksheet.Cells["A1"].Value = title;
+                worksheet.Cells["A1"].Style.Font.Size = 16;
+                worksheet.Cells["A1"].Style.Font.Bold = true;
+                worksheet.Cells["A1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells["A1"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+                startIndexTableRow = 2;
+            }
             // Tạo header
             for (int i = 0; i < headers.Count; i++)
             {
-                worksheet.Cells[2, i + 1].Value = headers[i];
+                worksheet.Cells[startIndexTableRow, i + 1].Value = headers[i];
 
                 //worksheet.Column(i + 1).AutoFit();
-                worksheet.Cells[2, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[2, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[2, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[2, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[2, i + 1].Style.Font.Bold = true;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.Font.Bold = true;
 
-                worksheet.Cells[2, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[2, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[startIndexTableRow, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 worksheet.Column(i + 1).Width = 30;
             }
@@ -1473,12 +1480,15 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 3;
+                int addressStartContent = 2;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("eFMS Agreement InFo");
                     var worksheet = excelPackage.Workbook.Worksheets.First();
-                    BuildHeader(worksheet, headers, "eFMS Agreement InFo");
+                    BuildHeader(worksheet, headers, null);
+
+                    //Cố định dòng đầu tiên (Freeze Row 1 and no column)
+                    worksheet.View.FreezePanes(2, 1);
                     for (int i = 0; i < listObj.Count; i++)
                     {
                         var item = listObj[i];

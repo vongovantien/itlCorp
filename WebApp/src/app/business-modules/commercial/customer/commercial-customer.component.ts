@@ -34,7 +34,7 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
-    
+
     menuSpecialPermission: Observable<any[]>;
 
     customers: Customer[] = [];
@@ -325,6 +325,17 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
 
     export() {
         this.formSearchExportPopup.show();
+    }
+
+    exportAgreementInfo() {
+        this._progressRef.start()
+        this._exportRepo.exportAgreementInfo(this.dataSearch)
+            .pipe(finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_customer_agreement.xlsx')
+                }
+            )
     }
 }
 interface ISearchGroup {
