@@ -1964,9 +1964,14 @@ namespace eFMS.API.Catalogue.DL.Services
                     var _office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
                     if(_office != null)
                     {
-                        officeName += _office.ShortName;
+                        officeName += _office.ShortName +"; ";
                     }
                 }
+            }
+
+            if (!string.IsNullOrEmpty(officeName))
+            {
+                officeName = officeName.Remove(officeName.Length - 2);
             }
 
             return officeName;

@@ -800,7 +800,7 @@ namespace eFMS.API.ReportData
             worksheet.Cells[5, 13].Value = "Contact";
             worksheet.Cells[5, 14].Value = "Phone";
             worksheet.Cells[5, 15].Value = "Bank Account";
-            worksheet.Cells[5, 16].Value = "Account Bank Name";
+            worksheet.Cells[5, 16].Value = "Bank Account Name";
             worksheet.Cells[5, 17].Value = "Bank Name";
             worksheet.Cells[5, 18].Value = "Status";
             worksheet.Cells[5, 19].Value = "Type";
@@ -1471,7 +1471,7 @@ namespace eFMS.API.ReportData
                 "Effective Date",
                 "Expired Date",
                 "Crurrency",
-                "Saleman",
+                "Salesman",
                 "AR Confirmed",
                 "Active",
                 "Service",
