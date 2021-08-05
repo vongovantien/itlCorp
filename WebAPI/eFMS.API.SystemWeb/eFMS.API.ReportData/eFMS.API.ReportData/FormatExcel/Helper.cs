@@ -1,4 +1,5 @@
-﻿using eFMS.API.ReportData.Consts;
+﻿using eFMS.API.Common.Helpers;
+using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.Models;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -53,7 +54,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Incoterm List");
@@ -102,7 +103,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
                     excelPackage.Workbook.Worksheets.Add("Potential Customer List");
@@ -468,8 +469,6 @@ namespace eFMS.API.ReportData
         }
         #endregion
 
-
-
         #region District
         public Stream CreateDistrictExcelFile(List<CatDistrict> listObj, Stream stream = null)
         {
@@ -527,7 +526,6 @@ namespace eFMS.API.ReportData
 
 
         #endregion
-
 
         #region Commodity List
         public Stream CreateCommoditylistExcelFile(List<CatCommodityModel> listObj, Stream stream = null)
@@ -1129,7 +1127,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 int no = 1;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
@@ -1183,24 +1181,23 @@ namespace eFMS.API.ReportData
             // Tạo header
             for (int i = 0; i < headers.Count; i++)
             {
-                worksheet.Cells[3, i + 1].Value = headers[i];
+                worksheet.Cells[2, i + 1].Value = headers[i];
 
                 //worksheet.Column(i + 1).AutoFit();
-                worksheet.Cells[3, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[3, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[3, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[3, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-                worksheet.Cells[3, i + 1].Style.Font.Bold = true;
+                worksheet.Cells[2, i + 1].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[2, i + 1].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[2, i + 1].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[2, i + 1].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                worksheet.Cells[2, i + 1].Style.Font.Bold = true;
 
-                worksheet.Cells[3, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                worksheet.Cells[3, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                worksheet.Cells[2, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                worksheet.Cells[2, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 worksheet.Column(i + 1).Width = 30;
             }
             worksheet.Cells.AutoFitColumns(minWidth, maxWidth);
             worksheet.Cells["A1:Z1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         }
-        #endregion
         public Stream GenerateOfficeExcel(List<SysOfficeModel> listCompany, Stream stream = null)
         {
             List<String> headers = new List<String>()
@@ -1217,7 +1214,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 int no = 1;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
@@ -1263,6 +1260,7 @@ namespace eFMS.API.ReportData
             }
             return null;
         }
+        #endregion
 
         #region Group
         internal Stream CreateGroupExcelFile(List<SysGroupModel> listObj, Stream stream = null)
@@ -1279,7 +1277,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 int no = 1;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
@@ -1354,7 +1352,7 @@ namespace eFMS.API.ReportData
             };
             try
             {
-                int addressStartContent = 4;
+                int addressStartContent = 3;
                 int no = 1;
                 using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
                 {
@@ -1449,6 +1447,73 @@ namespace eFMS.API.ReportData
                 worksheet.Cells[i + 2, 4].Value = inactivechar;
             }
         }
+        #endregion
+
+        #region Contract
+        public Stream GenerateAgreementExcel(List<AgreementInfo> listObj, Stream stream = null)
+        {
+            List<string> headers = new List<string>()
+            {
+
+                "Partner Code",
+                "Partner Name EN",
+                "Partner Name VN",
+                "Agreement Type",
+                "Contract No",
+                "Credit Limit",
+                "Payment Term",
+                "Effective Date",
+                "Expired Date",
+                "Crurrency",
+                "Saleman",
+                "AR Confirmed",
+                "Active",
+                "Service",
+                "Service Office",
+                "Creator",
+            };
+            try
+            {
+                int addressStartContent = 3;
+                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                {
+                    excelPackage.Workbook.Worksheets.Add("eFMS Agreement InFo");
+                    var worksheet = excelPackage.Workbook.Worksheets.First();
+                    BuildHeader(worksheet, headers, "eFMS Agreement InFo");
+                    for (int i = 0; i < listObj.Count; i++)
+                    {
+                        var item = listObj[i];
+
+                        worksheet.Cells[addressStartContent, 1].Value = item.PartnerCode;
+                        worksheet.Cells[addressStartContent, 2].Value = item.PartnerNameEn;
+                        worksheet.Cells[addressStartContent, 3].Value = item.PartnerNameVn;
+                        worksheet.Cells[addressStartContent, 4].Value = item.AgreementType;
+                        worksheet.Cells[addressStartContent, 5].Value = item.AgreementNo;
+                        worksheet.Cells[addressStartContent, 6].Value = item.CreditLimit;
+                        worksheet.Cells[addressStartContent, 7].Value = item.PaymentTerm;
+                        worksheet.Cells[addressStartContent, 8].Value = item.EffectiveDate != null ? item.EffectiveDate.Value.ToShortDateString() : null;
+                        worksheet.Cells[addressStartContent, 9].Value = item.ExpiredDate != null ? item.ExpiredDate.Value.ToShortDateString() : null;
+                        worksheet.Cells[addressStartContent, 10].Value = item.Currency;
+                        worksheet.Cells[addressStartContent, 11].Value = item.SaleManName;
+                        worksheet.Cells[addressStartContent, 12].Value = item.ARComfirm != null ? "Yes"  : "No";
+                        worksheet.Cells[addressStartContent, 13].Value = item.Active.Value ? "Active" : "Inactive";
+                        worksheet.Cells[addressStartContent, 14].Value = item.Service;
+                        worksheet.Cells[addressStartContent, 15].Value = item.Office;
+                        worksheet.Cells[addressStartContent, 16].Value = item.UserCreatedName;
+
+                        addressStartContent++;
+                    }
+                    excelPackage.Save();
+                    return excelPackage.Stream;
+                }
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("Exoort Data Log", ex.ToString());
+                return null;
+            }
+        }
+
         #endregion
     }
 }

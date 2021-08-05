@@ -1,6 +1,4 @@
 import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { ColumnSetting } from 'src/app/shared/models/layout/column-setting.model';
-import { PARTNERDATACOLUMNSETTING } from './partner-data.columns';
 import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
 import { PagerSetting } from 'src/app/shared/models/layout/pager-setting.model';
 import { PAGINGSETTING } from 'src/constants/paging.const';
@@ -51,10 +49,9 @@ export class PartnerComponent extends AppList implements OnInit {
     @ViewChild(SearchOptionsComponent, { static: true }) searchOptionsComponent: SearchOptionsComponent;
     @ViewChild(FormContractCommercialPopupComponent) formContractPopup: FormContractCommercialPopupComponent;
     @ViewChild(FormSearchExportComponent) formSearchExportPopup: FormSearchExportComponent;
-    
+
     menuSpecialPermission: Observable<any[]>;
     pager: PagerSetting = PAGINGSETTING;
-    partnerDataSettings: ColumnSetting[] = PARTNERDATACOLUMNSETTING;
     headerSearch: CommonInterface.IHeaderTable[];
 
     configSearch: any = {};
@@ -356,8 +353,19 @@ export class PartnerComponent extends AppList implements OnInit {
         this.router.navigate([`${RoutingConstants.CATALOGUE.PARTNER_DATA}/add`], { queryParams: { partnerType: type } });
     }
 
-    export() {
+    exportPartnerData() {
         this.formSearchExportPopup.show();
+    }
+
+    exportAgreementInfo() {
+        this._progressRef.start()
+        this._exportRepo.exportAgreementInfo(this.criteria)
+            .pipe(finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res: any) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms_agreement_info.xlsx');
+                }
+            )
     }
 }
 

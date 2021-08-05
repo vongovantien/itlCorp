@@ -103,6 +103,24 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
+        /// export partnerdata
+        /// </summary>
+        /// <returns></returns>
+        [Route("ExportAgreementInfo")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAgreementInfo(CatPartnerCriteria catPartnerCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            Helper helper = new Helper();
+            var responseFromApi = await HttpServiceExtension.PostAPI(catPartnerCriteria, aPis.CatalogueAPI + Urls.Catelogue.CatAgreementUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AgreementInfo>>();
+
+            var stream = helper.GenerateAgreementExcel(dataObjects.Result);
+            return new FileHelper().ExportExcel(stream, FilesNames.PartnerData);
+        }
+
+        /// <summary>
         /// export commodity list
         /// </summary>
         /// <returns></returns>

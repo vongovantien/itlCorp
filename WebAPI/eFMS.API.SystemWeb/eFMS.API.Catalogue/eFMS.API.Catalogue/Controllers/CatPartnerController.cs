@@ -120,6 +120,15 @@ namespace eFMS.API.Catalogue.Controllers
             var results = catPartnerService.QueryExport(criteria);
             return Ok(results);
         }
+
+        [HttpPost]
+        [Route("QueryExportAgreement")]
+        [Authorize]
+        public IActionResult QueryExportAgreement(CatPartnerCriteria criteria)
+        {
+            var results = catPartnerService.QueryExportAgreement(criteria);
+            return Ok(results);
+        }
         /// <summary>
         /// get partner by id
         /// </summary>

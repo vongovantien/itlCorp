@@ -11,14 +11,11 @@
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'export'">
-        <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}   m-btn--icon m-btn--uppercase"
-            *ngIf="(menuPermission | async)?.export === true" (click)="onClicked($event)">
-            <span>
-                <i class="la la-download"></i>
-                <span>
-                    {{title || 'Export'}}
-                </span>
-            </span>
+        <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}  m-btn--uppercase"
+            *ngIf="(menuPermission | async)?.export === true" (click)="onClicked($event)"
+            [class.dropdown-toggle]="mode === 'dropdown'">
+            <i class="la la-download"></i>
+            {{title || 'Export'}}
         </button>
     </ng-container>
     <ng-container *ngSwitchCase="'save'">
