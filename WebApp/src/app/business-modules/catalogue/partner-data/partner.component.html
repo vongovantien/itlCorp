@@ -11,12 +11,12 @@
                 mode="dropdown">
             </app-permission-button>
             <app-dropdown #dropdownMenu>
-                <a class="dropdown-item pointer" (click)="export()">
+                <a class="dropdown-item pointer" (click)="exportPartnerData()">
                     <span>
                         Partner Info
                     </span>
                 </a>
-                <a class="dropdown-item pointer">
+                <a class="dropdown-item pointer" (click)="exportAgreementInfo()">
                     <span>
                         Agreement Info
                     </span>
