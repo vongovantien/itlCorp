@@ -1,5 +1,5 @@
 import { Directive, OnDestroy, ElementRef, ViewContainerRef, Input } from '@angular/core';
-import { Overlay, OverlayRef, OverlayConfig } from '@angular/cdk/overlay';
+import { Overlay, OverlayRef, OverlayConfig, ConnectionPositionPair } from '@angular/cdk/overlay';
 import { OVERLAY_POSITION_MAP } from '@constants';
 import { TemplatePortal } from '@angular/cdk/portal';
 
@@ -14,10 +14,20 @@ import { IDropdownPanel } from '@common';
 export class DropdownToggleDirective implements OnDestroy {
 
     @Input('dpToggle') public dropdownPanel: IDropdownPanel;
+    @Input() set position(key: any) {
+        if (!!key) {
+            this._position = OVERLAY_POSITION_MAP[key];
+        }
+    }
+
+    get position() {
+        return this._position;
+    }
 
     private isOpenDropdown: boolean = false;
     private overlayRef: OverlayRef;
     private dropdownClosingActions$: Subscription = Subscription.EMPTY;
+    private _position: ConnectionPositionPair = OVERLAY_POSITION_MAP.topRight;
 
     private get overlayConfig(): OverlayConfig {
         return new OverlayConfig({
@@ -28,7 +38,7 @@ export class DropdownToggleDirective implements OnDestroy {
                 .position()
                 .flexibleConnectedTo(this._elementRef)
                 .withPositions([
-                    OVERLAY_POSITION_MAP.topRight
+                    this.position
                 ])
         });
     }

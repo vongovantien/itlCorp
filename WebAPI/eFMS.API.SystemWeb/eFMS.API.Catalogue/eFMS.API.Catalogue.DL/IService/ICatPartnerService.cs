@@ -36,6 +36,8 @@ namespace eFMS.API.Catalogue.DL.IService
         bool SendMailCreatedSuccess(CatPartner catPartner);
         List<CatPartnerViewModel> GetSubListPartnerByID(string id);
         HandleState UpdatePartnerData(CatPartnerModel model);
+        IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria);
+
 
     }
 }

@@ -408,5 +408,9 @@ export class ExportRepo {
             map((data: any) => data)
         );
     }
+
+    exportAgreementInfo(partnerSearchObj: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj);
+    }
 }
 
