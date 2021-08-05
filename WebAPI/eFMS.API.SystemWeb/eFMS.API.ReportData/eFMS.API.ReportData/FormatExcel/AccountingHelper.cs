@@ -3786,7 +3786,7 @@ namespace eFMS.API.ReportData.FormatExcel
                  "Over Amount",//11
                  "Currency",//12
                  "Credit Limited",//13
-                 "Salesman",//14
+                 "Sale man",//14
                  "Contract No",//15
                  "Contract Type",//16
                  "Status",//17
