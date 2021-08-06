@@ -1728,7 +1728,8 @@ namespace eFMS.API.Accounting.DL.Services
                         Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                         Over30Day = s.Sum(sum => sum.Over30Day),
                         ArCurrency = s.First().ArCurrency,
-                        ParentNameAbbr = s.First().ParentNameAbbr
+                        ParentNameAbbr = s.First().ParentNameAbbr,
+                        ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount)
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
