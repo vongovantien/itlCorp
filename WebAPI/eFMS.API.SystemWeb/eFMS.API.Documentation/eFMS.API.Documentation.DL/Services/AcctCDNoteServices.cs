@@ -2882,7 +2882,7 @@ namespace eFMS.API.Documentation.DL.Services
                               CdNoteNo = cd.CodeNo,
                               CdNoteType = cd.CodeType,
                               ChargeType = cd.ChargeType,
-                              PayerId = payer != null? payer.Id:"",
+                              PayerId = payer != null? payer.AccountNo : "",
                               PayerName = payer != null?payer.PartnerNameEn:"",
                               PayerType = payer != null? payer.PartnerType:"",
                               Currency= cd.Currency,
