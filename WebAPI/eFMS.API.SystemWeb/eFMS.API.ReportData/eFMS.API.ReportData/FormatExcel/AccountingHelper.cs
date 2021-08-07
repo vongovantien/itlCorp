@@ -3797,7 +3797,7 @@ namespace eFMS.API.ReportData.FormatExcel
                  "Over Amount",//11
                  "Currency",//12
                  "Credit Limited",//13
-                 "Sale man",//14
+                 "Salesman",//14
                  "Contract No",//15
                  "Contract Type",//16
                  "Status",//17
@@ -3823,9 +3823,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 1].Value = rowStart;
                 workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
                 workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
-                workSheet.Cells[rowStart, 4].Value = item.DebitRate;
-                workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat2 + " %";
-                workSheet.Cells[rowStart, 5].Value = item.DebitAmount;
+                workSheet.Cells[rowStart, 4].Value = item.DebitRate + " %";
+
+                workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
                 workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
                 workSheet.Cells[rowStart, 7].Value = item.PaidAmount;
                 workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid;
@@ -3833,11 +3833,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
                 workSheet.Cells[rowStart, 11].Value = item.Over30Day;
                 workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditAmount;
-                workSheet.Cells[rowStart, 13].Value = item.CreditCurrency;
+                workSheet.Cells[rowStart, 13].Value = item.AgreementCurrency;
                 workSheet.Cells[rowStart, 14].Value = item.CreditLimited;
 
                 for (int i = 5; i <= 14; i++)
-                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat2;
+                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
 
                 workSheet.Cells[rowStart, 15].Value = item.AgreementSalesmanName;
                 workSheet.Cells[rowStart, 16].Value = item.AgreementNo;
