@@ -5,7 +5,6 @@ import { SharedModule } from 'src/app/shared/shared.module';
 import { Routes, RouterModule } from '@angular/router';
 import { PartnerDataImportComponent } from './import/partner-data-import.component';
 import { NgProgressModule } from '@ngx-progressbar/core';
-import { PaginationModule } from 'ngx-bootstrap/pagination';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { SalemanPopupComponent } from './components/saleman-popup.component';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -52,7 +51,6 @@ const routing: Routes = [
         NgProgressModule,
         NgSelectModule,
         NgxDaterangepickerMd,
-        PaginationModule.forRoot(),
         ModalModule.forRoot(),
         TabsModule.forRoot(),
         ShareModulesModule,

@@ -1391,12 +1391,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCc = new List<string>
             {
                 "alex.phuong@itlvn.com",
-                "luis.quang@itlvn.com",
-                "andy.hoa@itlvn.com",
-                "cara.oanh@itlvn.com",
-                //"lynne.loc@itlvn.com",
-                "samuel.an@itlvn.com",
-                //"kenny.thuong@itlvn.com",
+                "kenny.thuong@itlvn.com",
             };
             return lstCc;
         }

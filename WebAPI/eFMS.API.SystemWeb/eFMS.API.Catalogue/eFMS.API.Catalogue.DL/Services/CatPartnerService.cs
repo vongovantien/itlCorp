@@ -23,6 +23,7 @@ using eFMS.API.Common.Models;
 using System.Text;
 using System.Text.RegularExpressions;
 using eFMS.API.Common.Helpers;
+using AutoMapper.QueryableExtensions;
 
 namespace eFMS.API.Catalogue.DL.Services
 {
@@ -47,6 +48,7 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CatPartnerEmail> catpartnerEmailRepository;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
+        private readonly ICacheServiceBase<CatPartner> cache;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -87,6 +89,8 @@ namespace eFMS.API.Catalogue.DL.Services
             catpartnerEmailRepository = emailRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             ApiUrl = apiurl;
+            cache = cacheService;
+
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
             SetChildren<SysUser>("Id", "PersonIncharge");
@@ -789,9 +793,72 @@ namespace eFMS.API.Catalogue.DL.Services
             return data.AsQueryable();
         }
 
+        public IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria)
+        {
+            IQueryable<CatPartner> data = null;
+            var cachedData = cache.Get();
+            if(cachedData == null)
+            {
+                IQueryable<CatPartnerViewModel> dataQuery =  QueryExport(criteria);
+                if(dataQuery != null)
+                {
+                    data = dataQuery.ProjectTo<CatPartner>(mapper.ConfigurationProvider);
+                }
+            }
+            else
+            {
+                data = cachedData.AsQueryable();
+            }
+
+            if(data != null)
+            {
+                return MappingQueryAgreementInfo(data);
+            }
+
+            return null;
+        }
+
+        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner)
+        {
+            var contract = contractRepository.Get();
+            var sysUSer = sysUserRepository.Get();
+            var office = officeRepository.Get();
+
+            var query = from c in contract
+                        join p in queryPartner on c.PartnerId equals p.Id
+                        join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
+                        from g1 in grpUs1.DefaultIfEmpty()
+                        join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
+                        from g2 in grpUs2.DefaultIfEmpty()
+                        where (p.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER || p.PartnerType == DataEnums.PARTNER_TYPE_AGENT)
+                        select new QueryExportAgreementInfo
+                        {
+                            Active = c.Active,
+                            AgreementNo = c.ContractNo,
+                            AgreementType = c.ContractType,
+                            ARComfirm = c.Arconfirmed,
+                            CreditLimit = c.ContractType == DataEnums.CONTRACT_TRIAL ? c.TrialCreditLimited : c.CreditLimit,
+                            Currency = c.CurrencyId,
+                            EffectiveDate = c.EffectiveDate,
+                            ExpiredDate = c.ExpiredDate,
+                            PartnerCode = p.TaxCode,
+                            PartnerNameEn = p.PartnerNameEn,
+                            PartnerNameVn = p.PartnerNameVn,
+                            PaymentTerm = c.PaymentTerm,
+                            SaleManName = g1.Username,
+                            UserCreatedName = g2.Username,
+                            Service = GetContractServicesName(c.SaleService),
+                            Office = GetContractOfficeName(c.OfficeId),
+                        };
+
+           return query;
+        }
+
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
         {
-            var data = QueryPaging(criteria);
+
+            /* 
+             * var data = QueryPaging(criteria);
             if (data == null)
             {
                 rowsCount = 0;
@@ -895,12 +962,18 @@ namespace eFMS.API.Catalogue.DL.Services
                         );
                     }
                     break;
-            }
+            } */
+            var data = QueryExport(criteria);
             if (data == null)
             {
                 rowsCount = 0;
                 return null;
             }
+
+            var dataCachedMap = data.ProjectTo<CatPartner>(mapper.ConfigurationProvider);
+
+            // cache for export 1 minutes
+            bool stateCaching = cache.Set(dataCachedMap.ToList(), TimeSpan.FromMinutes(1));
 
             rowsCount = data.Select(x => x.Id).Count();
             if (rowsCount == 0)
@@ -919,11 +992,6 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        /// <summary>
-        /// Check detail partner to view
-        /// </summary>
-        /// <param name="id">partner id</param>
-        /// <returns></returns>
         public HandleState CheckDetailPermission(string id)
         {
             ClearCache();
@@ -959,12 +1027,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (code == 403) return new HandleState(403, "");
             return new HandleState();
         }
-
-        /// <summary>
-        /// Check detail partner to delete
-        /// </summary>
-        /// <param name="id">partner id</param>
-        /// <returns></returns>
+        
         public HandleState CheckDeletePermission(string id)
         {
             var detail = DataContext.Get(x => x.Id == id).FirstOrDefault();
@@ -1004,7 +1067,6 @@ namespace eFMS.API.Catalogue.DL.Services
             int code = PermissionEx.GetPermissionToUpdate(model, permissionRange, currentUser, flagDetail);
             return code;
         }
-
 
         private int GetPermissionToDelete(ModelUpdate model, PermissionRange permissionRange)
         {
@@ -1890,6 +1952,30 @@ namespace eFMS.API.Catalogue.DL.Services
         }
         #endregion
 
+        private string GetContractOfficeName(string officeIds)
+        {
+            string officeName = string.Empty;
+
+            var officeIdArr = officeIds.Split(";").ToArray();
+            if (officeIdArr.Any())
+            {
+                foreach (var officeId in officeIdArr)
+                {
+                    var _office = officeRepository.Get(x => x.Id.ToString() == officeId)?.FirstOrDefault();
+                    if(_office != null)
+                    {
+                        officeName += _office.ShortName +"; ";
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(officeName))
+            {
+                officeName = officeName.Remove(officeName.Length - 2);
+            }
+
+            return officeName;
+        }
         private string GetContractServicesName(string ContractService)
         {
             string ContractServicesName = string.Empty;
@@ -2043,11 +2129,6 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        /// <summary>
-        /// Get partner list by parentId
-        /// </summary>
-        /// <param name="Id"></param>
-        /// <returns></returns>
         public List<CatPartnerViewModel> GetSubListPartnerByID(string id)
         {
             if (id == null) return null;
@@ -2081,11 +2162,6 @@ namespace eFMS.API.Catalogue.DL.Services
             return results;
         }
 
-        /// <summary>
-        /// Update info for partner
-        /// </summary>
-        /// <param name="model">CatPartnerModel</param>
-        /// <returns></returns>
         public HandleState UpdatePartnerData(CatPartnerModel model)
         {
             var listSalemans = contractRepository.Get(x => x.PartnerId == model.Id).ToList();
@@ -2115,5 +2191,6 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             return hs;
         }
+
     }
 }
