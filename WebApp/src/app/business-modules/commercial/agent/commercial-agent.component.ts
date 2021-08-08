@@ -322,6 +322,17 @@ export class CommercialAgentComponent extends AppList implements OnInit {
             );
     }
 
+    exportAgreementInfo() {
+        this._progressRef.start()
+        this._exportRepo.exportAgreementInfo(this.dataSearch)
+            .pipe(finalize(() => this._progressRef.complete()))
+            .subscribe(
+                (res) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_agent_agreement.xlsx')
+                }
+            )
+    }
+
 }
 interface ISearchGroup {
     type: string;
