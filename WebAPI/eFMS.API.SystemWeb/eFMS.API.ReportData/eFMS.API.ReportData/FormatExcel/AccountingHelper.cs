@@ -3722,18 +3722,21 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 2].Value = item.InvoiceNo;
                 workSheet.Cells[rowStart, 3].Value = item.Mbl;
                 workSheet.Cells[rowStart, 4].Value = item.Hbl;
-                workSheet.Cells[rowStart, 5].Value = item.VoucherId;
-                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 8].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 9].Value = item.PayerId;
-                workSheet.Cells[rowStart, 10].Value = item.PayerName;
-                workSheet.Cells[rowStart, 11].Value = item.PayerType;
-                workSheet.Cells[rowStart, 12].Value = item.Currency;
+                workSheet.Cells[rowStart, 5].Value = item.VoucherId; 
+                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo; 
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteType; 
+                workSheet.Cells[rowStart, 8].Value = item.ChargeType; 
+                workSheet.Cells[rowStart, 9].Value = item.PayerId; 
+                workSheet.Cells[rowStart, 10].Value = item.PayerName; 
+                workSheet.Cells[rowStart, 11].Value = item.PayerType; 
+                workSheet.Cells[rowStart, 12].Value = item.Currency; 
+
                 workSheet.Cells[rowStart, 13].Value = item.Amount;
-                workSheet.Cells[rowStart, 14].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 15].Value = item.Bu;
-                workSheet.Cells[rowStart, 16].Value = item.ServiceDate;
+                workSheet.Cells[rowStart, 13].Style.Numberformat.Format = decimalFormat;
+
+                workSheet.Cells[rowStart, 14].Value = item.IssueBy; 
+                workSheet.Cells[rowStart, 15].Value = item.Bu; 
+                workSheet.Cells[rowStart, 16].Value = item.ServiceDate; 
                 workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
