@@ -18,6 +18,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1727,7 +1728,8 @@ namespace eFMS.API.Accounting.DL.Services
                         Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                         Over30Day = s.Sum(sum => sum.Over30Day),
                         ArCurrency = s.First().ArCurrency,
-                        ParentNameAbbr = s.First().ParentNameAbbr
+                        ParentNameAbbr = s.First().ParentNameAbbr,
+                        ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount)
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -1949,6 +1951,17 @@ namespace eFMS.API.Accounting.DL.Services
         public IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria)
         {
             IEnumerable<object> data = GetDataARByCriteria(criteria);
+            return data;
+        }
+
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId)
+        {
+            if (argeementId == null || argeementId == Guid.Empty) return null;
+            DbParameter[] parameters =
+            {
+                SqlParam.GetParameter("argid", argeementId)
+            };
+            var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;
         }
         #endregion --- DETAIL ---

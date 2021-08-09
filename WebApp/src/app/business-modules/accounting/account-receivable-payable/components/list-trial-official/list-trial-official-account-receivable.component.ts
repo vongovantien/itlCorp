@@ -1,22 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from 'src/app/app.list';
 import { Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
+import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
+import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
     templateUrl: './list-trial-official-account-receivable.component.html',
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
+    @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
 
     trialOfficialList: TrialOfficialOtherModel[] = [];
 
@@ -48,9 +51,9 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 days', field: 'over30Day', sortable: true },
             { title: 'Over Amount', field: 'overAmount', sortable: true },
-            { title: 'Currency', field: 'creditCurrency', sortable: true },
+            { title: 'Currency', field: 'agreementCurrency', sortable: true },
             { title: 'Credit Limited', field: 'creditLimited', sortable: true },
-            { title: 'Sale Man', field: 'agreementSalesmanName', sortable: true },
+            { title: 'Salesman', field: 'agreementSalesmanName', sortable: true },
             { title: 'Contract No', field: 'agreementNo', sortable: true },
             { title: 'Expired Date', field: 'expriedDate', sortable: true },
             { title: 'Expired Days', field: 'expriedDay', sortable: true },
@@ -58,6 +61,20 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getAccountReceivableSearchState)
+        .pipe(
+            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                this.dataSearch = data.dataSearch;
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+            }
+        );
+
     }
 
     sortTrialOfficalList(sortField: string, order: boolean) {
@@ -65,15 +82,11 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     getPagingList() {
+        this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this._store.select(getAccountReceivableListState)
         .pipe(
             catchError(this.catchError),
-            map((data: any) => {
-                return {
-                    data: !!data.data ? data.data.map((item: any) => new TrialOfficialOtherModel(item)) : [],
-                    totalItems: data.totalItems,
-                };
-            })
+            map((store: any) => {return store})
         ).subscribe(
             (res: any) => {
                     this.trialOfficialList = res.data || [];
@@ -100,6 +113,22 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             }
         );
 
+    }
+
+    showDebitDetail(agreementId){
+        this._accountingRepo.getDataDebitDetail(agreementId)
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+        ).subscribe(
+            (res: any) => {
+                if (res) {
+                    this.debitDetailPopupComponent.dataDebitList = res || [];
+                    this.debitDetailPopupComponent.calculateTotal();
+                    this.debitDetailPopupComponent.show();
+                }
+            },
+        );
     }
 }
 

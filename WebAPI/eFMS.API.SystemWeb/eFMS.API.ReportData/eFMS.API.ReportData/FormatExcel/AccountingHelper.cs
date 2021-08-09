@@ -28,6 +28,7 @@ namespace eFMS.API.ReportData.FormatExcel
         const string numberFormatVND = "_-\"VND\"* #,##0.00_-;-\"VND\"* #,##0.00_-;_-\"VND\"* \"-\"??_-;_-@_-_(_)";
 
         const string decimalFormat = "#,##0.00";
+        const string decimalFormat2 = "#,##0";
 
         /// <summary>
         /// Get folder contain settlement payment template excel
@@ -3789,14 +3790,14 @@ namespace eFMS.API.ReportData.FormatExcel
                  "Debit Amount",//4
                  "Billing",//5
                  "Paid A Part",//6
-                 "Outstanding",//7
+                 "OutStanding Balance",//7
                  "Over 1-15 Days",//8
                  "Over 16-30 Days",//9
                  "Over 30 days",//10
-                 "Credit Limited",//11
-                 "Over Amount",//12
-                 "Currency",//13
-                 "Saleman",//14
+                 "Over Amount",//11
+                 "Currency",//12
+                 "Credit Limited",//13
+                 "Salesman",//14
                  "Contract No",//15
                  "Contract Type",//16
                  "Status",//17
@@ -3820,11 +3821,11 @@ namespace eFMS.API.ReportData.FormatExcel
             foreach (var item in acctMngts)
             {
                 workSheet.Cells[rowStart, 1].Value = rowStart;
-                workSheet.Cells[rowStart, 2].Value = item.PartnerId;
+                workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
                 workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
+                workSheet.Cells[rowStart, 4].Value = item.DebitRate + " %";
 
-                workSheet.Cells[rowStart, 4].Value = item.DebitRate;
-                workSheet.Cells[rowStart, 5].Value = item.DebitAmount;
+                workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
                 workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
                 workSheet.Cells[rowStart, 7].Value = item.PaidAmount;
                 workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid;
@@ -3832,10 +3833,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
                 workSheet.Cells[rowStart, 11].Value = item.Over30Day;
                 workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditAmount;
-                workSheet.Cells[rowStart, 13].Value = item.CreditCurrency;
+                workSheet.Cells[rowStart, 13].Value = item.AgreementCurrency;
                 workSheet.Cells[rowStart, 14].Value = item.CreditLimited;
 
-                for (int i = 4; i <= 14; i++)
+                for (int i = 5; i <= 14; i++)
                     workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
 
                 workSheet.Cells[rowStart, 15].Value = item.AgreementSalesmanName;

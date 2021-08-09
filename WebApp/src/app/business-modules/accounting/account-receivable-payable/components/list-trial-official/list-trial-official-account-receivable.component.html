@@ -46,31 +46,45 @@
                                             </td>
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
 
-                                            <td class="text-right">{{ item.billingAmount + item.obhBillingAmount |
-                                                number: '.0-3' }}
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
+                                                {{ item.billingAmount + item.obhBillingAmount |number: '.0-3' }}
+                                                </a>
                                             </td>
-                                            <td class="text-right">{{ (item.paidAmount+ item.obhPaidAmount) | number:
-                                                '.0-3'}}</td>
-                                            <td class="text-right">{{ (item.billingUnpaid + item.obhUnpaidAmount) |
-                                                number: '.0-3' }}</td>
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
+                                                    {{ (item.paidAmount+ item.obhPaidAmount) | number:'.0-3'}}
+                                                </a>
+                                            </td>
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
+                                                    {{ (item.billingUnpaid + item.obhUnpaidAmount) |number: '.0-3' }}
+                                                </a>
+                                            </td>
                                             <!-- <td>{{ item.obhAmount | number: '.0-3'}}</td> -->
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
                                                     {{ item.over1To15Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.over16To30Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
+                                                        {{ item.over16To30Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId)">
                                                     {{ item.over30Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">{{ (item.debitAmount-item. creditLimited)| number: '.0-3' }}</td>
-                                            <td class="text-center">{{ item.creditCurrency }}</td>
+                                            <td class="text-center">{{ item.agreementCurrency }}</td>
                                             <td class="text-right">{{ item.creditLimited | number: '.0-3' }}</td>
                                             <td class="text-center">{{ item.agreementSalesmanName}}</td>
                                             <td>
@@ -99,8 +113,8 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!trialOfficialList.length">
-                                </tr>
+                                <!-- <tr app-table-none-record *ngIf="!trialOfficialList.length">
+                                </tr> -->
                                 <tr app-table-row-loading *ngIf="isLoading === true"></tr>
                             </tbody>
                         </table>
@@ -113,3 +127,5 @@
 
     </div>
 </div>
+
+<account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>
