@@ -26,6 +26,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<AcctSoa> soaRepository;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
+        private readonly IContextBase<AcctReceipt> acctReceiptRepository;
+        private readonly IContextBase<AcctCdnote> cdNoteRepository;
         private readonly ICurrentUser currentUser;
 
         public AccAccountingPaymentService(IContextBase<AccAccountingPayment> repository, 
@@ -35,6 +37,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartner> partnerRepo,
             IContextBase<AcctSoa> soaRepo,
             IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<AcctReceipt> acctReceiptRepo,
+            IContextBase<AcctCdnote> cdNoteRepo,
             ICurrentUser currUser) : base(repository, mapper)
         {
             userRepository = userRepo;
@@ -43,11 +47,23 @@ namespace eFMS.API.Accounting.DL.Services
             soaRepository = soaRepo;
             surchargeRepository = surchargeRepo;
             currentUser = currUser;
+            acctReceiptRepository = acctReceiptRepo;
+            cdNoteRepository = cdNoteRepo;
         }
 
-        public IQueryable<AccAccountingPaymentModel> GetBy(string refId)
+        public IQueryable<AccAccountingPaymentModel> GetBy(string refId, string refNo)
         {
-            var data = DataContext.Get(x => x.RefId == refId).OrderBy(x => x.PaidDate).ThenBy(x=>x.PaymentNo);
+            IQueryable<AccAccountingPayment> data = null;
+            if (string.IsNullOrEmpty(refId)) // Type = Adv => search with receipt info
+            {
+                var receiptId = acctReceiptRepository.Get(x => x.PaymentRefNo == refNo).FirstOrDefault()?.Id;
+                data = DataContext.Get(x => x.ReceiptId == receiptId).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo); ;
+
+            }
+            else // Type != Adv
+            {
+                data = DataContext.Get(x => x.RefId == refId && x.BillingRefNo == refNo).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
+            }
             var users = userRepository.Get();
             var results = data.Join(users, x => x.UserModified, y => y.Id, (x, y) => new AccAccountingPaymentModel
             {
@@ -65,8 +81,11 @@ namespace eFMS.API.Accounting.DL.Services
                 DatetimeModified = x.DatetimeModified,
                 UserModifiedName = y.Username,
                 PaymentMethod = x.PaymentMethod,
-                ExchangeRate = x.ExchangeRate
+                ExchangeRate = x.ExchangeRate,
+                ReceiptNo = x.PaymentNo.Substring(x.PaymentNo.IndexOf('_') + 1, x.PaymentNo.Length - x.PaymentNo.IndexOf('_') - 1),
+                Note = x.Note
             });
+            results = results.OrderBy(x => x.ReceiptNo);
             return results;
         }
 
@@ -79,8 +98,9 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
-            var _totalItem = data.Select(s => s.RefId).Distinct().Count();
-            rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            //var _totalItem = data.Select(s => s.RefId).Distinct().Count();
+            //rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            var _totalItem = 0;
             if (size > 0)
             {
                 if (page < 1)
@@ -88,33 +108,80 @@ namespace eFMS.API.Accounting.DL.Services
                     page = 1;
                 }
                 
-                data = GetReferencesData(data, criteria.PaymentType);
+                data = GetReferencesData(data, criteria);
+                _totalItem = data.Count();
                 data = data.Skip((page - 1) * size).Take(size);
             }
-            //var _totalItem = data.Select(s => s.RefId).Count();
-            //rowsCount = (_totalItem > 0) ? _totalItem : 0;
+            rowsCount = (_totalItem > 0) ? _totalItem : 0;
             return data;
         }
         public IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria)
         {
             var data = Query(criteria);
             if (data == null) return null;
-            data = GetReferencesData(data, criteria.PaymentType);
+            data = GetReferencesData(data, criteria);
             return data;
         }
 
-        private IQueryable<AccountingPaymentModel> GetReferencesData(IQueryable<AccountingPaymentModel> data, PaymentType paymentType)
+        private IQueryable<AccountingPaymentModel> GetReferencesData(IQueryable<AccountingPaymentModel> data, PaymentCriteria criteria)
         {
-            IQueryable<AccountingPaymentModel> results= null;
-            if (paymentType == PaymentType.Invoice)
+            IQueryable<AccountingPaymentModel> results = null;
+            if (criteria.PaymentType == PaymentType.Invoice)
             {
-                results = GetReferencesInvoiceData(data);
+                results = GetReferencesInvoiceData(data, criteria);
             }
             else
             {
                 results = GetReferencesOBHData(data);
             }
+
+            var soaCredit =  GetCreditSoaPayment(criteria);
+            if (soaCredit.Count() > 0)
+            {
+                results = results.Union(soaCredit);
+            }
+            var creditNote = GetCreditNotePayment(criteria);
+            if (creditNote.Count() > 0)
+            {
+                results = results.Union(creditNote);
+            }
+            var advData = GetReferencesAdvanceData(criteria);
+            if (advData.Count() > 0)
+            {
+                results = results.Union(advData);
+            }
             return results;
+        }
+
+
+        private Expression<Func<AccAccountingPayment, bool>> GetQueryADVPermission(PermissionRange rangeSearch, ICurrentUser user)
+        {
+            Expression<Func<AccAccountingPayment, bool>> perQuery = null;
+            switch (rangeSearch)
+            {
+                case PermissionRange.All:
+                    break;
+                case PermissionRange.Owner:
+                    perQuery = x => x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Group:
+                    perQuery = x => (x.GroupId == user.GroupId && x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Department:
+                    perQuery = x => (x.DepartmentId == user.DepartmentId && x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == user.UserID;
+                    break;
+                case PermissionRange.Office:
+                    perQuery = x => (x.OfficeId == user.OfficeID && x.CompanyId == user.CompanyID)
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+                case PermissionRange.Company:
+                    perQuery = x => x.CompanyId == user.CompanyID
+                                                || x.UserCreated == currentUser.UserID;
+                    break;
+            }
+            return perQuery;
         }
 
         private IQueryable<AccountingPaymentModel> GetReferencesOBHData(IQueryable<AccountingPaymentModel> data)
@@ -166,38 +233,73 @@ namespace eFMS.API.Accounting.DL.Services
             return results;
         }
 
-        private IQueryable<AccountingPaymentModel> GetReferencesInvoiceData(IQueryable<AccountingPaymentModel> data)
+        private IQueryable<AccountingPaymentModel> GetReferencesInvoiceData(IQueryable<AccountingPaymentModel> data, PaymentCriteria criteria)
         {
             var partners = partnerRepository.Get();
+            var paymentData = DataContext.Get(x => x.Type != "ADV" && !x.Type.Contains("CREDIT"));
+            var test = paymentData.Select(x => x.Type).Distinct().ToList();
+            if (criteria.SearchType == "ReceiptNo")
+            {
+                if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
+                {
+                    var lstReceipt = acctReceiptRepository.Get(x => criteria.ReferenceNos.Contains(x.PaymentRefNo)).Select(x => x.Id).ToList();
+                    if (lstReceipt.Count > 0)
+                    {
+                        paymentData = paymentData.Where(x => lstReceipt.Any(r => r == x.ReceiptId));
+                    }
+                    else
+                    {
+                        paymentData = paymentData.Where(x => false);
+                    }
+                }
+            }
+            if (criteria.FromUpdatedDate != null)
+            {
+                paymentData = paymentData.Where(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            }
             var resultsQuery = (from invoice in data
                                 join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
                                 from part in grpPartners.DefaultIfEmpty()
-                                join payment in DataContext.Get() on invoice.RefId.ToLower() equals payment.RefId into grpPayments
-                                from detail in grpPayments.DefaultIfEmpty()
-                                select new { invoice, part.ShortName,
-                                    Balance = detail != null ? detail.Balance : (Decimal?)0,
-                                    PaymentAmount = detail != null ? detail.PaymentAmount : (Decimal?)0
+                                join payment in paymentData on invoice.RefId.ToLower() equals payment.RefId
+                                select new
+                                {
+                                    invoice,
+                                    part.ShortName,
+                                    payment.BillingRefNo,
+                                    payment.InvoiceNo,
+                                    payment.Type
                                 }).ToList();
-            var resultGroups = resultsQuery.GroupBy(x => new {
+
+            var resultGroups = resultsQuery.GroupBy(x => new
+            {
+                x.BillingRefNo,
                 x.invoice.RefId,
-                x.invoice.InvoiceNoReal,
-                x.invoice.Serie,
+                x.Type,
                 x.invoice.PartnerId,
                 x.ShortName,
+                x.InvoiceNo,
+                x.invoice.VoucherId,
                 x.invoice.Amount,
+                x.invoice.PaidAmount,
+                x.invoice.UnpaidAmount,
                 x.invoice.Currency,
+                x.invoice.Serie,
                 x.invoice.IssuedDate,
                 x.invoice.DueDate,
                 x.invoice.Status,
                 x.invoice.OverdueDays,
                 x.invoice.ExtendDays,
-                x.invoice.ExtendNote});
+                x.invoice.ExtendNote,
+            });
+
             var results = resultGroups
                             .Select(x => new AccountingPaymentModel
                             {
                                 RefId = x.Key.RefId,
+                                RefNo = x.Key.BillingRefNo,
+                                Type = x.Key.Type,
                                 PartnerId = x.Key.PartnerId,
-                                InvoiceNoReal = x.Key.InvoiceNoReal,
+                                InvoiceNoReal = x.Key.InvoiceNo,
                                 PartnerName = x.Key.ShortName,
                                 Amount = x.Key.Amount,
                                 Currency = x.Key.Currency,
@@ -208,12 +310,389 @@ namespace eFMS.API.Accounting.DL.Services
                                 Status = x.Key.Status,
                                 ExtendDays = x.Key.ExtendDays,
                                 ExtendNote = x.Key.ExtendNote,
-                                PaidAmount = x.Sum(c => c.PaymentAmount),
-                                UnpaidAmount = x.Key.Amount - x.Sum(c => c.PaymentAmount),
-                            }).AsQueryable();
-            return results;
+                                PaidAmount = x.Key.PaidAmount,
+                                UnpaidAmount = x.Key.UnpaidAmount,
+                            });
+            return results.AsQueryable();
         }
 
+        /// <summary>
+        /// Get payment data with type = CREDITSOA
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AccountingPaymentModel> GetCreditSoaPayment(PaymentCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
+            var results = new List<AccountingPaymentModel>();            
+            Expression<Func<AccAccountingPayment, bool>> query = x => (x.Type == "CREDITSOA" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)));
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                var soaNo = new List<string>();
+                switch (criteria.SearchType)
+                {
+                    case "VatInvoice":
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "SOA":
+                        query = query.And(x => criteria.ReferenceNos.Contains(x.BillingRefNo));
+                        break;
+                    case "CreditNote":
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "ReceiptNo":
+                        var listReceiptInfo = acctReceiptRepository.Get(receipt => criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
+                        if (listReceiptInfo.Count() > 0)
+                        {
+                            query = query.And(x => listReceiptInfo.Contains((Guid)x.ReceiptId));
+                        }
+                        else
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "HBL":
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "MBL":
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "JobNo":
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                }
+
+                if (soaNo != null && soaNo.Count > 0)
+                {
+                    query = query.And(x => soaNo.Any(s => s == x.BillingRefNo));
+                }
+            }
+            if (criteria.FromUpdatedDate != null)
+            {
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            }
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
+            var paymentData = DataContext.Get(query);
+            if(paymentData.Count() <= 0)
+            {
+                return results.AsQueryable();
+            }
+            var partners = partnerRepository.Get();
+            var creditSoaData = (from payment in paymentData
+                                join soa in soaRepository.Get() on payment.BillingRefNo equals soa.Soano
+                                join partner in partners on soa.Customer equals partner.Id into grpPartners
+                                from part in grpPartners.DefaultIfEmpty()
+                                select new
+                                {
+                                    payment,
+                                    PartnerId = part.Id,
+                                    part.ShortName,
+                                    Currency = payment.CurrencyId,
+                                    Amount = soa != null ? soa.CreditAmount : (decimal)0,
+                                }).ToList();
+
+            foreach (var item in creditSoaData)
+            {
+                var payment = new AccountingPaymentModel();
+                payment.RefId = item.payment.RefId;
+                payment.RefNo = item.payment.BillingRefNo;
+                payment.Type = GetTypeOfPayment(item.payment.Type, item.payment.BillingRefNo);
+                payment.PartnerId = item.PartnerId;
+                payment.InvoiceNoReal = item.payment.InvoiceNo;
+                payment.PartnerName = item.ShortName;
+                payment.Amount = item.Amount;
+                payment.Currency = item.Currency;
+                payment.UnpaidAmount = item.Amount;
+                payment.Status = (item.payment.Balance ?? 0) <= 0 ? "Paid" : "Unpaid";
+                results.Add(payment);
+            }
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+            {
+                results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null).ToList();
+            }
+            return results.AsQueryable();
+        }
+
+        /// <summary>
+        /// Get payment data with type = CREDITNOTE
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AccountingPaymentModel> GetCreditNotePayment(PaymentCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
+            var results = new List<AccountingPaymentModel>();
+            Expression<Func<AccAccountingPayment, bool>> query = x => (x.Type == "CREDITNOTE" || x.Type == "CREDIT") && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                var creditNo = new List<string>();
+                switch (criteria.SearchType)
+                {
+                    case "VatInvoice":
+                        query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "SOA":
+                        creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.PaySoano, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
+                        break;
+                    case "CreditNote":
+                        query = query.And(x => criteria.ReferenceNos.Contains(x.BillingRefNo));
+                        break;
+                    case "ReceiptNo":
+                        var listReceiptInfo = acctReceiptRepository.Get(receipt => criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
+                        if (listReceiptInfo.Count() > 0)
+                        {
+                            query = query.And(x => listReceiptInfo.Any(l => l == x.ReceiptId));
+                        }
+                        else
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "HBL":
+                        creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
+                        break;
+                    case "MBL":
+                        creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
+                        break;
+                    case "JobNo":
+                        creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
+                        break;
+                }
+
+                if (creditNo != null && creditNo.Count > 0)
+                {
+                    query = query.And(x => creditNo.Contains(x.BillingRefNo));
+                }
+            }
+            if (criteria.FromUpdatedDate != null)
+            {
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            }
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
+            var paymentData = DataContext.Get(query);
+            if (paymentData.Count() <= 0)
+            {
+                return results.AsQueryable();
+            }
+            var partners = partnerRepository.Get();
+            var creditSoaData = (from payment in paymentData
+                                 join cdNote in cdNoteRepository.Get() on payment.BillingRefNo equals cdNote.Code into grpCdNotes
+                                 from cd in grpCdNotes.DefaultIfEmpty()
+                                 join partner in partners on cd.PartnerId equals partner.Id into grpPartners
+                                 from part in grpPartners.DefaultIfEmpty()
+                                 select new
+                                 {
+                                     payment,
+                                     PartnerId = part.Id,
+                                     part.ShortName,
+                                     Currency = payment.CurrencyId,
+                                     Amount = cd != null ? cd.Total : (decimal)0,
+                                 }).ToList();
+            var resultGroups = creditSoaData.GroupBy(x => new
+            {
+                x.payment.BillingRefNo,
+                x.payment.RefId,
+                x.payment.Type,
+                x.Currency,
+                x.PartnerId,
+                x.ShortName,
+                x.payment.InvoiceNo,
+                x.Amount,
+                x.payment.Balance,
+            });
+            foreach (var item in resultGroups)
+            {
+                var payment = new AccountingPaymentModel();
+                payment.RefId = item.Key.RefId;
+                payment.RefNo = item.Key.BillingRefNo;
+                payment.Type = GetTypeOfPayment(item.Key.Type, item.Key.BillingRefNo);
+                payment.PartnerId = item.Key.PartnerId;
+                payment.InvoiceNoReal = item.Key.InvoiceNo;
+                payment.PartnerName = item.Key.ShortName;
+                payment.Amount = item.Key.Amount;
+                payment.Currency = item.Key.Currency;
+                payment.UnpaidAmount = item.Key.Amount;
+                payment.Status = (item.Key.Balance ?? 0) <= 0 ? "Paid" : "Unpaid";
+                results.Add(payment);
+            }
+            return results.AsQueryable();
+        }
+
+        /// <summary>
+        /// Get payment data with type = Advance
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        private IQueryable<AccountingPaymentModel> GetReferencesAdvanceData(PaymentCriteria criteria)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctARP);
+            PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None) return null;
+            Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
+            Expression<Func<AccAccountingPayment, bool>> query = x => x.Type == "ADV" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
+            if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "ReceiptNo":
+                        var receiptLst = acctReceiptRepository.Get(x => criteria.ReferenceNos.Any(re => re == x.PaymentRefNo)).Select(x => x.Id).ToList();
+                        if (receiptLst.Count > 0)
+                        {
+                            query = query.And(x => receiptLst.Any(r => r == x.ReceiptId));
+                        }
+                        else
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    default:
+                        query = query.And(x => false);
+                        break;
+                }
+            }
+
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+            {
+                query = query.And(x => false);
+            }
+            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
+            {
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromIssuedDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToIssuedDate.Value.Date);
+            }
+            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            {
+                query = query.And(x => false);
+            }
+            if (criteria.FromUpdatedDate != null)
+            {
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            }
+            if (perQuery != null)
+            {
+                query = query.And(perQuery);
+            }
+            var paymentAdv = DataContext.Get(query);
+            if (paymentAdv.Count() <= 0)
+            {
+                return null;
+            }
+            var partners = partnerRepository.Get();
+            var advData = (from adv in paymentAdv
+                           join rcpt in acctReceiptRepository.Get() on adv.ReceiptId equals rcpt.Id
+                           join partner in partners on rcpt.CustomerId equals partner.Id into grpPartners
+                           from part in grpPartners.DefaultIfEmpty()
+                           select new
+                           {
+                               adv,
+                               PartnerId = rcpt.CustomerId,
+                               part.ShortName,
+                               rcpt.PaymentRefNo,
+                               IssuedDate = rcpt.DatetimeCreated,
+                               Currency = rcpt.CurrencyId
+                           }).ToList();
+
+            var results = advData
+                           .Select(x => new AccountingPaymentModel
+                           {
+                               RefId = x.adv.RefId,
+                               RefNo = x.PaymentRefNo,
+                               Type = x.adv.Type,
+                               PartnerId = x.adv.PartnerId,
+                               InvoiceNoReal = x.adv.InvoiceNo,
+                               PartnerName = x.ShortName,
+                               Amount = x.adv.PaymentAmount,
+                               Currency = x.Currency,
+                               IssuedDate = null,
+                               Serie = null,
+                               DueDate = null,
+                               OverdueDays = 0,
+                               Status = "Paid",
+                               ExtendDays = 0,
+                               ExtendNote = null,
+                               PaidAmount = x.adv.PaymentAmount,
+                               UnpaidAmount = 0
+                           });
+            return results.AsQueryable();
+        }
+
+        /// <summary>
+        /// Get type of paymemt
+        /// </summary>
+        /// <param name="_type"></param>
+        /// <returns></returns>
+        private string GetTypeOfPayment(string _type, string _refNo)
+        {
+            string reptType = string.Empty;
+            if (string.IsNullOrEmpty(_type))
+            {
+                return reptType;
+            }
+            var _voucherId = string.Empty;
+            switch (_type.ToUpper())
+            {
+                case "CREDIT":
+                case "CREDITNOTE":
+                    _voucherId = surchargeRepository.Get(x => x.CreditNo == _refNo).FirstOrDefault()?.VoucherId;
+                    if (string.IsNullOrEmpty(_voucherId))
+                    {
+                        reptType = "OTHER";
+                    }
+                    else
+                    {
+                        reptType = "NETOFF";
+                    }
+                    break;
+                case "CREDITSOA":
+                    _voucherId = surchargeRepository.Get(x => x.PaySoano == _refNo).FirstOrDefault()?.VoucherId;
+                    if (string.IsNullOrEmpty(_voucherId))
+                    {
+                        reptType = "OTHER";
+                    }
+                    else
+                    {
+                        reptType = "NETOFF";
+                    }
+                    break;
+                case "DEBIT":
+                case "OBH":
+                case "ADV":
+                    reptType = _type;
+                    break;
+            }
+            return reptType;
+        }
         private IQueryable<AccountingPaymentModel> Query(PaymentCriteria criteria)
         {
             IQueryable<AccountingPaymentModel> results = null;
@@ -344,30 +823,97 @@ namespace eFMS.API.Accounting.DL.Services
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AccAccountingManagement, bool>> perQuery = GetQueryInvoicePermission(rangeSearch, _user);
             Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && x.Status != "New"
-                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId))
-                                                                      && (criteria.ReferenceNos.Contains(x.InvoiceNoReal) || criteria.ReferenceNos == null);
-            if(criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
+                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
+            var acctManagementIds = new List<Guid?>();
+            if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "VatInvoice":
+                        query = query.And(x => criteria.ReferenceNos.Contains(x.InvoiceNoReal));
+                        break;
+                    case "DebitInvoice":
+                        acctManagementIds = surchargeRepository.Get(x => (criteria.ReferenceNos.Contains(x.DebitNo, StringComparer.OrdinalIgnoreCase))
+                        || criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase)
+                        ).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if(acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "Soa":
+                        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Soano, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if (acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "ReceiptNo":
+                        var hasReceiptInfo = acctReceiptRepository.Any(receipt => criteria.ReferenceNos.Contains(receipt.PaymentRefNo));
+                        if (!hasReceiptInfo)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "CreditNote":
+                        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if (acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "HBL":
+                        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Hblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if (acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "MBL":
+                        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.Mblno, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if (acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                    case "JobNo":
+                        acctManagementIds = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.JobNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.AcctManagementId).Distinct().ToList();
+                        if (acctManagementIds.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
+                        break;
+                }
+            }
+            if (acctManagementIds != null && acctManagementIds.Count > 0)
+            {
+                query = query.And(x => acctManagementIds.Contains(x.Id));
+            }
+
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
                 query = query.And(x => criteria.PaymentStatus.Contains(x.PaymentStatus ?? "Unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null);
             }
-            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null) {
+            if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
+            {
                 query = query.And(x => x.Date.Value.Date >= criteria.FromIssuedDate.Value.Date && x.Date.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if(criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
             {
                 query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
             }
-            if(criteria.FromUpdatedDate != null)
-            {
-                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
-            }
+            //if (criteria.FromUpdatedDate != null)
+            //{
+            //    query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+            //}
             if (perQuery != null)
             {
                 query = query.And(perQuery);
             }
             var data = accountingManaRepository.Get(query);
             if (data == null) return null;
-            var results = data.OrderByDescending(x => x.PaymentDatetimeUpdated).Select(x => new AccountingPaymentModel {
+            var results = data.OrderByDescending(x => x.PaymentDatetimeUpdated).Select(x => new AccountingPaymentModel
+            {
                 RefId = x.Id.ToString(),
                 InvoiceNoReal = x.InvoiceNoReal,
                 PartnerId = x.PartnerId,
@@ -376,12 +922,13 @@ namespace eFMS.API.Accounting.DL.Services
                 IssuedDate = x.Date,
                 Serie = x.Serie,
                 DueDate = x.PaymentDueDate,
-                OverdueDays = (DateTime.Today > x.PaymentDueDate.Value.Date)? (DateTime.Today - x.PaymentDueDate.Value.Date).Days: 0,
+                OverdueDays = (DateTime.Today > x.PaymentDueDate.Value.Date) ? (DateTime.Today - x.PaymentDueDate.Value.Date).Days : 0,
                 Status = x.PaymentStatus ?? "Unpaid",
                 ExtendDays = x.PaymentExtendDays,
                 ExtendNote = x.PaymentNote,
                 PaidAmount = x.PaidAmount,
                 UnpaidAmount = x.UnpaidAmount,
+                VoucherId = x.VoucherId
             });
             if (results == null) return null;
             switch (criteria.OverDueDays)

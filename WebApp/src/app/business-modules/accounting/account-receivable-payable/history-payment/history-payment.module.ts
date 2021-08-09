@@ -16,6 +16,7 @@ import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/reducers';
 import { EffectsModule } from '@ngrx/effects';
 import { effects } from './store/effects';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 const routing: Routes = [
     {
@@ -47,6 +48,7 @@ const routing: Routes = [
         RouterModule.forChild(routing),
         StoreModule.forFeature('history-payment', reducers),
         EffectsModule.forFeature(effects),
+        BsDropdownModule.forRoot(),
     ],
     exports: [],
     providers: [],

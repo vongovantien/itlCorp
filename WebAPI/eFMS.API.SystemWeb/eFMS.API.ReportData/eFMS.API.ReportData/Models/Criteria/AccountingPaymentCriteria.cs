@@ -8,6 +8,7 @@ namespace eFMS.API.ReportData.Models.Criteria
 {
     public class AccountingPaymentCriteria
     {
+        public string SearchType { get; set; }
         public List<string> ReferenceNos { get; set; }
         public string PartnerId { get; set; }
         public DateTime? FromIssuedDate { get; set; }

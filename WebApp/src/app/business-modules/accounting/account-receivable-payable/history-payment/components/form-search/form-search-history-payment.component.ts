@@ -36,10 +36,11 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
     partnerId: AbstractControl;
     referenceNo: AbstractControl;
     issuedDate: AbstractControl;
-    updatedDate: AbstractControl;
+    paidDate: AbstractControl;
     dueDate: AbstractControl;
     overdueDate: AbstractControl;
     paymentStatus: AbstractControl;
+    searchType: AbstractControl;
 
     partners: Observable<Partner[]>;
 
@@ -60,6 +61,19 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
         { id: 4, text: '60-90 days' },
     ];
 
+    referenceTypes: CommonInterface.ICommonTitleValue[] = [
+        { title: 'VAT Invoice', value: 'VatInvoice' },
+        { title: 'DebitNote/Invoice', value: 'DebitInvoice' },
+        { title: 'SOA', value: 'Soa' },
+        { title: 'Receipt No', value: 'ReceiptNo' },
+        { title: 'Credit Note', value: 'CreditNote' },
+        { title: 'HBL/HAWB', value: 'HBL' },
+        { title: 'MBL/MAWB', value: 'MBL' },
+        { title: 'JOB No', value: 'JobNo' }
+    ];
+
+    showAdvanceSearch: boolean = false;
+    
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -79,10 +93,11 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
     initForm() {
         this.formSearch = this._fb.group({
-            referenceNo: [],
+            searchType: [this.referenceTypes[0].value],
+            referenceNo: [null],
             partnerId: [],
             issuedDate: [],
-            updatedDate: [],
+            paidDate: [],
             dueDate: [],
             overdueDate: [this.overDueDays[0].id],
             paymentStatus: [[this.payments[1], this.payments[2]]]
@@ -90,10 +105,12 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
         this.partnerId = this.formSearch.controls["partnerId"];
         this.issuedDate = this.formSearch.controls["issuedDate"];
-        this.updatedDate = this.formSearch.controls["updatedDate"];
+        this.paidDate = this.formSearch.controls["updatedDate"];
         this.dueDate = this.formSearch.controls["dueDate"];
         this.overdueDate = this.formSearch.controls["overdueDate"];
         this.paymentStatus = this.formSearch.controls["paymentStatus"];
+        this.searchType = this.formSearch.controls["searchType"];
+        this.referenceNo = this.formSearch.controls["referenceNo"];
     }
 
     // tslint:disable-next-line:no-any
@@ -113,21 +130,21 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
         const status = !!dataForm.paymentStatus ? this.getSearchStatus(dataForm.paymentStatus) : null;
         const body: ISearchAccPayment = {
             // tslint:disable-next-line:no-any
+            searchType: dataForm.searchType,
             referenceNos: !!dataForm.referenceNo ? dataForm.referenceNo.trim().replace(SystemConstants.CPATTERN.LINE, ',').trim().split(',').map((item: any) => item.trim()) : null,
             partnerId: dataForm.partnerId,
             paymentStatus: status,
             overDueDays: !!dataForm.overdueDate ? +dataForm.overdueDate : OverDueDays.All,
             fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
-            fromUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.startDate) ? formatDate(dataForm.updatedDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            toUpdatedDate: (!!dataForm.updatedDate && !!dataForm.updatedDate.endDate) ? formatDate(dataForm.updatedDate.endDate, 'yyyy-MM-dd', 'en') : null,
+            fromUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.startDate) ? formatDate(dataForm.paidDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            toUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.endDate) ? formatDate(dataForm.paidDate.endDate, 'yyyy-MM-dd', 'en') : null,
             fromDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.endDate) ? formatDate(dataForm.dueDate.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentType: PaymentType.Invoice
         };
-
-        //this.onSearch.emit(body);
         this._store.dispatch(SearchListHistoryPayment(body));
+        this.onSearch.emit(body);
     }
     getSearchStatus(paymentStatus: []) {
         let strStatus = null;
@@ -149,7 +166,8 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
     resetSearch() {
         this.formSearch.reset();
         this.initForm();
-        this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
+        this._store.dispatch(SearchListHistoryPayment({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All }));
+        // this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
     }
 
     selelectedStatus(event: string) {
@@ -173,17 +191,19 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             .subscribe(
                 (data: any) => {
                     if (data) {
+                        console.log('sub', data)
                         let formData: any = {
-                            referenceNo:data.referenceNos?data.referenceNos:null,
-                            partnerId:data.partnerId?data.partnerId:null,
-                            paymentStatus:(data.paymentStatus&&data.paymentStatus !== [])?data.paymentStatus:['All'],
-                            overdueDate:data.overDueDays?data.overDueDays:this.overDueDays[0].id,
-                            updatedDate :(!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
-                            { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
-                            dueDate:(!!data?.fromDueDate && !!data?.toDueDate) ?
-                            { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
-                            issuedDate:(!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
-                            { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
+                            searchType: data.searchType ? data.searchType : this.referenceTypes[0].value,
+                            referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
+                            partnerId: data.partnerId ? data.partnerId : null,
+                            paymentStatus: this.paymentStatus.value,
+                            overdueDate: data.overDueDays ? data.overDueDays : this.overDueDays[0].id,
+                            paidDate: (!!data?.fromPaidDate && !!data?.toPaidDate) ?
+                                { startDate: new Date(data?.fromPaidDate), endDate: new Date(data?.toPaidDate) } : null,
+                            dueDate: (!!data?.fromDueDate && !!data?.toDueDate) ?
+                                { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
+                            issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
+                                { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
                         };
                         this.formSearch.patchValue(formData);
                     }
@@ -193,6 +213,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 }
 
 interface ISearchAccPayment {
+    searchType: string;
     referenceNos: string;
     partnerId: string;
     paymentStatus: string[];

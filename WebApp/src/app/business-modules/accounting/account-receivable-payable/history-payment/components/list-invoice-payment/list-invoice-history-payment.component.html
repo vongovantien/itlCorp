@@ -15,9 +15,21 @@
                                     </span>
                                 </button>
                             </ng-container>
-                            <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'ExportInvoice'">
-                                <app-permission-button type="export" (onClick)="exportExcel()"></app-permission-button>
-                            </ng-container>
+                            <!-- <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'ExportInvoice'"> -->
+                                <!-- <app-permission-button type="export" (onClick)="exportExcel()"></app-permission-button> -->
+                            <!-- </ng-container> -->
+                            <div class="btn-group" [autoClose]= "!isClickSubMenu" dropdown container="body"
+                            *ngIf="menuSpecialPermission | async | specialPermission: 'ExportInvoice'">
+                                <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
+                                    aria-controls="dropdown-nested">
+                                    <i class="la la-download"></i>Export<span class="caret"></span>
+                                </button>
+                                <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
+                                    <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">General</a></li>
+                                    <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">Statement of Receivable Customer</a></li>
+                                    <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">Statement of Receivable Agency</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -32,19 +44,20 @@
                                 </th>
                             </thead>
                             <tbody>
-                                <ng-container *ngIf="!!refPaymens">
-                                    <ng-container *ngFor="let item of refPaymens; let i = index; trackBy: trackByFn">
+                                <ng-container *ngIf="!!refPayments">
+                                    <ng-container *ngFor="let item of refPayments; let i = index; trackBy: trackByFn">
                                         <tr class="collapse-toggle-row">
                                             <td class="table-actions-col">
                                                 <div class="table-actions">
+                                                    <!--  href="'#id-00' + (item.refId) + item.refNo"-->
                                                     <button type="button"
                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
-                                                        [attr.data-target]="'#id-00' + (item.refId)" title="Collapse"
-                                                        (click)="getPayments(item.refId)">
+                                                        [attr.data-target]="'#id-00' + (item.refId) + item.refNo" title="Collapse"
+                                                        (click)="getPayments(item.refId, item.refNo)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
-                                                    <button type="button"
+                                                    <!-- <button type="button"
                                                         class="btn btn-sm m-btn--icon m-btn--icon-only"
                                                         title="Sync to accountant system (Add)"
                                                         (click)="confirmSync(item.refId, 'ADD')">
@@ -55,22 +68,16 @@
                                                         title="Sync to accountant system (Update)"
                                                         (click)="confirmSync(item.refId, 'UPDATE')">
                                                         <i class="la la-cloud-upload text-info"></i>
-                                                    </button>
+                                                    </button> -->
                                                 </div>
                                             </td>
+                                            <td>{{ item.refNo }} </td>
+                                            <td>{{ item.type }} </td>
                                             <td>{{ item.invoiceNoReal }} </td>
                                             <td>{{ item.partnerName }}</td>
-                                            <td>{{ item.amount | number: '.0-3'}}</td>
-                                            <td>{{ item.currency }}</td>
-                                            <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}
-                                            </td>
-                                            <td>{{ item.serie }}</td>
-                                            <td>{{ item.paidAmount | number: '.0-3'}}</td>
-                                            <td>{{ item.unpaidAmount | number: '.0-3'}}</td>
-                                            <td><a href="javascript:void(0)"
-                                                    (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
-                                            </td>
-                                            <td>{{ item.overdueDays }}</td>
+                                            <td class="text-right">{{ item.amount | number: '.0-3'}}{{item.currency}}</td>
+                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}}{{item.currency}}</td>
+                                            <td class="text-right">{{ item.unpaidAmount | number: '.0-3'}}{{item.currency}}</td>
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
                                                     <span class="text-danger" *ngSwitchCase="'Unpaid'">
@@ -84,44 +91,45 @@
                                                     </span>
                                                 </ng-container>
                                             </td>
+                                            <td><a href="javascript:void(0)"
+                                                (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
+                                            </td>
+                                            <td>{{ item.overdueDays }}</td>
                                             <td>{{ item.extendDays}}</td>
-                                            <td>{{ item.extendNote }}</td>
+                                            <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}</td>
+                                            <td>{{ item.serie}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
-                                            [id]="'id-00' + item.refId" [parentId]="'#payment-table'">
+                                            [id]="'id-00' + item.refId + item.refNo" [parentId]="'#payment-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead app-table-header [headers]="paymentHeaders"
                                                     (onClick)="sortPayment($event.sortField, $event.order)">
-                                                    <th class="m--w-50 first table-actions-col">
+                                                    <!-- <th class="m--w-50 first table-actions-col">
                                                         Action
-                                                    </th>
+                                                    </th> -->
                                                 </thead>
                                                 <tbody>
                                                     <ng-container *ngIf="!!payments.length">
                                                         <tr
                                                             *ngFor="let payment of payments; let j = index; trackBy: trackByFn">
-                                                            <td class="table-actions-col">
+                                                            <!-- <td class="table-actions-col">
                                                                 <div class="table-actions">
                                                                     <button (click)="showConfirmDelete(payment, j)"
                                                                         class="btn btn-danger btn-sm  m-btn--icon m-btn--icon-only">
                                                                         <i class="la la-trash"></i>
                                                                     </button>
                                                                 </div>
+                                                            </td> -->
+                                                            <td>{{j+1}}</td>
+                                                            <td>{{ payment.receiptNo }}</td>
+                                                            <td class="text-right">{{ payment.paymentAmount| number: '.0-3'  }}
                                                             </td>
-                                                            <td>{{ payment.paymentNo }}</td>
-                                                            <td>{{ payment.paymentAmount| number: '.0-3'  }}
+                                                            <td class="text-right">{{ payment.balance| number: '.0-3' }}
                                                             </td>
-                                                            <td>{{ payment.balance| number: '.0-3' }}
-                                                            </td>
-                                                            <td>{{ payment.currencyId }}</td>
                                                             <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
                                                             </td>
-                                                            <td>{{ payment.paymentType }}</td>
                                                             <td>{{ payment.paymentMethod  }}</td>
-                                                            <td>{{ payment.exchangeRate | number: '.0-3' }}</td>
-                                                            <td>{{ payment.userModifiedName }}</td>
-                                                            <td>{{ payment.datetimeModified | date: 'dd/MM/yyyy' }}
-                                                            </td>
+                                                            <td>{{ payment.note }}</td>
                                                         </tr>
                                                     </ng-container>
                                                     <tr app-table-none-record *ngIf="!payments.length">
@@ -131,7 +139,7 @@
                                         </tr>
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!isLoading && !refPaymens.length">
+                                <tr app-table-none-record *ngIf="!isLoading && !refPayments.length">
                                 </tr>
                                 <tr app-table-row-loading *ngIf="isLoading"></tr>
                             </tbody>
