@@ -198,6 +198,7 @@
             get list payment by refNo
             </summary>
             <param name="refId"></param>
+            <param name="refNo">Payment RefNo</param>s
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadInvoicePaymentExcel">
