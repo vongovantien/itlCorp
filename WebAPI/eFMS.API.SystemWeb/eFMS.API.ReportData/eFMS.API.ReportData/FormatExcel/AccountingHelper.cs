@@ -3685,6 +3685,8 @@ namespace eFMS.API.ReportData.FormatExcel
         private void BindingDataAccoutingManagementDebCreInvExcel(ExcelWorksheet workSheet, List<AccountingManagementExport> acctMngts, string typeOfAcctMngt)
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
+            workSheet.Column(6).Width = 20; //Cột F
+            workSheet.Column(13).Width = 20; //Cột M
             List<string> headers = new List<string>
             {
                 "JobNo",//0
