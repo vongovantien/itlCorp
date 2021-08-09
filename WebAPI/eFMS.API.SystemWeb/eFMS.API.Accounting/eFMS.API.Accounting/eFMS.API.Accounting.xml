@@ -193,7 +193,7 @@
             <param name="pageSize"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String,System.String)">
             <summary>
             get list payment by refNo
             </summary>

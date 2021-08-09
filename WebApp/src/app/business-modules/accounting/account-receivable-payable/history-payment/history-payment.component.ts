@@ -89,11 +89,13 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     onSearchPayment(event) {
+        this.page = 1;
         this.dataSearch = event;
         this.dataSearch.paymentType = this.getPaymentType();
         if (this.dataSearch.paymentType === 0) {
             this.invoiceListComponent.dataSearch = this.dataSearch;
-            this.requestSearchShipment();
+            this.requestLoadListHistoryPayment();
+            // this.requestSearchShipment();
         }
     }
 
@@ -110,7 +112,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
             ).subscribe(
                 (res: any) => {
                     if (this.selectedTab === "HISTORY") {
-                        this.invoiceListComponent.refPaymens = res.data || [];
+                        this.invoiceListComponent.refPayments = res.data || [];
                         this.invoiceListComponent.totalItems = res.totalItems;
                     }
                 },
@@ -118,7 +120,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     handleUpdateExtendDateOfInvoice() {
-        this.requestSearchShipment();
+        this.invoiceListComponent.getPagingData();
     }
 
     onSelectTab(tabName: PAYMENT_TAB | string) {

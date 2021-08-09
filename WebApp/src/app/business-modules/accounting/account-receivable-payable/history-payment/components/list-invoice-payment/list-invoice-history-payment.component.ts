@@ -34,7 +34,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 
-    refPaymens: AccountingPaymentModel[] = [];
+    refPayments: AccountingPaymentModel[] = [];
     payments: PaymentModel[] = [];
     paymentHeaders: CommonInterface.IHeaderTable[];
 
@@ -42,6 +42,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     confirmMessage: string = '';
     refId: string;
     action: string;
+    isClickSubMenu: boolean = false;
     constructor(
         private _router: Router,
         private _accountingRepo: AccountingRepo,
@@ -60,31 +61,28 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
 
     ngOnInit(): void {
         this.headers = [
-            { title: 'Reference No', field: 'invoiceNoReal', sortable: true },
+            { title: 'Reference No', field: 'refNo', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
+            { title: 'Invoice No', field: 'invoiceNoReal', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Invoice Amount', field: 'amount', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Invoice Date', field: 'issuedDate', sortable: true },
-            { title: 'Serie No', field: 'serie', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Paid Amount', field: 'paidAmount', sortable: true },
             { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
+            { title: 'Payment Status', field: 'status', sortable: true },
             { title: 'Due Date', field: 'dueDate', sortable: true },
             { title: 'Overdue Days', field: 'overdueDays', sortable: true },
-            { title: 'Payment Status', field: 'status', sortable: true },
             { title: 'Extends date', field: 'extendDays', sortable: true },
-            { title: 'Notes', field: 'extendNote', sortable: true },
+            { title: 'Invoice Date', field: 'issuedDate', sortable: true },
+            { title: 'Serie No', field: 'serie', sortable: true },
         ];
         this.paymentHeaders = [
-            { title: 'Payment No', field: 'paymentNo', sortable: true },
-            { title: 'Payment Amount', field: 'paymentAmount', sortable: true },
+            { title: 'No', field: '', sortable: true },
+            { title: 'Receipt No', field: 'receiptNo', sortable: true },
+            { title: 'Paid Amount', field: 'paymentAmount', sortable: true },
             { title: 'Balance', field: 'balance', sortable: true },
-            { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Paid Date', field: 'paidDate', sortable: true },
-            { title: 'Payment Type', field: 'paymentType', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
-            { title: 'Exchange Rate', field: 'exchangeRate', sortable: true },
-            { title: 'Update Person', field: 'userModifiedName', sortable: true },
-            { title: 'Update Date', field: 'datetimeModified', sortable: true }
+            { title: 'Note', field: 'note', sortable: true },
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
@@ -124,8 +122,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    getPayments(refId: string) {
-        this._accountingRepo.getPaymentByrefId(refId)
+    getPayments(refId: string, refNo: string) {
+        this._accountingRepo.getPaymentByrefId(refId, refNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
@@ -136,7 +134,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     sortAccPayment(sortField: string, order: boolean) {
-        this.refPaymens = this._sortService.sort(this.refPaymens, sortField, order);
+        this.refPayments = this._sortService.sort(this.refPayments, sortField, order);
     }
 
     sortPayment(sortField: string, order: boolean) {
@@ -205,7 +203,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.getPagingData();
-                        this.getPayments(this.selectedPayment.refNo);
+                        this.getPayments(this.selectedPayment.refId, this.selectedPayment.receiptId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
@@ -213,10 +211,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    confirmSync(refId: string, action: string) {
+    confirmSync(refId: string, refNo: string, action: string) {
         this.refId = refId;
         this.action = action;
-        this._accountingRepo.getPaymentByrefId(refId)
+        this._accountingRepo.getPaymentByrefId(refId, refNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
