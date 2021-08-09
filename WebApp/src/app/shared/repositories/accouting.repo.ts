@@ -559,8 +559,8 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    getPaymentByrefId(refId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
+    getPaymentByrefId(refId: string, refNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId, refNo: refNo }).pipe(
             map((data: any) => data)
         );
     }

@@ -1,5 +1,7 @@
 export class AccountingPaymentModel {
     refId: string = null;
+    refNo: string = null;
+    type: string = null;
     invoiceNoReal: string = null;
     soaNo: string = null;
     partnerId: string = null;
@@ -15,6 +17,7 @@ export class AccountingPaymentModel {
     status: string = null;
     extendDays: number = 0;
     extendNote: string = null;
+    receiptId: string = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

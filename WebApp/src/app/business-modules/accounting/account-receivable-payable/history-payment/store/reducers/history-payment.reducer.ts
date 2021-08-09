@@ -6,7 +6,7 @@ export interface IHistoryPaymentReducerState {
     isLoading: boolean;
     isLoaded: boolean;
     dataSearch:any;
-    pagingData:any;
+    pagingData: { page: number, pageSize: number };
 }
 
 export const initialState: IHistoryPaymentReducerState = {

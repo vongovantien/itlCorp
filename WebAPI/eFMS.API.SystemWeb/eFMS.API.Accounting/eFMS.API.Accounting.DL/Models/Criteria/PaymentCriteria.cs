@@ -6,6 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
 {
     public class PaymentCriteria
     {
+        public string SearchType { get; set; }
         public List<string> ReferenceNos { get; set; }
         public string PartnerId { get; set; }
         public DateTime? FromIssuedDate { get; set; }
