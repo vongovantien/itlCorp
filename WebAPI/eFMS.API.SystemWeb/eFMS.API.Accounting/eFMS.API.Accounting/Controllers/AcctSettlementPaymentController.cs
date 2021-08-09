@@ -570,7 +570,8 @@ namespace eFMS.API.Accounting.Controllers
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
                         JobNo = item.JobId,
-                        Notes = item.Notes
+                        Notes = item.Notes,
+                        SettlementNo = model.Settlement.SettlementNo
                     };
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)
