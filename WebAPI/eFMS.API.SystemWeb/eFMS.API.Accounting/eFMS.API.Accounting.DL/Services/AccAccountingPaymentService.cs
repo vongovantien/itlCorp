@@ -136,17 +136,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var soaCredit =  GetCreditSoaPayment(criteria);
-            if (soaCredit.Count() > 0)
+            if (soaCredit?.Count() > 0)
             {
                 results = results.Union(soaCredit);
             }
             var creditNote = GetCreditNotePayment(criteria);
-            if (creditNote.Count() > 0)
+            if (creditNote?.Count() > 0)
             {
                 results = results.Union(creditNote);
             }
             var advData = GetReferencesAdvanceData(criteria);
-            if (advData.Count() > 0)
+            if (advData?.Count() > 0)
             {
                 results = results.Union(advData);
             }
