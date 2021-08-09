@@ -202,6 +202,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     resetSearch() {
         this.formSearch.patchValue(Object.assign({}));
+        this._store.dispatch(SearchListAccountReceivable(Object.assign({})));
         this.initForm();
         this.submitSearch();
     }
@@ -228,7 +229,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             debitRate: dataForm.debitRate
         };
 
-        this._store.dispatch(SearchListAccountReceivable(body))
+        this._store.dispatch(SearchListAccountReceivable(body));
         this.onSearch.emit(body);
     }
 
