@@ -63,11 +63,11 @@ namespace eFMS.API.System.Controllers
         [HttpPost("QueryData")]
         public IActionResult QueryData(CatDepartmentCriteria criteria)
         {
-            var _criteria = new CatDepartmentCriteria {
-                Type = !string.IsNullOrEmpty(criteria.Type) ? criteria.Type.Trim() : criteria.Type,
-                Keyword = !string.IsNullOrEmpty(criteria.Keyword) ? criteria.Keyword.Trim() : criteria.Keyword,
-            };            
-            var data = catDepartmentService.QueryData(_criteria);
+            //var _criteria = new CatDepartmentCriteria {
+            //    Type = !string.IsNullOrEmpty(criteria.Type) ? criteria.Type.Trim() : criteria.Type,
+            //    Keyword = !string.IsNullOrEmpty(criteria.Keyword) ? criteria.Keyword.Trim() : criteria.Keyword,
+            //};            
+            var data = catDepartmentService.QueryData(criteria);
             return Ok(data);
         }
 
