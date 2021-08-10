@@ -106,17 +106,17 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     exportExcel(){
-        this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
-        .subscribe(
-            (res: Blob) => {
-                this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
-            }
-        );
+        // this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
+        // .subscribe(
+        //     (res: Blob) => {
+        //         this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
+        //     }
+        // );
 
     }
 
-    showDebitDetail(agreementId){
-        this._accountingRepo.getDataDebitDetail(agreementId)
+    showDebitDetail(agreementId,option){
+        this._accountingRepo.getDataDebitDetail(agreementId,option)
         .pipe(
             catchError(this.catchError),
             finalize(() => this._progressRef.complete())
