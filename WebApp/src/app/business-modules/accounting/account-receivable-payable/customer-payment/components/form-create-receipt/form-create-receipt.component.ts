@@ -3,18 +3,17 @@ import { AbstractControl, FormBuilder, FormGroup, Validators, FormControl } from
 import { Store } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 
-import { JobConstants } from '@constants';
+import { JobConstants, AccountingConstants } from '@constants';
 import { CommonEnum } from '@enums';
 import { Partner, ReceiptInvoiceModel, } from '@models';
 import { CatalogueRepo, AccountingRepo } from '@repositories';
 import { IAppState } from '@store';
 import { AppForm } from '@app';
-import { DataService } from '@services';
 import { ComboGridVirtualScrollComponent } from '@common';
 
 import { Observable } from 'rxjs';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
-import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement } from '../../store/actions';
+import { ResetInvoiceList, SelectPartnerReceipt, SelectReceiptDate, SelectReceiptAgreement, SelectReceiptClass } from '../../store/actions';
 import { ReceiptTypeState } from '../../store/reducers';
 import { takeUntil } from 'rxjs/operators';
 
@@ -52,15 +51,21 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     customerName: string;
     contractNo: string;
 
-    classReceipt: string[] = ['Clear Debit', 'Advance', 'Other'];
+    classReceipt: string[] = [
+        AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
+        AccountingConstants.RECEIPT_CLASS.ADVANCE,
+        AccountingConstants.RECEIPT_CLASS.COLLECT_OBH,
+        AccountingConstants.RECEIPT_CLASS.PAY_OBH,
+        AccountingConstants.RECEIPT_CLASS.NET_OFF];
     partnerTypeState: string;
+    recriptReference: string = null;
+
     constructor(
         private _fb: FormBuilder,
         private _store: Store<IAppState>,
         private _catalogueRepo: CatalogueRepo,
         private _accountingRepo: AccountingRepo,
         private _toastService: ToastrService,
-        private _dataService: DataService
 
     ) {
         super();
@@ -217,6 +222,10 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         if (!!partnerId) {
             this.getPartnerOnForm(partnerId);
         }
+    }
+
+    onChangeReceiptType(type: string) {
+        this._store.dispatch(SelectReceiptClass({ class: type }));
     }
 
 }

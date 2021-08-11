@@ -38,6 +38,7 @@ export class ReceiptCreditDebitModel {
     exchangeRateBilling: number;
     voucherId: string = null;
     voucherIdre: string = null;
+    paymentType: string = null;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -102,6 +103,8 @@ export class Receipt {
     referenceId: string = null; // * ID của receipt cha (trường hợp có receipt banking)
     paymentMethod: string = null;
     class: string = null;
+    obhpartnerId: string = null;
+    notifyDepartment: string = null;
 
     constructor(object?: any) {
         const self = this;
@@ -125,6 +128,7 @@ export class ReceiptModel extends Receipt {
     finalPaidAmountUsd: number = null;
     finalPaidAmountVnd: number = null;
     isReceiptBankFee: boolean = false;
+    referenceNo: string = null;
 
     constructor(object?: any) {
         super();

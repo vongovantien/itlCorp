@@ -20,14 +20,18 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-
                             <ng-container
                                 *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
                                     icon="la la-cloud-upload" (onClick)="confirmSync()">
                                 </app-permission-button>
                             </ng-container>
-
+                            <ng-container
+                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail.type !== 'Clear Debit' ">
+                                <app-permission-button title="Clear Debit" type="Add" class="success"
+                                    icon="la la-credit-card" (onClick)="confirmCreateClearDebit()">
+                                </app-permission-button>
+                            </ng-container>
                             <ng-container>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                                 </app-default-button>

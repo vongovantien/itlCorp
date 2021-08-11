@@ -1,21 +1,22 @@
 import { Component, OnInit, Input, TemplateRef, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { ReceiptInvoiceModel, Currency, Partner } from '@models';
-import { AccountingRepo, CatalogueRepo } from '@repositories';
+import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { DataService } from '@services';
 import { formatDate, formatCurrency } from '@angular/common';
-import { AppList } from '@app';
-import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators, AbstractControlOptions } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
 
 import { Store } from '@ngrx/store';
-import { takeUntil, pluck } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { customerPaymentReceipLoadingState, ReceiptCreditListState, ReceiptDebitListState, ReceiptPartnerCurrentState, ReceiptAgreementCreditCurrencyState, ReceiptAgreementCusAdvanceState } from '../../store/reducers';
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptPartnerCurrentState, ReceiptAgreementCreditCurrencyState, ReceiptAgreementCusAdvanceState, ReceiptClassState } from '../../store/reducers';
 import { ToastrService } from 'ngx-toastr';
 import { InsertAdvance, ProcessClearInvoiceModel, ProcessClearSuccess, ToggleAutoConvertPaid, SelectReceiptCurrency } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 import cloneDeep from 'lodash/cloneDeep';
+import { JobConstants, AccountingConstants } from '@constants';
+import { AppForm } from 'src/app/app.form';
 
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -23,7 +24,7 @@ import cloneDeep from 'lodash/cloneDeep';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implements OnInit {
+export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implements OnInit {
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
 
@@ -52,11 +53,19 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
 
     isAutoConvert: AbstractControl;
     isAsPaidAmount: AbstractControl;
+    obhpartnerId: AbstractControl;
+    notifyDepartment: AbstractControl;
 
     $currencyList: Observable<Currency[]>;
-
-
-    paymentMethods: string[] = ['Cash', 'Bank Transfer', 'Other'];
+    paymentMethods: string[] = [
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+    ];
 
     partnerId: any = null;
 
@@ -77,14 +86,19 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         { title: 'Invoice Date', field: 'invoiceDate' },
         { title: 'Note', field: 'note' },
     ];
+    displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
+
+    obhPartners: Observable<Partner[]>;
+    departments: Observable<any>;
+    class$: Observable<string>;
 
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _store: Store<IAppState>,
         private readonly _fb: FormBuilder,
-        private readonly _dataService: DataService,
         private readonly _catalogueRepo: CatalogueRepo,
-        private readonly _toastService: ToastrService
+        private readonly _toastService: ToastrService,
+        private readonly _systemRepo: SystemRepo
     ) {
         super();
     }
@@ -92,10 +106,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     ngOnInit() {
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.$currencyList = this._store.select(getCatalogueCurrencyState);
-        this.isLoading = this._store.select(customerPaymentReceipLoadingState);
+
+        this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal' });
+        this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
 
         this.initForm();
-        this.listenCusAdvanceData();
         this.listenCustomerInfoData();
         this.listenAgreementData();
         this.generateExchangeRateUSD(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en'))
@@ -109,24 +124,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
                 }
             );
 
+        this.class$ = this._store.select(ReceiptClassState)
 
-    }
 
-    formatNumberCurrency(input: number, digit: number) {
-        return input.toLocaleString(
-            'en-Us', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
-            { minimumFractionDigits: digit }
-        );
-    }
-
-    listenCusAdvanceData() {
-        this._store.select(ReceiptAgreementCusAdvanceState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (data) => {
-                    data !== undefined && !this.cusAdvanceAmount.value && this.cusAdvanceAmount.setValue(data);
-                }
-            );
     }
 
     listenCustomerInfoData() {
@@ -157,19 +157,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             paidAmountUSD: [null, Validators.required],
             cusAdvanceAmount: [],
             finalPaidAmount: [{ value: null, disabled: true }],
-            // balance: [{ value: null, disabled: true }],
             paymentMethod: [this.paymentMethods[0]],
             currencyId: ['VND'],
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [1, Validators.required],
             bankAccountNo: [],
             amountVND: [],
-            amountUSD: [],
+            amountUSD: [{ value: null, disabled: true } as AbstractControlOptions],
             description: [],
             finalPaidAmountVND: [],
             finalPaidAmountUSD: [],
             isAutoConvert: [true],
-            isAsPaidAmount: [false]
+            isAsPaidAmount: [false],
+            obhpartnerId: [],
+            notifyDepartment: [],
 
         });
 
@@ -188,6 +189,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.finalPaidAmountUSD = this.form.controls['finalPaidAmountUSD'];
         this.isAutoConvert = this.form.controls['isAutoConvert'];
         this.isAsPaidAmount = this.form.controls['isAsPaidAmount'];
+        this.obhpartnerId = this.form.controls['obhpartnerId'];
+        this.notifyDepartment = this.form.controls['notifyDepartment'];
     }
 
     async generateExchangeRateUSD(date: string) {
@@ -254,9 +257,16 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             case 'currency':
                 if ((data as Currency).id === 'VND') {
                     this.exchangeRate.setValue(1);
+                    this.amountVND.enable();
+                    if (this.isAutoConvert)
+                        this.amountUSD.disable();
                 } else {
                     if ((data as Currency).id !== 'VND') {
                         this.exchangeRate.setValue(this.exchangeRateUsd);
+                        this.amountUSD.enable();
+
+                        if (this.isAutoConvert)
+                            this.amountVND.disable();
                     } else {
                         this.exchangeRate.setValue(1);
                     }
@@ -308,22 +318,31 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         }
     }
 
-    getListReceiptChange(onChange: boolean) {
-        if (onChange) {
-            // this.caculateAmountFromDebitList(); // ? 16056
-        }
-    }
+    insertOtherRowData(type?: string) {
+        const newInvoiceWithAdv: any = new ReceiptInvoiceModel();
+        newInvoiceWithAdv.paymentType = 'Other';
+        if (!!type) {
+            newInvoiceWithAdv.type = type;
+        } else {
+            this.class$
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe(
+                    (receiptType) => {
+                        newInvoiceWithAdv.type = receiptType;
+                    })
 
-    insertAdvanceRowData() {
-        const newInvoiceWithAdv: any = {};
-        newInvoiceWithAdv.typeInvoice = 'ADV';
-        newInvoiceWithAdv.type = 'ADV';
-        newInvoiceWithAdv.paidAmountVnd = 0;
-        newInvoiceWithAdv.paidAmountUsd = 0;
+        }
+        newInvoiceWithAdv.paidAmountVnd = this.amountVND.value ?? 0;
+        newInvoiceWithAdv.paidAmountUsd = this.amountUSD.value ?? 0;
+
+        newInvoiceWithAdv.totalPaidUsd = 0;
+        newInvoiceWithAdv.totalPaidVnd = 0;
+        newInvoiceWithAdv.unpaidAmountUsd = 0;
+        newInvoiceWithAdv.unpaidAmountVnd = 0;
         newInvoiceWithAdv.refNo = null;
 
-        const data = newInvoiceWithAdv as ReceiptInvoiceModel;
-        this._store.dispatch(InsertAdvance({ data: data }));
+        const data = cloneDeep(newInvoiceWithAdv)
+        this._store.dispatch(InsertAdvance({ data }));
 
     }
 
@@ -343,7 +362,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
             finalExchangeRate: this.exchangeRate.value,
             paidAmountVnd: this.finalPaidAmountVND.value,
             paidAmountUsd: this.finalPaidAmountUSD.value,
-            list: listInvoice.filter(x => x.type !== 'ADV'),
+            list: listInvoice.filter(x => x.type !== 'Other'),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
@@ -365,8 +384,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
     }
 
     getFinalPaidAmount() {
-        // const exChangeRateUSD = this.currencyId.value !== 'USD' ? this.exchangeRateUsd : 1;
-        // const exChangeRateVND = this.currencyId.value === 'USD' ? this.exchangeRateUsd : 1;
         const exChangeRate = this.currencyId.value === 'VND' ? 1 : this.exchangeRateUsd;
 
         let _finalPaidAmountVnd: number = (this.amountVND.value ?? 0) + (this.paidAmountVND.value ?? 0);
@@ -380,53 +397,37 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppList implem
         this.finalPaidAmountUSD.setValue(+(+(_finalPaidAmountUsd)).toFixed(2) ?? 0);
     }
 
-    // ! Decrepracated
-    caculateAmountFromDebitList() {
-        let creditAmountUSD = 0;
-        let creditAmountVND = 0;
-        let paidUSD = 0;
-        let paidVND = 0;
-        const exChangeRateUSD = this.currencyId.value !== 'USD' ? this.exchangeRateUsd : 1;
-        const exChangeRateVND = this.currencyId.value === 'USD' ? this.exchangeRateUsd : 1;
-        const cusAdvanceAmount = !this.cusAdvanceAmount.value ? 0 : this.cusAdvanceAmount.value;
-
-        this._store.select(ReceiptCreditListState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                x.reduce((amount: number, item: ReceiptInvoiceModel) => creditAmountUSD += item.unpaidAmountUsd, 0);
-                x.reduce((amount: number, item: ReceiptInvoiceModel) => creditAmountVND += item.unpaidAmountVnd, 0);
-            });
-        this._store.select(ReceiptDebitListState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe((x: ReceiptInvoiceModel[]) => {
-                paidUSD += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountUsd, 0);
-                paidVND += x.reduce((amount: number, item: ReceiptInvoiceModel) => amount += item.paidAmountVnd, 0);
-            });
-
-
-        if (!!this.isAsPaidAmount.value) {
-            if (this.currencyId.value === 'USD') {
-                this.paidAmountUSD.setValue(cusAdvanceAmount);
-            } else {
-                this.paidAmountVND.setValue(cusAdvanceAmount);
-            }
-        } else {
-            this.paidAmountUSD.setValue(+(+(paidUSD)).toFixed(2) ?? 0);
-            this.paidAmountVND.setValue(paidVND);
-        }
-
-        this.amountUSD.setValue(creditAmountUSD);
-        this.amountVND.setValue(creditAmountVND);
-
-        this.finalPaidAmountUSD.setValue((exChangeRateUSD === 0 ? 0 : +((((cusAdvanceAmount / exChangeRateUSD) * 100) / 100).toFixed(2)) + creditAmountUSD + paidUSD));
-        this.finalPaidAmountVND.setValue((cusAdvanceAmount * exChangeRateVND) + creditAmountVND + paidVND);
-    }
-
     onToggleAutoConvertPaid(isAuto: boolean) {
         if (!this.isAutoConvert.dirty) {
             return;
         }
         this._store.dispatch(ToggleAutoConvertPaid({ isAutoConvert: isAuto }));
+        if (isAuto === true) {
+            if (this.currencyId.value === 'VND') {
+                this.amountUSD.disable();
+                this.amountVND.enable();
+
+            } else {
+                this.amountUSD.enable();
+                this.amountVND.disable();
+            }
+        } else {
+            this.amountVND.enable();
+            this.amountUSD.enable();
+        }
+
+    }
+
+    onToggleAsPaidAmount(isCheck) {
+        if (!this.isAsPaidAmount.dirty) {
+            return;
+        }
+        if (isCheck) {
+            const totaValue = (this.finalPaidAmountVND.value ?? 0) + (this.cusAdvanceAmount.value ?? 0);
+            this.finalPaidAmountVND.setValue(totaValue);
+        } else {
+            this.finalPaidAmountVND.setValue(this.finalPaidAmountVND);
+        }
     }
 }
 

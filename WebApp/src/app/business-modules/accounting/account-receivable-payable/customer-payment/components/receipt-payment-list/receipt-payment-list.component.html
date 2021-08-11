@@ -1,151 +1,167 @@
 <div class="form-receipt-invoices">
-    <div [formGroup]="form" class="m-form m-form--state">
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">Payment Date</label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                            name="daterange" placeholder="Select request date" [autoApply]="true"
-                            formControlName="paymentDate" readonly calendar
-                            (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" [attr.disabled]="isReadonly" />
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">Payment Method</label>
-                    <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
-                        [clearable]="false" [readonly]="isReadonly" (change)="getBankAccountNo($event)">
-                    </ng-select>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">Currency</label>
-                    <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
-                        bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
-                        [clearable]="false" [readonly]="isReadonly">
-                    </ng-select>
+    <div [formGroup]="form" class="row m-form m-form--state">
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Payment Date</label>
+                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                        name="daterange" placeholder="Select request date" [autoApply]="true"
+                        formControlName="paymentDate" readonly calendar
+                        (datesUpdated)="onSelectDataFormInfo($event,'payment-date')" [attr.disabled]="isReadonly" />
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label">Bank Acount No</label>
-                    <input type="text" class="form-control m-input m-input--square" formControlName="bankAccountNo"
-                        [attr.readOnly]="isReadonly">
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Payment Method</label>
+                <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
+                    [clearable]="false" [readonly]="isReadonly" (change)="getBankAccountNo($event)">
+                </ng-select>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Currency</label>
+                <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async" bindLabel="id"
+                    bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false"
+                    [readonly]="isReadonly">
+                </ng-select>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
+                <label required> Exchange Rate </label>
+                <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
+                    [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
+                    (change)="onSelectDataFormInfo($event,'exchangeRate')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVND.valid }">
+                <label required>Collect Amount VND</label>
+                <input type="number" class="form-control m-input m-input--square text-success"
+                    formControlName="paidAmountVND" autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
+                <label required>Collect Amount USD</label>
+                <input type="number" class="form-control m-input m-input--square text-success"
+                    formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Cus Advance</label>
+                <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
+                    autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="">As Paid Amount</label>
+                        <app-switch size="sm" class="success" formControlName="isAsPaidAmount"
+                            (toggleChange)="onToggleAsPaidAmount($event)"></app-switch>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label for="">Auto convert</label>
+                        <app-switch size="sm" class="success" formControlName="isAutoConvert"
+                            (toggleChange)="onToggleAutoConvertPaid($event)"></app-switch>
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="form-group">
-                            <label class="form-control-label">Cus Advance Amount</label>
-                            <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric
-                                [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
-                                (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
-                        </div>
-                    </div>
-                    <div class="col-lg-4 text-right">
-                        <div class="form-group">
-                            <label for="">As Paid Amount</label>
-                            <app-switch size="sm" class="success" formControlName="isAsPaidAmount"></app-switch>
-                        </div>
-                    </div>
-                </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Credit VND</label>
+                <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
+                    autoFormatCurrency [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountVND')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Credit Amount USD</label>
+                <input class="form-control" type="number" formControlName="amountUSD" [decimals]="2" autoFormatCurrency
+                    [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountUSD')">
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Final Paid Amount USD</label>
+                <input type="text" class="form-control m-input m-input--square text-primary"
+                    formControlName="finalPaidAmountUSD" readonly formatDecimalFormControl>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label>Final Paid Amount VND</label>
+                <input type="text" class="form-control m-input m-input--square text-primary"
+                    formControlName="finalPaidAmountVND" formatDecimalFormControl readonly format="1.0-3">
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && !obhpartnerId.value && (obhpartnerId.errors | equalError: 'required') }">
+                        <label>OBH
+                            Partner</label>
+                        <app-combo-grid-virtual-scroll (itemSelected)="obhpartnerId.setValue($event.id)"
+                            (remove)="resetFormControl(obhpartnerId)"
+                            [currentActiveItemId]="{field:'id', value: obhpartnerId.value}"
+                            [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners | async"
+                            [displayFields]="displayFieldsPartner" placeholder="Select OBH Partner"
+                            [disabled]="isReadonly">
+                        </app-combo-grid-virtual-scroll>
 
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
-                    <label class="form-control-label" required> Exchange Rate </label>
-                    <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                        [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
-                        (change)="onSelectDataFormInfo($event,'exchangeRate')">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-2">
-                <div class="form-group">
-                    <label class="form-control-label">Credit Amount VND</label>
-                    <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
-                        autoFormatCurrency [attr.readOnly]="isReadonly"
-                        (change)="onSelectDataFormInfo($event,'amountVND')">
-                </div>
-            </div>
-            <div class="col-lg-2">
-                <div class="form-group">
-                    <label class="form-control-label">Credit Amount USD</label>
-                    <input class="form-control" type="number" formControlName="amountUSD" [decimals]="2"
-                        autoFormatCurrency [attr.readOnly]="isReadonly"
-                        (change)="onSelectDataFormInfo($event,'amountUSD')">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVND.valid }">
-                    <label class="form-control-label" required>Paid Amount VND</label>
-                    <input type="number" class="form-control m-input m-input--square text-success"
-                        formControlName="paidAmountVND" autoFormatCurrency [attr.readOnly]="isReadonly"
-                        (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="form-group"
-                            [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
-                            <label class="form-control-label" required>Paid Amount USD</label>
-                            <input type="number" class="form-control m-input m-input--square text-success"
-                                formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
-                                (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
-                        </div>
                     </div>
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="">Auto convert</label>
-                            <app-switch size="sm" class="success" formControlName="isAutoConvert"
-                                (toggleChange)="onToggleAutoConvertPaid($event)"></app-switch>
-                        </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label>Bank Acount No</label>
+                        <input type="text" class="form-control m-input m-input--square" formControlName="bankAccountNo"
+                            [attr.readOnly]="isReadonly">
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label>Alert Department</label>
+                        <ng-select [items]="departments | async" formControlName="notifyDepartment" class="custom"
+                            [readonly]="isReadonly" bindLabel="deptNameAbbr" bindValue="id" [multiple]="true">
+                        </ng-select>
+
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-{{syncInfoTemplate ? 8 : 12}}">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <label class="form-control-label">Final Paid Amount USD</label>
-                        <input type="text" class="form-control m-input m-input--square text-primary"
-                            formControlName="finalPaidAmountUSD" readonly formatDecimalFormControl>
-                    </div>
-                    <div class="col-lg-6">
-                        <label class="form-control-label">Final Paid Amount VND</label>
-                        <input type="text" class="form-control m-input m-input--square text-primary"
-                            formControlName="finalPaidAmountVND" formatDecimalFormControl readonly format="1.0-3">
+        <div class="col-lg-6">
+            <div class="row">
+                <div class="col-lg-{{!!syncInfoTemplate ? 8 : 12}}">
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea cols="30" rows="5" class="form-control" formControlName="description"
+                            [attr.readOnly]="isReadonly"></textarea>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label class="form-control-label">Description</label>
-                            <textarea cols="30" rows="5" class="form-control" formControlName="description"
-                                [attr.readOnly]="isReadonly"></textarea>
-                        </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label></label>
+                        <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label"></label>
-                    <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>
                 </div>
             </div>
         </div>
 
     </div>
+
     <ng-content> </ng-content>
 
     <div class="row m--margin-top-20">
@@ -160,21 +176,40 @@
                         </span>
                     </button>
 
-                    <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
-                        (click)="insertAdvanceRowData()">
-                        <span>
+                    <ng-container *ngIf="(class$ | async) === 'Clear Debit';else advTpl">
+                        <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10 dropdown-toggle"
+                            type="button" [dpToggle]="dropdownMenu">
                             <i class="la la-plus"></i>
-                            <span> Add Adv </span>
-                        </span>
-                    </button>
+                            Add Other
+                        </button>
+                        <app-dropdown #dropdownMenu>
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('Advance')">
+                                <span> Advance </span>
+                            </a>
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('COLL_OBH')">
+                                <span> Collect OBH </span>
+                            </a>
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('Pay_OBH')">
+                                <span> Pay OBH </span>
+                            </a>
+                        </app-dropdown>
+                    </ng-container>
+                    <ng-template #advTpl>
+                        <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10" type="button"
+                            (click)="insertOtherRowData()">
+                            <span>
+                                <i class="la la-plus"></i>
+                                <span> Add Adv </span>
+                            </span>
+                        </button>
+                    </ng-template>
+
                 </div>
             </div>
         </ng-container>
         <div class="col-lg-12 m--margin-top-20">
-            <customer-payment-receipt-debit-list [isReadonly]="isReadonly"
-                (onChangeDebit)="getListReceiptChange($event)"></customer-payment-receipt-debit-list>
-            <customer-payment-receipt-credit-list [isReadonly]="isReadonly"
-                (onChangeCredit)="getListReceiptChange($event)"></customer-payment-receipt-credit-list>
+            <customer-payment-receipt-debit-list [isReadonly]="isReadonly"></customer-payment-receipt-debit-list>
+            <customer-payment-receipt-credit-list [isReadonly]="isReadonly"></customer-payment-receipt-credit-list>
         </div>
     </div>
 </div>

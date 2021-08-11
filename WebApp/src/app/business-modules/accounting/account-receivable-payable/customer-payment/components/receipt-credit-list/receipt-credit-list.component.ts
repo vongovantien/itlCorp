@@ -21,7 +21,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChild(InjectViewContainerRefDirective) injectViewContainer: InjectViewContainerRefDirective;
 
-    @Output() onChangeCredit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
 
     creditList: ReceiptInvoiceModel[] = [];
@@ -136,6 +135,5 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             return;
         }
         this._store.dispatch(RemoveCredit({ index: this.selectedIndexInvoice }));
-        this.onChangeCredit.emit(true);
     }
 }

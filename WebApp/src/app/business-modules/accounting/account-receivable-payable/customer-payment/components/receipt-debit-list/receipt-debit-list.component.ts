@@ -21,7 +21,6 @@ import { Observable } from "rxjs";
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) viewContainerInject: InjectViewContainerRefDirective;
-    @Output() onChangeDebit: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() isReadonly: boolean = false;
 
     debitList$ = this._store.select(ReceiptDebitListState);
@@ -29,7 +28,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '', sortable: true },
-        { title: 'Type', field: '' },
+        { title: 'Type', field: '', width: 150 },
         { title: 'Invoice No', field: '' },
         { title: 'Credit No', field: '', width: 250 },
         { title: 'Job No', field: '', width: 150 },
@@ -140,7 +139,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             return;
         }
         this._store.dispatch(RemoveInvoice({ index: this.selectedIndexItem }));
-        this.onChangeDebit.emit(true);
     }
 
     calculateTotalPaidAmount(item: ReceiptInvoiceModel, type: string) {
@@ -240,8 +238,10 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 totalData.totalRemainVnd = (totalData.totalUnpaidAmountVnd ?? 0) - (+totalData.totalPaidVnd ?? 0);
             }
 
+
         }
 
+        console.log(totalData);
 
         return totalData
     }

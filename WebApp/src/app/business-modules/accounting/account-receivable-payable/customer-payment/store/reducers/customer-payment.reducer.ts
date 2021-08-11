@@ -2,6 +2,7 @@ import { createReducer, on, Action } from "@ngrx/store";
 import { ReceiptInvoiceModel, Receipt } from "@models";
 import * as ReceiptActions from "../actions";
 import { IAgreementReceipt } from "../../components/form-create-receipt/form-create-receipt.component";
+import { AccountingConstants } from "@constants";
 
 
 export interface IReceiptState {
@@ -18,6 +19,7 @@ export interface IReceiptState {
     pagingData: any;
     isAutoConvertPaid: boolean;
     currency: string;
+    class: string;
 }
 
 
@@ -35,7 +37,8 @@ export const initialState: IReceiptState = {
     dataSearch: null,
     pagingData: { page: 1, pageSize: 15 },
     isAutoConvertPaid: true,
-    currency: 'VND'
+    currency: 'VND',
+    class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
 };
 
 export const receiptManagementReducer = createReducer(
@@ -47,7 +50,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
         creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.type === 'ADV'), ...state.debitList]
+        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.paymentType === 'Other'), ...state.debitList]
     })),
     on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -115,6 +118,9 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptCurrency, (state: IReceiptState, payload: { currency: string }) => ({
         ...state, currency: payload.currency
+    })),
+    on(ReceiptActions.SelectReceiptClass, (state: IReceiptState, payload: { class: string }) => ({
+        ...state, class: payload.class
     }))
 );
 

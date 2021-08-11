@@ -150,8 +150,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Paid amount is required");
             return;
         }
-        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0) {
-            this._toastService.warning("You can't save without debit in this period, Please check it again!");
+
+        if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
+            this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0
+        ) {
+            this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
         if (this.paymentList.filter(x => x.type == 'CREDIT').length) {
@@ -162,7 +165,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             }
         }
 
-        if (this.paymentList.some(x => x.isChangeValue == true)) {
+        if (this.paymentList.some(x => x.paymentType !== 'Other' && x.isChangeValue == true)) {
             this._toastService.warning('Please you do Process Clear firstly!');
             return;
         }
@@ -176,16 +179,15 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
-
         const formMapValue: any = {
             fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
             type: this.type || 'Customer',
+            notifyDepartment: !!dataForm.notifyDepartment ? dataForm.notifyDepartment.toString() : null
         };
 
         const d = this.utility.mergeObject(dataForm, formMapValue);
-
         return d;
     }
 
@@ -193,6 +195,19 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         let valid: boolean = true;
         if (!this.formCreate.formSearchInvoice.valid || !this.listInvoice.form.valid) {
             valid = false;
+        }
+        if (this.formCreate.class.value?.includes('OBH') ||
+            (
+                this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
+                && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
+            )) {
+            if (!this.listInvoice.obhpartnerId.value) {
+                this.listInvoice.obhpartnerId.setErrors({ required: true });
+                valid = false;
+            } else {
+                this.listInvoice.obhpartnerId.setErrors({ required: null });
+                valid = true;
+            }
         }
         return valid;
     }
