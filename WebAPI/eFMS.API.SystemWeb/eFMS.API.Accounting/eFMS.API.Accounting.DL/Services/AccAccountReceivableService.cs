@@ -1954,12 +1954,13 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId)
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option)
         {
             if (argeementId == null || argeementId == Guid.Empty) return null;
             DbParameter[] parameters =
             {
-                SqlParam.GetParameter("argid", argeementId)
+                SqlParam.GetParameter("argid", argeementId),
+                SqlParam.GetParameter("option", option)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;
