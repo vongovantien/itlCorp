@@ -3829,6 +3829,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
                 workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
                 workSheet.Cells[rowStart, 4].Value = item.DebitRate + " %";
+                workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat;
 
                 workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
                 workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
