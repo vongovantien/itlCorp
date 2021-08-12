@@ -23,7 +23,9 @@ namespace eFMS.API.ReportData.Consts
 
         // Main Template folder
         public static string PathOfTemplateExcel = Path.Combine(Directory.GetCurrentDirectory(), @"FormatExcel\TemplateExport");
-        // Folder contain Settlement Templata
+        // Folder contain Settlement Template
         public const string SettlementPath = "SettlePayment";
+        // Folder contain AR Module Template
+        public const string AccountReceivablePath = "AccountReceivable";
     }
 }

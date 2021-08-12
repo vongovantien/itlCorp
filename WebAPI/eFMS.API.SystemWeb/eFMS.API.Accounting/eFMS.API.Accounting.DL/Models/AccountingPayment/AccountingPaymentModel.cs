@@ -24,5 +24,8 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string Type { get; set; }
         public string VoucherId { get; set; }
         public Guid? ReceiptId { get; set; }
+        public DateTime? ConfirmBillingDate { get; set; }
+        public Guid? OfficeId { get; set; }
+        public string ServiceType { get; set; }
     }
 }

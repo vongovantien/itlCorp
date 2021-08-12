@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
+using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing.Controls;
 using OfficeOpenXml.Style;
@@ -37,6 +38,15 @@ namespace eFMS.API.ReportData.FormatExcel
         private string GetSettleExcelFolder()
         {
             return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.SettlementPath);
+        }
+
+        /// <summary>
+        /// Get folder contain AR template excel
+        /// </summary>
+        /// <returns></returns>
+        private string GetARExcelFolder()
+        {
+            return Path.Combine(Consts.ResourceConsts.PathOfTemplateExcel, Consts.ResourceConsts.AccountReceivablePath);
         }
 
         /// <summary>
@@ -441,6 +451,85 @@ namespace eFMS.API.ReportData.FormatExcel
             return null;
         }
 
+        /// <summary>
+        /// GenerateExportCutomerHistoryPayment
+        /// </summary>
+        /// <param name="customerPayment"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream GenerateExportCutomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, string fileName)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                int startRow = 6;
+                excel.StartDetailTable = startRow;
+                foreach (var item in customerPayment)
+                {
+                    var listKeyData = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    listKeyData.Add("PartnerCode", item.PartnerCode);
+                    listKeyData.Add("ACRefCode", item.ParentCode);
+                    listKeyData.Add("PartnerName", item.PartnerName);
+                    listKeyData.Add("InvoiceDate", item.InvoiceDate);
+                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                    listKeyData.Add("SoaNo", item.BillingRefNo);
+                    listKeyData.Add("BillingDate", item.BillingDate);
+                    listKeyData.Add("DueDate", item.DueDate);
+                    listKeyData.Add("UnpaidAmount", item.UnpaidAmountInv);
+                    listKeyData.Add("OBHUnpaidAmount", item.UnpaidAmountOBH);
+                    listKeyData.Add("PaidAmount", item.PaidAmount);
+                    listKeyData.Add("OBHPaidAmount", item.PaidAmountOBH);
+                    var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
+                    var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
+                    listKeyData.Add("RemainDb", remainDb);
+                    listKeyData.Add("ReamainOBH", remainObh);
+                    listKeyData.Add("TotalAmount", remainDb + remainObh);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("MBL", item.MBL);
+                    listKeyData.Add("HBL", item.HBL);
+                    listKeyData.Add("CustomNo", item.CustomNo);
+                    listKeyData.Add("Salesman", item.Salesman);
+                    listKeyData.Add("Creator", item.Creator);
+                    excel.SetData(listKeyData);
+                    startRow++;
+                    foreach (var detail in item.receiptDetail)
+                    {
+                        listKeyData = new Dictionary<string, object>();
+                        excel.SetDataTable();
+                        listKeyData.Add("PaidAmountDt", detail.PaidAmount);
+                        listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBH);
+                        listKeyData.Add("PaidDate", detail.PaymentDate);
+                        listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
+                }
+                var listKeyTotal = new Dictionary<string, object>();
+                listKeyTotal.Add("SumUnpaidAmount", customerPayment.Sum(x => (x.UnpaidAmountInv ?? 0)));
+                listKeyTotal.Add("SumOBHUnpaidAmount", customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0)));
+                listKeyTotal.Add("SumPaidAmount", customerPayment.Sum(x => (x.PaidAmount ?? 0)));
+                listKeyTotal.Add("SumOBHPaidAmount", customerPayment.Sum(x => (x.PaidAmountOBH ?? 0)));
+                var sumRemainDb = customerPayment.Sum(x => (x.UnpaidAmountInv ?? 0) - (x.PaidAmount ?? 0));
+                var sumRemainObh = customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0) - (x.PaidAmountOBH ?? 0));
+                listKeyTotal.Add("SumRemainDb", sumRemainDb);
+                listKeyTotal.Add("SumRemainOBH", sumRemainObh);
+                listKeyTotal.Add("SumTotalAmount", sumRemainDb + sumRemainObh);
+                excel.SetData(listKeyTotal);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
         public Stream GenerateOBHPaymentShipmentExcel(List<AccountingPaymentModel> listObj, Stream stream = null)
         {
