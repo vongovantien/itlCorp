@@ -10,6 +10,7 @@ using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
+using FMS.API.ReportData.Models.Accounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -160,6 +161,25 @@ namespace eFMS.API.ReportData.Controllers
                 "Invoice Payment List.xlsx":"OBH Payment List.xlsx");
             return fileContent;
         }
+
+        [Route("ExportAccountingCustomerPayment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingCustomerPayment(AccountingPaymentCriteria paymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.CustomerPaymentUrl, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
+
+            var stream = new AccountingHelper().GenerateExportCutomerHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Customer.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Customer - eFMS.xlsx");
+
+            return fileContent;
+        }
+
         /// <summary>
         /// Export detail advance payment
         /// </summary>

@@ -584,6 +584,19 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(data);
         }
 
+        /// <summary>
+        /// Get data export Statement of Receivable Customers
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportAccountingCustomerPayment")]
+        [Authorize]
+        public IActionResult GetDataExportAccountingCustomerPayment(PaymentCriteria criteria)
+        {
+            var data = accountingPaymentService.GetDataExportAccountingCustomerPayment(criteria);
+            return Ok(data);
+        }
+
         private void CalculatorReceivableAcctPayment(List<Guid> surchargeIds)
         {
             if (surchargeIds != null && surchargeIds.Count > 0)
