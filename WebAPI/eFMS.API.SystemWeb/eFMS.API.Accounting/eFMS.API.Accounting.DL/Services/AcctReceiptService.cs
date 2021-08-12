@@ -426,7 +426,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<ReceiptInvoiceModel> paymentReceipts = new List<ReceiptInvoiceModel>();
             IOrderedEnumerable<AccAccountingPayment> acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id)
                 .ToList()
-                .OrderBy(x => x.PaymentType == "Other");
+                .OrderBy(x => x.PaymentType == "OTHER");
 
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
@@ -655,7 +655,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string advNo = "AD" + DateTime.Now.ToString("yyyy");
             string no = "0001";
-            IQueryable<string> paymentNewests = acctPaymentRepository.Get(x => x.PaymentType == "Other" && x.BillingRefNo.Contains("AD") && x.BillingRefNo.Substring(2, 4) == DateTime.Now.ToString("yyyy"))
+            IQueryable<string> paymentNewests = acctPaymentRepository.Get(x => x.PaymentType == "OTHER" && x.BillingRefNo.Contains("AD") && x.BillingRefNo.Substring(2, 4) == DateTime.Now.ToString("yyyy"))
                 .OrderByDescending(o => o.BillingRefNo).Select(s => s.BillingRefNo);
             string paymentNewest = paymentNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(paymentNewest))
@@ -818,9 +818,9 @@ namespace eFMS.API.Accounting.DL.Services
                 AccAccountingPayment _payment = new AccAccountingPayment();
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
-                _payment.BillingRefNo = payment.PaymentType == "Other" ? GenerateAdvNo() : payment.RefNo;
+                _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.RefNo;
                
-                if (payment.PaymentType == "Other")
+                if (payment.PaymentType == "OTHER")
                 {
                     _payment.PaymentNo = receipt.PaymentRefNo;
                 }
@@ -883,7 +883,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditNo = payment.CreditNo;
                 _payment.CreditAmountVnd = payment.CreditAmountVnd;
                 _payment.CreditAmountUsd = payment.CreditAmountUsd;
-                _payment.PartnerId = payment.PartnerId;
+                _payment.PartnerId = receipt.CustomerId;
                 _payment.PaymentType = payment.PaymentType;
 
                 _payment.Hblid = payment.Hblid;
@@ -954,9 +954,9 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
 
-                _payment.BillingRefNo = payment.PaymentType == "Other" ? GenerateAdvNo() : payment.BillingRefNo;
+                _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.BillingRefNo;
 
-                if(payment.PaymentType == "Other")
+                if(payment.PaymentType == "OTHER")
                 {
                     _payment.PaymentNo = receipt.PaymentRefNo;
                 }else
@@ -1210,7 +1210,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.PaymentType == "Other")
+            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.PaymentType == "OTHER")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
 

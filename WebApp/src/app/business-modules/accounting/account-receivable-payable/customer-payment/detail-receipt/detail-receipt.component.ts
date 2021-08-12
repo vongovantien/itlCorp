@@ -103,7 +103,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
-        this.formCreate.recriptReference = res.referenceNo;
+        this.formCreate.receiptReference = res.referenceNo;
         this.formCreate.getContract();
     }
 
@@ -127,6 +127,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
+        this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
@@ -231,8 +232,8 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         }
     }
 
-    confirmCreateReceiptBankFee() {
-        this.actionTypeCreate = 'bank';
+    confirmCreateReceiptBankFeeOther(type: string) {
+        this.actionTypeCreate = type;
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Create Bank Fee Receipt',
             body: `Are you sure you want to create bank fee receipt for <span class="text-primary font-weight-bold">${this.receiptDetail.customerName} </span>?`,

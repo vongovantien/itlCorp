@@ -67,7 +67,9 @@ export class AccountingConstants {
 
     public static RECEIPT_ADVANCE_TYPE = {
         ADVANCE: 'ADV',
-        COLLECT_OBH: 'COLL OBH',
-        PAY_OBH: 'Pay OBH',
+        COLLECT_OBH: 'COLL_OBH',
+        PAY_OBH: 'PAY_OBH',
+        COLLECT_OTHER: 'COLL_OTHER',
+        PAY_OTHER: 'PAY_OTHER'
     }
 }

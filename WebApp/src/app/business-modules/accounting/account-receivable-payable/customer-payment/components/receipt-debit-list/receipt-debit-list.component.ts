@@ -9,7 +9,7 @@ import { ToastrService } from "ngx-toastr";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState } from "../../store/reducers";
-import { RemoveInvoice } from "../../store/actions";
+import { RemoveInvoice, ChangeADVType } from "../../store/actions";
 
 import { takeUntil } from "rxjs/operators";
 import { Observable } from "rxjs";
@@ -64,6 +64,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     };
 
     isAutoConvert: boolean;
+    selectedPaymentItemAdvanceTypeIndex: number = -1;
+
     constructor(
         private readonly _store: Store<IReceiptState>,
         private readonly _dataService: DataService,
@@ -228,21 +230,26 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         for (let index = 0; index < model.length; index++) {
             const item: ReceiptInvoiceModel = model[index];
             if (model[index].type !== 'CREDIT' && model[index].negative !== true) {
-                totalData.totalUnpaidAmountUsd += (+item.unpaidAmountUsd ?? 0);
-                totalData.totalUnpaidAmountVnd += (+item.unpaidAmountVnd ?? 0);
-                totalData.totalPaidAmountUsd += (+item.paidAmountUsd ?? 0);
-                totalData.totalPaidAmountVnd += (+item.paidAmountVnd ?? 0);
-                totalData.totalPaidUsd += (+item.totalPaidUsd ?? 0);
-                totalData.totalPaidVnd += (+item.totalPaidVnd ?? 0);
-                totalData.totalRemainUsd = (+totalData.totalUnpaidAmountUsd ?? 0) - (+totalData.totalPaidUsd ?? 0);
-                totalData.totalRemainVnd = (totalData.totalUnpaidAmountVnd ?? 0) - (+totalData.totalPaidVnd ?? 0);
+                totalData.totalUnpaidAmountUsd += (+(item.unpaidAmountUsd) ?? 0);
+                totalData.totalUnpaidAmountVnd += (+(item.unpaidAmountVnd) ?? 0);
+                totalData.totalPaidAmountUsd += (+(item.paidAmountUsd) ?? 0);
+                totalData.totalPaidAmountVnd += (+(item.paidAmountVnd) ?? 0);
+                totalData.totalPaidUsd += (+(item.totalPaidUsd) ?? 0);
+                totalData.totalPaidVnd += (+(item.totalPaidVnd) ?? 0);
+                totalData.totalRemainUsd = (+(totalData.totalUnpaidAmountUsd) ?? 0) - (+(totalData.totalPaidUsd) ?? 0);
+                totalData.totalRemainVnd = (+(totalData.totalUnpaidAmountVnd) ?? 0) - (+(totalData.totalPaidVnd) ?? 0);
             }
-
-
         }
-
-        console.log(totalData);
-
         return totalData
+    }
+
+    selectPaymentTypeAdvanceItem(index: number) {
+        this.selectedPaymentItemAdvanceTypeIndex = index;
+    }
+
+    changePaymentTypeADV(newADVType: string) {
+        if (this.selectedPaymentItemAdvanceTypeIndex >= 0) {
+            this._store.dispatch(ChangeADVType({ index: this.selectedPaymentItemAdvanceTypeIndex, newType: newADVType }));
+        }
     }
 }

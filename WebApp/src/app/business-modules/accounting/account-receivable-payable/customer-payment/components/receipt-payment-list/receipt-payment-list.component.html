@@ -38,18 +38,18 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVND.valid }">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVnd.valid }">
                 <label required>Collect Amount VND</label>
                 <input type="number" class="form-control m-input m-input--square text-success"
-                    formControlName="paidAmountVND" autoFormatCurrency [attr.readOnly]="isReadonly"
+                    formControlName="paidAmountVnd" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'paid-amountVnd')">
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountUSD.valid }">
+            <div class="form-group">
                 <label required>Collect Amount USD</label>
                 <input type="number" class="form-control m-input m-input--square text-success"
-                    formControlName="paidAmountUSD" autoFormatCurrency [attr.readOnly]="isReadonly"
+                    formControlName="paidAmountUsd" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'paid-amountUsd')">
             </div>
         </div>
@@ -97,14 +97,14 @@
             <div class="form-group">
                 <label>Final Paid Amount USD</label>
                 <input type="text" class="form-control m-input m-input--square text-primary"
-                    formControlName="finalPaidAmountUSD" readonly formatDecimalFormControl>
+                    formControlName="finalPaidAmountUsd" readonly formatDecimalFormControl>
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Final Paid Amount VND</label>
                 <input type="text" class="form-control m-input m-input--square text-primary"
-                    formControlName="finalPaidAmountVND" formatDecimalFormControl readonly format="1.0-3">
+                    formControlName="finalPaidAmountVnd" formatDecimalFormControl readonly format="1.0-3">
             </div>
         </div>
         <div class="col-lg-6">
@@ -183,13 +183,13 @@
                             Add Other
                         </button>
                         <app-dropdown #dropdownMenu>
-                            <a class="dropdown-item pointer" (click)="insertOtherRowData('Advance')">
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('ADVANCE')">
                                 <span> Advance </span>
                             </a>
                             <a class="dropdown-item pointer" (click)="insertOtherRowData('COLL_OBH')">
                                 <span> Collect OBH </span>
                             </a>
-                            <a class="dropdown-item pointer" (click)="insertOtherRowData('Pay_OBH')">
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('PAY_OBH')">
                                 <span> Pay OBH </span>
                             </a>
                         </app-dropdown>

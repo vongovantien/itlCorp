@@ -373,7 +373,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Type)
-                    .HasMaxLength(10)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UnpaidPaymentAmountUsd)

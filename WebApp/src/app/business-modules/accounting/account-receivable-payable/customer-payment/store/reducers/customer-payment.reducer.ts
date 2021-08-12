@@ -50,7 +50,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
         creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.paymentType === 'Other'), ...state.debitList]
+        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
     })),
     on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -73,10 +73,14 @@ export const receiptManagementReducer = createReducer(
             if (payload.data.cusAdvanceAmountVnd > 0) {
                 return {
                     ...state, debitList: [...payload.data.invoices, {
-                        typeInvoice: 'ADV',
-                        type: 'ADV',
+                        type: 'ADVANCE',
                         paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                         paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                        unpaidAmountUsd: 0,
+                        unpaidAmountVnd: 0,
+                        totalPaidVnd: 0,
+                        totalPaidUsd: 0,
+                        paymentType: 'OTHER',
                         refNo: null
                     }]
                 };
@@ -84,10 +88,14 @@ export const receiptManagementReducer = createReducer(
         } else if (payload.data.cusAdvanceAmountVnd > 0) {
             return {
                 ...state, debitList: [...payload.data.invoices, {
-                    typeInvoice: 'ADV',
-                    type: 'ADV',
+                    type: 'ADVANCE',
                     paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                     paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                    unpaidAmountUsd: 0,
+                    unpaidAmountVnd: 0,
+                    totalPaidVnd: 0,
+                    totalPaidUsd: 0,
+                    paymentType: 'OTHER',
                     refNo: null
                 }]
             };
@@ -121,9 +129,15 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptClass, (state: IReceiptState, payload: { class: string }) => ({
         ...state, class: payload.class
-    }))
+    })),
+    on(ReceiptActions.ChangeADVType, (state: IReceiptState, payload: { index: number, newType: string }) => {
+        const newArrayDebit = [...state.debitList];
+        newArrayDebit[payload.index].type = payload.newType;
+        return { ...state, debitList: newArrayDebit }
+    })
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {
     return receiptManagementReducer(state, action);
 }
+

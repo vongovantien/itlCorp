@@ -58,7 +58,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         AccountingConstants.RECEIPT_CLASS.PAY_OBH,
         AccountingConstants.RECEIPT_CLASS.NET_OFF];
     partnerTypeState: string;
-    recriptReference: string = null;
+    receiptReference: string = null;
 
     constructor(
         private _fb: FormBuilder,

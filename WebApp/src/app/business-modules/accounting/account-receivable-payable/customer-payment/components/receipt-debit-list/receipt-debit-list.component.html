@@ -23,7 +23,7 @@
                     <tbody>
                         <ng-container *ngIf="!!(debitList$ | async)?.length">
                             <tr *ngFor="let item of (this.debitList$ | async); let i = index; trackBy: trackByFn"
-                                [class.bg-warning]="item.paymentType === 'Other'"
+                                [class.bg-warning]="item.paymentType === 'OTHER'"
                                 [ngClass]="{'bg-secondary font-italic':item.paidAmountVnd < 0}">
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
@@ -34,10 +34,18 @@
                                     </ng-container>
                                 </td>
                                 <td class="text-primary">{{item.refNo}}</td>
-                                <td ALIGN="center" class="font-weight-bold">{{item.type}}</td>
+                                <td ALIGN="center" class="font-weight-bold">
+                                    <ng-container *ngIf="item.type === 'ADVANCE'; else paymentOtherTypeTpl">
+                                        <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
+                                            (click)="selectPaymentTypeAdvanceItem(i)">Advance</a>
+                                    </ng-container>
+                                    <ng-template #paymentOtherTypeTpl>
+                                        {{item.type}}
+                                    </ng-template>
+                                </td>
                                 <td class="text-primary">
                                     {{item.invoiceNo}}
-                                    <ng-container *ngIf="item.paymentType !== 'Other' ">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
                                         <ng-container [ngSwitch]="item.paymentStatus">
                                             <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
                                                 {{item.paymentStatus}}
@@ -94,7 +102,7 @@
                                     {{item.totalPaidVnd | number:'1.0-3'}}
                                 </td>
                                 <td ALIGN="right">
-                                    <div *ngIf="item.paymentType !== 'Other'">
+                                    <div *ngIf="item.paymentType !== 'OTHER'">
                                         <ng-container
                                             *ngIf="item.unpaidAmountUsd - (item.totalPaidUsd | abs) >= 0 ; else negativeUsd">
 
@@ -109,7 +117,7 @@
                                     </div>
                                 </td>
                                 <td ALIGN="right">
-                                    <div *ngIf="item.paymentType !== 'Other'">
+                                    <div *ngIf="item.paymentType !== 'OTHER'">
                                         <ng-container
                                             *ngIf="item.unpaidAmountVnd - (item.totalPaidVnd | abs) >= 0 ; else negativeVnd">
                                             <span> {{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | negativeNumber
@@ -193,3 +201,12 @@
 <ng-template #TplnegativeRemainVnd>
     {{sumTotalObj.totalRemainVnd | negativeNumber:'1.3-3'}}
 </ng-template>
+
+<app-dropdown #dropdownMenuAdvance>
+    <a class="dropdown-item pointer" (click)="changePaymentTypeADV('COLL_OTHER')">
+        <span> Change To Collect Other </span>
+    </a>
+    <a class="dropdown-item pointer" (click)="changePaymentTypeADV('PAY_OTHER')">
+        <span> Change To Pay Other </span>
+    </a>
+</app-dropdown>

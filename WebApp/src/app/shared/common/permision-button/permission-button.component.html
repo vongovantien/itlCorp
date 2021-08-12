@@ -74,14 +74,11 @@
         </ng-container>
     </ng-container>
     <ng-container *ngSwitchCase="'add'">
-        <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--uppercase"
-            *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)">
-            <span>
-                <i className="{{icon ? icon : 'la la-plus'}}"></i>
-                <span>
-                    {{!!title ? title : 'Add New'}}
-                </span>
-            </span>
+        <button type="button" class="btn btn-{{class ? class : 'success'}} m-btn--icon m-btn--uppercase"
+            *ngIf="(menuPermission | async)?.allowAdd === true" (click)="onClicked($event)"
+            [class.dropdown-toggle]="mode === 'dropdown'">
+            <i className="{{icon ? icon : 'la la-plus'}}"></i>
+            {{!!title ? title : 'Add New'}}
         </button>
     </ng-container>
     <ng-container *ngSwitchDefault>

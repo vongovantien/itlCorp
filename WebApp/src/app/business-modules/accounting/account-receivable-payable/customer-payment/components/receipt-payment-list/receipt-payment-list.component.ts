@@ -46,10 +46,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     description: AbstractControl;
     amountVND: AbstractControl;
     amountUSD: AbstractControl;
-    paidAmountVND: AbstractControl;
-    paidAmountUSD: AbstractControl;
-    finalPaidAmountVND: AbstractControl;
-    finalPaidAmountUSD: AbstractControl;
+    paidAmountVnd: AbstractControl;
+    paidAmountUsd: AbstractControl;
+    finalPaidAmountVnd: AbstractControl;
+    finalPaidAmountUsd: AbstractControl;
 
     isAutoConvert: AbstractControl;
     isAsPaidAmount: AbstractControl;
@@ -91,6 +91,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     obhPartners: Observable<Partner[]>;
     departments: Observable<any>;
     class$: Observable<string>;
+
 
     constructor(
         private readonly _accountingRepo: AccountingRepo,
@@ -153,20 +154,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
     initForm() {
         this.form = this._fb.group({
-            paidAmountVND: [null, Validators.required],
-            paidAmountUSD: [null, Validators.required],
+            paidAmountVnd: [0, Validators.required],
+            paidAmountUsd: [{ value: 0, disabled: true }, Validators.required],
             cusAdvanceAmount: [],
-            finalPaidAmount: [{ value: null, disabled: true }],
+            finalPaidAmount: [{ value: 0, disabled: true }],
             paymentMethod: [this.paymentMethods[0]],
             currencyId: ['VND'],
             paymentDate: [{ startDate: new Date(), endDate: new Date() }],
             exchangeRate: [1, Validators.required],
             bankAccountNo: [],
-            amountVND: [],
-            amountUSD: [{ value: null, disabled: true } as AbstractControlOptions],
+            amountVND: [0],
+            amountUSD: [0],
             description: [],
-            finalPaidAmountVND: [],
-            finalPaidAmountUSD: [],
+            finalPaidAmountVnd: [0],
+            finalPaidAmountUsd: [0],
             isAutoConvert: [true],
             isAsPaidAmount: [false],
             obhpartnerId: [],
@@ -183,10 +184,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this.description = this.form.controls['description'];
         this.amountVND = this.form.controls['amountVND'];
         this.amountUSD = this.form.controls['amountUSD'];
-        this.paidAmountVND = this.form.controls['paidAmountVND'];
-        this.paidAmountUSD = this.form.controls['paidAmountUSD'];
-        this.finalPaidAmountVND = this.form.controls['finalPaidAmountVND'];
-        this.finalPaidAmountUSD = this.form.controls['finalPaidAmountUSD'];
+        this.paidAmountVnd = this.form.controls['paidAmountVnd'];
+        this.paidAmountUsd = this.form.controls['paidAmountUsd'];
+        this.finalPaidAmountVnd = this.form.controls['finalPaidAmountVnd'];
+        this.finalPaidAmountUsd = this.form.controls['finalPaidAmountUsd'];
         this.isAutoConvert = this.form.controls['isAutoConvert'];
         this.isAsPaidAmount = this.form.controls['isAsPaidAmount'];
         this.obhpartnerId = this.form.controls['obhpartnerId'];
@@ -228,13 +229,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         switch (type) {
             case 'paid-amountVnd':
                 if (!data.target.value.length) {
-                    this.paidAmountVND.setValue(0);
+                    this.paidAmountVnd.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
                     if (this.exchangeRateUsd === 0) {
-                        this.paidAmountUSD.setValue(0);
+                        this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUSD.setValue(+((this.paidAmountVND.value / this.exchangeRateUsd).toFixed(2)));
+                        this.paidAmountUsd.setValue(+((this.paidAmountVnd.value / this.exchangeRateUsd).toFixed(2)));
                     }
                 }
                 if (!!this.isAsPaidAmount.value) {
@@ -244,10 +245,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 break;
             case 'paid-amountUsd':
                 if (!data.target.value.length) {
-                    this.paidAmountUSD.setValue(0);
+                    this.paidAmountUsd.setValue(0);
                 }
                 if (this.isAutoConvert.value) {
-                    this.paidAmountVND.setValue(formatCurrency(this.paidAmountUSD.value * this.exchangeRateUsd, 'en', ''));
+                    this.paidAmountVnd.setValue(formatCurrency(this.paidAmountUsd.value * this.exchangeRateUsd, 'en', ''));
                 }
                 if (!!this.isAsPaidAmount.value) {
                     this.cusAdvanceAmount.setValue(this.form.controls[`paidAmount${this.currencyId.value}`].value);
@@ -320,15 +321,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
     insertOtherRowData(type?: string) {
         const newInvoiceWithAdv: any = new ReceiptInvoiceModel();
-        newInvoiceWithAdv.paymentType = 'Other';
+        newInvoiceWithAdv.paymentType = 'OTHER';
         if (!!type) {
-            newInvoiceWithAdv.type = type;
+            newInvoiceWithAdv.type = type.toUpperCase();
         } else {
             this.class$
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                     (receiptType) => {
-                        newInvoiceWithAdv.type = receiptType;
+                        newInvoiceWithAdv.type = receiptType?.toUpperCase();
                     })
 
         }
@@ -360,9 +361,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
             finalExchangeRate: this.exchangeRate.value,
-            paidAmountVnd: this.finalPaidAmountVND.value,
-            paidAmountUsd: this.finalPaidAmountUSD.value,
-            list: listInvoice.filter(x => x.type !== 'Other'),
+            paidAmountVnd: this.finalPaidAmountVnd.value,
+            paidAmountUsd: this.finalPaidAmountUsd.value,
+            list: listInvoice.filter(x => x.paymentType !== 'OTHER'),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
@@ -386,15 +387,15 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     getFinalPaidAmount() {
         const exChangeRate = this.currencyId.value === 'VND' ? 1 : this.exchangeRateUsd;
 
-        let _finalPaidAmountVnd: number = (this.amountVND.value ?? 0) + (this.paidAmountVND.value ?? 0);
-        let _finalPaidAmountUsd: number = (this.amountUSD.value ?? 0) + (this.paidAmountUSD.value ?? 0);
+        let _finalPaidAmountVnd: number = (this.amountVND.value ?? 0) + (this.paidAmountVnd.value ?? 0);
+        let _finalPaidAmountUsd: number = (this.amountUSD.value ?? 0) + (this.paidAmountUsd.value ?? 0);
 
         if (!this.isAsPaidAmount.value) {
             _finalPaidAmountVnd += ((this.cusAdvanceAmount.value ?? 0) * exChangeRate);
             _finalPaidAmountUsd += ((this.cusAdvanceAmount.value ?? 0) / exChangeRate)
         }
-        this.finalPaidAmountVND.setValue(_finalPaidAmountVnd ?? 0);
-        this.finalPaidAmountUSD.setValue(+(+(_finalPaidAmountUsd)).toFixed(2) ?? 0);
+        this.finalPaidAmountVnd.setValue(_finalPaidAmountVnd ?? 0);
+        this.finalPaidAmountUsd.setValue(+(+(_finalPaidAmountUsd)).toFixed(2) ?? 0);
     }
 
     onToggleAutoConvertPaid(isAuto: boolean) {
@@ -404,17 +405,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this._store.dispatch(ToggleAutoConvertPaid({ isAutoConvert: isAuto }));
         if (isAuto === true) {
             if (this.currencyId.value === 'VND') {
-                this.amountUSD.disable();
-                this.amountVND.enable();
+                this.paidAmountUsd.disable();
+                this.paidAmountVnd.enable();
 
             } else {
-                this.amountUSD.enable();
-                this.amountVND.disable();
+                this.paidAmountUsd.enable();
+                this.paidAmountVnd.disable();
             }
         } else {
-            this.amountVND.enable();
-            this.amountUSD.enable();
+            this.paidAmountVnd.enable();
+            this.paidAmountUsd.enable();
         }
+
+        this.paidAmountVnd.updateValueAndValidity();
+        this.paidAmountUsd.updateValueAndValidity();
 
     }
 
@@ -423,10 +427,10 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             return;
         }
         if (isCheck) {
-            const totaValue = (this.finalPaidAmountVND.value ?? 0) + (this.cusAdvanceAmount.value ?? 0);
-            this.finalPaidAmountVND.setValue(totaValue);
+            const totaValue = (this.finalPaidAmountVnd.value ?? 0) + (this.cusAdvanceAmount.value ?? 0);
+            this.finalPaidAmountVnd.setValue(totaValue);
         } else {
-            this.finalPaidAmountVND.setValue(this.finalPaidAmountVND);
+            this.finalPaidAmountVnd.setValue(this.finalPaidAmountVnd);
         }
     }
 }
