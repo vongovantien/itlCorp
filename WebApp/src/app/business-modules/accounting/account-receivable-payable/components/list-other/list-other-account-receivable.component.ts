@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from '@app';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
@@ -8,9 +8,10 @@ import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
+import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -47,6 +48,19 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getAccountReceivableSearchState)
+        .pipe(
+            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                this.dataSearch = data.dataSearch;
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+            }
+        );
     }
 
     sortOtherList(sortField: string, order: boolean) {
@@ -54,7 +68,7 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     }
 
     getPagingList() {
-
+        this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this._store.select(getAccountReceivableListState)
             .pipe(
                 catchError(this.catchError),
