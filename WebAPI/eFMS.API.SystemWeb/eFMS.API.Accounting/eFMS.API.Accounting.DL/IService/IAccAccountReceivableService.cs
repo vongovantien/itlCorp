@@ -21,6 +21,6 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> Paging(AccountReceivableCriteria criteria, int page, int size, out int rowsCount);
         List<ObjectReceivableModel> GetObjectReceivableBySurcharges(IQueryable<CsShipmentSurcharge> surcharges);
         IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
-        IEnumerable<object> GetDataDebitDetail(Guid argeementId);
+        IEnumerable<object> GetDataDebitDetail(Guid argeementId,string option);
     }
 }

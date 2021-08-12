@@ -888,8 +888,8 @@ export class AccountingRepo {
         );
     }
 
-    getDataDebitDetail(agreementId: any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`,{ argeementId: agreementId }).pipe(
+    getDataDebitDetail(agreementId: any,option : any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`,{ argeementId: agreementId,option :option }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
