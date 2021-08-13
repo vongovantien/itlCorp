@@ -94,6 +94,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 250 },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
+            { title: 'Synced From', field: 'syncedFrom', sortable: true },
         ];
 
         this.configChargeDisplayFields = [
@@ -521,6 +522,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
         newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
+        newCharge.debitNo = null;
+        newCharge.creditNo = null;
+        newCharge.soano = null;
+        newCharge.paySoano = null;
+        newCharge.syncedFromBy = null;
+        newCharge.syncedFrom = null;
         if (!newCharge.invoiceDate || !newCharge.invoiceDate.startDate) {
             newCharge.invoiceDate = null;
         }

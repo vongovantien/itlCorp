@@ -10,6 +10,7 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ShareSystemModule } from '../share-system.module';
 import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -37,6 +38,8 @@ const routing: Routes = [
         NgSelectModule,
         PaginationModule.forRoot(),
         RouterModule.forChild(routing),
+        FroalaEditorModule.forRoot(),
+        FroalaViewModule.forRoot(),
         ShareSystemModule,
         TabsModule.forRoot()
     ],

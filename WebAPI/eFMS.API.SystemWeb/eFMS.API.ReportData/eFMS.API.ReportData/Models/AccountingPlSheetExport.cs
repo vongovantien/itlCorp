@@ -41,5 +41,8 @@ namespace eFMS.API.ReportData.Models
         public string CdNote { get; set; }
         public string Creator { get; set; }
         public string SyncedFrom { get; set; }
+        public string VatPartnerName { get; set; }
+        public decimal? OBHNetAmount { get; set; }
+
     }
 }

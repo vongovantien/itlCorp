@@ -22,14 +22,18 @@
                             <!-- *Phí hiện trường -->
                             <ng-template #chargeFromShipmentTpl>
                                 <ng-container *ngIf="!surcharge.isLocked;else lockIconTpl">
-                                    <label class="m-checkbox">
-                                        <input type="checkbox" (change)="onChangeCheckBoxCharge()" value="{{surcharge}}"
-                                            [(ngModel)]="surcharge.isSelected">
-                                        <span></span>
-                                    </label>
+                                    <ng-container *ngIf="!surcharge.syncedFromBy;else locktpl">
+                                        <label class="m-checkbox">
+                                            <input type="checkbox" (change)="onChangeCheckBoxCharge()"
+                                                value="{{surcharge}}" [(ngModel)]="surcharge.isSelected">
+                                            <span></span>
+                                        </label>
+                                    </ng-container>
                                 </ng-container>
                             </ng-template>
-
+                            <ng-template #locktpl>
+                                <span class="d-block" style="width:25px"></span>
+                            </ng-template>
                             <ng-template #lockIconTpl>
                                 <span>
                                     <button type="button" title="Shipment has been locked"
@@ -74,6 +78,12 @@
                     <td>{{surcharge.clearanceNo}}</td>
                     <td>{{surcharge.contNo}}</td>
                     <td>{{surcharge.notes}}</td>
+                    <td class="text-danger">
+                        <ng-container
+                            *ngIf="!surcharge.isFromShipment && surcharge.type === 'OBH' && !!surcharge.syncedFrom">
+                            {{surcharge.syncedFromBy}}
+                        </ng-container>
+                    </td>
                 </tr>
             </ng-container>
             <tr *ngIf="!data || !data.chargeSettlements.length" app-table-none-record [colspan]="headers.length + 2">

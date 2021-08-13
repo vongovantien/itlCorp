@@ -27,6 +27,7 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults
         public string KilosUnit { get; set; }
         public string AgentName { get; set; }
         public string Notify { get; set; }
+        public string SignPath { get; set; }
     }
     public class AirImptAuthorisedLetterReportParameter
     {

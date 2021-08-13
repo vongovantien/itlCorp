@@ -150,15 +150,20 @@ namespace eFMS.API.Accounting.Controllers
             var isAllowDelete = acctSettlementPaymentService.CheckDeletePermissionBySettlementNo(settlementNo);
             if (isAllowDelete == false)
             {
-               return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
-
-            if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+            var _settleType = acctSettlementPaymentService.Get(x => x.SettlementNo == settlementNo)?.FirstOrDefault().SettlementType;
+            if (_settleType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
             {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",",shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                List<ShipmentOfSettlementResult> shipments = acctSettlementPaymentService.GetShipmentOfSettlements(settlementNo);
+
+                if (shipments.Count > 0 && shipments.Any(x => x.IsLocked == true))
+                {
+                    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[AccountingLanguageSub.MSG_SETTLE_NOT_ALLOW_DELETE_SHIPMENT_LOCK, settlementNo, string.Join(",", shipments.Where(x => x.IsLocked == true).Select(x => x.JobId))].Value });
+                }
             }
+            
 
             if (!acctSettlementPaymentService.CheckValidateDeleteSettle(settlementNo))
             {
@@ -369,12 +374,15 @@ namespace eFMS.API.Accounting.Controllers
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model,out object dataDuplicate);
-                if (isDuplicateCharge)
+                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
                 {
-                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                    return BadRequest(_result);
+                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
+                    if (isDuplicateCharge)
+                    {
+                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
+                        return BadRequest(_result);
+                    }
                 }
 
                 foreach (var item in model.ShipmentCharge)
@@ -442,23 +450,19 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            //Đã check bên trong function UpdateSettlementPayment
-            //if (!model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.Settlement.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
-            //{
-            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the settlement payment status is New or Deny" };
-            //    return Ok(_result);
-            //}
-
             //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
-                if (isDuplicateCharge)
+                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
                 {
-                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                    return BadRequest(_result);
+                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
+                    if (isDuplicateCharge)
+                    {
+                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
+                        return BadRequest(_result);
+                    }
                 }
 
                 foreach (var item in model.ShipmentCharge)
@@ -523,16 +527,18 @@ namespace eFMS.API.Accounting.Controllers
 
             if (!ModelState.IsValid) return BadRequest();
 
-            //Check duplicate
             if (model.ShipmentCharge.Count > 0)
             {
                 //Check Duplicate phí
-                var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
-                if (isDuplicateCharge)
+                if (!string.IsNullOrEmpty(model.Settlement.SettlementType) && model.Settlement.SettlementType == AccountingConstants.SETTLEMENT_TYPE_DIRECT)
                 {
-                    string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
-                    ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
-                    return BadRequest(_result);
+                    var isDuplicateCharge = CheckDuplicateCharge(model, out object dataDuplicate);
+                    if (isDuplicateCharge)
+                    {
+                        string mesg = String.Format("Duplicate charge {0} in {1}-{2}-{3}", dataDuplicate.GetValueBy("ChargeCode"), dataDuplicate.GetValueBy("JobId"), dataDuplicate.GetValueBy("MBL"), dataDuplicate.GetValueBy("HBL"));
+                        ResultHandle _result = new ResultHandle { Status = false, Message = mesg, Data = dataDuplicate };
+                        return BadRequest(_result);
+                    }
                 }
 
                 foreach (var item in model.ShipmentCharge)
@@ -564,7 +570,8 @@ namespace eFMS.API.Accounting.Controllers
                         MBLNo = item.MBL,
                         HBLNo = item.HBL,
                         JobNo = item.JobId,
-                        Notes = item.Notes
+                        Notes = item.Notes,
+                        SettlementNo = model.Settlement.SettlementNo
                     };
                     var _checkDuplicate = acctSettlementPaymentService.CheckDuplicateShipmentSettlement(shipment, out List<DuplicateShipmentSettlementResultModel> listDup);
                     if (_checkDuplicate.Status)

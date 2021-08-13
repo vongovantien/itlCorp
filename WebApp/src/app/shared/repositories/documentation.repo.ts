@@ -580,8 +580,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewAirImportAuthorizeLetter1(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id }).pipe(
+    previewAirImportAuthorizeLetter1(id: string, withSign: boolean) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/PreviewAirImptAuthorisedLetter`, { housbillId: id, printSign: withSign }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;
@@ -589,8 +589,8 @@ export class DocumentationRepo {
         );
     }
 
-    previewAirImportAuthorizeLetter2(id: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id }).pipe(
+    previewAirImportAuthorizeLetter2(id: string, withSign: boolean) {
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransactionDetail/AirImptAuthorisedLetter_Consign`, { housbillId: id, printSign: withSign }).pipe(
             catchError((error) => throwError(error)),
             map((res: any) => {
                 return res;

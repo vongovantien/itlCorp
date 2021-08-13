@@ -43,6 +43,7 @@ export class SettlementTableSurchargeComponent extends AppList {
             { title: 'Custom No', field: 'clearanceNo', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true, width: 200 },
+            { title: 'Synced From', field: 'syncedFrom', sortable: true, width: 200 },
         ];
     }
 
@@ -57,7 +58,9 @@ export class SettlementTableSurchargeComponent extends AppList {
 
     checkUncheckAllCharge() {
         for (const surcharge of this.data.chargeSettlements) {
-            surcharge.isSelected = this.isCheckAll;
+            if (!surcharge.syncedFromBy) {
+                surcharge.isSelected = this.isCheckAll;
+            }
         }
     }
 

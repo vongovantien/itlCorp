@@ -472,16 +472,16 @@ namespace eFMS.API.Documentation.Controllers
         }
 
         [HttpGet("PreviewAirImptAuthorisedLetter")]
-        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId)
+        public IActionResult PreviewAirImptAuthorisedLetter(Guid housbillId, bool printSign)
         {
-            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId);
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetter(housbillId, printSign);
             return Ok(result);
         }
 
         [HttpGet("AirImptAuthorisedLetter_Consign")]
-        public IActionResult PreviewAirImptAuthorisedLetterConsign(Guid housbillId)
+        public IActionResult PreviewAirImptAuthorisedLetterConsign(Guid housbillId, bool printSign)
         {
-            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetterConsign(housbillId);
+            var result = csTransactionDetailService.PreviewAirImptAuthorisedLetterConsign(housbillId, printSign);
             return Ok(result);
         }
 

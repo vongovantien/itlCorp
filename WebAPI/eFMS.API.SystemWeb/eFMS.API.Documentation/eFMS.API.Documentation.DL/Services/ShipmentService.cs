@@ -257,6 +257,8 @@ namespace eFMS.API.Documentation.DL.Services
             else
             {
                 shipmentOperation = from ops in opstran
+                                    join cd in customsDeclarationRepo.Get() on ops.JobNo equals cd.JobNo into cdGrps
+                                    from cdgrp in cdGrps.DefaultIfEmpty()
                                     join sur in surcharge on ops.Hblid equals sur.Hblid into sur2
                                     from sur in sur2.DefaultIfEmpty()
                                     join cus in catPartnerRepo.Get() on ops.CustomerId equals cus.Id into cus2
@@ -274,7 +276,7 @@ namespace eFMS.API.Documentation.DL.Services
                                         MBL = ops.Mblno,
                                         HBL = ops.Hwbno,
                                         HBLID = ops.Hblid,
-                                        CustomNo = sur.ClearanceNo,
+                                        CustomNo = cdgrp.ClearanceNo,
                                         Service = "CL"
                                     };
             }
@@ -3350,6 +3352,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
                 {
                     var _mapCharge = mapper.Map<CsShipmentSurcharge>(charge);
+                    data.OBHNetAmount = currencyExchangeService.ConvertNetAmountChargeToNetAmountObj(_mapCharge, criteria.Currency); // Amount trước thuế OBH
                     data.AmountObh = currencyExchangeService.ConvertAmountChargeToAmountObj(_mapCharge, criteria.Currency); //Amount sau thuế của phí OBH
                     data.CdNote = charge.DebitNo;
                 }
@@ -3368,6 +3371,8 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ChargeName = detailLookupCharge[charge.ChargeId].FirstOrDefault()?.ChargeNameEn;
                 data.Creator = LookupUser[charge.UserCreated].Select(t => t.Username).FirstOrDefault();
                 data.SyncedFrom = charge.SyncedFrom;
+                data.VatPartnerName = detailLookupPartner[charge.VatPartnerID].FirstOrDefault()?.ShortName;
+
                 dataList.Add(data);
             }
             return dataList.AsQueryable();
