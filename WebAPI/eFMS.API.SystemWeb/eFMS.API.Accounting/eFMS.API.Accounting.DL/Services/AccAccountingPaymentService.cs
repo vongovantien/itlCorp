@@ -949,8 +949,8 @@ namespace eFMS.API.Accounting.DL.Services
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AccAccountingManagement, bool>> perQuery = GetQueryInvoicePermission(rangeSearch, _user);
-            Expression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null && x.Status != "New"
-                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
+            EExpression<Func<AccAccountingManagement, bool>> query = x => x.InvoiceNoReal != null
+                                                                      && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)); // TH synce inv từ bravo && x.Status != "New"
             var acctManagementIds = new List<Guid?>();
             if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
             {
