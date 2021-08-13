@@ -12,7 +12,8 @@
                                 <td>{{item.chargeName}}
                                 </td>
                                 <td class='m--align-right'>
-                                    {{item.totalAmount | number:'1.3-3'}}
+                                    <span *ngIf="item.settlementCurrency === 'VND'">{{item.totalAmount | number: '.0-3'}} {{item.settlementCurrency}}</span>
+                                    <span *ngIf="item.settlementCurrency !== 'VND'">{{item.totalAmount | number: '.2-2'}} {{item.settlementCurrency}}</span>
                                 </td>
                                 <td>{{item.payer}}</td>
                                 <td>{{item.obhPartner}}</td>

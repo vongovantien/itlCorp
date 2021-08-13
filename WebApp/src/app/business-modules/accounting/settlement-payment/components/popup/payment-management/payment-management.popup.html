@@ -64,7 +64,12 @@
                                                     <div class="row p-3">
                                                         <div class="col text-center font-weight-bold">{{advance.advanceNo}}</div>
                                                         <div class="col text-center">{{advance.description}}</div>
-                                                        <div class="col text-center">{{advance.totalAmount | number: '.0-3'}}</div>
+                                                        <div class="col text-center" *ngIf="advance.advanceCurrency === 'VND'">
+                                                            {{advance.totalAmount | number: '.0-3'}}
+                                                        </div>
+                                                        <div class="col text-center" *ngIf="advance.advanceCurrency !== 'VND'">
+                                                            {{advance.totalAmount | number: '.2-2'}}
+                                                        </div>
                                                         <div class="col text-center">{{advance.advanceCurrency}}</div>
                                                         <div class="col text-center">{{advance.advanceDate | date: 'dd/MM/yyyy'}}
                                                         </div>
@@ -75,7 +80,11 @@
                                                             <div class="row">
                                                                 <div class="col text-center"></div>
                                                                 <div class="col text-center">{{request.description}}</div>
-                                                                <div class="col text-center">{{request.totalAmount | number: '.0-3'}}
+                                                                <div class="col text-center" *ngIf="request.advanceCurrency === 'VND'">
+                                                                    {{request.totalAmount | number: '.0-3'}}
+                                                                </div>
+                                                                <div class="col text-center" *ngIf="request.advanceCurrency !== 'VND'">
+                                                                    {{request.totalAmount | number: '.2-2'}}
                                                                 </div>
                                                                 <div class="col text-center">{{request.advanceCurrency}}</div>
                                                                 <div class="col text-center"></div>
@@ -142,7 +151,12 @@
                                                     <div class="row p-3">
                                                         <div class="col text-center font-weight-bold">{{settlement.settlementNo}}</div>
                                                         <div class="col text-center">{{settlement.chargeName}}</div>
-                                                        <div class="col text-center">{{settlement.totalAmount | number: '.0-3'}}</div>
+                                                        <div class="col text-center" *ngIf="settlement.settlementCurrency === 'VND'">
+                                                            {{settlement.totalAmount | number: '.0-3'}}
+                                                        </div>
+                                                        <div class="col text-center" *ngIf="settlement.settlementCurrency !== 'VND'">
+                                                            {{settlement.totalAmount | number: '.2-2'}}
+                                                        </div>
                                                         <div class="col text-center">{{settlement.settlementCurrency}}</div>
                                                         <div class="col text-center">{{settlement.settlementDate | date: 'dd/MM/yyyy'}}
                                                         </div>
@@ -156,7 +170,11 @@
                                                             <div class="row">
                                                                 <div class="col text-center">{{charge.advanceNo}}</div>
                                                                 <div class="col text-center">{{charge.chargeName}}</div>
-                                                                <div class="col text-center">{{charge.totalAmount | number: '.0-3'}}
+                                                                <div class="col text-center" *ngIf="charge.settlementCurrency === 'VND'">
+                                                                    {{charge.totalAmount | number: '.0-3'}}
+                                                                </div>
+                                                                <div class="col text-center" *ngIf="charge.settlementCurrency !== 'VND'">
+                                                                    {{charge.totalAmount | number: '.2-2'}}
                                                                 </div>
                                                                 <div class="col text-center">{{charge.settlementCurrency}}</div>
                                                                 <div class="col text-center"></div>
