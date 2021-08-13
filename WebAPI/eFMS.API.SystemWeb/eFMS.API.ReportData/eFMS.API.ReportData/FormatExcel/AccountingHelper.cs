@@ -3870,7 +3870,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Column(2).Width = 38;
             for (int i = 4; i <= 14; i++)
-                workSheet.Column(i).Width = 19;
+                workSheet.Column(i).Width = 22;
             workSheet.Column(15).Width = 26;
             workSheet.Column(16).Width = 41;
             workSheet.Column(21).Width = 63;
@@ -3917,8 +3917,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 1].Value = rowStart;
                 workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
                 workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
-                workSheet.Cells[rowStart, 4].Value = item.DebitRate + " %";
-                workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat;
+                workSheet.Cells[rowStart, 4].Value = item.DebitRate;
+                workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat + " %";
 
                 workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
                 workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
@@ -3990,7 +3990,7 @@ namespace eFMS.API.ReportData.FormatExcel
             foreach (var item in acctMngts)
             {
                 workSheet.Cells[rowStart, 1].Value = rowStart-1;
-                workSheet.Cells[rowStart, 2].Value = item.PartnerId;
+                workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
                 workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
                 workSheet.Cells[rowStart, 4].Value = item.DebitAmount;
                 workSheet.Cells[rowStart, 5].Value = item.BillingAmount;
@@ -4006,10 +4006,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:I" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:I" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:I" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:I" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
         #endregion --- ACCOUTING MANAGEMENT ---
     }

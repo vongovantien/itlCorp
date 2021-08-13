@@ -2690,10 +2690,18 @@ namespace eFMS.API.Accounting.DL.Services
             var details = new List<PaymentDetailModel>();
             foreach (var payment in payments)
             {
+                // Not sync payment when netoff = true
+                var netOff = CheckNetOffPayment(payment.Type, payment.RefId);
+                if (netOff)
+                {
+                    continue;
+                }
+
                 var invoice = DataContext.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
                 var detail = new PaymentDetailModel();
                 detail.RowId = payment.Id.ToString();
-                
+                // Customer Code
+                detail.CustomerCode = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault()?.AccountNo;
                 //Paid Amount
                 decimal? _paidAmount = payment.PaymentAmount;
                 if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
@@ -2715,9 +2723,9 @@ namespace eFMS.API.Accounting.DL.Services
                 // Theo currency của hóa đơn
                 if (invoice != null && invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    _paidAmountVnd = payment.PaymentAmountVnd; 
+                    _paidAmountVnd = payment.PaymentAmountVnd;
                 }
-                if(type == "CREDIT")
+                if (type == "CREDIT")
                 {
                     _paidAmountVnd = payment.UnpaidPaymentAmountVnd; // Số tiền nợ trên credit note, credit SOA
                 }
@@ -2742,15 +2750,17 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 detail.Description = _description;
 
-                detail.ObhPartnerCode = type == "CREDIT" ? invoicePartner?.AccountNo : string.Empty; //Đối với công nợ Credit => Set đối tượng Partner của phiếu thu. Ngược lại để trống
+                // [CR] : ObhPartnerCode = OBH Collect Partner code
+                //detail.ObhPartnerCode = type == "CREDIT" ? invoicePartner?.AccountNo : string.Empty; //Đối với công nợ Credit => Set đối tượng Partner của phiếu thu. Ngược lại để trống
+                detail.ObhPartnerCode = receipt.ObhpartnerId == null ? string.Empty : partners.Where(x => x.Id == receipt.ObhpartnerId.ToString()).FirstOrDefault()?.AccountNo;
                 detail.BankAccountNo = invoicePartner?.BankAccountNo; //Partner Bank Account no
 
                 string _Stt_Cd_Htt = string.Empty;
-                if(type == "DEBIT")
+                if (type == "DEBIT")
                 {
                     _Stt_Cd_Htt = invoice.ReferenceNo;
                 }
-                else if(type == "CREDIT")
+                else if (type == "CREDIT")
                 {
                     // Số ref của invoice cấn trừ
                     var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault();
@@ -2760,13 +2770,50 @@ namespace eFMS.API.Accounting.DL.Services
                 detail.Stt_Cd_Htt = _Stt_Cd_Htt;
 
                 detail.ChargeType = (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE") ? "NETOFF" : payment.Type;
-                detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
+                // [CR] get debit account
+                //detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
+                var debitAccount = string.Empty;
+                if (payment.Type.ToUpper() == "COLL_OTHER")
+                {
+                    detail.DebitAccount = "7118";
+                }
+                else if (payment.Type.ToUpper() == "COLL_OBH")
+                {
+                    detail.DebitAccount = "336";
+                }
+                else if (payment.Type.ToUpper() == "PAY_OBH")
+                {
+                    detail.DebitAccount = "338802";
+                }
+
                 detail.NganhCode = "FWD";
 
                 details.Add(detail);
             }
             sync.Details = details;            
             return sync;
+        }
+
+        /// <summary>
+        /// Get value of netoff
+        /// </summary>
+        /// <param name="Type"></param>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        private bool CheckNetOffPayment(string Type, string Id)
+        {
+            var netOff = false;
+            if (Type == "CREDITNOTE")
+            {
+                var cdNote = cdNoteRepository.Get(x => x.Id.ToString() == Id).FirstOrDefault();
+                netOff = cdNote == null ? netOff : (bool)cdNote.NetOff;
+            }
+            else if (Type == "CREDITSOA")
+            {
+                var soa = soaRepository.Get(x => x.Id == Id).FirstOrDefault();
+                netOff = soa == null ? netOff : (bool)soa.NetOff;
+            }
+            return netOff;
         }
 
         /// <summary>
