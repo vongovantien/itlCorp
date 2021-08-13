@@ -40,5 +40,7 @@ namespace eFMS.API.Accounting.Service.Models
         public Guid? CompanyId { get; set; }
         public Guid? ReferenceId { get; set; }
         public string Class { get; set; }
+        public Guid? ObhpartnerId { get; set; }
+        public string NotifyDepartment { get; set; }
     }
 }

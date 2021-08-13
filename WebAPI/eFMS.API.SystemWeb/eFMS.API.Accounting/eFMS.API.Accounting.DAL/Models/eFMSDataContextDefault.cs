@@ -373,7 +373,7 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Type)
-                    .HasMaxLength(10)
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.UnpaidPaymentAmountUsd)
@@ -879,6 +879,12 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.GroupId).HasColumnName("GroupID");
 
                 entity.Property(e => e.LastSyncDate).HasColumnType("datetime");
+
+                entity.Property(e => e.NotifyDepartment)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.ObhpartnerId).HasColumnName("OBHPartnerID");
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 

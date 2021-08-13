@@ -987,23 +987,23 @@ namespace eFMS.API.Accounting.DL.Services
                 List<CatContract> contractChildOfPartner = new List<CatContract>();
                 if (partnerChildIds != null)
                 {
-                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.Id.ToString()) && x.ContractType == "Parent Contract").ToList();                  
+                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.Id.ToString()) && x.ContractType == "Parent Contract").ToList();
                 }
 
-                agreement.BillingAmount = receivables.Sum(su => su.BillingAmount + su.ObhBilling); //Sum BillingAmount + BillingOBH
+                agreement.BillingAmount = receivables.Sum(su => (su.BillingAmount ?? 0) + (su.ObhBilling ?? 0)); //Sum BillingAmount + BillingOBH
                 //Credit Amount ~ Debit Amount
-                agreement.CreditAmount = receivables.Sum(su => su.DebitAmount) + contractChildOfPartner.Sum(su => su.CreditAmount); //Sum DebitAmount + Debit Amount (của các đối tượng con)
-                agreement.UnpaidAmount = receivables.Sum(su => su.BillingUnpaid + su.ObhUnpaid) + contractChildOfPartner.Sum(su => su.UnpaidAmount); //Sum BillingUnpaid + ObhUnpaid + BillingUnpaid (của các đối tượng con)
-                agreement.PaidAmount = receivables.Sum(su => su.PaidAmount + su.ObhPaid) + contractChildOfPartner.Sum(su => su.PaidAmount); //Sum PaidAmount + ObhPaid + PaidAmount (của các đối tượng con)
+                agreement.CreditAmount = receivables.Sum(su => su.DebitAmount ?? 0) + contractChildOfPartner.Sum(su => su.CreditAmount ?? 0); //Sum DebitAmount + Debit Amount (của các đối tượng con)
+                agreement.UnpaidAmount = receivables.Sum(su => (su.BillingUnpaid ?? 0) + (su.ObhUnpaid ?? 0)) + contractChildOfPartner.Sum(su => su.UnpaidAmount ?? 0); //Sum BillingUnpaid + ObhUnpaid + BillingUnpaid (của các đối tượng con)
+                agreement.PaidAmount = receivables.Sum(su => (su.PaidAmount ?? 0) + (su.ObhPaid ?? 0)) + contractChildOfPartner.Sum(su => su.PaidAmount ?? 0); //Sum PaidAmount + ObhPaid + PaidAmount (của các đối tượng con)
 
                 decimal? _creditRate = agreement.CreditRate;
                 if (agreement.ContractType == "Trial")
                 {
-                    _creditRate = ((agreement.CreditAmount + agreement.CustomerAdvanceAmount) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.CreditAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = ((agreement.CreditAmount + agreement.CustomerAdvanceAmount) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null? 0:(((agreement.CreditAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
