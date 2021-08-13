@@ -9,7 +9,7 @@ import { ToastrService } from "ngx-toastr";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState } from "../../store/reducers";
-import { RemoveInvoice, ChangeADVType } from "../../store/actions";
+import { RemoveInvoice, ChangeADVType, InsertCreditToDebit } from "../../store/actions";
 
 import { takeUntil } from "rxjs/operators";
 import { Observable } from "rxjs";
@@ -17,6 +17,7 @@ import { Observable } from "rxjs";
 @Component({
     selector: 'customer-payment-receipt-debit-list',
     templateUrl: './receipt-debit-list.component.html',
+    styleUrls: ['./receipt-debit-list.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptDebitListComponent extends AppList implements OnInit {
@@ -30,21 +31,23 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'RefNo', field: '', sortable: true },
         { title: 'Type', field: '', width: 150 },
         { title: 'Invoice No', field: '' },
-        { title: 'Credit No', field: '', width: 250 },
-        { title: 'Job No', field: '', width: 150 },
-        { title: 'MBL No', field: '', width: 150 },
-        { title: 'HBL No', field: '', width: 150 },
-        { title: 'Unpaid USD', field: '', width: 150 },
-        { title: 'Unpaid VND', field: '', width: 150 },
-        { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
+        { title: 'Credit No', field: '', width: 300 },
+        { title: 'Unpaid USD', field: '', width: 150, align: this.right },
+        { title: 'Unpaid VND', field: '', width: 150, align: this.right },
+        { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true, },
         { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
         { title: 'Total Paid VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
-        { title: 'Remain USD', field: '', width: 150 },
-        { title: 'Remain VND', field: '', width: 150 },
+        { title: 'Remain USD', field: '', width: 150, align: this.right },
+        { title: 'Remain VND', field: '', width: 150, align: this.right },
         { title: 'Note', field: '', width: 200 },
         { title: 'BU Handle', field: '' },
-        { title: 'Office', field: '' }
+        { title: 'Office', field: '' },
+        { title: 'NetOff Only', field: '', width: 150 },
+        { title: 'Job No', field: '', width: 150 },
+        { title: 'MBL No', field: '', width: 150 },
+        { title: 'HBL No', field: '', width: 150 },
+
     ];
     selectedIndexItem: number;
     receiptType$: Observable<string> = this._store.select(ReceiptTypeState);
@@ -64,7 +67,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     };
 
     isAutoConvert: boolean;
-    selectedPaymentItemAdvanceTypeIndex: number = -1;
+    selectedPaymentItemIndex: number = -1;
 
     constructor(
         private readonly _store: Store<IReceiptState>,
@@ -76,21 +79,22 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     ngOnInit() {
         this.headers = [
-            { title: 'RefNo', field: '', sortable: true },
-            { title: 'Type', field: '' },
-            { title: 'Invoice No', field: '' },
+            { title: 'RefNo', field: '', sortable: true, width: 100 },
+            { title: 'Type', field: '', width: 100 },
+            { title: 'Invoice No', field: '', width: 100 },
             { title: 'Credit No', field: '', width: 180 },
-            { title: 'Unpaid USD', field: '', width: 150 },
-            { title: 'Unpaid VND', field: '', width: 150 },
+            { title: 'Unpaid USD', field: '', width: 150, align: this.right },
+            { title: 'Unpaid VND', field: '', width: 150, align: this.right },
             { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
             { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
             { title: 'Total Paid VND', field: '', width: 150, align: this.right },
-            { title: 'Remain USD', field: '', width: 150 },
-            { title: 'Remain VND', field: '', width: 150 },
+            { title: 'Remain USD', field: '', width: 150, align: this.right },
+            { title: 'Remain VND', field: '', width: 150, align: this.right },
             { title: 'Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
+            { title: 'NetOff Only', field: '', width: 150 }
         ];
 
         this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
@@ -243,13 +247,30 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         return totalData
     }
 
-    selectPaymentTypeAdvanceItem(index: number) {
-        this.selectedPaymentItemAdvanceTypeIndex = index;
+    selectPaymentItem(index: number) {
+        this.selectedPaymentItemIndex = index;
+        console.log(this.selectedPaymentItemIndex);
     }
 
     changePaymentTypeADV(newADVType: string) {
-        if (this.selectedPaymentItemAdvanceTypeIndex >= 0) {
-            this._store.dispatch(ChangeADVType({ index: this.selectedPaymentItemAdvanceTypeIndex, newType: newADVType }));
+        if (this.selectedPaymentItemIndex >= 0) {
+            this._store.dispatch(ChangeADVType({ index: this.selectedPaymentItemIndex, newType: newADVType }));
         }
+    }
+
+    selectCreditPaymentItem(item: ReceiptInvoiceModel) {
+        if (this.selectedPaymentItemIndex >= 0) {
+            this._store.dispatch(InsertCreditToDebit({ index: this.selectedPaymentItemIndex, creditNo: item.refNo }));
+
+        }
+    }
+    deleteCreditItem(credit: string, item: ReceiptInvoiceModel, e: Event) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const index = (item.creditNos as string[]).findIndex(x => x === credit);
+        console.log(index);
+
+        item.creditNos = [...item.creditNos.slice(0, index), ...item.creditNos.slice(index + 1)];
+
     }
 }

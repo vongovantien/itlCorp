@@ -23,6 +23,7 @@ export enum ReceiptActionTypes {
     SELECT_CURRENCY = '[AR Receipt] Select Receipt Currency',
     SELECT_CLASS = '[AR Receipt] Select Receipt Class',
     CHANGE_ADV_TYPE = '[AR Receipt] Change ADV Type',
+    INSERT_CREDIT_TO_DEBIT = '[AR Receipt] Insert Credit To Debit',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -49,6 +50,7 @@ export const ToggleAutoConvertPaid = createAction(ReceiptActionTypes.TOGGLE_AUTO
 export const SelectReceiptCurrency = createAction(ReceiptActionTypes.SELECT_CURRENCY, props<{ currency: string }>());
 export const SelectReceiptClass = createAction(ReceiptActionTypes.SELECT_CLASS, props<{ class: string }>());
 export const ChangeADVType = createAction(ReceiptActionTypes.CHANGE_ADV_TYPE, props<{ index: number, newType: string }>());
+export const InsertCreditToDebit = createAction(ReceiptActionTypes.INSERT_CREDIT_TO_DEBIT, props<{ index: number, creditNo: string }>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());

@@ -1948,8 +1948,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2028,8 +2028,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2471,8 +2471,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2592,8 +2592,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2675,7 +2675,8 @@ namespace eFMS.API.Accounting.DL.Services
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
                                CreditType = "CREDITSOA",
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               
                            };
 
             return joinData;
@@ -2749,7 +2750,7 @@ namespace eFMS.API.Accounting.DL.Services
                                CreditType = "CREDITNOTE",
                                VoucherId = inv.VoucherId,
                                VoucherIdre = inv.VoucherIdre,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
                            };
 
             return joinData;

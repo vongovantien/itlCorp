@@ -140,6 +140,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     if (element.length > 0) {
                         element.map(item => {
+                            if (item.type === 'DEBIT' && !!item.creditNos.length) {
+                                item.creditNo = item.creditNos.toString();
+                            }
                             this.paymentList.push(item);
                         })
                     }

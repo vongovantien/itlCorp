@@ -134,6 +134,18 @@ export const receiptManagementReducer = createReducer(
         const newArrayDebit = [...state.debitList];
         newArrayDebit[payload.index].type = payload.newType;
         return { ...state, debitList: newArrayDebit }
+    }),
+    on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: { index: number, creditNo: string }) => {
+        const newArrayDebit = [...state.debitList];
+        newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
+
+        const newArrayCredit = [...state.creditList];
+        const indexCreditToUpdate = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);
+        if (indexCreditToUpdate != -1) {
+            newArrayCredit[indexCreditToUpdate].invoiceNo = newArrayDebit[payload.index].invoiceNo;
+        }
+
+        return { ...state, debitList: newArrayDebit, creditList: newArrayCredit }
     })
 );
 

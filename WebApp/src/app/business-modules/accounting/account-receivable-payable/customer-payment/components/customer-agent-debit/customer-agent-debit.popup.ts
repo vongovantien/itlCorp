@@ -306,9 +306,12 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             this._store.dispatch(ResetInvoiceList());
         }
 
+        // * Set Default
         datatoReceipt.forEach(element => {
             element.totalPaidVnd = element.paidAmountVnd;
             element.totalPaidUsd = element.paidAmountUsd;
+            element.paidAmountVnd = element.unpaidAmountVnd;
+            element.paidAmountUsd = element.unpaidAmountUsd;
         });
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));

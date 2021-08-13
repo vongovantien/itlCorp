@@ -30,12 +30,15 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         { title: 'RefNo', field: '' },
         { title: 'Net Off Invoice No', field: '' },
         { title: 'Acct Doc', field: '', },
+        { title: 'Amount USD', field: '', width: 150, align: this.right },
+        { title: 'Amount VND', field: '', width: 150, align: this.right },
+        { title: 'NetOff USD', field: '', width: 150, required: true, align: this.right },
+        { title: 'NetOff VND', field: '', width: 150, required: true, align: this.right },
+        { title: 'Balance USD', field: '', width: 150, align: this.right },
+        { title: 'Balance VND', field: '', width: 150, align: this.right },
         { title: 'Job', field: '', width: 150 },
         { title: 'HBL', field: '', width: 150 },
         { title: 'MBL', field: '', width: 150 },
-        { title: 'Org Amount', field: '', align: this.right, width: 150 },
-        { title: 'Amount USD', field: '', width: 150, align: this.right },
-        { title: 'Amount VND', field: '', width: 150, align: this.right },
         { title: 'Note', field: '', width: 200 },
         { title: 'BU Handle', field: '' },
         { title: 'Office', field: '' },
@@ -52,7 +55,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         { field: 'amount', title: 'Unpaid Invoice' }
     ];
     invoiceDatasource: any[] = [];
-    receiptType: string = null;
+    receiptType$: Observable<string> = this._store.select(ReceiptTypeState);
 
     constructor(
         private readonly _store: Store<IReceiptState>,
@@ -66,9 +69,14 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'RefNo', field: '' },
             { title: 'Net Off Invoice No', field: '' },
             { title: 'Acct Doc', field: '', },
-            { title: 'Org Amount', field: '', align: this.right, width: 150 },
             { title: 'Amount USD', field: '', width: 150, align: this.right },
             { title: 'Amount VND', field: '', width: 150, align: this.right },
+            { title: 'Amount USD', field: '', width: 150, align: this.right },
+            { title: 'Amount VND', field: '', width: 150, align: this.right },
+            { title: 'NetOff USD', field: '', width: 150, required: true, align: this.right },
+            { title: 'NetOff VND', field: '', width: 150, required: true, align: this.right },
+            { title: 'Balance USD', field: '', width: 150, align: this.right },
+            { title: 'Balance VND', field: '', width: 150, align: this.right },
             { title: 'Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
@@ -81,11 +89,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                     this.creditList = data;
                 }
             )
-
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => this.receiptType = x || 'Customer');
-
 
         // * Listen Debit clear Credit
         this.dataService.currentMessage
