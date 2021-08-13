@@ -228,6 +228,8 @@ namespace eFMS.API.Accounting.Controllers
         {
             var advancePayment = acctSettlementPaymentService.GetAdvancePaymentMngts(JobId, MBL, HBL, requester);
             var settlementPayment = acctSettlementPaymentService.GetSettlementPaymentMngts(JobId, MBL, HBL, requester);
+            // List Charges Detail
+            var listChargeDetail = new List<ChargeSettlementPaymentMngt>();
 
             //Lấy ra list các currency của cả 2 (không trùng currency)
             List<string> currencies = new List<string>();
@@ -247,6 +249,11 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     currencies.Add(item.SettlementCurrency);
                 }
+                foreach(var sp in settlementPayment)
+                {
+                    listChargeDetail.AddRange(sp.ChargeSettlementPaymentMngts);
+                }
+                listChargeDetail = listChargeDetail.OrderBy(x => x.SettlementNo).ThenBy(x => x.AdvanceNo).ToList();
             }
 
             var totalAdvance = "";
@@ -256,12 +263,14 @@ namespace eFMS.API.Accounting.Controllers
             {
                 foreach (var currency in currencies)
                 {
-                    decimal totalAdv = NumberHelper.RoundNumber(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), 2);
-                    decimal totalSet = NumberHelper.RoundNumber(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), 2);
+                    var roundNumber = currency == AccountingConstants.CURRENCY_LOCAL ? 0 : 2;
+                    var formatNumber = currency == AccountingConstants.CURRENCY_LOCAL ? "{0:n0}" : "{0:n}";
+                    decimal totalAdv = NumberHelper.RoundNumber(advancePayment.Where(x => x.AdvanceCurrency == currency).Sum(su => su.TotalAmount), roundNumber);
+                    decimal totalSet = NumberHelper.RoundNumber(settlementPayment.Where(x => x.SettlementCurrency == currency).Sum(su => su.TotalAmount), roundNumber);
                     decimal bal = (totalAdv - totalSet);
-                    totalAdvance += string.Format("{0:n}", totalAdv) + " " + currency + " | ";
-                    totalSettlement += string.Format("{0:n}", totalSet) + " " + currency + " | ";
-                    balance += (bal < 0 ? "(" + string.Format("{0:n}", Math.Abs(bal)) + ")" : string.Format("{0:n}", bal) + "") + " " + currency + " | ";
+                    totalAdvance += string.Format(formatNumber, totalAdv) + " " + currency + " | ";
+                    totalSettlement += string.Format(formatNumber, totalSet) + " " + currency + " | ";
+                    balance += (bal < 0 ? "(" + string.Format(formatNumber, Math.Abs(bal)) + ")" : string.Format(formatNumber, bal) + "") + " " + currency + " | ";
                 }
                 totalAdvance = (totalAdvance += ")").Replace(" | )", "");
                 totalSettlement = (totalSettlement += ")").Replace(" | )", "");
@@ -277,7 +286,8 @@ namespace eFMS.API.Accounting.Controllers
                 totalSettlement = totalSettlement,
                 balance = balance,
                 AdvancePayment = advancePayment,
-                SettlementPayment = settlementPayment
+                SettlementPayment = settlementPayment,
+                ChargesSettlementPayment = listChargeDetail
             };
             return Ok(result);
         }

@@ -1284,7 +1284,7 @@ namespace eFMS.API.Accounting.DL.Services
                 dataResult.Add(new AdvancePaymentMngt
                 {
                     AdvanceNo = item.AdvanceNo,
-                    TotalAmount = item.TotalAmount,
+                    TotalAmount = NumberHelper.RoundNumber(item.TotalAmount, item.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL ? 0 : 2),
                     AdvanceCurrency = item.AdvanceCurrency,
                     AdvanceDate = item.AdvanceDate,
                     ChargeAdvancePaymentMngts = request.Where(x => x.AdvanceNo == item.AdvanceNo && x.JobId == jobId && x.Mbl == mbl && x.Hbl == hbl)
@@ -1304,13 +1304,14 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
+            // [CR] Lấy theo exchange rate of charge
             //Quy đổi tỉ giá theo ngày hiện tại, nếu tỉ giá ngày hiện tại không có thì lấy ngày mới nhất
-            var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date).ToList();
-            if (currencyExchange.Count == 0)
-            {
-                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }
+            //var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == DateTime.Now.Date).ToList();
+            //if (currencyExchange.Count == 0)
+            //{
+            //    DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
+            //    currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
+            //}
 
             // Chỉ lấy ra những settlement có status là done => update sprint22: lấy tất cả
             var dataOperation = from settle in settlement
@@ -1328,7 +1329,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 select new SettlementPaymentMngt
                                 {
                                     SettlementNo = settle.SettlementNo,
-                                    TotalAmount = sur.Total,
+                                    TotalAmount = settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0)) :
+                                                                                                                    ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0)),
                                     SettlementCurrency = settle.SettlementCurrency,
                                     ChargeCurrency = sur.CurrencyId,
                                     SettlementDate = settle.DatetimeCreated
@@ -1350,7 +1352,8 @@ namespace eFMS.API.Accounting.DL.Services
                                select new SettlementPaymentMngt
                                {
                                    SettlementNo = settle.SettlementNo,
-                                   TotalAmount = sur.Total,
+                                   TotalAmount = settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0)) :
+                                                                                                                    ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0)),
                                    SettlementCurrency = settle.SettlementCurrency,
                                    ChargeCurrency = sur.CurrencyId,
                                    SettlementDate = settle.DatetimeCreated
@@ -1361,7 +1364,8 @@ namespace eFMS.API.Accounting.DL.Services
                 .Select(s => new SettlementPaymentMngt
                 {
                     SettlementNo = s.Key.SettlementNo,
-                    TotalAmount = s.Sum(su => su.TotalAmount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
+                    //TotalAmount = s.Sum(su => su.TotalAmount * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, su.ChargeCurrency, su.SettlementCurrency)),
+                    TotalAmount = s.Sum(su => su.TotalAmount),
                     SettlementCurrency = s.Key.SettlementCurrency,
                     SettlementDate = s.Key.SettlementDate
                 });
@@ -1382,7 +1386,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         public IQueryable<ChargeSettlementPaymentMngt> GetListChargeSettlementPaymentMngt(string settlementNo, string jobId, string hbl, string mbl)
         {
-            var settlement = DataContext.Get();
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             var surcharge = csShipmentSurchargeRepo.Get();
             var charge = catChargeRepo.Get();
             var payee = catPartnerRepo.Get();
@@ -1390,6 +1394,11 @@ namespace eFMS.API.Accounting.DL.Services
             var opsTrans = opsTransactionRepo.Get();
             var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get();
+            // get settlement status
+            var settleStatus = settlement.StatusApproval;
+            // get requester name
+            var userRequest = sysUserRepo.Get(x => x.Id == settlement.Requester).FirstOrDefault().EmployeeId;
+            var requester = sysEmployeeRepo.Get(em => em.Id == userRequest).FirstOrDefault()?.EmployeeNameVn;
 
             var dataOperation = from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1409,11 +1418,15 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     SettlementNo = settlementNo,
                                     AdvanceNo = sur.AdvanceNo,
+                                    ChargeCode = cc.Code,
                                     ChargeName = cc.ChargeNameEn,
-                                    TotalAmount = sur.Total,
+                                    TotalAmount = NumberHelper.RoundNumber(sur.Total, sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2),
                                     SettlementCurrency = sur.CurrencyId,
                                     OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),
+                                    InvoiceNo = sur.InvoiceNo,
+                                    SettlementStatus = settleStatus,
+                                    Requester = requester
                                 };
             var dataDocument = from sur in surcharge
                                join cc in charge on sur.ChargeId equals cc.Id into cc2
@@ -1435,11 +1448,15 @@ namespace eFMS.API.Accounting.DL.Services
                                {
                                    SettlementNo = settlementNo,
                                    AdvanceNo = sur.AdvanceNo,
+                                   ChargeCode = cc.Code,
                                    ChargeName = cc.ChargeNameEn,
-                                   TotalAmount = sur.Total,
+                                   TotalAmount = NumberHelper.RoundNumber(sur.Total, sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2),
                                    SettlementCurrency = sur.CurrencyId,
                                    OBHPartner = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),
-                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName)
+                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),
+                                   InvoiceNo = sur.InvoiceNo,
+                                   SettlementStatus = settleStatus,
+                                   Requester = requester
                                };
             var data = dataOperation.Union(dataDocument);
             return data;
