@@ -105,7 +105,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
         this.partnerId = this.formSearch.controls["partnerId"];
         this.issuedDate = this.formSearch.controls["issuedDate"];
-        this.paidDate = this.formSearch.controls["updatedDate"];
+        this.paidDate = this.formSearch.controls["paidDate"];
         this.dueDate = this.formSearch.controls["dueDate"];
         this.overdueDate = this.formSearch.controls["overdueDate"];
         this.paymentStatus = this.formSearch.controls["paymentStatus"];
@@ -191,15 +191,14 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             .subscribe(
                 (data: any) => {
                     if (data) {
-                        console.log('sub', data)
                         let formData: any = {
-                            searchType: data.searchType ? data.searchType : this.referenceTypes[0].value,
+                            searchType: data.searchType,
                             referenceNo: !!data.referenceNos && !!data.referenceNos.length ? data.referenceNos.join('\n') : null,
                             partnerId: data.partnerId ? data.partnerId : null,
-                            paymentStatus: this.paymentStatus.value,
+                            paymentStatus: data.paymentStatus.length === 0 ? [this.payments[0]] : data.paymentStatus,
                             overdueDate: data.overDueDays ? data.overDueDays : this.overDueDays[0].id,
-                            paidDate: (!!data?.fromPaidDate && !!data?.toPaidDate) ?
-                                { startDate: new Date(data?.fromPaidDate), endDate: new Date(data?.toPaidDate) } : null,
+                            paidDate: (!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
+                                { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
                             dueDate: (!!data?.fromDueDate && !!data?.toDueDate) ?
                                 { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
                             issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
