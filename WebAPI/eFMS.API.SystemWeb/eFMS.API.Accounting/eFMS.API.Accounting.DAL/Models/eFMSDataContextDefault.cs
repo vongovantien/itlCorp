@@ -849,6 +849,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
+                entity.Property(e => e.CreditAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CreditAmountVnd).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.CurrencyId)
                     .HasMaxLength(10)
                     .IsUnicode(false);

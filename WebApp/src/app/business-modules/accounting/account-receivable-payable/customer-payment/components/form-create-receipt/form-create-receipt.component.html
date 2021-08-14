@@ -24,7 +24,8 @@
                     <input type="text" ngxDaterangepickerMd class="form-control"
                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                         placeholder="Select request date" [autoApply]="true" formControlName="date"
-                        [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly" />
+                        [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly"
+                        [allowRemove]="true" />
                 </div>
             </div>
         </div>

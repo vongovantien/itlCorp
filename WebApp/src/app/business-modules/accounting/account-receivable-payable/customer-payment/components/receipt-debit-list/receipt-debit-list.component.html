@@ -139,7 +139,10 @@
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
                                 <td class="text-center">
-                                    <app-switch size="sm" class="danger"></app-switch>
+                                    <ng-container *ngIf="item.type === 'DEBIT'">
+                                        <app-switch size="sm" class="danger"
+                                            (toggleChange)="onToggleNetOfOnly($event, item)"></app-switch>
+                                    </ng-container>
                                 </td>
 
                                 <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.jobNo}}</td>

@@ -9,7 +9,7 @@ import { ToastrService } from "ngx-toastr";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState } from "../../store/reducers";
-import { RemoveInvoice, ChangeADVType, InsertCreditToDebit } from "../../store/actions";
+import { RemoveInvoice, ChangeADVType, InsertCreditToDebit, UpdateCreditItemValue } from "../../store/actions";
 
 import { takeUntil } from "rxjs/operators";
 import { Observable } from "rxjs";
@@ -97,14 +97,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'NetOff Only', field: '', width: 150 }
         ];
 
-        this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (debitList: ReceiptInvoiceModel[]) => {
-                    if (!!debitList.length) {
-                        this.sumTotalObj = this.calculateTotal(debitList);
-                    }
-                }
-            )
+
+        this.calculateSumTotalDebit();
 
         this._store.select(ReceiptIsAutoConvertPaidState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -151,31 +145,44 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         item.isChangeValue = true; // ! Detect user changed -> Flag to Force Process Clear
         switch (type) {
             case 'paidVnd':
-                if (!!item.creditNo) {
-                    item.totalPaidVnd = +item.paidAmountVnd + (item.creditAmountVnd ?? 0);
-                } else {
-                    if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
-                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
-                    }
-                    item.totalPaidVnd = +item.paidAmountVnd;
+                // if (!!item.creditNo) {
+                //     item.totalPaidVnd = +item.paidAmountVnd + (item.creditAmountVnd ?? 0);
+                // } else {
+                //     if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
+                //         item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                //     }
+                //     item.totalPaidVnd = +item.paidAmountVnd;
+                // }
+                if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
+                    item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
                 }
+                item.totalPaidVnd = +item.paidAmountVnd;
                 break;
             case 'paidUsd':
-                if (item.creditNo) {
-                    item.totalPaidUsd = +item.paidAmountUsd + (item.creditAmountUsd ?? 0);
-                } else {
-                    //* [16056]
-                    if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
-                        item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling);
-                    }
-                    item.totalPaidUsd = +item.paidAmountUsd;
+                // if (item.creditNo) {
+                //     item.totalPaidUsd = +item.paidAmountUsd + (item.creditAmountUsd ?? 0);
+                // } else {
+                //     //* [16056]
+                //     if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
+                //         item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling);
+                //     }
+                //     item.totalPaidUsd = +item.paidAmountUsd;
+                // }
+                //* [16056]
+                if (!!item.exchangeRateBilling && !!this.isAutoConvert) {
+                    item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling);
                 }
+                item.totalPaidUsd = +item.paidAmountUsd;
                 break;
             default:
 
                 break;
         }
+        this.calculateSumTotalDebit();
 
+    }
+
+    calculateSumTotalDebit() {
         this.debitList$.pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (debitList: ReceiptInvoiceModel[]) => {
@@ -184,39 +191,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     }
                 }
             )
-    }
-
-    onChangeCalCredit(_refNo: string, curr: ReceiptInvoiceModel) {
-        if (!!_refNo) {
-            this.creditList$
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe(
-                    (credits: ReceiptInvoiceModel[]) => {
-                        if (!!credits.length) {
-                            const currentCredit = credits.find(x => x.refNo == _refNo);
-                            if (!!currentCredit) {
-                                if (currentCredit.amount > curr.amount) {
-                                    this._toastService.warning("Credit Amount > Invoice Amount", "Warning");
-                                    curr.creditNo = null;
-                                    return;
-                                }
-                                curr.creditNo = _refNo;
-
-                                curr.creditAmountVnd = currentCredit.unpaidAmountVnd;
-                                curr.creditAmountUsd = currentCredit.unpaidAmountUsd;
-
-                                curr.paidAmountVnd = curr.unpaidAmountVnd - currentCredit?.unpaidAmountVnd;
-                                curr.paidAmountUsd = curr.unpaidAmountUsd - currentCredit?.unpaidAmountUsd;
-
-                                curr.totalPaidVnd = currentCredit?.unpaidAmountVnd + curr.paidAmountVnd;
-                                curr.totalPaidUsd = currentCredit?.unpaidAmountUsd + curr.paidAmountUsd;
-
-                                this._dataService.setData('clearCredit', { invoiceNo: curr.invoiceNo, creditNo: _refNo });
-                            }
-                        }
-                    }
-                )
-        }
     }
 
     calculateTotal(model: ReceiptInvoiceModel[]) {
@@ -264,13 +238,58 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
         }
     }
+
     deleteCreditItem(credit: string, item: ReceiptInvoiceModel, e: Event) {
         e.preventDefault();
         e.stopImmediatePropagation();
+
         const index = (item.creditNos as string[]).findIndex(x => x === credit);
-        console.log(index);
 
         item.creditNos = [...item.creditNos.slice(0, index), ...item.creditNos.slice(index + 1)];
 
+        this._store.dispatch(UpdateCreditItemValue({ searchKey: 'refNo', searchValue: credit, key: 'invoiceNo', value: null }));
+
     }
+
+    onToggleNetOfOnly(isNetOff: boolean, item: ReceiptInvoiceModel) {
+
+        let totalNetOffVNd: number = 0;
+        let totalNetOffUsd: number = 0;
+        let creditMapPriceValue: ICreditNetOffMapValue[];
+
+        if (!!item.creditNos.length) {
+            this.creditList$
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((creditList: ReceiptInvoiceModel[]) => {
+                    creditMapPriceValue = creditList.map((item: ReceiptInvoiceModel) =>
+                        ({ creditNo: item.refNo, netOffVnd: item.paidAmountVnd, netOffUsd: item.paidAmountUsd })
+                    )
+                    item.creditNos.forEach((credit: string) => {
+                        const currentCreditMapping = creditMapPriceValue.find(x => x.creditNo == credit);
+                        if (!!currentCreditMapping) {
+                            totalNetOffVNd += currentCreditMapping.netOffVnd;
+                            totalNetOffUsd += currentCreditMapping.netOffUsd;
+                        }
+                    })
+
+                    if (isNetOff === true) {
+                        item.paidAmountVnd = item.totalPaidUsd = totalNetOffVNd;
+                        item.paidAmountUsd = item.totalPaidVnd = totalNetOffUsd;
+                    }
+                    else {
+                        // item.paidAmountVnd = item.unpaidAmountVnd - totalNetOffVNd;
+                        // item.paidAmountUsd = item.unpaidAmountUsd - totalNetOffUsd;
+                    }
+                    this.calculateSumTotalDebit();
+
+                })
+        }
+    }
+
+}
+
+interface ICreditNetOffMapValue {
+    creditNo: string;
+    netOffUsd: number;
+    netOffVnd: number;
 }

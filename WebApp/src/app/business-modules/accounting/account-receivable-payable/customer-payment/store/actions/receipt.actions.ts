@@ -17,13 +17,14 @@ export enum ReceiptActionTypes {
     REMOVE_CREDIT = '[AR Receipt] Remove Credit',
     INSERT_ADVANCE = '[AR Receipt] Insert Advance',
     SELECT_PARTNER_RECEIPT = '[AR Receipt] Select Partner',
-    SELECT_DATE_RECEIPT = '[AR Receipt] Select Partner',
+    SELECT_DATE_RECEIPT = '[AR Receipt] Select Date Receipt',
     SELECT_AGREEMENT = '[AR Receipt] select Agreement',
     TOGGLE_AUTO_CONVERT_PAID = '[AR Receipt] Toggle Auto Convert Paid',
     SELECT_CURRENCY = '[AR Receipt] Select Receipt Currency',
     SELECT_CLASS = '[AR Receipt] Select Receipt Class',
     CHANGE_ADV_TYPE = '[AR Receipt] Change ADV Type',
     INSERT_CREDIT_TO_DEBIT = '[AR Receipt] Insert Credit To Debit',
+    UPDATE_CREDIT_ITEM_VALUE = '[AR Receipt] Update Credit Item Value',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -51,6 +52,7 @@ export const SelectReceiptCurrency = createAction(ReceiptActionTypes.SELECT_CURR
 export const SelectReceiptClass = createAction(ReceiptActionTypes.SELECT_CLASS, props<{ class: string }>());
 export const ChangeADVType = createAction(ReceiptActionTypes.CHANGE_ADV_TYPE, props<{ index: number, newType: string }>());
 export const InsertCreditToDebit = createAction(ReceiptActionTypes.INSERT_CREDIT_TO_DEBIT, props<{ index: number, creditNo: string }>());
+export const UpdateCreditItemValue = createAction(ReceiptActionTypes.UPDATE_CREDIT_ITEM_VALUE, props<{ searchKey: string, searchValue: string, key: string, value: string }>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());

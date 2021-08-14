@@ -537,7 +537,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     payment.Negative = acctPayment.Negative;
                     payment.PaymentType = acctPayment.PaymentType;
-
+                    payment.CreditNos = !string.IsNullOrEmpty(acctPayment.CreditNo) ? acctPayment.CreditNo.Split(",").ToList() : new List<string>();
                     paymentReceipts.Add(payment);
                 }
             }
@@ -880,7 +880,6 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DeptInvoiceId = payment.DepartmentId;
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
-                _payment.CreditNo = payment.CreditNo;
                 _payment.CreditAmountVnd = payment.CreditAmountVnd;
                 _payment.CreditAmountUsd = payment.CreditAmountUsd;
                 _payment.PartnerId = receipt.CustomerId;
@@ -893,6 +892,14 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DepartmentId = currentUser.DepartmentId;
                 _payment.OfficeId = currentUser.OfficeID;
                 _payment.CompanyId = currentUser.CompanyID;
+
+                string _creditNo = string.Empty;
+
+                if(payment.CreditNos != null && payment.CreditNos.Count > 0)
+                {
+                    _creditNo = string.Join(",", payment.CreditNos);
+                }
+                _payment.CreditNo = _creditNo;
 
                 results.Add(_payment);
             }

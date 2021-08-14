@@ -140,9 +140,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     if (element.length > 0) {
                         element.map(item => {
-                            if (item.type === 'DEBIT' && !!item.creditNos.length) {
-                                item.creditNo = item.creditNos.toString();
-                            }
                             this.paymentList.push(item);
                         })
                     }
@@ -366,8 +363,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
             cusAdvanceAmount: 0,
-            amountUSD: 0,
-            amountVND: 0,
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
             paidAmountVnd: 0,
             paidAmountUsd: 0,
             finalPaidAmountVnd: 0,
@@ -393,8 +390,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
             cusAdvanceAmount: 0,
-            amountUSD: 0,
-            amountVND: 0,
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
             paidAmountVnd: res.finalPaidAmountVnd,
             paidAmountUsd: res.finalPaidAmountUsd,
 
@@ -412,8 +409,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
             cusAdvanceAmount: 0,
-            amountUSD: 0,
-            amountVND: 0,
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
             paidAmountVnd: 0,
             paidAmountUsd: 0,
             finalPaidAmountVnd: 0,

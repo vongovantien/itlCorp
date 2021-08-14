@@ -24,7 +24,6 @@ export interface IReceiptState {
 
 
 export const initialState: IReceiptState = {
-    //list:[],
     list: { data: [], totalItems: 0, },
     debitList: [],
     creditList: [],
@@ -65,7 +64,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]
     })),
-    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: any) => ({
+    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: { index: number }) => ({
         ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
     })),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
@@ -133,19 +132,30 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.ChangeADVType, (state: IReceiptState, payload: { index: number, newType: string }) => {
         const newArrayDebit = [...state.debitList];
         newArrayDebit[payload.index].type = payload.newType;
+
         return { ...state, debitList: newArrayDebit }
     }),
     on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: { index: number, creditNo: string }) => {
-        const newArrayDebit = [...state.debitList];
+        const newArrayDebit: ReceiptInvoiceModel[] = [...state.debitList];
         newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
 
-        const newArrayCredit = [...state.creditList];
-        const indexCreditToUpdate = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);
+        const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
+        const indexCreditToUpdate: number = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);
         if (indexCreditToUpdate != -1) {
             newArrayCredit[indexCreditToUpdate].invoiceNo = newArrayDebit[payload.index].invoiceNo;
         }
 
         return { ...state, debitList: newArrayDebit, creditList: newArrayCredit }
+    }),
+    on(ReceiptActions.UpdateCreditItemValue, (state: IReceiptState, payload: { searchKey: string, searchValue: string, key: string, value: string }) => {
+        const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
+
+        const indexCreditItemToUpdate: number = newArrayCredit.findIndex(x => x[payload.searchKey] === payload.searchValue);
+        if (indexCreditItemToUpdate !== -1) {
+            newArrayCredit[indexCreditItemToUpdate][payload.key] = payload.value;
+        }
+
+        return { ...state, creditList: newArrayCredit }
     })
 );
 

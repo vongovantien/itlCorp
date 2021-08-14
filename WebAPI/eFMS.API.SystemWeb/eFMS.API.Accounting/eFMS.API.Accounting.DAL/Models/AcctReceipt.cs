@@ -42,5 +42,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string Class { get; set; }
         public Guid? ObhpartnerId { get; set; }
         public string NotifyDepartment { get; set; }
+        public decimal? CreditAmountVnd { get; set; }
+        public decimal? CreditAmountUsd { get; set; }
     }
 }

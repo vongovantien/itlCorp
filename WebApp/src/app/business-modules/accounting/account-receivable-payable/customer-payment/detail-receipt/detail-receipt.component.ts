@@ -16,7 +16,6 @@ import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt } from '../s
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
-import cloneDeep from 'lodash/cloneDeep';
 
 @Component({
     selector: 'app-detail-receipt',
@@ -116,29 +115,14 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: res.cusAdvanceAmount,
-            amountUSD: valueUSD,
-            amountVND: valueVND,
-            paidAmountUSD: res.paidAmountUsd,
-            paidAmountVND: res.paidAmountVnd,
-            finalPaidAmountUSD: res.finalPaidAmountUsd,
-            finalPaidAmountVND: res.finalPaidAmountVnd,
             notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : []
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         // * Mapping credit to credit[]
-        const payments = res.payments.map(payment => {
-            if (!!payment.creditNo) {
-                payment.creditNos = payment.creditNo.split(",");
-            }
-            return payment;
-        })
-
-        console.log(payments);
-        this._store.dispatch(ResetInvoiceList());
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: payments }));
+        // this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {

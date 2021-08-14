@@ -56,8 +56,8 @@
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Cus Advance</label>
-                <input class="form-control" type="number" formControlName="cusAdvanceAmount" numeric [decimals]="2"
-                    autoFormatCurrency [attr.readOnly]="isReadonly"
+                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmount" numeric
+                    [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
             </div>
         </div>
@@ -82,28 +82,30 @@
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Credit VND</label>
-                <input class="form-control" type="number" formControlName="amountVND" numeric [decimals]="0"
-                    autoFormatCurrency [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountVND')">
+                <input class="form-control" type="number" formControlName="creditAmountVnd" numeric [decimals]="0"
+                    autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'creditAmountVnd')">
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
-                <label>Credit Amount USD</label>
-                <input class="form-control" type="number" formControlName="amountUSD" [decimals]="2" autoFormatCurrency
-                    [attr.readOnly]="isReadonly" (change)="onSelectDataFormInfo($event,'amountUSD')">
+                <label>Credit USD</label>
+                <input class="form-control" type="number" formControlName="creditAmountUsd" [decimals]="2"
+                    autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'creditAmountUsd')">
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Final Paid Amount USD</label>
-                <input type="text" class="form-control m-input m-input--square text-primary"
+                <input type="text" class="form-control m-input m-input--square text-primary text-success"
                     formControlName="finalPaidAmountUsd" readonly formatDecimalFormControl>
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Final Paid Amount VND</label>
-                <input type="text" class="form-control m-input m-input--square text-primary"
+                <input type="text" class="form-control m-input m-input--square text-primary text-success"
                     formControlName="finalPaidAmountVnd" formatDecimalFormControl readonly format="1.0-3">
             </div>
         </div>
