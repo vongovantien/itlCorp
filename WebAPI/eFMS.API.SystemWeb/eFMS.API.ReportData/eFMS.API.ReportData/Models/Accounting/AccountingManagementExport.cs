@@ -61,7 +61,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string PayerId { get;set; }
         public string PayerName { get; set; }
         public string PayerType { get; set; }
-        public string Amount { get; set; }
+        public decimal? Amount { get; set; }
         public string IssueBy { get; set; }
         public string Bu { get; set; }
         public DateTime? ServiceDate { get; set; }
