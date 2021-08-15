@@ -1595,8 +1595,6 @@ namespace eFMS.API.Accounting.DL.Services
                 x.invoice.IssuedDate,
                 x.InvoiceNo,
                 x.BillingRefNo,
-                x.CurrencyId,
-                x.Negative,
                 x.invoice.ConfirmBillingDate,
                 x.invoice.OfficeId,
                 x.invoice.DueDate,
@@ -1663,7 +1661,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 results.Add(payment);
             }
-            return results.AsQueryable();
+            return results.OrderBy(x=>x.PartnerCode).AsQueryable();
         }
 
     }
