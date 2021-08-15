@@ -22,15 +22,29 @@
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
-                        <div class="col-lg-6">
+                        <div class="col-lg-3">
                             <div class="form-group">
-                                <label>Issue Date</label>
+                                <label>Export Date</label>
                                 <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                     <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
                                         [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                         [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
-                                        [singleDatePicker]="true" placeholder="/ /" readonly calendar
-                                        formControlName="issuedDate" />
+                                        formControlName="exportDate" placeholder="   /   /   " readonly calendar
+                                        [allowRemove]="!!exportDate.value && !!exportDate.value.startDate"
+                                        (remove)="resetFormControl(exportDate)" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <div class="form-group">
+                                <label>Accounting Date</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [autoApply]="true" [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                        [ranges]="ranges" [alwaysShowCalendars]="true" name="daterange"
+                                        formControlName="accountingDate" placeholder="   /   /   " readonly calendar
+                                        [allowRemove]="!!accountingDate.value && !!accountingDate.value.startDate"
+                                        (remove)="resetFormControl(accountingDate)" />
                                 </div>
                             </div>
                         </div>

@@ -347,6 +347,13 @@ export class ExportRepo {
         );
     }
 
+    exportAccountingManagementDebCreInvoice(body: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportAccountingManagementDebCreInvoice`, body).pipe(
+            catchError((error) => throwError(error)),
+            map(data => data)
+        );
+    }
+
     exportHousebillDaily(issuedDate: string) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Documentation/ExportHousebillDaily?issuedDate=${issuedDate}`).pipe(
             catchError((error) => throwError(error)),

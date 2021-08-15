@@ -151,11 +151,11 @@ namespace eFMS.API.Accounting.DL.Services
                             item.InvoiceNo = null;
                             item.InvoiceDate = null;
                             item.SeriesNo = null;
-                            
+
                             // item.AmountVnd = item.VatAmountVnd = null;
                             // Tính lại do 2 field kế toán edit
                             AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
-                          
+
                             item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
                             item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
 
@@ -275,6 +275,10 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.VoucherType == criteria.VoucherType);
             }
+
+            if (criteria.FromExportDate != null && criteria.ToExportDate != null)
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
+
             return query;
         }
 
@@ -1101,7 +1105,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
-                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
+                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
                                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                                 charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                 charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
@@ -1279,7 +1283,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 {
                                     surchargeOfAcct.VoucherId = null;
                                     surchargeOfAcct.VoucherIddate = null;
-                                }                                
+                                }
 
                                 // CR: 14344
                                 surchargeOfAcct.InvoiceNo = null;
@@ -1323,7 +1327,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 charge.FinalExchangeRate = chargeOfAcct.ExchangeRate; //Cập nhật lại Final Exchange Rate
 
-                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --                            
+                                #region -- Tính lại giá trị các field: NetAmount, Total, AmountUsd, VatAmountUsd --
                                 var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
                                 charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                                 charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
@@ -1397,7 +1401,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         //Tính toán total amount theo currency
                         accounting.TotalAmount = accounting.UnpaidAmount = _totalAmount;
-                        
+
                         //Task: 15631 - Andy - 14/04/2021
                         accounting.TotalAmountVnd = accounting.UnpaidAmountVnd = _totalAmountVnd;
                         accounting.TotalAmountUsd = accounting.UnpaidAmountUsd = _totalAmountUsd;
@@ -1559,7 +1563,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return total;
         }
-        
+
         /// <summary>
         /// Generate Voucher ID
         /// </summary>
@@ -1735,7 +1739,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         #endregion --- DETAIL ---
 
-        #region --- EXPORT ---        
+        #region --- EXPORT ---
         public List<AccountingManagementExport> GetDataAcctMngtExport(AccAccountingManagementCriteria criteria)
         {
             var query = ExpressionQuery(criteria);
@@ -1763,7 +1767,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var _productDept = _charge?.ProductDept;
                     var _chargeDefault = LookupChargeDefault[_chargeId].FirstOrDefault();
                     string _deptCode = string.Empty;
-                    
+
                     if (!string.IsNullOrEmpty(_productDept))
                     {
                         _deptCode = _productDept;
@@ -1910,7 +1914,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.VatPartnerNameVn = _vatPartner?.PartnerNameVn; //Partner Name Local của Charge
                     item.Description = acct.Description;
                     item.IsTick = true; //Default is True
-                    item.PaymentTerm = acct.PaymentTerm ?? 0; //Default is 0                    
+                    item.PaymentTerm = acct.PaymentTerm ?? 0; //Default is 0
                     item.DepartmentCode = _deptCode;
                     item.CustomNo = surcharge.ClearanceNo;//GetCustomNoOldOfShipment(surcharge.JobNo); //Xem xét sau
                     item.PaymentMethod = _paymentMethod;
@@ -2247,7 +2251,7 @@ namespace eFMS.API.Accounting.DL.Services
         private Expression<Func<AccAccountingManagement, bool>> ConfirmBillingExpressionQuery(ConfirmBillingCriteria criteria)
         {
             Expression<Func<AccAccountingManagement, bool>> query = q => q.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || q.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
-            
+
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
                 if (criteria.SearchOption == "Debit Note")
@@ -2387,7 +2391,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return data.ToList();
         }
-        
+
         public HandleState UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate)
         {
             try
@@ -2438,7 +2442,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- CONFIRM BILLING ---
 
-        
+
         private string GetPayeeIdFromSettlement(string settleCode)
         {
             string payeeId = null;
