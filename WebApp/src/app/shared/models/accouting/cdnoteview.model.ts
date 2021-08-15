@@ -16,6 +16,7 @@ export class CDNoteViewModel {
     lastSyncDate: string = '';
     voucherId: string = '';
     datetimeModified: Date = null;
+    voucherIddate: Date = null;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
