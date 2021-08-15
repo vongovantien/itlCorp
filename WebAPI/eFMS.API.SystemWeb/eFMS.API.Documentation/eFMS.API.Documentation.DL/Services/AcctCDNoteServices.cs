@@ -2239,15 +2239,13 @@ namespace eFMS.API.Documentation.DL.Services
                 AcctManagementId = s.AcctManagementId,
                 Hblno = s.Hblno,
                 CreditNo = s.CreditNo,
-                DebitNo = s.DebitNo
+                DebitNo = s.DebitNo,
+                VoucherIddate = s.VoucherIddate
             });
 
             var query = from cdnote in cdNotes
                         join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
                         select new { cdnote, charge };
-
-            if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
-                query.Where(x => x.charge.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.charge.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date);
 
             var grpQuery = query.GroupBy(g => new {
                 ReferenceNo = g.charge.DebitNo ?? g.charge.CreditNo,
@@ -2278,8 +2276,12 @@ namespace eFMS.API.Documentation.DL.Services
                 IssuedStatus = se.Charge.Any(y => !string.IsNullOrEmpty(y.InvoiceNo) && y.AcctManagementId != null) ? "Issued Invoice" : se.Charge.Any(y => !string.IsNullOrEmpty(y.VoucherId) && y.AcctManagementId != null) ? "Issued Voucher" : "New",
                 SyncStatus = se.CdNote.FirstOrDefault().SyncStatus,
                 LastSyncDate = se.CdNote.FirstOrDefault().LastSyncDate,
-                DatetimeModified = se.CdNote.FirstOrDefault().DatetimeModified
+                DatetimeModified = se.CdNote.FirstOrDefault().DatetimeModified,
+                VoucherIddate = se.Charge.FirstOrDefault().VoucherIddate
             });
+
+            if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
+                selectData = selectData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
 
             var _resultDatas = GetByStatus(criteria.Status, selectData).ToArray();
 
@@ -2321,7 +2323,8 @@ namespace eFMS.API.Documentation.DL.Services
                                    IssuedStatus = cd.IssuedStatus,
                                    SyncStatus = cd.SyncStatus,
                                    LastSyncDate = cd.LastSyncDate,
-                                   DatetimeModified = cd.DatetimeModified
+                                   DatetimeModified = cd.DatetimeModified,
+                                   VoucherIddate = cd.VoucherIddate
                                };
 
                 results = joinData.ToList();
