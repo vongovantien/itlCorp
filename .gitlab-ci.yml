@@ -1,32 +1,32 @@
 variables:
-    PROJECT_PATH: "$CI_PROJECT_DIR"
-    APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/prod"
+  PROJECT_PATH: "$CI_PROJECT_DIR"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/prod"
 
 image: node:12
 
 cache:
-    paths:
-        - ./WebApp/node_modules
-        - ./WebApp/package-lock.json
+  paths:
+    - ./WebApp/node_modules
+    - ./WebApp/package-lock.json
 stages:
-    - build
+  - build
 
 job_build:
-    stage: build
-    script:
-        - node --version
-        - echo "start job_build"
-        - cd WebApp
-        - npm install
-        - npm install -g @angular/cli
-        - ng version
-        #- node_modules/.bin/ng build --c=uat-en
-        - npm run build:prod
-        - echo "job_build doing something..."
-        - echo "end job_build"
-    only:
-        - uat/12-07-2021-sprint24
-    artifacts:
-        name: "angular_build"
-        paths:
-            - $APP_OUTPUT_PATH
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - cd WebApp
+    - npm install
+    - npm install -g @angular/cli
+    - ng version
+    #- node_modules/.bin/ng build --c=uat-en
+    - npm run build:prod
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - uat/12-07-2021-sprint24
+  artifacts:
+    name: "angular_build"
+    paths:
+      - $APP_OUTPUT_PATH
