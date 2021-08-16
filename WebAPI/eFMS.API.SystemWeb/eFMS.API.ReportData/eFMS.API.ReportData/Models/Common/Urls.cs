@@ -39,6 +39,8 @@
 
             public const string InvoicePaymentUrl = "/api/v1/en-US/AccountingPayment/ExportAccountingPayment";
 
+            public const string CustomerPaymentUrl = "/api/v1/en-US/AccountingPayment/GetDataExportAccountingCustomerPayment";
+
             public const string GetDataBravoSOAUrl = "/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
 
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";

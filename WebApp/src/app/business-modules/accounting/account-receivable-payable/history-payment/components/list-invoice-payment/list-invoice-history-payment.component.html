@@ -26,7 +26,7 @@
                                 </button>
                                 <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
                                     <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">General</a></li>
-                                    <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">Statement of Receivable Customer</a></li>
+                                    <li role="menuitem"><a (click)="exportStatementReceivableCustomer()" class="dropdown-item pointer">Statement of Receivable Customer</a></li>
                                     <li role="menuitem"><a (click)="exportExcel()" class="dropdown-item pointer">Statement of Receivable Agency</a></li>
                                 </ul>
                             </div>
@@ -75,9 +75,9 @@
                                             <td>{{ item.type }} </td>
                                             <td>{{ item.invoiceNoReal }} </td>
                                             <td>{{ item.partnerName }}</td>
-                                            <td class="text-right">{{ item.amount | number: '.0-3'}}{{item.currency}}</td>
-                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}}{{item.currency}}</td>
-                                            <td class="text-right">{{ item.unpaidAmount | number: '.0-3'}}{{item.currency}}</td>
+                                            <td class="text-right">{{ item.amount | number: '.0-3'}} {{item.currency}}</td>
+                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}} {{item.currency}}</td>
+                                            <td class="text-right">{{ item.unpaidAmount | number: '.0-3'}} {{item.currency}}</td>
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
                                                     <span class="text-danger" *ngSwitchCase="'Unpaid'">
@@ -122,9 +122,9 @@
                                                             </td> -->
                                                             <td>{{j+1}}</td>
                                                             <td>{{ payment.receiptNo }}</td>
-                                                            <td class="text-right">{{ payment.paymentAmount| number: '.0-3'  }}
+                                                            <td class="text-right">{{ payment.paymentAmount| number: '.0-3'  }} {{payment.currencyId}}
                                                             </td>
-                                                            <td class="text-right">{{ payment.balance| number: '.0-3' }}
+                                                            <td class="text-right">{{ payment.balance| number: '.0-3' }} {{payment.currencyId}}
                                                             </td>
                                                             <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
                                                             </td>

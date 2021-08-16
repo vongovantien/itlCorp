@@ -122,6 +122,20 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
+    exportStatementReceivableCustomer() {
+        if (!this.refPayments.length) {
+            this._toastService.warning('No Data To View, Please Re-Apply Filter');
+            return;
+        } else {
+            this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Customer - eFMS.xlsx');
+                    }
+                );
+        }
+    }
+
     getPayments(refId: string, refNo: string) {
         this._accountingRepo.getPaymentByrefId(refId, refNo)
             .pipe(
