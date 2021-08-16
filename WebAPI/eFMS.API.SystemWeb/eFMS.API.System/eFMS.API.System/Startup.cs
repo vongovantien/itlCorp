@@ -51,7 +51,7 @@ namespace eFMS.API.System
                 .WithOrigins("https://localhost:4200")
                 .WithOrigins("http://localhost:4200")
                 .WithOrigins("http://test.efms.itlvn.com")
-                .WithOrigins("http://staging.efms.itlvn.com")
+                .WithOrigins("https://efms-demo.logtechub.com")
                 .WithOrigins("https://efms.itlvn.com");
 
             }));

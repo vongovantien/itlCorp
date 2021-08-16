@@ -316,5 +316,6 @@ export interface ConfirmPopupConfig {
     align?: string;
     classConfirmButton?: string;
     classCancelButton?: string;
+    center?: boolean;
     [key: string]: any;
 }

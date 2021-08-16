@@ -168,7 +168,8 @@
                                     "with": "src/environments/environment.staging.ts"
                                 }
                             ],
-                            "serviceWorker": false,
+                            "serviceWorker": true,
+                            "ngswConfigPath": "ngsw-config.json",
                             "budgets": [
                                 {
                                     "type": "bundle",

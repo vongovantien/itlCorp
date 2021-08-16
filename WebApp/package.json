@@ -6,6 +6,7 @@
         "start": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng serve ",
         "start-uat": "ng serve --ssl true --c=uat",
         "start-prod": "ng serve --ssl true --c=prod",
+        "start-stag": "ng serve --ssl true --c=stag",
         "build": "ng build",
         "build:test": "ng build --c=test-vi && ng build --c=test-en",
         "build:test:vi": "node --max_old_space_size=8192 node_modules/@angular/cli/bin/ng build --c=test-vi",

@@ -179,5 +179,11 @@
 
         public static readonly string SETTLEMENT_TYPE_DIRECT = "DIRECT";
         public static readonly string SETTLEMENT_TYPE_EXISTING = "EXISTING";
+
+        public static readonly string RECEIPT_CLASS_CLEAR_DEBIT = "Clear Debit";
+        public static readonly string RECEIPT_CLASS_ADVANCE = "Advance";
+        public static readonly string RECEIPT_CLASS_COLLECT_OBH = "Collect OBH";
+        public static readonly string RECEIPT_CLASS_PAY_OBH = "Pay OBH";
+        public static readonly string RECEIPT_CLASS_NET_OFF = "Net Off";
     }
 }

@@ -2093,18 +2093,46 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)
         {
-            ClearCache();
+            //ClearCache();
+            //string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
+            //IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
+            //                    && (x.Active == criteria.Active || criteria.Active == null)
+            //                    && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
+            //if (!string.IsNullOrEmpty(criteria.ExceptId))
+            //{
+            //    data = data.Where(x => x.ParentId != criteria.ExceptId);
+            //}
+            //if (!string.IsNullOrEmpty(criteria.PartnerMode))
+            //{
+            //    data = data.Where(x => x.PartnerMode == criteria.PartnerMode);
+            //}
+            //if (data == null) return null;
             string partnerGroup = criteria != null ? PlaceTypeEx.GetPartnerGroup(criteria.PartnerGroup) : null;
-            IQueryable<CatPartnerModel> data = Get().Where(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase)
-                                && (x.Active == criteria.Active || criteria.Active == null)
-                                && (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
+            Expression<Func<CatPartner, bool>> query = q => true;
+            if(criteria.Active != null)
+            {
+                query = query.And(x => x.Active == criteria.Active);
+            }
+            if (!string.IsNullOrEmpty(partnerGroup))
+            {
+                query = query.And(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
+            }
+            if (!string.IsNullOrEmpty(partnerGroup))
+            {
+                query = query.And(x => (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
+            }
             if (!string.IsNullOrEmpty(criteria.ExceptId))
             {
-                data = data.Where(x => x.ParentId != criteria.ExceptId);
+                query = query.And(x => x.ParentId != criteria.ExceptId);
             }
-            if (data == null) return null;
+            if (!string.IsNullOrEmpty(criteria.PartnerMode))
+            {
+                query = query.And(x => x.PartnerMode == criteria.PartnerMode);
+            }
 
-            IQueryable<CatPartnerViewModel> results = data.Select(x => new CatPartnerViewModel
+            var dataQuery = DataContext.Get(query);
+
+            IQueryable<CatPartnerViewModel> results = dataQuery.Select(x => new CatPartnerViewModel
             {
                 Id = x.Id,
                 PartnerGroup = x.PartnerGroup,

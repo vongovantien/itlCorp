@@ -2,6 +2,7 @@ import { createReducer, on, Action } from "@ngrx/store";
 import { ReceiptInvoiceModel, Receipt } from "@models";
 import * as ReceiptActions from "../actions";
 import { IAgreementReceipt } from "../../components/form-create-receipt/form-create-receipt.component";
+import { AccountingConstants } from "@constants";
 
 
 export interface IReceiptState {
@@ -18,11 +19,11 @@ export interface IReceiptState {
     pagingData: any;
     isAutoConvertPaid: boolean;
     currency: string;
+    class: string;
 }
 
 
 export const initialState: IReceiptState = {
-    //list:[],
     list: { data: [], totalItems: 0, },
     debitList: [],
     creditList: [],
@@ -35,7 +36,8 @@ export const initialState: IReceiptState = {
     dataSearch: null,
     pagingData: { page: 1, pageSize: 15 },
     isAutoConvertPaid: true,
-    currency: 'VND'
+    currency: 'VND',
+    class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
 };
 
 export const receiptManagementReducer = createReducer(
@@ -47,7 +49,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
         creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.type === 'ADV'), ...state.debitList]
+        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
     })),
     on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -62,7 +64,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]
     })),
-    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: any) => ({
+    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: { index: number }) => ({
         ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
     })),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
@@ -70,10 +72,14 @@ export const receiptManagementReducer = createReducer(
             if (payload.data.cusAdvanceAmountVnd > 0) {
                 return {
                     ...state, debitList: [...payload.data.invoices, {
-                        typeInvoice: 'ADV',
-                        type: 'ADV',
+                        type: 'ADVANCE',
                         paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                         paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                        unpaidAmountUsd: 0,
+                        unpaidAmountVnd: 0,
+                        totalPaidVnd: 0,
+                        totalPaidUsd: 0,
+                        paymentType: 'OTHER',
                         refNo: null
                     }]
                 };
@@ -81,10 +87,14 @@ export const receiptManagementReducer = createReducer(
         } else if (payload.data.cusAdvanceAmountVnd > 0) {
             return {
                 ...state, debitList: [...payload.data.invoices, {
-                    typeInvoice: 'ADV',
-                    type: 'ADV',
+                    type: 'ADVANCE',
                     paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                     paidAmountUsd: payload.data.cusAdvanceAmountUsd,
+                    unpaidAmountUsd: 0,
+                    unpaidAmountVnd: 0,
+                    totalPaidVnd: 0,
+                    totalPaidUsd: 0,
+                    paymentType: 'OTHER',
                     refNo: null
                 }]
             };
@@ -115,9 +125,41 @@ export const receiptManagementReducer = createReducer(
     })),
     on(ReceiptActions.SelectReceiptCurrency, (state: IReceiptState, payload: { currency: string }) => ({
         ...state, currency: payload.currency
-    }))
+    })),
+    on(ReceiptActions.SelectReceiptClass, (state: IReceiptState, payload: { class: string }) => ({
+        ...state, class: payload.class
+    })),
+    on(ReceiptActions.ChangeADVType, (state: IReceiptState, payload: { index: number, newType: string }) => {
+        const newArrayDebit = [...state.debitList];
+        newArrayDebit[payload.index].type = payload.newType;
+
+        return { ...state, debitList: newArrayDebit }
+    }),
+    on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: { index: number, creditNo: string }) => {
+        const newArrayDebit: ReceiptInvoiceModel[] = [...state.debitList];
+        newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
+
+        const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
+        const indexCreditToUpdate: number = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);
+        if (indexCreditToUpdate != -1) {
+            newArrayCredit[indexCreditToUpdate].invoiceNo = newArrayDebit[payload.index].invoiceNo;
+        }
+
+        return { ...state, debitList: newArrayDebit, creditList: newArrayCredit }
+    }),
+    on(ReceiptActions.UpdateCreditItemValue, (state: IReceiptState, payload: { searchKey: string, searchValue: string, key: string, value: string }) => {
+        const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
+
+        const indexCreditItemToUpdate: number = newArrayCredit.findIndex(x => x[payload.searchKey] === payload.searchValue);
+        if (indexCreditItemToUpdate !== -1) {
+            newArrayCredit[indexCreditItemToUpdate][payload.key] = payload.value;
+        }
+
+        return { ...state, creditList: newArrayCredit }
+    })
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {
     return receiptManagementReducer(state, action);
 }
+
