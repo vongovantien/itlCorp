@@ -1650,13 +1650,14 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 payment.receiptDetail = new List<AccountingReceiptDetail>();
-                foreach (var rcp in item)
+                var receiptGroup = item.GroupBy(x => new { x.PaymentRefNo, x.invoice.Type }).Select(x=> new { grp = x.Key , Payment = x.Select(z=> new { z.PaymentDate, z.PaymentAmountVnd })});
+                foreach (var rcp in receiptGroup)
                 {
                     var detail = new AccountingReceiptDetail();
-                    detail.PaymentRefNo = rcp.PaymentRefNo;
-                    detail.PaymentDate = rcp.PaymentDate;
-                    detail.PaidAmount = rcp.invoice.Type == "Invoice" ? (rcp.PaymentAmountVnd ?? 0) : 0;
-                    detail.PaidAmountOBH = rcp.invoice.Type == "InvoiceTemp" ? (rcp.PaymentAmountVnd ?? 0) : 0;
+                    detail.PaymentRefNo = rcp.grp.PaymentRefNo;
+                    detail.PaymentDate = rcp.Payment.FirstOrDefault().PaymentDate;
+                    detail.PaidAmount = rcp.grp.Type == "Invoice" ? (rcp.Payment.FirstOrDefault().PaymentAmountVnd ?? 0) : 0;
+                    detail.PaidAmountOBH = rcp.grp.Type == "InvoiceTemp" ? rcp.Payment.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
                     payment.receiptDetail.Add(detail);
                 }
                 results.Add(payment);
