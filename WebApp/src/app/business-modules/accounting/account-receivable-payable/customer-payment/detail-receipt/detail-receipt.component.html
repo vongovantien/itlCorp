@@ -20,14 +20,18 @@
                     </h3>
                     <div>
                         <div class="c-button-actions">
-
                             <ng-container
                                 *ngIf="receiptDetail?.status === 'Done' && receiptDetail?.syncStatus !== 'Synced'">
                                 <app-permission-button title="Sync to Accountant" type="sync" class="info"
                                     icon="la la-cloud-upload" (onClick)="confirmSync()">
                                 </app-permission-button>
                             </ng-container>
-
+                            <ng-container
+                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail.type !== 'Clear Debit' ">
+                                <app-permission-button title="Clear Debit" type="Add" class="success"
+                                    icon="la la-credit-card" (onClick)="confirmCreateClearDebit()">
+                                </app-permission-button>
+                            </ng-container>
                             <ng-container>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="confirmCancel()">
                                 </app-default-button>
@@ -65,8 +69,8 @@
                         </app-permission-button>
                     </ng-container>
                     <ng-container *ngIf="receiptDetail?.status === 'Done' && !!receiptDetail.isReceiptBankFee">
-                        <app-permission-button type="add" title="Create Bank Fee Receipt" class="primary"
-                            icon="la la-bank" (onClick)="confirmCreateReceiptBankFee()">
+                        <app-permission-button type="add" title="Bank Fee/Other" class="primary" icon="la la-bank"
+                            [dpToggle]="dropdownMenuBankFee" mode="dropdown">
                         </app-permission-button>
                     </ng-container>
                     <ng-container
@@ -105,3 +109,18 @@
 </ng-template>
 
 <ng-template inject></ng-template>
+
+<app-dropdown #dropdownMenuBankFee>
+    <ng-container *ngIf="receiptDetail?.paymentMethod !== 'Cash'">
+        <a class="dropdown-item pointer" (click)="confirmCreateReceiptBankFeeOther('bank')"
+            title="Create Receipt Bank Fee">
+            <i class="la la-bank"></i>
+            <span> Bank Fee </span>
+        </a>
+    </ng-container>
+
+    <a class="dropdown-item pointer" (click)="confirmCreateReceiptBankFeeOther('other')" title="Create Receipt Other">
+        <i class="la la-file"></i>
+        <span> Other </span>
+    </a>
+</app-dropdown>

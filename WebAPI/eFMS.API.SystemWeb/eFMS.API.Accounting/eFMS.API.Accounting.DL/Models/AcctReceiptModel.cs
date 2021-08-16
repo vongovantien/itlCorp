@@ -12,7 +12,8 @@ namespace eFMS.API.Accounting.DL.Models
         public string UserNameCreated { get; set; }
         public string UserNameModified { get; set; }
         public string SubRejectReceipt { get; set; }
-        public bool IsReceiptBankFee { get; set; } // cho phép tạo phiếu thu ngân hàng.
+        public bool IsReceiptBankFee { get; set; } 
+        public string ReferenceNo { get; set; }
     }
 
     public enum SaveAction

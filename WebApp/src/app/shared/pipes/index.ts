@@ -13,7 +13,7 @@ export * from './safe.pipe';
 export * from './class-status-approval.pipe';
 export * from './extension';
 export * from './class-status-sync.pipe';
-export * from './sort-table-class.pipe';
+export { SortTableClassPipe, FixedColumnClassPipe, AlignClassPipe } from './sort-table-class.pipe';
 
 
 

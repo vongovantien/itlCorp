@@ -28,6 +28,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
     receiptId: string;
     receiptDetail: ReceiptModel;
     confirmMessage: string = '';
+    actionTypeCreate: string;
 
     constructor(
         protected _router: Router,
@@ -102,6 +103,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
         this.formCreate.customerName = res.customerName;
+        this.formCreate.receiptReference = res.referenceNo;
         this.formCreate.getContract();
     }
 
@@ -113,17 +115,13 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: res.cusAdvanceAmount,
-            amountUSD: valueUSD,
-            amountVND: valueVND,
-            paidAmountUSD: res.paidAmountUsd,
-            paidAmountVND: res.paidAmountVnd,
-            finalPaidAmountUSD: res.finalPaidAmountUsd,
-            finalPaidAmountVND: res.finalPaidAmountVnd,
+            notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : []
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
+        // * Mapping credit to credit[]
+        // this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
@@ -228,22 +226,38 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         }
     }
 
-    confirmCreateReceiptBankFee() {
+    confirmCreateReceiptBankFeeOther(type: string) {
+        this.actionTypeCreate = type;
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
             title: 'Create Bank Fee Receipt',
             body: `Are you sure you want to create bank fee receipt for <span class="text-primary font-weight-bold">${this.receiptDetail.customerName} </span>?`,
             iconConfirm: 'la la-save',
-            labelConfirm: 'Yes'
+            labelConfirm: 'Yes',
+            center: true
+
         }, () => {
-            this.createReceiptBankFee();
+            this.createReceiptWithActionType();
         });
     }
 
-    createReceiptBankFee() {
+    createReceiptWithActionType() {
         // * Go to create 
         this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(RegistTypeReceipt({ data: this.receiptDetail.type.toUpperCase() }));
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { id: this.receiptId } });
-
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { id: this.receiptId, action: this.actionTypeCreate } });
     }
+
+
+    confirmCreateClearDebit() {
+        this.actionTypeCreate = 'debit';
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Create Receipt Clear Debit',
+            body: `Are you sure you want to create Receipt Clear Debit for <span class="text-primary font-weight-bold">${this.receiptDetail.customerName} </span>?`,
+            iconConfirm: 'la la-save',
+            labelConfirm: 'Yes',
+        }, () => {
+            this.createReceiptWithActionType();
+        });
+    }
+
 }
