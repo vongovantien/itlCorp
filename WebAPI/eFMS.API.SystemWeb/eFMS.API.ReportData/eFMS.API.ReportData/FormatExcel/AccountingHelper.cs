@@ -3813,21 +3813,21 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 2].Value = item.InvoiceNo;
                 workSheet.Cells[rowStart, 3].Value = item.Mbl;
                 workSheet.Cells[rowStart, 4].Value = item.Hbl;
-                workSheet.Cells[rowStart, 5].Value = item.VoucherId; 
-                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo; 
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteType; 
-                workSheet.Cells[rowStart, 8].Value = item.ChargeType; 
-                workSheet.Cells[rowStart, 9].Value = item.PayerId; 
-                workSheet.Cells[rowStart, 10].Value = item.PayerName; 
-                workSheet.Cells[rowStart, 11].Value = item.PayerType; 
-                workSheet.Cells[rowStart, 12].Value = item.Currency; 
+                workSheet.Cells[rowStart, 5].Value = item.VoucherId;
+                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo;
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 8].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 9].Value = item.PayerId;
+                workSheet.Cells[rowStart, 10].Value = item.PayerName;
+                workSheet.Cells[rowStart, 11].Value = item.PayerType;
+                workSheet.Cells[rowStart, 12].Value = item.Currency;
 
                 workSheet.Cells[rowStart, 13].Value = item.Amount;
                 workSheet.Cells[rowStart, 13].Style.Numberformat.Format = decimalFormat;
 
-                workSheet.Cells[rowStart, 14].Value = item.IssueBy; 
-                workSheet.Cells[rowStart, 15].Value = item.Bu; 
-                workSheet.Cells[rowStart, 16].Value = item.ServiceDate; 
+                workSheet.Cells[rowStart, 14].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 15].Value = item.Bu;
+                workSheet.Cells[rowStart, 16].Value = item.ServiceDate;
                 workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
@@ -4012,5 +4012,69 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
         #endregion --- ACCOUTING MANAGEMENT ---
+
+        public Stream GenerateExportAgencyHistoryPayment(List<AccountingAgencyPaymentExport> result, string fileName)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                int startRow = 6;
+                excel.StartDetailTable = startRow;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+                    listKeyData.Add("AgentParentCode", item.AgentParentCode);
+                    listKeyData.Add("AgentPartnerCode", item.AgentPartnerCode);
+                    listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
+                    listKeyData.Add("InvoiceDate", item.InvoiceDate);
+                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                    listKeyData.Add("CreditNo", item.CreditNo);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("MBL", item.MBL);
+                    listKeyData.Add("HBL", item.HBL);
+                    listKeyData.Add("ETD", item.EtdDate);
+                    listKeyData.Add("ETA", item.EtaDate);
+                    var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
+                    listKeyData.Add("DebitAmount", debit);
+                    listKeyData.Add("CreditAmount", item.CreditAmount);
+
+                    var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
+                    var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
+                    listKeyData.Add("Debit_Ending", remainDb + remainObh);
+
+                    listKeyData.Add("Salesman", item.Salesman);
+                    listKeyData.Add("Creator", item.Creator);
+                    excel.SetData(listKeyData);
+                    startRow++;
+                    foreach (var detail in item.details)
+                    {
+                        listKeyData = new Dictionary<string, object>();
+                        excel.SetDataTable();
+                        listKeyData.Add("PaidDate", detail.PaidDate);
+                        listKeyData.Add("RefNo", detail.RefNo);
+                        listKeyData.Add("Debit", detail.Debit);
+                        listKeyData.Add("Credit", detail.Credit);
+                        excel.SetData(listKeyData);
+                        startRow++;
+                    }
+                }
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
+
     }
 }

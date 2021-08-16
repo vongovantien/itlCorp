@@ -11,6 +11,7 @@ import { RoutingConstants, SystemConstants } from '@constants';
 import { getAccountReceivableListState, IAccountReceivableState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -25,8 +26,9 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _router: Router,
-        private _store:Store<IAccountReceivableState>,
+        private _store: Store<IAccountReceivableState>,
         private _exportRepo: ExportRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -66,8 +68,8 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
                 })
             ).subscribe(
                 (res: any) => {
-                        this.otherList = res.data || [];
-                        this.totalItems = res.totalItems;
+                    this.otherList = res.data || [];
+                    this.totalItems = res.totalItems;
                 },
             );
     }
@@ -91,14 +93,18 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
 
     }
 
-
-    exportExcel(){
-        this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
-        .subscribe(
-            (res: Blob) => {
-                this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Cash.xlsx');
-            }
-        );
+    exportExcel() {
+        if (!this.otherList.length) {
+            this._toastService.warning('No Data To View, Please Re-Apply Filter');
+            return;
+        } else {
+            this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Cash.xlsx');
+                    }
+                );
+        }
 
     }
 }
