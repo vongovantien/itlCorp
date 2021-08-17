@@ -35,5 +35,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string BankName { get; set; }
         public decimal? AdvanceAmount { get; set; }
         public decimal? BalanceAmount { get; set; }
+        public string BankCode { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

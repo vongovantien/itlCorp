@@ -1402,6 +1402,8 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");

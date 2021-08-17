@@ -61,10 +61,10 @@ namespace eFMS.API.Accounting.DL.Services
             sysEmployeeRepository = sysEmployeeRepo;
         }
 
-        public IQueryable<AccAccountingPaymentModel> GetBy(string refId, string refNo)
+        public IQueryable<AccAccountingPaymentModel> GetBy(string refNo, string type)
         {
             IQueryable<AccAccountingPayment> data = null;
-            if (string.IsNullOrEmpty(refId)) // Type = Adv => search with receipt info
+            if (type == "ADV") // Type = Adv => search with receipt info
             {
                 var receiptId = acctReceiptRepository.Get(x => x.PaymentRefNo == refNo).FirstOrDefault()?.Id;
                 data = DataContext.Get(x => x.ReceiptId == receiptId).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo); ;
@@ -72,31 +72,26 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else // Type != Adv
             {
-                data = DataContext.Get(x => x.RefId == refId && x.BillingRefNo == refNo).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
+                data = DataContext.Get(x => x.BillingRefNo == refNo && x.Type == type).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
             }
             var users = userRepository.Get();
-            var results = data.Join(users, x => x.UserModified, y => y.Id, (x, y) => new AccAccountingPaymentModel
+            var grpData = data.GroupBy(x => x.ReceiptId).Select(x => new { x.Key, payment = x.Select(z => z) });
+
+            var results = new List<AccAccountingPaymentModel>();
+            foreach(var x in grpData)
             {
-                Id = x.Id,
-                RefNo = x.RefId,
-                PaymentNo = x.PaymentNo,
-                PaymentAmount = x.PaymentAmount,
-                Balance = x.Balance,
-                CurrencyId = x.CurrencyId,
-                PaidDate = x.PaidDate,
-                PaymentType = x.PaymentType,
-                UserCreated = x.UserCreated,
-                DatetimeCreated = x.DatetimeCreated,
-                UserModified = x.UserModified,
-                DatetimeModified = x.DatetimeModified,
-                UserModifiedName = y.Username,
-                PaymentMethod = x.PaymentMethod,
-                ExchangeRate = x.ExchangeRate,
-                ReceiptNo = x.PaymentNo.Substring(x.PaymentNo.IndexOf('_') + 1, x.PaymentNo.Length - x.PaymentNo.IndexOf('_') - 1),
-                Note = x.Note
-            });
-            results = results.OrderBy(x => x.ReceiptNo);
-            return results;
+                var item = new AccAccountingPaymentModel();
+                var payment = x.payment.FirstOrDefault();
+                var receipt = acctReceiptRepository.Get(acct => acct.Id == x.Key).FirstOrDefault();
+                item.ReceiptNo = payment.PaymentNo.Substring(payment.PaymentNo.IndexOf('_') + 1, payment.PaymentNo.Length - payment.PaymentNo.IndexOf('_') - 1);
+                item.PaymentAmount = x.payment.Sum(y => y.PaymentAmount ?? 0);
+                item.Balance = x.payment.Sum(y => y.Balance ?? 0);
+                item.PaidDate = payment.PaidDate;
+                item.PaymentMethod = receipt.PaymentMethod;
+                item.Note = receipt.Description;
+                results.Add(item);
+            }
+            return results?.OrderBy(x => x.ReceiptNo).AsQueryable();
         }
 
         public IQueryable<AccountingPaymentModel> Paging(PaymentCriteria criteria, int page, int size, out int rowsCount)
@@ -162,7 +157,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results != null ? results.Union(advData) : advData;
             }
-            return results;
+            return results?.OrderBy(x => x.PartnerId).ThenBy(x => x.RefNo);
         }
 
 
@@ -231,7 +226,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date);
             }
 
             if (perQuery != null)
@@ -308,49 +303,44 @@ namespace eFMS.API.Accounting.DL.Services
                                     payment.BillingRefNo,
                                     InvoiceNo = payment.Type == "OBH" ? string.Empty : payment.InvoiceNo,
                                     payment.Type,
-                                    payment.PaymentAmount
+                                    payment.PaymentAmount,
+                                    payment.UnpaidPaymentAmountUsd,
+                                    payment.UnpaidPaymentAmountVnd,
+                                    payment.RefAmount,
+                                    payment.RefCurrency
                                 }).ToList();
 
             var resultGroups = resultsQuery.GroupBy(x => new
             {
                 x.invoice.PartnerId,
                 x.BillingRefNo,
-                x.invoice.RefId,
                 x.Type,
                 x.ShortName,
                 x.InvoiceNo,
-                x.invoice.Amount,
-                x.invoice.PaidAmount,
-                x.invoice.UnpaidAmount,
-                x.invoice.Currency,
-                x.invoice.Serie,
-                x.invoice.IssuedDate,
-                x.invoice.DueDate,
-                x.invoice.Status,
-                x.invoice.OverdueDays,
-                x.invoice.ExtendDays,
-            });
+            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.PaymentAmount, f.RefAmount, f.UnpaidPaymentAmountUsd, f.UnpaidPaymentAmountVnd, f.RefCurrency }) });
 
             var results = resultGroups
                             .Select(x => new AccountingPaymentModel
                             {
-                                RefId = x.Key.RefId,
+                                //RefId = x.Select(z=>z.invoice.RefId),
                                 RefNo = x.Key.BillingRefNo,
                                 Type = x.Key.Type,
                                 PartnerId = x.Key.PartnerId,
                                 InvoiceNoReal = x.Key.InvoiceNo,
                                 PartnerName = x.Key.ShortName,
-                                Amount = x.Key.Amount,
-                                Currency = x.Key.Currency,
-                                IssuedDate = x.Key.IssuedDate,
-                                Serie = x.Key.Serie,
-                                DueDate = x.Key.DueDate,
-                                OverdueDays = x.Key.OverdueDays,
-                                Status = x.Key.Status,
-                                ExtendDays = x.Key.ExtendDays,
-                                PaidAmount = x.Key.Type == "OBH" ? x.Sum(i => i.PaymentAmount) : x.Key.PaidAmount,
-                                UnpaidAmount = x.Key.UnpaidAmount,
-                            }).OrderBy(x => x.PartnerId).ThenBy(x => x.RefNo);
+                                Amount = x.payment.FirstOrDefault().RefAmount,
+                                Currency = x.payment.FirstOrDefault().RefCurrency,
+                                IssuedDate = x.invoice.FirstOrDefault().IssuedDate,
+                                Serie = x.invoice.FirstOrDefault().Serie,
+                                DueDate = x.invoice.FirstOrDefault().DueDate,
+                                OverdueDays = x.invoice.FirstOrDefault().OverdueDays,
+                                Status = x.invoice.FirstOrDefault().Status,
+                                ExtendDays = x.invoice.FirstOrDefault().ExtendDays,
+                                PaidAmount = x.payment.Sum(i => i.PaymentAmount ?? 0),
+                                UnpaidAmount = x.payment.FirstOrDefault().RefCurrency == AccountingConstants.CURRENCY_LOCAL ? (x.payment.FirstOrDefault().UnpaidPaymentAmountVnd ?? 0) : (x.payment.FirstOrDefault().UnpaidPaymentAmountUsd ??0)
+                                //PaidAmount = x.Key.Type == "OBH" ? x.payment.Sum(i => i.PaymentAmount) : x.payment.FirstOrDefault().PaymentAmount,
+                                //UnpaidAmount = x.Key.Type == "OBH" ? (x.payment.FirstOrDefault().RefCurrency == AccountingConstants.CURRENCY_LOCAL ? x.payment.FirstOrDefault().UnpaidPaymentAmountVnd : x.payment.FirstOrDefault().UnpaidPaymentAmountUsd) : x.payment.FirstOrDefault().RefAmount,
+                            });
             return results.AsQueryable();
         }
 
@@ -433,7 +423,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date);
             }
             if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
@@ -471,41 +461,37 @@ namespace eFMS.API.Accounting.DL.Services
                                     payment,
                                     PartnerId = part.Id,
                                     part.ShortName,
-                                    Currency = payment.CurrencyId,
-                                    Amount = soa != null ? soa.CreditAmount : (decimal)0,
+                                    soa.NetOff
                                 }).ToList();
             var resultGroups = creditSoaData.GroupBy(x => new
             {
                 x.payment.BillingRefNo,
-                x.payment.RefId,
                 x.payment.Type,
                 x.PartnerId,
                 x.ShortName,
-                x.Amount,
-                x.Currency,
-                x.payment.InvoiceNo,
-                x.payment.Balance
-            });
+            }).Select(x => new { grp = x.Key, payment = x.Select(z => z.payment), NetOff = x.Select(z => z.NetOff) });
+            //
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingPaymentModel();
-                payment.RefId = item.Key.RefId;
-                payment.RefNo = item.Key.BillingRefNo;
-                payment.Type = GetTypeOfPayment(item.Key.Type, item.Key.BillingRefNo);
-                payment.PartnerId = item.Key.PartnerId;
-                payment.InvoiceNoReal = item.Key.InvoiceNo;
-                payment.PartnerName = item.Key.ShortName;
-                payment.Amount = item.Key.Amount;
-                payment.Currency = item.Key.Currency;
-                payment.UnpaidAmount = item.Key.Amount;
-                payment.Status = (item.Key.Balance ?? 0) <= 0 ? "Paid" : "Unpaid";
+                var acctPayment = item.payment.FirstOrDefault();
+                payment.RefNo = item.grp.BillingRefNo;
+                payment.Type = GetTypeOfPayment(item.grp.Type, item.grp.BillingRefNo);
+                payment.PartnerId = item.grp.PartnerId;
+                payment.InvoiceNoReal = acctPayment.InvoiceNo;
+                payment.PartnerName = item.grp.ShortName;
+                payment.Amount = acctPayment.RefAmount ?? 0;
+                payment.Currency = acctPayment.RefCurrency;
+                payment.PaidAmount = acctPayment.PaymentAmount ?? 0;
+                payment.UnpaidAmount = acctPayment.RefCurrency == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.UnpaidPaymentAmountVnd ?? 0) : (acctPayment.UnpaidPaymentAmountUsd ?? 0);
+                payment.Status = item.NetOff.FirstOrDefault() == true ? "Paid" : "Unpaid";
                 results.Add(payment);
             }
             if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
                 results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null).ToList();
             }
-            return results?.OrderBy(x => x.PartnerId).ThenBy(x => x.RefNo).AsQueryable();
+            return results.AsQueryable();
         }
 
         /// <summary>
@@ -583,7 +569,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date);
             }
             if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
@@ -622,41 +608,37 @@ namespace eFMS.API.Accounting.DL.Services
                                      payment,
                                      PartnerId = part.Id,
                                      part.ShortName,
-                                     Currency = payment.CurrencyId,
                                      Amount = cd != null ? cd.Total : (decimal)0,
+                                     cd.NetOff
                                  }).ToList();
             var resultGroups = creditSoaData.GroupBy(x => new
             {
                 x.payment.BillingRefNo,
-                x.payment.RefId,
                 x.payment.Type,
-                x.Currency,
                 x.PartnerId,
                 x.ShortName,
-                x.payment.InvoiceNo,
-                x.Amount,
-                x.payment.Balance,
-            });
+            }).Select(x => new { grp = x.Key, payment = x.Select(z => z.payment), NetOff = x.Select(z => z.NetOff) });
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingPaymentModel();
-                payment.RefId = item.Key.RefId;
-                payment.RefNo = item.Key.BillingRefNo;
-                payment.Type = GetTypeOfPayment(item.Key.Type, item.Key.BillingRefNo);
-                payment.PartnerId = item.Key.PartnerId;
-                payment.InvoiceNoReal = item.Key.InvoiceNo;
-                payment.PartnerName = item.Key.ShortName;
-                payment.Amount = item.Key.Amount;
-                payment.Currency = item.Key.Currency;
-                payment.UnpaidAmount = item.Key.Amount;
-                payment.Status = (item.Key.Balance ?? 0) <= 0 ? "Paid" : "Unpaid";
+                var acctPayment = item.payment.FirstOrDefault();
+                payment.RefNo = item.grp.BillingRefNo;
+                payment.Type = GetTypeOfPayment(item.grp.Type, item.grp.BillingRefNo);
+                payment.PartnerId = item.grp.PartnerId;
+                payment.InvoiceNoReal = acctPayment.InvoiceNo;
+                payment.PartnerName = item.grp.ShortName;
+                payment.Amount = acctPayment.RefAmount;
+                payment.Currency = acctPayment.RefCurrency;
+                payment.PaidAmount = acctPayment.PaymentAmount ?? 0;
+                payment.UnpaidAmount = acctPayment.RefCurrency == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.UnpaidPaymentAmountVnd ?? 0) : (acctPayment.UnpaidPaymentAmountUsd ?? 0);
+                payment.Status = item.NetOff.FirstOrDefault() == true ? "Paid" : "Unpaid";
                 results.Add(payment);
             }
             if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
                 results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid") || criteria.PaymentStatus.Count() == 0 || criteria.PaymentStatus == null).ToList();
             }
-            return results?.OrderBy(x => x.PartnerId).ThenBy(x => x.RefNo).AsQueryable();
+            return results.AsQueryable();
         }
 
         /// <summary>
@@ -706,7 +688,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+                query = query.And(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date);
             }
             switch (criteria.OverDueDays)
             {
@@ -722,9 +704,10 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(perQuery);
             }
             var paymentAdv = DataContext.Get(query);
+            var results = new List<AccountingPaymentModel>();
             if (paymentAdv.Count() <= 0)
             {
-                return null;
+                return results.AsQueryable();
             }
             var partners = partnerRepository.Get();
             var advData = (from adv in paymentAdv
@@ -742,35 +725,28 @@ namespace eFMS.API.Accounting.DL.Services
                            }).ToList();
             var resultGroups = advData.GroupBy(x => new
             {
-                x.adv.BillingRefNo,
-                x.adv.RefId,
                 x.PaymentRefNo,
                 x.adv.Type,
                 x.PartnerId,
                 x.ShortName,
-                x.Currency,
-                x.adv.InvoiceNo,
-                x.adv.PaymentAmount,
-            });
-            var results = resultGroups
-                           .Select(x => new AccountingPaymentModel
-                           {
-                               RefId = x.Key.RefId,
-                               RefNo = x.Key.PaymentRefNo,
-                               Type = x.Key.Type,
-                               PartnerId = x.Key.PartnerId,
-                               InvoiceNoReal = x.Key.InvoiceNo,
-                               PartnerName = x.Key.ShortName,
-                               Amount = x.Key.PaymentAmount,
-                               Currency = x.Key.Currency,
-                               IssuedDate = null,
-                               DueDate = null,
-                               OverdueDays = 0,
-                               Status = "Paid",
-                               ExtendDays = 0,
-                               PaidAmount = x.Key.PaymentAmount,
-                               UnpaidAmount = 0
-                           });
+            }).Select(x => new { grp = x.Key, payment = x.Select(z => z.adv) });
+
+            foreach (var item in resultGroups)
+            {
+                var payment = new AccountingPaymentModel();
+                var acctPayment = item.payment.FirstOrDefault();
+                payment.RefNo = item.grp.PaymentRefNo;
+                payment.Type = item.grp.Type;
+                payment.PartnerId = item.grp.PartnerId;
+                payment.InvoiceNoReal = acctPayment.InvoiceNo;
+                payment.PartnerName = item.grp.ShortName;
+                payment.Amount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.PaymentAmountVnd ?? 0) : (acctPayment.PaymentAmountUsd ?? 0);
+                payment.Currency = acctPayment.CurrencyId;
+                payment.PaidAmount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.PaymentAmountVnd ?? 0) : (acctPayment.PaymentAmountUsd ?? 0);
+                payment.UnpaidAmount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.UnpaidPaymentAmountVnd ?? 0) : (acctPayment.UnpaidPaymentAmountUsd ?? 0);
+                payment.Status = "Paid";
+                results.Add(payment);
+            }
             return results.AsQueryable();
         }
 
@@ -859,7 +835,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (criteria.FromUpdatedDate != null)
             {
-                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
+                query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.ToUpdatedDate.Value.Date);
             }
 
             if (perQuery != null)
@@ -1029,10 +1005,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
             }
-            //if (criteria.FromUpdatedDate != null)
-            //{
-            //    query = query.And(x => x.PaymentDatetimeUpdated != null && x.PaymentDatetimeUpdated.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDatetimeUpdated.Value.Date <= criteria.FromUpdatedDate.Value.Date);
-            //}
             if (perQuery != null)
             {
                 query = query.And(perQuery);
@@ -1141,16 +1113,23 @@ namespace eFMS.API.Accounting.DL.Services
 
         private HandleState UpdateExtendDateVATInvoice(ExtendDateUpdatedModel model)
         {
-            Guid id = new Guid(model.RefId);
-            var vatInvoice = accountingManaRepository.Get(x => x.Id == id).FirstOrDefault();
-            vatInvoice.PaymentExtendDays = model.NumberDaysExtend;
-            vatInvoice.PaymentNote = model.Note;
-            vatInvoice.PaymentDueDate = vatInvoice.PaymentDueDate.Value.AddDays(model.NumberDaysExtend);
-            vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
-            vatInvoice.UserModified = currentUser.UserID;
-            vatInvoice.DatetimeModified = DateTime.Now;
-            var result = accountingManaRepository.Update(vatInvoice, x => x.Id == id);
-            return result;
+
+            HandleState hs = new HandleState();
+            var refIdLst = DataContext.Get(x => x.BillingRefNo == model.RefId).Select(x => x.RefId).ToList();
+            foreach (var refId in refIdLst)
+            {
+                Guid id = new Guid(refId);
+                var vatInvoice = accountingManaRepository.Get(x => x.Id == id).FirstOrDefault();
+                vatInvoice.PaymentExtendDays = model.NumberDaysExtend;
+                vatInvoice.PaymentNote = model.Note;
+                vatInvoice.PaymentDueDate = vatInvoice.PaymentDueDate.Value.AddDays(model.NumberDaysExtend);
+                vatInvoice.PaymentDatetimeUpdated = DateTime.Now;
+                vatInvoice.UserModified = currentUser.UserID;
+                vatInvoice.DatetimeModified = DateTime.Now;
+                accountingManaRepository.Update(vatInvoice, x => x.Id == id, false);
+            }
+            hs = accountingManaRepository.SubmitChanges();
+            return hs;
         }
 
         public HandleState Delete(Guid id)
@@ -1377,11 +1356,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }
 
-        public ExtendDateUpdatedModel GetInvoiceExtendedDate(string id)
+        public ExtendDateUpdatedModel GetInvoiceExtendedDate(string refNo)
         {
-            var invoice = accountingManaRepository.Get(x => x.Id == new Guid(id)).FirstOrDefault();
+            var billingNoList = DataContext.Get(x => x.BillingRefNo == refNo).Select(x => x.RefId).ToList();
+            var invoice = accountingManaRepository.Get(x => billingNoList.Any(b => b.ToUpper() == x.Id.ToString())).FirstOrDefault();
             if (invoice == null) return null;
-            return new ExtendDateUpdatedModel { RefId = id,
+            return new ExtendDateUpdatedModel { RefId = refNo,
                 Note = invoice.PaymentNote,
                 NumberDaysExtend = invoice.PaymentExtendDays == null ? 0 : (int)invoice.PaymentExtendDays,
                 PaymentType = PaymentType.Invoice
@@ -1591,15 +1571,9 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PartnerCode,
                 x.PartnerName,
                 x.ParentCode,
-                x.invoice.Type,
-                x.invoice.IssuedDate,
-                x.InvoiceNo,
                 x.BillingRefNo,
-                x.invoice.ConfirmBillingDate,
-                x.invoice.OfficeId,
-                x.invoice.DueDate,
-                x.invoice.ServiceType
-            });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.InvoiceNo, z.PaymentDate, z.PaymentAmountVnd, z.UnpaidPaymentAmountVnd }) });
+
             var results = new List<AccountingCustomerPaymentExport>();
             var soaLst = soaRepository.Get().ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
@@ -1608,38 +1582,39 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingCustomerPaymentExport();
-                payment.PartnerCode = item.Key.PartnerCode;
-                payment.PartnerName = item.Key.PartnerName;
-                payment.ParentCode = item.Key.ParentCode;
-                payment.InvoiceNo = item.Key.InvoiceNo;
-                payment.InvoiceDate = item.Key.IssuedDate;
-                payment.BillingRefNo = item.Key.BillingRefNo;
-                payment.BillingDate = item.Key.ConfirmBillingDate;
-                payment.DueDate = item.Key.DueDate;
+                var invoice = item.invoice.FirstOrDefault();
+                payment.PartnerCode = item.grp.PartnerCode;
+                payment.PartnerName = item.grp.PartnerName;
+                payment.ParentCode = item.grp.ParentCode;
+                payment.InvoiceNo = item.payment.FirstOrDefault()?.InvoiceNo;
+                payment.InvoiceDate = invoice.IssuedDate;
+                payment.BillingRefNo = item.grp.BillingRefNo;
+                payment.BillingDate = invoice.ConfirmBillingDate;
+                payment.DueDate = invoice.DueDate;
 
-                payment.UnpaidAmountInv = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                payment.UnpaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                payment.PaidAmount = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.PaymentAmountVnd ?? 0;
-                payment.PaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").Sum(x => x.PaymentAmountVnd ?? 0);
-                var billingDebit = surchargeRepository.Get(x => x.DebitNo == item.Key.BillingRefNo).FirstOrDefault();
+                payment.UnpaidAmountInv = item.payment.Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
+                payment.UnpaidAmountOBH = item.payment.Where(x => x.PaymentType == "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
+                payment.PaidAmount = item.payment.Where(x => x.PaymentType != "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                payment.PaidAmountOBH = item.payment.Where(x => x.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                var billingDebit = surchargeRepository.Get(x => x.DebitNo == item.grp.BillingRefNo).FirstOrDefault();
                 payment.JobNo = billingDebit?.JobNo;
                 payment.MBL = billingDebit?.Mblno;
                 payment.HBL = billingDebit?.Hblno;
                 payment.CustomNo = billingDebit == null ? string.Empty : customsDeclarationRepository.Get(x => x.JobNo == billingDebit.JobNo).FirstOrDefault()?.ClearanceNo;
                 // Get saleman name
-                var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.Key.PartnerId
-                                                                               && x.OfficeId.Contains(item.Key.OfficeId.ToString())
-                                                                               && x.SaleService.Contains(item.Key.ServiceType)).FirstOrDefault()?.SaleManId;
+                var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
+                                                                               && x.OfficeId.Contains(invoice.OfficeId.ToString())
+                                                                               && x.SaleService.Contains(invoice.ServiceType)).FirstOrDefault()?.SaleManId;
                 if (!string.IsNullOrEmpty(salemanId))
                 {
                     var employeeId = userLst[salemanId].FirstOrDefault()?.EmployeeId;
                     payment.Salesman = salemanId == null ? string.Empty : employeeLst[employeeId].FirstOrDefault().EmployeeNameEn;
                 }
                 // Get creator name
-                var creatorId = soaLst[item.Key.BillingRefNo].FirstOrDefault()?.UserCreated;
+                var creatorId = soaLst[item.grp.BillingRefNo].FirstOrDefault()?.UserCreated;
                 if (string.IsNullOrEmpty(creatorId))
                 {
-                    creatorId = cdNoteLst[item.Key.BillingRefNo].FirstOrDefault()?.UserCreated;
+                    creatorId = cdNoteLst[item.grp.BillingRefNo].FirstOrDefault()?.UserCreated;
                     var creator = string.IsNullOrEmpty(creatorId) ? string.Empty : userLst[creatorId].FirstOrDefault()?.EmployeeId;
                     payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                 }
@@ -1650,19 +1625,19 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 payment.receiptDetail = new List<AccountingReceiptDetail>();
-                var receiptGroup = item.GroupBy(x => new { x.PaymentRefNo, x.invoice.Type }).Select(x=> new { grp = x.Key , Payment = x.Select(z=> new { z.PaymentDate, z.PaymentAmountVnd })});
+                var receiptGroup = item.payment.GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentDate, z.PaymentType, z.PaymentAmountVnd }) });
                 foreach (var rcp in receiptGroup)
                 {
                     var detail = new AccountingReceiptDetail();
                     detail.PaymentRefNo = rcp.grp.PaymentRefNo;
                     detail.PaymentDate = rcp.Payment.FirstOrDefault().PaymentDate;
-                    detail.PaidAmount = rcp.grp.Type == "Invoice" ? (rcp.Payment.FirstOrDefault().PaymentAmountVnd ?? 0) : 0;
-                    detail.PaidAmountOBH = rcp.grp.Type == "InvoiceTemp" ? rcp.Payment.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                    detail.PaidAmount = rcp.Payment.Where(z => z.PaymentType != "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                    detail.PaidAmountOBH = rcp.Payment.Where(z => z.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
                     payment.receiptDetail.Add(detail);
                 }
                 results.Add(payment);
             }
-            return results.OrderBy(x=>x.PartnerCode).AsQueryable();
+            return results.OrderBy(x => x.PartnerCode).AsQueryable();
         }
 
     }

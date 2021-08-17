@@ -209,7 +209,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             baseOn: [null],
             creditLimit: [],
             creditLimitRate: [],
-            creditAmount: [],
+            debitAmount: [],
             billingAmount: [],
             paidAmount: [],
             unpaidAmount: [],
@@ -597,7 +597,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             trialCreditDays: this.selectedContract.trialCreditDays,
             trialEffectDate: !!this.selectedContract.trialEffectDate ? { startDate: new Date(this.selectedContract.trialEffectDate), endDate: new Date(this.selectedContract.trialEffectDate) } : null,
             trialExpiredDate: !!this.selectedContract.trialExpiredDate ? { startDate: new Date(this.selectedContract.trialExpiredDate), endDate: new Date(this.selectedContract.trialExpiredDate) } : null,
-            creditAmount: this.selectedContract.creditAmount,
+            debitAmount: this.selectedContract.debitAmount,
             billingAmount: this.selectedContract.billingAmount,
             paidAmount: this.selectedContract.paidAmount,
             unpaidAmount: this.selectedContract.unpaidAmount,
@@ -682,7 +682,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
         this.selectedContract.creditLimit = this.formGroup.controls['creditLimit'].value;
         this.selectedContract.creditLimitRate = this.formGroup.controls['creditLimitRate'].value;
-        this.selectedContract.creditAmount = this.formGroup.controls['creditAmount'].value;
+        this.selectedContract.debitAmount = this.formGroup.controls['debitAmount'].value;
         this.selectedContract.billingAmount = this.formGroup.controls['billingAmount'].value;
         this.selectedContract.paidAmount = this.formGroup.controls['paidAmount'].value;
         this.selectedContract.unpaidAmount = this.formGroup.controls['unpaidAmount'].value;

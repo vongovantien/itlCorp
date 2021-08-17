@@ -85,13 +85,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// get list payment by refNo
         /// </summary>
-        /// <param name="refId"></param>
-        /// <param name="refNo">Payment RefNo</param>s
+        /// <param name="refNo">Payment RefNo</param>
+        /// <param name="type">payment type</param>s
         /// <returns></returns>
         [HttpGet("GetBy")]
-        public IActionResult GetBy(string refId, string refNo)
+        public IActionResult GetBy(string refNo, string type)
         {
-            var results = accountingPaymentService.GetBy(refId, refNo);
+            var results = accountingPaymentService.GetBy(refNo, type);
             return Ok(results);
         }
         /// <summary>
@@ -442,12 +442,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// get extended date of an invoice
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="refNo">billing no</param>
         /// <returns></returns>
         [HttpGet("GetInvoiceExtendedDate")]
-        public IActionResult GetInvoiceExtendedDate(string id)
+        public IActionResult GetInvoiceExtendedDate(string refNo)
         {
-            var result = accountingPaymentService.GetInvoiceExtendedDate(id);
+            var result = accountingPaymentService.GetInvoiceExtendedDate(refNo);
             return Ok(result);
         }
 

@@ -992,18 +992,18 @@ namespace eFMS.API.Accounting.DL.Services
 
                 agreement.BillingAmount = receivables.Sum(su => (su.BillingAmount ?? 0) + (su.ObhBilling ?? 0)); //Sum BillingAmount + BillingOBH
                 //Credit Amount ~ Debit Amount
-                agreement.CreditAmount = receivables.Sum(su => su.DebitAmount ?? 0) + contractChildOfPartner.Sum(su => su.CreditAmount ?? 0); //Sum DebitAmount + Debit Amount (của các đối tượng con)
+                agreement.DebitAmount = receivables.Sum(su => su.DebitAmount ?? 0) + contractChildOfPartner.Sum(su => su.DebitAmount ?? 0); //Sum DebitAmount + Debit Amount (của các đối tượng con)
                 agreement.UnpaidAmount = receivables.Sum(su => (su.BillingUnpaid ?? 0) + (su.ObhUnpaid ?? 0)) + contractChildOfPartner.Sum(su => su.UnpaidAmount ?? 0); //Sum BillingUnpaid + ObhUnpaid + BillingUnpaid (của các đối tượng con)
                 agreement.PaidAmount = receivables.Sum(su => (su.PaidAmount ?? 0) + (su.ObhPaid ?? 0)) + contractChildOfPartner.Sum(su => su.PaidAmount ?? 0); //Sum PaidAmount + ObhPaid + PaidAmount (của các đối tượng con)
 
                 decimal? _creditRate = agreement.CreditRate;
                 if (agreement.ContractType == "Trial")
                 {
-                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.CreditAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = agreement.CreditLimit == null? 0:(((agreement.CreditAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null? 0:(((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
@@ -1063,6 +1063,14 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var model in models)
                 {
                     var receivable = new AccAccountReceivableModel();
+                    receivable.Over30Day = 0;
+                    receivable.Over1To15Day = 0;
+                    receivable.Over16To30Day = 0;
+                    receivable.ObhAmount = 0;
+                    receivable.ObhBilling = 0;
+                    receivable.ObhPaid = 0;
+                    receivable.ObhUnpaid = 0;
+                    receivable.DebitAmount = 0;
                     var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
                     //Không tính công nợ cho đối tượng Internal
                     if (partner != null && partner.PartnerMode != "Internal")

@@ -27,6 +27,7 @@ export class Contract {
     creditLimit: number = null;
     creditLimitRate: number = null;
     creditAmount: number = null;
+    debitAmount: number = null;
     billingAmount: number = null;
     paidAmount: number = null;
     unpaidAmount: number = null;
