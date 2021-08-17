@@ -447,5 +447,23 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        [Route("ExportAccountingAgencyPayment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingAgencyPayment(AccountingPaymentCriteria paymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
+             
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
+
+            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Agency - eFMS.xlsx");
+
+            return fileContent;
+        }
     }
 }

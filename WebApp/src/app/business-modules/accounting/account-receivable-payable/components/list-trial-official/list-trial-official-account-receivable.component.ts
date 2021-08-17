@@ -13,6 +13,7 @@ import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
 import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
     selector: 'list-trial-official-account-receivable',
@@ -30,6 +31,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         private _accountingRepo: AccountingRepo,
         private _store:Store<IAccountReceivableState>,
         private _exportRepo: ExportRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -106,12 +108,17 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     exportExcel(){
-        this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
-        .subscribe(
-            (res: Blob) => {
-                this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
-            }
-        );
+        if (!this.trialOfficialList.length) {
+            this._toastService.warning('No Data To View, Please Re-Apply Filter');
+            return;
+        } else {
+            this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
+                }
+            );
+        }
     }
 
     showDebitDetail(agreementId,option){

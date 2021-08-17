@@ -272,4 +272,17 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
+    exportStatementReceivableAgency(){
+        if (!this.refPayments.length) {
+            this._toastService.warning('No Data To View, Please Re-Apply Filter');
+            return;
+        } else {
+            this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Agency - eFMS.xlsx');
+                    }
+                );
+        }
+    }
 }
