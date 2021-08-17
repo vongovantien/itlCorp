@@ -1591,15 +1591,9 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PartnerCode,
                 x.PartnerName,
                 x.ParentCode,
-                x.invoice.Type,
-                x.invoice.IssuedDate,
-                x.InvoiceNo,
                 x.BillingRefNo,
-                x.invoice.ConfirmBillingDate,
-                x.invoice.OfficeId,
-                x.invoice.DueDate,
-                x.invoice.ServiceType
-            });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.InvoiceNo, z.PaymentDate, z.PaymentAmountVnd, z.UnpaidPaymentAmountVnd }) });
+
             var results = new List<AccountingCustomerPaymentExport>();
             var soaLst = soaRepository.Get().ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
@@ -1608,38 +1602,39 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingCustomerPaymentExport();
-                payment.PartnerCode = item.Key.PartnerCode;
-                payment.PartnerName = item.Key.PartnerName;
-                payment.ParentCode = item.Key.ParentCode;
-                payment.InvoiceNo = item.Key.InvoiceNo;
-                payment.InvoiceDate = item.Key.IssuedDate;
-                payment.BillingRefNo = item.Key.BillingRefNo;
-                payment.BillingDate = item.Key.ConfirmBillingDate;
-                payment.DueDate = item.Key.DueDate;
+                var invoice = item.invoice.FirstOrDefault();
+                payment.PartnerCode = item.grp.PartnerCode;
+                payment.PartnerName = item.grp.PartnerName;
+                payment.ParentCode = item.grp.ParentCode;
+                payment.InvoiceNo = item.payment.FirstOrDefault()?.InvoiceNo;
+                payment.InvoiceDate = invoice.IssuedDate;
+                payment.BillingRefNo = item.grp.BillingRefNo;
+                payment.BillingDate = invoice.ConfirmBillingDate;
+                payment.DueDate = invoice.DueDate;
 
-                payment.UnpaidAmountInv = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                payment.UnpaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                payment.PaidAmount = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.PaymentAmountVnd ?? 0;
-                payment.PaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").Sum(x => x.PaymentAmountVnd ?? 0);
-                var billingDebit = surchargeRepository.Get(x => x.DebitNo == item.Key.BillingRefNo).FirstOrDefault();
+                payment.UnpaidAmountInv = item.payment.Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
+                payment.UnpaidAmountOBH = item.payment.Where(x => x.PaymentType == "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
+                payment.PaidAmount = item.payment.Where(x => x.PaymentType != "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                payment.PaidAmountOBH = item.payment.Where(x => x.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                var billingDebit = surchargeRepository.Get(x => x.DebitNo == item.grp.BillingRefNo).FirstOrDefault();
                 payment.JobNo = billingDebit?.JobNo;
                 payment.MBL = billingDebit?.Mblno;
                 payment.HBL = billingDebit?.Hblno;
                 payment.CustomNo = billingDebit == null ? string.Empty : customsDeclarationRepository.Get(x => x.JobNo == billingDebit.JobNo).FirstOrDefault()?.ClearanceNo;
                 // Get saleman name
-                var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.Key.PartnerId
-                                                                               && x.OfficeId.Contains(item.Key.OfficeId.ToString())
-                                                                               && x.SaleService.Contains(item.Key.ServiceType)).FirstOrDefault()?.SaleManId;
+                var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
+                                                                               && x.OfficeId.Contains(invoice.OfficeId.ToString())
+                                                                               && x.SaleService.Contains(invoice.ServiceType)).FirstOrDefault()?.SaleManId;
                 if (!string.IsNullOrEmpty(salemanId))
                 {
                     var employeeId = userLst[salemanId].FirstOrDefault()?.EmployeeId;
                     payment.Salesman = salemanId == null ? string.Empty : employeeLst[employeeId].FirstOrDefault().EmployeeNameEn;
                 }
                 // Get creator name
-                var creatorId = soaLst[item.Key.BillingRefNo].FirstOrDefault()?.UserCreated;
+                var creatorId = soaLst[item.grp.BillingRefNo].FirstOrDefault()?.UserCreated;
                 if (string.IsNullOrEmpty(creatorId))
                 {
-                    creatorId = cdNoteLst[item.Key.BillingRefNo].FirstOrDefault()?.UserCreated;
+                    creatorId = cdNoteLst[item.grp.BillingRefNo].FirstOrDefault()?.UserCreated;
                     var creator = string.IsNullOrEmpty(creatorId) ? string.Empty : userLst[creatorId].FirstOrDefault()?.EmployeeId;
                     payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                 }
@@ -1650,19 +1645,19 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 payment.receiptDetail = new List<AccountingReceiptDetail>();
-                var receiptGroup = item.GroupBy(x => new { x.PaymentRefNo, x.invoice.Type }).Select(x=> new { grp = x.Key , Payment = x.Select(z=> new { z.PaymentDate, z.PaymentAmountVnd })});
+                var receiptGroup = item.payment.GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentDate, z.PaymentType, z.PaymentAmountVnd }) });
                 foreach (var rcp in receiptGroup)
                 {
                     var detail = new AccountingReceiptDetail();
                     detail.PaymentRefNo = rcp.grp.PaymentRefNo;
                     detail.PaymentDate = rcp.Payment.FirstOrDefault().PaymentDate;
-                    detail.PaidAmount = rcp.grp.Type == "Invoice" ? (rcp.Payment.FirstOrDefault().PaymentAmountVnd ?? 0) : 0;
-                    detail.PaidAmountOBH = rcp.grp.Type == "InvoiceTemp" ? rcp.Payment.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                    detail.PaidAmount = rcp.Payment.Where(z => z.PaymentType != "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                    detail.PaidAmountOBH = rcp.Payment.Where(z => z.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
                     payment.receiptDetail.Add(detail);
                 }
                 results.Add(payment);
             }
-            return results.OrderBy(x=>x.PartnerCode).AsQueryable();
+            return results.OrderBy(x => x.PartnerCode).AsQueryable();
         }
 
     }
