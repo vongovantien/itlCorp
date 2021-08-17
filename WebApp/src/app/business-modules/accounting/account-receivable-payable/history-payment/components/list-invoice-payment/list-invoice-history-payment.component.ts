@@ -136,8 +136,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         }
     }
 
-    getPayments(refId: string, refNo: string) {
-        this._accountingRepo.getPaymentByrefId(refId, refNo)
+    getPayments(refNo: string, type: string) {
+        this._accountingRepo.getPaymentByrefNo(refNo, type)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
@@ -164,8 +164,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         }
     }
 
-    showExtendDateModel(refId: string) {
-        this._accountingRepo.getInvoiceExtendedDate(refId)
+    showExtendDateModel(refNo: string) {
+        this._accountingRepo.getInvoiceExtendedDate(refNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe((res: any) => {
@@ -217,7 +217,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                     if (res.status) {
                         this._toastService.success(res.message, '');
                         this.getPagingData();
-                        this.getPayments(this.selectedPayment.refId, this.selectedPayment.receiptId);
+                        // this.getPayments(this.selectedPayment.refId, this.selectedPayment.receiptId);
                     } else {
                         this._toastService.error(res.message || 'Có lỗi xảy ra', '');
                     }
@@ -228,7 +228,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     confirmSync(refId: string, refNo: string, action: string) {
         this.refId = refId;
         this.action = action;
-        this._accountingRepo.getPaymentByrefId(refId, refNo)
+        this._accountingRepo.getPaymentByrefNo(refId, refNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
