@@ -44,6 +44,5 @@ namespace eFMS.API.Accounting.Service.Models
         public string NotifyDepartment { get; set; }
         public decimal? CreditAmountVnd { get; set; }
         public decimal? CreditAmountUsd { get; set; }
-
     }
 }

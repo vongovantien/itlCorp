@@ -36,5 +36,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string BankName { get; set; }
         public string Photo { get; set; }
         public string PersonalId { get; set; }
+        public string BankCode { get; set; }
     }
 }

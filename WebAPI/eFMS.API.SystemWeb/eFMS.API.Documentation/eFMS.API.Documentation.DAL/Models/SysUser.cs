@@ -31,6 +31,7 @@ namespace eFMS.API.Documentation.Service.Models
         public string Description { get; set; }
         public decimal? CreditLimit { get; set; }
         public decimal? CreditRate { get; set; }
+        public string UserRole { get; set; }
 
         public virtual ICollection<SysAuthorization> SysAuthorizationAssignToNavigation { get; set; }
         public virtual ICollection<SysAuthorization> SysAuthorizationUser { get; set; }
