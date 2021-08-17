@@ -230,7 +230,14 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     selectCreditPaymentItem(item: ReceiptInvoiceModel) {
         if (this.selectedPaymentItemIndex >= 0) {
-            this._store.dispatch(InsertCreditToDebit({ index: this.selectedPaymentItemIndex, creditNo: item.refNo }));
+            this._store.dispatch(InsertCreditToDebit(
+                {
+                    index: this.selectedPaymentItemIndex,
+                    creditNo: item.refNo,
+                    creditAmountVnd: item.paidAmountVnd,
+                    creditAmountUsd: item.paidAmountUsd
+                }
+            ));
 
         }
     }
@@ -252,7 +259,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         let totalNetOffVNd: number = 0;
         let totalNetOffUsd: number = 0;
         let creditMapPriceValue: ICreditNetOffMapValue[];
-
+        item.isNetOff = isNetOff;
         if (!!item.creditNos.length) {
             this.creditList$
                 .pipe(takeUntil(this.ngUnsubscribe))
@@ -269,8 +276,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     })
 
                     if (isNetOff === true) {
-                        item.paidAmountVnd = item.totalPaidUsd = totalNetOffVNd;
-                        item.paidAmountUsd = item.totalPaidVnd = totalNetOffUsd;
+                        item.paidAmountVnd = item.totalPaidVnd = totalNetOffVNd;
+                        item.paidAmountUsd = item.totalPaidUsd = totalNetOffUsd;
                     }
                     else {
                         // item.paidAmountVnd = item.unpaidAmountVnd - totalNetOffVNd;

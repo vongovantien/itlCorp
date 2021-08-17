@@ -51,7 +51,7 @@ export const ToggleAutoConvertPaid = createAction(ReceiptActionTypes.TOGGLE_AUTO
 export const SelectReceiptCurrency = createAction(ReceiptActionTypes.SELECT_CURRENCY, props<{ currency: string }>());
 export const SelectReceiptClass = createAction(ReceiptActionTypes.SELECT_CLASS, props<{ class: string }>());
 export const ChangeADVType = createAction(ReceiptActionTypes.CHANGE_ADV_TYPE, props<{ index: number, newType: string }>());
-export const InsertCreditToDebit = createAction(ReceiptActionTypes.INSERT_CREDIT_TO_DEBIT, props<{ index: number, creditNo: string }>());
+export const InsertCreditToDebit = createAction(ReceiptActionTypes.INSERT_CREDIT_TO_DEBIT, props<ISelectCreditToDebit>());
 export const UpdateCreditItemValue = createAction(ReceiptActionTypes.UPDATE_CREDIT_ITEM_VALUE, props<{ searchKey: string, searchValue: string, key: string, value: string }>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
@@ -62,4 +62,11 @@ export interface ProcessClearInvoiceModel {
     invoices: ReceiptInvoiceModel[],
     cusAdvanceAmountVnd: number,
     cusAdvanceAmountUsd: number,
+}
+
+export interface ISelectCreditToDebit {
+    index: number
+    creditNo: string;
+    creditAmountVnd: number;
+    creditAmountUsd: number;
 }

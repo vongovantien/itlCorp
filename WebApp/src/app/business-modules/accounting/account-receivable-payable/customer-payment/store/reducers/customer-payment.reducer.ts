@@ -135,9 +135,17 @@ export const receiptManagementReducer = createReducer(
 
         return { ...state, debitList: newArrayDebit }
     }),
-    on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: { index: number, creditNo: string }) => {
+    on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: ReceiptActions.ISelectCreditToDebit) => {
         const newArrayDebit: ReceiptInvoiceModel[] = [...state.debitList];
         newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
+
+        // * if NetOff
+        if (newArrayDebit[payload.index].isNetOff === true && newArrayDebit[payload.index].creditNos.length === 1) {
+            // const currentPaidVndDebitItem = newArrayDebit[payload.index].paidAmountVnd;
+            // const currentpaidAmountUsdDebitItem = newArrayDebit[payload.index].paidAmountUsd;
+            newArrayDebit[payload.index].paidAmountVnd = newArrayDebit[payload.index].totalPaidVnd = payload.creditAmountVnd;
+            newArrayDebit[payload.index].paidAmountUsd = newArrayDebit[payload.index].totalPaidUsd = payload.creditAmountUsd;
+        }
 
         const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
         const indexCreditToUpdate: number = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);

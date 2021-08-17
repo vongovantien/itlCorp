@@ -537,7 +537,13 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     payment.Negative = acctPayment.Negative;
                     payment.PaymentType = acctPayment.PaymentType;
-                    payment.CreditNos = !string.IsNullOrEmpty(acctPayment.CreditNo) ? acctPayment.CreditNo.Split(",").ToList() : new List<string>();
+
+                    List<string> _creditNos = new List<string>();
+                    if(!string.IsNullOrEmpty(acctPayment.CreditNo))
+                    {
+                        _creditNos = acctPayment.CreditNo.Split(",").ToList();
+                    }
+                    payment.CreditNos = _creditNos;
                     paymentReceipts.Add(payment);
                 }
             }
