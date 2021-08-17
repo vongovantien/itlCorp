@@ -425,5 +425,12 @@ export class ExportRepo {
     exportAgreementInfo(partnerSearchObj: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/Catalogue/ExportAgreementInfo`, partnerSearchObj);
     }
+
+    exportStatementReceivableAgency(searchObject: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingAgencyPayment`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 }
 

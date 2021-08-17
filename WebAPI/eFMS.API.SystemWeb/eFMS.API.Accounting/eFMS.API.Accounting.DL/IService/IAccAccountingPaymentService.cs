@@ -25,5 +25,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<AccountingPaymentOBHImportTemplateModel> CheckValidImportOBHPayment(List<AccountingPaymentOBHImportTemplateModel> dataList);
         IQueryable<AccountingPaymentModel> ExportAccountingPayment(PaymentCriteria criteria);
         IQueryable<AccountingCustomerPaymentExport> GetDataExportAccountingCustomerPayment(PaymentCriteria criteria);
+        IQueryable<AccountingAgencyPaymentExport> GetDataExportAccountingAgencyPayment(PaymentCriteria criteria);
     }
 }
