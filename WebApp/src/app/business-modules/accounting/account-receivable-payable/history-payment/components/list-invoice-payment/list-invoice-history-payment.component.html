@@ -53,8 +53,8 @@
                                                     <button type="button"
                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
-                                                        [attr.data-target]="'#id-00' + (item.refId) + item.refNo" title="Collapse"
-                                                        (click)="getPayments(item.refId, item.refNo)">
+                                                        [attr.data-target]="'#id-00' + item.refNo + item.type" title="Collapse"
+                                                        (click)="getPayments(item.refNo, item.type)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
                                                     <!-- <button type="button"
@@ -92,7 +92,7 @@
                                                 </ng-container>
                                             </td>
                                             <td><a href="javascript:void(0)"
-                                                (click)="showExtendDateModel(item.refId)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
+                                                (click)="showExtendDateModel(item.refNo)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
                                             </td>
                                             <td>{{ item.overdueDays }}</td>
                                             <td>{{ item.extendDays}}</td>
@@ -100,7 +100,7 @@
                                             <td>{{ item.serie}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
-                                            [id]="'id-00' + item.refId + item.refNo" [parentId]="'#payment-table'">
+                                            [id]="'id-00' + item.refNo + item.type" [parentId]="'#payment-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead app-table-header [headers]="paymentHeaders"
                                                     (onClick)="sortPayment($event.sortField, $event.order)">

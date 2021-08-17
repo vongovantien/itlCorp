@@ -197,8 +197,8 @@
             <summary>
             get list payment by refNo
             </summary>
-            <param name="refId"></param>
-            <param name="refNo">Payment RefNo</param>s
+            <param name="refNo">Payment RefNo</param>
+            <param name="type">payment type</param>s
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadInvoicePaymentExcel">
@@ -252,7 +252,7 @@
             <summary>
             get extended date of an invoice
             </summary>
-            <param name="id"></param>
+            <param name="refNo">billing no</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetOBHSOAExtendedDate(System.String)">
@@ -267,6 +267,13 @@
             upload OBH payment template
             </summary>
             <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingCustomerPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Customers
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountReceivableController">

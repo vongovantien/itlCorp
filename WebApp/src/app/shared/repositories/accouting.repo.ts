@@ -559,14 +559,14 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    getPaymentByrefId(refId: string, refNo: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId, refNo: refNo }).pipe(
+    getPaymentByrefNo(refNo: string, type: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refNo: refNo, type: type}).pipe(
             map((data: any) => data)
         );
     }
 
-    getInvoiceExtendedDate(refId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refId }).pipe(
+    getInvoiceExtendedDate(refNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refNo }).pipe(
             map((data: any) => data)
         );
     }
