@@ -1792,5 +1792,4 @@ namespace eFMS.API.Accounting.DL.Services
             return results.AsQueryable();
         }
     }
-    }
 }
