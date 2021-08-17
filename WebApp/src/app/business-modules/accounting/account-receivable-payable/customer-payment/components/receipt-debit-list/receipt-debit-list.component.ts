@@ -1,11 +1,9 @@
 import { OnInit, Component, ChangeDetectionStrategy, EventEmitter, Output, Input, ViewChild } from "@angular/core";
 import { AppList } from "@app";
 import { Store } from "@ngrx/store";
-import { DataService } from "@services";
 import { ReceiptInvoiceModel } from "@models";
 import { ConfirmPopupComponent } from "@common";
 import { InjectViewContainerRefDirective } from "@directives";
-import { ToastrService } from "ngx-toastr";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState } from "../../store/reducers";
@@ -36,8 +34,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'Unpaid VND', field: '', width: 150, align: this.right },
         { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true, },
         { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
-        { title: 'Total Paid VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
+        { title: 'Total Paid VND', field: '', width: 150, align: this.right },
         { title: 'Remain USD', field: '', width: 150, align: this.right },
         { title: 'Remain VND', field: '', width: 150, align: this.right },
         { title: 'Note', field: '', width: 200 },
@@ -71,8 +69,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     constructor(
         private readonly _store: Store<IReceiptState>,
-        private readonly _dataService: DataService,
-        private readonly _toastService: ToastrService,
     ) {
         super();
     }
