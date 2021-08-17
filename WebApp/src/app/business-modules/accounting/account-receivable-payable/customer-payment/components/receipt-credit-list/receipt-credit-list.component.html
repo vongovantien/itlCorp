@@ -4,8 +4,8 @@
             <div class="m-portlet__head-title w-100">
                 <h3 class="m-portlet__head-text collapse-toggle" data-toggle="collapse" data-target="#credit-summary">
                     <i class="la la-angle-up m--margin-right-5"></i> CREDIT
-                    <ng-container *ngIf="!!(creditList )?.length">
-                        <span class="badge badge-success">{{(creditList)?.length}}</span>
+                    <ng-container *ngIf="!!(creditList | async )?.length">
+                        <span class="badge badge-success">{{(creditList | async)?.length}}</span>
                     </ng-container>
                 </h3>
             </div>
@@ -21,8 +21,8 @@
                         </th>
                     </thead>
                     <tbody>
-                        <ng-container *ngIf="!!(creditList)?.length">
-                            <tr *ngFor="let item of (creditList); let i = index; trackBy: trackByFn">
+                        <ng-container *ngIf="!!(creditList | async)?.length">
+                            <tr *ngFor="let item of (creditList | async); let i = index; trackBy: trackByFn">
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
                                         <app-permission-button type="delete"
@@ -91,21 +91,42 @@
 
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!(creditList)?.length">
+                        <tr app-table-none-record *ngIf="!(creditList | async)?.length">
                         </tr>
                     </tbody>
-                    <tfoot>
-                        <tr class="font-weight-bold font-15 bg-locked">
-                            <td colspan="4" rowspan="4" ALIGN="center">Total</td>
-                            <td class="text-right">{{creditList | sumAmount:'unpaidAmountUsd' |
-                                number:'1.2-2'}}
-                            </td>
-                            <td class="text-right">{{creditList | sumAmount:'unpaidAmountVnd' |
-                                number:'1.0-3'}}
-                            </td>
-                            <td colspan="11"></td>
-                        </tr>
-                    </tfoot>
+                    <ng-container *ngIf="!!(creditList | async)?.length">
+                        <tfoot>
+                            <tr class="font-weight-bold font-15 bg-locked">
+                                <td colspan="4" rowspan="4" ALIGN="center">Total</td>
+                                <td class="text-right">{{creditList | async | sumAmount:'unpaidAmountUsd' |
+                                    number:'1.2-2'}}
+                                </td>
+                                <td class="text-right">{{creditList | async | sumAmount:'unpaidAmountVnd' |
+                                    number:'1.0-3'}}
+                                </td>
+                                <td rowspan="4" ALIGN="center" class="text-right">
+                                    {{sumTotalObj.totalPaidAmountUsd | number:'.2-2'}} USD
+                                </td>
+                                <td rowspan="4" ALIGN="center" class="text-right">
+                                    {{sumTotalObj.totalPaidAmountVnd | number: '.0-3'}} VND
+                                </td>
+                                <td ALIGN="right">
+                                    <ng-container
+                                        *ngIf="sumTotalObj.totalRemainUsd > 0; else negativeRemainCreditUsdTpl">
+                                        {{sumTotalObj.totalRemainUsd | number:'.2-2'}} USD
+                                    </ng-container>
+                                </td>
+                                <td ALIGN="right">
+                                    <ng-container
+                                        *ngIf="sumTotalObj.totalRemainVnd > 0; else negativeRemainCreditVndTpl">
+                                        {{sumTotalObj.totalRemainVnd | number:'.0-3'}} VND
+
+                                    </ng-container>
+                                </td>
+                                <td colspan="7"></td>
+                            </tr>
+                        </tfoot>
+                    </ng-container>
                 </table>
             </div>
         </div>
@@ -113,3 +134,14 @@
 </div>
 
 <ng-template inject></ng-template>
+
+
+
+<ng-template #negativeRemainCreditUsdTpl>
+    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.2-2'}}
+</ng-template>
+
+
+<ng-template #negativeRemainCreditVndTpl>
+    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.0-3'}}
+</ng-template>

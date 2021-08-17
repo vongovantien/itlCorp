@@ -439,7 +439,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             const totaValue = (this.finalPaidAmountVnd.value ?? 0) + (this.cusAdvanceAmount.value ?? 0);
             this.finalPaidAmountVnd.setValue(totaValue);
         } else {
-            this.finalPaidAmountVnd.setValue(this.finalPaidAmountVnd);
+            this.finalPaidAmountVnd.setValue(this.finalPaidAmountVnd.value - (this.cusAdvanceAmount.value ?? 0));
         }
     }
 }

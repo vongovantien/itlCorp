@@ -1,20 +1,19 @@
-import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter, ViewChild } from "@angular/core";
+import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
-import { distinctUntilChanged, skip, takeUntil, filter, pluck } from "rxjs/operators";
+import { takeUntil } from "rxjs/operators";
 import { RemoveCredit } from "../../store/actions";
-import { AppComboGridComponent, ConfirmPopupComponent } from "@common";
-import { DataService } from "@services";
 import _cloneDeep from 'lodash/cloneDeep'
 import { InjectViewContainerRefDirective } from "@directives";
+import { ConfirmPopupComponent } from "@common";
 @Component({
     selector: 'customer-payment-receipt-credit-list',
     templateUrl: './receipt-credit-list.component.html',
-    // changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ARCustomerPaymentReceiptCreditListComponent extends AppList implements OnInit {
 
@@ -23,8 +22,8 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
 
     @Input() isReadonly: boolean = false;
 
-    creditList: ReceiptInvoiceModel[] = [];
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
+    creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '' },
@@ -57,9 +56,19 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
     invoiceDatasource: any[] = [];
     receiptType$: Observable<string> = this._store.select(ReceiptTypeState);
 
+    sumTotalObj = {
+        totalUnpaidAmountUsd: 0,
+        totalUnpaidAmountVnd: 0,
+        totalPaidAmountVnd: 0,
+        totalPaidAmountUsd: 0,
+        totalPaidVnd: 0,
+        totalPaidUsd: 0,
+        totalRemainVnd: 0,
+        totalRemainUsd: 0
+    };
+
     constructor(
         private readonly _store: Store<IReceiptState>,
-        private readonly dataService: DataService
     ) {
         super();
     }
@@ -86,24 +95,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
                 (data) => {
-                    this.creditList = data;
-                }
-            )
-
-        // * Listen Debit clear Credit
-        this.dataService.currentMessage
-            .pipe(
-                filter(x => !!x['clearCredit']),
-                pluck('clearCredit'),
-                takeUntil(this.ngUnsubscribe))
-            .subscribe(
-                (data: { invoiceNo: string, creditNo: string }) => {
-                    if (data.creditNo) {
-                        const indexCreditCurrent = this.creditList.findIndex(x => x.refNo === data.creditNo)
-                        if (indexCreditCurrent !== -1) {
-                            this.creditList[indexCreditCurrent].invoiceNo = data.invoiceNo;
-                        }
-                    }
+                    this.sumTotalObj = this.calculateTotal(data);
                 }
             )
     }
@@ -131,6 +123,33 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         } else {
             this.onDeleteInvoiceItem();
         }
+    }
+
+    calculateTotal(model: ReceiptInvoiceModel[]) {
+        console.log(model);
+        const totalData = {
+            totalUnpaidAmountUsd: 0,
+            totalUnpaidAmountVnd: 0,
+            totalPaidAmountVnd: 0,
+            totalPaidAmountUsd: 0,
+            totalPaidVnd: 0,
+            totalPaidUsd: 0,
+            totalRemainVnd: 0,
+            totalRemainUsd: 0
+        };
+
+        for (let index = 0; index < model.length; index++) {
+            const item: ReceiptInvoiceModel = model[index];
+            totalData.totalUnpaidAmountUsd += (+(item.unpaidAmountUsd) ?? 0);
+            totalData.totalUnpaidAmountVnd += (+(item.unpaidAmountVnd) ?? 0);
+            totalData.totalPaidAmountUsd += (+(item.paidAmountUsd) ?? 0);
+            totalData.totalPaidAmountVnd += (+(item.paidAmountVnd) ?? 0);
+            totalData.totalPaidUsd += (+(item.totalPaidUsd) ?? 0);
+            totalData.totalPaidVnd += (+(item.totalPaidVnd) ?? 0);
+            totalData.totalRemainUsd = (+(totalData.totalUnpaidAmountUsd) ?? 0) - (+(totalData.totalPaidAmountUsd) ?? 0);
+            totalData.totalRemainVnd = (+(totalData.totalUnpaidAmountVnd) ?? 0) - (+(totalData.totalPaidAmountVnd) ?? 0);
+        }
+        return totalData
     }
 
     onDeleteInvoiceItem() {
