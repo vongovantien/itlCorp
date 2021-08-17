@@ -150,7 +150,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.some(x => (x.type === 'DEBIT' || x.type === 'OBH') && (!x.paidAmountVnd || !x.paidAmountUsd))) {
+        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd))) {
             this._toastService.warning("Paid amount is required");
             return;
         }

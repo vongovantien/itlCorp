@@ -47,14 +47,14 @@ namespace eFMS.API.Documentation.DL.Services
         readonly ICsShipmentOtherChargeService shipmentOtherChargeService;
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<SysAuthorization> authorizationRepository;
-        readonly IUserPermissionService permissionService;
-        readonly IContextBase<SysOffice> sysOfficeRepo;
+        private readonly IUserPermissionService permissionService;
+        private readonly IContextBase<SysOffice> sysOfficeRepo;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IContextBase<SysCompany> sysCompanyRepo;
         private readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepository;
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
-        readonly IContextBase<SysUserLevel> userlevelRepository;
-        readonly IContextBase<CatDepartment> catDepartmentRepository;
+        private readonly IContextBase<SysUserLevel> userlevelRepository;
+        private readonly IContextBase<CatDepartment> catDepartmentRepository;
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<SysSentEmailHistory> sendEmailHistoryRepository;
 
@@ -85,6 +85,7 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<SysUserLevel> userlevelRepo,
+            IContextBase<CatDepartment> catDepartRepo,
             IContextBase<SysEmployee> sysEmployeeRepo,
             IContextBase<SysSentEmailHistory> sendEmailHistoryRepo) : base(repository, mapper)
         {
@@ -111,6 +112,7 @@ namespace eFMS.API.Documentation.DL.Services
             stringLocalizer = localizer;
             sysCompanyRepo = sysCompany;
             userlevelRepository = userlevelRepo;
+            catDepartmentRepository = catDepartRepo;
             acctAdvancePaymentRepository = acctAdvancePaymentRepo;
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             sysEmployeeRepository = sysEmployeeRepo;
@@ -524,7 +526,7 @@ namespace eFMS.API.Documentation.DL.Services
                     detail.PackageTypeName = detail.PackageType == null ? string.Empty : catUnitRepo.Get(x => x.Id == detail.PackageType)?.FirstOrDefault()?.UnitNameEn;
                     detail.ShipmentPIC = shipment.PersonIncharge;
                     //detail.DeliveryPlace = detail.DeliveryPlace == null ? string.Empty : !string.IsNullOrEmpty(shipment.Pod.ToString()) ?  catPlaceRepo.Get(x => x.Id == shipment.Pod)?.FirstOrDefault()?.NameEn : null;
-                    detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId).FirstOrDefault()?.SignPath;
+                    detail.DeptSign = catDepartmentRepository.Get(x => x.Id == shipment.DepartmentId)?.FirstOrDefault()?.SignPath;
                     return detail;
                 }
             }

@@ -62,6 +62,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
 
     isChangeValue: boolean = false;
     creditNos: string[] = [];
+    isNetOff: boolean = false;
 
     constructor(object?: any) {
         super();

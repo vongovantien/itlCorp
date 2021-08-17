@@ -276,6 +276,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingAgencyPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Agency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountReceivableController">
             <summary>
             A base class for an MVC controller without view support.
