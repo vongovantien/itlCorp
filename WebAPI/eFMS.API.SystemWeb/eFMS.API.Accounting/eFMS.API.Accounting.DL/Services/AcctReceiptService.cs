@@ -426,7 +426,7 @@ namespace eFMS.API.Accounting.DL.Services
             List<ReceiptInvoiceModel> paymentReceipts = new List<ReceiptInvoiceModel>();
             IOrderedEnumerable<AccAccountingPayment> acctPayments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id)
                 .ToList()
-                .OrderBy(x => x.Type == "ADV");
+                .OrderBy(x => x.PaymentType == "OTHER");
 
             IEnumerable<AccAccountingPayment> listOBH = acctPayments.Where(x => x.Type == "OBH").OrderBy(x => x.DatetimeCreated);
             if (listOBH.Count() > 0)
@@ -536,6 +536,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.ExchangeRateBilling = acctPayment.ExchangeRateBilling;
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     payment.Negative = acctPayment.Negative;
+                    payment.PaymentType = acctPayment.PaymentType;
+                    payment.CreditNos = !string.IsNullOrEmpty(acctPayment.CreditNo) ? acctPayment.CreditNo.Split(",").ToList() : new List<string>();
                     paymentReceipts.Add(payment);
                 }
             }
@@ -545,6 +547,10 @@ namespace eFMS.API.Accounting.DL.Services
 
             CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == result.CustomerId).FirstOrDefault();
             result.CustomerName = partnerInfo?.ShortName;
+            if (result.ReferenceId != Guid.Empty)
+            {
+                result.ReferenceNo = Get(x => x.Id == result.ReferenceId)?.FirstOrDefault()?.PaymentRefNo;
+            }
 
             // Check có tồn tại 1 invoice thu chưa hết.
             if (result.Status == AccountingConstants.RECEIPT_STATUS_DONE)
@@ -649,7 +655,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             string advNo = "AD" + DateTime.Now.ToString("yyyy");
             string no = "0001";
-            IQueryable<string> paymentNewests = acctPaymentRepository.Get(x => x.Type == "ADV" && x.BillingRefNo.Contains("AD") && x.BillingRefNo.Substring(2, 4) == DateTime.Now.ToString("yyyy"))
+            IQueryable<string> paymentNewests = acctPaymentRepository.Get(x => x.PaymentType == "OTHER" && x.BillingRefNo.Contains("AD") && x.BillingRefNo.Substring(2, 4) == DateTime.Now.ToString("yyyy"))
                 .OrderByDescending(o => o.BillingRefNo).Select(s => s.BillingRefNo);
             string paymentNewest = paymentNewests.FirstOrDefault();
             if (!string.IsNullOrEmpty(paymentNewest))
@@ -812,8 +818,17 @@ namespace eFMS.API.Accounting.DL.Services
                 AccAccountingPayment _payment = new AccAccountingPayment();
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
-                _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.RefNo;
-                _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.RefNo;
+               
+                if (payment.PaymentType == "OTHER")
+                {
+                    _payment.PaymentNo = receipt.PaymentRefNo;
+                }
+                else
+                {
+                    _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                }
+
                 if (payment.RefIds != null)
                 {
                     _payment.RefId = string.Join(",", payment.RefIds);
@@ -865,10 +880,10 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DeptInvoiceId = payment.DepartmentId;
                 _payment.OfficeInvoiceId = payment.OfficeId;
                 _payment.CompanyInvoiceId = payment.CompanyId;
-                _payment.CreditNo = payment.CreditNo;
                 _payment.CreditAmountVnd = payment.CreditAmountVnd;
                 _payment.CreditAmountUsd = payment.CreditAmountUsd;
-                _payment.PartnerId = payment.PartnerId;
+                _payment.PartnerId = receipt.CustomerId;
+                _payment.PaymentType = payment.PaymentType;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -877,6 +892,14 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.DepartmentId = currentUser.DepartmentId;
                 _payment.OfficeId = currentUser.OfficeID;
                 _payment.CompanyId = currentUser.CompanyID;
+
+                string _creditNo = string.Empty;
+
+                if(payment.CreditNos != null && payment.CreditNos.Count > 0)
+                {
+                    _creditNo = string.Join(",", payment.CreditNos);
+                }
+                _payment.CreditNo = _creditNo;
 
                 results.Add(_payment);
             }
@@ -938,8 +961,15 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
 
-                _payment.BillingRefNo = payment.Type == "ADV" ? GenerateAdvNo() : payment.BillingRefNo;
-                _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.BillingRefNo;
+
+                if(payment.PaymentType == "OTHER")
+                {
+                    _payment.PaymentNo = receipt.PaymentRefNo;
+                }else
+                {
+                    _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                }
 
                 //Phát sinh payment amount âm
                 _payment.PaymentAmount = -payment.PaymentAmount;
@@ -1187,7 +1217,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
+            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.PaymentType == "OTHER")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
 
@@ -1282,6 +1312,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptModel.DepartmentId = currentUser.DepartmentId;
                 receiptModel.OfficeId = currentUser.OfficeID;
                 receiptModel.CompanyId = currentUser.CompanyID;
+                receiptModel.ReferenceId = receiptCurrent.ReferenceId;
 
                 receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
                 receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
@@ -1924,8 +1955,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2004,8 +2035,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2447,8 +2478,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2568,8 +2599,8 @@ namespace eFMS.API.Accounting.DL.Services
                                TaxCode = par.TaxCode,
                                CurrencyId = inv.CurrencyId,
                                Amount = inv.Amount,
-                               PaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaidAmountVnd = inv.UnpaidAmountVnd,
+                               //PaidAmountUsd = inv.UnpaidAmountUsd,
+                               //PaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmount = inv.UnpaidAmount,
                                UnpaidAmountVnd = inv.UnpaidAmountVnd,
                                UnpaidAmountUsd = inv.UnpaidAmountUsd,
@@ -2651,7 +2682,8 @@ namespace eFMS.API.Accounting.DL.Services
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
                                CreditType = "CREDITSOA",
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               
                            };
 
             return joinData;
@@ -2725,7 +2757,7 @@ namespace eFMS.API.Accounting.DL.Services
                                CreditType = "CREDITNOTE",
                                VoucherId = inv.VoucherId,
                                VoucherIdre = inv.VoucherIdre,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
                            };
 
             return joinData;

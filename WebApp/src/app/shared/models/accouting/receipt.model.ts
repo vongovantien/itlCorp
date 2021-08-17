@@ -32,12 +32,13 @@ export class ReceiptCreditDebitModel {
     totalPaidVnd: number;
     totalPaidUsd: number;
     negative: boolean;
-    creditNo: string; // * Số Credit dùng để cấn trừ trên hóa đơn
+    creditNo: any; // * Số Credit dùng để cấn trừ trên hóa đơn
     creditAmountVnd: number;
     creditAmountUsd: number;
     exchangeRateBilling: number;
     voucherId: string = null;
     voucherIdre: string = null;
+    paymentType: string = null;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -60,6 +61,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
     hbl?: string;
 
     isChangeValue: boolean = false;
+    creditNos: string[] = [];
 
     constructor(object?: any) {
         super();
@@ -82,7 +84,7 @@ export class Receipt {
     customerName: string = null;
     paymentRefNo: string = null;
     paidAmount: string = null;
-    finalPaidAmount: number = null;
+    finalPaidAmount: number = 0;
     paymentDate: string = null;
     status: string = null;
     type: string = null;
@@ -102,7 +104,15 @@ export class Receipt {
     referenceId: string = null; // * ID của receipt cha (trường hợp có receipt banking)
     paymentMethod: string = null;
     class: string = null;
-
+    obhpartnerId: string = null;
+    notifyDepartment: string = null;
+    creditAmountVnd: number = 0;
+    creditAmountUsd: number = 0;
+    finalPaidAmountUsd: number = 0;
+    finalPaidAmountVnd: number = 0;
+    cusAdvanceAmount: number = 0;
+    paidAmountUsd: number = 0;
+    paidAmountVnd: number = 0;
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -119,12 +129,8 @@ export class ReceiptModel extends Receipt {
     userNameCreated: string = null;
     userNameModified: string = null;
     subRejectReceipt: string = null;
-    cusAdvanceAmount: number = null;
-    paidAmountUsd: number = null;
-    paidAmountVnd: number = null;
-    finalPaidAmountUsd: number = null;
-    finalPaidAmountVnd: number = null;
     isReceiptBankFee: boolean = false;
+    referenceNo: string = null;
 
     constructor(object?: any) {
         super();

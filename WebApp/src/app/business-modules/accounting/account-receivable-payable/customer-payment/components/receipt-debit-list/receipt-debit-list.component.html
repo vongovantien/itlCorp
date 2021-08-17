@@ -16,14 +16,14 @@
             <div class="table-horizontal">
                 <table class="table table-brand table-bordered">
                     <thead app-table-header [headers]="(receiptType$ | async) ==='CUSTOMER' ? headers : agencyHeaders"
-                        class="text-center">
+                        [align]="'center'">
                         <th class="m--w-50 first">
                         </th>
                     </thead>
                     <tbody>
                         <ng-container *ngIf="!!(debitList$ | async)?.length">
                             <tr *ngFor="let item of (this.debitList$ | async); let i = index; trackBy: trackByFn"
-                                [class.bg-warning]="item.type === 'ADV'"
+                                [class.bg-warning]="item.paymentType === 'OTHER'"
                                 [ngClass]="{'bg-secondary font-italic':item.paidAmountVnd < 0}">
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
@@ -34,10 +34,18 @@
                                     </ng-container>
                                 </td>
                                 <td class="text-primary">{{item.refNo}}</td>
-                                <td ALIGN="center">{{item.type}}</td>
+                                <td ALIGN="center" class="font-weight-bold">
+                                    <ng-container *ngIf="item.type === 'ADVANCE'; else paymentOtherTypeTpl">
+                                        <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
+                                            (click)="selectPaymentItem(i)">Advance</a>
+                                    </ng-container>
+                                    <ng-template #paymentOtherTypeTpl>
+                                        {{item.type}}
+                                    </ng-template>
+                                </td>
                                 <td class="text-primary">
                                     {{item.invoiceNo}}
-                                    <ng-container *ngIf="item.type !== 'ADV' ">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
                                         <ng-container [ngSwitch]="item.paymentStatus">
                                             <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
                                                 {{item.paymentStatus}}
@@ -53,22 +61,24 @@
                                     </ng-container>
                                 </td>
                                 <td>
-                                    <div class="form-group" *ngIf="item.type === 'DEBIT'">
-                                        <select class="form-control" [ngModel]="item.creditNo" [disabled]="isReadonly"
-                                            (ngModelChange)="onChangeCalCredit($event, item)">
-                                            <option [value]="i.refNo" *ngFor="let i of (creditList$ | async)">
-                                                {{i.refNo}}</option>
-                                            <option value=null disabled>Please select</option>
-                                        </select>
-                                    </div>
+                                    <ng-container class="form-group " *ngIf="item.type === 'DEBIT'">
+                                        <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
+                                            position=bottomCenter (click)="selectPaymentItem(i)">
+                                            <div class="credit-container">
+                                                <ng-container *ngFor="let credit of item.creditNos; let j = index">
+                                                    <div class="credit-item-wrapper">
+                                                        <span class="credit-item__icon"
+                                                            (click)="deleteCreditItem(credit, item, $event)">x</span>
+                                                        <span class="credit-item__label">{{credit}}</span>
+                                                    </div>
+                                                </ng-container>
+                                            </div>
+                                        </div>
+                                    </ng-container>
                                 </td>
 
-                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.jobNo}}</td>
-                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.mbl}}</td>
-                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'">{{item.hbl}}</td>
-
                                 <td ALIGN="right">
-                                    {{item.unpaidAmountUsd | number:'1.3-3'}}
+                                    {{item.unpaidAmountUsd | number:'1.2-2'}}
                                 </td>
                                 <td ALIGN="right">
                                     {{item.unpaidAmountVnd | number:'1.0-3'}}
@@ -88,37 +98,37 @@
                                 </td>
 
                                 <td ALIGN="right">
-                                    {{item.totalPaidUsd | number:'1.3-3'}}
+                                    {{item.totalPaidUsd | number:'1.2-2'}}
                                 </td>
                                 <td ALIGN="right">
                                     {{item.totalPaidVnd | number:'1.0-3'}}
                                 </td>
                                 <td ALIGN="right">
-                                    <div *ngIf="item.type !== 'ADV'">
+                                    <div *ngIf="item.paymentType !== 'OTHER'">
                                         <ng-container
                                             *ngIf="item.unpaidAmountUsd - (item.totalPaidUsd | abs) >= 0 ; else negativeUsd">
 
                                             <span> {{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | negativeNumber
                                                 |
-                                                number: '.3-3'}} </span>
+                                                number: '.2-2'}} </span>
                                         </ng-container>
                                         <ng-template #negativeUsd>
                                             <span> ({{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | abs | number:
-                                                '.3-3'}}) </span>
+                                                '.2-2'}}) </span>
                                         </ng-template>
                                     </div>
                                 </td>
                                 <td ALIGN="right">
-                                    <div *ngIf="item.type !== 'ADV'">
+                                    <div *ngIf="item.paymentType !== 'OTHER'">
                                         <ng-container
                                             *ngIf="item.unpaidAmountVnd - (item.totalPaidVnd | abs) >= 0 ; else negativeVnd">
                                             <span> {{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | negativeNumber
                                                 |
-                                                number: '.3-3'}} </span>
+                                                number: '.2-2'}} </span>
                                         </ng-container>
                                         <ng-template #negativeVnd>
                                             <span> ({{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | abs | number:
-                                                '.3-3'}}) </span>
+                                                '.2-2'}}) </span>
                                         </ng-template>
                                     </div>
                                 </td>
@@ -128,6 +138,16 @@
                                 </td>
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
+                                <td class="text-center">
+                                    <ng-container *ngIf="item.type === 'DEBIT'">
+                                        <app-switch size="sm" class="danger"
+                                            (toggleChange)="onToggleNetOfOnly($event, item)"></app-switch>
+                                    </ng-container>
+                                </td>
+
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.jobNo}}</td>
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.mbl}}</td>
+                                <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.hbl}}</td>
                             </tr>
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(debitList$ | async)?.length">
@@ -135,26 +155,21 @@
                     </tbody>
                     <tfoot *ngIf="!!(debitList$ | async)?.length">
                         <tr class="font-weight-bold font-15 bg-locked">
-                            <ng-container *ngIf="(receiptType$ | async) === 'CUSTOMER' else totalLabelAgent">
-                                <td colspan="5" rowspan="4" ALIGN="center">Total</td>
-                            </ng-container>
-                            <ng-template #totalLabelAgent>
-                                <td colspan="8" rowspan="4" ALIGN="center">Total</td>
-                            </ng-template>
+                            <td colspan="5" rowspan="4" ALIGN="center">Total</td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalUnpaidAmountUsd | number:'.3-3'}} USD
+                                {{sumTotalObj.totalUnpaidAmountUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalUnpaidAmountVnd | number: '.0-3'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalPaidAmountUsd | number:'.3-3'}} USD
+                                {{sumTotalObj.totalPaidAmountUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidAmountVnd | number: '.0-3'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalPaidUsd | number:'.3-3'}} USD
+                                {{sumTotalObj.totalPaidUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidVnd | number: '.0-3'}} VND
@@ -162,7 +177,7 @@
 
                             <td ALIGN="right">
                                 <ng-container *ngIf="sumTotalObj.totalRemainUsd > 0; else TplnegativeRemainUsd">
-                                    {{sumTotalObj.totalRemainUsd | number:'.3-3'}} USD
+                                    {{sumTotalObj.totalRemainUsd | number:'.2-2'}} USD
                                 </ng-container>
                             </td>
                             <td ALIGN="right">
@@ -172,7 +187,7 @@
                                 </ng-container>
                             </td>
 
-                            <td colspan="3"></td>
+                            <td colspan="7"></td>
                         </tr>
                     </tfoot>
                 </table>
@@ -193,3 +208,20 @@
 <ng-template #TplnegativeRemainVnd>
     {{sumTotalObj.totalRemainVnd | negativeNumber:'1.3-3'}}
 </ng-template>
+
+<app-dropdown #dropdownMenuAdvance>
+    <a class="dropdown-item pointer" (click)="changePaymentTypeADV('COLL_OTHER')">
+        <span> Change To Collect Other </span>
+    </a>
+    <a class="dropdown-item pointer" (click)="changePaymentTypeADV('PAY_OTHER')">
+        <span> Change To Pay Other </span>
+    </a>
+</app-dropdown>
+
+<app-dropdown #dropdownMenuCreditList>
+    <ng-container *ngFor="let item of (creditList$ | async)">
+        <a class="dropdown-item pointer" (click)="selectCreditPaymentItem(item)">
+            {{item.refNo}}
+        </a>
+    </ng-container>
+</app-dropdown>

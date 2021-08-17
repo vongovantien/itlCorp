@@ -164,7 +164,7 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel.Payments);
+            string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
             if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
             {
                 ResultHandle _result = new ResultHandle { Status = false, Message = ListPaymentMessageInvalid, Data = receiptModel };
@@ -309,7 +309,7 @@ namespace eFMS.API.Accounting.Controllers
         private string CheckInvoicePaid(AcctReceiptModel receiptModel)
         {
             string result = string.Empty;
-            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT" && x.Type != "ADV").ToList();
+            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT" && x.PaymentType != "OTHER").ToList();
             bool isValidPayment = acctReceiptService.CheckPaymentPaid(payments);
 
             if (isValidPayment == true)
@@ -319,7 +319,7 @@ namespace eFMS.API.Accounting.Controllers
             return result;
         }
 
-        private string ValidatePaymentList(List<ReceiptInvoiceModel> payments)
+        private string ValidatePaymentList(AcctReceiptModel model, List<ReceiptInvoiceModel> payments)
         {
             string messageInValid = string.Empty;
             if (payments.Count == 0)
@@ -328,7 +328,7 @@ namespace eFMS.API.Accounting.Controllers
             }
             else
             {
-                if (!payments.Any(x => (x.Type == "DEBIT" || x.Type == "OBH")))
+                if (model.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT && !payments.Any(x => (x.Type == "DEBIT" || x.Type == "OBH")))
                 {
                     messageInValid = "You can't save without debit in this period, Please check it again!";
                 }
