@@ -69,7 +69,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -532,6 +532,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
 
+                entity.Property(e => e.DebitAmount).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Description).HasColumnType("text");
 
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
@@ -735,6 +737,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
+                entity.Property(e => e.SignPath).HasMaxLength(1000);
+
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -821,6 +825,10 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.BankAccountNo)
                     .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.BankName).HasMaxLength(200);
@@ -2807,6 +2815,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.BankCode)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.BankName)
                     .HasMaxLength(500)
                     .IsUnicode(false);
@@ -3125,6 +3137,10 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserRole)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
