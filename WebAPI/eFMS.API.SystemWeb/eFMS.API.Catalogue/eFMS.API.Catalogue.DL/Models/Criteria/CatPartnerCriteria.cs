@@ -29,5 +29,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string ContractType { get; set; }
         public DateTime? DatetimeCreatedFrom { get; set; }
         public DateTime? DatetimeCreatedTo { get; set; }
+        public string PartnerMode { get; set; }
     }
 }

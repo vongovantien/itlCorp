@@ -14,3 +14,26 @@ export class SortTableClassPipe implements PipeTransform {
         return '';
     }
 }
+@Pipe({ name: 'fixedColumnClass' })
+export class FixedColumnClassPipe implements PipeTransform {
+    transform(header: any, index: number) {
+        if (index == NaN) {
+            return '';
+        }
+        if (header.fixed === true) {
+            return 'fixed-side-' + index;
+        }
+        return '';
+    }
+}
+
+@Pipe({ name: 'alignClass' })
+export class AlignClassPipe implements PipeTransform {
+    transform(h: any) {
+        if (!h.align) {
+            return '';
+        }
+        return 'text-' + h.align;
+
+    }
+}

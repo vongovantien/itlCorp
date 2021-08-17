@@ -45,6 +45,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     receiptRefId: string = null;
     receiptRefDetail: ReceiptModel;
     titleReceipt: string;
+    actionReceiptFromParams: string;
 
     constructor(
         protected readonly _router: Router,
@@ -59,6 +60,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     ngOnInit(): void {
         this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
+
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(x => {
@@ -66,24 +68,26 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this.titleReceipt = `Create ${this.type} Receipt`;
             });
 
-        // * Listen Bank Fee Receipt     
+        // * Listen Bank Fee/Other/Clear Debit Receipt     
         this._activedRoute.queryParams
             .pipe(
-                pluck('id'),
-                tap((id: string) => { this.receiptRefId = id }),
-                switchMap((receiptId: string) => {
-                    if (!!receiptId) {
-                        return this._accountingRepo.getDetailReceipt(receiptId)
+                tap((params: { id: string, action: string }) => {
+                    this.receiptRefId = params.id;
+                    this.actionReceiptFromParams = params['action'];
+                }),
+                switchMap((params: { id: string, action: string }) => {
+                    if (!!params['id']) {
+                        return this._accountingRepo.getDetailReceipt(params['id']);
                     }
                     return EMPTY;
                 }),
                 takeUntil(this.ngUnsubscribe),
             )
             .subscribe(
-                (res: ReceiptModel) => {
+                (res: any) => {
                     if (!!res) {
-                        this.titleReceipt = "Create Bank Fee Receipt";
-                        this.setFormBankReceipt(res);
+                        this.titleReceipt = this.actionReceiptFromParams === 'debit' ? 'Create Clear Debit' : "Create Bank Fee/Other";
+                        this.setFormReceiptDefault(res);
                     }
                 },
                 (err) => {
@@ -150,8 +154,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Paid amount is required");
             return;
         }
-        if (this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0) {
-            this._toastService.warning("You can't save without debit in this period, Please check it again!");
+
+        if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
+            this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0
+        ) {
+            this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
         if (this.paymentList.filter(x => x.type == 'CREDIT').length) {
@@ -162,7 +169,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             }
         }
 
-        if (this.paymentList.some(x => x.isChangeValue == true)) {
+        if (this.paymentList.some(x => x.paymentType !== 'OTHER' && x.isChangeValue == true)) {
             this._toastService.warning('Please you do Process Clear firstly!');
             return;
         }
@@ -176,16 +183,15 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     getDataForm() {
         const dataForm: any = Object.assign({}, this.formCreate.formSearchInvoice.getRawValue(), this.listInvoice.form.getRawValue());
-
         const formMapValue: any = {
             fromDate: !!dataForm.date?.startDate ? formatDate(dataForm.date?.startDate, 'yyyy-MM-dd', 'en') : null,
             toDate: !!dataForm.date?.endDate ? formatDate(dataForm.date?.endDate, 'yyyy-MM-dd', 'en') : null,
             paymentDate: !!dataForm.paymentDate?.startDate ? formatDate(dataForm.paymentDate?.startDate, 'yyyy-MM-dd', 'en') : null,
             type: this.type || 'Customer',
+            notifyDepartment: !!dataForm.notifyDepartment ? dataForm.notifyDepartment.toString() : null
         };
 
         const d = this.utility.mergeObject(dataForm, formMapValue);
-
         return d;
     }
 
@@ -194,6 +200,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         if (!this.formCreate.formSearchInvoice.valid || !this.listInvoice.form.valid) {
             valid = false;
         }
+        if (this.formCreate.class.value?.includes('OBH') ||
+            (
+                this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
+                && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
+            )) {
+            if (!this.listInvoice.obhpartnerId.value) {
+                this.listInvoice.obhpartnerId.setErrors({ required: true });
+                valid = false;
+            } else {
+                this.listInvoice.obhpartnerId.setErrors({ required: null });
+                valid = true;
+            }
+        }
+
         return valid;
     }
     onSaveDataReceipt(model: ReceiptModel, action: number) {
@@ -274,29 +294,56 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         })
     }
 
-    setFormBankReceipt(receiptModel: ReceiptModel) {
+    setFormReceiptDefault(receiptModel: ReceiptModel) {
         this.receiptRefDetail = receiptModel;
         this._store.dispatch(RegistTypeReceipt({ data: receiptModel.type.toUpperCase(), partnerId: receiptModel.customerId }));
 
-        this.setFormCreate(this.receiptRefDetail);
-        this.setListInvoice(this.receiptRefDetail);
+        this.setFormCreateDefault(this.receiptRefDetail);
+        this.setPaymentListFormDefault(this.receiptRefDetail);
     }
 
-    setFormCreate(res: ReceiptModel) {
+    setFormCreateDefault(res: ReceiptModel) {
         const formMapping = {
             date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
             customerId: res.customerId,
             agreementId: res.agreementId,
+            class: this.actionReceiptFromParams === 'debit' ? AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT : null,
         };
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
+
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
 
-        this.formCreate.isReadonly = true;
+        if (this.actionReceiptFromParams !== 'debit') {
+            this.formCreate.isReadonly = true;
+        }
+
+        if (this.actionReceiptFromParams === 'bank') {
+            const formMappingBank = {
+                paymentRefNo: res.paymentRefNo + '_BANK',
+            }
+
+            this.formCreate.formSearchInvoice.patchValue(formMappingBank);
+            this.formCreate.receiptReference = res.paymentRefNo + res.class;
+        } else if (this.actionReceiptFromParams === 'other') {
+            this.formCreate.formSearchInvoice.patchValue({ paymentRefNo: res.paymentRefNo + '_OTH001' });
+            this.formCreate.receiptReference = res.paymentRefNo + '_' + res.class;
+        }
     }
 
-    setListInvoice(res: ReceiptModel) {
+    setPaymentListFormDefault(res: ReceiptModel) {
+        if (this.actionReceiptFromParams === 'debit') {
+            this.setPaymentListFormForClearDebit(res);
+            return;
+        } else if (this.actionReceiptFromParams === 'bank') {
+            this.setPaymentListDefaultForBankFee(res);
+            return;
+        }
+        this.setListInvoiceDefaultForOther(res);
+    }
+
+    setPaymentListDefaultForBankFee(res: ReceiptModel) {
         const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH")
             && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
         if (!listPaymentWithUnpaid.length) {
@@ -316,25 +363,64 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
             cusAdvanceAmount: 0,
-            amountUSD: 0,
-            amountVND: 0,
-
-            description: 'Bank Fee Receipt',
-            paymentMethod: 'Other'
-
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
+            paidAmountVnd: 0,
+            paidAmountUsd: 0,
+            finalPaidAmountVnd: 0,
+            finalPaidAmountUsd: 0,
+            paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
-            x.paidAmountVnd = x.unpaidAmountVnd,
-                x.paidAmountUsd = x.unpaidAmountUsd,
-                x.notes = "Bank Fee Receipt",
-                x.id = SystemConstants.EMPTY_GUID // ? Reset ID Trường hợp phiếu ngân hàng.
+            x.paidAmountVnd = x.unpaidAmountVnd;
+            x.paidAmountUsd = x.unpaidAmountUsd;
+            x.notes = "Bank Fee Receipt";
+            x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
         })
         this._store.dispatch(GetInvoiceListSuccess({ invoices: listPaymentWithUnpaid }));
 
         (this.listInvoice.partnerId as any) = { id: res.customerId };
+    }
 
+    setPaymentListFormForClearDebit(res: ReceiptModel) {
+        const formMapping = {
+            type: res.type?.split(","),
+            paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
+            cusAdvanceAmount: 0,
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
+            paidAmountVnd: res.finalPaidAmountVnd,
+            paidAmountUsd: res.finalPaidAmountUsd,
+
+            paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+        };
+
+        this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
+        (this.listInvoice.partnerId as any) = { id: res.customerId };
+    }
+
+    setListInvoiceDefaultForOther(res: ReceiptModel) {
+        const formMappingFormOther = {
+            type: res.type?.split(","),
+            paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
+            cusAdvanceAmount: 0,
+            creditAmountUsd: 0,
+            creditAmountVnd: 0,
+            paidAmountVnd: 0,
+            paidAmountUsd: 0,
+            finalPaidAmountVnd: 0,
+            finalPaidAmountUsd: 0,
+            paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE
+        };
+
+        this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMappingFormOther));
+
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
+        (this.listInvoice.partnerId as any) = { id: res.customerId };
     }
 }

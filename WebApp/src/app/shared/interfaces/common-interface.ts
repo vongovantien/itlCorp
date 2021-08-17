@@ -8,6 +8,7 @@ namespace CommonInterface {
         required?: boolean;
         align?: AlignSetting;
         dataType?: CommonType.DataType;
+        fixed?: boolean;
     }
 
     export interface IComboGirdConfig {
