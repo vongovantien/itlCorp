@@ -375,8 +375,8 @@ namespace eFMS.API.Documentation.DL.Services
             if (transactionType == TermData.AirImport || transactionType == TermData.AirExport)
             {
                 //Không order theo DatetimeCreated, chỉ order giảm dần theo số HAWBNo
-                var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
-                    .Where(n => 
+                var hblNos = Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL) && isNumeric(x.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, x.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) && x.Hwbno.Length <= 11).ToArray()
+                    .Where(n =>
                     Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) >= 675 // Số hệ thống gen tới  ITL79390675
                     && Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) < 9755 // Số user đã giành  ITL79399755
                     )
