@@ -807,27 +807,30 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-
-                // Group By InvoiceID
-                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                if(invs != null)
                 {
-                    Id = s.Key.Id,
-                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
-                    TotalAmount = s.FirstOrDefault().TotalAmount,
-                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
-                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                    {
+                        Id = s.Key.Id,
+                        DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                        TotalAmount = s.FirstOrDefault().TotalAmount,
+                        TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                        TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
 
-                    PaidAmount = s.FirstOrDefault().PaidAmount,
-                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
-                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+                        PaidAmount = s.FirstOrDefault().PaidAmount,
+                        PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                        PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
 
-                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
-                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
-                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
-                    ServiceType = s.FirstOrDefault().ServiceType
+                        UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                        UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                        UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                        ServiceType = s.FirstOrDefault().ServiceType
 
-                });
-                fe.Over1To15Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    });
+                    fe.Over1To15Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                }
+               
             });
 
             return models;
@@ -878,26 +881,29 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                // Group By InvoiceID
-                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
-                {
-                    Id = s.Key.Id,
-                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
-                    TotalAmount = s.FirstOrDefault().TotalAmount,
-                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
-                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+                if (invs != null) {
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                    {
+                        Id = s.Key.Id,
+                        DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                        TotalAmount = s.FirstOrDefault().TotalAmount,
+                        TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                        TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
 
-                    PaidAmount = s.FirstOrDefault().PaidAmount,
-                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
-                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+                        PaidAmount = s.FirstOrDefault().PaidAmount,
+                        PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                        PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
 
-                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
-                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
-                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
-                    ServiceType = s.FirstOrDefault().ServiceType
+                        UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                        UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                        UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                        ServiceType = s.FirstOrDefault().ServiceType
 
-                });
-                fe.Over16To30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    });
+                    fe.Over16To30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                }
+                
             });
 
             return models;
@@ -946,26 +952,30 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                // Group By InvoiceID
-                IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                if (invs != null)
                 {
-                    Id = s.Key.Id,
-                    DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
-                    TotalAmount = s.FirstOrDefault().TotalAmount,
-                    TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
-                    TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                    {
+                        Id = s.Key.Id,
+                        DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                        TotalAmount = s.FirstOrDefault().TotalAmount,
+                        TotalAmountVnd = s.FirstOrDefault().TotalAmountVnd,
+                        TotalAmountUsd = s.FirstOrDefault().TotalAmountUsd,
 
-                    PaidAmount = s.FirstOrDefault().PaidAmount,
-                    PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
-                    PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
+                        PaidAmount = s.FirstOrDefault().PaidAmount,
+                        PaidAmountUsd = s.FirstOrDefault().PaidAmountUsd,
+                        PaidAmountVnd = s.FirstOrDefault().PaidAmountVnd,
 
-                    UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
-                    UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
-                    UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
-                    ServiceType = s.FirstOrDefault().ServiceType
+                        UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                        UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                        UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                        ServiceType = s.FirstOrDefault().ServiceType
 
-                });
-                fe.Over30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    });
+                    fe.Over30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                }
+                    
             });
 
             return models;
@@ -1215,8 +1225,8 @@ namespace eFMS.API.Accounting.DL.Services
         private void WriteLogInsertOrUpdateReceivable(bool status, string message, List<AccAccountReceivableModel> receivables)
         {
             string logMessage = string.Format("InsertOrUpdateReceivable by {0} at {1} \n ** Message: {2} \n ** Receivables: {3} \n\n---------------------------\n\n",
-                            currentUser.UserID,
-                            DateTime.Now.ToString("dd/MM/yyyy HH:ss:mm"),
+                            currentUser.Action,
+                            DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
                             message,
                             receivables != null ? JsonConvert.SerializeObject(receivables) : "[]");
             string logName = string.Format("InsertOrUpdateReceivable_{0}_eFMS_LOG", (status ? "Success" : "Fail"));
