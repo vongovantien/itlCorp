@@ -1748,6 +1748,7 @@ namespace eFMS.API.Accounting.DL.Services
                         ArCurrency = s.First().ArCurrency,
                         ParentNameAbbr = s.First().ParentNameAbbr,
                         ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
+                        ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount)
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
