@@ -2788,11 +2788,14 @@ namespace eFMS.API.Documentation.DL.Services
                DatetimeCreated = s.DatetimeCreated,
                DatetimeModified = s.DatetimeModified,
                LastSyncDate = s.LastSyncDate,
-               SyncStatus = s.SyncStatus
+               SyncStatus = s.SyncStatus,
+               Type = s.Type,
+               DepartmentId = s.DepartmentId
             }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
 
             var charges = surchargeRepository.Get().Select(s => new CsShipmentSurcharge
             {
+               Id =s.Id,
                CurrencyId = s.CurrencyId,
                Total = s.Total,
                JobNo = s.JobNo,
@@ -2800,6 +2803,7 @@ namespace eFMS.API.Documentation.DL.Services
                VoucherId = s.VoucherId,
                AcctManagementId = s.AcctManagementId,
                Hblno = s.Hblno,
+               Mblno=s.Mblno,
                CreditNo = s.CreditNo,
                DebitNo = s.DebitNo,
                Type = s.Type,
@@ -2862,16 +2866,13 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Join to get info PartnerName, Username create CDNote
             var dataTrans = from cd in _resultDatas
-                          join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
-                          from partner in partnerGrp.DefaultIfEmpty()
+                          join trans in transaction on cd.JobNo equals trans.JobNo
+                          join payer in partners on cd.PartnerId equals payer.Id into partnerGrp
+                          from payer in partnerGrp.DefaultIfEmpty()
                           join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
                           from creator in creatorGrp.DefaultIfEmpty()
-                          join payer in partners on cd.PayerId equals payer.Id into payerGrp
-                          from payer in payerGrp.DefaultIfEmpty()
                           join departs in departments on cd.DepartmentId equals departs.Id into departGrp
                           from departs in departGrp.DefaultIfEmpty()
-                          join trans in transaction on cd.JobNo equals trans.JobNo into transGrp
-                          from trans in transGrp.DefaultIfEmpty()
                           select new AccAccountingManagementResult
                           {
                               JobNo = cd.JobNo,
@@ -2893,16 +2894,13 @@ namespace eFMS.API.Documentation.DL.Services
                           };
 
             var dataOps = from cd in _resultDatas
-                          join partner in partners on cd.PartnerId equals partner.Id into partnerGrp
-                          from partner in partnerGrp.DefaultIfEmpty()
+                          join trans in opstransaction on cd.JobNo equals trans.JobNo
+                          join payer in partners on cd.PartnerId equals payer.Id into partnerGrp
+                          from payer in partnerGrp.DefaultIfEmpty()
                           join creator in sysUserRepo.Get() on cd.Creator equals creator.Id into creatorGrp
                           from creator in creatorGrp.DefaultIfEmpty()
-                          join payer in partners on cd.PayerId equals payer.Id into payerGrp
-                          from payer in payerGrp.DefaultIfEmpty()
                           join departs in departments on cd.DepartmentId equals departs.Id into departGrp
                           from departs in departGrp.DefaultIfEmpty()
-                          join trans in opstransaction on cd.JobNo equals trans.JobNo into transGrp
-                          from trans in transGrp.DefaultIfEmpty()
                           select new AccAccountingManagementResult
                           {
                               JobNo = cd.JobNo,
