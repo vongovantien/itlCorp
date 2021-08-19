@@ -29,6 +29,8 @@
                                         </tr>
                                     </ng-container>
                                 </ng-container>
+                                <tr app-table-none-record *ngIf="!dataDebitList.length">
+                                </tr>
                             </tbody>
                             <tfoot *ngIf="dataDebitList?.length">
                                 <tr class="font-weight-bold font-15 bg-locked">
