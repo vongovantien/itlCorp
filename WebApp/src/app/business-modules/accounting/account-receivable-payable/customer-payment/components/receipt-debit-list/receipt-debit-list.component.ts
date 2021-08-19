@@ -259,7 +259,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         let totalNetOffVNd: number = 0;
         let totalNetOffUsd: number = 0;
         let creditMapPriceValue: ICreditNetOffMapValue[];
-        item.isNetOff = isNetOff;
+        item.netOff = isNetOff;
         if (!!item.creditNos.length) {
             this.creditList$
                 .pipe(takeUntil(this.ngUnsubscribe))

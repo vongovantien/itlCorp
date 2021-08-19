@@ -8,12 +8,22 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         `
         .m-switch.m-switch--success:not(.m-switch--outline) input:empty ~ span:before {
             background-color: #ebedf2;
-        }
+        }        
         .m-switch.m-switch--success:not(.m-switch--outline)
             input:checked
             ~ span:before {
             background-color: #34bfa3;
-        }`
+        }
+        .m-switch.m-switch--danger:not(.m-switch--outline) input:empty ~ span:before {
+            background-color: #ebedf2;
+        }
+         .m-switch.m-switch--danger:not(.m-switch--outline)
+            input:checked
+            ~ span:before {
+            background-color: #f4516c;
+        }
+        
+        `
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [

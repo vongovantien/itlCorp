@@ -857,7 +857,9 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CusAdvanceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.CusAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CusAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.CustomerId)
                     .HasColumnName("CustomerID")

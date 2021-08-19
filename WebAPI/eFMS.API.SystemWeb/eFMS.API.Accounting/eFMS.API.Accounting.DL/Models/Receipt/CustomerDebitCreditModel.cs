@@ -40,5 +40,6 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public decimal? ExchangeRateBilling { get; set; } // tỷ giá của SOA DEBIT hoặc DEBIT hoặc vatInvoice(phí đầu  tiên)
         public bool? Negative { get; set; }
         public string PaymentType { get; set; }
+        public bool? NetOff { get; set; }
     }
 }

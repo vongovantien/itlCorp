@@ -308,10 +308,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
 
         // * Set Default
         datatoReceipt.forEach(element => {
-            element.totalPaidVnd = element.paidAmountVnd;
-            element.totalPaidUsd = element.paidAmountUsd;
             element.paidAmountVnd = element.unpaidAmountVnd;
             element.paidAmountUsd = element.unpaidAmountUsd;
+            element.totalPaidVnd = element.paidAmountVnd;
+            element.totalPaidUsd = element.paidAmountUsd;
             element.creditNos = []
         });
 

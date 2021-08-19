@@ -27,7 +27,7 @@
                                 </app-permission-button>
                             </ng-container>
                             <ng-container
-                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail.type !== 'Clear Debit' ">
+                                *ngIf="receiptDetail?.status === 'Done' && receiptDetail.class !== 'Clear Debit' ">
                                 <app-permission-button title="Clear Debit" type="Add" class="success"
                                     icon="la la-credit-card" (onClick)="confirmCreateClearDebit()">
                                 </app-permission-button>
@@ -74,7 +74,7 @@
                         </app-permission-button>
                     </ng-container>
                     <ng-container
-                        *ngIf="receiptDetail?.status !== 'Draft' &&receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
+                        *ngIf="receiptDetail?.status !== 'Draft' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
                         <app-permission-button title="Cancel Receipt" type="reject" class="danger" icon="la la-times"
                             (onClick)="confirmCancelReceipt()">
                         </app-permission-button>
