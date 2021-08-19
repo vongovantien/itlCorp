@@ -28,8 +28,9 @@ export class TrialOfficialOtherModel {
     over30Day: number = null;
 
     obhBillingAmount: number = 0;
-    obhUnpaidAmount: number = 0;
+    obhUnPaidAmount: number = 0;
     obhPaidAmount: number = 0;
+    agreementCurrency:string = null;
 
     agreementSalesmanName: string = null;
 

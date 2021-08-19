@@ -25,7 +25,7 @@
                         [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
                         placeholder="Select request date" [autoApply]="true" formControlName="date"
                         [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly"
-                        [allowRemove]="true" />
+                        [allowRemove]="!!date.value && !!date.value.startDate" />
                 </div>
             </div>
         </div>
@@ -68,7 +68,7 @@
                 </app-combo-grid-virtual-scroll>
             </div>
         </div>
-        <div class="col-lg-2 text-right">
+        <div class="col-lg-2 text-right" *ngIf="isShowGetDebit">
             <div class="m--margin-top-25">
                 <app-permission-button title="Get Debit" class="outline-info" [icon]="'la la-search'"
                     (onClick)="getDebit()">
