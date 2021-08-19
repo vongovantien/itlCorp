@@ -141,7 +141,7 @@
                                 <td class="text-center">
                                     <ng-container *ngIf="item.type === 'DEBIT'">
                                         <app-switch size="sm" class="danger"
-                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.isNetOff">
+                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff">
                                         </app-switch>
                                     </ng-container>
                                 </td>

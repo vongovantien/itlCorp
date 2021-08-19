@@ -22,19 +22,32 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group">
-                <label>Currency</label>
-                <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async" bindLabel="id"
-                    bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" [clearable]="false"
-                    [readonly]="isReadonly">
-                </ng-select>
+                <label>Cus ADV USD</label>
+                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmountUsd" numeric
+                    [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
+                    (change)="onSelectDataFormInfo($event,'cusAdvanceAmountUsd')">
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
-                <label required> Exchange Rate </label>
-                <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
-                    [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
-                    (change)="onSelectDataFormInfo($event,'exchangeRate')">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label>Currency</label>
+                        <ng-select formControlName="currencyId" class="custom" [items]="$currencyList | async"
+                            bindLabel="id" bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
+                            [clearable]="false" [readonly]="isReadonly">
+                        </ng-select>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
+                        <label required> Exchange Rate </label>
+                        <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
+                            [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
+                            (change)="onSelectDataFormInfo($event,'exchangeRate')">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="col-lg-3">
@@ -55,10 +68,10 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group">
-                <label>Cus Advance</label>
-                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmount" numeric
+                <label>Cus ADV VND</label>
+                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmountVnd" numeric
                     [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
-                    (change)="onSelectDataFormInfo($event,'cusAdvanceAmount')">
+                    (change)="onSelectDataFormInfo($event,'cusAdvanceAmountVnd')">
             </div>
         </div>
         <div class="col-lg-3">

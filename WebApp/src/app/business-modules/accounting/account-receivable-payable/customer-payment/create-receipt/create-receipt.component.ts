@@ -367,11 +367,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: res.finalPaidAmountVnd,
             paidAmountUsd: res.finalPaidAmountUsd,
+            cusAdvanceAmountVnd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountVnd : 0,
+            cusAdvanceAmountIsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
 
             paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
         };

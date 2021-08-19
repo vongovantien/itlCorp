@@ -537,6 +537,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PartnerId = acctPayment?.PartnerId?.ToString();
                     payment.Negative = acctPayment.Negative;
                     payment.PaymentType = acctPayment.PaymentType;
+                    payment.NetOff = acctPayment.NetOff;
 
                     List<string> _creditNos = new List<string>();
                     if(!string.IsNullOrEmpty(acctPayment.CreditNo))
@@ -890,6 +891,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditAmountUsd = payment.CreditAmountUsd;
                 _payment.PartnerId = receipt.CustomerId;
                 _payment.PaymentType = payment.PaymentType;
+                _payment.NetOff = payment.NetOff;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -1223,14 +1225,23 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.PaymentType == "OTHER")
+            decimal? totalAdvPayment= acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADVANCE")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
+            
 
             if (action != SaveAction.SAVECANCEL){
                 if (agreement != null)
                 {
-                    decimal _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmount ?? 0);
+                    decimal _cusAdv = 0;
+                    if(agreement.CreditCurrency != AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
+                    }
+                    else
+                    {
+                        _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+                    }
                     agreement.CustomerAdvanceAmount = _cusAdv;
                 }
             }
@@ -1238,7 +1249,14 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (agreement != null)
                 {
-                    agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmount ?? 0) - (totalAdvPayment ?? 0); 
+                    if (agreement.CreditCurrency != AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPayment ?? 0);
+                    }
+                    else
+                    {
+                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0); 
+                    }
                 }
             }
 

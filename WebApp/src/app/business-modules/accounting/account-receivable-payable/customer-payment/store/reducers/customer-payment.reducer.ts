@@ -6,20 +6,20 @@ import { AccountingConstants } from "@constants";
 
 
 export interface IReceiptState {
-    list: { data: Receipt[], totalItems };
+    list: { data: Receipt[], totalItems: number };
     debitList: ReceiptInvoiceModel[],
     creditList: ReceiptInvoiceModel[],
     isLoading: boolean;
     isLoaded: boolean;
-    type: string;
-    partnerId: string // * đối tượng của phiếu thu,
+    type: string; // ? CUSTOMER/AGENCY
+    partnerId: string;
     date: any; // * Ngày tím kiếm -> Điều kiện search
     agreement: Partial<IAgreementReceipt>;
     dataSearch: any;
     pagingData: any;
     isAutoConvertPaid: boolean;
     currency: string;
-    class: string;
+    class: string; // ? REceipt Type
 }
 
 
@@ -140,7 +140,7 @@ export const receiptManagementReducer = createReducer(
         newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
 
         // * if NetOff
-        if (newArrayDebit[payload.index].isNetOff === true && newArrayDebit[payload.index].creditNos.length === 1) {
+        if (newArrayDebit[payload.index].netOff === true && newArrayDebit[payload.index].creditNos.length === 1) {
             // const currentPaidVndDebitItem = newArrayDebit[payload.index].paidAmountVnd;
             // const currentpaidAmountUsdDebitItem = newArrayDebit[payload.index].paidAmountUsd;
             newArrayDebit[payload.index].paidAmountVnd = newArrayDebit[payload.index].totalPaidVnd = payload.creditAmountVnd;

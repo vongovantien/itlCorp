@@ -39,6 +39,7 @@ export class ReceiptCreditDebitModel {
     voucherId: string = null;
     voucherIdre: string = null;
     paymentType: string = null;
+    netOff: boolean = null;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -62,7 +63,6 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
 
     isChangeValue: boolean = false;
     creditNos: string[] = [];
-    isNetOff: boolean = false;
 
     constructor(object?: any) {
         super();
