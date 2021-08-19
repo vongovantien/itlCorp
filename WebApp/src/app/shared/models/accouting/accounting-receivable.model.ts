@@ -30,6 +30,7 @@ export class TrialOfficialOtherModel {
     obhBillingAmount: number = 0;
     obhUnpaidAmount: number = 0;
     obhPaidAmount: number = 0;
+    agreementCurrency:string = null;
 
     agreementSalesmanName: string = null;
 
