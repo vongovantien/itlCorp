@@ -146,11 +146,11 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                             if (!this.houseBills.some((house: HouseBill) => house.id === this.selectedHblId)) {
                                 this._toastService.error('This House Bill does not exist!');
                             }
-                            this._store.dispatch(new GetDetailHBLAction(this.selectedHblId));
-                            this.selectHBL(this.houseBills.filter((house: HouseBill) => house.id === this.selectedHblId)[0]);
+                            const currenthbl = this.houseBills.find((house: HouseBill) => house.id === this.selectedHblId);
+                            if (currenthbl) {
+                                this.selectHBL(currenthbl);
+                            }
                         } else {
-                            this._store.dispatch(new GetDetailHBLAction(this.houseBills[0].id));
-
                             this.selectHBL(this.houseBills[0]);
                         }
                     } else {
@@ -181,8 +181,8 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             this.selectedHbl = new CsTransactionDetail(hbl);
 
             // * Get container, Job detail, Surcharge with hbl id, JobId.
-            // this._store.dispatch(new GetDetailHBLSuccessAction(hbl));
-
+            //this._store.dispatch(new GetDetailHBLSuccessAction(hbl));
+            this._store.dispatch(new GetDetailHBLAction(hbl.id));
             this._store.dispatch(new GetContainersHBLAction({ hblid: hbl.id }));
             if (this.serviceType === 'sea') {
                 this._store.dispatch(new GetContainerAction({ mblid: this.jobId }));
