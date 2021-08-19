@@ -37,7 +37,7 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
     switch (action.type) {
 
         case HBLActionTypes.GET_DETAIL: {
-            return { ...state, isLoaded: false, isLoading: true };
+            return { ...state, isLoaded: false };
         }
         case HBLActionTypes.GET_DETAIL_SUCCESS: {
             return { ...state, hbl: action.payload, isLoading: false, isLoaded: true };
