@@ -1,8 +1,8 @@
-import { InitProfitHBLAction } from './../../store/actions/hbl.action';
+import { InitProfitHBLAction, GetDetailHBLAction } from './../../store/actions/hbl.action';
 import { AppList } from "src/app/app.list";
 import { SortService } from "@services";
 import { HouseBill, CsTransactionDetail, CsTransaction } from "@models";
-import { getHBLSState, IShareBussinessState, GetDetailHBLSuccessAction, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction } from "../../store";
+import { getHBLSState, IShareBussinessState, GetContainersHBLAction, GetProfitHBLAction, GetBuyingSurchargeAction, GetSellingSurchargeAction, GetOBHSurchargeAction, GetListHBLAction, TransactionGetDetailAction, getTransactionLocked, getHBLLoadingState, getSurchargeLoadingState, getTransactionDetailCsTransactionState, GetContainerAction } from "../../store";
 import { Store } from "@ngrx/store";
 import { Params, ActivatedRoute } from "@angular/router";
 import { NgxSpinnerService } from "ngx-spinner";
@@ -13,7 +13,7 @@ import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo } from "@repositories";
 import { ICrystalReport } from "@interfaces";
 
-import { takeUntil, take, catchError, finalize, map } from "rxjs/operators";
+import { takeUntil, catchError, finalize, map } from "rxjs/operators";
 import isUUID from 'validator/lib/isUUID';
 import { delayTime } from "@decorators";
 import { combineLatest } from 'rxjs';
@@ -74,7 +74,7 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             (param: any) => {
                 if (param.jobId && isUUID(param.jobId)) {
                     this.jobId = param.jobId;
-                    if(param.selected){
+                    if (param.selected) {
                         this.selectedHblId = param.selected;
                     }
 
@@ -142,12 +142,15 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
                         this.totalCW = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.cw, 0);
                         this.totalQty = this.houseBills.reduce((acc: number, curr: HouseBill) => acc += curr.packageQty, 0);
 
-                        if(this.selectedHblId){
-                            if(!this.houseBills.some((house: HouseBill)=> house.id === this.selectedHblId)){
+                        if (this.selectedHblId) {
+                            if (!this.houseBills.some((house: HouseBill) => house.id === this.selectedHblId)) {
                                 this._toastService.error('This House Bill does not exist!');
                             }
-                            this.selectHBL(this.houseBills.filter((house: HouseBill)=> house.id === this.selectedHblId)[0]);
-                        }else{
+                            this._store.dispatch(new GetDetailHBLAction(this.selectedHblId));
+                            this.selectHBL(this.houseBills.filter((house: HouseBill) => house.id === this.selectedHblId)[0]);
+                        } else {
+                            this._store.dispatch(new GetDetailHBLAction(this.houseBills[0].id));
+
                             this.selectHBL(this.houseBills[0]);
                         }
                     } else {
@@ -178,7 +181,8 @@ export abstract class AppShareHBLBase extends AppList implements ICrystalReport 
             this.selectedHbl = new CsTransactionDetail(hbl);
 
             // * Get container, Job detail, Surcharge with hbl id, JobId.
-            this._store.dispatch(new GetDetailHBLSuccessAction(hbl));
+            // this._store.dispatch(new GetDetailHBLSuccessAction(hbl));
+
             this._store.dispatch(new GetContainersHBLAction({ hblid: hbl.id }));
             if (this.serviceType === 'sea') {
                 this._store.dispatch(new GetContainerAction({ mblid: this.jobId }));
