@@ -40,7 +40,7 @@ export function HBLReducer(state = initHBlState, action: HBLActions): IHBLState 
             return { ...state, isLoaded: false, isLoading: true };
         }
         case HBLActionTypes.GET_DETAIL_SUCCESS: {
-            return { ...state, hbl: action.payload };
+            return { ...state, hbl: action.payload, isLoading: false, isLoaded: true };
         }
 
         case HBLActionTypes.GET_LIST: {

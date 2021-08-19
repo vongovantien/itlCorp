@@ -1,6 +1,8 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
-  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/prod"
+  APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
+  APP_OUT_PATH_PROD_EN: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
+  APP_OUT_PATH_PROD_VI: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
 
 image: node:12
 
@@ -10,8 +12,8 @@ cache:
     - ./WebApp/package-lock.json
 stages:
   - build
-
-job_build:
+  # - deploy
+build_uat:
   stage: build
   script:
     - node --version
@@ -21,7 +23,27 @@ job_build:
     - npm install -g @angular/cli
     - ng version
     #- node_modules/.bin/ng build --c=uat-en
-    - npm run build:prod
+    - npm run build:uat:en
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - dev
+  artifacts:
+    name: "angular_build"
+    paths:
+      - $APP_OUTPUT_PATH
+
+build_test:
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - cd WebApp
+    - npm install
+    - npm install -g @angular/cli
+    - ng version
+    #- node_modules/.bin/ng build --c=uat-en
+    - npm run build:test:en
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
@@ -30,3 +52,43 @@ job_build:
     name: "angular_build"
     paths:
       - $APP_OUTPUT_PATH
+
+build_prod_en:
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - cd WebApp
+    - npm install
+    - npm install -g @angular/cli
+    - ng version
+    #- node_modules/.bin/ng build --c=uat-en
+    - npm run build:prod:en
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - prod/15-08-2021-sprint24
+  artifacts:
+    name: "angular_build_prod_en"
+    paths:
+      - APP_OUT_PATH_PROD_EN
+
+build_prod_vi:
+  stage: build
+  script:
+    - node --version
+    - echo "start job_build"
+    - cd WebApp
+    - npm install
+    - npm install -g @angular/cli
+    - ng version
+    #- node_modules/.bin/ng build --c=uat-en
+    - npm run build:prod:vi
+    - echo "job_build doing something..."
+    - echo "end job_build"
+  only:
+    - prod/15-08-2021-sprint24
+  artifacts:
+    name: "angular_build_prod_vi"
+    paths:
+      - APP_OUT_PATH_PROD_VI
