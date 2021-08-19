@@ -38,7 +38,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     customers: Partner[] = [];
 
     agreements: IAgreementReceipt[];
-    listReceipts: ReceiptInvoiceModel[] = [];
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = JobConstants.CONFIG.COMBOGRID_PARTNER;
     displayFieldAgreement: CommonInterface.IComboGridDisplayField[] = [
@@ -59,13 +58,14 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         AccountingConstants.RECEIPT_CLASS.NET_OFF];
     partnerTypeState: string;
     receiptReference: string = null;
+    isShowGetDebit: boolean = true;
 
     constructor(
-        private _fb: FormBuilder,
-        private _store: Store<IAppState>,
-        private _catalogueRepo: CatalogueRepo,
-        private _accountingRepo: AccountingRepo,
-        private _toastService: ToastrService,
+        private readonly _fb: FormBuilder,
+        private readonly _store: Store<IAppState>,
+        private readonly _catalogueRepo: CatalogueRepo,
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _toastService: ToastrService,
 
     ) {
         super();
@@ -226,6 +226,11 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     onChangeReceiptType(type: string) {
         this._store.dispatch(SelectReceiptClass({ class: type }));
+        if (type === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT || type === AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            this.isShowGetDebit = true;
+            return;
+        }
+        this.isShowGetDebit = false;
     }
 
 }

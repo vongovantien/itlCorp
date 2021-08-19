@@ -307,7 +307,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
             customerId: res.customerId,
             agreementId: res.agreementId,
-            class: this.actionReceiptFromParams === 'debit' ? AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT : null,
+            class: this.actionReceiptFromParams === 'debit' ? AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT : res.class,
         };
 
         this.formCreate.formSearchInvoice.patchValue(formMapping);
@@ -323,9 +323,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             const formMappingBank = {
                 paymentRefNo: res.paymentRefNo + '_BANK',
             }
-
             this.formCreate.formSearchInvoice.patchValue(formMappingBank);
             this.formCreate.receiptReference = res.paymentRefNo + res.class;
+
         } else if (this.actionReceiptFromParams === 'other') {
             this.formCreate.formSearchInvoice.patchValue({ paymentRefNo: res.paymentRefNo + '_OTH001' });
             this.formCreate.receiptReference = res.paymentRefNo + '_' + res.class;
@@ -344,21 +344,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     setPaymentListDefaultForBankFee(res: ReceiptModel) {
-        const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH")
-            && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
-        if (!listPaymentWithUnpaid.length) {
-            return;
-        }
-        listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
-            if (c.currencyId === 'VND') {
-                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
-            } else {
-                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
-            }
-            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
-            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
-        })
-
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
@@ -371,16 +356,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             finalPaidAmountUsd: 0,
             paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         };
-
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
-        listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
-            x.paidAmountVnd = x.unpaidAmountVnd;
-            x.paidAmountUsd = x.unpaidAmountUsd;
-            x.notes = "Bank Fee Receipt";
-            x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
-        })
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: listPaymentWithUnpaid }));
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: this.generateDefaultDebitList(res) }));
 
         (this.listInvoice.partnerId as any) = { id: res.customerId };
     }
@@ -420,7 +398,33 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMappingFormOther));
 
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: this.generateDefaultDebitList(res) }));
+
         (this.listInvoice.partnerId as any) = { id: res.customerId };
+    }
+
+    generateDefaultDebitList(res: ReceiptModel) {
+        const listPaymentWithUnpaid = res.payments.filter(x => (x.type === "DEBIT" || x.type === "OBH")
+            && x.paymentStatus === AccountingConstants.PAYMENT_STATUS.PAID_A_PART);
+        if (!listPaymentWithUnpaid.length) {
+            return;
+        }
+        listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
+            if (c.currencyId === 'VND') {
+                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
+            } else {
+                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
+            }
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
+        })
+        listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
+            x.paidAmountVnd = x.unpaidAmountVnd;
+            x.paidAmountUsd = x.unpaidAmountUsd;
+            x.notes = "Bank Fee/Other Receipt";
+            x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
+        })
+
+        return listPaymentWithUnpaid;
     }
 }

@@ -1253,28 +1253,29 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                receiptModel.Id = Guid.NewGuid();
-                receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DRAFT;
-                receiptModel.UserCreated = receiptModel.UserModified = currentUser.UserID;
-                receiptModel.DatetimeCreated = receiptModel.DatetimeModified = DateTime.Now;
-                receiptModel.GroupId = currentUser.GroupId;
-                receiptModel.DepartmentId = currentUser.DepartmentId;
-                receiptModel.OfficeId = currentUser.OfficeID;
-                receiptModel.CompanyId = currentUser.CompanyID;
-                receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
-                receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
-
-                CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
-                if (partner != null)
-                {
-                    receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
-                }
-
-                AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
+               
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
+                        receiptModel.Id = Guid.NewGuid();
+                        receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DRAFT;
+                        receiptModel.UserCreated = receiptModel.UserModified = currentUser.UserID;
+                        receiptModel.DatetimeCreated = receiptModel.DatetimeModified = DateTime.Now;
+                        receiptModel.GroupId = currentUser.GroupId;
+                        receiptModel.DepartmentId = currentUser.DepartmentId;
+                        receiptModel.OfficeId = currentUser.OfficeID;
+                        receiptModel.CompanyId = currentUser.CompanyID;
+                        receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                        receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
+
+                        CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
+                        if (partner != null)
+                        {
+                            receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                        }
+
+                        AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
                         HandleState hs = DataContext.Add(receipt, false);
                         if (hs.Success)
                         {
@@ -1307,33 +1308,33 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-                AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
-                if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
-                if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DONE) return new HandleState((object)"Not allow save draft. Receipt has been done");
-                if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save draft. Receipt has canceled");
-
-                receiptModel.UserModified = currentUser.UserID;
-                receiptModel.DatetimeModified = DateTime.Now;
-                receiptModel.GroupId = currentUser.GroupId;
-                receiptModel.DepartmentId = currentUser.DepartmentId;
-                receiptModel.OfficeId = currentUser.OfficeID;
-                receiptModel.CompanyId = currentUser.CompanyID;
-                receiptModel.ReferenceId = receiptCurrent.ReferenceId;
-
-                receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
-                receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
-
-                CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
-                if (partner != null)
-                {
-                    receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
-                }
-
-                AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
                     {
+                        AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
+                        if (receiptCurrent == null) return new HandleState((object)"Not found receipt");
+                        if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DONE) return new HandleState((object)"Not allow save draft. Receipt has been done");
+                        if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_CANCEL) return new HandleState((object)"Not allow save draft. Receipt has canceled");
+
+                        receiptModel.UserModified = currentUser.UserID;
+                        receiptModel.DatetimeModified = DateTime.Now;
+                        receiptModel.GroupId = currentUser.GroupId;
+                        receiptModel.DepartmentId = currentUser.DepartmentId;
+                        receiptModel.OfficeId = currentUser.OfficeID;
+                        receiptModel.CompanyId = currentUser.CompanyID;
+                        receiptModel.ReferenceId = receiptCurrent.ReferenceId;
+
+                        receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                        receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
+
+                        CatPartner partner = catPartnerRepository.Get(x => x.Id == receiptModel.CustomerId)?.FirstOrDefault();
+                        if (partner != null)
+                        {
+                            receiptModel.Type = partner.PartnerType == "Agent" ? "Agent" : "Customer";
+                        }
+
+                        AcctReceipt receipt = mapper.Map<AcctReceipt>(receiptModel);
                         HandleState hs = DataContext.Update(receipt, x => x.Id == receipt.Id, false);
                         if (hs.Success)
                         {

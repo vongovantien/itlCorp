@@ -342,17 +342,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     })
 
         }
-        newInvoiceWithAdv.paidAmountVnd = this.creditAmountVnd.value ?? 0;
-        newInvoiceWithAdv.paidAmountUsd = this.creditAmountUsd.value ?? 0;
+        newInvoiceWithAdv.paidAmountVnd = this.paidAmountVnd.value ?? 0;
+        newInvoiceWithAdv.paidAmountUsd = this.paidAmountUsd.value ?? 0;
 
         newInvoiceWithAdv.totalPaidUsd = 0;
         newInvoiceWithAdv.totalPaidVnd = 0;
         newInvoiceWithAdv.unpaidAmountUsd = 0;
         newInvoiceWithAdv.unpaidAmountVnd = 0;
         newInvoiceWithAdv.refNo = null;
+        newInvoiceWithAdv.id = this.utility.newGuid();
 
-        const data = cloneDeep(newInvoiceWithAdv)
-        this._store.dispatch(InsertAdvance({ data }));
+        this._store.dispatch(InsertAdvance({ data: newInvoiceWithAdv }));
 
     }
 
@@ -389,8 +389,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     }
                 }
             );
-
-
     }
 
     getFinalPaidAmount() {
