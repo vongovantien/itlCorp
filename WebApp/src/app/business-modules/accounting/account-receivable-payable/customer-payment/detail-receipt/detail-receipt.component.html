@@ -85,8 +85,8 @@
     </div>
 </div>
 
-<ng-container *ngIf="receiptDetail?.status === 'Done'">
-    <ng-template #syncInfoTemplate>
+<ng-template #syncInfoTemplate>
+    <ng-container *ngIf="receiptDetail?.status === 'Done'">
         <ul class="list-group">
             <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
                 <b>Sync Status:</b>
@@ -105,8 +105,8 @@
                 <span>{{receiptDetail?.lastSyncDate | date:'dd/MM/yyyy HH:ss:mm'}}</span>
             </li>
         </ul>
-    </ng-template>
-</ng-container>
+    </ng-container>
+</ng-template>
 
 <ng-template inject></ng-template>
 
