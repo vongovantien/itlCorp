@@ -51,7 +51,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     ngAfterViewInit() {
-        this.dataSearch.paymentStatus = ["UnPaid", "Paid A Part"];
+        this.dataSearch.paymentStatus = ["Unpaid", "Paid A Part"];
         this.invoiceListComponent.dataSearch = this.dataSearch;
 
         this.invoiceListComponent.getPagingData();
