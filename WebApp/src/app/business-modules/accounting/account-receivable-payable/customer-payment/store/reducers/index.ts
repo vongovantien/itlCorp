@@ -24,6 +24,7 @@ export const ReceiptAgreementCreditCurrencyState = createSelector(customerPaymen
 export const ReceiptAgreementCusAdvanceState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt.agreement?.cusAdvanceAmount);
 export const ReceiptIsAutoConvertPaidState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.isAutoConvertPaid);
 export const ReceiptClassState = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state?.receipt?.class);
+export const ReceiptExchangeRate = createSelector(customerPaymentState, (state: ICustomerPaymentState) => state.receipt?.exchangeRate);
 
 export const reducers: ActionReducerMap<ICustomerPaymentState> = {
     receipt: receiptReducer,

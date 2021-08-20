@@ -309,7 +309,7 @@ namespace eFMS.API.Accounting.Controllers
         private string CheckInvoicePaid(AcctReceiptModel receiptModel)
         {
             string result = string.Empty;
-            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.Type != "CREDIT" && x.PaymentType != "OTHER").ToList();
+            List<ReceiptInvoiceModel> payments = receiptModel.Payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentType != "OTHER").ToList();
             bool isValidPayment = acctReceiptService.CheckPaymentPaid(payments);
 
             if (isValidPayment == true)
@@ -333,7 +333,7 @@ namespace eFMS.API.Accounting.Controllers
                     messageInValid = "You can't save without debit in this period, Please check it again!";
                 }
 
-                if (payments.Any(x => (x.Type == "CREDIT")))
+                if (payments.Any(x => (x.PaymentType == "CREDIT")))
                 {
                     bool isHaveInvoice = payments.Any(x => x.Type == "DEBIT" && string.IsNullOrEmpty(x.InvoiceNo));
                     if (isHaveInvoice == true)
