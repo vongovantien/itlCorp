@@ -51,7 +51,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
         { field: 'taxCode', label: 'Tax Code' },
     ];
 
-    payments: string[] = ['All', 'Unpaid', 'Paid A Part', 'Paid'];
+    payments: string[] = ['All', 'Unpaid', 'Paid A Part', 'Paid', 'Other'];
 
     overDueDays: CommonInterface.INg2Select[] = [
         { id: '0', text: 'All' },

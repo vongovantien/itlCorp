@@ -172,7 +172,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
 
-            var stream = new AccountingHelper().GenerateExportCutomerHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Customer.xlsx");
+            var stream = new AccountingHelper().GenerateExportCustomerHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Customer.xlsx");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Customer - eFMS.xlsx");

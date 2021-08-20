@@ -457,7 +457,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="customerPayment"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportCutomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, string fileName)
+        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, string fileName)
         {
             try
             {
@@ -471,6 +471,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
+                if(customerPayment.Count == 0)
+                {
+                    customerPayment.Add(new AccountingCustomerPaymentExport());
+                }
+                if (customerPayment.Count(x => x.receiptDetail != null) == 0)
+                {
+                    excel.DeleteRow(7);
+                }
                 foreach (var item in customerPayment)
                 {
                     var listKeyData = new Dictionary<string, object>();
@@ -500,16 +508,19 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    foreach (var detail in item.receiptDetail)
+                    if (item.receiptDetail != null)
                     {
-                        listKeyData = new Dictionary<string, object>();
-                        excel.SetDataTable();
-                        listKeyData.Add("PaidAmountDt", detail.PaidAmount);
-                        listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBH);
-                        listKeyData.Add("PaidDate", detail.PaymentDate);
-                        listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
-                        excel.SetData(listKeyData);
-                        startRow++;
+                        foreach (var detail in item.receiptDetail)
+                        {
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("PaidAmountDt", detail.PaidAmount);
+                            listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBH);
+                            listKeyData.Add("PaidDate", detail.PaymentDate);
+                            listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
+                            excel.SetData(listKeyData);
+                            startRow++;
+                        }
                     }
                 }
                 var listKeyTotal = new Dictionary<string, object>();
