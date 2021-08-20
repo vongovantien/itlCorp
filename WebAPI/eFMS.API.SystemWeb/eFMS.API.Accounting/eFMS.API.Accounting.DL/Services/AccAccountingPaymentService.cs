@@ -306,7 +306,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
                                 from part in grpPartners.DefaultIfEmpty()
                                 join payments in paymentData on invoice.RefId.ToLower() equals payments.RefId into grpPayment
-                                from payment in grpPayment
+                                from payment in grpPayment.DefaultIfEmpty()
                                 select new
                                 {
                                     invoice,
@@ -456,7 +456,7 @@ namespace eFMS.API.Accounting.DL.Services
             var creditSoaData = (from soa in soaData
                                  join surcharge in surchargeData on soa.Soano equals surcharge.PaySoano
                                  join payments in paymentData on soa.Id equals payments.RefId into grpPayment
-                                 from payment in grpPayment
+                                 from payment in grpPayment.DefaultIfEmpty()
                                  join partner in partners on soa.Customer equals partner.Id into grpPartners
                                  from part in grpPartners.DefaultIfEmpty()
                                  select new
@@ -1542,7 +1542,7 @@ namespace eFMS.API.Accounting.DL.Services
             var resultsQuery = (from invoice in data
                                 join surcharge in surchargeData on invoice.RefId equals surcharge.AcctManagementId.ToString()
                                 join payments in paymentData on invoice.RefId.ToLower() equals payments.RefId into grpPayment
-                                from payment in grpPayment
+                                from payment in grpPayment.DefaultIfEmpty()
                                 join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
                                 from part in grpPartners.DefaultIfEmpty()
                                 join parent in partners on part.ParentId equals parent.Id into grpParents
