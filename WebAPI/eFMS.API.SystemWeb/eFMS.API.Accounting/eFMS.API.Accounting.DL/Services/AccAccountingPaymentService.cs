@@ -34,6 +34,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmployee> sysEmployeeRepository;
         private readonly IContextBase<CsTransaction> csTransactionRepository;
         private readonly ICurrentUser currentUser;
+        private readonly ICurrencyExchangeService currencyExchangeService;
 
         public AccAccountingPaymentService(IContextBase<AccAccountingPayment> repository,
             IMapper mapper,
@@ -48,6 +49,7 @@ namespace eFMS.API.Accounting.DL.Services
              IContextBase<CatContract> catContractRepo,
              IContextBase<SysEmployee> sysEmployeeRepo,
              IContextBase<CsTransaction> csTransRepo,
+             ICurrencyExchangeService exchangeService,
 
             ICurrentUser currUser) : base(repository, mapper)
         {
@@ -63,6 +65,7 @@ namespace eFMS.API.Accounting.DL.Services
             catContractRepository = catContractRepo;
             sysEmployeeRepository = sysEmployeeRepo;
             csTransactionRepository = csTransRepo;
+            currencyExchangeService = exchangeService;
         }
 
         public IQueryable<AccAccountingPaymentModel> GetBy(string refNo, string type)
@@ -1651,14 +1654,16 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepository.Get(x=>x.PartnerType == "Agent");
             var paymentData = QueryInvoiceDataPayment(criteria);
             var resultsQuery = (from invoice in data
-                                join payment in paymentData on invoice.RefId.ToLower() equals payment.RefId
+                                join payment in paymentData on invoice.RefId.ToLower() equals payment.RefId into grpPayment
+                                from payment in grpPayment.DefaultIfEmpty()
                                 join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
                                 from part in grpPartners.DefaultIfEmpty()
                                 join parent in partners on part.ParentId equals parent.Id into grpParents
                                 from pa in grpParents.DefaultIfEmpty()
-                                where part != null //Lấy partner có type Agent
                                 join rcpt in acctReceiptRepository.Get() on payment.ReceiptId equals rcpt.Id into grpReceipts
                                 from rcpts in grpReceipts.DefaultIfEmpty()
+                                where part != null //Lấy partner có type Agent
+                                where rcpts.Status == "Done" 
                                 select new
                                 {
                                     invoice,
@@ -1673,8 +1678,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaidDate = payment.PaidDate,
                                     payment.PaymentAmount,
                                     //payment.ReceiptId,
-                                    payment.PaymentAmountVnd,
-                                    payment.UnpaidPaymentAmountVnd,
+                                    payment.PaymentAmountUsd,
+                                    payment.UnpaidPaymentAmountUsd,
+                                    payment.CreditAmountUsd,
                                     rcpts.PaymentRefNo,
                                     rcpts.PaymentDate,
                                     rcpts.PaidAmountUsd
@@ -1724,12 +1730,18 @@ namespace eFMS.API.Accounting.DL.Services
                 agent.EtaDate = trans?.Eta;
                 agent.EtdDate = trans?.Etd;
 
-                agent.UnpaidAmountInv = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                agent.UnpaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                agent.PaidAmount = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.PaymentAmountVnd ?? 0;
-                agent.PaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").Sum(x => x.PaymentAmountVnd ?? 0);
+                agent.UnpaidAmountInv = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.UnpaidPaymentAmountUsd ?? 0;
+                agent.UnpaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").FirstOrDefault()?.UnpaidPaymentAmountUsd ?? 0;
+                agent.PaidAmount = item.Where(x => x.invoice.Type == "Invoice").FirstOrDefault()?.PaidAmountUsd ?? 0;
+                agent.PaidAmountOBH = item.Where(x => x.invoice.Type == "InvoiceTemp").Sum(x => x.PaidAmountUsd ?? 0);
 
-                agent.CreditAmount = cdNoteLst[item.Key.RefNo].Where(x=>x.Type== "CREDIT").FirstOrDefault()?.Total??0;
+                var a = currencyExchangeService.CurrencyExchangeRateConvert(agent.UnpaidAmountInv, item.Key.IssuedDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
+                agent.UnpaidAmountOBH = currencyExchangeService.CurrencyExchangeRateConvert(agent.UnpaidAmountOBH, item.Key.IssuedDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
+
+                if (item.Key.PaymentType == "CREDIT")
+                    agent.CreditAmount = item.FirstOrDefault().UnpaidPaymentAmountUsd??0;
+                else
+                    agent.CreditAmount = item.FirstOrDefault().CreditAmountUsd ?? 0;
 
                 //Get saleman name
                 var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.Key.PartnerId
