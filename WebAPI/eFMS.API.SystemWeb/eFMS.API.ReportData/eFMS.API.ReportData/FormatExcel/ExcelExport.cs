@@ -253,6 +253,15 @@ namespace eFMS.API.ReportData.FormatExcel
         }
 
         /// <summary>
+        /// Delete row in excel file
+        /// </summary>
+        /// <param name="_row">row to delete</param>
+        public void DeleteRow(int _row)
+        {
+            Worksheet.DeleteRow(_row);
+        }
+
+        /// <summary>
         /// Save excel and return file stream
         /// </summary>
         /// <returns></returns>
