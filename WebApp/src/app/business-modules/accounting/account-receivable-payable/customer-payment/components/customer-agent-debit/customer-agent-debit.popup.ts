@@ -131,6 +131,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                 x.forEach((element: ReceiptInvoiceModel[]) => {
                     this.currentPaymentReceiptCurrent.push(...element);
                 });
+                this.currentPaymentReceiptCurrent = this.currentPaymentReceiptCurrent.filter(x => x.paymentType !== 'OTHER');
                 if (!!this.currentPaymentReceiptCurrent.length) {
                     this.sumTotalObjectPaymentReceipt = this.calculateSumDataObject(this.currentPaymentReceiptCurrent);
                 }

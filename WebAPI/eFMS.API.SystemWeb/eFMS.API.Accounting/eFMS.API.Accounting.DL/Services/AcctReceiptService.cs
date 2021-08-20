@@ -507,7 +507,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.RefNo = acctPayment.BillingRefNo;
                     payment.InvoiceNo = acctPayment.InvoiceNo;
                     payment.CreditType = acctPayment.Type;
-                    payment.Type = (acctPayment.Type == "CREDITNOTE" || acctPayment.Type == "CREDITSOA") ? "CREDIT" : acctPayment.Type;
+                    payment.Type = acctPayment.Type;
                     payment.CurrencyId = acctPayment.RefCurrency;
                     payment.Amount = acctPayment.RefAmount;
                     payment.UnpaidAmount = acctPayment.RefAmount;
@@ -840,22 +840,11 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _payment.RefId = string.Join(",", payment.RefIds);
                 }
+
                 _payment.InvoiceNo = payment.InvoiceNo;
-
-                if (payment.Type == "CREDIT")
-                {
-                    _payment.Type = payment.CreditType;
-
-                    _payment.PaymentAmountUsd = (payment.UnpaidAmountUsd ?? 0);
-                    _payment.PaymentAmountVnd = (payment.UnpaidAmountVnd ?? 0);
-                }
-                else
-                {
-                    _payment.Type = payment.Type;  // OBH/DEBIT
-
-                    _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
-                    _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
-                }
+                _payment.Type = payment.Type;  // OBH/DEBIT
+                _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
+                _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -1225,7 +1214,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            decimal? totalAdvPayment= acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADVANCE")
+            decimal? totalAdvPayment= acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
             
@@ -1778,7 +1767,6 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpCreditNoteCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Job.credit.Code,
-                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.Job.credit.PartnerId,
@@ -1812,7 +1800,6 @@ namespace eFMS.API.Accounting.DL.Services
                            select new AgencyDebitCreditModel
                            {
                                RefNo = inv.RefNo,
-                               Type = inv.Type,
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -1835,7 +1822,8 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = inv.JobNo,
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
-                               CreditType = "CREDITNOTE",
+                               Type = "CREDITNOTE",
+                               PaymentType = "CREDIT",
                                Hblid = inv.Hblid,
                                VoucherId = inv.VoucherId,
                                VoucherIdre = inv.VoucherIdre,
@@ -1860,7 +1848,6 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpSoaCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.Soa.soa.Soano,
-                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.Soa.soa.Customer,
@@ -1892,7 +1879,6 @@ namespace eFMS.API.Accounting.DL.Services
                            select new AgencyDebitCreditModel
                            {
                                RefNo = inv.RefNo,
-                               Type = inv.Type,
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -1915,7 +1901,8 @@ namespace eFMS.API.Accounting.DL.Services
                                JobNo = inv.JobNo,
                                Mbl = inv.Mbl,
                                Hbl = inv.Hbl,
-                               CreditType = "SOA",
+                               Type = "CREDITSOA",
+                               PaymentType = "CREDIT",
                                Hblid = inv.Hblid,
                                ExchangeRateBilling = inv.ExchangeRateBilling
                            };
@@ -1998,7 +1985,8 @@ namespace eFMS.API.Accounting.DL.Services
                                Hbl = inv.Hbl,
                                JobNo = inv.JobNo,
                                Hblid = inv.Hblid,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               PaymentType = inv.Type
                            };
             return joinData;
         }
@@ -2078,7 +2066,8 @@ namespace eFMS.API.Accounting.DL.Services
                                Hbl = inv.Hbl,
                                Mbl = inv.Mbl,
                                Hblid = inv.Hblid,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               PaymentType = inv.Type
                            };
             return joinData;
         }
@@ -2516,7 +2505,8 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               PaymentType = inv.Type
                            };
 
             return joinData;
@@ -2637,7 +2627,8 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               ExchangeRateBilling = inv.ExchangeRateBilling
+                               ExchangeRateBilling = inv.ExchangeRateBilling,
+                               PaymentType = inv.Type
                            };
 
             return joinData;
@@ -2659,7 +2650,6 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpSoaCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.Soa.Soano,
-                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.Soa.Customer,
@@ -2686,8 +2676,7 @@ namespace eFMS.API.Accounting.DL.Services
                            from ofi in ofiGrp.DefaultIfEmpty()
                            select new CustomerDebitCreditModel
                            {
-                               RefNo = inv.RefNo,
-                               Type = inv.Type,
+                               RefNo = inv.RefNo,                            
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -2706,8 +2695,9 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "CREDITSOA",
                                ExchangeRateBilling = inv.ExchangeRateBilling,
+                               Type = "CREDITSOA",
+                               PaymentType = "CREDIT"
                                
                            };
 
@@ -2730,7 +2720,6 @@ namespace eFMS.API.Accounting.DL.Services
             var data = grpCreditNoteCharge.Select(se => new CustomerDebitCreditModel
             {
                 RefNo = se.CreditNote.Code,
-                Type = "CREDIT",
                 InvoiceNo = null,
                 InvoiceDate = null,
                 PartnerId = se.CreditNote.PartnerId,
@@ -2760,7 +2749,6 @@ namespace eFMS.API.Accounting.DL.Services
                            select new CustomerDebitCreditModel
                            {
                                RefNo = inv.RefNo,
-                               Type = inv.Type,
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -2779,7 +2767,8 @@ namespace eFMS.API.Accounting.DL.Services
                                OfficeName = ofi != null ? ofi.ShortName : null,
                                CompanyId = inv.CompanyId,
                                RefIds = inv.RefIds,
-                               CreditType = "CREDITNOTE",
+                               Type = "CREDITNOTE",
+                               PaymentType = "CREDIT",
                                VoucherId = inv.VoucherId,
                                VoucherIdre = inv.VoucherIdre,
                                ExchangeRateBilling = inv.ExchangeRateBilling,

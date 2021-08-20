@@ -35,15 +35,15 @@
                                 </td>
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center" class="font-weight-bold">
-                                    <ng-container *ngIf="item.type === 'ADVANCE'; else paymentOtherTypeTpl">
+                                    <ng-container *ngIf="item.type === 'ADV'; else paymentOtherTypeTpl">
                                         <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
-                                            (click)="selectPaymentItem(i)">Advance</a>
+                                            (click)="selectPaymentItem(i)">ADV</a>
                                     </ng-container>
                                     <ng-template #paymentOtherTypeTpl>
                                         {{item.type}}
                                     </ng-template>
                                 </td>
-                                <td class="text-primary">
+                                <td class="text-primary" [class.text-right]="item.paymentType === 'OBH'">
                                     {{item.invoiceNo}}
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
                                         <ng-container [ngSwitch]="item.paymentStatus">
@@ -61,27 +61,34 @@
                                     </ng-container>
                                 </td>
                                 <td>
-                                    <ng-container class="form-group " *ngIf="item.type === 'DEBIT'">
-                                        <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
-                                            position=bottomCenter (click)="selectPaymentItem(i)">
-                                            <div class="credit-container">
-                                                <ng-container *ngFor="let credit of item.creditNos; let j = index">
-                                                    <div class="credit-item-wrapper">
-                                                        <span class="credit-item__icon"
-                                                            (click)="deleteCreditItem(credit, item, $event)">x</span>
-                                                        <span class="credit-item__label">{{credit}}</span>
-                                                    </div>
-                                                </ng-container>
+                                    <ng-container class="form-group " *ngIf="item.paymentType === 'DEBIT'">
+                                        <ng-container *ngIf="!!(creditList$ | async)?.length">
+                                            <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
+                                                position=bottomCenter (click)="selectPaymentItem(i)">
+                                                <div class="credit-container">
+                                                    <ng-container *ngFor="let credit of item.creditNos; let j = index">
+                                                        <div class="credit-item-wrapper">
+                                                            <span class="credit-item__icon"
+                                                                (click)="deleteCreditItem(credit, item, $event)">x</span>
+                                                            <span class="credit-item__label">{{credit}}</span>
+                                                        </div>
+                                                    </ng-container>
+                                                </div>
                                             </div>
-                                        </div>
+                                        </ng-container>
+
                                     </ng-container>
                                 </td>
 
                                 <td ALIGN="right">
-                                    {{item.unpaidAmountUsd | number:'1.2-2'}}
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        {{item.unpaidAmountUsd | number:'1.2-2'}}
+                                    </ng-container>
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidAmountVnd | number:'1.0-3'}}
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        {{item.unpaidAmountVnd | number:'1.0-3'}}
+                                    </ng-container>
                                 </td>
 
                                 <td ALIGN="right">
@@ -98,10 +105,14 @@
                                 </td>
 
                                 <td ALIGN="right">
-                                    {{item.totalPaidUsd | number:'1.2-2'}}
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        {{item.totalPaidUsd | number:'1.2-2'}}
+                                    </ng-container>
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.totalPaidVnd | number:'1.0-3'}}
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        {{item.totalPaidVnd | number:'1.0-3'}}
+                                    </ng-container>
                                 </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.paymentType !== 'OTHER'">
@@ -139,7 +150,7 @@
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
                                 <td class="text-center">
-                                    <ng-container *ngIf="item.type === 'DEBIT'">
+                                    <ng-container *ngIf="item.paymentType === 'DEBIT'">
                                         <app-switch size="sm" class="danger"
                                             (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff">
                                         </app-switch>
