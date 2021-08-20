@@ -2,7 +2,7 @@ import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Vi
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
-import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from "../../store/reducers";
+import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptIsAutoConvertPaidState, ReceiptExchangeRate } from "../../store/reducers";
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { takeUntil } from "rxjs/operators";
@@ -10,6 +10,7 @@ import { RemoveCredit } from "../../store/actions";
 import _cloneDeep from 'lodash/cloneDeep'
 import { InjectViewContainerRefDirective } from "@directives";
 import { ConfirmPopupComponent } from "@common";
+import { AccountingConstants } from "@constants";
 @Component({
     selector: 'customer-payment-receipt-credit-list',
     templateUrl: './receipt-credit-list.component.html',
@@ -67,6 +68,10 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         totalRemainUsd: 0
     };
 
+    isAutoConvert: boolean;
+    receiptExchangeRate: number;
+
+
     constructor(
         private readonly _store: Store<IReceiptState>,
     ) {
@@ -91,11 +96,22 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Office', field: '' },
         ];
 
-        this._store.select(ReceiptCreditListState)
+        this.calculateSumTotalCredit();
+
+
+        this._store.select(ReceiptIsAutoConvertPaidState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe(
-                (data) => {
-                    this.sumTotalObj = this.calculateTotal(data);
+                (isAutoConvert) => {
+                    this.isAutoConvert = isAutoConvert;
+                }
+            )
+
+        this._store.select(ReceiptExchangeRate)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (exchangeRate) => {
+                    this.receiptExchangeRate = exchangeRate;
                 }
             )
     }
@@ -125,8 +141,7 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
         }
     }
 
-    calculateTotal(model: ReceiptInvoiceModel[]) {
-        console.log(model);
+    private calculateTotal(model: ReceiptInvoiceModel[]) {
         const totalData = {
             totalUnpaidAmountUsd: 0,
             totalUnpaidAmountVnd: 0,
@@ -157,5 +172,45 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             return;
         }
         this._store.dispatch(RemoveCredit({ index: this.selectedIndexInvoice }));
+    }
+
+    calculateSumTotalCredit() {
+        this._store.select(ReceiptCreditListState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe(
+                (data) => {
+                    this.sumTotalObj = this.calculateTotal(data);
+                }
+            )
+    }
+
+    calculateTotalPaidAmount(item: ReceiptInvoiceModel, key: string) {
+        switch (key) {
+            case 'paidVnd':
+                if (!!this.isAutoConvert) {
+                    if (!!item.exchangeRateBilling) {
+                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                    } else {
+                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                    }
+                }
+                item.totalPaidVnd = +item.paidAmountVnd;
+                break;
+            case 'paidUsd':
+                if (!!this.isAutoConvert) {
+                    if (!!item.exchangeRateBilling) {
+                        item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling).toFixed(0);
+                    } else {
+                        item.totalPaidVnd = item.paidAmountVnd = +((item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                    }
+                }
+                item.totalPaidUsd = +item.paidAmountUsd;
+                break;
+            default:
+
+                break;
+        }
+
+        this.calculateSumTotalCredit();
     }
 }

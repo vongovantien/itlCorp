@@ -66,9 +66,28 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.RemoveInvoice, (state: IReceiptState, payload: any) => ({
         ...state, debitList: [...state.debitList.slice(0, payload.index), ...state.debitList.slice(payload.index + 1)]
     })),
-    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: { index: number }) => ({
-        ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)]
-    })),
+    on(ReceiptActions.RemoveCredit, (state: IReceiptState, payload: { index: number }) => {
+        const currentCredit: ReceiptInvoiceModel = state.creditList[payload.index];
+        if (!!currentCredit.invoiceNo) {
+            const newDebitList: ReceiptInvoiceModel[] = [...state.debitList];
+
+            for (let index = 0; index < newDebitList.length; index++) {
+                const element = newDebitList[index];
+                if ((element.creditNos || []).includes(currentCredit.refNo)) {
+                    const indexCreditDelete: number = element.creditNos.findIndex(c => c === currentCredit.refNo);
+                    if (indexCreditDelete !== -1) {
+                        element.creditNos.splice(indexCreditDelete, 1);
+                        element.paidAmountVnd = +(element.totalPaidVnd += currentCredit.paidAmountVnd).toFixed(0);
+                        element.paidAmountUsd = +(element.totalPaidUsd += currentCredit.paidAmountUsd).toFixed(2);
+                    }
+                }
+            }
+
+            return { ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)], debitList: [...newDebitList] };
+        }
+
+        return { ...state, creditList: [...state.creditList.slice(0, payload.index), ...state.creditList.slice(payload.index + 1)] };
+    }),
     on(ReceiptActions.ProcessClearSuccess, (state: IReceiptState, payload: any) => {
         if (state.currency === 'VND') {
             if (payload.data.cusAdvanceAmountVnd > 0) {
@@ -139,16 +158,20 @@ export const receiptManagementReducer = createReducer(
     }),
     on(ReceiptActions.InsertCreditToDebit, (state: IReceiptState, payload: ReceiptActions.ISelectCreditToDebit) => {
         const newArrayDebit: ReceiptInvoiceModel[] = [...state.debitList];
-        newArrayDebit[payload.index].creditNos = [...newArrayDebit[payload.index].creditNos, payload.creditNo];
+        const currentDebitItem = newArrayDebit[payload.index];
 
-        // * if NetOff
-        if (newArrayDebit[payload.index].netOff === true && newArrayDebit[payload.index].creditNos.length === 1) {
-            // const currentPaidVndDebitItem = newArrayDebit[payload.index].paidAmountVnd;
-            // const currentpaidAmountUsdDebitItem = newArrayDebit[payload.index].paidAmountUsd;
-            newArrayDebit[payload.index].paidAmountVnd = newArrayDebit[payload.index].totalPaidVnd = payload.creditAmountVnd;
-            newArrayDebit[payload.index].paidAmountUsd = newArrayDebit[payload.index].totalPaidUsd = payload.creditAmountUsd;
+        currentDebitItem.creditNos = [...currentDebitItem.creditNos, payload.creditNo];
+
+        // * if NetOff has default value
+        if (currentDebitItem.netOff === true) {
+            currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(payload.creditAmountVnd).toFixed(0);
+            currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(payload.creditAmountUsd).toFixed(2);
+        } else {
+            currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(currentDebitItem.paidAmountVnd - payload.creditAmountVnd).toFixed(0);
+            currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(currentDebitItem.paidAmountUsd - payload.creditAmountUsd).toFixed(2);
         }
 
+        // * Update value for creditItem Correcsponding
         const newArrayCredit: ReceiptInvoiceModel[] = [...state.creditList];
         const indexCreditToUpdate: number = newArrayCredit.findIndex(x => x.refNo === payload.creditNo);
         if (indexCreditToUpdate != -1) {
@@ -175,4 +198,5 @@ export const receiptManagementReducer = createReducer(
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {
     return receiptManagementReducer(state, action);
 }
+
 

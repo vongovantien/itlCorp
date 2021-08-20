@@ -25,7 +25,7 @@ const routing: Routes = [
     {
         path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' }, },
+            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' } },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
         ]
     },

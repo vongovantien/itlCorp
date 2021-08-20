@@ -24,7 +24,7 @@
                         <ng-container *ngIf="!!(debitList$ | async)?.length">
                             <tr *ngFor="let item of (this.debitList$ | async); let i = index; trackBy: trackByFn"
                                 [class.bg-warning]="item.paymentType === 'OTHER'"
-                                [ngClass]="{'bg-secondary font-italic':item.paidAmountVnd < 0}">
+                                [ngClass]="{'bg-secondary font-italic': item.negative}">
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
                                         <app-permission-button type="delete"
@@ -35,7 +35,7 @@
                                 </td>
                                 <td class="text-primary">{{item.refNo}}</td>
                                 <td ALIGN="center" class="font-weight-bold">
-                                    <ng-container *ngIf="item.type === 'ADV'; else paymentOtherTypeTpl">
+                                    <ng-container *ngIf="item.type === 'ADV' && !isReadonly; else paymentOtherTypeTpl">
                                         <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
                                             (click)="selectPaymentItem(i)">ADV</a>
                                     </ng-container>
@@ -62,7 +62,7 @@
                                 </td>
                                 <td>
                                     <ng-container class="form-group " *ngIf="item.paymentType === 'DEBIT'">
-                                        <ng-container *ngIf="!!(creditList$ | async)?.length">
+                                        <ng-container *ngIf="!!(creditList$ | async)?.length && !isReadonly">
                                             <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
                                                 position=bottomCenter (click)="selectPaymentItem(i)">
                                                 <div class="credit-container">
@@ -150,7 +150,8 @@
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
                                 <td class="text-center">
-                                    <ng-container *ngIf="item.paymentType === 'DEBIT'">
+                                    <ng-container
+                                        *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
                                         <app-switch size="sm" class="danger"
                                             (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff">
                                         </app-switch>

@@ -459,7 +459,8 @@ namespace eFMS.API.Accounting.DL.Services
                     PaymentStatus = GetPaymentStatus(listOBH.Where(x => x.BillingRefNo == s.Key.BillingRefNo).Select(x => x.RefId).ToList()),
                     ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
                     PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
-                    Negative = s.FirstOrDefault()?.Negative
+                    Negative = s.FirstOrDefault()?.Negative,
+                    PaymentType = s.FirstOrDefault().PaymentType 
             }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -688,6 +689,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.PaymentNo = invTemp.InvoiceNoReal + "_" + receipt.PaymentRefNo;
             _payment.InvoiceNo = invTemp.InvoiceNoTempt;
             _payment.Type = "OBH";
+            _payment.PaymentType = "OBH";
             _payment.CurrencyId = receipt.CurrencyId; // Theo currency của phiếu thu
             _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
             _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
@@ -1004,7 +1006,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.PartnerId = payment.PartnerId;
 
                 _payment.Negative = true;
-
+                _payment.PaymentType = payment.PaymentType;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
                 _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
                 _payment.GroupId = currentUser.GroupId;
