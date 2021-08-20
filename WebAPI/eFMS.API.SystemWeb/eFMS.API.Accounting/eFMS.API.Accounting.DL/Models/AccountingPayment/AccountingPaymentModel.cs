@@ -27,5 +27,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public DateTime? ConfirmBillingDate { get; set; }
         public Guid? OfficeId { get; set; }
         public string ServiceType { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public decimal? UnpaidAmountVnd { get; set; }
     }
 }

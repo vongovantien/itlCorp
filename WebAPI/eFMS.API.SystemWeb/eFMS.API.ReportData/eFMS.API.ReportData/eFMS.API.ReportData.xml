@@ -479,7 +479,7 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCutomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
             <summary>
             GenerateExportCutomerHistoryPayment
             </summary>
@@ -714,6 +714,12 @@
             <summary>
             Set detail data for table
             </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32)">
+            <summary>
+            Delete row in excel file
+            </summary>
+            <param name="_row">row to delete</param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
             <summary>
