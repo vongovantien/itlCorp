@@ -191,14 +191,15 @@
                         </span>
                     </button>
 
-                    <ng-container *ngIf="(class$ | async) === 'Clear Debit';else advTpl">
+                    <ng-container
+                        *ngIf="((class$ | async) === 'Clear Debit') ||((class$ | async) === 'Net Off');else advTpl">
                         <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10 dropdown-toggle"
                             type="button" [dpToggle]="dropdownMenu">
                             <i class="la la-plus"></i>
                             Add Other
                         </button>
                         <app-dropdown #dropdownMenu>
-                            <a class="dropdown-item pointer" (click)="insertOtherRowData('ADVANCE')">
+                            <a class="dropdown-item pointer" (click)="insertOtherRowData('ADV')">
                                 <span> Advance </span>
                             </a>
                             <a class="dropdown-item pointer" (click)="insertOtherRowData('COLL_OBH')">
@@ -214,7 +215,7 @@
                             (click)="insertOtherRowData()">
                             <span>
                                 <i class="la la-plus"></i>
-                                <span> Add Adv </span>
+                                <span> Add Other </span>
                             </span>
                         </button>
                     </ng-template>

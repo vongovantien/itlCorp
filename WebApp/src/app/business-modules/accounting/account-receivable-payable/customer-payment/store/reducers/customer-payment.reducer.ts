@@ -20,6 +20,7 @@ export interface IReceiptState {
     isAutoConvertPaid: boolean;
     currency: string;
     class: string; // ? REceipt Type
+    exchangeRate: number;
 }
 
 
@@ -37,7 +38,8 @@ export const initialState: IReceiptState = {
     pagingData: { page: 1, pageSize: 15 },
     isAutoConvertPaid: true,
     currency: 'VND',
-    class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
+    class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
+    exchangeRate: 1
 };
 
 export const receiptManagementReducer = createReducer(
@@ -48,8 +50,8 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true })),
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
-        creditList: [...payload.invoices.filter(x => x.type === 'CREDIT'), ...state.creditList],
-        debitList: [...payload.invoices.filter(x => x.type === 'DEBIT' || x.type === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
+        creditList: [...payload.invoices.filter(x => x.paymentType === 'CREDIT'), ...state.creditList],
+        debitList: [...payload.invoices.filter(x => x.paymentType === 'DEBIT' || x.paymentType === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
     })),
     on(ReceiptActions.RegistTypeReceipt, (state: IReceiptState, payload: any) => ({
         ...state,
@@ -72,7 +74,7 @@ export const receiptManagementReducer = createReducer(
             if (payload.data.cusAdvanceAmountVnd > 0) {
                 return {
                     ...state, debitList: [...payload.data.invoices, {
-                        type: 'ADVANCE',
+                        type: 'ADV',
                         paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                         paidAmountUsd: payload.data.cusAdvanceAmountUsd,
                         unpaidAmountUsd: 0,
@@ -87,7 +89,7 @@ export const receiptManagementReducer = createReducer(
         } else if (payload.data.cusAdvanceAmountVnd > 0) {
             return {
                 ...state, debitList: [...payload.data.invoices, {
-                    type: 'ADVANCE',
+                    type: 'ADV',
                     paidAmountVnd: payload.data.cusAdvanceAmountVnd,
                     paidAmountUsd: payload.data.cusAdvanceAmountUsd,
                     unpaidAmountUsd: 0,
@@ -164,7 +166,10 @@ export const receiptManagementReducer = createReducer(
         }
 
         return { ...state, creditList: newArrayCredit }
-    })
+    }),
+    on(ReceiptActions.UpdateReceiptExchangeRate, (state: IReceiptState, payload: { exchangeRate: number }) => ({
+        ...state, exchangeRate: payload.exchangeRate
+    }))
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {

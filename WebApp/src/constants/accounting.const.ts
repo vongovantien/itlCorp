@@ -69,7 +69,17 @@ export class AccountingConstants {
         ADVANCE: 'ADV',
         COLLECT_OBH: 'COLL_OBH',
         PAY_OBH: 'PAY_OBH',
-        COLLECT_OTHER: 'COLL_OTHER',
-        PAY_OTHER: 'PAY_OTHER'
+        COLLECT_OTHER: 'COLL_OTH',
+        PAY_OTHER: 'PAY_OTH'
+    }
+
+    public static RECEIPT_PAYMENT_TYPE = {
+        DEBIT: 'DEBIT',
+        OBH: 'OBH',
+        OTHER: 'OTHER',
+        CREDIT: 'CREDIT',
+        CREDITNOTE: 'CREDITNOTE',
+        CREDITSOA: 'CREDITSOA'
+
     }
 }

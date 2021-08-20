@@ -21,13 +21,14 @@ import {
     ProcessClearInvoiceModel,
     ProcessClearSuccess,
     ToggleAutoConvertPaid,
-    SelectReceiptCurrency
+    SelectReceiptCurrency,
+    UpdateReceiptExchangeRate
 } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 
 import { takeUntil } from 'rxjs/operators';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -125,6 +126,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this.initForm();
         this.listenCustomerInfoData();
         this.listenAgreementData();
+
         this.generateExchangeRate(formatDate(this.paymentDate.value?.startDate, 'yyyy-MM-dd', 'en'))
             .then(
                 (exchangeRate: IExchangeRate) => {
@@ -133,6 +135,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     } else {
                         this.exchangeRateValue = 0;
                     }
+
+                    this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: this.exchangeRateValue }));
                 }
             );
 
@@ -337,6 +341,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                         } else {
                             this.exchangeRateValue = 0;
                         }
+                        this._store.dispatch(UpdateReceiptExchangeRate({ exchangeRate: this.exchangeRateValue }));
+
                         if (exchangeRate.rate !== this.exchangeRate.value) {
                             if (this.currencyId.value === 'VND') {
                                 this.exchangeRate.setValue(1);
@@ -354,9 +360,31 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         }
     }
 
+    private mappingReceiptTypeToAdvanceType(key: string): string {
+        let otherType = '';
+        switch (key) {
+            case AccountingConstants.RECEIPT_CLASS.ADVANCE:
+                otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE;
+                break;
+            case AccountingConstants.RECEIPT_CLASS.COLLECT_OBH:
+                otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.COLLECT_OBH;
+                break;
+            case AccountingConstants.RECEIPT_CLASS.PAY_OBH:
+                otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.PAY_OBH;
+                break;
+            case AccountingConstants.RECEIPT_CLASS.ADVANCE:
+                otherType = AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE;
+                break;
+            default:
+                break;
+        }
+
+        return otherType;
+    }
+
     insertOtherRowData(type?: string) {
         const newInvoiceWithAdv: any = new ReceiptInvoiceModel();
-        newInvoiceWithAdv.paymentType = 'OTHER';
+        newInvoiceWithAdv.paymentType = AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER;
         if (!!type) {
             newInvoiceWithAdv.type = type.toUpperCase();
         } else {
@@ -364,7 +392,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 .pipe(takeUntil(this.ngUnsubscribe))
                 .subscribe(
                     (receiptType) => {
-                        newInvoiceWithAdv.type = receiptType?.toUpperCase();
+                        newInvoiceWithAdv.type = this.mappingReceiptTypeToAdvanceType(receiptType);
                     })
 
         }
@@ -378,7 +406,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         newInvoiceWithAdv.refNo = null;
         newInvoiceWithAdv.id = this.utility.newGuid();
 
-        this._store.dispatch(InsertAdvance({ data: newInvoiceWithAdv }));
+        this._store.dispatch(InsertAdvance({ data: cloneDeep(newInvoiceWithAdv) }));
 
     }
 
@@ -398,7 +426,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             finalExchangeRate: this.exchangeRate.value,
             paidAmountVnd: this.finalPaidAmountVnd.value,
             paidAmountUsd: this.finalPaidAmountUsd.value,
-            list: listInvoice.filter(x => x.paymentType !== 'OTHER'),
+            list: listInvoice.filter(x => x.type !== AccountingConstants.RECEIPT_ADVANCE_TYPE),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');

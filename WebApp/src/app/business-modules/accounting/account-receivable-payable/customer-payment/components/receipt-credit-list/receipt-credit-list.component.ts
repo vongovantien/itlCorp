@@ -1,4 +1,4 @@
-import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, Output, EventEmitter, ViewChild, ChangeDetectionStrategy } from "@angular/core";
+import { OnInit, Component, Input, ViewContainerRef, ViewChildren, QueryList, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { AppList } from "@app";
 import { Observable } from "rxjs";
 import { Store } from "@ngrx/store";
