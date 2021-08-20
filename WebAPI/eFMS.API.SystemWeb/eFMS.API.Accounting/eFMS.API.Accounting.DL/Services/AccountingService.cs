@@ -2610,7 +2610,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
                 var paymentsDebit = payments.Where(x => (x.Type == "DEBIT" || x.Type == "OBH") && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 var paymentsCredit = payments.Where(x => x.Type == "CREDITSOA" || x.Type == "CREDITNOTE");
-                var paymentsAdv = payments.Where(x => x.Type == "ADV");
+                var paymentsAdv = payments.Where(x => x.PaymentType == "OTHER");
                 if (paymentsDebit.Count() > 0)
                 {
                     var syncDebit = GenerateReceiptToAccountant("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
@@ -2674,7 +2674,7 @@ namespace eFMS.API.Accounting.DL.Services
             sync.BranchCode = officeCode;
             sync.OfficeCode = officeCode;
             sync.DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate; //Payment Date (Chỉ lấy Date, không lấy time)
-            sync.ReferenceNo = string.Format("{0}{1}", receipt.PaymentRefNo, (type == "CREDIT" ? "-NETOFF" : (type == "ADV" ? "-ADV" : ""))); //Receipt No
+            sync.ReferenceNo = string.Format("{0}{1}", receipt.PaymentRefNo, (type == "CREDIT" ? "-NETOFF" : (type == "ADV" ? "-ADV" : "-" + type))); //Receipt No
 
             receiptSync.ReceiptSyncNo = sync.ReferenceNo;
 

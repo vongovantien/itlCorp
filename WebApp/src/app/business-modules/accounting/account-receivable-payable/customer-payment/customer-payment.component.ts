@@ -213,8 +213,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     gotoCreateReceipt(type: string) {
         this._store.dispatch(ResetInvoiceList());
-        this._store.dispatch(RegistTypeReceipt({ data: type }));
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`]);
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${type.toLowerCase()}/new`]);
     }
 
     requestLoadListCustomerPayment() {

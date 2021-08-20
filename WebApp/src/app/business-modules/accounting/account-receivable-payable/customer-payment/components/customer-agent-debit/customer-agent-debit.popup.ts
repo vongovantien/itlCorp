@@ -31,9 +31,9 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         { title: 'VoucherId', field: 'voucherId', sortable: true },
         { title: 'Type', field: 'type', sortable: true },
         { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-        { title: 'JOB', field: 'jobNo', sortable: true },
-        { title: 'HBL', field: 'hbl', sortable: true },
-        { title: 'MBL', field: 'mbl', sortable: true },
+        { title: 'JOB', field: 'jobNo', sortable: true, width: 150 },
+        { title: 'HBL', field: 'hbl', sortable: true, width: 150 },
+        { title: 'MBL', field: 'mbl', sortable: true, width: 150 },
         { title: 'PartnerId', field: 'taxCode', sortable: true },
         { title: 'Partner Name', field: 'partnerName', sortable: true },
         { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true, width: 150 },
@@ -46,9 +46,9 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     ];
 
     agencyDebitModel: AgencyReceiptModel = new AgencyReceiptModel();
-    checkAll = false;
     checkAllAgency = false;
     checkAllGroup = false;
+    isCheckAllAgent
     TYPELIST: string = 'LIST';
     partnerId: string;
 
@@ -138,16 +138,74 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             })
     }
 
-    checkAllChange() {
-        if (this.checkAll) {
-            this.listDebit.forEach(x => {
-                x.isSelected = true;
-            });
-        } else {
-            this.listDebit.forEach(x => {
-                x.isSelected = false;
-            });
+    onChangeCheckAll(type: string) {
+        switch (type) {
+            case 'CUSTOMER':
+                if (this.isCheckAll) {
+                    this.listDebit.forEach(x => {
+                        x.isSelected = true;
+                    });
+                } else {
+                    this.listDebit.forEach(x => {
+                        x.isSelected = false;
+                    });
+                }
+                break;
+            case 'AGENT':
+                if (this.isCheckAllAgent) {
+                    this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
+                        x.isSelected = true;
+                        for (let i = 0; i < x.invoices.length; i++) {
+                            x.invoices[i].isSelected = true;
+                        }
+                    })
+                    return;
+                }
+                this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
+                    x.isSelected = false;
+                    for (let i = 0; i < x.invoices.length; i++) {
+                        x.invoices[i].isSelected = false;
+                    }
+                })
+                break;
+            default:
+                break;
         }
+    }
+
+    onChangeItemCheck(type: string, view?: string, groupShipment?: any) {
+        switch (type) {
+            case 'CUSTOMER':
+                this.isCheckAll = this.listDebit.every(x => x.isSelected);
+                break;
+            case 'AGENT':
+                if (view === 'LIST') {
+                    const items = [];
+                    for (let index = 0; index < groupShipment.length; index++) {
+                        const element = groupShipment[index];
+                        items.push(...element.invoices);
+                    }
+                    this.isCheckAllAgent = items.every(x => x.isSelected);
+                } else {
+                    groupShipment.isSelected = groupShipment.invoices.every(x => x.isSelected);
+                    this.isCheckAllAgent = this.agencyDebitModel.groupShipmentsAgency.every(x => x.isSelected);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    onChecItemInGroupAgent(groupShipment: IDataGroupShipmentAgency) {
+        groupShipment.invoices.forEach(x => {
+            if (groupShipment.isSelected) {
+                x.isSelected = true;
+            }
+            else {
+                x.isSelected = false;
+            }
+        })
+        this.isCheckAllAgent = this.agencyDebitModel.groupShipmentsAgency.every(x => x.isSelected);
     }
 
     onApply(body) {
@@ -170,12 +228,18 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                     (res: AgencyReceiptModel) => {
                         if (!!res) {
                             this.agencyDebitModel = res;
-                            this.agencyDebitModel.groupShipmentsAgency.forEach(element => {
+                            const invoiceToCalculate: ReceiptInvoiceModel[] = [];
+                            this.agencyDebitModel.groupShipmentsAgency.forEach((element: IDataGroupShipmentAgency) => {
                                 element.isSelected = false;
                                 element.invoices.forEach(x => {
                                     x.isSelected = false;
                                 });
+                                invoiceToCalculate.push(...element.invoices);
                             });
+                            if (!!invoiceToCalculate.length) {
+                                this.sumTotalObj = this.calculateSumDataObject(invoiceToCalculate);
+                            }
+
                             this.filterList();
                         }
                     },
@@ -183,19 +247,17 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         }
     }
 
-    filterListCredit() {
+    private filterListCredit() {
         this._store.select(ReceiptCreditListState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((result: ReceiptInvoiceModel[]) => {
                 if (!!result.length) {
                     this.listCreditInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        // result.every((t: { [x: string]: string; }) => {
-                        //     return s["refNo"] !== t["refNo"]
-                        // })
                         result.filter(x => x.refNo === s.refNo && x.type == s.type).length == 0
                     );
                     this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
+
                     if (this.type === "AGENT") {
                         this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
                             x.invoices.forEach(invoice => {
@@ -216,21 +278,27 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                             });
                         });
                         this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+                        const items: ReceiptInvoiceModel[] = [];
+                        for (let index = 0; index < this.agencyDebitModel.groupShipmentsAgency.length; index++) {
+                            const element: IDataGroupShipmentAgency = this.agencyDebitModel.groupShipmentsAgency[index];
+                            items.push(...element.invoices);
+                        }
+
+                        if (!!items.length) {
+                            this.sumTotalObj = this.calculateSumDataObject(items);
+                        }
                     }
                 }
             });
     }
 
-    filterListDebit() {
+    private filterListDebit() {
         this._store.select(ReceiptDebitListState)
             .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((result: ReceiptInvoiceModel[]) => {
                 if (!!result.length) {
                     this.listDebitInvoice = result || [];
                     this.listDebit = this.listDebit.filter(s =>
-                        // result.every((t: { [x: string]: string; }) => {
-                        //     return s["refNo"] !== t["refNo"];
-                        // })
                         result.filter(x => x.refNo === s.refNo && x.type == s.type).length == 0
                     );
                     this.sumTotalObj = this.calculateSumDataObject(this.listDebit);
@@ -261,6 +329,16 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
                         })
 
                         this.agencyDebitModel.groupShipmentsAgency = this.agencyDebitModel.groupShipmentsAgency.filter(x => x.invoices.length > 0);
+
+                        const items: ReceiptInvoiceModel[] = [];
+                        for (let index = 0; index < this.agencyDebitModel.groupShipmentsAgency.length; index++) {
+                            const element: IDataGroupShipmentAgency = this.agencyDebitModel.groupShipmentsAgency[index];
+                            items.push(...element.invoices);
+                        }
+
+                        if (!!items.length) {
+                            this.sumTotalObj = this.calculateSumDataObject(items);
+                        }
                     }
 
                 }
@@ -330,6 +408,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     }
 
     sortDebit(sort: string) {
+        if (this.type === 'AGENT') {
+            this.agencyDebitModel.groupShipmentsAgency = this._sortService.sort(this.agencyDebitModel.groupShipmentsAgency, sort, this.order);
+            return;
+        }
         this.listDebit = this._sortService.sort(this.listDebit, sort, this.order);
     }
 
@@ -337,50 +419,6 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
     reset() {
         this.listDebit = [];
         this.agencyDebitModel = new AgencyReceiptModel();
-    }
-
-    removeAllChecked(groupShipment: any) {
-        this.checkAll = false;
-        this.checkAllAgency = false;
-        if (this.type === 'AGENT') {
-            groupShipment.isSelected = false;
-            if (this.TYPELIST === 'GROUP') {
-                groupShipment.invoices.forEach(x => {
-                    x.isSelected = false;
-                })
-            }
-        }
-    }
-
-    checkAllChangeAgency() {
-        if (this.checkAllAgency) {
-            this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
-                x.isSelected = true;
-                for (let i = 0; i < x.invoices.length; i++) {
-                    x.invoices[i].isSelected = true;
-                }
-
-            })
-        }
-        else {
-            this.agencyDebitModel.groupShipmentsAgency.forEach(x => {
-                x.isSelected = false;
-                for (let i = 0; i < x.invoices.length; i++) {
-                    x.invoices[i].isSelected = false;
-                }
-            })
-        }
-    }
-
-    checkAllChangeGroupAgency(groupShipment: any) {
-        groupShipment.invoices.forEach(x => {
-            if (groupShipment.isSelected) {
-                x.isSelected = true;
-            }
-            else {
-                x.isSelected = false;
-            }
-        })
     }
 
     calculateSumDataObject(model: ReceiptInvoiceModel[]): ITotalObject {
@@ -399,7 +437,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         }
         for (let index = 0; index < model.length; index++) {
             const element = model[index];
-            switch (element.type) {
+            switch (element.paymentType) {
                 case 'CREDIT':
                     totalObject.totalCreditVnd += element.unpaidAmountVnd;
                     totalObject.totalCreditUsd += element.unpaidAmountUsd;
@@ -440,6 +478,22 @@ interface ITotalObject {
     totalCreditUsd: number,
     totalBalanceVnd: number,
     totalBalanceUsd: number,
+}
+
+interface IDataIssueAgencyPayment {
+    groupShipmentsAgency: IDataGroupShipmentAgency[];
+    invoices: ReceiptInvoiceModel[];
+}
+
+interface IDataGroupShipmentAgency {
+    hbl: string;
+    hblid: string;
+    jobNo: string;
+    mbl: string;
+    unpaidAmountUsd: number;
+    unpaidAmountVnd: number;
+    invoices: ReceiptInvoiceModel[]
+    isSelected?: boolean;
 }
 
 

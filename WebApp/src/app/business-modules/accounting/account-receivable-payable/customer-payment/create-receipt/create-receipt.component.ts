@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
 import { ReceiptModel, ReceiptInvoiceModel } from '@models';
 import { AppForm } from '@app';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
 import { InfoPopupComponent, ConfirmPopupComponent } from '@common';
 import { AccountingRepo } from '@repositories';
@@ -61,12 +61,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     ngOnInit(): void {
         this.initSubmitClickSubscription((action: string) => { this.saveReceipt(action) });
 
-        this._store.select(ReceiptTypeState)
-            .pipe(takeUntil(this.ngUnsubscribe))
-            .subscribe(x => {
-                this.type = x || 'Customer'
+        this._activedRoute.params
+            .pipe(
+                pluck('type'),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((type: string) => {
+                console.log(type);
+                this._store.dispatch(RegistTypeReceipt({ data: type.toUpperCase() }));
+                this.type = type.toUpperCase()
                 this.titleReceipt = `Create ${this.type} Receipt`;
-            });
+            })
 
         // * Listen Bank Fee/Other/Clear Debit Receipt     
         this._activedRoute.queryParams
@@ -156,24 +161,24 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
 
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
-            this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === 'DEBIT' || x.type === 'OBH').length === 0
+            this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
             this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
-        if (this.paymentList.filter(x => x.type == 'CREDIT').length) {
-            const isCreditHaveInvoice = this.paymentList.filter(x => x.type === "CREDIT").some(x => !x.invoiceNo);
+        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length) {
+            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
             if (isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
             }
         }
 
-        if (this.paymentList.some(x => x.paymentType !== 'OTHER' && x.isChangeValue == true)) {
+        if (this.paymentList.some(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && x.isChangeValue == true)) {
             this._toastService.warning('Please you do Process Clear firstly!');
             return;
         }
-        if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == "DEBIT" && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
+        if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
             this._toastService.warning("Total Paid must <= Unpaid");
             return;
         }

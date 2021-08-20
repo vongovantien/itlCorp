@@ -47,35 +47,37 @@
                                 </td>
                                 <td ALIGN="right">
                                     <input type="text" class="form-control text-right text-success font-15"
-                                        [(ngModel)]="item.paidAmountUsd" autoFormatCurrency [disabled]="isReadonly">
+                                        [(ngModel)]="item.paidAmountUsd" autoFormatCurrency [disabled]="isReadonly"
+                                        (ngModelChange)="calculateTotalPaidAmount(item,'paidUsd')">
                                 </td>
                                 <td>
                                     <input type="text" class="form-control text-right text-success font-15"
                                         [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency
-                                        [disabled]="isReadonly">
+                                        [disabled]="isReadonly"
+                                        (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
                                 </td>
                                 <td ALIGN="right">
                                     <ng-container
-                                        *ngIf="item.unpaidAmountUsd - (item.paidAmountUsd | abs) >= 0 ; else negativeBalanceUsd">
+                                        *ngIf="item.unpaidAmountUsd - (item.paidAmountUsd ) >= 0 ; else negativeBalanceUsd">
 
-                                        <span> {{item.unpaidAmountUsd - (item.paidAmountUsd | abs) | negativeNumber
+                                        <span> {{item.unpaidAmountUsd - (item.paidAmountUsd ) | negativeNumber
                                             |
-                                            number: '.2-32'}} </span>
+                                            number: '.2-2'}} </span>
                                     </ng-container>
                                     <ng-template #negativeBalanceUsd>
-                                        <span> ({{item.unpaidAmountUsd - (item.paidAmountUsd | abs) | abs | number:
+                                        <span> ({{item.unpaidAmountUsd - (item.paidAmountUsd) | abs | number:
                                             '.2-2'}}) </span>
                                     </ng-template>
                                 </td>
                                 <td ALIGN="right">
                                     <ng-container
-                                        *ngIf="item.unpaidAmountVnd - (item.paidAmountVnd | abs) >= 0 ; else negativeBalanceVnd">
-                                        <span> {{item.unpaidAmountVnd - (item.paidAmountVnd | abs) | negativeNumber
+                                        *ngIf="item.unpaidAmountVnd - (item.paidAmountVnd) >= 0 ; else negativeBalanceVnd">
+                                        <span> {{item.unpaidAmountVnd - (item.paidAmountVnd) | negativeNumber
                                             |
                                             number: '.3-3'}} </span>
                                     </ng-container>
                                     <ng-template #negativeBalanceVnd>
-                                        <span> ({{item.unpaidAmountVnd - (item.paidAmountVnd | abs) | abs | number:
+                                        <span> ({{item.unpaidAmountVnd - (item.paidAmountVnd) | abs | number:
                                             '.3-3'}}) </span>
                                     </ng-template>
                                 </td>

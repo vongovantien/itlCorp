@@ -10,7 +10,7 @@ import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, Receip
 import { RemoveInvoice, ChangeADVType, InsertCreditToDebit, UpdateCreditItemValue } from "../../store/actions";
 
 import { takeUntil } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { Observable, BehaviorSubject } from "rxjs";
 import { AccountingConstants } from "@constants";
 
 @Component({
@@ -25,6 +25,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     debitList$ = this._store.select(ReceiptDebitListState);
     creditList$ = this._store.select(ReceiptCreditListState);
+
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '', sortable: true },
@@ -68,6 +69,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     isAutoConvert: boolean;
     selectedPaymentItemIndex: number = -1;
     receiptExchangeRate: number;
+
+    creditHasNetOff$: BehaviorSubject<{ credits: string[] }> = new BehaviorSubject<{ credits: string[] }>({ credits: [] });
 
     constructor(
         private readonly _store: Store<IReceiptState>,
@@ -225,6 +228,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     selectPaymentItem(index: number) {
         this.selectedPaymentItemIndex = index;
+
     }
 
     changePaymentTypeADV(newADVType: string) {
@@ -243,6 +247,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     creditAmountUsd: item.paidAmountUsd
                 }
             ));
+            this.creditHasNetOff$.next({ credits: [...this.creditHasNetOff$.value.credits, item.refNo] })
 
         }
     }
