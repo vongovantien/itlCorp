@@ -4051,6 +4051,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
                     var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
                     listKeyData.Add("Debit_Ending", remainDb + remainObh);
+                    listKeyData.Add("Credit_Ending", item.CreditAmount);
 
                     listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("Creator", item.Creator);
