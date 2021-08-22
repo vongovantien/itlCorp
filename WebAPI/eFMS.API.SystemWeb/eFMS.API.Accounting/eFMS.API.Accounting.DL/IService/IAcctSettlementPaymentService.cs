@@ -93,7 +93,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
-        List<string> GetListAdvanceNoForShipment(Guid hblId);
+        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);

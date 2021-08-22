@@ -307,13 +307,13 @@ namespace eFMS.API.Accounting.Controllers
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
-                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid);
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
-                shipment.AdvanceNo = advanceLst == null ? null : advanceLst.FirstOrDefault();
+                shipment.AdvanceNo = advanceLst == null ? null : advanceLst.Where(x => x == item.FirstOrDefault().AdvanceNo).FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
                 shipment.CustomNo = item.Select(x => x.ClearanceNo).FirstOrDefault();
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
@@ -1037,12 +1037,14 @@ namespace eFMS.API.Accounting.Controllers
         /// Get List AdvanceNo For Shipment
         /// </summary>
         /// <param name="hblId"></param>
+        /// <param name="payeeId">use in get existing charge</param>
+        /// <param name="requester">use in get existing charge</param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetListAdvanceNoForShipment")]
-        public IActionResult GetListAdvanceNoForShipment(Guid hblId)
+        public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester)
         {
-            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId);
+            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester);
             return Ok(_result);
         }
 
