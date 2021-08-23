@@ -9,5 +9,6 @@ namespace eFMSWindowService.Helpers
     public static class CommonData
     {
         public static List<string> EmailBCCs = new List<string> { "alex.phuong@itlvn.com", "andy.hoa@itlvn.com" };
+        public static List<string> EmailBCCsOverDuePayment = new List<string> { "daniel.khoa@itlvn.com" };
     }    
 }
