@@ -317,9 +317,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     BillingRefNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano,
                                     InvoiceNo = invoice.Type != "Invoice" ? string.Empty : invoice.InvoiceNoReal,
                                     Type = surcharge.Type == "OBH" ? "OBH" : "DEBIT",
-                                    PaymentAmount = payment == null ? 0 : payment.PaymentAmount,
-                                    UnpaidPaymentAmountUsd = payment == null ? 0 : payment.UnpaidPaymentAmountUsd,
-                                    UnpaidPaymentAmountVnd = payment == null ? 0 : payment.UnpaidPaymentAmountVnd,
+                                    payment
                                 }).ToList();
 
             var resultGroups = resultsQuery.GroupBy(x => new
@@ -329,7 +327,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.Type,
                 x.ShortName,
                 x.InvoiceNo,
-            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.PaymentAmount, f.UnpaidPaymentAmountUsd, f.UnpaidPaymentAmountVnd }) });
+            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.PaymentAmount, f.payment?.UnpaidPaymentAmountUsd, f.payment?.UnpaidPaymentAmountVnd }) });
 
             var results = resultGroups
                             .Select(x => new AccountingPaymentModel

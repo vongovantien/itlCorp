@@ -3939,7 +3939,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 9].Value = item.Over1To15Day;
                 workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
                 workSheet.Cells[rowStart, 11].Value = item.Over30Day;
-                workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditAmount;
+                workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditLimited;
                 workSheet.Cells[rowStart, 13].Value = item.AgreementCurrency;
                 workSheet.Cells[rowStart, 14].Value = item.CreditLimited;
 

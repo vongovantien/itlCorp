@@ -64,12 +64,12 @@
                                     <ng-container class="form-group " *ngIf="item.paymentType === 'DEBIT'">
                                         <ng-container *ngIf="!!(creditList$ | async)?.length && !isReadonly">
                                             <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
-                                                position=bottomCenter (click)="selectPaymentItem(i)">
+                                                position=bottomCenter (click)="selectPaymentItem(i, item)">
                                                 <div class="credit-container">
                                                     <ng-container *ngFor="let credit of item.creditNos; let j = index">
                                                         <div class="credit-item-wrapper">
                                                             <span class="credit-item__icon"
-                                                                (click)="deleteCreditItem(credit, item, $event)">x</span>
+                                                                (click)="deleteCreditItem(credit, i, item, $event)">x</span>
                                                             <span class="credit-item__label">{{credit}}</span>
                                                         </div>
                                                     </ng-container>

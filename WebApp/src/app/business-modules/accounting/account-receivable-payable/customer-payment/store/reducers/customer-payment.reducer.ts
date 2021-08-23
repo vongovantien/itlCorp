@@ -161,14 +161,18 @@ export const receiptManagementReducer = createReducer(
         const currentDebitItem = newArrayDebit[payload.index];
 
         currentDebitItem.creditNos = [...currentDebitItem.creditNos, payload.creditNo];
+        currentDebitItem.paidAmountUsd = payload.paidAmountUsd;
+        currentDebitItem.paidAmountVnd = payload.paidAmountVnd;
+        currentDebitItem.totalPaidUsd = payload.totalPaidUsd;
+        currentDebitItem.totalPaidVnd = payload.totalPaidVnd;
 
         // * if NetOff has default value
         if (currentDebitItem.netOff === true) {
             currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(payload.creditAmountVnd).toFixed(0);
             currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(payload.creditAmountUsd).toFixed(2);
         } else {
-            currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(currentDebitItem.paidAmountVnd - payload.creditAmountVnd).toFixed(0);
-            currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(currentDebitItem.paidAmountUsd - payload.creditAmountUsd).toFixed(2);
+            currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(payload.paidAmountVnd - payload.creditAmountVnd).toFixed(0);
+            currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(payload.paidAmountUsd - payload.creditAmountUsd).toFixed(2);
         }
 
         // * Update value for creditItem Correcsponding
@@ -188,11 +192,22 @@ export const receiptManagementReducer = createReducer(
             newArrayCredit[indexCreditItemToUpdate][payload.key] = payload.value;
         }
 
-        return { ...state, creditList: newArrayCredit }
+        return { ...state, creditList: [...newArrayCredit] }
     }),
     on(ReceiptActions.UpdateReceiptExchangeRate, (state: IReceiptState, payload: { exchangeRate: number }) => ({
         ...state, exchangeRate: payload.exchangeRate
-    }))
+    })),
+    on(ReceiptActions.DeleteCreditInDebit, (state: IReceiptState, payload: ReceiptActions.ISelectCreditToDebit) => {
+        const newDebitList: ReceiptInvoiceModel[] = [...state.debitList];
+        const currentdebit: ReceiptInvoiceModel = newDebitList[payload.index];
+
+        const currentCreditToDelete = state.creditList.find(x => x.refNo === payload.creditNo);
+        if (!!currentCreditToDelete && !currentdebit.netOff) {
+            currentdebit.paidAmountUsd = currentdebit.totalPaidUsd = +(payload.totalPaidUsd + currentCreditToDelete.paidAmountUsd).toFixed(2);
+            currentdebit.paidAmountVnd = currentdebit.totalPaidVnd = +(payload.totalPaidVnd + currentCreditToDelete.paidAmountVnd).toFixed(0);
+        }
+        return { ...state, debitList: [...newDebitList] }
+    })
 );
 
 export function receiptReducer(state: IReceiptState | undefined, action: Action) {

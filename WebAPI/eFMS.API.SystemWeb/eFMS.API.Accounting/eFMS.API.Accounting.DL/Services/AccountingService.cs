@@ -2700,8 +2700,11 @@ namespace eFMS.API.Accounting.DL.Services
                 var invoice = DataContext.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
                 var detail = new PaymentDetailModel();
                 detail.RowId = payment.Id.ToString();
-                // Customer Code
-                detail.CustomerCode = partners.Where(x => x.Id == invoice.PartnerId).FirstOrDefault()?.AccountNo;
+
+                if(invoice != null)
+                {
+                    detail.CustomerCode = partners.Where(x => x.Id == invoice.PartnerId)?.FirstOrDefault()?.AccountNo;
+                }
                 //Paid Amount
                 decimal? _paidAmount = payment.PaymentAmount;
                 if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
