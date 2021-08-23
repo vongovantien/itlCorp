@@ -7,9 +7,9 @@ import { InjectViewContainerRefDirective } from "@directives";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState, ReceiptExchangeRate } from "../../store/reducers";
-import { RemoveInvoice, ChangeADVType, InsertCreditToDebit, UpdateCreditItemValue } from "../../store/actions";
+import { RemoveInvoice, ChangeADVType, InsertCreditToDebit, UpdateCreditItemValue, DeleteCreditInDebit } from "../../store/actions";
 
-import { takeUntil } from "rxjs/operators";
+import { takeUntil, withLatestFrom, map } from "rxjs/operators";
 import { Observable, BehaviorSubject } from "rxjs";
 import { AccountingConstants } from "@constants";
 
@@ -24,7 +24,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     @Input() isReadonly: boolean = false;
 
     debitList$ = this._store.select(ReceiptDebitListState);
-    creditList$ = this._store.select(ReceiptCreditListState);
+    creditList$: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
 
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
@@ -50,6 +50,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     ];
     selectedIndexItem: number;
+    selectedItem: ReceiptInvoiceModel;
     receiptType$: Observable<string> = this._store.select(ReceiptTypeState);
 
     selectedCredit: ReceiptInvoiceModel;
@@ -67,10 +68,11 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
     };
 
     isAutoConvert: boolean;
-    selectedPaymentItemIndex: number = -1;
     receiptExchangeRate: number;
 
     creditHasNetOff$: BehaviorSubject<{ credits: string[] }> = new BehaviorSubject<{ credits: string[] }>({ credits: [] });
+
+
 
     constructor(
         private readonly _store: Store<IReceiptState>,
@@ -116,6 +118,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     this.receiptExchangeRate = exchangeRate;
                 }
             )
+
+
     }
 
     confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {
@@ -226,39 +230,53 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         return totalData
     }
 
-    selectPaymentItem(index: number) {
-        this.selectedPaymentItemIndex = index;
+    selectPaymentItem(index: number, item: ReceiptInvoiceModel) {
+        this.selectedIndexItem = index;
+        this.selectedItem = item;
 
     }
 
     changePaymentTypeADV(newADVType: string) {
-        if (this.selectedPaymentItemIndex >= 0) {
-            this._store.dispatch(ChangeADVType({ index: this.selectedPaymentItemIndex, newType: newADVType }));
+        if (this.selectedIndexItem >= 0) {
+            this._store.dispatch(ChangeADVType({ index: this.selectedIndexItem, newType: newADVType }));
         }
     }
 
     selectCreditPaymentItem(item: ReceiptInvoiceModel) {
-        if (this.selectedPaymentItemIndex >= 0) {
+        if (this.selectedIndexItem >= 0) {
             this._store.dispatch(InsertCreditToDebit(
                 {
-                    index: this.selectedPaymentItemIndex,
+                    index: this.selectedIndexItem,
                     creditNo: item.refNo,
+                    paidAmountVnd: this.selectedItem.paidAmountVnd,
+                    paidAmountUsd: this.selectedItem.paidAmountUsd,
+                    totalPaidVnd: this.selectedItem.totalPaidVnd,
+                    totalPaidUsd: this.selectedItem.totalPaidUsd,
                     creditAmountVnd: item.paidAmountVnd,
                     creditAmountUsd: item.paidAmountUsd
                 }
             ));
-            this.creditHasNetOff$.next({ credits: [...this.creditHasNetOff$.value.credits, item.refNo] })
-
         }
     }
 
-    deleteCreditItem(credit: string, item: ReceiptInvoiceModel, e: Event) {
+    deleteCreditItem(credit: string, index: number, item: ReceiptInvoiceModel, e: Event) {
+        this.selectedItem = item;
+        this.selectedIndexItem = index;
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        const index = (item.creditNos as string[]).findIndex(x => x === credit);
+        const indexCreditTodelete = (item.creditNos as string[]).findIndex(x => x === credit);
 
-        item.creditNos = [...item.creditNos.slice(0, index), ...item.creditNos.slice(index + 1)];
+        item.creditNos = [...item.creditNos.slice(0, indexCreditTodelete), ...item.creditNos.slice(indexCreditTodelete + 1)];
+
+        this._store.dispatch(DeleteCreditInDebit({
+            index: this.selectedIndexItem,
+            paidAmountVnd: this.selectedItem.paidAmountVnd,
+            paidAmountUsd: this.selectedItem.paidAmountUsd,
+            totalPaidVnd: this.selectedItem.totalPaidVnd,
+            totalPaidUsd: this.selectedItem.totalPaidUsd,
+            creditNo: credit
+        }));
 
         this._store.dispatch(UpdateCreditItemValue({ searchKey: 'refNo', searchValue: credit, key: 'invoiceNo', value: null }));
 
@@ -290,8 +308,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                         item.paidAmountUsd = item.totalPaidUsd = totalNetOffUsd;
                     }
                     else {
-                        // item.paidAmountVnd = item.unpaidAmountVnd - totalNetOffVNd;
-                        // item.paidAmountUsd = item.unpaidAmountUsd - totalNetOffUsd;
+                        item.paidAmountVnd = item.totalPaidVnd = item.unpaidAmountVnd - totalNetOffVNd;
+                        item.paidAmountUsd = item.totalPaidUsd = item.unpaidAmountUsd - totalNetOffUsd;
                     }
                     this.calculateSumTotalDebit();
 

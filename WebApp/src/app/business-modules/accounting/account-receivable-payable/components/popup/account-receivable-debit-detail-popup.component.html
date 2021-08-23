@@ -5,25 +5,30 @@
                 <h5 class="modal-title">Debit detail</h5>
             </div>
             <div class="modal-body">
-                <div class="m-form m-form--state">
-                    <div class="table-wrapper table-scrollabler" id="department-list-table">
-                        <table class="table table-hover table-brand dataTable table-hover" >
+                <div class="m-form m-form--state ">
+                    <div class="table-horizontal" id="department-list-table" style="max-height: 600px">
+                        <table class="table table-hover table-brand dataTable table-hover">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"> </thead>
                             <tbody>
                                 <ng-container>
-                                    <ng-container
-                                        *ngFor="let item of dataDebitList; let i = index; trackBy: trackByFn">
+                                    <ng-container *ngFor="let item of dataDebitList; let i = index; trackBy: trackByFn">
                                         <tr class="">
                                             <td>{{i+1}} </td>
                                             <td class="text-primary"> {{item.billingNo }}</td>
                                             <td ALIGN="center">{{item.type }}</td>
                                             <td ALIGN="center">{{item.invoiceNo }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.totalAmountVND | number: '.0-3' }}</td>
-                                            <td class="text-right" ALIGN="right" >{{ item.totalAmountUSD | number: '.0-3' }}</td>
-                                            <td class="text-right text-success" ALIGN="right" >{{ item.paidAmountVND | number: '.0-3' }}</td>
-                                            <td class="text-right text-success" ALIGN="right">{{ item.paidAmountUSD | number: '.0-3' }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountVND | number: '.0-3' }}</td>
-                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountUSD | number: '.0-3' }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.totalAmountVND | number: '.0-3'
+                                                }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.totalAmountUSD | number: '.0-3'
+                                                }}</td>
+                                            <td class="text-right text-success" ALIGN="right">{{ item.paidAmountVND |
+                                                number: '.0-3' }}</td>
+                                            <td class="text-right text-success" ALIGN="right">{{ item.paidAmountUSD |
+                                                number: '.0-3' }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountVND | number:
+                                                '.0-3' }}</td>
+                                            <td class="text-right" ALIGN="right">{{ item.unpaidAmountUSD | number:
+                                                '.0-3' }}</td>
                                             <td class="text-right">{{ item.overdueDays }}</td>
                                             <td class="text-right text-success">{{ item.code }}</td>
                                         </tr>
@@ -53,6 +58,7 @@
                                     <td rowspan="4" ALIGN="center" class="text-right">
                                         {{sumTotalObj.totalunpaidUSD | number:'.0-3'}}
                                     </td>
+                                    <td colspan="4"></td>
                                 </tr>
                             </tfoot>
                         </table>

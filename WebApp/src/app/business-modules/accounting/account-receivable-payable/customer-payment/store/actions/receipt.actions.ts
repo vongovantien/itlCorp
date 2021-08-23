@@ -25,6 +25,7 @@ export enum ReceiptActionTypes {
     INSERT_CREDIT_TO_DEBIT = '[AR Receipt] Insert Credit To Debit',
     UPDATE_CREDIT_ITEM_VALUE = '[AR Receipt] Update Credit Item Value',
     UPDATE_EXCHANGE_RATE = '[AR Receipt] Update Exchange Rate',
+    DELETE_CREDIT_IN_DEBIT_ITEM = '[AR Receipt] Delete Credit In Debit Item',
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
@@ -54,6 +55,7 @@ export const ChangeADVType = createAction(ReceiptActionTypes.CHANGE_ADV_TYPE, pr
 export const InsertCreditToDebit = createAction(ReceiptActionTypes.INSERT_CREDIT_TO_DEBIT, props<ISelectCreditToDebit>());
 export const UpdateCreditItemValue = createAction(ReceiptActionTypes.UPDATE_CREDIT_ITEM_VALUE, props<{ searchKey: string, searchValue: string, key: string, value: string }>());
 export const UpdateReceiptExchangeRate = createAction(ReceiptActionTypes.UPDATE_EXCHANGE_RATE, props<{ exchangeRate: number }>());
+export const DeleteCreditInDebit = createAction(ReceiptActionTypes.DELETE_CREDIT_IN_DEBIT_ITEM, props<ISelectCreditToDebit>());
 
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
@@ -67,7 +69,8 @@ export interface ProcessClearInvoiceModel {
 
 export interface ISelectCreditToDebit {
     index: number
-    creditNo: string;
-    creditAmountVnd: number;
-    creditAmountUsd: number;
+    // creditNo: string;
+    // creditAmountVnd: number;
+    // creditAmountUsd: number;
+    [key: string]: any
 }
