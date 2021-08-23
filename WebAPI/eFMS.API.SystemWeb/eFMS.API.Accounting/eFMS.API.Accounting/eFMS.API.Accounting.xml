@@ -756,11 +756,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String)">
             <summary>
             Get List AdvanceNo For Shipment
             </summary>
             <param name="hblId"></param>
+            <param name="payeeId">use in get existing charge</param>
+            <param name="requester">use in get existing charge</param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">

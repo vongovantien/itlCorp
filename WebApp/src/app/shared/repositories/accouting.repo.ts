@@ -847,8 +847,8 @@ export class AccountingRepo {
         return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/DeleteAttachedFile/${folder}/${id}`);
     }
 
-    getListAdvanceNoForShipment(hblId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId }).pipe(
+    getListAdvanceNoForShipment(hblId: string, payeeId: string = '', requester: string = '') {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId, payeeId: payeeId, requester: requester }).pipe(
             map((data: any) => data)
         );
     }

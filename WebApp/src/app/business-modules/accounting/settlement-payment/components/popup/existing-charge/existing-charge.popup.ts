@@ -78,6 +78,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     personInCharges: any[] = [];
     selectedSurcharge: Surcharge;
     selectedIndexCharge: number = -1;
+    requester: string = '';
 
     constructor(
         private _catalogue: CatalogueRepo,
@@ -355,7 +356,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             this.total.totalCharges = surcharges.length;
 
             this.orgChargeShipment = { shipmentSettlement: cloneDeep(this.shipments), total: cloneDeep(this.total) };
-            this.getAdvnaceList(surcharge.hblid);
+            const payeeId = surcharge.type === 'OBH' ? surcharge.payerId : surcharge.paymentObjectId;
+            this.getAdvanceList(surcharge.hblid, payeeId);
             this.checkedAllCharges();
         }
     }
@@ -367,8 +369,8 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         );
     }
 
-    getAdvnaceList(hblId: string) {
-        this._accoutingRepo.getListAdvanceNoForShipment(hblId)
+    getAdvanceList(hblId: string, payeeId: string) {
+        this._accoutingRepo.getListAdvanceNoForShipment(hblId, payeeId, this.requester)
             .pipe(catchError(this.catchError), finalize(() => {
             }))
             .subscribe(
@@ -538,6 +540,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             serviceDateFrom: !!this.serviceDate.value ? (!this.serviceDate.value.startDate ? null : formatDate(this.serviceDate.value.startDate, 'yyyy-MM-dd', 'en')) : null,
             serviceDateTo: !!this.serviceDate.value ? (!this.serviceDate.value.endDate ? null : formatDate(this.serviceDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
             personInCharge: !this.personInCharge.value ? this.personInCharges.map((item: any) => item.id).join(';') : this.personInCharge.value.join(';'),
+            requester: this.requester
         };
         this.isSoaCDNoteSelected();
         if (!this.referenceInput.value) {
@@ -596,7 +599,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                         body.partnerId = this.selectedPartnerData.id;
                         if (!!res.length) {
                             return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                                catchError((err, caught) => this.catchError),
+                                catchError(this.catchError),
                                 concatMap((rs: any) => {
                                     if (!rs.status) {
                                         this._toastService.error(rs.message);
@@ -628,7 +631,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                 );
         } else {
             this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                catchError((err, caught) => this.catchError),
+                catchError(this.catchError),
                 concatMap((rs: any) => {
                     if (!rs.status) {
                         console.log('mess', rs)
@@ -750,6 +753,7 @@ export interface ISearchExistsChargeSettlePayment {
     serviceDateFrom: string;
     serviceDateTo: string;
     personInCharge: string;
+    requester: string;
 }
 
 interface IGetExistsCharge {
