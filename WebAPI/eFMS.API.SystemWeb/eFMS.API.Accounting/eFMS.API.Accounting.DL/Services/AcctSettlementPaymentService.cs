@@ -1601,7 +1601,8 @@ namespace eFMS.API.Accounting.DL.Services
                                      PICName = user.Username,
                                      KickBack = sur.KickBack,
                                      VatPartnerId = sur.VatPartnerId,
-                                     VatPartnerShortName = vatPgrp.ShortName
+                                     VatPartnerShortName = vatPgrp.ShortName,
+                                     AdvanceNo = sur.AdvanceNo
                                  }).ToList();
             for (int i = 0; i < dataOperation.Count(); i++)
             {
@@ -1673,7 +1674,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PICName = user.Username,
                                     KickBack = sur.KickBack,
                                     VatPartnerId = sur.VatPartnerId,
-                                    VatPartnerShortName = vatPgrp.ShortName
+                                    VatPartnerShortName = vatPgrp.ShortName,
+                                    AdvanceNo = sur.AdvanceNo
                                 }).ToList();
 
             var data = dataDocument.Union(dataOperation);
@@ -5398,7 +5400,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (surchargesFilter.Any())
                 {
-                    message = "SOA: " + string.Join(',', surchargesFilter.Select(x => x.PaySoano)) + " exist charges that synced to Accountant or made settlement, Please you check again!";
+                    message = "SOA: " + string.Join(',', surchargesFilter.Select(x => x.PaySoano).Distinct()) + " exist charges that synced to Accountant or made settlement, Please you check again!";
                 }
 
             }
@@ -5413,7 +5415,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (surchargesFilter.Any())
                 {
-                    message = "CDNote: " + string.Join(',', surchargesFilter.Select(x => x.CreditNo)) + " exist charges that synced to Accountant or made settlement, Please you check again!";
+                    message = "CDNote: " + string.Join(',', surchargesFilter.Select(x => x.CreditNo).Distinct()) + " exist charges that synced to Accountant or made settlement, Please you check again!";
                 }
             }
             return message;
@@ -5426,15 +5428,32 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="mbl"></param>
         /// <param name="hbl"></param>
         /// <returns></returns>
-        public List<string> GetListAdvanceNoForShipment(Guid hblId)
+        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null)
         {
-            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).ToLookup(x => x.AdvanceNo);
-            if (advanceRequest != null && advanceRequest.Count() > 0)
+            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
+            IQueryable<AcctAdvancePayment> advancePayments = null;
+            var advanceNo = csShipmentSurchargeRepo.Get(x => advanceRequest.Any(ad => ad == x.AdvanceNo) && string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.AdvanceNo).ToList();
+            if(advanceNo.Count() == 0)
             {
-                var advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceRequest.Any(a => a.Key.Contains(x.AdvanceNo)));
-                return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
+                return advanceNo;
             }
-            return new List<string>();
+
+            if(string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
+            {
+                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)));
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(payeeId))
+                {
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId));
+                }
+                if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
+                {
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
+                }
+            }
+            return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
         }
 
         #region --- Calculator Receivable Settlement ---

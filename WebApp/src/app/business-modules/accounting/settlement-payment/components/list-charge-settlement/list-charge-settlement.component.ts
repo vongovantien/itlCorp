@@ -127,6 +127,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
     showExistingCharge() {
         this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
+        this.existingChargePopup.requester = this.requester;
         this.existingChargePopup.show();
     }
 
@@ -405,6 +406,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.getDetailShipmentOfSettle(cloneDeep(surchargesFromShipment));
             this.existingChargePopup.state = 'update';
             this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
+            this.existingChargePopup.requester = this.requester;
             this.existingChargePopup.show();
         } else {
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
