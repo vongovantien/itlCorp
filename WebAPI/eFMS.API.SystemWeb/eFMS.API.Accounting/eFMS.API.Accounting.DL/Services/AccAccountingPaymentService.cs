@@ -223,17 +223,6 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Soa":
                         query = query.And(x => criteria.ReferenceNos.Contains(x.BillingRefNo, StringComparer.OrdinalIgnoreCase));
                         break;
-                    case "ReceiptNo":
-                        var lstReceipt = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(x.PaymentRefNo)).Select(x => x.Id).ToList();
-                        if (lstReceipt.Count > 0)
-                        {
-                            query = query.And(x => lstReceipt.Any(r => r == x.ReceiptId));
-                        }
-                        else
-                        {
-                            query = query.And(x => false);
-                        }
-                        break;
                 }
             }
             if (criteria.FromUpdatedDate != null)
@@ -349,6 +338,14 @@ namespace eFMS.API.Accounting.DL.Services
                                 UnpaidAmount = x.payment == null ? (x.Key.Type == "OBH" ? x.invoice.Sum(z => z.UnpaidAmount ?? 0) : (x.invoice.FirstOrDefault().UnpaidAmount ?? 0)) :
                                                                     (x.invoice.FirstOrDefault().Currency == AccountingConstants.CURRENCY_LOCAL ? (x.payment.FirstOrDefault().UnpaidPaymentAmountVnd ?? 0) : (x.payment.FirstOrDefault().UnpaidPaymentAmountUsd ?? 0)),
                             });
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                if (criteria.SearchType == "ReceiptNo")
+                {
+                    var listReceiptInfo = acctReceiptRepository.Get(receipt => receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
+                    results = results.Where(x => listReceiptInfo.Any(z => z == x.ReceiptId)).ToList();
+                }
+            }
             return results.AsQueryable();
         }
 
@@ -512,7 +509,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results.Where(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date).ToList();
             }
-            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0 && !criteria.PaymentStatus.Contains("Other"))
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
                 results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid")).ToList();
             }
@@ -680,7 +677,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results.Where(x => x.PaidDate != null && x.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date).ToList();
             }
-            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0 && !criteria.PaymentStatus.Contains("Other"))
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
             {
                 results = results.Where(x => criteria.PaymentStatus.Contains(x.Status ?? "Unpaid")).ToList();
             }
@@ -698,7 +695,7 @@ namespace eFMS.API.Accounting.DL.Services
             PermissionRange rangeSearch = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
-            Expression<Func<AccAccountingPayment, bool>> query = x => (x.Type != "DEBIT" && x.Type != "OBH" && x.PaymentType != "CREDIT") && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
+            Expression<Func<AccAccountingPayment, bool>> query = x => x.PaymentType == "OTHER" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId));
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
             if (criteria.ReferenceNos?.Count(x => !string.IsNullOrEmpty(x)) > 0)
             {
@@ -721,7 +718,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            if (criteria.PaymentStatus != null && !criteria.PaymentStatus.Contains("Other"))
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count() > 0 && !criteria.PaymentStatus.Contains("Other"))
             {
                 query = query.And(x => false);
             }
@@ -1560,6 +1557,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     ParentCode = pa != null ? pa.AccountNo : string.Empty,
                                     PartnerName = part.PartnerNameEn,
                                     BillingRefNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano,
+                                    ReceiptId = payment == null ? null : payment.ReceiptId,
                                     PaymentType = payment == null ? string.Empty : payment.Type,
                                     PaymentAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
                                     UnpaidPaymentAmountVnd = payment == null ? 0 : payment.UnpaidPaymentAmountVnd,
@@ -1567,7 +1565,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaymentRefNo = rcpt == null ? null : rcpt.PaymentRefNo,
                                     PaymentDate = rcpt == null ? null : rcpt.PaymentDate
                                 }).ToList();
-
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                if (criteria.SearchType == "ReceiptNo")
+                {
+                    var listReceiptInfo = acctReceiptRepository.Get(receipt => receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
+                    resultsQuery = resultsQuery.Where(x => listReceiptInfo.Any(z => z == x.ReceiptId)).ToList();
+                }
+            }
             var resultGroups = resultsQuery.GroupBy(x => new
             {
                 x.invoice.PartnerId,
