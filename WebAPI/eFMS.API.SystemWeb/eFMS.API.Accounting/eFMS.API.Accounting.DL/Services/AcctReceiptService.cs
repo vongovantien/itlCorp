@@ -1677,21 +1677,26 @@ namespace eFMS.API.Accounting.DL.Services
                 creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
             }
 
-            if (debits != null)
+            if (debits != null && debits.Count() > 0)
             {
                 data.AddRange(debits);
             }
-            if (obhs != null)
+            if (obhs != null && obhs.Count() > 0)
             {
                 data.AddRange(obhs);
             }
-            if (soaCredits != null)
+            if (soaCredits != null && soaCredits.Count() > 0)
             {
                 data.AddRange(soaCredits);
             }
-            if (creditNotes != null)
+            if (creditNotes != null && creditNotes.Count() > 0)
             {
                 data.AddRange(creditNotes);
+            }
+
+            if(data.Count == 0)
+            {
+                return data;
             }
             foreach (var item in data)
             {
@@ -1721,21 +1726,26 @@ namespace eFMS.API.Accounting.DL.Services
 
             }
 
-            if (creditNote != null)
+            if (creditNote != null && creditNote.Count() > 0)
             {
                 data.Invoices.AddRange(creditNote);
             }
-            if (soaCredit != null)
+            if (soaCredit != null && soaCredit.Count() > 0)
             {
                 data.Invoices.AddRange(soaCredit);
             }
-            if (debits != null)
+            if (debits != null && debits.Count() > 0)
             {
                 data.Invoices.AddRange(debits);
             }
-            if (obhs != null)
+            if (obhs != null && obhs.Count() > 0)
             {
                 data.Invoices.AddRange(obhs);
+            }
+            if(data.Invoices.Count == 0)
+            {
+                data.GroupShipmentsAgency = new List<GroupShimentAgencyModel>();
+                return data;
             }
             var groupShipmentAgency = data.Invoices.GroupBy(g => new { g.JobNo, g.Hbl, g.Mbl, g.Hblid }).Select(s => new GroupShimentAgencyModel
             {
@@ -1747,6 +1757,7 @@ namespace eFMS.API.Accounting.DL.Services
                 UnpaidAmountVnd = s.Select(t => t.UnpaidAmountVnd).Sum(),
                 Invoices = s.ToList()
             }).ToList();
+
             data.GroupShipmentsAgency = groupShipmentAgency;
             return data;
         }
