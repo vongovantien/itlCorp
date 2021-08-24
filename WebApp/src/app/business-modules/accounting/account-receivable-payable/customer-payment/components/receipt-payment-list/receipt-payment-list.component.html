@@ -80,14 +80,14 @@
                     <div class="form-group">
                         <label for="">As Paid Amount</label>
                         <app-switch size="sm" class="success" formControlName="isAsPaidAmount"
-                            (toggleChange)="onToggleAsPaidAmount($event)"></app-switch>
+                            (toggleChange)="onToggleAsPaidAmount($event)" [disabled]="isReadonly"></app-switch>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group">
                         <label for="">Auto convert</label>
                         <app-switch size="sm" class="success" formControlName="isAutoConvert"
-                            (toggleChange)="onToggleAutoConvertPaid($event)"></app-switch>
+                            (toggleChange)="onToggleAutoConvertPaid($event)" [disabled]="isReadonly"></app-switch>
                     </div>
                 </div>
             </div>

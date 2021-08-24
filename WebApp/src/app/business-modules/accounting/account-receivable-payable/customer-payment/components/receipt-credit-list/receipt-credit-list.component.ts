@@ -85,8 +85,6 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
             { title: 'Acct Doc', field: '', },
             { title: 'Amount USD', field: '', width: 150, align: this.right },
             { title: 'Amount VND', field: '', width: 150, align: this.right },
-            { title: 'Amount USD', field: '', width: 150, align: this.right },
-            { title: 'Amount VND', field: '', width: 150, align: this.right },
             { title: 'NetOff USD', field: '', width: 150, required: true, align: this.right },
             { title: 'NetOff VND', field: '', width: 150, required: true, align: this.right },
             { title: 'Balance USD', field: '', width: 150, align: this.right },
