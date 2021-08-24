@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, forwardRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { coerceBooleanProperty } from '@angular/cdk/coercion';
 
 @Component({
     selector: 'app-switch',
@@ -37,12 +38,20 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 export class SwitchToggleComponent implements ControlValueAccessor {
     @Input() class: string = 'success';
     @Input() size: string = "md";
-    @Input() disabled: boolean = null;
+    @Input() set disabled(v: boolean) {
+        this._disabled = coerceBooleanProperty(v);
+    };
     @Output() toggleChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     private toggle: boolean = false; // * internal state
     private onChange: Function = (v: boolean) => { };
     private onTouch: Function = () => { };
+
+    private _disabled: boolean = false;
+
+    get disabled(): boolean {
+        return this._disabled;
+    }
 
     constructor(private _cd: ChangeDetectorRef) { }
 
