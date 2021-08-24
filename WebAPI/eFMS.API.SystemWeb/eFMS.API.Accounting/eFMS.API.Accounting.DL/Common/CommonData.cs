@@ -56,5 +56,13 @@ namespace eFMS.API.Accounting.DL.Common
             new CommonData { Value = "Denied", DisplayName = "Denied" }
         };
 
+        // Defined list payment type = other with code and name
+        public static readonly List<CommonData> PaymentTypeOther = new List<CommonData>
+        {
+            new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_PAY_OBH, DisplayName = AccountingConstants.RECEIPT_CLASS_PAY_OBH },
+            new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_PAY_OTHER, DisplayName = AccountingConstants.RECEIPT_CLASS_PAY_OTHER },
+            new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH, DisplayName = AccountingConstants.RECEIPT_CLASS_COLLECT_OBH },
+            new CommonData { Value = AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER, DisplayName = AccountingConstants.RECEIPT_CLASS_COLLECT_OTHER }
+        };
     }
 }
