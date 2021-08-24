@@ -180,7 +180,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                         .replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',')
                         .trim()
                         .split(',')
-                        .map((item: any) => item.trim()) : null,
+                        .map((item: any) => item.trim()) : [],
 
                 fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,

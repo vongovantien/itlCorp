@@ -61,7 +61,8 @@
                                     </ng-container>
                                 </td>
                                 <td>
-                                    <ng-container class="form-group " *ngIf="item.paymentType === 'DEBIT'">
+                                    <ng-container class="form-group "
+                                        *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
                                         <ng-container *ngIf="!!(creditList$ | async)?.length && !isReadonly">
                                             <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
                                                 position=bottomCenter (click)="selectPaymentItem(i, item)">
@@ -87,7 +88,7 @@
                                 </td>
                                 <td ALIGN="right">
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
-                                        {{item.unpaidAmountVnd | number:'1.0-3'}}
+                                        {{item.unpaidAmountVnd | number:'1.0-2'}}
                                     </ng-container>
                                 </td>
 
@@ -111,7 +112,7 @@
                                 </td>
                                 <td ALIGN="right">
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
-                                        {{item.totalPaidVnd | number:'1.0-3'}}
+                                        {{item.totalPaidVnd | number:'1.0-2'}}
                                     </ng-container>
                                 </td>
                                 <td ALIGN="right">
@@ -153,7 +154,8 @@
                                     <ng-container
                                         *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
                                         <app-switch size="sm" class="danger"
-                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff">
+                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
+                                            [disabled]="isReadonly">
                                         </app-switch>
                                     </ng-container>
                                 </td>
@@ -173,19 +175,19 @@
                                 {{sumTotalObj.totalUnpaidAmountUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalUnpaidAmountVnd | number: '.0-3'}} VND
+                                {{sumTotalObj.totalUnpaidAmountVnd | number: '1.0-2'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidAmountUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalPaidAmountVnd | number: '.0-3'}} VND
+                                {{sumTotalObj.totalPaidAmountVnd | number: '1.0-2'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalPaidVnd | number: '.0-3'}} VND
+                                {{sumTotalObj.totalPaidVnd | number: '1.0-2'}} VND
                             </td>
 
                             <td ALIGN="right">
@@ -195,7 +197,7 @@
                             </td>
                             <td ALIGN="right">
                                 <ng-container *ngIf="sumTotalObj.totalRemainVnd > 0; else TplnegativeRemainVnd">
-                                    {{sumTotalObj.totalRemainVnd | number:'.0-3'}} VND
+                                    {{sumTotalObj.totalRemainVnd | number:'1.0-2'}} VND
 
                                 </ng-container>
                             </td>
@@ -214,7 +216,7 @@
 
 
 <ng-template #TplnegativeRemainUsd>
-    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.0-3'}}
+    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.0-2'}}
 </ng-template>
 
 
