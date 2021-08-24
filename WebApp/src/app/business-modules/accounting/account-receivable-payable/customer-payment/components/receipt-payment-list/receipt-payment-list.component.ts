@@ -272,24 +272,25 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.exchangeRate.setValue(1);
                     this.creditAmountVnd.enable();
                     this.cusAdvanceAmountVnd.enable();
+                    this.paidAmountVnd.enable();
 
                     if (this.isAutoConvert) {
                         this.creditAmountUsd.disable();
                         this.cusAdvanceAmountUsd.disable();
+                        this.paidAmountUsd.disable();
                     }
                 } else {
-                    if ((data as Currency).id !== 'VND') {
-                        this.exchangeRate.setValue(this.exchangeRateValue);
-                        this.creditAmountUsd.enable();
-                        this.cusAdvanceAmountUsd.enable();
+                    this.exchangeRate.setValue(this.exchangeRateValue);
+                    this.creditAmountUsd.enable();
+                    this.cusAdvanceAmountUsd.enable();
+                    this.paidAmountUsd.enable();
 
-                        if (this.isAutoConvert) {
-                            this.creditAmountVnd.disable();
-                            this.cusAdvanceAmountVnd.disable();
-                        }
-                    } else {
-                        this.exchangeRate.setValue(1);
+                    if (this.isAutoConvert) {
+                        this.creditAmountVnd.disable();
+                        this.cusAdvanceAmountVnd.disable();
+                        this.paidAmountVnd.disable();
                     }
+
                 }
                 this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.calculateFinalPaidAmount();
@@ -452,28 +453,37 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this._store.dispatch(ToggleAutoConvertPaid({ isAutoConvert: isAuto }));
         if (isAuto === true) {
             if (this.currencyId.value === 'VND') {
-                this.paidAmountUsd.disable();
                 this.paidAmountVnd.enable();
+                this.cusAdvanceAmountVnd.enable();
+                this.creditAmountVnd.enable();
 
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                 this.cusAdvanceAmountUsd.setValue(_advanceUsd);
+
                 this.cusAdvanceAmountUsd.disable();
-                this.cusAdvanceAmountVnd.enable();
+                this.creditAmountUsd.disable();
+                this.paidAmountUsd.disable();
+
 
             } else {
                 this.paidAmountUsd.enable();
-                this.paidAmountVnd.disable();
+                this.cusAdvanceAmountUsd.enable();
+                this.creditAmountUsd.enable();
 
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
-                this.cusAdvanceAmountVnd.disable();
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
-                this.cusAdvanceAmountUsd.enable();
+
+                this.cusAdvanceAmountVnd.disable();
+                this.paidAmountVnd.disable();
+                this.creditAmountVnd.disable();
             }
         } else {
             this.paidAmountVnd.enable();
             this.paidAmountUsd.enable();
             this.cusAdvanceAmountVnd.enable();
             this.cusAdvanceAmountUsd.enable();
+            this.creditAmountUsd.enable();
+            this.creditAmountVnd.enable();
         }
 
         this.paidAmountVnd.updateValueAndValidity();
