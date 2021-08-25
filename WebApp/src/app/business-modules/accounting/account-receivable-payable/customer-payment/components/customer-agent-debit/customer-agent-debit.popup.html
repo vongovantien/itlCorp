@@ -85,10 +85,10 @@
                                             </td>
                                             <td ALIGN="right">
                                                 <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit2">
-                                                    {{(-debit.unpaidAmountUsd) | number}}
+                                                    {{(-debit.unpaidAmountUsd) | number: '1.2-2'}}
                                                 </ng-container>
                                                 <ng-template #notCredit2>
-                                                    {{debit.unpaidAmountUsd | number}}
+                                                    {{debit.unpaidAmountUsd | number: '1.2-2'}}
                                                 </ng-template>
                                             </td>
                                             <td>
@@ -116,13 +116,13 @@
                                         <td class="text-right" rowspan="6" ALIGN="center">
                                             <ng-container
                                                 *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
-                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}} VND
+                                                {{sumTotalObj.totalBalanceVnd | number:'1.0-2'}} VND
                                             </ng-container>
                                         </td>
                                         <td class="text-right" rowspan="6" ALIGN="center">
                                             <ng-container
                                                 *ngIf="sumTotalObj.totalBalanceUsd >= 0;else TplTotalObjectBalanceUsdNegative">
-                                                {{sumTotalObj.totalBalanceUsd | number:'1.3-3'}} USD
+                                                {{sumTotalObj.totalBalanceUsd | number:'1.2-2'}} USD
                                             </ng-container>
                                         </td>
                                         <td rowspan="6" colspan="5"></td>
@@ -190,10 +190,9 @@
                                                                 |
                                                                 number}}</span>
                                                         </div>
-                                                        <div class="col-2">Unpaid USD: <span
-                                                                class='text-primary'>{{groupShipment.unpaidAmountUsd
-                                                                |
-                                                                number}}</span>
+                                                        <div class="col-2">Unpaid USD: <span class='text-primary'>
+                                                                {{groupShipment.unpaidAmountUsd | number:
+                                                                '1.2-2'}}</span>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -262,7 +261,7 @@
                                                     <span>{{invoice.unpaidAmountVnd | number}} </span>
                                                 </td>
                                                 <td ALIGN="right">
-                                                    <span>{{invoice.unpaidAmountUsd | number}} </span>
+                                                    <span>{{invoice.unpaidAmountUsd | number: '1.2-2'}} </span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -347,10 +346,10 @@
                                                     <span>{{invoice.partnerName}}</span>
                                                 </td>
                                                 <td ALIGN="right">
-                                                    <span>{{invoice.unpaidAmountVnd | number}} </span>
+                                                    <span>{{invoice.unpaidAmountVnd | number: '1.0-2'}} </span>
                                                 </td>
                                                 <td ALIGN="right">
-                                                    <span>{{invoice.unpaidAmountUsd | number}} </span>
+                                                    <span>{{invoice.unpaidAmountUsd | number: '1.2-2'}} </span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -398,23 +397,23 @@
                                     <td style="border-right-color:#d5d5d5">
                                         {{(sumTotalObjectPaymentReceipt.totalDebitVnd +
                                         sumTotalObjectPaymentReceipt.totalDebitOBHVnd)
-                                        | number:'1.0-3'}}
+                                        | number:'1.0-2'}}
                                         VND
                                     </td>
                                     <td>
                                         {{(sumTotalObjectPaymentReceipt.totalDebitUsd +
                                         sumTotalObjectPaymentReceipt.totalDebitOBHUsd)
-                                        | number:'1.3-3'}}
+                                        | number:'1.2-2'}}
                                         USD
                                     </td>
                                     <td style="border-right-color:#d5d5d5">
                                         {{(sumTotalObj.totalDebitVnd + sumTotalObj.totalDebitOBHVnd)
-                                        | number:'1.0-3'}}
+                                        | number:'1.0-2'}}
                                         VND
                                     </td>
                                     <td>
                                         {{(sumTotalObj.totalDebitUsd + sumTotalObj.totalDebitOBHUsd)
-                                        | number:'1.3-3'}}
+                                        | number:'1.2-2'}}
                                         USD
                                     </td>
                                 </tr>
@@ -423,19 +422,19 @@
                                         Credit
                                     </td>
                                     <td style="border-right-color:#d5d5d5">
-                                        {{sumTotalObjectPaymentReceipt.totalCreditVnd | number:'1.0-3'}}
+                                        {{sumTotalObjectPaymentReceipt.totalCreditVnd | number:'1.0-2'}}
                                         VND
                                     </td>
                                     <td>
-                                        {{sumTotalObjectPaymentReceipt.totalCreditUsd | number:'1.3-3'}}
+                                        {{sumTotalObjectPaymentReceipt.totalCreditUsd | number:'1.2-2'}}
                                         USD
                                     </td>
                                     <td style="border-right-color:#d5d5d5">
-                                        {{sumTotalObj.totalCreditVnd | number:'1.0-3'}}
+                                        {{sumTotalObj.totalCreditVnd | number:'1.0-2'}}
                                         VND
                                     </td>
                                     <td>
-                                        {{sumTotalObj.totalCreditUsd | number:'1.3-3'}}
+                                        {{sumTotalObj.totalCreditUsd | number:'1.2-2'}}
                                         USD
                                     </td>
                                 </tr>
@@ -446,25 +445,25 @@
                                     <td style="border-right-color:#d5d5d5">
                                         <ng-container
                                             *ngIf="sumTotalObjectPaymentReceipt.totalBalanceVnd >= 0;else TplTotalObjectPaymentReceiptBalanceVndNegative">
-                                            {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-3'}} VND
+                                            {{sumTotalObjectPaymentReceipt.totalBalanceVnd | number:'1.0-2'}} VND
                                         </ng-container>
                                     </td>
                                     <td>
                                         <ng-container
                                             *ngIf="sumTotalObjectPaymentReceipt.totalBalanceUsd >= 0;else TplTotalObjectPaymentReceiptBalanceUsdNegative">
-                                            {{sumTotalObjectPaymentReceipt.totalBalanceUsd | number:'1.0-3'}} USD
+                                            {{sumTotalObjectPaymentReceipt.totalBalanceUsd | number:'1.0-2'}} USD
                                         </ng-container>
                                     </td>
                                     <td style="border-right-color:#d5d5d5">
                                         <ng-container
                                             *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
-                                            {{sumTotalObj.totalBalanceVnd | number:'1.0-3'}} VND
+                                            {{sumTotalObj.totalBalanceVnd | number:'1.0-2'}} VND
                                         </ng-container>
                                     </td>
                                     <td>
                                         <ng-container
                                             *ngIf="sumTotalObj.totalBalanceUsd >= 0;else TplTotalObjectBalanceUsdNegative">
-                                            {{sumTotalObj.totalBalanceUsd | number:'1.0-3'}} USD
+                                            {{sumTotalObj.totalBalanceUsd | number:'1.0-2'}} USD
                                         </ng-container>
                                     </td>
                                 </tr>
@@ -498,16 +497,16 @@
 </div>
 
 <ng-template #TplTotalObjectBalanceVndNegative>
-    {{sumTotalObj.totalBalanceVnd | negativeNumber:'1.0-3' }}
+    {{sumTotalObj.totalBalanceVnd | negativeNumber:'1.0-2' }}
 </ng-template>
 
 <ng-template #TplTotalObjectBalanceUsdNegative>
-    {{sumTotalObj.totalBalanceUsd | negativeNumber:'1.3-3' }}
+    {{sumTotalObj.totalBalanceUsd | negativeNumber:'1.2-2' }}
 </ng-template>
 <ng-template #TplTotalObjectPaymentReceiptBalanceVndNegative>
-    {{sumTotalObjectPaymentReceipt.totalBalanceVnd | negativeNumber:'1.0-3' }}
+    {{sumTotalObjectPaymentReceipt.totalBalanceVnd | negativeNumber:'1.0-2' }}
 </ng-template>
 
 <ng-template #TplTotalObjectPaymentReceiptBalanceUsdNegative>
-    {{sumTotalObjectPaymentReceipt.totalBalanceUsd | negativeNumber:'1.3-3' }}
+    {{sumTotalObjectPaymentReceipt.totalBalanceUsd | negativeNumber:'1.2-2' }}
 </ng-template>

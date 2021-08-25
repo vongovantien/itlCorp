@@ -166,7 +166,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
-        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length) {
+        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
             if (isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");

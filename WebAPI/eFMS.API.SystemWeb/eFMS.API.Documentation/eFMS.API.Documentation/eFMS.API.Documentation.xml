@@ -934,7 +934,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Common.Globals.Menu)">
             <summary>
             
             </summary>
@@ -942,6 +942,7 @@
             <param name="service"></param>
             <param name="hostingEnvironment"></param>
             <param name="curUser"></param>
+            <param name="AccAccountReceivable"></param>
             <param name="menu"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Query(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">

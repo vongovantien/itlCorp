@@ -43,18 +43,27 @@
                                     {{item.unpaidAmountUsd | number:'1.2-2'}}
                                 </td>
                                 <td ALIGN="right">
-                                    {{item.unpaidAmountVnd | number:'1.0-3'}}
+                                    {{item.unpaidAmountVnd | number:'1.0-2'}}
                                 </td>
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control text-right text-success font-15"
-                                        [(ngModel)]="item.paidAmountUsd" autoFormatCurrency [disabled]="isReadonly"
-                                        (ngModelChange)="calculateTotalPaidAmount(item,'paidUsd')">
+                                    <ng-container
+                                        *ngIf="(receiptType$ | async) !=='CUSTOMER'; else paidAmountUsdCusTpl">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.paidAmountUsd" autoFormatCurrency [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'paidUsd')">
+                                    </ng-container>
+                                    <ng-template #paidAmountUsdCusTpl>{{item.paidAmountUsd}}</ng-template>
                                 </td>
-                                <td>
-                                    <input type="text" class="form-control text-right text-success font-15"
-                                        [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency
-                                        [disabled]="isReadonly"
-                                        (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
+                                <td ALIGN="right">
+                                    <ng-container
+                                        *ngIf="(receiptType$ | async) !=='CUSTOMER'; else paidAmountVndCusTpl">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.paidAmountVnd" numeric autoFormatCurrency
+                                            [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
+                                    </ng-container>
+
+                                    <ng-template #paidAmountVndCusTpl>{{item.paidAmountVnd}}</ng-template>
                                 </td>
                                 <td ALIGN="right">
                                     <ng-container
@@ -62,7 +71,7 @@
 
                                         <span> {{item.unpaidAmountUsd - (item.paidAmountUsd ) | negativeNumber
                                             |
-                                            number: '.2-2'}} </span>
+                                            number: '1.2-2'}} </span>
                                     </ng-container>
                                     <ng-template #negativeBalanceUsd>
                                         <span> ({{item.unpaidAmountUsd - (item.paidAmountUsd) | abs | number:
