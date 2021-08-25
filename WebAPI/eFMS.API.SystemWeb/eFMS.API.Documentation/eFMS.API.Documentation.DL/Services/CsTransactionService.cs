@@ -2165,8 +2165,9 @@ namespace eFMS.API.Documentation.DL.Services
                 return new ResultHandle { Data = new object { }, Message = ex.Message, Status = true };
             }
         }
-        public ResultHandle ImportCSTransaction(CsTransactionEditModel model)
+        public ResultHandle ImportCSTransaction(CsTransactionEditModel model, out List<Guid> surchargeIds)
         {
+            surchargeIds = new List<Guid>();
             IQueryable<CsTransactionDetail> detailTrans = csTransactionDetailRepo.Get(x => x.JobId == model.Id && x.ParentId == null);
             if (string.IsNullOrEmpty(model.Mawb) && detailTrans.Select(x => x.Id).Count() > 0 && model.TransactionType != "SFE" && model.TransactionType != "SLE" && model.TransactionType != "SCE")
                 return new ResultHandle { Status = false, Message = "This shipment did't have MBL No. You can't import or duplicate it." };
@@ -2340,7 +2341,11 @@ namespace eFMS.API.Documentation.DL.Services
                     if (surcharges != null && surcharges.Count() > 0)
                     {
                         HandleState hsSurcharges = csShipmentSurchargeRepo.Add(surcharges, false);
-                        csShipmentSurchargeRepo.SubmitChanges();
+                        HandleState addSurcharge = csShipmentSurchargeRepo.SubmitChanges();
+                        if(addSurcharge.Success)
+                        {
+                            surchargeIds = surcharges.Select(x => x.Id).ToList();
+                        }
                     }
 
                     if (freightCharges != null && freightCharges.Count() > 0)

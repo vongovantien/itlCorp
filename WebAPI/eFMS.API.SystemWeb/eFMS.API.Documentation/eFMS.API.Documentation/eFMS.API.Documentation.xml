@@ -632,7 +632,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.ISysImageService)">
+        <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Documentation.DL.Common.DocumentationLanguageSub},eFMS.API.Documentation.DL.IService.ICsTransactionService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Documentation.DL.IService.ISysImageService)">
             <summary>
             constructor
             </summary>
@@ -640,6 +640,7 @@
             <param name="service">inject ICsTransactionService</param>
             <param name="user">inject ICurrentUser</param>
             <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
+            <param name="AccAccountReceivaService"></param>
             <param name="imageService"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.CsTransactionController.CountJob(System.DateTime)">
@@ -934,7 +935,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Common.Globals.Menu)">
+        <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.IOpsTransactionService,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl},eFMS.API.Common.Globals.Menu)">
             <summary>
             
             </summary>
@@ -942,6 +943,7 @@
             <param name="service"></param>
             <param name="hostingEnvironment"></param>
             <param name="curUser"></param>
+            <param name="AccAccountReceivable"></param>
             <param name="menu"></param>
         </member>
         <member name="M:eFMS.API.Documentation.Controllers.OpsTransactionController.Query(eFMS.API.Documentation.DL.Models.Criteria.OpsTransactionCriteria)">

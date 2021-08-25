@@ -107,7 +107,7 @@
 
         public static readonly string CHARGE_SA_OTH_AIR_CODE = "SA_OTH_AIR";
         public static readonly string CHARGE_BA_OTH_AIR_CODE = "BA_OTH_Air";
-        public static readonly string CHARGE_SA_OTH_FEE = "Other Charges";        
+        public static readonly string CHARGE_SA_OTH_FEE = "Other Charges";
 
         public static readonly string CHARGE_BA_DHL_AIR_CODE = "BA_HDL_Air";
         public static readonly string CHARGE_HANDLING_FEE = "handling";
@@ -185,5 +185,18 @@
         public static readonly string RECEIPT_CLASS_COLLECT_OBH = "Collect OBH";
         public static readonly string RECEIPT_CLASS_PAY_OBH = "Pay OBH";
         public static readonly string RECEIPT_CLASS_NET_OFF = "Net Off";
+
+        #region PAYMENT
+        public static readonly string PAYMENT_TYPE_CODE_COLLECT_OBH = "COLL_OBH";
+        public static readonly string PAYMENT_TYPE_CODE_COLLECT_OTHER = "COLL_OTH";
+        public static readonly string PAYMENT_TYPE_CODE_PAY_OBH = "PAY_OBH";
+        public static readonly string PAYMENT_TYPE_CODE_PAY_OTHER = "PAY_OTH";
+
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT OBH";
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY OBH";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
+        #endregion
     }
 }
