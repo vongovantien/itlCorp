@@ -779,7 +779,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var payment = new AccountingPaymentModel();
                 var acctPayment = item.payment.FirstOrDefault();
                 payment.RefNo = item.grp.PaymentRefNo;
-                payment.Type = item.grp.Type;
+                payment.Type = Common.CustomData.PaymentTypeOther.Where(x => x.Value == item.grp.Type).Select(x => x.DisplayName).FirstOrDefault();
                 payment.PartnerId = item.grp.PartnerId;
                 payment.InvoiceNoReal = acctPayment.InvoiceNo;
                 payment.PartnerName = item.grp.ShortName;

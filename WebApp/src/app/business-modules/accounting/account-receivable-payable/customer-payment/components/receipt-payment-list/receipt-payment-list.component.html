@@ -23,7 +23,7 @@
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Cus ADV USD</label>
-                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmountUsd" numeric
+                <input class="form-control text-success" type="number" formControlName="cusAdvanceAmountUsd" numeric
                     [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'cusAdvanceAmountUsd')">
             </div>
@@ -69,7 +69,7 @@
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Cus ADV VND</label>
-                <input class="form-control text-primary" type="number" formControlName="cusAdvanceAmountVnd" numeric
+                <input class="form-control text-success" type="number" formControlName="cusAdvanceAmountVnd" numeric
                     [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'cusAdvanceAmountVnd')">
             </div>
@@ -95,15 +95,15 @@
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Credit VND</label>
-                <input class="form-control" type="number" formControlName="creditAmountVnd" numeric [decimals]="0"
-                    autoFormatCurrency [attr.readOnly]="isReadonly"
+                <input class="form-control text-success" type="number" formControlName="creditAmountVnd" numeric
+                    [decimals]="0" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'creditAmountVnd')">
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Credit USD</label>
-                <input class="form-control" type="number" formControlName="creditAmountUsd" [decimals]="2"
+                <input class="form-control text-success" type="number" formControlName="creditAmountUsd" [decimals]="2"
                     autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'creditAmountUsd')">
             </div>
@@ -112,14 +112,14 @@
             <div class="form-group">
                 <label>Final Paid Amount USD</label>
                 <input type="text" class="form-control m-input m-input--square text-primary text-success"
-                    formControlName="finalPaidAmountUsd" readonly formatDecimalFormControl>
+                    formControlName="finalPaidAmountUsd" readonly formatDecimalFormControl format="1.2-2">
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group">
                 <label>Final Paid Amount VND</label>
                 <input type="text" class="form-control m-input m-input--square text-primary text-success"
-                    formControlName="finalPaidAmountVnd" formatDecimalFormControl readonly format="1.0-3">
+                    formControlName="finalPaidAmountVnd" formatDecimalFormControl readonly>
             </div>
         </div>
         <div class="col-lg-6">

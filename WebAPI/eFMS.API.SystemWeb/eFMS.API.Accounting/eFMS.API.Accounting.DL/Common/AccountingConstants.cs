@@ -107,7 +107,7 @@
 
         public static readonly string CHARGE_SA_OTH_AIR_CODE = "SA_OTH_AIR";
         public static readonly string CHARGE_BA_OTH_AIR_CODE = "BA_OTH_Air";
-        public static readonly string CHARGE_SA_OTH_FEE = "Other Charges";        
+        public static readonly string CHARGE_SA_OTH_FEE = "Other Charges";
 
         public static readonly string CHARGE_BA_DHL_AIR_CODE = "BA_HDL_Air";
         public static readonly string CHARGE_HANDLING_FEE = "handling";
@@ -198,6 +198,5 @@
         public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
         public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
         #endregion
-
     }
 }

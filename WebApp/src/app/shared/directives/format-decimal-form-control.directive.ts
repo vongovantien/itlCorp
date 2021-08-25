@@ -14,10 +14,10 @@ export class FormatDecimalFormControlDirective {
 
     private _minValue: string = null;
 
-    @Input() set(format: string) {
+    @Input() set format(format: string) {
         this._format = format;
     }
-    private _format = '.0-3';
+    private _format = '.0-2';
 
     get format() {
         return this._format;

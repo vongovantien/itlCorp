@@ -377,7 +377,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             paidAmountVnd: res.finalPaidAmountVnd,
             paidAmountUsd: res.finalPaidAmountUsd,
             cusAdvanceAmountVnd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountVnd : 0,
-            cusAdvanceAmountIsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
+            cusAdvanceAmountUsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
 
             paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
         };

@@ -2701,7 +2701,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var detail = new PaymentDetailModel();
                 detail.RowId = payment.Id.ToString();
 
-                if(invoice != null)
+                if (invoice != null)
                 {
                     detail.CustomerCode = partners.Where(x => x.Id == invoice.PartnerId)?.FirstOrDefault()?.AccountNo;
                 }
