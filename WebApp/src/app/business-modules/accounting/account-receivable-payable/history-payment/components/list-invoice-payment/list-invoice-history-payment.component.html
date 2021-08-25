@@ -94,8 +94,8 @@
                                             <td><a href="javascript:void(0)"
                                                 (click)="showExtendDateModel(item.refNo)">{{ item.dueDate | date: 'dd/MM/yyyy'}}</a>
                                             </td>
-                                            <td>{{ item.overdueDays }}</td>
-                                            <td>{{ item.extendDays}}</td>
+                                            <td class="text-right">{{ item.overdueDays }}</td>
+                                            <td class="text-right">{{ item.extendDays}}</td>
                                             <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}</td>
                                             <td>{{ item.serie}}</td>
                                         </tr>
