@@ -41,7 +41,7 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="form-group"
-                        [ngClass]="{'m-form__group has-danger':isSubmitted && !exchangeRate.valid }">
+                        [ngClass]="{'m-form__group has-danger':isSubmitted && exchangeRate.value === null}">
                         <label required> Exchange Rate </label>
                         <input type="number" class="form-control m-input m-input--square" formControlName="exchangeRate"
                             [attr.readOnly]="isReadonly" numeric [decimals]="0" autoFormatCurrency
@@ -51,7 +51,8 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paidAmountVnd.valid }">
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger':isSubmitted && paidAmountVnd.value === null }">
                 <label required>Collect Amount VND</label>
                 <input type="number" class="form-control m-input m-input--square text-success"
                     formControlName="paidAmountVnd" autoFormatCurrency [attr.readOnly]="isReadonly"
@@ -59,7 +60,8 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group">
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger':isSubmitted && paidAmountUsd.value === null }">
                 <label required>Collect Amount USD</label>
                 <input type="number" class="form-control m-input m-input--square text-success"
                     formControlName="paidAmountUsd" autoFormatCurrency [attr.readOnly]="isReadonly"
