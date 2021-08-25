@@ -7,6 +7,8 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UserLevel } from 'src/app/shared/models/system/userlevel';
 import { SystemConstants } from '@constants';
+import { HttpClient } from "@angular/common/http";
+
 @Component({
     selector: 'app-form-add-user',
     templateUrl: './form-add-user.component.html'
@@ -34,7 +36,7 @@ export class FormAddUserComponent extends AppList {
     //
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
-
+    userRole:AbstractControl;
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -53,11 +55,14 @@ export class FormAddUserComponent extends AppList {
         { title: 'Off', value: 'Off' }
     ];
 
+    userRoles:CommonInterface.ICommonTitleValue[]=[];
+
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
+        private _httpClient: HttpClient,
 
     ) {
         super();
@@ -96,7 +101,11 @@ export class FormAddUserComponent extends AppList {
             //
             creditLimit: [],
             creditRate: [],
-            personalId: []
+            personalId: [],
+            userRole: [this.userRoles[0],
+            Validators.compose([
+                Validators.required
+            ])]
         });
 
         this.staffcode = this.formGroup.controls['staffcode'];
@@ -115,10 +124,14 @@ export class FormAddUserComponent extends AppList {
         this.creditLimit = this.formGroup.controls['creditLimit'];
         this.creditRate = this.formGroup.controls['creditRate'];
         this.personalId = this.formGroup.controls['personalId'];
+        this.userRole = this.formGroup.controls['userRole'];
 
     }
 
     ngOnInit() {
+        this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
+            if (data) {this.userRoles = data["DropDownUserRole"]}
+        })
         this.initForm();
         this.headersuslv = [
             { title: 'Group Name', field: 'groupName' },

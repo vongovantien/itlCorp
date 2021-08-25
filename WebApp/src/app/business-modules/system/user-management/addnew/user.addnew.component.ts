@@ -52,6 +52,7 @@ export class UserAddNewComponent extends AppPage {
                 //
                 creditLimit: this.formAdd.creditLimit.value,
                 creditRate: this.formAdd.creditRate.value,
+                userRole: this.formAdd.userRole.value.value,
 
             };
 
@@ -86,4 +87,5 @@ export interface IAddUser {
     //
     creditLimit: number;
     creditRate: number;
+    userRole: string;
 }

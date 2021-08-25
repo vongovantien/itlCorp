@@ -126,7 +126,9 @@
                             <td>
                                 <span [ngClass]="{'m--font-danger' : !item.description}">{{ item.description }}</span>
                             </td>
-
+                            <td>
+                                <span [ngClass]="{'m--font-danger' : !item.userRole}">{{ item.userRole }}</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

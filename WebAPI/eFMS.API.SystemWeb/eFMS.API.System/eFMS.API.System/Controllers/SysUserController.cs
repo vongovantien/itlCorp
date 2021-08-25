@@ -365,7 +365,8 @@ namespace eFMS.API.System.Controllers
                         WorkingStatus = worksheet.Cells[row, 9].Value?.ToString(),
                         Email = worksheet.Cells[row, 10].Value?.ToString(),
                         Tel = worksheet.Cells[row, 11].Value?.ToString(),
-                        Description = worksheet.Cells[row, 12].Value?.ToString()
+                        Description = worksheet.Cells[row, 12].Value?.ToString(),
+                        UserRole = worksheet.Cells[row, 13].Value?.ToString()
                     };
                     list.Add(userobj);
                 }

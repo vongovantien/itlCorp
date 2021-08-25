@@ -58,7 +58,8 @@ export class UserManagementImportComponent extends AppList {
             { title: 'Working Status', field: 'workingstatus', sortable: true },
             { title: 'Email', field: 'email', sortable: true },
             { title: 'Phone Number', field: 'tel', sortable: true },
-            { title: 'Description', field: 'description', sortable: true }
+            { title: 'Description', field: 'description', sortable: true },
+            { title: 'User Role', field: 'userRole', sortable: true }
         ];
     }
 

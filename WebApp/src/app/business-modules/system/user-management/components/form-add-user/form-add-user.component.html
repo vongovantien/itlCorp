@@ -71,7 +71,7 @@
                                 placeholder="Please Enter Title">
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-2">
                         <div class="form-group">
                             <label class="form-control-label">
                                 User Type <span class="m--font-danger">(*)</span>
@@ -79,6 +79,21 @@
                             <select formControlName="usertype" class="form-control">
                                 <option *ngFor="let ustype of usertypes" [ngValue]="ustype">{{ustype.title}}</option>
                             </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group"
+                        [ngClass]="{'m-form__group has-danger': (userRole.dirty && !userRole.valid) || (isSubmited && !userRole.valid)}">
+                            <label class="form-control-label">
+                                User Role <span class="m--font-danger">(*)</span>
+                            </label>
+                            <select formControlName="userRole" class="form-control">
+                                <option *ngFor="let usRole of userRoles" [ngValue]="usRole">{{usRole.title}}</option>
+                            </select>
+                            <div class="form-control-feedback"
+                            *ngIf="isSubmited && (userRole.errors | equalError: 'required') || (userRole.errors | equalError: 'required') && userRole.dirty">
+                             User Role is required!
+                            </div>
                         </div>
                     </div>
                 </div>
