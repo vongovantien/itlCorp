@@ -1570,7 +1570,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         // ChargeName contains Terminal
-                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling"))
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling") || chargeObj.ChargeNameEn.ToLower().Equals("THC"))
                         {
                             isOtherSell = false;
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
@@ -1622,7 +1622,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         // ChargeName contains automated manifest
-                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest"))
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest") || chargeObj.ChargeNameEn.ToLower().Equals("AMS"))
                         {
                             isOtherSell = false;
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
@@ -1721,7 +1721,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         // ChargeName contains Terminal
-                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling"))
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("terminal handling") || chargeObj.ChargeNameEn.ToLower().Equals("THC"))
                         {
                             isOther = false;
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
@@ -1773,7 +1773,7 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         // ChargeName contains automated manifest
-                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest"))
+                        if (chargeObj.ChargeNameEn.ToLower().Equals("automated manifest") || chargeObj.ChargeNameEn.ToLower().Equals("AMS"))
                         {
                             isOther = false;
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
@@ -1899,8 +1899,8 @@ namespace eFMS.API.Documentation.DL.Services
             var billFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("BILL FEE"))?.Select(x => x.Id).ToList();
             var telexRelease = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("TELEX RELEASE"))?.Select(x => x.Id).ToList();
             var cfsCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("CFS"))?.Select(x => x.Id).ToList();
-            var securityCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("SECURITY"))?.Select(x => x.Id).ToList();
-            var autoManCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("AUTOMATED MANIFEST"))?.Select(x => x.Id).ToList();
+            var securityCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("SECURITY") || x.ChargeNameEn.ToUpper().Contains("EBS"))?.Select(x => x.Id).ToList();
+            var autoManCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("AUTOMATED MANIFEST") || x.ChargeNameEn.ToUpper().Contains("AMS"))?.Select(x => x.Id).ToList();
             var vgmCharge = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("VGM"))?.Select(x => x.Id).ToList();
             var lclBookingFee = catChargeRepo.Get(x => x.ChargeNameEn.ToUpper().Contains("LCL BOOKING FEE"))?.Select(x => x.Id).ToList();
             var customFeeName = new string[] { "PICK-UP CHARGE", "CUSTOMS CLEARANCE", "CUSTOMS INSPECTION" };
