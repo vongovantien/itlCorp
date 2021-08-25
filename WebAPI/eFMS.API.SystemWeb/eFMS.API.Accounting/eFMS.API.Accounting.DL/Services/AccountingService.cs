@@ -2776,15 +2776,15 @@ namespace eFMS.API.Accounting.DL.Services
                 // [CR] get debit account
                 //detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
                 var debitAccount = string.Empty;
-                if (payment.Type.ToUpper() == "COLL_OTHER")
+                if (payment.Type.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER)
                 {
                     detail.DebitAccount = "7118";
                 }
-                else if (payment.Type.ToUpper() == "COLL_OBH")
+                else if (payment.Type.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
                 {
                     detail.DebitAccount = "336";
                 }
-                else if (payment.Type.ToUpper() == "PAY_OBH")
+                else if (payment.Type.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_PAY_OBH)
                 {
                     detail.DebitAccount = "338802";
                 }
