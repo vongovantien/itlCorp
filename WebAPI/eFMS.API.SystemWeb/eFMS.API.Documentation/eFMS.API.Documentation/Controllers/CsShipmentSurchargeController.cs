@@ -43,6 +43,7 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private IMapper mapper;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
 
@@ -60,6 +61,7 @@ namespace eFMS.API.Documentation.Controllers
             ICurrentUser user, IHostingEnvironment hostingEnvironment, 
             ICurrencyExchangeService currencyExchange,
             IMapper _mapper,
+            IAccAccountReceivableService accAccountReceivable,
             IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
@@ -68,6 +70,7 @@ namespace eFMS.API.Documentation.Controllers
             _hostingEnvironment = hostingEnvironment;
             currencyExchangeService = currencyExchange;
             mapper = _mapper;
+            accAccountReceivableService = accAccountReceivable;
             apiServiceUrl = serviceUrl;
 
         }
@@ -234,31 +237,11 @@ namespace eFMS.API.Documentation.Controllers
                 Response.OnCompleted(async () =>
                 {
                     //Tính công nợ sau khi tạo mới hóa đơn thành công
-                    List<ObjectReceivableModel> modelReceivableList = GetListObjectReceivableBySurchargeIds(Ids);
+                    List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
                     await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
                 });
             }
             return Ok(result);
-        }
-
-        private List<ObjectReceivableModel> GetListObjectReceivableBySurchargeIds(List<Guid> surchargeIds)
-        {
-            var surcharges = csShipmentSurchargeService.Get(x => surchargeIds.Any(a => a == x.Id));
-            if(surcharges.Count() == 0)
-            {
-                return new List<ObjectReceivableModel>();
-            }
-            var objPO = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PaymentObjectId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PaymentObjectId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-            var objPR = from surcharge in surcharges
-                        where !string.IsNullOrEmpty(surcharge.PayerId)
-                        select new ObjectReceivableModel { PartnerId = surcharge.PayerId, Office = surcharge.OfficeId, Service = surcharge.TransactionType };
-
-            var objMerge = objPO.Union(objPR).ToList();
-            var objectReceivables = objMerge.GroupBy(g => new { g.Service, g.PartnerId, g.Office })
-                .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Service = s.Key.Service, Office = s.Key.Office });
-            return objectReceivables.ToList();
         }
 
         private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
