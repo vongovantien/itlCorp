@@ -316,12 +316,13 @@ namespace eFMS.API.Accounting.DL.Services
                 x.Type,
                 x.ShortName,
                 x.InvoiceNo,
-            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.PaymentAmount, f.payment?.UnpaidPaymentAmountUsd, f.payment?.UnpaidPaymentAmountVnd }) });
+            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.ReceiptId, f.payment?.PaymentAmount, f.payment?.UnpaidPaymentAmountUsd, f.payment?.UnpaidPaymentAmountVnd }) });
 
             var results = resultGroups
                             .Select(x => new AccountingPaymentModel
                             {
                                 RefNo = x.Key.BillingRefNo,
+                                ReceiptId = x.payment.FirstOrDefault()?.ReceiptId,
                                 Type = x.Key.Type,
                                 PartnerId = x.Key.PartnerId,
                                 InvoiceNoReal = x.Key.InvoiceNo,
