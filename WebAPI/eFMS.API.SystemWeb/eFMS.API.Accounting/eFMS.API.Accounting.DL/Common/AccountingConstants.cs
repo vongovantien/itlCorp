@@ -191,12 +191,14 @@
         public static readonly string PAYMENT_TYPE_CODE_COLLECT_OTHER = "COLL_OTH";
         public static readonly string PAYMENT_TYPE_CODE_PAY_OBH = "PAY_OBH";
         public static readonly string PAYMENT_TYPE_CODE_PAY_OTHER = "PAY_OTH";
+        public static readonly string PAYMENT_TYPE_CODE_ADVANCE = "ADV";
 
         public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT OBH";
         public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT OTHER";
         public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY OBH";
         public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
         public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
+        public static readonly string PAYMENT_TYPE_NAME_ADVANCE = "ADV";
         #endregion
     }
 }
