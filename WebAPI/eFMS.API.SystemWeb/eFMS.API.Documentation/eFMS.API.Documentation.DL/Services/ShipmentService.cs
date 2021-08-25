@@ -1519,9 +1519,12 @@ namespace eFMS.API.Documentation.DL.Services
                 data.ConsigneeDescription = ArrayConsgineeDesc != null && ArrayConsgineeDesc.Length > 0 ? ArrayConsgineeDesc[0] : string.Empty;
                 data.Consignee = !string.IsNullOrEmpty(data.ConsigneeDescription) ? data.ConsigneeDescription : LookupPartner[item.ConsigneeId].FirstOrDefault()?.PartnerNameEn;
                 data.Shipper = !string.IsNullOrEmpty(data.ShipperDescription) ? data.ShipperDescription : LookupPartner[item.Shipper].FirstOrDefault()?.PartnerNameEn;
-                data.ShipmentType = item.ShipmentType;
+                data.ShipmentType = item.ServiceType;
                 data.Salesman = !string.IsNullOrEmpty(item.SalemanId) ? LookupUser[item.SalemanId].FirstOrDefault()?.Username : string.Empty;
-                data.AgentName = LookupPartner[item.AgentId].FirstOrDefault()?.PartnerNameVn;
+
+                var ArrNotifyPartyDesc = item.NotifyPartyDescription?.Split("\n").ToArray();
+                data.AgentName = ArrNotifyPartyDesc != null && ArrNotifyPartyDesc.Length > 0 ? ArrNotifyPartyDesc[0] : string.Empty;
+
                 data.GW = item.GrossWeight;
                 data.CW = item.ChargeWeight;
                 data.CBM = item.Cbm;
@@ -1870,7 +1873,7 @@ namespace eFMS.API.Documentation.DL.Services
                 string Code = item.PackageType != null ? LookupUnitList[(short)item.PackageType].Select(t => t.Code).FirstOrDefault() : string.Empty;
                 data.QTy = item.PackageQty.ToString() + " " + Code;
                 data.CustomNo = item.TransactionType == "CL" ? GetCustomNoOldOfShipment(item.JobNo) : string.Empty;
-                data.BKRefNo = item.BookingNo;
+                data.BKRefNo = item.ReferenceNo;
                 data.ReferenceNo = item.ReferenceNo;
                 data.FinalDestination = item.FinalDestination;
                 lstShipment.Add(data);

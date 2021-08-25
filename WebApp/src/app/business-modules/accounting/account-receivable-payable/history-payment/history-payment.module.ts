@@ -12,6 +12,11 @@ import { ARHistoryPaymentComponent } from './history-payment.component';
 import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-payment/list-invoice-history-payment.component';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from './components/popup/update-extend-day/update-extend-day.popup';
 import { ARHistoryPaymentImportComponent } from './import/history-import-payment.component';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/reducers';
+import { EffectsModule } from '@ngrx/effects';
+import { effects } from './store/effects';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 const routing: Routes = [
     {
@@ -40,7 +45,10 @@ const routing: Routes = [
         NgxDaterangepickerMd,
         NgSelectModule,
         PerfectScrollbarModule,
-        RouterModule.forChild(routing)
+        RouterModule.forChild(routing),
+        StoreModule.forFeature('history-payment', reducers),
+        EffectsModule.forFeature(effects),
+        BsDropdownModule.forRoot(),
     ],
     exports: [],
     providers: [],

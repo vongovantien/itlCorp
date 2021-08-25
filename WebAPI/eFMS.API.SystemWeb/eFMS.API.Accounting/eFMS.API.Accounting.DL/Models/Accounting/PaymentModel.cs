@@ -34,5 +34,6 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string ChargeType { get; set; }
         public string DebitAccount { get; set; }
         public string NganhCode { get; set; } = "FWD"; //Set default value FWD
+        public string CustomerCode { get; set; }
     }
 }

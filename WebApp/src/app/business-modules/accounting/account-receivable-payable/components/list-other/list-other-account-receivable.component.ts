@@ -1,13 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { AppList } from '@app';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { SortService } from '@services';
 
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { Router } from '@angular/router';
 import { TrialOfficialOtherModel } from '@models';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { Store } from '@ngrx/store';
+import { getMenuUserSpecialPermissionState } from '@store';
+import { ToastrService } from 'ngx-toastr';
+import { LoadListAccountReceivable } from '../../account-receivable/store/actions';
 
 @Component({
     selector: 'list-other-account-receivable',
@@ -22,6 +27,9 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         private _progressService: NgProgress,
         private _accountingRepo: AccountingRepo,
         private _router: Router,
+        private _store: Store<IAccountReceivableState>,
+        private _exportRepo: ExportRepo,
+        private _toastService: ToastrService,
     ) {
         super();
         this._progressRef = this._progressService.ref();
@@ -32,17 +40,29 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
         this.headers = [
             { title: 'Partner Id', field: 'partnerCode', sortable: true },
             { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
-
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
-
             { title: 'Billing', field: 'billingAmount', sortable: true },
-            { title: 'Billing Unpaid', field: 'billingUnpaid', sortable: true },
             { title: 'Paid', field: 'paidAmount', sortable: true },
-            { title: 'OBH Amount', field: 'obhAmount', sortable: true },
-
+            { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
             { title: 'Status', field: 'agreementStatus', sortable: true },
+            { title: 'Parent Partner', field: 'partnerNameAbbr', sortable: true },
+
         ];
 
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getAccountReceivableSearchState)
+        .pipe(
+            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                this.dataSearch = data.dataSearch;
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+            }
+        );
     }
 
     sortOtherList(sortField: string, order: boolean) {
@@ -50,19 +70,19 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     }
 
     getPagingList() {
-        this._progressRef.start();
-        this.isLoading = true;
-
-        this._accountingRepo.receivablePaging(this.page, this.pageSize, Object.assign({}, this.dataSearch))
+        this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this._store.select(getAccountReceivableListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this._progressRef.complete();
-                    this.isLoading = false;
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new TrialOfficialOtherModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
                 })
             ).subscribe(
-                (res: CommonInterface.IResponsePaging) => {
-                    this.otherList = (res.data || []).map((item: TrialOfficialOtherModel) => new TrialOfficialOtherModel(item));
+                (res: any) => {
+                    this.otherList = res.data || [];
                     this.totalItems = res.totalItems;
                 },
             );
@@ -70,19 +90,34 @@ export class AccountReceivableListOtherComponent extends AppList implements OnIn
     viewDetail(agreementId: string, partnerId: string) {
 
         if (!!agreementId) {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
                 queryParams: {
                     agreementId: agreementId,
                     subTab: 'other',
                 }
             });
         } else {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receivable/detail`], {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
                 queryParams: {
                     partnerId: partnerId,
                     subTab: 'other',
                 }
             });
+        }
+
+    }
+
+    exportExcel() {
+        if (!this.otherList.length) {
+            this._toastService.warning('No Data To View, Please Re-Apply Filter');
+            return;
+        } else {
+            this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Cash.xlsx');
+                    }
+                );
         }
 
     }

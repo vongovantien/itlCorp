@@ -74,5 +74,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string InternalCode { get; set; }
         public string CreditPayment { get; set; }
         public string BankName { get; set; }
+        public string BankCode { get; set; }
     }
 }

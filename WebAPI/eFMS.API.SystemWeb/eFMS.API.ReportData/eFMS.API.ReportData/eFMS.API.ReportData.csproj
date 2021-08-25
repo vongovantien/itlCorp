@@ -35,6 +35,12 @@
      </Reference>
    </ItemGroup>
    <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\Statement_of_Receivable-Agency.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\Statement_of_Receivable-Customer.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\SettlePayment\Settlement-General-Preview.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>

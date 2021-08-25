@@ -46,7 +46,7 @@ export {
     AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
 } from './accouting/accounting-receivable.model';
 export * from './accouting/accounting-approve';
-export { ReceiptInvoiceModel, Receipt, ReceiptModel } from './accouting/receipt.model';
+export { ReceiptInvoiceModel, Receipt, ReceiptModel, ReceiptCreditDebitModel } from './accouting/receipt.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';

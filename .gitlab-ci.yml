@@ -52,7 +52,7 @@ build_test:
     name: "angular_build"
     paths:
       - $APP_OUTPUT_PATH
-      
+
 build_prod_en:
   stage: build
   script:
@@ -71,8 +71,8 @@ build_prod_en:
   artifacts:
     name: "angular_build_prod_en"
     paths:
-      - APP_OUT_PATH_PROD_EN      
-      
+      - APP_OUT_PATH_PROD_EN
+
 build_prod_vi:
   stage: build
   script:
@@ -91,4 +91,4 @@ build_prod_vi:
   artifacts:
     name: "angular_build_prod_vi"
     paths:
-      - APP_OUT_PATH_PROD_VI   
+      - APP_OUT_PATH_PROD_VI

@@ -18,6 +18,9 @@ namespace AccountingInterface {
         agreementExpiredDay: string;
         salesmanId: string;
         officeId: string;
+        fromOverdueDays:number;
+        toOverdueDays:number;
+        debitRate:number;
     }
 
     export interface IDefaultSearchAcctMngt {

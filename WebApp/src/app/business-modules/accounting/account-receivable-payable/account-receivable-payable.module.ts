@@ -10,20 +10,16 @@ const routing: Routes = [
                 path: '', redirectTo: 'customer'
             },
             {
-                path: 'customer', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
-                data: { name: 'Customer Payment' }
+                path: '', loadChildren: () => import('./customer-payment/customer-payment.module').then(m => m.ARCustomerPaymentModule),
+                data: { name: 'Customer/Agency Payment', title: 'eFMS AR Payment' }
             },
             {
-                path: 'agency', loadChildren: () => import('./agency-payment/agency-payment.module').then(m => m.ARAgencyPaymentModule),
-                data: { name: 'Agency Payment' }
-            },
-            {
-                path: 'receivable', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
-                data: { name: 'A.R Summary' }
+                path: 'summary', loadChildren: () => import('./account-receivable/account-receivable.module').then(m => m.AccountReceivableModule),
+                data: { name: 'A.R Summary', title: 'eFMS AR Summary' }
             },
             {
                 path: 'history-payment', loadChildren: () => import('./history-payment/history-payment.module').then(m => m.ARHistoryPaymentModule),
-                data: { name: 'history Payment' }
+                data: { name: 'History Payment', title: 'eFMS AR History Payment' }
             },
 
         ]
@@ -35,7 +31,7 @@ const routing: Routes = [
     declarations: [
     ],
     imports: [
-        RouterModule.forChild(routing),
+        RouterModule.forChild(routing)
     ],
     exports: [],
     providers: [],

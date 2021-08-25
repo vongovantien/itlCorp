@@ -19,6 +19,8 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? PaidAmount { get; set; }
         public decimal? ObhAmount { get; set; }
         public decimal? ObhUnpaid { get; set; }
+        public decimal? ObhPaid { get; set; }
+        public decimal? ObhBilling { get; set; }
         public decimal? AdvanceAmount { get; set; }
         public decimal? CreditAmount { get; set; }
         public decimal? SellingNoVat { get; set; }

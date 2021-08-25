@@ -5,6 +5,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
     public class AccountingPaymentModel
     {
         public string RefId { get; set; }
+        public string RefNo { get; set; }
         public string InvoiceNoReal { get; set; }
         public string SOANo { get; set; }
         public string PartnerId { get; set; }
@@ -20,5 +21,13 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string Status { get; set; }
         public int? ExtendDays { get; set; }
         public string ExtendNote { get; set; }
+        public string Type { get; set; }
+        public string VoucherId { get; set; }
+        public Guid? ReceiptId { get; set; }
+        public DateTime? ConfirmBillingDate { get; set; }
+        public Guid? OfficeId { get; set; }
+        public string ServiceType { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public decimal? UnpaidAmountVnd { get; set; }
     }
 }

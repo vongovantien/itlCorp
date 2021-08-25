@@ -46,7 +46,7 @@ export class FormAddChargeComponent extends AppForm {
     isSubmitted: boolean = false;
     isShowMappingSelling: boolean = false;
 
-    ngDataType: Array<string> = ["CREDIT", "DEBIT", "OBH"];
+    ngDataType: Array<string> = ["CREDIT", "DEBIT", "OBH", "OTHER"];
 
     ngDataService = [
         { text: ChargeConstants.IT_DES, id: ChargeConstants.IT_CODE },

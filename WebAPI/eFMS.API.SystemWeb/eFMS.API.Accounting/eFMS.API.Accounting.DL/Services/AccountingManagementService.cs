@@ -17,7 +17,6 @@ using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -52,7 +51,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<SysNotifications> sysNotifyRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotifyRepository;
-
+        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         public AccountingManagementService(IContextBase<AccAccountingManagement> repository,
             IMapper mapper,
@@ -78,7 +77,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatContract> catContractRepo,
             IContextBase<SysNotifications> sysNotifyRepo,
             IContextBase<SysUserNotification> sysUserNotifyRepo,
-
+            IAccAccountReceivableService accAccountReceivable,
             IContextBase<AcctSoa> soa) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -104,7 +103,7 @@ namespace eFMS.API.Accounting.DL.Services
             catContractRepository = catContractRepo;
             sysUserNotifyRepository = sysUserNotifyRepo;
             sysNotifyRepository = sysNotifyRepo;
-
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region --- DELETE ---
@@ -183,10 +182,105 @@ namespace eFMS.API.Accounting.DL.Services
                                 settlementPaymentRepo.SubmitChanges();
                             }
                         }
+                        else
+                        {
+                            AccAccountReceivableModel receivable = new AccAccountReceivableModel();
+                            CatPartner partner = partnerRepo.Get(x => x.Id == data.PartnerId).FirstOrDefault();
+                            // Hđ của đối tượng này đang cho bao nhiêu service.
+
+                            var totalInvoiceServices = data.ServiceType.Split(";").ToList();
+                            //Không tính công nợ cho đối tượng Internal
+                            if (partner != null && partner.PartnerMode != "Internal")
+                            {
+                                receivable.PartnerId = data.PartnerId;
+                                receivable.Office = data.OfficeId;
+                                receivable.Service = data.ServiceType;
+                                receivable.AcRef = partner.ParentId ?? partner.Id;
+                                CatContract contractPartner = catContractRepository.Get(x => x.Active == true
+                                                                                && x.PartnerId == data.PartnerId
+                                                                                && x.OfficeId.Contains(data.OfficeId.ToString())
+                                                                                && x.SaleService.Contains(data.ServiceType)).FirstOrDefault();
+                                if (contractPartner == null)
+                                {
+                                    // Lấy currency local và use created of partner gán cho Receivable
+                                    receivable.ContractId = null;
+                                    receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
+                                    receivable.SaleMan = null;
+                                    receivable.UserCreated = partner.UserCreated;
+                                    receivable.UserModified = partner.UserCreated;
+                                    receivable.GroupId = partner.GroupId;
+                                    receivable.DepartmentId = partner.DepartmentId;
+                                    receivable.OfficeId = partner.OfficeId;
+                                    receivable.CompanyId = partner.CompanyId;
+                                }
+                                else
+                                {
+                                    // Lấy currency của contract & user created of contract gán cho Receivable
+                                    receivable.ContractId = contractPartner.Id;
+                                    receivable.ContractCurrency = contractPartner.CurrencyId;
+                                    receivable.SaleMan = contractPartner.SaleManId;
+                                    receivable.UserCreated = contractPartner.UserCreated;
+                                    receivable.UserModified = contractPartner.UserCreated;
+                                    receivable.GroupId = null;
+                                    receivable.DepartmentId = null;
+                                    receivable.OfficeId = data.OfficeId;
+                                    receivable.CompanyId = contractPartner.CompanyId;
+                                }
+                            }
+
+                            // lấy thông tin + Cập nhật lại công nợcủa đối tượng
+                            var receivables = accAccountReceivableService.Get(x => x.PartnerId == data.PartnerId);
+                            if (receivables.Count() > 0)
+                            {
+                                decimal? _totalAmount = data.Currency != AccountingConstants.CURRENCY_LOCAL ? data.TotalAmountUsd : data.TotalAmountVnd;
+                                decimal? _totalUnpaid = data.Currency != AccountingConstants.CURRENCY_LOCAL ? data.UnpaidAmountUsd : data.UnpaidAmountVnd;
+                                decimal? _totalPaid = data.Currency != AccountingConstants.CURRENCY_LOCAL ? data.PaidAmountUsd : data.PaidAmountVnd;
+
+                                if (totalInvoiceServices.Count == 1)
+                                {
+                                    AccAccountReceivableModel receivableCurrent = receivables.Where(x => x.Service == totalInvoiceServices.First())?.FirstOrDefault();
+                                    if (receivableCurrent != null)
+                                    {
+                                        receivableCurrent.BillingAmount = (receivableCurrent.BillingAmount ?? 0) - _totalAmount;
+                                        receivableCurrent.BillingUnpaid = (receivableCurrent.BillingUnpaid ?? 0) - _totalUnpaid;
+                                        receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
+                                        receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) + _totalAmount;
+
+                                        receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+                                        accAccountReceivableService.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
+                                    }
+                                }
+
+                                if (totalInvoiceServices.Count > 1)
+                                {
+                                    // Chi đều cho các service.
+                                    _totalAmount /= totalInvoiceServices.Count;
+                                    _totalPaid /= totalInvoiceServices.Count;
+                                    _totalUnpaid /= totalInvoiceServices.Count;
+                                    foreach (var service in totalInvoiceServices)
+                                    {
+                                        AccAccountReceivableModel receivableCurrent = receivables.Where(x => x.Service == service)?.FirstOrDefault();
+                                        if (receivableCurrent != null)
+                                        {
+                                            receivableCurrent.BillingAmount = (receivableCurrent.BillingAmount ?? 0) - _totalAmount;
+                                            receivableCurrent.BillingUnpaid = (receivableCurrent.BillingUnpaid ?? 0) - _totalUnpaid;
+                                            receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
+                                            receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) +  _totalAmount;
+
+                                            receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+
+                                            accAccountReceivableService.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
                         soaRepo.SubmitChanges();
                         surchargeRepo.SubmitChanges();
                         DataContext.SubmitChanges();
+                        accAccountReceivableService.SubmitChanges();
                         trans.Commit();
                     }
                     return hs;
@@ -1457,7 +1551,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             DateTime? dueDate = null;
-            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a)) ).FirstOrDefault();
+            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
             if (contractPartner == null)
             {
                 var acRefPartner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault()?.ParentId;
@@ -1832,10 +1926,11 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         item.VatAccount = _chargeDefault?.CreditVat;
                     }
-                    else if(surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                    else if (surcharge.Type == AccountingConstants.TYPE_CHARGE_BUY)
                     {
                         item.VatAccount = _chargeDefault?.DebitVat;
-                    } else
+                    }
+                    else
                     {
                         item.VatAccount = _chargeDefault?.CreditVat ?? _chargeDefault?.DebitVat;
                     }
@@ -2317,11 +2412,11 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(criteria.CsHandling))
             {
                 var acctManagementIdOps = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
-                                          join ops in opsTransactionRepo.Get(x => criteria.CsHandling.Contains(x.BillingOpsId)) on sur.JobNo equals ops.JobNo
-                                          select sur.AcctManagementId).Distinct().ToList();
+                                           join ops in opsTransactionRepo.Get(x => criteria.CsHandling.Contains(x.BillingOpsId)) on sur.JobNo equals ops.JobNo
+                                           select sur.AcctManagementId).Distinct().ToList();
                 var acctManagementIdDoc = (from sur in surchargeRepo.Get(x => x.AcctManagementId != null)
-                                          join ops in csTransactionRepo.Get(x => criteria.CsHandling.Contains(x.PersonIncharge)) on sur.JobNo equals ops.JobNo
-                                          select sur.AcctManagementId).Distinct().ToList();
+                                           join ops in csTransactionRepo.Get(x => criteria.CsHandling.Contains(x.PersonIncharge)) on sur.JobNo equals ops.JobNo
+                                           select sur.AcctManagementId).Distinct().ToList();
                 if (acctManagementIdOps != null && acctManagementIdDoc == null)
                 {
                     query = query.And(x => acctManagementIdOps.Contains(x.Id));
@@ -2401,7 +2496,7 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         var hs = new HandleState();
-                        foreach(var id in ids)
+                        foreach (var id in ids)
                         {
                             var accounting = DataContext.Get(x => x.Id == id).FirstOrDefault();
                             accounting.ConfirmBillingDate = billingDate;
@@ -2471,5 +2566,23 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        #region --- Calculator Receivable Accounting Management ---
+        /// <summary>
+        /// Tính công nợ dựa vào id của Accounting Management
+        /// </summary>
+        /// <param name="acctId"></param>
+        /// <returns></returns>
+        public HandleState CalculatorReceivableAcctMngt(Guid acctId)
+        {
+            //Get list charge of Accounting Management
+            var surcharges = surchargeRepo.Get(x => x.AcctManagementId == acctId || x.PayerAcctManagementId == acctId);
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+            //Tính công nợ cho Partner, Service, Office có trong Invoice
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return hs;
+        }
+        #endregion --- Calculator Receivable Accounting Management ---
+
     }
 }

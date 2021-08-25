@@ -8,7 +8,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ARCustomerPaymentCreateReciptComponent } from './create-receipt/create-receipt.component';
 import { ARCustomerPaymentDetailReceiptComponent } from './detail-receipt/detail-receipt.component';
 import { ARCustomerPaymentFormCreateReceiptComponent } from './components/form-create-receipt/form-create-receipt.component';
-import { ARCustomerPaymentReceiptSummaryComponent } from './components/receipt-summary/receipt-summary.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from './components/receipt-payment-list/receipt-payment-list.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
@@ -16,28 +15,36 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { reducers } from './store/reducers';
 import { effects } from './store/effects';
-import { NgxCurrencyModule } from 'ngx-currency';
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { ARCustomerPaymentReceiptCreditListComponent } from './components/receipt-credit-list/receipt-credit-list.component';
+import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt-debit-list/receipt-debit-list.component';
+import { ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent } from './components/form-search-agent-customer/form-search-customer-agent-cd-invoice.component';
+import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
 
 const routing: Routes = [
     {
         path: '', data: { name: '' }, children: [
             { path: '', component: ARCustomerPaymentComponent },
-            { path: 'receipt/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' }, },
+            { path: 'receipt/:type/new', component: ARCustomerPaymentCreateReciptComponent, data: { name: 'New' } },
             { path: 'receipt/:id', component: ARCustomerPaymentDetailReceiptComponent },
         ]
     },
 
 ];
 
+
 @NgModule({
     declarations: [
         ARCustomerPaymentComponent,
-        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentCreateReciptComponent,
         ARCustomerPaymentDetailReceiptComponent,
+        ARCustomerPaymentFormSearchComponent,
         ARCustomerPaymentFormCreateReceiptComponent,
-        ARCustomerPaymentReceiptSummaryComponent,
         ARCustomerPaymentReceiptPaymentListComponent,
+        ARCustomerPaymentReceiptCreditListComponent,
+        ARCustomerPaymentReceiptDebitListComponent,
+        ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent,
+        ARCustomerPaymentCustomerAgentDebitPopupComponent
     ],
     imports: [
         SharedModule,
@@ -45,19 +52,10 @@ const routing: Routes = [
         TabsModule.forRoot(),
         NgSelectModule,
         NgxDaterangepickerMd,
+        ModalModule.forRoot(),
         StoreModule.forFeature('customer-payment', reducers),
         EffectsModule.forFeature(effects),
-        NgxCurrencyModule.forRoot({
-            align: "left",
-            allowNegative: false,
-            allowZero: true,
-            decimal: ".",
-            precision: 2,
-            prefix: "",
-            suffix: "",
-            thousands: ",",
-            nullable: true
-        }),
+
     ],
     exports: [],
     providers: [],

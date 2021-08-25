@@ -55,6 +55,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
+        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -85,7 +86,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUserNotifyRepo,
             IContextBase<AccAccountReceivable> accAccountRepo,
             IContextBase<SysUserLevel> userLevelRepo,
-            IUserBaseService userBase) : base(repository, mapper)
+            IUserBaseService userBase,
+            IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -115,6 +117,7 @@ namespace eFMS.API.Accounting.DL.Services
             userlevelRepository = userLevelRepo;
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region --- LIST & PAGING ---
@@ -3965,5 +3968,24 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+
+        #region --- Calculator Receivable Advance ---
+        /// <summary>
+        /// Tính công nợ dựa vào list hblid của Advance
+        /// </summary>
+        /// <param name="acctAdvanceRequests"></param>
+        /// <returns></returns>
+        public HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
+        {
+            var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
+            //Get list charge of by hblid
+            var surcharges = csShipmentSurchargeRepo.Get(x => hblIds.Any(a => a == x.Hblid));
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+            //Tính công nợ Partner, Service, Office có trong Advance
+            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return hs;
+        }
+        #endregion --- Calculator Receivable Advance ---
+
     }
 }

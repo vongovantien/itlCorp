@@ -7,8 +7,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -35,5 +34,6 @@ namespace eFMS.API.Accounting.DL.IService
         List<ConfirmBillingResult> ConfirmBillingPaging(ConfirmBillingCriteria criteria, int page, int size, out int rowsCount);
         HandleState UpdateConfirmBillingDate(List<Guid> ids, DateTime? billingDate);
         bool CheckExistDebitChargeSynced(List<ChargeOfAccountingManagementModel> charges, string typeAcctMngt);
+        HandleState CalculatorReceivableAcctMngt(Guid acctId);
     }
 }

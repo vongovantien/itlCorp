@@ -107,6 +107,22 @@
             <param name="criteria">List Voucher or Invoices</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingReceivableArSumary(eFMS.API.ReportData.Models.Accounting.AccountReceivableCriteria)">
+            <summary>
+            Export accounting receivable
+            </summary>
+            <param name="criteria">AccountReceivableCriteria</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPreview(System.Guid,System.String,System.String)">
+            <summary>
+            Export detail settlement payment
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <param name="key">String random</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.CatalogueController">
             <summary>
             A base class for an MVC controller without view support.
@@ -370,6 +386,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteria)">
+            <summary>
+            Export accounting management
+            </summary>
+            <param name="criteria">List Voucher or Invoices</param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.ReportData.Controllers.SettingReportController">
             <summary>
             Setting Report Controller
@@ -434,6 +457,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GetARExcelFolder">
+            <summary>
+            Get folder contain AR template excel
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateAdvancePaymentExcel(System.Collections.Generic.List{eFMS.API.ReportData.Models.AdvancePaymentModel},System.IO.Stream)">
             <summary>
             Generate advance payment excel
@@ -448,6 +477,14 @@
             </summary>
             <param name="listObj"></param>
             <param name="stream"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
+            <summary>
+            GenerateExportCutomerHistoryPayment
+            </summary>
+            <param name="customerPayment"></param>
+            <param name="fileName"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.BuildHeader(OfficeOpenXml.ExcelWorksheet,System.Collections.Generic.List{System.String},System.String)">
@@ -677,6 +714,12 @@
             <summary>
             Set detail data for table
             </summary>
+        </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32)">
+            <summary>
+            Delete row in excel file
+            </summary>
+            <param name="_row">row to delete</param>
         </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.ExcelStream">
             <summary>

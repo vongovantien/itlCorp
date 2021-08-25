@@ -13,7 +13,7 @@
             [placeholder]="loading ? '' : placeholder" [attr.aria-expanded]="!showAngledownIcon"
             (focus)="onFocusInputPlaceholder($event)" dropdownToggle>
     </ng-template>
-    <ng-container>
+    <ng-container *ngIf="!disabled">
         <div class="e--combogrid_icon">
             <ng-container *ngIf="allowEditing;else readOnlyIconDropdownTpl">
                 <span

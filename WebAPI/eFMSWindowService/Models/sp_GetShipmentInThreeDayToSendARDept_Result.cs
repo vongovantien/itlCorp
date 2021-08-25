@@ -25,4 +25,18 @@ namespace eFMSWindowService.Models
         public Nullable<System.Guid> OfficeID { get; set; }
         public string OfficeName { get; set; }
     }
+
+    public partial class sp_GetOverDuePayment_Result
+    {
+        public System.Guid ID { get; set; }
+        public string BranchName_EN { get; set; }
+        public string PartnerName_EN { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public decimal Debit_Rate { get; set; }
+        public decimal NonOverdue { get; set; }
+        public decimal Over1To15Day { get; set; }
+        public decimal Over16To30Day { get; set; }
+        public decimal Over30Day { get; set; }
+    }
 }

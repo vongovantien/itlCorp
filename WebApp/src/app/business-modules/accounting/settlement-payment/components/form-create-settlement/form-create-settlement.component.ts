@@ -13,7 +13,8 @@ import { Store } from '@ngrx/store';
 import { getCurrentUserState, IAppState } from '@store';
 @Component({
     selector: 'settle-payment-form-create',
-    templateUrl: './form-create-settlement.component.html'
+    templateUrl: './form-create-settlement.component.html',
+    styleUrls: ['./form-create-settlement.component.scss']
 })
 
 export class SettlementFormCreateComponent extends AppForm {
@@ -122,12 +123,12 @@ export class SettlementFormCreateComponent extends AppForm {
 
     getUserLogged() {
         this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((res: any)=>{
-            if(!!res){
-                this.userLogged = res;
-                this.requester.setValue(this.userLogged.id);
-            }
-        })
+            .subscribe((res: any) => {
+                if (!!res) {
+                    this.userLogged = res;
+                    this.requester.setValue(this.userLogged.id);
+                }
+            })
     }
 
     getSystemUser() {

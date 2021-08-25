@@ -10,6 +10,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -93,9 +94,10 @@ namespace eFMS.API.Accounting.DL.IService
 
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
-        List<string> GetListAdvanceNoForShipment(Guid hblId);
+        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
+        HandleState CalculatorReceivableSettlement(string settlementCode);
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);

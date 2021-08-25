@@ -42,8 +42,44 @@ export class AccountingConstants {
         DENIED: 'Denied'
     }
 
-    public static DATE_TYPE: string[] = <string[]>['All', 'Create Date', 'Paid Date', 'Last Sync'];
-    public static PAYMENT_TYPE: string[] = <string[]>['All', 'Payment', 'Invoice'];
-    public static STATUS: string[] = <string[]>['All', 'Draft', 'Done', 'Cancel'];
-    public static SYNC_STATUSS: string[] = <string[]>['All', 'Synced', 'Rejected'];
+    public static DATE_TYPE: string[] = <string[]>['Create Date', 'Paid Date', 'Last Sync'];
+    public static PAYMENT_TYPE: string[] = <string[]>['Payment', 'Invoice'];
+    public static STATUS: string[] = <string[]>['Draft', 'Done', 'Cancel'];
+    public static SYNC_STATUSS: string[] = <string[]>['Synced', 'Rejected'];
+
+    public static RECEIPT_CLASS = {
+        CLEAR_DEBIT: 'Clear Debit',
+        ADVANCE: 'Advance',
+        COLLECT_OBH: 'Collect OBH',
+        PAY_OBH: 'Pay OBH',
+        NET_OFF: 'Net Off',
+    }
+
+    public static RECEIPT_PAYMENT_METHOD = {
+        CASH: 'Cash',
+        BANK: 'Bank Transfer',
+        INTERNAL: 'COLL - Internal',
+        MANAGEMENT_FEE: 'Management Fee',
+        OTHER_FEE: 'Other Fee',
+        EXTRA: 'COLL - Extra',
+        OTHER: 'Other'
+    }
+
+    public static RECEIPT_ADVANCE_TYPE = {
+        ADVANCE: 'ADV',
+        COLLECT_OBH: 'COLL_OBH',
+        PAY_OBH: 'PAY_OBH',
+        COLLECT_OTHER: 'COLL_OTH',
+        PAY_OTHER: 'PAY_OTH'
+    }
+
+    public static RECEIPT_PAYMENT_TYPE = {
+        DEBIT: 'DEBIT',
+        OBH: 'OBH',
+        OTHER: 'OTHER',
+        CREDIT: 'CREDIT',
+        CREDITNOTE: 'CREDITNOTE',
+        CREDITSOA: 'CREDITSOA'
+
+    }
 }

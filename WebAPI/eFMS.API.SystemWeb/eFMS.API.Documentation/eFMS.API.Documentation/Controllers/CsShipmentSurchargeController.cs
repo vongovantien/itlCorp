@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Common;
@@ -13,12 +14,15 @@ using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
 using eFMS.API.Documentation.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.IdentityServer.DL.UserManager;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -39,6 +43,9 @@ namespace eFMS.API.Documentation.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private IMapper mapper;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
+
 
         /// <summary>
         /// constructor
@@ -47,7 +54,15 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, ICurrencyExchangeService currencyExchange, IMapper _mapper)
+        /// <param name="currencyExchange"></param>
+        /// <param name="_mapper"></param>
+        /// <param name="serviceUrl"></param>
+        public CsShipmentSurchargeController(IStringLocalizer<LanguageSub> localizer, ICsShipmentSurchargeService service, 
+            ICurrentUser user, IHostingEnvironment hostingEnvironment, 
+            ICurrencyExchangeService currencyExchange,
+            IMapper _mapper,
+            IAccAccountReceivableService accAccountReceivable,
+            IOptions<ApiServiceUrl> serviceUrl)
         {
             stringLocalizer = localizer;
             csShipmentSurchargeService = service;
@@ -55,6 +70,9 @@ namespace eFMS.API.Documentation.Controllers
             _hostingEnvironment = hostingEnvironment;
             currencyExchangeService = currencyExchange;
             mapper = _mapper;
+            accAccountReceivableService = accAccountReceivable;
+            apiServiceUrl = serviceUrl;
+
         }
 
         /// <summary>
@@ -206,14 +224,34 @@ namespace eFMS.API.Documentation.Controllers
             //});
             currentUser.Action = "AddAndUpdate";
 
-            var hs = csShipmentSurchargeService.AddAndUpdate(list);
+            var hs = csShipmentSurchargeService.AddAndUpdate(list, out List<Guid> Ids);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
+            else
+            {
+                //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                Response.OnCompleted(async () =>
+                {
+                    //Tính công nợ sau khi tạo mới hóa đơn thành công
+                    List<ObjectReceivableModel> modelReceivableList = accAccountReceivableService.GetListObjectReceivableBySurchargeIds(Ids);
+                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                });
+            }
             return Ok(result);
+        }
+
+        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
         }
 
 

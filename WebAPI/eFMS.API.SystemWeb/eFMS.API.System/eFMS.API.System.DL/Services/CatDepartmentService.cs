@@ -12,6 +12,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -34,7 +35,16 @@ namespace eFMS.API.System.DL.Services
 
         public IQueryable<CatDepartmentModel> QueryData(CatDepartmentCriteria criteria)
         {
-            var dept = DataContext.Get();
+            Expression<Func<CatDepartment, bool>> queryExpression = q => true;
+            if (criteria.Active != null)
+            {
+                queryExpression = queryExpression.And(x => x.Active == criteria.Active);
+            }
+            if (criteria.DeptTypes.Count > 0)
+            {
+                queryExpression = queryExpression.And(x => x.DeptType != null && criteria.DeptTypes.Contains(x.DeptType));
+            }
+            var dept = DataContext.Get(queryExpression);
             var query = from d in dept
                         join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
                         from off in off2.DefaultIfEmpty()

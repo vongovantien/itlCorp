@@ -85,12 +85,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// get list payment by refNo
         /// </summary>
-        /// <param name="refId"></param>
+        /// <param name="refNo">Payment RefNo</param>
+        /// <param name="type">payment type</param>s
         /// <returns></returns>
         [HttpGet("GetBy")]
-        public IActionResult GetBy(string refId)
+        public IActionResult GetBy(string refNo, string type)
         {
-            var results = accountingPaymentService.GetBy(refId);
+            var results = accountingPaymentService.GetBy(refNo, type);
             return Ok(results);
         }
         /// <summary>
@@ -441,12 +442,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <summary>
         /// get extended date of an invoice
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="refNo">billing no</param>
         /// <returns></returns>
         [HttpGet("GetInvoiceExtendedDate")]
-        public IActionResult GetInvoiceExtendedDate(string id)
+        public IActionResult GetInvoiceExtendedDate(string refNo)
         {
-            var result = accountingPaymentService.GetInvoiceExtendedDate(id);
+            var result = accountingPaymentService.GetInvoiceExtendedDate(refNo);
             return Ok(result);
         }
 
@@ -580,6 +581,32 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult ExportAccountingPayment(PaymentCriteria criteria)
         {
             var data = accountingPaymentService.ExportAccountingPayment(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get data export Statement of Receivable Customers
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportAccountingCustomerPayment")]
+        [Authorize]
+        public IActionResult GetDataExportAccountingCustomerPayment(PaymentCriteria criteria)
+        {
+            var data = accountingPaymentService.GetDataExportAccountingCustomerPayment(criteria);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get data export Statement of Receivable Agency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportAccountingAgencyPayment")]
+        [Authorize]
+        public IActionResult GetDataExportAccountingAgencyPayment(PaymentCriteria criteria)
+        {
+            var data = accountingPaymentService.GetDataExportAccountingAgencyPayment(criteria);
             return Ok(data);
         }
 

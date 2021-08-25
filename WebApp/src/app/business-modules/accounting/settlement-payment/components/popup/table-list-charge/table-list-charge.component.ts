@@ -234,9 +234,10 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         forkJoin([
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.CREDIT, serviceTypeId: serviceTypeId }),
             this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OBH, serviceTypeId: serviceTypeId }),
+            this._catalogueRepo.getListCharge(null, null, { active: true, type: CommonEnum.CHARGE_TYPE.OTHER, serviceTypeId: serviceTypeId }),
         ]).pipe(
-            map(([chargeCredit, chargeOBH]) => {
-                return [...chargeCredit, ...chargeOBH];
+            map(([chargeCredit, chargeOBH, chargeOther]) => {
+                return [...chargeCredit, ...chargeOBH, ...chargeOther];
             })
         ).subscribe(
             (res: any[]) => {

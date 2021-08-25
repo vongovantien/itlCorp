@@ -38,7 +38,7 @@ namespace eFMSWindowService
                             new UpdateStatusAuthorization(),
                             new SendMailToARDepartmentService(),
                             new AutoLockShipmentService(),
-                            //new SendMailOverduePaymentService(),
+                            new SendMailOverduePaymentService(),
                             //new SendMailExceededCreditLimitService()
             };
             ServiceBase.Run(ServicesToRun);

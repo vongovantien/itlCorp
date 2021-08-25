@@ -1,75 +1,81 @@
 <div class="form-search-invoice">
-    <form [formGroup]="formSearchInvoice" class="m-form m-form--state">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="form-group"
-                    [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
-                    <label for="form-control-label" required>
-                        Customer Name
-                    </label>
-                    <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
-                        (remove)="resetFormControl(customerId)"
-                        [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
-                        [selectedDisplayFields]="['shortName']" [dataSources]="$customers | async"
-                        [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
-                        [disabled]="isReadonly">
-                    </app-combo-grid-virtual-scroll>
-                </div>
+    <form [formGroup]="formSearchInvoice" class="row m-form m-form--state">
+        <div class="col-lg-6">
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger':(isSubmitted || customerId.dirty) && !customerId.valid }">
+                <label class="form-control-label" required>
+                    Customer
+                </label>
+                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
+                    (remove)="resetFormControl(customerId)"
+                    [currentActiveItemId]="{field:'id', value: customerId.value, hardValue:customerName}"
+                    [selectedDisplayFields]="['shortName']" [dataSources]="customers"
+                    [displayFields]="displayFieldsPartner" placeholder="Select Partner" [clearable]="false"
+                    [disabled]="isReadonly">
+                </app-combo-grid-virtual-scroll>
             </div>
-            <div class="col-lg-6">
-                <div class="form-group">
-                    <label for="form-control-label">
-                        Date
-                    </label>
-                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                        <input type="text" ngxDaterangepickerMd class="form-control"
-                            [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
-                            placeholder="Select request date" [autoApply]="true" formControlName="date"
-                            [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar
-                            [attr.disabled]="isReadonly" />
-                    </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label class="form-control-label">
+                    Date
+                </label>
+                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                    <input type="text" ngxDaterangepickerMd class="form-control"
+                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" name="daterange"
+                        placeholder="Select request date" [autoApply]="true" formControlName="date"
+                        [alwaysShowCalendars]="true" [ranges]="ranges" readonly calendar [attr.disabled]="isReadonly"
+                        [allowRemove]="!!date.value && !!date.value.startDate" />
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
-                    <label required>
-                        Payment Reference No
-                    </label>
-                    <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
-                        [attr.disabled]="isReadonly">
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="form-group" class="form-group"
-                    [ngClass]="{'m-form__group has-danger':isSubmitted && !agreementId.valid }">
-                    <label required>Agreement
-                    </label>
-                    <app-combo-grid-virtual-scroll #combogridAgreement
-                        (itemSelected)="onSelectDataFormInfo($event, 'agreement')"
-                        (remove)="resetFormControl(agreementId)"
-                        [currentActiveItemId]="{field:'id', value: agreementId.value}"
-                        [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
-                        [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
-                        [disabled]="isReadonly">
-                    </app-combo-grid-virtual-scroll>
-                </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label class="form-control-label">
+                    Receipt Reference
+                </label>
+                <input type="text" [(ngModel)]="receiptReference" [ngModelOptions]="{standalone: true}"
+                    class="form-control" disabled />
             </div>
         </div>
-        <ng-container *ngIf="!isReadonly">
-            <div class="row">
-                <div class="col-lg-6"></div>
-                <div class="col-lg-6 m--align-right  align-items-center justify-content-between">
-                    <button class="btn btn-info m-btn--icon m-btn--uppercase m--margin-right-10 ng-star-inserted"
-                        type="button" (click)="getInvoiceList()">
-                        <span>
-                            <i class="la la-search"></i>
-                            <span>Apply </span>
-                        </span>
-                    </button>
-                </div>
+        <div class="col-lg-3">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
+                <label class="form-control-label" required>
+                    Receipt No
+                </label>
+                <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
+                    [attr.disabled]="isReadonly">
             </div>
-        </ng-container>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group">
+                <label class="form-control-label">Receipt Type</label>
+                <ng-select formControlName="class" class="custom" [items]="classReceipt" [clearable]="false"
+                    [readonly]="isReadonly" (change)="onChangeReceiptType($event)">
+                </ng-select>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !agreementId.valid }">
+                <label class="form-control-label" required>Agreement
+                </label>
+                <app-combo-grid-virtual-scroll #combogridAgreement
+                    (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreementId)"
+                    [currentActiveItemId]="{field:'id', value: agreementId.value, hardValue:contractNo}"
+                    [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
+                    [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
+                    [disabled]="isReadonly">
+                </app-combo-grid-virtual-scroll>
+            </div>
+        </div>
+        <div class="col-lg-3 text-right" *ngIf="isShowGetDebit && !isReadonly">
+            <div class="m--margin-top-25">
+                <app-permission-button title="Get Debit" class="outline-info" [icon]="'la la-search'"
+                    (onClick)="getDebit()">
+                </app-permission-button>
+            </div>
+        </div>
     </form>
 </div>
+
+<customer-agent-debit-popup (onAddToReceipt)="addToReceipt($event)"></customer-agent-debit-popup>
