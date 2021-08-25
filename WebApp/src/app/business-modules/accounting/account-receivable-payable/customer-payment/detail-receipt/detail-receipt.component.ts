@@ -244,7 +244,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         // * Go to create 
         this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(RegistTypeReceipt({ data: this.receiptDetail.type.toUpperCase() }));
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/new`], { queryParams: { id: this.receiptId, action: this.actionTypeCreate } });
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${this.receiptDetail.type.toLowerCase()}/new`], { queryParams: { id: this.receiptId, action: this.actionTypeCreate } });
     }
 
 
