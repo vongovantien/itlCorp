@@ -35,7 +35,7 @@ export const initialState: IReceiptState = {
     date: null,
     agreement: {},
     dataSearch: null,
-    pagingData: { page: 1, pageSize: 15 },
+    pagingData: { page: 1, pageSize: 30 },
     isAutoConvertPaid: true,
     currency: 'VND',
     class: AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT,
@@ -166,13 +166,19 @@ export const receiptManagementReducer = createReducer(
         currentDebitItem.totalPaidUsd = payload.totalPaidUsd;
         currentDebitItem.totalPaidVnd = payload.totalPaidVnd;
 
+        payload.creditAmountVnd = (+payload.creditAmountVnd);
+        payload.creditAmountUsd = (+payload.creditAmountUsd)
+
         // * if NetOff has default value
         if (currentDebitItem.netOff === true) {
             currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(payload.creditAmountVnd).toFixed(0);
             currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(payload.creditAmountUsd).toFixed(2);
         } else {
-            currentDebitItem.paidAmountVnd = currentDebitItem.totalPaidVnd = +(payload.paidAmountVnd - payload.creditAmountVnd).toFixed(0);
-            currentDebitItem.paidAmountUsd = currentDebitItem.totalPaidUsd = +(payload.paidAmountUsd - payload.creditAmountUsd).toFixed(2);
+            currentDebitItem.paidAmountVnd = +(payload.paidAmountVnd - payload.creditAmountVnd).toFixed(0);
+            currentDebitItem.paidAmountUsd = +(payload.paidAmountUsd - payload.creditAmountUsd).toFixed(2);
+
+            currentDebitItem.totalPaidVnd = +((currentDebitItem.paidAmountVnd + payload.creditAmountVnd).toFixed(0));
+            currentDebitItem.totalPaidUsd = +(currentDebitItem.paidAmountUsd + payload.creditAmountUsd).toFixed(2);
         }
 
         // * Update value for creditItem Correcsponding
@@ -203,8 +209,15 @@ export const receiptManagementReducer = createReducer(
 
         const currentCreditToDelete = state.creditList.find(x => x.refNo === payload.creditNo);
         if (!!currentCreditToDelete && !currentdebit.netOff) {
-            currentdebit.paidAmountUsd = currentdebit.totalPaidUsd = +(payload.totalPaidUsd + currentCreditToDelete.paidAmountUsd).toFixed(2);
-            currentdebit.paidAmountVnd = currentdebit.totalPaidVnd = +(payload.totalPaidVnd + currentCreditToDelete.paidAmountVnd).toFixed(0);
+            currentdebit.paidAmountUsd = +(payload.paidAmountUsd + currentCreditToDelete.paidAmountUsd).toFixed(2);
+            currentdebit.paidAmountVnd = +(payload.paidAmountVnd + currentCreditToDelete.paidAmountVnd).toFixed(0);
+            if (currentdebit.creditNos.length === 0) {
+                currentdebit.totalPaidUsd = currentdebit.paidAmountUsd;
+                currentdebit.totalPaidVnd = currentdebit.paidAmountVnd;
+            } else {
+                currentdebit.totalPaidUsd = +(payload.totalPaidUsd - currentCreditToDelete.paidAmountUsd).toFixed(2);
+                currentdebit.totalPaidVnd = +(payload.totalPaidVnd - currentCreditToDelete.paidAmountVnd).toFixed(0);
+            }
         }
         return { ...state, debitList: [...newDebitList] }
     })

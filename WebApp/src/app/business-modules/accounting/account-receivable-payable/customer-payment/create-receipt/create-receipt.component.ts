@@ -202,7 +202,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
     checkValidateForm() {
         let valid: boolean = true;
-        if (!this.formCreate.formSearchInvoice.valid || !this.listInvoice.form.valid) {
+        if (!this.formCreate.formSearchInvoice.valid
+            || !this.listInvoice.form.valid
+            || this.listInvoice.paidAmountVnd.value === null
+            || this.listInvoice.paidAmountUsd.value === null
+            || this.listInvoice.exchangeRate.value === null
+
+        ) {
             valid = false;
         }
         if (this.formCreate.class.value?.includes('OBH') ||
@@ -221,6 +227,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         return valid;
     }
+
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
         model.referenceId = this.receiptRefId; // * Set Id cho phiếu ngân hàng.
@@ -243,7 +250,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 }
             )
     };
-
 
     gotoList() {
         this._store.dispatch(ResetInvoiceList());

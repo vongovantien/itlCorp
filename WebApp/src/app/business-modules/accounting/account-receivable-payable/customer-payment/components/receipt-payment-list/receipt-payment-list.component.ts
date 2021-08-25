@@ -289,6 +289,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                         this.creditAmountVnd.disable();
                     }
 
+                    this.paidAmountVnd.updateValueAndValidity();
+
                 }
                 this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.calculateFinalPaidAmount();
