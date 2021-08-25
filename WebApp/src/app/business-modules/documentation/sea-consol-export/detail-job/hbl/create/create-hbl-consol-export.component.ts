@@ -155,6 +155,7 @@ export class SeaConsolExportCreateHBLComponent extends AppForm {
             moveType: form.moveType,
             freightPayment: form.freightPayment,
             hbltype: form.hbltype,
+            incotermId: form.incotermId,
 
             customerId: form.customer,
             saleManId: form.saleMan,

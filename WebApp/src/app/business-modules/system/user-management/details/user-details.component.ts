@@ -12,7 +12,6 @@ import { IAddUser } from '../addnew/user.addnew.component';
 import { catchError, finalize } from 'rxjs/operators';
 import { RoutingConstants } from '@constants';
 import { DataService } from '@services';
-import { HttpClient } from "@angular/common/http";
 
 @Component({
     selector: 'app-user-details',
@@ -49,7 +48,32 @@ export class UserDetailsComponent extends AppPage {
     selectedUserLevel: UserLevel;
 
     userDetail: any;
-    dataUseRole:any=[];
+    dataUseRole: any = [
+        {
+            "title": "CS Document",
+            "value": "CS"
+        },
+        {
+            "title": "Sale",
+            "value": "Sale"
+        },
+        {
+            "title": "Accountant",
+            "value": "FIN"
+        },
+        {
+            "title": "Internal Audit",
+            "value": "IA"
+        },
+        {
+            "title": "Account Receivable",
+            "value": "AR"
+        },
+        {
+            "title": "BOD",
+            "value": "BOD"
+        }
+    ];
 
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -58,16 +82,15 @@ export class UserDetailsComponent extends AppPage {
         private _progressService: NgProgress,
         private _toastService: ToastrService,
         private _dataService: DataService,
-        private _httpClient: HttpClient
     ) {
         super();
         this._progressRef = this._progressService.ref();
     }
 
     ngOnInit() {
-        this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
-            if (data) {this.dataUseRole = data["DropDownUserRole"]}
-        })
+        // this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
+        //     if (data) {this.dataUseRole = data["DropDownUserRole"]}
+        // })
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.userId = param.id;
