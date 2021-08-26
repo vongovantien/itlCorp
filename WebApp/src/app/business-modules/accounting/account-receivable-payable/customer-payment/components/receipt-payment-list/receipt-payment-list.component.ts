@@ -512,15 +512,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     private calculateFinalPaidAmountWithAsPaid(isAsPaid: boolean) {
+        let totalFinalPaidVnd: number = 0;
+        let totalFinalPaidusd: number = 0;
+
         if (!!isAsPaid) {
-            const totaValueVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
-            const totaValueUsd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
-            this.finalPaidAmountVnd.setValue(+totaValueVnd);
-            this.finalPaidAmountUsd.setValue(+totaValueUsd);
+            totalFinalPaidVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
+            totalFinalPaidusd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
+
+            this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd);
+            this.finalPaidAmountUsd.setValue(+totalFinalPaidusd);
             return;
         }
-        this.finalPaidAmountVnd.setValue(this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0));
-        this.finalPaidAmountUsd.setValue(this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0));
+        totalFinalPaidVnd = this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0);
+        totalFinalPaidusd = this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0);
+
+        this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd.toFixed(0));
+        this.finalPaidAmountUsd.setValue(+totalFinalPaidusd.toFixed(2));
     }
 }
 
