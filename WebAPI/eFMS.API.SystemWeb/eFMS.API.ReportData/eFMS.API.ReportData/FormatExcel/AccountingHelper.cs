@@ -475,7 +475,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.Count(x => x.receiptDetail != null) == 0)
+                if (customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
                 {
                     excel.DeleteRow(7);
                 }
