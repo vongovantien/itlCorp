@@ -248,7 +248,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUsd.setValue(formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        this.paidAmountUsd.setValue(+formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
                     }
                 }
 
