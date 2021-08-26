@@ -1467,7 +1467,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PAYMENT MANAGEMENT ---
 
         #region -- GET EXISITS CHARGE --
-        public List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
+        public IQueryable<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
         {
             //Chỉ lấy ra những phí chứng từ (thuộc phí credit + partner hay những phí thuộc đối tượng payer + partner)
             var surcharge = csShipmentSurchargeRepo
@@ -1602,14 +1602,14 @@ namespace eFMS.API.Accounting.DL.Services
                                      KickBack = sur.KickBack,
                                      VatPartnerId = sur.VatPartnerId,
                                      VatPartnerShortName = vatPgrp.ShortName,
-                                     AdvanceNo = sur.AdvanceNo
-                                 }).ToList();
+                                 });
+            
             for (int i = 0; i < dataOperation.Count(); i++)
             {
-                var jobId = dataOperation[i].JobId;
+                var jobId = dataOperation.ElementAt(i).JobId;
                 if (clearanceDataList[jobId].Count() > 0)
                 {
-                    dataOperation[i].ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                    dataOperation.ElementAt(i).ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
                 }
             }
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
@@ -1675,11 +1675,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     KickBack = sur.KickBack,
                                     VatPartnerId = sur.VatPartnerId,
                                     VatPartnerShortName = vatPgrp.ShortName,
-                                    AdvanceNo = sur.AdvanceNo
-                                }).ToList();
-
+                                });
             var data = dataDocument.Union(dataOperation);
-            return data.ToList();
+            return data;
         }
         #endregion -- GET EXISITS CHARGE --
 
@@ -5430,15 +5428,15 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null)
         {
-            var advanceRequest = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
+            var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
-            var advanceNo = csShipmentSurchargeRepo.Get(x => advanceRequest.Any(ad => ad == x.AdvanceNo) && string.IsNullOrEmpty(x.SettlementCode)).Select(x => x.AdvanceNo).ToList();
-            if(advanceNo.Count() == 0)
+            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid != hblId).Select(x => x.AdvanceNo).ToList();
+            if (advanceExp?.Count() != 0)
             {
-                return advanceNo;
+                advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
             }
 
-            if(string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
+            if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
             {
                 advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)));
             }
