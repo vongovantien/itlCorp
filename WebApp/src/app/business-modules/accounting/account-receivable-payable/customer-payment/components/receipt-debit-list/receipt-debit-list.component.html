@@ -37,7 +37,7 @@
                                 <td ALIGN="center" class="font-weight-bold">
                                     <ng-container *ngIf="item.type === 'ADV' && !isReadonly; else paymentOtherTypeTpl">
                                         <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
-                                            (click)="selectPaymentItem(i)">ADV</a>
+                                            (click)="selectPaymentItem(i)" position="bottomCenter">ADV</a>
                                     </ng-container>
                                     <ng-template #paymentOtherTypeTpl>
                                         {{item.type}}

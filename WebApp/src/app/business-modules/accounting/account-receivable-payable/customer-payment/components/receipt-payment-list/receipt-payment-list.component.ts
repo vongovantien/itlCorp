@@ -300,7 +300,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.creditAmountUsd.setValue(0);
                     } else {
-                        this.creditAmountUsd.setValue(formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        this.creditAmountUsd.setValue(+formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
                     }
                 }
                 this.calculateFinalPaidAmount();
@@ -323,7 +323,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 }
                 if (!!this.isAutoConvert.value) {
                     const valueUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                    this.cusAdvanceAmountUsd.setValue(formatCurrency(valueUsd, 'en', ''));
+                    this.cusAdvanceAmountUsd.setValue(+formatCurrency(valueUsd, 'en', ''));
                 }
                 this.calculateFinalPaidAmount();
                 break;
@@ -429,8 +429,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
             finalExchangeRate: this.exchangeRate.value,
-            paidAmountVnd: this.finalPaidAmountVnd.value,
-            paidAmountUsd: this.finalPaidAmountUsd.value,
+            paidAmountVnd: +this.finalPaidAmountVnd.value,
+            paidAmountUsd: +this.finalPaidAmountUsd.value,
             list: listInvoice.filter(x => x.type !== AccountingConstants.RECEIPT_ADVANCE_TYPE),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
@@ -462,7 +462,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 this.creditAmountVnd.enable();
 
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                this.cusAdvanceAmountUsd.setValue(formatCurrency(_advanceUsd, 'en', ''));
+                this.cusAdvanceAmountUsd.setValue(+formatCurrency(_advanceUsd, 'en', ''));
 
                 this.cusAdvanceAmountUsd.disable();
                 this.creditAmountUsd.disable();
@@ -515,8 +515,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         if (!!isAsPaid) {
             const totaValueVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
             const totaValueUsd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
-            this.finalPaidAmountVnd.setValue(totaValueVnd);
-            this.finalPaidAmountUsd.setValue(totaValueUsd);
+            this.finalPaidAmountVnd.setValue(+totaValueVnd);
+            this.finalPaidAmountUsd.setValue(+totaValueUsd);
             return;
         }
         this.finalPaidAmountVnd.setValue(this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0));
