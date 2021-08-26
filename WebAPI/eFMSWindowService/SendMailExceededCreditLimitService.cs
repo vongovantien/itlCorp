@@ -2,6 +2,7 @@
 using eFMSWindowService.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.ServiceProcess;
@@ -25,6 +26,7 @@ namespace eFMSWindowService
 
         public void Start()
         {
+            FileHelper.WriteToFile("SendMailExceededCreditLimit", "[SendMailExceededCreditLimitService] [START]:" + DateTime.Now);
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
@@ -45,7 +47,7 @@ namespace eFMSWindowService
         {
             try
             {
-                FileHelper.WriteToFile("SendMailExceededCreditLimit", "Service send mail exceeded credit limit is recall at " + DateTime.Now);
+                FileHelper.WriteToFile("SendMailExceededCreditLimit", "[RECALL] at " + DateTime.Now);
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
                     var dt = db.Database.SqlQuery<sp_GetOverDuePaymentCredit_Result>("[dbo].[sp_GetOverDuePaymentCredit]").ToList();
@@ -128,7 +130,8 @@ namespace eFMSWindowService
                         string body = dear + headerBody + tableBody + footerBody;
                         body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
                         List<string> mail = new List<string> { item.Key.Email };
-                        List<string> emailBCCs = CommonData.EmailBCCs;
+                        var configBCC = ConfigurationManager.AppSettings["SendMailBCC"];
+                        List<string> emailBCCs = configBCC.Split(',').ToList<string>();
                         if (exceededCreditLimits != null && exceededCreditLimits.Count > 0
                             && (exceededCreditsMore70.Count > 0 || exceededCreditsMore100.Count > 0 || exceededCreditsMore120.Count > 0)
                             && mail != null && mail.Count > 0)
@@ -161,6 +164,7 @@ namespace eFMSWindowService
             catch (Exception ex)
             {
                 throw ex;
+                FileHelper.WriteToFile("SendMailExceededCreditLimit", "[ERROR][Timer_Elapsed]:" + ex.Message);
             }
         }
 
@@ -194,7 +198,7 @@ namespace eFMSWindowService
 
         public new void Stop()
         {
-            FileHelper.WriteToFile("SendMailExceededCreditLimit", "Service send mail exceeded credit limit is stopped at " + DateTime.Now);
+            FileHelper.WriteToFile("SendMailExceededCreditLimit", "[SendMailExceededCreditLimitService] [STOP]:" + DateTime.Now);
             _timer.Stop();
             _timer.Dispose();
         }
