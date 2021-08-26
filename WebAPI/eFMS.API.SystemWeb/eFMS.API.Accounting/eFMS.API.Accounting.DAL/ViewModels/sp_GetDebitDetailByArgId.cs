@@ -1,4 +1,6 @@
-﻿namespace eFMS.API.Accounting.Service.ViewModels
+﻿using System;
+
+namespace eFMS.API.Accounting.Service.ViewModels
 {
     public class sp_GetDebitDetailByArgId
     {
@@ -13,5 +15,7 @@
         public decimal UnpaidAmountUSD { get; set; }
         public int OverdueDays { get; set; }
         public string Code { get; set; }
+        public DateTime PaymentDueDate { get; set; }
+        public string PaymentStatus { get; set; }
     }
 }

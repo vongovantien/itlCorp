@@ -2735,22 +2735,30 @@ namespace eFMS.API.Accounting.DL.Services
                 detail.Amount = _paidAmountVnd;
 
                 string _description = string.Empty;
-                if (payment.Type == "DEBIT")
+                switch (payment.Type)
                 {
-                    _description = string.Format("{0} {1}", "Công Nợ Phải Thu", payment.InvoiceNo);
+                    case "DEBIT":
+                        _description = string.Format("{0} {1}", "Công Nợ Phải Thu", payment.InvoiceNo);
+                        break;
+                    case "OBH":
+                        _description = "Công Nợ Phải Thu OBH";
+                        break;
+                    case "ADV":
+                        _description = "Công Nợ Ứng Trước";
+                        break;
+                    case "PAY_OBH":
+                        _description = "Công Nợ Trả Hộ";
+                        break;
+                    case "PAY_OTH":
+                        _description = "Công Nợ Trả Khác";
+                        break;
+                    case "COLL_OTH":
+                        _description = string.Format("{0} {1}", "Công Nợ Thu Khác", payment.InvoiceNo);
+                        break;
+                    default:
+                        break;
                 }
-                else if (payment.Type == "OBH")
-                {
-                    _description = "Công Nợ Phải Thu OBH";
-                }
-                else if (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE")
-                {
-                    _description = string.Format("{0} {1}", "Công Nợ Bù Trừ", payment.InvoiceNo);
-                }
-                else if (payment.Type == "ADV")
-                {
-                    _description = "Công Nợ Ứng Trước";
-                }
+               
                 detail.Description = _description;
 
                 // [CR] : ObhPartnerCode = OBH Collect Partner code
