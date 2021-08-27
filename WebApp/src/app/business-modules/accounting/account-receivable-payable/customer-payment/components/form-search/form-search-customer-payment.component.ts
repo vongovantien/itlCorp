@@ -62,7 +62,6 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.customerIDs = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL, null);
         this.creators = this._systemRepo.getSystemUsers();
         this.Currencys = this._catalogueRepo.getListCurrency();
-
         this.subscriptionSearchParamState();
     }
 
@@ -73,7 +72,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
             customerID: [],
             date: [{ startDate: new Date(new Date().setDate(new Date().getDate() - 29)), endDate: new Date() }],
             dateType: [],
-            currency: ['VND'],
+            currency: [],
             status: [],
             syncStatus: [],
             typeReceipt: []
@@ -127,7 +126,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
         this.paymentType.reset();
         this.customerID.reset();
         this.dateType.reset();
-        this.currency.setValue('VND');
+        this.currency.setValue(null);
         this.syncStatus.reset();
         this.status.reset();
 
@@ -148,7 +147,7 @@ export class ARCustomerPaymentFormSearchComponent extends AppForm implements OnI
                             customerID: data?.customerID,
                             date: (!!data?.dateFrom && !!data?.dateTo) ? { startDate: new Date(data?.dateFrom), endDate: new Date(data?.dateTo) } : null,
                             dateType: data.dateType ? data.dateType : null,
-                            currency: data.currency ? data.currency : 'VND',
+                            currency: data.currency ? data.currency : null,
                             status: data.status ? data.status : null,
                             syncStatus: data.syncStatus ? data.syncStatus : null,
                             typeReceipt: data.typeReceipt ? data.typeReceipt : null
