@@ -86,10 +86,15 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
         {
+            //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
+            //Expression<Func<AcctReceipt, bool>> query = (x =>
+            //(x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            //&& (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            //);
             Expression<Func<AcctReceipt, bool>> query = (x =>
-            (x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            );
+              (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+             );
+            //[END]
 
             // Tìm theo status
             if (!string.IsNullOrEmpty(criteria.Status))
@@ -157,7 +162,7 @@ namespace eFMS.API.Accounting.DL.Services
             return dataQuery;
         }
 
-        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceipt> dataQuery)
+        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceipt> dataQuery, AcctReceiptCriteria criteria)
         {
             List<AcctReceiptModel> list = new List<AcctReceiptModel>();
 
@@ -170,6 +175,14 @@ namespace eFMS.API.Accounting.DL.Services
                     d.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
                     d.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
                     d.CustomerName = item.CustomerId == null ? null : catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
+
+                    //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
+                    if (criteria.Currency != null)
+                    {
+                        d.PaidAmount = criteria.Currency == "VND" ? d.PaidAmountVnd : d.PaidAmountUsd;
+                        d.CurrencyId = criteria.Currency;
+                    }
+                    //[END]
                     list.Add(d);
                 }
             }
@@ -255,7 +268,7 @@ namespace eFMS.API.Accounting.DL.Services
                 page = 1;
                 size = rowsCount;
             }
-            IQueryable<AcctReceiptModel> result = FormatReceipt(data);
+            IQueryable<AcctReceiptModel> result = FormatReceipt(data,criteria);
 
             return result.Skip((page - 1) * size).Take(size);
         }
