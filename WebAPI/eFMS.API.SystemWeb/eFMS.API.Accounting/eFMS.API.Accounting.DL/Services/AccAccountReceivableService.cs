@@ -1323,12 +1323,12 @@ namespace eFMS.API.Accounting.DL.Services
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
                                                                     (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) /(s.First().contract.TrialCreditLimited)
-                                                                    :0) * 100 ?? 0, 2) :
+                                                                    :0) * 100 ?? 0,3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
                                                                     (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited)
-                                                                    : 0) * 100 ?? 0, 2):0),
+                                                                    : 0) * 100 ?? 0, 3):0),
                     CusAdvance = s.First().contract.CustomerAdvanceAmount ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
                     BillingUnpaid = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingUnpaid : 0).Sum(),
