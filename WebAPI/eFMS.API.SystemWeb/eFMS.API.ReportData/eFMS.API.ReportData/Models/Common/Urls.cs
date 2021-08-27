@@ -47,6 +47,7 @@
 
 
             public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
+            public const string SettlementPaymentDetailListUrl = "/api/v1/en-US/AcctSettlementPayment/GetDataExportSettlementDetail";
             public const string DetailAdvancePaymentExportUrl = "/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
             public const string DetailSettlementPaymentExportUrl = "/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string GeneralSettlementPaymentExport = "/api/v1/en-US/AcctSettlementPayment/GeneralSettlementPaymentExport";
