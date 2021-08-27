@@ -39,8 +39,9 @@ namespace eFMS.API.System.DL.Services
             try
             {
                 SysEmailSetting.CreateDate = DateTime.Now;
-                SysEmailSetting.ModifiedDate = null;
+                SysEmailSetting.ModifiedDate = DateTime.Now;
                 SysEmailSetting.UserCreated = currentUser.UserID;
+                SysEmailSetting.UserModified = currentUser.UserID;
                 var modelAdd = mapper.Map<SysEmailSetting>(SysEmailSetting);
                 return DataContext.Add(modelAdd);
             }

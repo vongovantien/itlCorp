@@ -1,6 +1,11 @@
 import { PopupBase } from "src/app/popup.base";
 import { Component, Output, EventEmitter, ViewChild } from "@angular/core";
-import { FormGroup, FormBuilder, AbstractControl } from "@angular/forms";
+import {
+    FormGroup,
+    FormBuilder,
+    AbstractControl,
+    Validators,
+} from "@angular/forms";
 import { SystemRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { catchError } from "rxjs/operators";
@@ -62,8 +67,14 @@ export class ShareSystemAddEmailComponent extends PopupBase {
 
     initForm() {
         this.formEmailSetting = this._fb.group({
-            emailType: [],
-            emailInfo: [""],
+            emailType: [null, Validators.required],
+            emailInfo: [
+                "",
+                Validators.compose([
+                    Validators.required,
+                    Validators.maxLength(100),
+                ]),
+            ],
         });
 
         this.emailType = this.formEmailSetting.controls["emailType"];

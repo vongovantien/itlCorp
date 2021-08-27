@@ -51,15 +51,14 @@
                                     </div>
                                     <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                         <span class="m--font-bolder">Modified:</span>
-                                        <ng-container *ngIf="!!emailSelected.userModified">
-                                            <span class="m--font-success m--margin-left-5">{{emailSelected.modifiedDate
-                                                |
-                                                date:'dd/MM/yyyy h:mm:ss a'}}</span>
-                                            <span class="m--font-bolder m--margin-left-5">by</span>
 
-                                            <span
-                                                class="m--font-success m--margin-left-5">{{emailSelected.userNameModified}}</span>
-                                        </ng-container>
+                                        <span class="m--font-success m--margin-left-5">{{emailSelected.modifiedDate
+                                            |
+                                            date:'dd/MM/yyyy h:mm:ss a'}}</span>
+                                        <span class="m--font-bolder m--margin-left-5">by</span>
+                                        <span
+                                            class="m--font-success m--margin-left-5">{{emailSelected.userNameModified}}</span>
+
                                     </div>
                                 </div>
                             </ng-container>
