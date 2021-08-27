@@ -158,6 +158,12 @@ namespace eFMS.API.System.DL.Common
 
         #endregion
 
+        #region Email
+        public static readonly string MSG_EMAIL_EN_EXISTED_IN_DEPT = "MSG_EMAIL_EN_EXISTED_IN_DEPT";
+        public static readonly string MSG_EMAIL_EN_NOT_EXISTED_IN_DEPT = "MSG_EMAIL_EN_NOT_EXISTED_IN_DEPT";
+        #endregion
+
+
         //#region Name field
         //public const string EF_DISPLAYNAME_CODE = "EF_DISPLAYNAME_CODE";
         //#endregion

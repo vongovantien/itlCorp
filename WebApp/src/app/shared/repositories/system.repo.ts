@@ -676,5 +676,44 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
+    
+    getListEmailSettingByDeptID(Id: number) {
+        return this._api.get(
+            `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/GetEmailSettingByDeptId/`,
+            { id: Id }
+        );
+    }
+
+    getEmailSettingByID(Id: number) {
+        return this._api.get(
+            `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/${Id}`
+        );
+    }
+
+    deleteEmailSetting(Id: number) {
+        return this._api.delete(
+            `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/Delete`,
+            { id: Id }
+        );
+    }
+
+    addEmailInfo(body: any) {
+        return this._api
+            .post(
+                `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/Add`,
+                body
+            )
+            .pipe(map((data: any) => data));
+    }
+
+    updateEmailInfo(body: any = {}) {
+        return this._api
+            .put(
+                `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/Update`,
+                body
+            )
+            .pipe(map((data: any) => data));
+    }
+
 }
 

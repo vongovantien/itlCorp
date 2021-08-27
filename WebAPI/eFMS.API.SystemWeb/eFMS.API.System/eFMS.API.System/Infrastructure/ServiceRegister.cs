@@ -61,6 +61,7 @@ namespace eFMS.API.System.Infrastructure
             services.AddTransient<ISysNotificationService, SysNotificationService>();
             services.AddTransient<NotificationHubSubscription>();
             services.AddTransient<ISysUserNotification, SysUserNotificationService>();
+            services.AddTransient<ISysEmailSettingService, SysEmailSettingService>();
 
             services.AddSingleton<ICacheServiceBase<SysMenu>>(x =>
             new CacheServiceBase<SysMenu>(x.GetRequiredService<IConnectionMultiplexer>()
