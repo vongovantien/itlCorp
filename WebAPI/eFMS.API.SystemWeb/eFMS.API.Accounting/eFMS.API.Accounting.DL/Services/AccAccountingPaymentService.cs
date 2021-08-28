@@ -1562,7 +1562,7 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepository.Get().Select(x => new { x.Id, x.AccountNo, x.ParentId, x.PartnerNameEn });
             var paymentData = QueryInvoiceDataPayment(criteria);
             var surchargeData = surchargeRepository.Get().Select(x => new { x.AcctManagementId, x.JobNo, x.Hblno, x.Mblno, x.DebitNo, x.Soano, x.PaySoano });
-            var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE).Select(x => new { x.Id, x.PaymentRefNo, x.PaymentDate });
+            var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
             var resultsQuery = (from invoice in data
                                 join surcharge in surchargeData on invoice.RefId equals surcharge.AcctManagementId.ToString()
                                 join payments in paymentData on invoice.RefId.ToLower() equals payments.RefId into grpPayment
