@@ -308,7 +308,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
+            var dataGroups = data.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (var item in dataGroups)
             {
