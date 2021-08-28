@@ -1467,7 +1467,7 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PAYMENT MANAGEMENT ---
 
         #region -- GET EXISITS CHARGE --
-        public IQueryable<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
+        public List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
         {
             //Chỉ lấy ra những phí chứng từ (thuộc phí credit + partner hay những phí thuộc đối tượng payer + partner)
             var surcharge = csShipmentSurchargeRepo
@@ -1482,7 +1482,6 @@ namespace eFMS.API.Accounting.DL.Services
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            var csTransD = csTransactionDetailRepo.Get();
             var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
 
             // Data search = jobNo
@@ -1545,7 +1544,7 @@ namespace eFMS.API.Accounting.DL.Services
             var userRepo = sysUserRepo.Get();
             var unit = catUnitRepo.Get();
             var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
-            var dataOperation = (from sur in surcharge
+            var operationLst = (from sur in surcharge
                                  join cc in charge on sur.ChargeId equals cc.Id into cc2
                                  from cc in cc2.DefaultIfEmpty()
                                  join u in unit on sur.UnitId equals u.Id into u2
@@ -1597,19 +1596,19 @@ namespace eFMS.API.Accounting.DL.Services
                                      ContNo = sur.ContNo,
                                      Notes = sur.Notes,
                                      IsFromShipment = sur.IsFromShipment,
-                                     //AdvanceNo = advGrp.AdvanceNo,
                                      PICName = user.Username,
+                                     //PICName = opst.UserCreated,
                                      KickBack = sur.KickBack,
                                      VatPartnerId = sur.VatPartnerId,
                                      VatPartnerShortName = vatPgrp.ShortName,
                                  });
-            
-            for (int i = 0; i < dataOperation.Count(); i++)
+            var dataOperation = operationLst.ToList();
+            foreach (var item in dataOperation)
             {
-                var jobId = dataOperation.ElementAt(i).JobId;
+                var jobId = item.JobId;
                 if (clearanceDataList[jobId].Count() > 0)
                 {
-                    dataOperation.ElementAt(i).ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+                    item.ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
                 }
             }
             if (criteria.customNos != null && criteria.customNos.Count() > 0)
@@ -1617,7 +1616,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return dataOperation;
             }
 
-            var dataDocument = (from sur in surcharge
+            var documentLst = (from sur in surcharge
                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
                                 from cc in cc2.DefaultIfEmpty()
                                 join u in unit on sur.UnitId equals u.Id into u2
@@ -1676,8 +1675,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     VatPartnerId = sur.VatPartnerId,
                                     VatPartnerShortName = vatPgrp.ShortName,
                                 });
+            var dataDocument = documentLst.ToList();
             var data = dataDocument.Union(dataOperation);
-            return data;
+            return data.ToList();
         }
         #endregion -- GET EXISITS CHARGE --
 
