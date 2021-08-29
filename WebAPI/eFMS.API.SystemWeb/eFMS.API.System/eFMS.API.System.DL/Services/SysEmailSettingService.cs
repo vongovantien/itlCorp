@@ -109,10 +109,18 @@ namespace eFMS.API.System.DL.Services
         {
             var isExists = false;
             isExists = DataContext.Get(x => x.DeptId == model.DeptId &&
-                  x.Id == model.Id).Any();
+              x.Id == model.Id).Any();
             return isExists;
         }
 
+        public bool CheckValidEmail(SysEmailSettingModel model)
+        {
+            var isExists = true;
+            if (string.IsNullOrEmpty(model.EmailType) || string.IsNullOrEmpty(model.EmailInfo)){
+                isExists = false;
+            }
+            return isExists;
+        }
     }
 }
 

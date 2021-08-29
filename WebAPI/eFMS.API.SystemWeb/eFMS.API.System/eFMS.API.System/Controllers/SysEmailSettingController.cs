@@ -85,6 +85,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+        //[Authorize]
         [Route("Add")]
         public IActionResult Insert(SysEmailSettingModel model)
         {
@@ -93,6 +94,11 @@ namespace eFMS.API.System.Controllers
             if (sysEmailSettingService.CheckExistsEmailInDept(model))
             {
                 return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_EMAIL_EN_EXISTED_IN_DEPT].Value, Data = model });
+            }
+
+            if (!sysEmailSettingService.CheckValidEmail(model))
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_EMAIL_EN_NOT_VALID].Value, Data = model });
             }
 
             var hs = sysEmailSettingService.AddEmailSetting(model);
@@ -108,7 +114,7 @@ namespace eFMS.API.System.Controllers
 
             if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
 
             return Ok(result);
@@ -120,6 +126,7 @@ namespace eFMS.API.System.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPut]
+        //[Authorize]
         [Route("Update")]
         public IActionResult Update(SysEmailSettingModel model)
         {
@@ -130,6 +137,11 @@ namespace eFMS.API.System.Controllers
                 return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_EMAIL_EN_NOT_EXISTED_IN_DEPT].Value, Data = model });
             }
 
+            if (!sysEmailSettingService.CheckValidEmail(model))
+            {
+                return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_EMAIL_EN_NOT_VALID].Value, Data = model });
+            }
+
             var hs = sysEmailSettingService.UpdateEmailInfo(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -138,7 +150,7 @@ namespace eFMS.API.System.Controllers
             { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
-                return Ok(result);
+                return BadRequest(result);
             }
             return Ok(result);
         }

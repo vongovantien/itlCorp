@@ -28,8 +28,8 @@
                     </td>
                     <td>{{emailSetting.emailType}}</td>
                     <td>{{emailSetting.emailInfo}}</td>
-                    <td>{{emailSetting.modifiedDate}}</td>
-                    <td>{{emailSetting.createDate}}</td>
+                    <td>{{emailSetting.modifiedDate|date:'dd/MM/yyyy hh:mm:ss '}}</td>
+                    <td>{{emailSetting.createDate|date:'dd/MM/yyyy hh:mm:ss '}}</td>
                 </tr>
             </ng-container>
         </tbody>

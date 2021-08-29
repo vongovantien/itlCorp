@@ -67,12 +67,12 @@ export class ShareSystemAddEmailComponent extends PopupBase {
 
     initForm() {
         this.formEmailSetting = this._fb.group({
-            emailType: [null, Validators.required],
+            emailType: ['', Validators.required],
             emailInfo: [
-                "",
+                '',
                 Validators.compose([
                     Validators.required,
-                    Validators.maxLength(100),
+                    Validators.maxLength(50),
                 ]),
             ],
         });

@@ -23,6 +23,9 @@ namespace eFMS.API.System.DL.IService
         HandleState UpdateEmailInfo(SysEmailSettingModel model);
 
         HandleState DeleteEmailSetting(int id);
+
         bool CheckExistsEmailInDept(SysEmailSettingModel model);
+
+        bool CheckValidEmail(SysEmailSettingModel model);
     }
 }
