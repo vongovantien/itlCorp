@@ -16,7 +16,20 @@
                                             <td>{{i+1}} </td>
                                             <td class="text-primary"> {{item.billingNo }}</td>
                                             <td ALIGN="center">{{item.type }}</td>
-                                            <td ALIGN="center">{{item.invoiceNo }}</td>
+                                            <td ALIGN="center">{{item.invoiceNo }}
+                                                    <ng-container [ngSwitch]="item.paymentStatus">
+                                                        <span class="m-badge m-badge--success m-badge--wide" *ngSwitchCase="'Paid'">
+                                                            {{item.paymentStatus}}
+                                                        </span>
+                                                        <span class="m-badge m-badge--warning m-badge--wide text-white"
+                                                            *ngSwitchCase="'Paid A Part'">
+                                                            {{item.paymentStatus}}
+                                                        </span>
+                                                        <span class="m-badge m-badge--danger m-badge--wide" *ngSwitchDefault>
+                                                            {{item.paymentStatus}}
+                                                        </span>
+                                                    </ng-container>
+                                            </td>
                                             <td class="text-right" ALIGN="right">{{ item.totalAmountVND | number: '.0-3'
                                                 }}</td>
                                             <td class="text-right" ALIGN="right">{{ item.totalAmountUSD | number: '.0-3'
@@ -30,6 +43,7 @@
                                             <td class="text-right" ALIGN="right">{{ item.unpaidAmountUSD | number:
                                                 '.0-3' }}</td>
                                             <td class="text-right">{{ item.overdueDays }}</td>
+                                            <td class="text-right">{{ item.paymentDueDate | date: 'dd/MM/yyyy' }}</td>
                                             <td class="text-right text-success">{{ item.code }}</td>
                                         </tr>
                                     </ng-container>
