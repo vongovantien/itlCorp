@@ -6,7 +6,9 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.ReportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
+using eFMS.API.Accounting.Service.Contexts;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
@@ -14,12 +16,14 @@ using eFMS.API.Common.Models;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -1467,217 +1471,280 @@ namespace eFMS.API.Accounting.DL.Services
         #endregion --- PAYMENT MANAGEMENT ---
 
         #region -- GET EXISITS CHARGE --
+        private List<sp_GetDataExistsCharge> GetExistingChargeData(ExistsChargeCriteria criteria)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
+                new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.serviceDateTo },
+                new SqlParameter(){ ParameterName = "@partnerId", Value = criteria.partnerId },
+                new SqlParameter(){ ParameterName = "@jobIds", Value = string.Join(';',criteria.jobIds) },
+                new SqlParameter(){ ParameterName = "@mbls", Value = string.Join(';',criteria.mbls) },
+                new SqlParameter(){ ParameterName = "@hbls", Value = string.Join(';',criteria.hbls) },
+                new SqlParameter(){ ParameterName = "@customNos", Value = string.Join(';',criteria.customNos) },
+                new SqlParameter(){ ParameterName = "@soaNo", Value = string.Join(';',criteria.soaNo) },
+                new SqlParameter(){ ParameterName = "@creditNo", Value = string.Join(';',criteria.creditNo) },
+                new SqlParameter(){ ParameterName = "@servicesType", Value = criteria.servicesType },
+                new SqlParameter(){ ParameterName = "@personInCharge", Value = criteria.personInCharge },
+                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester }
+            };
+            var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExistsCharge>(parameters);
+            return list;
+        }
+
         public List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria)
         {
+            #region soure old
             //Chỉ lấy ra những phí chứng từ (thuộc phí credit + partner hay những phí thuộc đối tượng payer + partner)
-            var surcharge = csShipmentSurchargeRepo
-                .Get(x =>
-                        x.IsFromShipment == true
-                     && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId && string.IsNullOrEmpty(x.SyncedFrom))
-                     || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId && string.IsNullOrEmpty(x.PaySyncedFrom)))
-                     && string.IsNullOrEmpty(x.SettlementCode)
-                );
+            //var surcharge = csShipmentSurchargeRepo
+            //    .Get(x =>
+            //            x.IsFromShipment == true
+            //         && ((x.Type == AccountingConstants.TYPE_CHARGE_BUY && x.PaymentObjectId == criteria.partnerId && string.IsNullOrEmpty(x.SyncedFrom))
+            //         || (x.Type == AccountingConstants.TYPE_CHARGE_OBH && x.PayerId == criteria.partnerId && string.IsNullOrEmpty(x.PaySyncedFrom)))
+            //         && string.IsNullOrEmpty(x.SettlementCode)
+            //    );
             // Get data source
-            var charge = catChargeRepo.Get();
-            var payer = catPartnerRepo.Get();
-            var payee = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
-            var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
+            //var charge = catChargeRepo.Get();
+            //var payer = catPartnerRepo.Get();
+            //var payee = catPartnerRepo.Get();
+            //var opsTrans = opsTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
+            //var csTrans = csTransactionRepo.Get(x => x.CurrentStatus != AccountingConstants.CURRENT_STATUS_CANCELED);
 
             // Data search = jobNo
-            criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            if (criteria.jobIds != null && criteria.jobIds.Count() > 0)
-            {
-                surcharge = surcharge.Where(x => criteria.jobIds.Any(job => job == x.JobNo) && x.JobNo != null);
-            }
+            //criteria.jobIds = criteria.jobIds.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //if (criteria.jobIds != null && criteria.jobIds.Count() > 0)
+            //{
+            //    surcharge = surcharge.Where(x => criteria.jobIds.Any(job => job == x.JobNo) && x.JobNo != null);
+            //}
             // Data search = mblNo
-            criteria.mbls = criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            if (criteria.mbls != null && criteria.mbls.Count() > 0)
-            {
-                surcharge = surcharge.Where(x => criteria.mbls.Any(mbl => mbl == x.Mblno) && x.Mblno != null);
-            }
+            //criteria.mbls = criteria.mbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //if (criteria.mbls != null && criteria.mbls.Count() > 0)
+            //{
+            //    surcharge = surcharge.Where(x => criteria.mbls.Any(mbl => mbl == x.Mblno) && x.Mblno != null);
+            //}
             // Data search = hblNo
-            criteria.hbls = criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            if (criteria.hbls != null && criteria.hbls.Count() > 0)
-            {
-                surcharge = surcharge.Where(x => criteria.hbls.Any(hbl => hbl == x.Hblno) && x.Hblno != null);
-            }
+            //criteria.hbls = criteria.hbls.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //if (criteria.hbls != null && criteria.hbls.Count() > 0)
+            //{
+            //    surcharge = surcharge.Where(x => criteria.hbls.Any(hbl => hbl == x.Hblno) && x.Hblno != null);
+            //}
             // Data search = soaNo
-            criteria.soaNo = criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
-            {
-                surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0);
-            }
+            //criteria.soaNo = criteria.soaNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //if (criteria.soaNo != null && criteria.soaNo.Count() > 0)
+            //{
+            //    surcharge = surcharge.Where(x => criteria.soaNo.IndexOf(x.PaySoano ?? "") >= 0);
+            //}
             // Data search = customNo
-            criteria.customNos = criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            var clearanceData = customClearanceRepo.Get();
-            if (criteria.customNos != null && criteria.customNos.Count() > 0)
-            {
-                clearanceData = customClearanceRepo.Get(x => criteria.customNos.Any(cus => cus == x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
-                var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x => x.Key).ToList();
-                opsTrans = opsTrans.Where(x => clearanceDataGroup.Any(cl => cl == x.JobNo));
-            }
+            //criteria.customNos = criteria.customNos.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //var clearanceData = customClearanceRepo.Get();
+            //if (criteria.customNos != null && criteria.customNos.Count() > 0)
+            //{
+            //    clearanceData = customClearanceRepo.Get(x => criteria.customNos.Any(cus => cus == x.ClearanceNo)).OrderBy(x => x.ClearanceDate);
+            //    var clearanceDataGroup = clearanceData.GroupBy(x => x.JobNo).Select(x => x.Key).ToList();
+            //    opsTrans = opsTrans.Where(x => clearanceDataGroup.Any(cl => cl == x.JobNo));
+            //}
             // Data search = creditNo
-            criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
-            if (criteria.creditNo != null && criteria.creditNo.Count() > 0)
-            {
-                surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
-            }
+            //criteria.creditNo = criteria.creditNo.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            //if (criteria.creditNo != null && criteria.creditNo.Count() > 0)
+            //{
+            //    surcharge = surcharge.Where(x => criteria.creditNo.IndexOf(x.CreditNo ?? "") >= 0);
+            //}
             // Data search = ServiceDate
-            if (criteria.serviceDateFrom != null || criteria.serviceDateTo != null)
-            {
-                opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date : false);
-                csTrans = csTrans.Where(x => x.ServiceDate.HasValue ? (criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date) : false);
-            }
+            //if (criteria.serviceDateFrom != null || criteria.serviceDateTo != null)
+            //{
+            //    opsTrans = opsTrans.Where(x => x.ServiceDate.HasValue ? criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date : false);
+            //    csTrans = csTrans.Where(x => x.ServiceDate.HasValue ? (criteria.serviceDateFrom.Value.Date <= x.ServiceDate.Value.Date && x.ServiceDate.Value.Date <= criteria.serviceDateTo.Value.Date) : false);
+            //}
             // Data search = serviceType
-            if (!string.IsNullOrEmpty(criteria.servicesType))
-            {
-                surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
-            }
+            //if (!string.IsNullOrEmpty(criteria.servicesType))
+            //{
+            //    surcharge = surcharge.Where(x => criteria.servicesType.Contains(x.TransactionType));
+            //}
             // Data search = PIC (PIC = UserCreated of job)
-            if (!string.IsNullOrEmpty(criteria.personInCharge))
-            {
-                opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
-                csTrans = csTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
-            }
+            //if (!string.IsNullOrEmpty(criteria.personInCharge))
+            //{
+            //    opsTrans = opsTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+            //    csTrans = csTrans.Where(x => criteria.personInCharge.ToLower().Contains(x.UserCreated.ToLower()));
+            //}
 
-            var userRepo = sysUserRepo.Get();
-            var unit = catUnitRepo.Get();
-            var clearanceDataList = clearanceData.ToLookup(x => x.JobNo);
-            var operationLst = (from sur in surcharge
-                                 join cc in charge on sur.ChargeId equals cc.Id into cc2
-                                 from cc in cc2.DefaultIfEmpty()
-                                 join u in unit on sur.UnitId equals u.Id into u2
-                                 from u in u2.DefaultIfEmpty()
-                                 join par in payer on sur.PayerId equals par.Id into par2
-                                 from par in par2.DefaultIfEmpty()
-                                 join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                                 from pae in pae2.DefaultIfEmpty()
-                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
-                                 join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
-                                 from vatPgrp in vatPgrps.DefaultIfEmpty()
-                                     //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                     //from advGrp in advGrps.DefaultIfEmpty()
-                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
-                                 from user in sysUser.DefaultIfEmpty()
-                                 select new ShipmentChargeSettlement
-                                 {
-                                     Id = sur.Id,
-                                     JobId = sur.JobNo,
-                                     MBL = sur.Mblno,
-                                     HBL = sur.Hblno,
-                                     Hblid = sur.Hblid,
-                                     Type = sur.Type,
-                                     //SettlementCode = sur.SettlementCode,
-                                     ChargeId = sur.ChargeId,
-                                     ChargeCode = cc.Code,
-                                     ChargeName = cc.ChargeNameEn,
-                                     Quantity = sur.Quantity,
-                                     UnitId = sur.UnitId,
-                                     UnitName = u.UnitNameEn,
-                                     UnitPrice = sur.UnitPrice,
-                                     CurrencyId = sur.CurrencyId,
-                                     FinalExchangeRate = sur.FinalExchangeRate,
-                                     NetAmount = sur.NetAmount,
-                                     Vatrate = sur.Vatrate,
-                                     Total = sur.Total,
-                                     AmountVnd = sur.AmountVnd,
-                                     VatAmountVnd = sur.VatAmountVnd,
-                                     TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
-                                     AmountUSD = sur.AmountUsd,
-                                     VatAmountUSD = sur.VatAmountUsd,
-                                     PayerId = sur.PayerId,
-                                     Payer = pae.ShortName,
-                                     PaymentObjectId = sur.PaymentObjectId,
-                                     OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
-                                     InvoiceNo = sur.InvoiceNo,
-                                     SeriesNo = sur.SeriesNo,
-                                     InvoiceDate = sur.InvoiceDate,
-                                     ContNo = sur.ContNo,
-                                     Notes = sur.Notes,
-                                     IsFromShipment = sur.IsFromShipment,
-                                     PICName = user.Username,
-                                     //PICName = opst.UserCreated,
-                                     KickBack = sur.KickBack,
-                                     VatPartnerId = sur.VatPartnerId,
-                                     VatPartnerShortName = vatPgrp.ShortName,
-                                 });
-            var dataOperation = operationLst.ToList();
-            foreach (var item in dataOperation)
-            {
-                var jobId = item.JobId;
-                if (clearanceDataList[jobId].Count() > 0)
-                {
-                    item.ClearanceNo = clearanceDataList[jobId].FirstOrDefault() == null ? string.Empty : clearanceDataList[jobId].OrderBy(x => x.ClearanceDate).First().ClearanceNo;
-                }
-            }
-            if (criteria.customNos != null && criteria.customNos.Count() > 0)
-            {
-                return dataOperation;
-            }
+            //var operationLst = (from sur in surcharge
+            //                     join cc in charge on sur.ChargeId equals cc.Id into cc2
+            //                     from cc in cc2.DefaultIfEmpty()
+            //                     join u in unit on sur.UnitId equals u.Id into u2
+            //                     from u in u2.DefaultIfEmpty()
+            //                     join par in payer on sur.PayerId equals par.Id into par2
+            //                     from par in par2.DefaultIfEmpty()
+            //                     join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+            //                     from pae in pae2.DefaultIfEmpty()
+            //                     join opst in opsTrans on sur.Hblid equals opst.Hblid
+            //                     join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+            //                     from vatPgrp in vatPgrps.DefaultIfEmpty()
+            //                         //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                         //from advGrp in advGrps.DefaultIfEmpty()
+            //                     join user in userRepo on opst.UserCreated equals user.Id into sysUser
+            //                     from user in sysUser.DefaultIfEmpty()
+            //                     select new ShipmentChargeSettlement
+            //                     {
+            //                         Id = sur.Id,
+            //                         JobId = sur.JobNo,
+            //                         MBL = sur.Mblno,
+            //                         HBL = sur.Hblno,
+            //                         Hblid = sur.Hblid,
+            //                         Type = sur.Type,
+            //                         //SettlementCode = sur.SettlementCode,
+            //                         ChargeId = sur.ChargeId,
+            //                         ChargeCode = cc.Code,
+            //                         ChargeName = cc.ChargeNameEn,
+            //                         Quantity = sur.Quantity,
+            //                         UnitId = sur.UnitId,
+            //                         UnitName = u.UnitNameEn,
+            //                         UnitPrice = sur.UnitPrice,
+            //                         CurrencyId = sur.CurrencyId,
+            //                         FinalExchangeRate = sur.FinalExchangeRate,
+            //                         NetAmount = sur.NetAmount,
+            //                         Vatrate = sur.Vatrate,
+            //                         Total = sur.Total,
+            //                         AmountVnd = sur.AmountVnd,
+            //                         VatAmountVnd = sur.VatAmountVnd,
+            //                         TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
+            //                         AmountUSD = sur.AmountUsd,
+            //                         VatAmountUSD = sur.VatAmountUsd,
+            //                         PayerId = sur.PayerId,
+            //                         Payer = pae.ShortName,
+            //                         PaymentObjectId = sur.PaymentObjectId,
+            //                         OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
+            //                         InvoiceNo = sur.InvoiceNo,
+            //                         SeriesNo = sur.SeriesNo,
+            //                         InvoiceDate = sur.InvoiceDate,
+            //                         ContNo = sur.ContNo,
+            //                         Notes = sur.Notes,
+            //                         IsFromShipment = sur.IsFromShipment,
+            //                         PICName = user.Username,
+            //                         //PICName = opst.UserCreated,
+            //                         KickBack = sur.KickBack,
+            //                         VatPartnerId = sur.VatPartnerId,
+            //                         VatPartnerShortName = vatPgrp.ShortName,
+            //                     });
+            //var dataOperation = operationLst.ToList();
+            //foreach (var item in dataOperation)
+            //{
+            //    var jobId = item.JobId;
+            //    var clearanceDataList = clearanceData.Where(x => x.JobNo == jobId);
+            //    if (clearanceDataList.Count() > 0)
+            //    {
+            //        item.ClearanceNo = clearanceDataList.FirstOrDefault() == null ? string.Empty : clearanceDataList.OrderBy(x => x.ClearanceDate).First().ClearanceNo;
+            //    }
+            //}
+            //if (criteria.customNos != null && criteria.customNos.Count() > 0)
+            //{
+            //    return dataOperation;
+            //}
 
-            var documentLst = (from sur in surcharge
-                                join cc in charge on sur.ChargeId equals cc.Id into cc2
-                                from cc in cc2.DefaultIfEmpty()
-                                join u in unit on sur.UnitId equals u.Id into u2
-                                from u in u2.DefaultIfEmpty()
-                                join par in payer on sur.PayerId equals par.Id into par2
-                                from par in par2.DefaultIfEmpty()
-                                join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
-                                from pae in pae2.DefaultIfEmpty()
-                                join cst in csTrans on sur.JobNo equals cst.JobNo
-                                join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
-                                from vatPgrp in vatPgrps.DefaultIfEmpty()
-                                    //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
-                                    //from advGrp in advGrps.DefaultIfEmpty()
-                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
-                                from user in sysUser.DefaultIfEmpty()
-                                select new ShipmentChargeSettlement
-                                {
-                                    Id = sur.Id,
-                                    JobId = cst.JobNo,
-                                    MBL = cst.Mawb,
-                                    HBL = sur.Hblno,
-                                    Hblid = sur.Hblid,
-                                    Type = sur.Type,
-                                    //SettlementCode = sur.SettlementCode,
-                                    ChargeId = sur.ChargeId,
-                                    ChargeCode = cc.Code,
-                                    ChargeName = cc.ChargeNameEn,
-                                    Quantity = sur.Quantity,
-                                    UnitId = sur.UnitId,
-                                    UnitName = u.UnitNameEn,
-                                    UnitPrice = sur.UnitPrice,
-                                    CurrencyId = sur.CurrencyId,
-                                    FinalExchangeRate = sur.FinalExchangeRate,
-                                    NetAmount = sur.NetAmount,
-                                    Vatrate = sur.Vatrate,
-                                    Total = sur.Total,
-                                    AmountVnd = sur.AmountVnd,
-                                    VatAmountVnd = sur.VatAmountVnd,
-                                    TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
-                                    AmountUSD = sur.AmountUsd,
-                                    VatAmountUSD = sur.VatAmountUsd,
-                                    PayerId = sur.PayerId,
-                                    Payer = pae.ShortName,
-                                    PaymentObjectId = sur.PaymentObjectId,
-                                    OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
-                                    InvoiceNo = sur.InvoiceNo,
-                                    SeriesNo = sur.SeriesNo,
-                                    InvoiceDate = sur.InvoiceDate,
-                                    ClearanceNo = sur.ClearanceNo,
-                                    ContNo = sur.ContNo,
-                                    Notes = sur.Notes,
-                                    IsFromShipment = sur.IsFromShipment,
-                                    //AdvanceNo = advGrp.AdvanceNo,
-                                    PICName = user.Username,
-                                    KickBack = sur.KickBack,
-                                    VatPartnerId = sur.VatPartnerId,
-                                    VatPartnerShortName = vatPgrp.ShortName,
-                                });
-            var dataDocument = documentLst.ToList();
-            var data = dataDocument.Union(dataOperation);
-            return data.ToList();
+            //var documentLst = (from sur in surcharge
+            //                    join cc in charge on sur.ChargeId equals cc.Id into cc2
+            //                    from cc in cc2.DefaultIfEmpty()
+            //                    join u in unit on sur.UnitId equals u.Id into u2
+            //                    from u in u2.DefaultIfEmpty()
+            //                    join par in payer on sur.PayerId equals par.Id into par2
+            //                    from par in par2.DefaultIfEmpty()
+            //                    join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+            //                    from pae in pae2.DefaultIfEmpty()
+            //                    join cst in csTrans on sur.JobNo equals cst.JobNo
+            //                    join vatP in payee on sur.VatPartnerId equals vatP.Id into vatPgrps
+            //                    from vatPgrp in vatPgrps.DefaultIfEmpty()
+            //                        //join adv in advanceRequests on sur.AdvanceNo equals adv.AdvanceNo into advGrps
+            //                        //from advGrp in advGrps.DefaultIfEmpty()
+            //                    join user in userRepo on cst.UserCreated equals user.Id into sysUser
+            //                    from user in sysUser.DefaultIfEmpty()
+            //                    select new ShipmentChargeSettlement
+            //                    {
+            //                        Id = sur.Id,
+            //                        JobId = cst.JobNo,
+            //                        MBL = cst.Mawb,
+            //                        HBL = sur.Hblno,
+            //                        Hblid = sur.Hblid,
+            //                        Type = sur.Type,
+            //                        //SettlementCode = sur.SettlementCode,
+            //                        ChargeId = sur.ChargeId,
+            //                        ChargeCode = cc.Code,
+            //                        ChargeName = cc.ChargeNameEn,
+            //                        Quantity = sur.Quantity,
+            //                        UnitId = sur.UnitId,
+            //                        UnitName = u.UnitNameEn,
+            //                        UnitPrice = sur.UnitPrice,
+            //                        CurrencyId = sur.CurrencyId,
+            //                        FinalExchangeRate = sur.FinalExchangeRate,
+            //                        NetAmount = sur.NetAmount,
+            //                        Vatrate = sur.Vatrate,
+            //                        Total = sur.Total,
+            //                        AmountVnd = sur.AmountVnd,
+            //                        VatAmountVnd = sur.VatAmountVnd,
+            //                        TotalAmountVnd = sur.AmountVnd + sur.VatAmountVnd,
+            //                        AmountUSD = sur.AmountUsd,
+            //                        VatAmountUSD = sur.VatAmountUsd,
+            //                        PayerId = sur.PayerId,
+            //                        Payer = pae.ShortName,
+            //                        PaymentObjectId = sur.PaymentObjectId,
+            //                        OBHPartnerName = sur.Type == AccountingConsp_GetDebitDetailByArgIdstants.TYPE_CHARGE_OBH ? par.ShortName : string.Empty,
+            //                        InvoiceNo = sur.InvoiceNo,
+            //                        SeriesNo = sur.SeriesNo,
+            //                        InvoiceDate = sur.InvoiceDate,
+            //                        ClearanceNo = sur.ClearanceNo,
+            //                        ContNo = sur.ContNo,
+            //                        Notes = sur.Notes,
+            //                        IsFromShipment = sur.IsFromShipment,
+            //                        //AdvanceNo = advGrp.AdvanceNo,
+            //                        PICName = user.Username,
+            //                        KickBack = sur.KickBack,
+            //                        VatPartnerId = sur.VatPartnerId,
+            //                        VatPartnerShortName = vatPgrp.ShortName,
+            //                    });
+            //var dataDocument = documentLst.ToList();
+            //var data = dataDocument.Union(dataOperation);
+            #endregion
+            var dataShiment = GetExistingChargeData(criteria).Select(x => new ShipmentChargeSettlement
+            {
+                Id = x.Id,
+                JobId = x.JobId,
+                MBL = x.MBL,
+                HBL = x.HBL,
+                Hblid = x.Hblid,
+                Type = x.Type,
+                //SettlementCode = x.SettlementCode,
+                ChargeId = x.ChargeId,
+                ChargeCode = x.ChargeCode,
+                ChargeName = x.ChargeName,
+                Quantity = x.Quantity,
+                UnitId = x.UnitId,
+                UnitName = x.UnitName,
+                UnitPrice = x.UnitPrice,
+                CurrencyId = x.CurrencyId,
+                FinalExchangeRate = x.FinalExchangeRate,
+                NetAmount = x.NetAmount,
+                Vatrate = x.Vatrate,
+                Total = x.Total,
+                AmountVnd = x.AmountVnd,
+                VatAmountVnd = x.VatAmountVnd,
+                TotalAmountVnd = x.AmountVnd + x.VatAmountVnd,
+                AmountUSD = x.AmountUSD,
+                VatAmountUSD = x.VatAmountUSD,
+                PayerId = x.PayerId,
+                Payer = x.Payer,
+                PaymentObjectId = x.PaymentObjectId,
+                OBHPartnerName = x.OBHPartnerName,
+                InvoiceNo = x.InvoiceNo,
+                SeriesNo = x.SeriesNo,
+                InvoiceDate = x.InvoiceDate,
+                ClearanceNo = x.ClearanceNo,
+                ContNo = x.ContNo,
+                Notes = x.Notes,
+                IsFromShipment = x.IsFromShipment,
+                //AdvanceNo = advGrp.AdvanceNo,
+                PICName = x.PICName,
+                KickBack = x.KickBack,
+                VatPartnerId = x.VatPartnerId,
+                VatPartnerShortName = x.VatPartnerShortName
+            });
+            return dataShiment.ToList();
         }
         #endregion -- GET EXISITS CHARGE --
 
@@ -5430,10 +5497,19 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
-            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid != hblId).Select(x => x.AdvanceNo).ToList();
-            if (advanceExp?.Count() != 0)
+            // Check if adv existed in another settlement
+            var advanceNotExist = csShipmentSurchargeRepo.Get(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid == hblId);
+            var settleNum = advanceNotExist.Count();
+            if (settleNum > 0)
             {
-                advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
+                foreach (var adv in advanceNo)
+                {
+                    var advanceExist = advanceNotExist.Count(x => x.AdvanceNo == adv);
+                    if (advanceExist == settleNum)
+                    {
+                        advanceNo = advanceNo.Where(x => x != adv).ToList();
+                    }
+                }
             }
 
             if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
