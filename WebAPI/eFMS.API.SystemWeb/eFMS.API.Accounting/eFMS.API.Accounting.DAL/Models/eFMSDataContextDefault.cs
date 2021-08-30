@@ -327,6 +327,14 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.NetOffUsd)
+                    .HasColumnName("NetOffUSD")
+                    .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.NetOffVnd)
+                    .HasColumnName("NetOffVND")
+                    .HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
                 entity.Property(e => e.OfficeInvoiceId).HasColumnName("OfficeInvoiceID");

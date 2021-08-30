@@ -437,6 +437,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             this._toastService.warning('Missing data to process', 'Warning');
             return;
         }
+        if (!!this.creditAmountVnd.value || !!this.creditAmountUsd.value) {
+            const isHavenetOff = body.list.every(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && (!!x.netOffVnd || !!x.netOffUsd));
+            if (!isHavenetOff) {
+                this._toastService.warning('Please you check Net Off Amount Detail on Debit List', 'Warning');
+                return;
+            }
+        }
 
         this._accountingRepo.processInvoiceReceipt(body)
             .subscribe(
