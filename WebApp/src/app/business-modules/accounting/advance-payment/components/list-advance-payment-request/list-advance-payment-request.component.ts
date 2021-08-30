@@ -48,6 +48,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Custom No', field: 'customNo', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
+            { title: 'Settle Status', field: 'statusPayment', sortable: false },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
@@ -56,7 +57,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         ];
         this.getRequestAdvancePayment();
     }
-
+    
     getRequestAdvancePayment() {
         this.$listRequestAdvancePayment
             .pipe(
@@ -65,8 +66,8 @@ export class AdvancePaymentListRequestComponent extends AppList {
             )
             .subscribe(
                 (data: any) => {
+                    console.log(data);
                     this.listRequestAdvancePayment.push(data);
-
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
                 },
