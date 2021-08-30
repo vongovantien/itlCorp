@@ -552,6 +552,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.Negative = acctPayment.Negative;
                     payment.PaymentType = acctPayment.PaymentType;
                     payment.NetOff = acctPayment.NetOff;
+                    payment.NetOffUsd = acctPayment.NetOffUsd;
+                    payment.NetOffVnd = acctPayment.NetOffVnd;
 
                     List<string> _creditNos = new List<string>();
                     if(!string.IsNullOrEmpty(acctPayment.CreditNo))
@@ -896,6 +898,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.PartnerId = receipt.CustomerId;
                 _payment.PaymentType = payment.PaymentType;
                 _payment.NetOff = payment.NetOff;
+                _payment.NetOffUsd = payment.NetOffUsd;
+                _payment.NetOffVnd = payment.NetOffVnd;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -994,6 +998,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
                 _payment.TotalPaidVnd = -payment.TotalPaidVnd;
                 _payment.TotalPaidUsd = -payment.TotalPaidUsd;
+                _payment.NetOffUsd = -payment.NetOffUsd;
+                _payment.NetOffVnd = -payment.NetOffVnd;
 
                 _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
                 _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
@@ -1017,6 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                 _payment.Hblid = payment.Hblid;
                 _payment.PartnerId = payment.PartnerId;
+               
 
                 _payment.Negative = true;
                 _payment.PaymentType = payment.PaymentType;

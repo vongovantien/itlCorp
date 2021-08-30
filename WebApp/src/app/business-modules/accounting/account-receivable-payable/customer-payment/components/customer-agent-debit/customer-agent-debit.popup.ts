@@ -14,7 +14,7 @@ import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 @Component({
     selector: 'customer-agent-debit-popup',
-    templateUrl: 'customer-agent-debit.popup.html'
+    templateUrl: 'customer-agent-debit.popup.html',
 })
 
 export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase {
