@@ -66,7 +66,6 @@ export class AdvancePaymentListRequestComponent extends AppList {
             )
             .subscribe(
                 (data: any) => {
-                    console.log(data);
                     this.listRequestAdvancePayment.push(data);
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
