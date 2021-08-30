@@ -4049,10 +4049,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
                     listKeyData.Add("InvoiceDate", item.InvoiceDate);
                     listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("CreditNo", item.CreditNo);
-                    listKeyData.Add("JobNo", item.JobNo);
-                    listKeyData.Add("MBL", item.MBL);
-                    listKeyData.Add("HBL", item.HBL);
+                    listKeyData.Add("CreditNoGrp", item.CreditNo == null ? "" : item.CreditNo);
+                    listKeyData.Add("JobNoGrp", item.JobNo);
+                    listKeyData.Add("MBLGrp", item.JobNo);
+                    listKeyData.Add("HBLGrp", item.JobNo);
+                   
                     listKeyData.Add("ETD", item.EtdDate);
                     listKeyData.Add("ETA", item.EtaDate);
                     var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
@@ -4076,6 +4077,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("RefNo", detail.RefNo);
                         listKeyData.Add("Debit", detail.Debit);
                         listKeyData.Add("Credit", detail.Credit);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("MBL", item.MBL);
+                        listKeyData.Add("HBL", item.HBL);
+                        listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
                         excel.SetData(listKeyData);
                         startRow++;
                     }
