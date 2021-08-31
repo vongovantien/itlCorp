@@ -197,7 +197,7 @@
                                 {{sumTotalObj.totalPaidAmountUsd | number:'.2-2'}} USD
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
-                                {{sumTotalObj.totalUnpaidAmountVnd | number: '1.0-2'}} VND
+                                {{sumTotalObj.totalPaidAmountVnd | number: '1.0-2'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalNetOffUsd | number:'.2-2'}} USD
@@ -238,7 +238,7 @@
 
 
 <ng-template #TplnegativeRemainUsd>
-    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.0-2'}}
+    {{sumTotalObj.totalRemainUsd | negativeNumber:'1.0-2'}}
 </ng-template>
 
 
