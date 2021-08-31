@@ -165,72 +165,71 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             case 'paidVnd':
                 if (!!this.isAutoConvert) {
                     item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
-                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
 
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
-                        item.paidAmountUsd = +((item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
 
-                        item.totalPaidUsd = +((item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
                     } else if (!!item.exchangeRateBilling) {
-                        item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
-                        item.totalPaidUsd = +((item.paidAmountVnd + (+item.netOffVnd ?? 0) / item.exchangeRateBilling).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / item.exchangeRateBilling).toFixed(2));
                     } else {
-                        item.paidAmountUsd = +((item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
-                        item.totalPaidUsd = +((item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
                     }
                 }
-                // item.totalPaidVnd = +item.paidAmountVnd;
-                // item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+
+                item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
 
                 break;
             case 'paidUsd':
                 if (!!this.isAutoConvert) {
                     item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
-                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
 
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
-                        item.paidAmountVnd = +((item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                        item.paidAmountVnd = +((+item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
 
-                        item.totalPaidVnd = +((item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
+                        // item.totalPaidVnd = +((+item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
                     } else if (!!item.exchangeRateBilling) {
-                        item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling).toFixed(0);
-                        item.totalPaidVnd = +(item.paidAmountUsd + (+item.netOffUsd ?? 0) * item.exchangeRateBilling).toFixed(0);
+                        item.paidAmountVnd = +(+item.paidAmountUsd * item.exchangeRateBilling).toFixed(0);
+                        // item.totalPaidVnd = +(+item.paidAmountUsd + (+item.netOffUsd ?? 0) * item.exchangeRateBilling).toFixed(0);
                     } else {
-                        item.paidAmountVnd = +((item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
-                        item.totalPaidVnd = +((item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
+                        item.paidAmountVnd = +((+item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                        // item.totalPaidVnd = +((+item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
                     }
                 }
                 // item.totalPaidUsd = +item.paidAmountUsd;
                 // item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.totalPaidUsd) ?? 0);
+                item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
 
                 break;
 
             case 'netOffVnd':
                 if (!!this.isAutoConvert) {
                     if (!!item.exchangeRateBilling) {
-                        item.netOffUsd = +((item.netOffVnd / item.exchangeRateBilling).toFixed(2));
+                        item.netOffUsd = +((+item.netOffVnd / item.exchangeRateBilling).toFixed(2));
                     } else {
-                        item.netOffUsd = +((item.netOffVnd / this.receiptExchangeRate).toFixed(2));
+                        item.netOffUsd = +((+item.netOffVnd / this.receiptExchangeRate).toFixed(2));
                     }
 
                     item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
                     item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
                 }
-                item.netOffVnd = + item.netOffVnd;
+                item.netOffVnd = +item.netOffVnd;
 
                 break;
             case 'netOffUsd':
                 if (!!this.isAutoConvert) {
                     if (!!item.exchangeRateBilling) {
-                        item.netOffVnd = +((item.netOffUsd * item.exchangeRateBilling).toFixed(2));
+                        item.netOffVnd = +((+item.netOffUsd * item.exchangeRateBilling).toFixed(2));
                     } else {
-                        item.netOffVnd = +((item.netOffUsd * this.receiptExchangeRate).toFixed(2));
+                        item.netOffVnd = +((+item.netOffUsd * this.receiptExchangeRate).toFixed(2));
                     }
                     item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
                     item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
                 }
 
-                item.netOffUsd = + item.netOffUsd;
+                item.netOffUsd = +item.netOffUsd;
                 break;
             default:
 
