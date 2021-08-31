@@ -93,6 +93,8 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Unpaid VND', field: '', width: 150, align: this.right },
             { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
             { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
+            { title: 'NetOff USD', field: '', width: 150, align: this.right },
+            { title: 'NetOff VND', field: '', width: 150, align: this.right },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
             { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Remain USD', field: '', width: 150, align: this.right },
