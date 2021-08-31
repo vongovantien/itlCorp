@@ -20,6 +20,7 @@ namespace eFMS.API.System.Service.Models
         public virtual DbSet<SysAuthorization> SysAuthorization { get; set; }
         public virtual DbSet<SysAuthorizedApproval> SysAuthorizedApproval { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
+        public virtual DbSet<SysEmailSetting> SysEmailSetting { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysGroup> SysGroup { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
@@ -45,13 +46,13 @@ namespace eFMS.API.System.Service.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=192.168.0.120; Database=eFMS; User ID=eFMS-Admin; Password=eFMS@dm!n20");
+                optionsBuilder.UseSqlServer("Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd");
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatDepartment>(entity =>
             {
@@ -354,6 +355,31 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Website).HasMaxLength(1600);
+            });
+
+            modelBuilder.Entity<SysEmailSetting>(entity =>
+            {
+                entity.ToTable("sysEmailSetting");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeptId).HasColumnName("DeptID");
+
+                entity.Property(e => e.EmailInfo).HasMaxLength(50);
+
+                entity.Property(e => e.EmailType).HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<SysEmployee>(entity =>

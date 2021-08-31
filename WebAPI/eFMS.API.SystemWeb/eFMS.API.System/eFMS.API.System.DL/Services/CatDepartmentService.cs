@@ -40,10 +40,11 @@ namespace eFMS.API.System.DL.Services
             {
                 queryExpression = queryExpression.And(x => x.Active == criteria.Active);
             }
-            if (criteria.DeptTypes.Count > 0)
-            {
-                queryExpression = queryExpression.And(x => x.DeptType != null && criteria.DeptTypes.Contains(x.DeptType));
-            }
+            // NOTE this is handle not response DATA please check again
+            //if (criteria.DeptTypes.Count > 0)
+            //{
+            //    queryExpression = queryExpression.And(x => x.DeptType != null && criteria.DeptTypes.Contains(x.DeptType));
+            //}
             var dept = DataContext.Get(queryExpression);
             var query = from d in dept
                         join off in sysOfficeRepo.Get() on d.BranchId equals off.Id into off2
