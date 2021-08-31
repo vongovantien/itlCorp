@@ -331,7 +331,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 OverdueDays = x.invoice.FirstOrDefault().OverdueDays,
                                 Status = x.invoice.FirstOrDefault().Status,
                                 ExtendDays = x.invoice.FirstOrDefault().ExtendDays,
-                                PaidAmount = x.payment == null ? 0 : (x.Key.Type == "OBH" ? x.payment.Sum(i => i.PaymentAmount ?? 0) : x.payment.FirstOrDefault()?.PaymentAmount),
+                                PaidAmount = x.payment.Sum(i => i.PaymentAmount ?? 0),
                                 UnpaidAmount = x.payment == null ? (x.Key.Type == "OBH" ? x.invoice.Sum(z => z.UnpaidAmount ?? 0) : (x.invoice.FirstOrDefault().UnpaidAmount ?? 0)) :
                                                                     (x.invoice.FirstOrDefault().Currency == AccountingConstants.CURRENCY_LOCAL ? (x.payment.FirstOrDefault().UnpaidPaymentAmountVnd ?? 0) : (x.payment.FirstOrDefault().UnpaidPaymentAmountUsd ?? 0)),
                             });
@@ -367,6 +367,10 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                     case "DebitInvoice":
                         soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        if (soaNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
                         break;
                     case "Soa":
                         query = query.And(x => criteria.ReferenceNos.Contains(x.Soano));
@@ -557,6 +561,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     case "VatInvoice":
                         creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.InvoiceNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
+                        if (creditNo.Count == 0)
+                        {
+                            query = query.And(x => false);
+                        }
                         break;
                     case "Soa":
                         creditNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.PaySoano, StringComparer.OrdinalIgnoreCase)).Select(se => se.CreditNo).Distinct().ToList();
@@ -1565,21 +1573,22 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var data = Query(criteria);
             if (data == null) return null;
-            var partners = partnerRepository.Get().Select(x => new { x.Id, x.AccountNo, x.ParentId, x.PartnerNameEn });
+            var partners = partnerRepository.Get();
             var paymentData = QueryInvoiceDataPayment(criteria);
-            var surchargeData = surchargeRepository.Get().Select(x => new { x.AcctManagementId, x.JobNo, x.Hblno, x.Mblno, x.DebitNo, x.Soano, x.PaySoano });
+            var surchargeData = surchargeRepository.Get();
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
             var resultsQuery = (from invoice in data
                                 join surcharge in surchargeData on invoice.RefId equals surcharge.AcctManagementId.ToString()
-                                join payments in paymentData on invoice.RefId.ToLower() equals payments.RefId into grpPayment
-                                from payment in grpPayment.DefaultIfEmpty()
-                                join partner in partners on invoice.PartnerId equals partner.Id into grpPartners
+                                join part in partners on invoice.PartnerId equals part.Id into grpPartners
                                 from part in grpPartners.DefaultIfEmpty()
-                                join rcpts in receiptData on payment.ReceiptId equals rcpts.Id into grpReceipts
+                                join payment in paymentData on invoice.RefId.ToLower() equals payment.RefId into grpPayment
+                                from payment in grpPayment.DefaultIfEmpty()
+                                join rcpt in receiptData on payment.ReceiptId equals rcpt.Id into grpReceipts
                                 from rcpt in grpReceipts.DefaultIfEmpty()
                                 select new
                                 {
                                     invoice,
+                                    payment,
                                     surcharge.JobNo,
                                     surcharge.Hblno,
                                     surcharge.Mblno,
@@ -1587,11 +1596,6 @@ namespace eFMS.API.Accounting.DL.Services
                                     ParentCode = part != null ? part.ParentId : string.Empty,
                                     PartnerName = part.PartnerNameEn,
                                     BillingRefNo = string.IsNullOrEmpty(surcharge.Soano) ? surcharge.DebitNo : surcharge.Soano,
-                                    ReceiptId = payment == null ? null : payment.ReceiptId,
-                                    PaymentType = payment == null ? string.Empty : payment.Type,
-                                    PaymentAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
-                                    UnpaidPaymentAmountVnd = payment == null ? 0 : payment.UnpaidPaymentAmountVnd,
-                                    Negative = payment == null ? null : payment.Negative,
                                     PaymentRefNo = rcpt == null ? null : rcpt.PaymentRefNo,
                                     PaymentDate = rcpt == null ? null : rcpt.PaymentDate
                                 });
@@ -1600,7 +1604,7 @@ namespace eFMS.API.Accounting.DL.Services
                 if (criteria.SearchType == "ReceiptNo")
                 {
                     var listReceiptInfo = acctReceiptRepository.Get(receipt => receipt.Status == AccountingConstants.RECEIPT_STATUS_DONE && criteria.ReferenceNos.Contains(receipt.PaymentRefNo)).Select(x => x.Id).ToList();
-                    resultsQuery = resultsQuery.Where(x => listReceiptInfo.Any(z => z == x.ReceiptId));
+                    resultsQuery = resultsQuery.Where(x => listReceiptInfo.Any(z => z == (x.payment == null ? null : x.payment.ReceiptId)));
                 }
             }
             var resultGroups = resultsQuery.ToList().GroupBy(x => new
@@ -1610,7 +1614,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.PartnerName,
                 x.ParentCode,
                 x.BillingRefNo,
-            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno }), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.PaymentDate, z.PaymentAmountVnd, z.UnpaidPaymentAmountVnd, z.Negative }) });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, z.PaymentDate, z.payment?.PaymentAmountVnd, z.payment?.UnpaidPaymentAmountVnd }) });
             var results = new List<AccountingCustomerPaymentExport>();
             var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
@@ -1621,7 +1625,6 @@ namespace eFMS.API.Accounting.DL.Services
                 var payment = new AccountingCustomerPaymentExport();
                 var invoice = item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE);
                 var invoiceObh = item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
-                var acctPayment = item.payment.FirstOrDefault();
                 var sur = item.surcharge.FirstOrDefault();
                 payment.PartnerCode = item.grp.PartnerCode;
                 payment.PartnerName = item.grp.PartnerName;
@@ -1633,10 +1636,10 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.DueDate = invoice.FirstOrDefault()?.DueDate;
 
                 // Use amount VND
-                payment.UnpaidAmountInv = acctPayment == null ? (invoice.FirstOrDefault()?.UnpaidAmountVnd ?? 0) : item.payment.Distinct().Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
-                payment.UnpaidAmountOBH = acctPayment == null ? invoiceObh.Sum(x => x.UnpaidAmountVnd ?? 0) : (item.payment.Distinct().Where(x => x.PaymentType == "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0);
-                payment.PaidAmount = acctPayment == null ? 0 : item.payment.Distinct().Where(x => x.PaymentType != "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
-                payment.PaidAmountOBH = acctPayment == null ? 0 : item.payment.Distinct().Where(x => x.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                payment.UnpaidAmountInv = item.payment.FirstOrDefault().Id == null ? (invoice.FirstOrDefault()?.UnpaidAmountVnd ?? 0) : item.payment.Distinct().Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0;
+                payment.UnpaidAmountOBH = item.payment.FirstOrDefault().Id == null ? invoiceObh.Sum(x => x.UnpaidAmountVnd ?? 0) : (item.payment.Distinct().Where(x => x.PaymentType == "OBH").FirstOrDefault()?.UnpaidPaymentAmountVnd ?? 0);
+                payment.PaidAmount = 0;
+                payment.PaidAmountOBH = 0;
                 payment.JobNo = sur?.JobNo;
                 payment.MBL = sur?.Mblno;
                 payment.HBL = sur?.Hblno;
@@ -1665,7 +1668,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 payment.receiptDetail = new List<AccountingReceiptDetail>();
-                var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentDate, z.PaymentType, z.PaymentAmountVnd, z.Negative }) });
+                var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentAmountVnd }) });
                 foreach (var rcp in receiptGroup)
                 {
                     var detail = new AccountingReceiptDetail();
@@ -1673,6 +1676,8 @@ namespace eFMS.API.Accounting.DL.Services
                     detail.PaymentDate = rcp.Payment.FirstOrDefault().PaymentDate;
                     detail.PaidAmount = rcp.Payment.Where(z => z.PaymentType != "OBH").FirstOrDefault()?.PaymentAmountVnd ?? 0;
                     detail.PaidAmountOBH = rcp.Payment.Where(z => z.PaymentType == "OBH").Sum(x => x.PaymentAmountVnd ?? 0);
+                    payment.PaidAmount += (detail.PaidAmount ?? 0);
+                    payment.PaidAmountOBH += (detail.PaidAmountOBH ?? 0);
                     payment.receiptDetail.Add(detail);
                 }
                 results.Add(payment);
