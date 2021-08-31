@@ -182,6 +182,8 @@ export class AccReceivableDebitDetailModel {
     unpaidAmountUSD:number = 0;
     overdueDays :string = null;
     code :string = null;
+    paymentStatus :string = null;
+    paymentDueDate: Date = null;
 
     constructor(data?: any) {
         const self = this;
