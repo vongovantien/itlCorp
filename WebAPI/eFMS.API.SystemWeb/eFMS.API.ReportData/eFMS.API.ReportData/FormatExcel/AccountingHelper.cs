@@ -514,10 +514,18 @@ namespace eFMS.API.ReportData.FormatExcel
                         {
                             listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
+                            listKeyData.Add("InvoiceDatedt", item.InvoiceDate);
+                            listKeyData.Add("InvoiceNodt", item.InvoiceNo);
+                            listKeyData.Add("SoaNodt", item.BillingRefNo);
+                            listKeyData.Add("BillingDatedt", item.BillingDate);
                             listKeyData.Add("PaidAmountDt", detail.PaidAmount);
                             listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBH);
                             listKeyData.Add("PaidDate", detail.PaymentDate);
                             listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
+                            listKeyData.Add("JobNodt", item.JobNo);
+                            listKeyData.Add("MBLdt", item.MBL);
+                            listKeyData.Add("HBLdt", item.HBL);
+                            listKeyData.Add("CustomNodt", item.CustomNo);
                             excel.SetData(listKeyData);
                             startRow++;
                         }
