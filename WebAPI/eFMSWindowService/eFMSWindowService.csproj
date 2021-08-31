@@ -12,7 +12,7 @@
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>\\192.168.7.31\\inetpub\efms-api\WindowService\</PublishUrl>
+    <PublishUrl>\\192.168.0.120\inetpub\eFMS-API\Window Service\</PublishUrl>
     <Install>false</Install>
     <InstallFrom>Unc</InstallFrom>
     <UpdateEnabled>false</UpdateEnabled>
@@ -50,7 +50,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>D680BC91DC5E25052CF17CD4A36EFA19CAC2CFC7</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>DF495403D950D63FF9626536A03A83C0945950AF</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>eFMSWindowService_TemporaryKey.pfx</ManifestKeyFile>
