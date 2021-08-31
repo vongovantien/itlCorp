@@ -105,18 +105,21 @@
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
                                 </td>
                                 <td ALIGN="right">
-                                    <input type="text" class="form-control text-right text-success font-15"
-                                        [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
-                                        [disabled]="isReadonly"
-                                        (ngModelChange)="calculateTotalPaidAmount(item,'netOffUsd')">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
+                                            [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'netOffUsd')">
+                                    </ng-container>
                                 </td>
                                 <td>
-                                    <input type="text" class="form-control text-right text-success font-15"
-                                        [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
-                                        [disabled]="isReadonly"
-                                        (ngModelChange)="calculateTotalPaidAmount(item,'netOffVnd')">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
+                                            [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'netOffVnd')">
+                                    </ng-container>
                                 </td>
-
 
                                 <td ALIGN="right">
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
