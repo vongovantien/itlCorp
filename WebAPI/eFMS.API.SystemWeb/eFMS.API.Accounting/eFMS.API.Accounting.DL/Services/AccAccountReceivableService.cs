@@ -1339,7 +1339,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : 0).Sum(),
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                     CreditCurrency = s.First().contract.CreditCurrency,
-                    ParentNameAbbr = string.Empty, //Get data bên dưới
+                    ParentNameAbbr = string.Empty, //Get data bên dưới,
+                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified
                 });
 
             var data = from contract in groupByContract
@@ -1394,7 +1395,8 @@ namespace eFMS.API.Accounting.DL.Services
                            Over30Day = contract.Over30Day,
                            ArCurrency = contract.ArCurrency,
                            CreditCurrency = contract.CreditCurrency,
-                           ParentNameAbbr = parent.ShortName
+                           ParentNameAbbr = parent.ShortName,
+                           DatetimeModified = contract.DatetimeModified
                        };
             return data;
         }
@@ -1565,23 +1567,31 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        private IQueryable<object> GetDataTrialOfficial(AccountReceivableCriteria criteria)
+        private IQueryable<AccountReceivableResult> GetDataTrialOfficial(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
             var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL);
             var partnerContracts = QueryContractPartner(contracts, criteria);
-            var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
+
+            IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
             if (arPartnerContracts == null || !arPartnerContracts.Any())
             {
-                return null;
+                var arPartnerNoContracts = GetARNoContract(acctReceivables, contracts, partners);
+                if(arPartnerNoContracts == null)
+                {
+                    return null;
+                }
+                var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
+                arPartnerNoContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0).OrderByDescending(x => x.DatetimeModified);
+                return arPartnerNoContracts;
             }
             else
             {
                 arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
-                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
         }
@@ -1755,7 +1765,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ParentNameAbbr = s.First().ParentNameAbbr,
                         ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
                         ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
-                        ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount)
+                        ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
+                        DatetimeModified = s.First().DatetimeModified
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }

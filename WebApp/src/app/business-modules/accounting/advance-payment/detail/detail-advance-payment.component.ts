@@ -123,10 +123,8 @@ export class AdvancePaymentDetailComponent extends AppPage implements ICrystalRe
                         payee: this.advancePayment.payee,
                         bankCode:this.advancePayment.bankCode
                     });
-
                     this.listRequestAdvancePaymentComponent.listRequestAdvancePayment = this.advancePayment.advanceRequests;
                     this.listRequestAdvancePaymentComponent.totalAmount = this.listRequestAdvancePaymentComponent.updateTotalAmount(this.advancePayment.advanceRequests);
-
                     this.listRequestAdvancePaymentComponent.advanceNo = this.advancePayment.advanceNo;
                     this.getInfoApprove(this.advancePayment.advanceNo);
                 },

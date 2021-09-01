@@ -47,6 +47,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? ObhBillingAmount { get; set; }
         public decimal? ObhPaidAmount { get; set; }
         public decimal? ObhUnPaidAmount { get; set; }
+        public DateTime? DatetimeModified { get; set; }
 
     }
 }
