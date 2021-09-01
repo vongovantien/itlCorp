@@ -111,11 +111,17 @@
                                                             <td class="text-right">
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
                                                             </td>
+                                                            <td class="text-right">
+                                                                <span>{{(cps.currencyId === 'VND'?cps.finalPaidAmountVnd:cps.finalPaidAmountUsd) | number :'.0-3'}}</span>
+                                                            </td>
                                                             <td>
                                                                 <span>{{cps.currencyId}}</span>
                                                             </td>
                                                             <td>
                                                                 {{cps.paymentMethod}}
+                                                            </td>
+                                                            <td>
+                                                                {{cps.class}}
                                                             </td>
                                                             <td>
                                                                 <span>{{cps.type}}</span>
