@@ -1326,8 +1326,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                     :0) * 100 ?? 0,3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
-                                                                    s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited)
+                                                                    s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.CreditLimit)
                                                                     : 0) * 100 ?? 0, 3):0),
                     CusAdvance = s.First().contract.CustomerAdvanceAmount ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
