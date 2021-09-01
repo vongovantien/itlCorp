@@ -76,6 +76,7 @@ export { ExchangeRateHistory } from './tool-setting/exchange-rate';
 export * from './system/user';
 export * from './system/company';
 export * from './system/office';
+export * from './system/emailSetting';
 export { PermissionGeneralItem, Permission, PermissionGeneral, PermissionSample, PermissionSampleGeneral, PermissionSampleSpecial } from './system/permission';
 
 export * from './system/role';

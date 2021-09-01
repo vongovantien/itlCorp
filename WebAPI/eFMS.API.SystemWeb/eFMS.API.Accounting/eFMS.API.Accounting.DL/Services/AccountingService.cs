@@ -2611,6 +2611,8 @@ namespace eFMS.API.Accounting.DL.Services
                 var paymentsDebit = payments.Where(x => (x.Type == "DEBIT" || x.Type == "OBH") && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
                 var paymentsCredit = payments.Where(x => x.Type == "CREDITSOA" || x.Type == "CREDITNOTE");
                 var paymentsAdv = payments.Where(x => x.PaymentType == "OTHER");
+                var paymentNetOff = payments.Where(x => x.NetOffVnd != null || x.NetOffUsd != null); 
+            
                 if (paymentsDebit.Count() > 0)
                 {
                     var syncDebit = GenerateReceiptToAccountant("DEBIT", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
@@ -2626,6 +2628,13 @@ namespace eFMS.API.Accounting.DL.Services
                 if (paymentsAdv.Count() > 0)
                 {
                     var syncAdv = GenerateReceiptToAccountant("ADV", receipt, paymentsAdv, out AcctReceiptSyncModel receiptSyncAdv);
+                    receiptSyncs.Add(receiptSyncAdv);
+                    data.Add(syncAdv);
+                }
+
+                if(paymentsAdv.Count() > 0 && receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_OTHER)
+                {
+                    var syncAdv = GenerateReceiptToAccountant("NetOff", receipt, paymentsAdv, out AcctReceiptSyncModel receiptSyncAdv);
                     receiptSyncs.Add(receiptSyncAdv);
                     data.Add(syncAdv);
                 }
@@ -2679,18 +2688,20 @@ namespace eFMS.API.Accounting.DL.Services
             receiptSync.ReceiptSyncNo = sync.ReferenceNo;
 
             var invoicePartner = partners.Where(x => x.Id == receipt.CustomerId).FirstOrDefault();
+
             sync.CustomerCode = invoicePartner?.AccountNo; //Partner Code
             sync.CustomerName = invoicePartner?.PartnerNameVn; //Partner Local Name
             sync.CurrencyCode = receipt.CurrencyId;
             sync.ExchangeRate = receipt.ExchangeRate;
             sync.Description0 = string.Format("{0} {1}", "Công Nợ Phải Thu", receipt.Description);
-            sync.PaymentMethod = (type == "CREDIT") ? "Other" : receipt.PaymentMethod;
+            sync.PaymentMethod = (type == "CREDIT" || type == "NetOff") ? "Other" : receipt.PaymentMethod;
             sync.DataType = "PAYMENT";
 
             var details = new List<PaymentDetailModel>();
             foreach (var payment in payments)
             {
                 // Not sync payment when netoff = true
+                // TODO check remain
                 var netOff = CheckNetOffPayment(payment.Type, payment.RefId);
                 if (netOff)
                 {
@@ -2705,33 +2716,51 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     detail.CustomerCode = partners.Where(x => x.Id == invoice.PartnerId)?.FirstOrDefault()?.AccountNo;
                 }
+
                 //Paid Amount
                 decimal? _paidAmount = payment.PaymentAmount;
-                if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
-                {
-                    _paidAmount = payment.PaymentAmountVnd;
-                }
-                else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
-                {
-                    _paidAmount = payment.PaymentAmountUsd;
-                }
-                detail.OriginalAmount = _paidAmount;
-
-                //Paid Amount VND
                 decimal? _paidAmountVnd = 0;
-                //if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL) || receipt.CurrencyId != payment.CurrencyId)
-                //{
-                //    _paidAmountVnd = payment.PaymentAmountVnd;
-                //}
-                // Theo currency của hóa đơn
-                if (invoice != null && invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+
+                // generate dòng netoff với số tiền netoff
+                if(type == "NetOff")
                 {
-                    _paidAmountVnd = payment.PaymentAmountVnd;
+                    if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmount = payment.NetOffVnd;
+                    }
+                    else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
+                    {
+                        _paidAmount = payment.NetOffUsd;
+                    }
+
+                    if (invoice != null && invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmountVnd = payment.NetOffVnd;
+                    }
                 }
-                if (type == "CREDIT")
+                else
                 {
-                    _paidAmountVnd = payment.UnpaidPaymentAmountVnd; // Số tiền nợ trên credit note, credit SOA
+                    if (receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmount = payment.PaymentAmountVnd;
+                    }
+                    else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
+                    {
+                        _paidAmount = payment.PaymentAmountUsd;
+                    }
+
+                    if (invoice != null && invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        _paidAmountVnd = payment.PaymentAmountVnd;
+                    }
+                    if (type == "CREDIT")
+                    {
+                        _paidAmountVnd = payment.UnpaidPaymentAmountVnd; // Số tiền nợ trên credit note, credit SOA
+                    }
                 }
+               
+
+                detail.OriginalAmount = _paidAmount;
                 detail.Amount = _paidAmountVnd;
 
                 string _description = string.Empty;
@@ -2771,16 +2800,15 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _Stt_Cd_Htt = invoice.ReferenceNo;
                 }
-                else if (type == "CREDIT")
-                {
-                    // Số ref của invoice cấn trừ
-                    var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault();
-                    _Stt_Cd_Htt = invoiceRef.ReferenceNo;
+                //else if (type == "CREDIT")
+                //{
+                //    var invoiceRef = DataContext.Get(x => x.InvoiceNoReal == payment.InvoiceNo)?.FirstOrDefault();  // Số ref của invoice cấn trừ
+                //    _Stt_Cd_Htt = invoiceRef.ReferenceNo;
 
-                }
+                //}
                 detail.Stt_Cd_Htt = _Stt_Cd_Htt;
-
                 detail.ChargeType = (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE") ? "NETOFF" : payment.Type;
+
                 // [CR] get debit account
                 //detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
                 var debitAccount = string.Empty;

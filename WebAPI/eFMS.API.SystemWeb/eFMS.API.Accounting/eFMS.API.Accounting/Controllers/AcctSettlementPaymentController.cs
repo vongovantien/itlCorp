@@ -308,7 +308,7 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
-            var dataGroups = data.ToList().GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
+            var dataGroups = data.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
             List<ShipmentSettlement> shipmentSettlement = new List<ShipmentSettlement>();
             foreach (var item in dataGroups)
             {
@@ -1085,6 +1085,20 @@ namespace eFMS.API.Accounting.Controllers
 
             return BadRequest(new ResultHandle { Status = false, Message = "Cap nhat Balance that bai" });
 
+        }
+
+        /// <summary>
+        ///Settlement export List within Shipment.
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetDataExportSettlementDetail")]
+        [Authorize]
+        public IActionResult GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria)
+        {
+            var data = acctSettlementPaymentService.GetDataExportSettlementDetail(criteria);
+            return Ok(data);
         }
     }
 }

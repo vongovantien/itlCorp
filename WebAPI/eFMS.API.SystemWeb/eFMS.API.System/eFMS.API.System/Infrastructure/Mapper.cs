@@ -36,7 +36,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysPartnerApi, SysPartnerAPIModel>();
             CreateMap<SysNotifications, SysNotificationsModel>();
             CreateMap<SysUserNotification, SysUserNotificationModel>();
-
+            CreateMap<SysEmailSetting, SysEmailSettingModel>();
 
             //map view model to entity model
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
@@ -61,7 +61,7 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysPartnerAPIModel, SysPartnerApi>();
             CreateMap<SysNotificationsModel, SysNotifications>();
             CreateMap<SysUserNotificationModel, SysUserNotification>();
-
+            CreateMap<SysEmailSettingModel, SysEmailSetting>();
 
 
 

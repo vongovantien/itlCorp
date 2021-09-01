@@ -31,11 +31,12 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'RefNo', field: '', sortable: true },
         { title: 'Type', field: '', width: 150 },
         { title: 'Invoice No', field: '' },
-        { title: 'Credit No', field: '', width: 300 },
         { title: 'Unpaid USD', field: '', width: 150, align: this.right },
         { title: 'Unpaid VND', field: '', width: 150, align: this.right },
         { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true, },
         { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
+        { title: 'NetOff USD', field: '', width: 150, align: this.right },
+        { title: 'NetOff VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
         { title: 'Total Paid VND', field: '', width: 150, align: this.right },
         { title: 'Remain USD', field: '', width: 150, align: this.right },
@@ -64,7 +65,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         totalPaidVnd: 0,
         totalPaidUsd: 0,
         totalRemainVnd: 0,
-        totalRemainUsd: 0
+        totalRemainUsd: 0,
+        totalNetOffVnd: 0,
+        totalNetOffUsd: 0
     };
 
     isAutoConvert: boolean;
@@ -85,11 +88,13 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'RefNo', field: '', sortable: true, width: 100 },
             { title: 'Type', field: '', width: 100 },
             { title: 'Invoice No', field: '', width: 100 },
-            { title: 'Credit No', field: '', width: 180 },
+            // { title: 'Credit No', field: '', width: 180 },
             { title: 'Unpaid USD', field: '', width: 150, align: this.right },
             { title: 'Unpaid VND', field: '', width: 150, align: this.right },
             { title: 'Paid Amount USD', field: '', width: 150, align: this.right, required: true },
             { title: 'Paid Amount VND', field: '', width: 150, align: this.right, required: true },
+            { title: 'NetOff USD', field: '', width: 150, align: this.right },
+            { title: 'NetOff VND', field: '', width: 150, align: this.right },
             { title: 'Total Paid USD', field: '', width: 150, align: this.right },
             { title: 'Total Paid VND', field: '', width: 150, align: this.right },
             { title: 'Remain USD', field: '', width: 150, align: this.right },
@@ -159,33 +164,78 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         switch (type) {
             case 'paidVnd':
                 if (!!this.isAutoConvert) {
+                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
-                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
                     } else if (!!item.exchangeRateBilling) {
-                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / item.exchangeRateBilling).toFixed(2));
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / item.exchangeRateBilling).toFixed(2));
                     } else {
-                        item.totalPaidUsd = item.paidAmountUsd = +((item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                        item.paidAmountUsd = +((+item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
+                        // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
                     }
                 }
-                item.totalPaidVnd = +item.paidAmountVnd;
+
+                item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
+
                 break;
             case 'paidUsd':
                 if (!!this.isAutoConvert) {
+                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
+
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
-                        item.totalPaidVnd = item.paidAmountVnd = +((item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                        item.paidAmountVnd = +((+item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+
+                        // item.totalPaidVnd = +((+item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
                     } else if (!!item.exchangeRateBilling) {
-                        item.totalPaidVnd = item.paidAmountVnd = +(item.paidAmountUsd * item.exchangeRateBilling).toFixed(0);
+                        item.paidAmountVnd = +(+item.paidAmountUsd * item.exchangeRateBilling).toFixed(0);
+                        // item.totalPaidVnd = +(+item.paidAmountUsd + (+item.netOffUsd ?? 0) * item.exchangeRateBilling).toFixed(0);
                     } else {
-                        item.totalPaidVnd = item.paidAmountVnd = +((item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                        item.paidAmountVnd = +((+item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
+                        // item.totalPaidVnd = +((+item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
                     }
                 }
-                item.totalPaidUsd = +item.paidAmountUsd;
+                // item.totalPaidUsd = +item.paidAmountUsd;
+                // item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.totalPaidUsd) ?? 0);
+                item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+
+                break;
+
+            case 'netOffVnd':
+                if (!!this.isAutoConvert) {
+                    if (!!item.exchangeRateBilling) {
+                        item.netOffUsd = +((+item.netOffVnd / item.exchangeRateBilling).toFixed(2));
+                    } else {
+                        item.netOffUsd = +((+item.netOffVnd / this.receiptExchangeRate).toFixed(2));
+                    }
+
+                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
+                }
+                item.netOffVnd = +item.netOffVnd;
+
+                break;
+            case 'netOffUsd':
+                if (!!this.isAutoConvert) {
+                    if (!!item.exchangeRateBilling) {
+                        item.netOffVnd = +((+item.netOffUsd * item.exchangeRateBilling).toFixed(2));
+                    } else {
+                        item.netOffVnd = +((+item.netOffUsd * this.receiptExchangeRate).toFixed(2));
+                    }
+                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
+                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+                }
+
+                item.netOffUsd = +item.netOffUsd;
                 break;
             default:
 
                 break;
         }
-
+        console.log(item);
         this.calculateSumTotalDebit();
     }
 
@@ -209,7 +259,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             totalPaidVnd: 0,
             totalPaidUsd: 0,
             totalRemainVnd: 0,
-            totalRemainUsd: 0
+            totalRemainUsd: 0,
+            totalNetOffUsd: 0,
+            totalNetOffVnd: 0
         };
 
         for (let index = 0; index < model.length; index++) {
@@ -221,6 +273,9 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 totalData.totalPaidAmountVnd += (+(item.paidAmountVnd) ?? 0);
                 totalData.totalPaidUsd += (+(item.totalPaidUsd) ?? 0);
                 totalData.totalPaidVnd += (+(item.totalPaidVnd) ?? 0);
+                totalData.totalNetOffUsd += (+item.netOffUsd ?? 0);
+                totalData.totalNetOffVnd += (+item.netOffVnd ?? 0);
+
                 if (model[index].paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
                     totalData.totalRemainUsd = (+(totalData.totalUnpaidAmountUsd) ?? 0) - (+(totalData.totalPaidUsd) ?? 0);
                     totalData.totalRemainVnd = (+(totalData.totalUnpaidAmountVnd) ?? 0) - (+(totalData.totalPaidVnd) ?? 0);
@@ -288,33 +343,51 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         let creditMapPriceValue: ICreditNetOffMapValue[];
         item.netOff = isNetOff;
 
-        if (!!item.creditNos.length) {
-            this.creditList$
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe((creditList: ReceiptInvoiceModel[]) => {
-                    creditMapPriceValue = creditList.map((item: ReceiptInvoiceModel) =>
-                        ({ creditNo: item.refNo, netOffVnd: item.paidAmountVnd, netOffUsd: item.paidAmountUsd })
-                    )
-                    item.creditNos.forEach((credit: string) => {
-                        const currentCreditMapping = creditMapPriceValue.find(x => x.creditNo == credit);
-                        if (!!currentCreditMapping) {
-                            totalNetOffVNd += currentCreditMapping.netOffVnd;
-                            totalNetOffUsd += currentCreditMapping.netOffUsd;
-                        }
-                    })
+        // if (!!item.creditNos.length) {
+        //     this.creditList$
+        //         .pipe(takeUntil(this.ngUnsubscribe))
+        //         .subscribe((creditList: ReceiptInvoiceModel[]) => {
+        //             creditMapPriceValue = creditList.map((item: ReceiptInvoiceModel) =>
+        //                 ({ creditNo: item.refNo, netOffVnd: item.paidAmountVnd, netOffUsd: item.paidAmountUsd })
+        //             )
+        //             item.creditNos.forEach((credit: string) => {
+        //                 const currentCreditMapping = creditMapPriceValue.find(x => x.creditNo == credit);
+        //                 if (!!currentCreditMapping) {
+        //                     totalNetOffVNd += currentCreditMapping.netOffVnd;
+        //                     totalNetOffUsd += currentCreditMapping.netOffUsd;
+        //                 }
+        //             })
 
-                    if (isNetOff === true) {
-                        item.paidAmountVnd = item.totalPaidVnd = totalNetOffVNd;
-                        item.paidAmountUsd = item.totalPaidUsd = totalNetOffUsd;
-                    }
-                    else {
-                        item.paidAmountVnd = item.totalPaidVnd = item.unpaidAmountVnd - totalNetOffVNd;
-                        item.paidAmountUsd = item.totalPaidUsd = item.unpaidAmountUsd - totalNetOffUsd;
-                    }
-                    this.calculateSumTotalDebit();
+        //             if (isNetOff === true) {
+        //                 item.paidAmountVnd = item.totalPaidVnd = totalNetOffVNd;
+        //                 item.paidAmountUsd = item.totalPaidUsd = totalNetOffUsd;
+        //             }
+        //             else {
+        //                 item.paidAmountVnd = item.totalPaidVnd = item.unpaidAmountVnd - totalNetOffVNd;
+        //                 item.paidAmountUsd = item.totalPaidUsd = item.unpaidAmountUsd - totalNetOffUsd;
+        //             }
+        //             this.calculateSumTotalDebit();
 
-                })
+        //         })
+        // }
+        if (!isNetOff) {
+            return;
         }
+        if (!!item.netOffVnd && !!item.netOffUsd) {
+            item.paidAmountVnd = 0;
+            item.paidAmountUsd = 0;
+        } else {
+            item.netOffVnd = item.paidAmountVnd;
+            item.netOffUsd = item.paidAmountUsd;
+
+            item.paidAmountVnd = item.paidAmountUsd = 0;
+        }
+
+        item.totalPaidVnd = item.paidAmountVnd + item.netOffVnd;
+        item.totalPaidUsd = item.paidAmountUsd + item.netOffUsd;
+
+        this.calculateSumTotalDebit();
+
     }
 
 }
