@@ -273,6 +273,15 @@ export class SettlementPaymentComponent extends AppList implements ICrystalRepor
             );
     }
 
+    accountingeExport() {
+        this._exportRepo.exportSettlementPaymentShipmentDetail(this.dataSearch)
+            .subscribe(
+                (res: Blob) => {
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Settlement-Detail Template.xlsx');
+                }
+            );
+    }
+
     issueVoucher() {
         const settlementCodes = this.settlements.filter(x => x.isSelected && x.statusApproval === 'Done');
         if (!!settlementCodes.length) {
