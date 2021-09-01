@@ -179,7 +179,6 @@ namespace eFMS.API.Accounting.DL.Services
                     //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
                     if (criteria.Currency != null)
                     {
-                        d.PaidAmount = criteria.Currency == "VND" ? d.PaidAmountVnd : d.PaidAmountUsd;
                         d.CurrencyId = criteria.Currency;
                     }
                     //[END]
@@ -473,7 +472,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
                     PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
                     Negative = s.FirstOrDefault()?.Negative,
-                    PaymentType = s.FirstOrDefault().PaymentType 
+                    PaymentType = s.FirstOrDefault().PaymentType
             }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -764,7 +763,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu 
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu
                                 _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
@@ -843,7 +842,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
                 _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.RefNo;
-               
+
                 if (payment.PaymentType == "OTHER")
                 {
                     _payment.PaymentNo = receipt.PaymentRefNo;
@@ -1023,7 +1022,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                 _payment.Hblid = payment.Hblid;
                 _payment.PartnerId = payment.PartnerId;
-               
+
 
                 _payment.Negative = true;
                 _payment.PaymentType = payment.PaymentType;
@@ -1102,7 +1101,7 @@ namespace eFMS.API.Accounting.DL.Services
                 switch (payment.Type)
                 {
                     case "DEBIT":
-                        // Tổng thu của invoice bao gôm VND/USD. 
+                        // Tổng thu của invoice bao gôm VND/USD.
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
                         decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => (s.PaymentAmount ?? 0));
@@ -1239,7 +1238,7 @@ namespace eFMS.API.Accounting.DL.Services
             decimal? totalAdvPayment= acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
-            
+
 
             if (action != SaveAction.SAVECANCEL){
                 if (agreement != null)
@@ -1266,7 +1265,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0); 
+                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0);
                     }
                 }
             }
@@ -1282,7 +1281,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-               
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1997,12 +1996,12 @@ namespace eFMS.API.Accounting.DL.Services
                 default:
                     break;
             }
-            
+
             var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
-                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) 
-                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() 
+                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano))
+                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault()
                 : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
                 Type = "DEBIT",
                 InvoiceNo = se.Invoice.inv.InvoiceNoReal,
@@ -2767,7 +2766,7 @@ namespace eFMS.API.Accounting.DL.Services
                            from ofi in ofiGrp.DefaultIfEmpty()
                            select new CustomerDebitCreditModel
                            {
-                               RefNo = inv.RefNo,                            
+                               RefNo = inv.RefNo,
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -2789,7 +2788,7 @@ namespace eFMS.API.Accounting.DL.Services
                                ExchangeRateBilling = inv.ExchangeRateBilling,
                                Type = "CREDITSOA",
                                PaymentType = "CREDIT"
-                               
+
                            };
 
             return joinData;
