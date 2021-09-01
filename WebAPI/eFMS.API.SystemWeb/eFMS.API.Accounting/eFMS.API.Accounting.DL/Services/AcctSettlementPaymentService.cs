@@ -5600,6 +5600,117 @@ namespace eFMS.API.Accounting.DL.Services
             
             return rs;
         }
+
+        /// <summary>
+        /// Get detail shipment of settle to export
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        private List<ShipmentSettlementExportGroup> GetDataShipmentOfSettlement(string settlementNo, string currency)
+        {
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+            var custom = customsDeclarationRepo.Get();
+            var sysUser = sysUserRepo.Get();
+            var sysEmployee = sysEmployeeRepo.Get();
+            var chargeDatas = catChargeRepo.Get();
+            var UnitDatas = catUnitRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var advanceReqData = acctAdvanceRequestRepo.Get();
+            var approveSettlement = acctApproveSettlementRepo.Get();
+
+            var data = from sur in surcharges
+                       join par in payer on sur.PayerId equals par.Id into par2
+                       from par in par2.DefaultIfEmpty()
+                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                       from pae in pae2.DefaultIfEmpty()
+                       join vatPartner in payee on sur.VatPartnerId equals vatPartner.Id into vatPgrps
+                       from vatPartner in vatPgrps.DefaultIfEmpty()
+                       join charges in chargeDatas on sur.ChargeId equals charges.Id into grpCharge
+                       from charge in grpCharge.DefaultIfEmpty()
+                       join units in UnitDatas on sur.UnitId equals units.Id into grpUnit
+                       from unit in grpUnit.DefaultIfEmpty()
+                       join advanceReq in advanceReqData on new { sur.AdvanceNo, sur.JobNo, sur.Hblno } equals new { advanceReq.AdvanceNo, JobNo = advanceReq.JobId, Hblno = advanceReq.Hbl } into grpAdv
+                       from adv in grpAdv.DefaultIfEmpty()
+                       join cus in custom on sur.JobNo equals cus.JobNo into cus1
+                       from cus in cus1.DefaultIfEmpty()
+                       select new ShipmentSettlementExportGroup
+                       {
+                           JobID = sur.JobNo,
+                           HBL = sur.Hblno,
+                           MBL = sur.Mblno,
+                           CustomNo = cus == null ? string.Empty : cus.ClearanceNo,
+                           ChargeCode = charge == null ? string.Empty : charge.Code,
+                           ChargeName = charge == null ? string.Empty : charge.ChargeNameEn,
+                           Quantity = sur.Quantity,
+                           ChargeUnit = unit == null ? string.Empty : unit.UnitNameEn,
+                           UnitPrice = sur.UnitPrice,
+                           CurrencyId = sur.CurrencyId,
+                           NetAmount = sur.NetAmount ?? 0,
+                           Vatrate = sur.Vatrate ?? 0,
+                           VatAmount = sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (sur.VatAmountVnd ?? 0) : (sur.VatAmountUsd ?? 0),
+                           TotalAmount = sur.Total,
+                           TotalAmountVnd = (sur.VatAmountVnd ?? 0) + (sur.AmountVnd ?? 0),
+                           TotalAmountUsd = (sur.VatAmountUsd ?? 0) + (sur.AmountUsd ?? 0),
+                           Payee = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (pae == null ? string.Empty : pae.ShortName) : (par == null ? string.Empty : par.ShortName),
+                           OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? (pae == null ? string.Empty : pae.ShortName) : (par == null ? string.Empty : par.ShortName),
+                           InvoiceNo = sur.InvoiceNo,
+                           SeriesNo = sur.SeriesNo,
+                           InvoiceDate = sur.InvoiceDate,
+                           VatPartner = vatPartner == null ? string.Empty : vatPartner.ShortName,
+                           AdvanceNo = sur.AdvanceNo,
+                           AdvanceAmount = adv == null ? 0m : (currency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd ?? 0 : adv.AmountUsd ?? 0)
+                       };
+            var groupData = data.OrderBy(x => x.JobID).ThenBy(x => x.MBL).ThenBy(x => x.HBL);
+            return groupData.ToList();
+        }
+
+        /// <summary>
+        /// Get data to export settlement list detail
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public List<AccountingSettlementExportGroup> GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria)
+        {
+            var results = new List<AccountingSettlementExportGroup>();
+            var settlementPayments = GetSettlementsByCriteria(criteria);
+            if(settlementPayments == null ||settlementPayments.Count() == 0)
+            {
+                return results;
+            }
+            
+            var sysUser = sysUserRepo.Get();
+            var sysEmployee = sysEmployeeRepo.Get();
+            var approveSettlement = acctApproveSettlementRepo.Get();
+            // Get data
+            var data = (from settle in settlementPayments
+                        join users in sysUser on settle.Requester equals users.Id into grpUser
+                        from user in grpUser.DefaultIfEmpty()
+                        join employees in sysEmployee on user.EmployeeId equals employees.Id into grpEmployee
+                        from employee in grpEmployee.DefaultIfEmpty()
+                        join approveSettle in approveSettlement on settle.SettlementNo equals approveSettle.SettlementNo into grpApprove
+                        from approve in grpApprove.DefaultIfEmpty()
+                        select new AccountingSettlementExportGroup
+                        {
+                            SettlementNo = settle.SettlementNo,
+                            Requester = employee == null ? string.Empty : employee.EmployeeNameVn,
+                            RequestDate = settle.RequestDate,
+                            SettlementAmount = settle.Amount ?? 0,
+                            Currency = settle.SettlementCurrency,
+                            ApproveDate = approve == null ? null : approve.BuheadAprDate,
+                            PaymentMethod = settle.PaymentMethod,
+                            DueDate = settle.DueDate,
+                            BankAccountNo = settle.BankAccountNo,
+                            BankAccountName = settle.BankAccountName,
+                            BankName = settle.BankName,
+                        }).ToList();
+            foreach(var settle in data)
+            {
+                settle.ShipmentDetail = GetDataShipmentOfSettlement(settle.SettlementNo, settle.Currency);
+            }
+            return data;
+        }
     }
 }
 

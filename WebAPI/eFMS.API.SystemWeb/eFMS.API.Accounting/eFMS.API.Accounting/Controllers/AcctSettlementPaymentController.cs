@@ -1086,5 +1086,19 @@ namespace eFMS.API.Accounting.Controllers
             return BadRequest(new ResultHandle { Status = false, Message = "Cap nhat Balance that bai" });
 
         }
+
+        /// <summary>
+        ///Settlement export List within Shipment.
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("GetDataExportSettlementDetail")]
+        [Authorize]
+        public IActionResult GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria)
+        {
+            var data = acctSettlementPaymentService.GetDataExportSettlementDetail(criteria);
+            return Ok(data);
+        }
     }
 }

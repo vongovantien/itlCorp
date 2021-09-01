@@ -3,7 +3,17 @@
         <div class="c-button-actions">
             <app-permission-button title="Add New" [routerLink]="'/home/accounting/settlement-payment/new'">
             </app-permission-button>
-            <app-permission-button type="export" title="Export" (onClick)="export()"></app-permission-button>
+            <app-permission-button type="export" title="Export" [dpToggle]="dropdownMenu" position="bottomCenter"
+                mode="dropdown">
+            </app-permission-button>
+            <app-dropdown #dropdownMenu>
+                <a class="dropdown-item pointer" (click)="export()">
+                    <span>General Template</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="accountingeExport()">
+                    <span>Accounting Template</span>
+                </a>
+            </app-dropdown>
         </div>
     </app-sub-header>
     <div class="m-content">
