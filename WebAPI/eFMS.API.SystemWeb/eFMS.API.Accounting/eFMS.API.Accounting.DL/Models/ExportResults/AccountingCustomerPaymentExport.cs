@@ -24,6 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string CustomNo { get; set; }
         public string Salesman { get; set; }
         public string Creator { get; set; }
+        public string Status { get; set; }
         public List<AccountingReceiptDetail> receiptDetail;
     }
     
