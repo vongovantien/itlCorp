@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -2977,7 +2978,7 @@ namespace eFMS.API.Accounting.DL.Services
             return joinData;
         }
 
-        public HandleState CalculatorReceivableForReceipt(Guid receiptId)
+        public async Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId)
         {
             //Get list payment of Receipt
             var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
@@ -3016,7 +3017,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong Receipt
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            hs = await accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
             return hs;
         }
 

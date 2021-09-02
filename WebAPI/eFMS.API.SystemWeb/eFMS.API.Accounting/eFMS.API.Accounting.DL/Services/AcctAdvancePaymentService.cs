@@ -3975,15 +3975,15 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="acctAdvanceRequests"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
+        public List<ObjectReceivableModel> CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
         {
             var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
             //Get list charge of by hblid
             var surcharges = csShipmentSurchargeRepo.Get(x => hblIds.Any(a => a == x.Hblid));
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ Partner, Service, Office có trong Advance
-            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
-            return hs;
+            // var hs = accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
+            return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Advance ---
 
