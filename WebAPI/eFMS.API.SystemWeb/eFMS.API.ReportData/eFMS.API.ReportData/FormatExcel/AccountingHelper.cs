@@ -395,7 +395,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     settlementList.Add(new AccountingSettlementExportGroup());
                     settlementList.FirstOrDefault().ShipmentDetail.Add(new ShipmentSettlementExportGroup());
                 }
-                if (settlementList.Count(x => x.ShipmentDetail.Count() > 0) == 0)
+                if (settlementList.FirstOrDefault().ShipmentDetail == null || settlementList.Count(x => x.ShipmentDetail.Count() > 0) == 0)
                 {
                     excel.DeleteRow(6);
                 }
@@ -599,7 +599,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
                 {
                     excel.DeleteRow(7);
                 }
