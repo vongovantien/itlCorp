@@ -2573,14 +2573,14 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="acctId"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableAcctMngt(Guid acctId)
+        public List<ObjectReceivableModel> CalculatorReceivableAcctMngt(Guid acctId)
         {
             //Get list charge of Accounting Management
             var surcharges = surchargeRepo.Get(x => x.AcctManagementId == acctId || x.PayerAcctManagementId == acctId);
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong Invoice
-            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
-            return hs;
+            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Accounting Management ---
 
