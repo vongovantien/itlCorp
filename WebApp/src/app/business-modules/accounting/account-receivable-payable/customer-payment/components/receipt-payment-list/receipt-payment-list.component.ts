@@ -328,6 +328,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 this.calculateFinalPaidAmount();
                 break;
             case 'cusAdvanceAmountUsd':
+                debugger
                 if (!data.target.value.length) {
                     this.cusAdvanceAmountUsd.setValue(0);
                 }
