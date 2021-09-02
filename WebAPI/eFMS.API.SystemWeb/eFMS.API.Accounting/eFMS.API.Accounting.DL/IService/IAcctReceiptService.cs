@@ -8,6 +8,7 @@ using System.Linq;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using System.Collections.Generic;
 using eFMS.API.Accounting.DL.Models.Receipt;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -25,7 +26,7 @@ namespace eFMS.API.Accounting.DL.IService
         ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
         List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
         AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria);
-        HandleState CalculatorReceivableForReceipt(Guid receiptId);
+        Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
 
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
     }
