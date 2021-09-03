@@ -30,5 +30,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public DateTime? PaidDate { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? TotalAmount { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
     }
 }
