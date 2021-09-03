@@ -85,21 +85,20 @@ namespace eFMS.API.Accounting.DL.Services
                 var receiptId = receiptData.Where(x => x.PaymentRefNo == refNo).FirstOrDefault()?.Id;
                 data = DataContext.Get(x => x.ReceiptId == receiptId).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
             }
-            var dataPM = data.Join(receiptData, pm => pm.ReceiptId, re => re.Id, (pm, rc) => rc);
+            var dataPM = data.Join(receiptData, pm => pm.ReceiptId, re => re.Id, (pm, rc) => new { pm.PaymentAmount, pm.ReceiptId, rc.PaymentRefNo, pm.CurrencyId, pm.Balance, rc.PaymentDate, rc.PaymentMethod, pm.Note});
             var results = new List<AccAccountingPaymentModel>();
-            var grpData = dataPM.GroupBy(x => x.Id).Select(x => new { x.Key, receipt = x.Select(z => z) });
+            var grpData = dataPM.GroupBy(x => x.ReceiptId).Select(x => new { x.Key, receipt = x.Select(z => z) });
             foreach (var x in grpData)
             {
                 var item = new AccAccountingPaymentModel();
-                //var receipt = receiptData.Where(acct => acct.Id == x.Key).FirstOrDefault();
                 var receipt = x.receipt.FirstOrDefault();
                 item.ReceiptNo = receipt.PaymentRefNo;
-                item.PaymentAmount = receipt.PaidAmount ?? 0;
+                item.PaymentAmount = type == "OBH" ? x.receipt.Sum(r => r.PaymentAmount ?? 0) : (receipt.PaymentAmount ?? 0);
                 item.CurrencyId = receipt.CurrencyId;
                 item.Balance = receipt.Balance ?? 0;
                 item.PaidDate = receipt.PaymentDate;
                 item.PaymentMethod = receipt.PaymentMethod;
-                item.Note = receipt.Description;
+                item.Note = receipt.Note;
                 results.Add(item);
             }
 
@@ -315,7 +314,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.Type,
                 x.ShortName,
                 x.InvoiceNo,
-            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.ReceiptId, f.PaymentRefNo, f.payment?.Type, f.payment?.PaymentAmount, f.payment?.UnpaidPaymentAmountUsd, f.payment?.UnpaidPaymentAmountVnd }) });
+            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.ReceiptId, f.PaymentRefNo, f.payment?.Type, f.payment?.PaymentAmount }) });
             var results = new List<AccountingPaymentModel>();
             foreach (var item in resultGroups)
             {
@@ -358,7 +357,7 @@ namespace eFMS.API.Accounting.DL.Services
                         item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault()?.UnpaidAmount ?? 0;
                 if (item.payment.Any(x => !string.IsNullOrEmpty(x.PaymentRefNo)))
                 {
-                    var paymentUniq = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { key = x.Key, p = x.Select(z => new { z.UnpaidPaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.PaymentAmount }) });
+                    var paymentUniq = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { key = x.Key, p = x.Select(z => new { z.PaymentAmount }) });
                     payment.PaidAmount = item.Key.Type == "OBH" ? paymentUniq.Sum(x => x.p.Sum(z => z.PaymentAmount ?? 0)) : paymentUniq.Sum(x => x.p.FirstOrDefault()?.PaymentAmount ?? 0);
                 }
 
@@ -458,7 +457,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (rangeSearch == PermissionRange.None) return null;
             Expression<Func<AccAccountingPayment, bool>> perQuery = GetQueryADVPermission(rangeSearch, _user);
             var results = new List<AccountingPaymentModel>();
-            Expression<Func<AccAccountingPayment, bool>> query = x => (x.Type == "CREDITSOA" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)));
+            Expression<Func<AccAccountingPayment, bool>> query = x => (x.PaymentType == "CREDIT" && (x.PartnerId == criteria.PartnerId || string.IsNullOrEmpty(criteria.PartnerId)));
             if (criteria.FromIssuedDate != null && criteria.ToIssuedDate != null)
             {
                 query = query.And(x => false);
@@ -1093,7 +1092,8 @@ namespace eFMS.API.Accounting.DL.Services
                 PaidAmount = x.PaidAmount,
                 UnpaidAmount = x.UnpaidAmount,
                 UnpaidAmountVnd = x.UnpaidAmountVnd,
-                TotalAmount = x.TotalAmount,
+                TotalAmountVnd = x.TotalAmountVnd,
+                TotalAmountUsd = x.TotalAmountUsd,
                 VoucherId = x.VoucherId,
                 ConfirmBillingDate = x.ConfirmBillingDate,
                 Type = x.Type,
@@ -1656,14 +1656,14 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingCustomerPaymentExport();
-                var invoice = item.invoice.GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.Type, z.UnpaidAmountVnd, z.UnpaidAmount, z.TotalAmount, z.InvoiceNoReal, z.IssuedDate, z.ConfirmBillingDate, z.DueDate }) });
+                var invoice = item.invoice.GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.Type, z.UnpaidAmountVnd, z.TotalAmountVnd, z.InvoiceNoReal, z.IssuedDate, z.ConfirmBillingDate, z.DueDate }) });
                 var invoiceDe = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE);
                 var invoiceObh = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
                 if (criteria.PaymentStatus.Count > 0 && invoiceObh.Count() > 0)
                 {
                     var statusOBH = string.Empty;
-                    var unpaidOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault().UnpaidAmount ?? 0);
-                    var totalPaidOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault().TotalAmount ?? 0);
+                    var unpaidOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault().UnpaidAmountVnd ?? 0);
+                    var totalPaidOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault().TotalAmountVnd ?? 0);
                     if (unpaidOBH <= 0)
                     {
                         statusOBH = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
@@ -1691,9 +1691,12 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.BillingDate = invoice.FirstOrDefault().invc.FirstOrDefault()?.ConfirmBillingDate;
                 payment.DueDate = invoice.FirstOrDefault().invc.FirstOrDefault()?.DueDate;
 
-                // Use amount VND
-                payment.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0;
-                payment.UnpaidAmountOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0);
+                // [CR]: Unpaid => TotalAmount
+                //payment.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0;
+                //payment.UnpaidAmountOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0);
+                payment.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0;
+                payment.UnpaidAmountOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0);
+
                 payment.PaidAmount = 0;
                 payment.PaidAmountOBH = 0;
                 payment.JobNo = sur?.JobNo;
