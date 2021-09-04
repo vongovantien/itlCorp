@@ -159,6 +159,7 @@
         public static readonly string ARGEEMENT_TYPE_OFFICIAL = "Official";
         public static readonly string ARGEEMENT_TYPE_GUARANTEED = "Guaranteed";
         public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
+        public static readonly string ARGEEMENT_TYPE_PARENT= "Parent Contract";
 
         public static readonly string STATUS_ACTIVE = "Active";
         public static readonly string STATUS_INACTIVE = "Inactive";

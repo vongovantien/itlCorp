@@ -324,8 +324,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.cusAdvanceAmountVnd.setValue(0);
                 }
                 if (!!this.isAutoConvert.value) {
-                    const valueUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
-                    this.cusAdvanceAmountUsd.setValue(+formatCurrency(valueUsd, 'en', ''));
+                    const cusAdvanceAmountUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
+                    this.cusAdvanceAmountUsd.setValue(cusAdvanceAmountUsd);
                 }
                 this.calculateFinalPaidAmount();
                 break;

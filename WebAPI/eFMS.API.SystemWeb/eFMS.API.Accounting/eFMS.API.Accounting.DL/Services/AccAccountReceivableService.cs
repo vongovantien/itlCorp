@@ -1388,7 +1388,7 @@ namespace eFMS.API.Accounting.DL.Services
             var selectQuery = from contract in partnerContracts
                               join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
-                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString())
+                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
             if (selectQuery == null || !selectQuery.Any()) return null;
 
@@ -1685,7 +1685,9 @@ namespace eFMS.API.Accounting.DL.Services
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL);
+            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL 
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT);
             var partnerContracts = QueryContractPartner(contracts, criteria);
 
             IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
