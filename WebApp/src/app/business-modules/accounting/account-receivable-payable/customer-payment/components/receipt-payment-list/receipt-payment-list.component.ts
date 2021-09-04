@@ -248,7 +248,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUsd.setValue(+formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const paidAmountUsd = Number((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.paidAmountUsd.setValue(paidAmountUsd);
                     }
                 }
 
@@ -300,7 +301,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.creditAmountUsd.setValue(0);
                     } else {
-                        this.creditAmountUsd.setValue(+formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const creditAmountUsd = Number((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.creditAmountUsd.setValue(creditAmountUsd);
                     }
                 }
                 this.calculateFinalPaidAmount();
@@ -322,7 +324,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.cusAdvanceAmountVnd.setValue(0);
                 }
                 if (!!this.isAutoConvert.value) {
-                    const valueUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                    const valueUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
                     this.cusAdvanceAmountUsd.setValue(+formatCurrency(valueUsd, 'en', ''));
                 }
                 this.calculateFinalPaidAmount();
