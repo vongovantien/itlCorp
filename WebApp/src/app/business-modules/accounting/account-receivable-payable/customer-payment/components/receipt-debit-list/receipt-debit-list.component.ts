@@ -164,8 +164,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         switch (type) {
             case 'paidVnd':
                 if (!!this.isAutoConvert) {
-                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
-
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
                         item.paidAmountUsd = +((+item.paidAmountVnd / this.receiptExchangeRate).toFixed(2));
 
@@ -178,13 +176,12 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                         // item.totalPaidUsd = +((+item.paidAmountVnd + (+item.netOffVnd ?? 0) / this.receiptExchangeRate).toFixed(2));
                     }
                 }
-
+                item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
                 item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
 
                 break;
             case 'paidUsd':
                 if (!!this.isAutoConvert) {
-                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
 
                     if (item.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER) {
                         item.paidAmountVnd = +((+item.paidAmountUsd * this.receiptExchangeRate).toFixed(0));
@@ -198,8 +195,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                         // item.totalPaidVnd = +((+item.paidAmountUsd + (+item.netOffUsd ?? 0) * this.receiptExchangeRate).toFixed(0));
                     }
                 }
-                // item.totalPaidUsd = +item.paidAmountUsd;
-                // item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.totalPaidUsd) ?? 0);
+                item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
                 item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
 
                 break;
@@ -211,10 +207,10 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     } else {
                         item.netOffUsd = +((+item.netOffVnd / this.receiptExchangeRate).toFixed(2));
                     }
-
-                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
-                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
                 }
+
+                item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
+                item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
                 item.netOffVnd = +item.netOffVnd;
 
                 break;
@@ -225,17 +221,15 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                     } else {
                         item.netOffVnd = +((+item.netOffUsd * this.receiptExchangeRate).toFixed(2));
                     }
-                    item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
-                    item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
                 }
-
+                item.totalPaidUsd = ((+item.netOffUsd) ?? 0) + ((+item.paidAmountUsd) ?? 0);
+                item.totalPaidVnd = ((+item.netOffVnd) ?? 0) + ((+item.paidAmountVnd) ?? 0);
                 item.netOffUsd = +item.netOffUsd;
                 break;
             default:
 
                 break;
         }
-        console.log(item);
         this.calculateSumTotalDebit();
     }
 

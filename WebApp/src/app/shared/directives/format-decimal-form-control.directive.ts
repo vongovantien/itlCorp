@@ -50,7 +50,7 @@ export class FormatDecimalFormControlDirective {
     }
 
     private formatNumber(value: any) {
-        if (!!value) {
+        if (value !== null && value !== undefined) {
             value = value.toString().replace(/[^-0-9.]+/g, '');
         }
         return this.check(value);
