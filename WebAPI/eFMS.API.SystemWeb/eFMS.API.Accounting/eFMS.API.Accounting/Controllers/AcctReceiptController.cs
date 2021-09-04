@@ -228,7 +228,7 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptModel };
                 return BadRequest(_result);
             }
-            else
+            else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
             {
                 Response.OnCompleted(async () =>
                 {
