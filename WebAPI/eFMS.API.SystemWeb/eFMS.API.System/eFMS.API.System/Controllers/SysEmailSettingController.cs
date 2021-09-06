@@ -91,7 +91,7 @@ namespace eFMS.API.System.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (sysEmailSettingService.CheckExistsEmailInDept(model))
+            if (sysEmailSettingService.CheckExistsEmailInDeptInsert(model))
             {
                 return Ok(new ResultHandle { Status = false, Message = stringLocalizer[SystemLanguageSub.MSG_EMAIL_EN_EXISTED_IN_DEPT].Value, Data = model });
             }
