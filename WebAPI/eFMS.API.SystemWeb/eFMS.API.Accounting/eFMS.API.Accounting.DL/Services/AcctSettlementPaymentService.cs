@@ -1851,7 +1851,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
-                settlement.SettlementNo = model.Settlement.SettlementNo ;
+                settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo(); 
                 settlement.StatusApproval = model.Settlement.StatusApproval = string.IsNullOrEmpty(model.Settlement.StatusApproval) ? AccountingConstants.STATUS_APPROVAL_NEW : model.Settlement.StatusApproval;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
