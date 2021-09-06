@@ -121,6 +121,14 @@ namespace eFMS.API.System.DL.Services
             }
             return isExists;
         }
+
+        public bool CheckExistsEmailInDeptInsert(SysEmailSettingModel model)
+        {
+            var isExists = false;
+            isExists = DataContext.Get(x => x.DeptId == model.DeptId && x.EmailType.Contains(model.EmailType)).Any();
+            return isExists;
+        }
+
     }
 }
 
