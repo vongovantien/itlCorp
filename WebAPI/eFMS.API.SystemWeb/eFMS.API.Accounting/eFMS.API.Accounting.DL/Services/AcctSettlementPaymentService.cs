@@ -1851,7 +1851,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
-                settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo();
+                settlement.SettlementNo = model.Settlement.SettlementNo ;
                 settlement.StatusApproval = model.Settlement.StatusApproval = string.IsNullOrEmpty(model.Settlement.StatusApproval) ? AccountingConstants.STATUS_APPROVAL_NEW : model.Settlement.StatusApproval;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
@@ -1859,6 +1859,10 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.DepartmentId = currentUser.DepartmentId;
                 settlement.OfficeId = currentUser.OfficeID;
                 settlement.CompanyId = currentUser.CompanyID;
+
+                if(DataContext.Any(x => x.SettlementNo == settlement.SettlementNo && x.Id != settlement.Id)) {
+                    return new HandleState((object)string.Format("Settlement {0} was existied", model.Settlement.SettlementNo));
+                }
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
