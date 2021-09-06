@@ -40,7 +40,7 @@ namespace eFMS.API.System.DL.Services
             {
                 queryExpression = queryExpression.And(x => x.Active == criteria.Active);
             }
-            if (criteria.DeptTypes.Count > 0)
+            if (criteria.DeptTypes != null && criteria.DeptTypes.Count > 0)
             {
                 queryExpression = queryExpression.And(x => x.DeptType != null && criteria.DeptTypes.Contains(x.DeptType));
             }
