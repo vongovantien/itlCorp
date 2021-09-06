@@ -37,7 +37,7 @@
                                 <td ALIGN="center" class="font-weight-bold">
                                     <ng-container *ngIf="item.type === 'ADV' && !isReadonly; else paymentOtherTypeTpl">
                                         <a [dpToggle]="dropdownMenuAdvance" class="text-underline text-primary"
-                                            (click)="selectPaymentItem(i)">ADV</a>
+                                            (click)="selectPaymentItem(i)" position="bottomCenter">ADV</a>
                                     </ng-container>
                                     <ng-template #paymentOtherTypeTpl>
                                         {{item.type}}
@@ -60,7 +60,7 @@
                                         </ng-container>
                                     </ng-container>
                                 </td>
-                                <td>
+                                <!-- <td>
                                     <ng-container class="form-group "
                                         *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
                                         <ng-container *ngIf="!!(creditList$ | async)?.length && !isReadonly">
@@ -79,7 +79,7 @@
                                         </ng-container>
 
                                     </ng-container>
-                                </td>
+                                </td> -->
 
                                 <td ALIGN="right">
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
@@ -103,6 +103,22 @@
                                         [(ngModel)]="item.paidAmountVnd" name="paidAmountVnd" numeric autoFormatCurrency
                                         [disabled]="isReadonly"
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
+                                </td>
+                                <td ALIGN="right">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
+                                            [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'netOffUsd')">
+                                    </ng-container>
+                                </td>
+                                <td>
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                        <input type="text" class="form-control text-right text-success font-15"
+                                            [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
+                                            [disabled]="isReadonly"
+                                            (ngModelChange)="calculateTotalPaidAmount(item,'netOffVnd')">
+                                    </ng-container>
                                 </td>
 
                                 <td ALIGN="right">
@@ -170,7 +186,7 @@
                     </tbody>
                     <tfoot *ngIf="!!(debitList$ | async)?.length">
                         <tr class="font-weight-bold font-15 bg-locked">
-                            <td colspan="5" rowspan="4" ALIGN="center">Total</td>
+                            <td colspan="4" rowspan="4" ALIGN="center">Total</td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalUnpaidAmountUsd | number:'.2-2'}} USD
                             </td>
@@ -182,6 +198,12 @@
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidAmountVnd | number: '1.0-2'}} VND
+                            </td>
+                            <td rowspan="4" ALIGN="center" class="text-right">
+                                {{sumTotalObj.totalNetOffUsd | number:'.2-2'}} USD
+                            </td>
+                            <td rowspan="4" ALIGN="center" class="text-right">
+                                {{sumTotalObj.totalNetOffVnd | number: '1.0-2'}} VND
                             </td>
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidUsd | number:'.2-2'}} USD
@@ -216,7 +238,7 @@
 
 
 <ng-template #TplnegativeRemainUsd>
-    {{sumTotalObj.totalRemainVnd | negativeNumber:'1.0-2'}}
+    {{sumTotalObj.totalRemainUsd | negativeNumber:'1.0-2'}}
 </ng-template>
 
 

@@ -41,5 +41,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public string CurrencyId { get; set; }
         public bool? CreditUnlimited { get; set; }
         public string CreditCurrency { get; set; }
+        public decimal? DebitAmount { get; set; }
     }
 }

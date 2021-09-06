@@ -40,6 +40,8 @@ export class ReceiptCreditDebitModel {
     voucherIdre: string = null;
     paymentType: string = null;
     netOff: boolean = null;
+    netOffVnd: number;
+    netOffUsd: number;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {

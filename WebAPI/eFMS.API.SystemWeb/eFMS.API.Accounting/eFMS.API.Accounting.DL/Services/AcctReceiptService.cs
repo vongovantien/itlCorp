@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -86,10 +87,15 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
         {
+            //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
+            //Expression<Func<AcctReceipt, bool>> query = (x =>
+            //(x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            //&& (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+            //);
             Expression<Func<AcctReceipt, bool>> query = (x =>
-            (x.CurrencyId ?? "").IndexOf(criteria.Currency ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            && (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
-            );
+              (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+             );
+            //[END]
 
             // Tìm theo status
             if (!string.IsNullOrEmpty(criteria.Status))
@@ -157,7 +163,7 @@ namespace eFMS.API.Accounting.DL.Services
             return dataQuery;
         }
 
-        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceipt> dataQuery)
+        private IQueryable<AcctReceiptModel> FormatReceipt(IQueryable<AcctReceipt> dataQuery, AcctReceiptCriteria criteria)
         {
             List<AcctReceiptModel> list = new List<AcctReceiptModel>();
 
@@ -170,6 +176,13 @@ namespace eFMS.API.Accounting.DL.Services
                     d.UserNameCreated = item.UserCreated == null ? null : sysUserRepository.Get(u => u.Id == item.UserCreated).FirstOrDefault().Username;
                     d.UserNameModified = item.UserModified == null ? null : sysUserRepository.Get(u => u.Id == item.UserModified).FirstOrDefault().Username;
                     d.CustomerName = item.CustomerId == null ? null : catPartnerRepository.Get(x => x.Id == item.CustomerId.ToString()).FirstOrDefault().ShortName;
+
+                    //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
+                    if (criteria.Currency != null)
+                    {
+                        d.CurrencyId = criteria.Currency;
+                    }
+                    //[END]
                     list.Add(d);
                 }
             }
@@ -255,7 +268,7 @@ namespace eFMS.API.Accounting.DL.Services
                 page = 1;
                 size = rowsCount;
             }
-            IQueryable<AcctReceiptModel> result = FormatReceipt(data);
+            IQueryable<AcctReceiptModel> result = FormatReceipt(data,criteria);
 
             return result.Skip((page - 1) * size).Take(size);
         }
@@ -460,7 +473,7 @@ namespace eFMS.API.Accounting.DL.Services
                     ExchangeRateBilling = s.FirstOrDefault().ExchangeRateBilling,
                     PartnerId = s.FirstOrDefault()?.PartnerId?.ToString(),
                     Negative = s.FirstOrDefault()?.Negative,
-                    PaymentType = s.FirstOrDefault().PaymentType 
+                    PaymentType = s.FirstOrDefault().PaymentType
             }).ToList();
 
                 paymentReceipts.AddRange(items);
@@ -539,6 +552,8 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.Negative = acctPayment.Negative;
                     payment.PaymentType = acctPayment.PaymentType;
                     payment.NetOff = acctPayment.NetOff;
+                    payment.NetOffUsd = acctPayment.NetOffUsd;
+                    payment.NetOffVnd = acctPayment.NetOffVnd;
 
                     List<string> _creditNos = new List<string>();
                     if(!string.IsNullOrEmpty(acctPayment.CreditNo))
@@ -749,7 +764,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu 
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu
                                 _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
@@ -828,7 +843,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.Id = Guid.NewGuid();
                 _payment.ReceiptId = receipt.Id;
                 _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.RefNo;
-               
+
                 if (payment.PaymentType == "OTHER")
                 {
                     _payment.PaymentNo = receipt.PaymentRefNo;
@@ -883,6 +898,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.PartnerId = receipt.CustomerId;
                 _payment.PaymentType = payment.PaymentType;
                 _payment.NetOff = payment.NetOff;
+                _payment.NetOffUsd = payment.NetOffUsd;
+                _payment.NetOffVnd = payment.NetOffVnd;
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
@@ -981,6 +998,8 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
                 _payment.TotalPaidVnd = -payment.TotalPaidVnd;
                 _payment.TotalPaidUsd = -payment.TotalPaidUsd;
+                _payment.NetOffUsd = -payment.NetOffUsd;
+                _payment.NetOffVnd = -payment.NetOffVnd;
 
                 _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
                 _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
@@ -1004,6 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _payment.CreditAmountUsd = -payment.CreditAmountUsd;
                 _payment.Hblid = payment.Hblid;
                 _payment.PartnerId = payment.PartnerId;
+
 
                 _payment.Negative = true;
                 _payment.PaymentType = payment.PaymentType;
@@ -1082,7 +1102,7 @@ namespace eFMS.API.Accounting.DL.Services
                 switch (payment.Type)
                 {
                     case "DEBIT":
-                        // Tổng thu của invoice bao gôm VND/USD. 
+                        // Tổng thu của invoice bao gôm VND/USD.
                         AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
                         decimal totalAmountPayment = payments.Where(x => x.RefId == invoice.Id.ToString()).Sum(s => (s.PaymentAmount ?? 0));
@@ -1219,7 +1239,7 @@ namespace eFMS.API.Accounting.DL.Services
             decimal? totalAdvPayment= acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
               .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
               .Sum();
-            
+
 
             if (action != SaveAction.SAVECANCEL){
                 if (agreement != null)
@@ -1246,7 +1266,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     else
                     {
-                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0); 
+                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0 ) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0);
                     }
                 }
             }
@@ -1262,7 +1282,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             try
             {
-               
+
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -1775,19 +1795,25 @@ namespace eFMS.API.Accounting.DL.Services
                         join sur in surcharges on credit.Code equals sur.CreditNo
                         select new { credit, sur };
 
-            switch (criteria.SearchType)
+            if (criteria.ReferenceNos.Count > 0)
             {
-                case "HBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "MBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "Job No":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
-                    break;
-                default:
-                    break;
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
             }
             var grpCreditNoteCharge = query.GroupBy(g => new { g.sur.JobNo, g.sur.Hblno, g.sur.Mblno, g.credit, g.sur.Hblid })
                 .Select(s => new { Job = s.Key, Surcharge = s.Select(se => se.sur), credit = s.Select(x => x.credit )});
@@ -1872,19 +1898,25 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from soa in soas
                         join sur in surcharges on soa.Soano equals sur.PaySoano
                         select new { soa, sur };
-            switch (criteria.SearchType)
+            if (criteria.ReferenceNos.Count > 0)
             {
-                case "HBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "MBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "Job No":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
-                    break;
-                default:
-                    break;
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
             }
             var grpSoaCharge = query.GroupBy(g => new { g.soa, g.sur.Hblno, g.sur.Mblno, g.sur.JobNo, g.sur.Hblid }).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
             var data = grpSoaCharge.Select(se => new AgencyDebitCreditModel
@@ -1963,26 +1995,32 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            switch (criteria.SearchType)
+            if (criteria.ReferenceNos.Count > 0)
             {
-                case "HBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "MBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "Job No":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
-                    break;
-                default:
-                    break;
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
             }
-            
+
             var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
-                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano)) 
-                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault() 
+                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano))
+                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault()
                 : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
                 Type = "DEBIT",
                 InvoiceNo = se.Invoice.inv.InvoiceNoReal,
@@ -2060,19 +2098,26 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
-            switch (criteria.SearchType)
+
+            if (criteria.ReferenceNos.Count > 0)
             {
-                case "HBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "MBL":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
-                    break;
-                case "Job No":
-                    query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
-                    break;
-                default:
-                    break;
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
             }
             var grpInvoiceCharge = query.GroupBy(g => new {g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
                 .Select(s => new {s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
@@ -2521,6 +2566,28 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoices
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
+
+            if (criteria.ReferenceNos.Count > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             var grpInvoiceCharge = query.GroupBy(g => g.inv).Select(s => new { Invoice = s.Key, Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }), Surcharge = s.Select(se => se.sur) });
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
             {
@@ -2643,6 +2710,28 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from inv in invoiceTemps
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
+
+            if(criteria.ReferenceNos.Count > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
             var grpInvoiceCharge = query.GroupBy(g => new { g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)) })
                 .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(x => x.sur) });
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
@@ -2717,6 +2806,26 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from soa in soas
                         join sur in surcharges on soa.Soano equals sur.PaySoano
                         select new { soa, sur };
+            if (criteria.ReferenceNos.Count > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
+            }
             var grpSoaCharge = query.GroupBy(g => g.soa).Select(s => new { Soa = s.Key, Surcharge = s.Select(se => se.sur) });
             var data = grpSoaCharge.Select(se => new CustomerDebitCreditModel
             {
@@ -2747,7 +2856,7 @@ namespace eFMS.API.Accounting.DL.Services
                            from ofi in ofiGrp.DefaultIfEmpty()
                            select new CustomerDebitCreditModel
                            {
-                               RefNo = inv.RefNo,                            
+                               RefNo = inv.RefNo,
                                InvoiceNo = inv.InvoiceNo,
                                InvoiceDate = inv.InvoiceDate,
                                PartnerId = inv.PartnerId,
@@ -2769,7 +2878,7 @@ namespace eFMS.API.Accounting.DL.Services
                                ExchangeRateBilling = inv.ExchangeRateBilling,
                                Type = "CREDITSOA",
                                PaymentType = "CREDIT"
-                               
+
                            };
 
             return joinData;
@@ -2787,6 +2896,27 @@ namespace eFMS.API.Accounting.DL.Services
             var query = from credit in creditNotes
                         join sur in surcharges on credit.Code equals sur.CreditNo
                         select new { credit, sur };
+
+            if (criteria.ReferenceNos.Count > 0)
+            {
+                switch (criteria.SearchType)
+                {
+                    case "HBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Hblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "MBL":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Mblno, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Job No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.JobNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Customs No":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    default:
+                        break;
+                }
+            }
             var grpCreditNoteCharge = query.GroupBy(g => g.credit).Select(s => new { CreditNote = s.Key, Surcharge = s.Select(se => se.sur) });
             var data = grpCreditNoteCharge.Select(se => new CustomerDebitCreditModel
             {
@@ -2848,7 +2978,7 @@ namespace eFMS.API.Accounting.DL.Services
             return joinData;
         }
 
-        public HandleState CalculatorReceivableForReceipt(Guid receiptId)
+        public async Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId)
         {
             //Get list payment of Receipt
             var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
@@ -2887,7 +3017,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong Receipt
-            hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            hs = await accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
             return hs;
         }
 

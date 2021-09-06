@@ -367,6 +367,130 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
+
+        /// <summary>
+        /// Set settlement detail data to excel
+        /// </summary>
+        /// <param name="settlementList"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        public Stream ExportSettlementPaymentDetailSurCharges(List<AccountingSettlementExportGroup> settlementList, string fileName)
+        {
+            try
+            {
+                var folderOfFile = GetSettleExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+                var excel = new ExcelExport(path);
+                var startRow = 4;
+                excel.StartDetailTable = startRow;
+                excel.NumberOfGroup = 2;
+                var totalAdvAmount = 0m;
+                if (settlementList.Count == 0)
+                {
+                    settlementList.Add(new AccountingSettlementExportGroup());
+                    settlementList.FirstOrDefault().ShipmentDetail.Add(new ShipmentSettlementExportGroup());
+                }
+                if (settlementList.FirstOrDefault().ShipmentDetail == null || settlementList.Count(x => x.ShipmentDetail.Count() > 0) == 0)
+                {
+                    excel.DeleteRow(6);
+                }
+                foreach (var settle in settlementList)
+                {
+                    var listKeyData = new Dictionary<string, object>();
+                    excel.IndexOfGroup = 1; // Set index of group 1
+                    excel.SetGroupsTable(); // Set group 1
+                    listKeyData.Add("SettlementNo", settle.SettlementNo);
+                    listKeyData.Add("Requester", settle.Requester);
+                    listKeyData.Add("RequestDate", settle.RequestDate?.ToString("dd/MM/yyyy"));
+
+                    var shipmentGroup = settle.ShipmentDetail.GroupBy(x => new { x.JobID, x.MBL, x.HBL });
+                    totalAdvAmount += shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0);
+
+                    listKeyData.Add("NetAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.NetAmount ?? 0)));
+                    listKeyData.Add("VatAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.VatAmount ?? 0)));
+                    listKeyData.Add("TotalAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.TotalAmount ?? 0)));
+                    listKeyData.Add("TotalAmountVndG1", shipmentGroup.Sum(x => x.Sum(z => z.TotalAmountVnd ?? 0)));
+                    listKeyData.Add("AdvanceAmountG1", shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0));
+                    listKeyData.Add("BalanceG1", shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0) - (settle.SettlementAmount ?? 0));
+
+                    listKeyData.Add("ApproveDate", settle.ApproveDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("PaymentMethod", settle.PaymentMethod);
+                    listKeyData.Add("DueDate", settle.DueDate?.ToString("dd/MM/yyyy"));
+                    listKeyData.Add("BankAccountNo", settle.BankAccountNo);
+                    listKeyData.Add("BankAccountName", settle.BankAccountName);
+                    listKeyData.Add("BankName", settle.BankName);
+                    excel.SetData(listKeyData);
+                    startRow++;
+                    foreach (var shipment in shipmentGroup)
+                    {
+                        listKeyData = new Dictionary<string, object>();
+                        excel.IndexOfGroup = 2; // Set index of group 2
+                        excel.SetGroupsTable(); // Set group 2
+                        listKeyData.Add("JobIDG2", shipment.Key.JobID);
+                        listKeyData.Add("MBLG2", shipment.Key.MBL);
+                        listKeyData.Add("HBLG2", shipment.Key.HBL);
+                        listKeyData.Add("CustomNoG2", string.Join(',', shipment.Select(x => x.CustomNo).Distinct()));
+                        listKeyData.Add("NetAmountG2", shipment.Sum(x => x.NetAmount ?? 0));
+                        listKeyData.Add("VatAmountG2", shipment.Sum(x => x.VatAmount ?? 0));
+                        listKeyData.Add("TotalAmountG2", shipment.Sum(x => x.TotalAmount ?? 0));
+                        listKeyData.Add("TotalAmountVndG2", shipment.Sum(x => x.TotalAmountVnd ?? 0));
+                        listKeyData.Add("AdvanceNo", shipment.FirstOrDefault().AdvanceNo);
+                        listKeyData.Add("AdvanceAmountG2", shipment.FirstOrDefault().AdvanceAmount ?? 0);
+                        var totalShipment = settle.Currency == "VND" ? shipment.Sum(x => x.TotalAmountVnd ?? 0) : shipment.Sum(x => x.TotalAmountVnd ?? 0);
+                        listKeyData.Add("BalanceG2", (shipment.FirstOrDefault().AdvanceAmount ?? 0) - totalShipment);
+                        excel.SetData(listKeyData);
+                        startRow++;
+                        foreach (var charge in shipment)
+                        {
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("JobID", shipment.Key.JobID);
+                            listKeyData.Add("MBL", shipment.Key.MBL);
+                            listKeyData.Add("HBL", shipment.Key.HBL);
+                            listKeyData.Add("CustomNo", string.Join(',', shipment.Select(x => x.CustomNo).Distinct()));
+                            listKeyData.Add("ChargeCode", charge.ChargeCode);
+                            listKeyData.Add("ChargeName", charge.ChargeName);
+                            listKeyData.Add("Quantity", charge.Quantity);
+                            listKeyData.Add("ChargeUnit", charge.ChargeUnit);
+                            listKeyData.Add("UnitPrice", charge.UnitPrice);
+                            listKeyData.Add("Currency", charge.CurrencyId);
+                            listKeyData.Add("NetAmount", charge.NetAmount);
+                            listKeyData.Add("Vatrate", charge.Vatrate);
+                            listKeyData.Add("VatAmount", charge.VatAmount);
+                            listKeyData.Add("TotalAmount", charge.TotalAmount);
+                            listKeyData.Add("TotalAmountVnd", charge.TotalAmountVnd);
+                            listKeyData.Add("Payee", charge.Payee);
+                            listKeyData.Add("OBHPartnerName", charge.OBHPartnerName);
+                            listKeyData.Add("InvoiceNo", charge.InvoiceNo);
+                            listKeyData.Add("SeriesNo", charge.SeriesNo);
+                            listKeyData.Add("InvoiceDate", charge.InvoiceDate);
+                            listKeyData.Add("VatPartner", charge.VatPartner);
+                            excel.SetData(listKeyData);
+                            startRow++;
+                        }
+                    }
+
+                }
+                // Set total
+                var listKeyTotal = new Dictionary<string, object>();
+                var totalSettleAmount = settlementList.Sum(x => x.SettlementAmount ?? 0);
+                listKeyTotal.Add("TotalSettle", totalSettleAmount);
+                listKeyTotal.Add("TotalAdv", totalAdvAmount);
+                listKeyTotal.Add("TotalBalance", totalAdvAmount - totalSettleAmount);
+                excel.SetData(listKeyTotal);
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
         public Stream GenerateInvoicePaymentShipmentExcel(List<AccountingPaymentModel> listObj, Stream stream = null)
         {
             List<string> headers = new List<string>()
@@ -475,7 +599,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.Count(x => x.receiptDetail != null) == 0)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
                 {
                     excel.DeleteRow(7);
                 }
@@ -514,10 +638,18 @@ namespace eFMS.API.ReportData.FormatExcel
                         {
                             listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
+                            listKeyData.Add("InvoiceDatedt", item.InvoiceDate);
+                            listKeyData.Add("InvoiceNodt", item.InvoiceNo);
+                            listKeyData.Add("SoaNodt", item.BillingRefNo);
+                            listKeyData.Add("BillingDatedt", item.BillingDate);
                             listKeyData.Add("PaidAmountDt", detail.PaidAmount);
                             listKeyData.Add("PaidAmountOBHDt", detail.PaidAmountOBH);
                             listKeyData.Add("PaidDate", detail.PaymentDate);
                             listKeyData.Add("ReceiptNo", detail.PaymentRefNo);
+                            listKeyData.Add("JobNodt", item.JobNo);
+                            listKeyData.Add("MBLdt", item.MBL);
+                            listKeyData.Add("HBLdt", item.HBL);
+                            listKeyData.Add("CustomNodt", item.CustomNo);
                             excel.SetData(listKeyData);
                             startRow++;
                         }
@@ -4049,10 +4181,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
                     listKeyData.Add("InvoiceDate", item.InvoiceDate);
                     listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("CreditNo", item.CreditNo);
-                    listKeyData.Add("JobNo", item.JobNo);
-                    listKeyData.Add("MBL", item.MBL);
-                    listKeyData.Add("HBL", item.HBL);
+                    listKeyData.Add("CreditNoGrp", item.CreditNo == null ? "" : item.CreditNo);
+                    listKeyData.Add("JobNoGrp", item.JobNo);
+                    listKeyData.Add("MBLGrp", item.JobNo);
+                    listKeyData.Add("HBLGrp", item.JobNo);
+                   
                     listKeyData.Add("ETD", item.EtdDate);
                     listKeyData.Add("ETA", item.EtaDate);
                     var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
@@ -4076,6 +4209,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("RefNo", detail.RefNo);
                         listKeyData.Add("Debit", detail.Debit);
                         listKeyData.Add("Credit", detail.Credit);
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("MBL", item.MBL);
+                        listKeyData.Add("HBL", item.HBL);
+                        listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
                         excel.SetData(listKeyData);
                         startRow++;
                     }

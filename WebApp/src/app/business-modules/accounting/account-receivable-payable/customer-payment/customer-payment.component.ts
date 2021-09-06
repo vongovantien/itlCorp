@@ -63,10 +63,12 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.headers = [
             { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+            { title: 'Collect Amount', field: '', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
             { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Receipt Type', field: '', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },

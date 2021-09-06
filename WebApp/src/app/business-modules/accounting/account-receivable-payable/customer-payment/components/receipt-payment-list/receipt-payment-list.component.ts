@@ -248,7 +248,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUsd.setValue(formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const paidAmountUsd = Number((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.paidAmountUsd.setValue(paidAmountUsd);
                     }
                 }
 
@@ -289,6 +290,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                         this.creditAmountVnd.disable();
                     }
 
+                    this.paidAmountVnd.updateValueAndValidity();
+
                 }
                 this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.calculateFinalPaidAmount();
@@ -298,7 +301,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.creditAmountUsd.setValue(0);
                     } else {
-                        this.creditAmountUsd.setValue(formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const creditAmountUsd = Number((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.creditAmountUsd.setValue(creditAmountUsd);
                     }
                 }
                 this.calculateFinalPaidAmount();
@@ -320,12 +324,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.cusAdvanceAmountVnd.setValue(0);
                 }
                 if (!!this.isAutoConvert.value) {
-                    const valueUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                    this.cusAdvanceAmountUsd.setValue(formatCurrency(valueUsd, 'en', ''));
+                    const cusAdvanceAmountUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
+                    this.cusAdvanceAmountUsd.setValue(cusAdvanceAmountUsd);
                 }
                 this.calculateFinalPaidAmount();
                 break;
             case 'cusAdvanceAmountUsd':
+                debugger
                 if (!data.target.value.length) {
                     this.cusAdvanceAmountUsd.setValue(0);
                 }
@@ -427,13 +432,20 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
             finalExchangeRate: this.exchangeRate.value,
-            paidAmountVnd: this.finalPaidAmountVnd.value,
-            paidAmountUsd: this.finalPaidAmountUsd.value,
+            paidAmountVnd: +this.finalPaidAmountVnd.value,
+            paidAmountUsd: +this.finalPaidAmountUsd.value,
             list: listInvoice.filter(x => x.type !== AccountingConstants.RECEIPT_ADVANCE_TYPE),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
             return;
+        }
+        if (!!this.creditAmountVnd.value || !!this.creditAmountUsd.value) {
+            const isHavenetOff = body.list.every(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && (!!x.netOffVnd || !!x.netOffUsd));
+            if (!isHavenetOff) {
+                this._toastService.warning('Please you check Net Off Amount Detail on Debit List', 'Warning');
+                return;
+            }
         }
 
         this._accountingRepo.processInvoiceReceipt(body)
@@ -460,7 +472,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 this.creditAmountVnd.enable();
 
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                this.cusAdvanceAmountUsd.setValue(formatCurrency(_advanceUsd, 'en', ''));
+                this.cusAdvanceAmountUsd.setValue(+formatCurrency(_advanceUsd, 'en', ''));
 
                 this.cusAdvanceAmountUsd.disable();
                 this.creditAmountUsd.disable();
@@ -510,15 +522,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     private calculateFinalPaidAmountWithAsPaid(isAsPaid: boolean) {
+        let totalFinalPaidVnd: number = 0;
+        let totalFinalPaidusd: number = 0;
+
         if (!!isAsPaid) {
-            const totaValueVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
-            const totaValueUsd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
-            this.finalPaidAmountVnd.setValue(totaValueVnd);
-            this.finalPaidAmountUsd.setValue(totaValueUsd);
+            totalFinalPaidVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
+            totalFinalPaidusd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
+
+            this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd);
+            this.finalPaidAmountUsd.setValue(+totalFinalPaidusd);
             return;
         }
-        this.finalPaidAmountVnd.setValue(this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0));
-        this.finalPaidAmountUsd.setValue(this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0));
+        totalFinalPaidVnd = this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0);
+        totalFinalPaidusd = this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0);
+
+        this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd.toFixed(0));
+        this.finalPaidAmountUsd.setValue(+totalFinalPaidusd.toFixed(2));
     }
 }
 

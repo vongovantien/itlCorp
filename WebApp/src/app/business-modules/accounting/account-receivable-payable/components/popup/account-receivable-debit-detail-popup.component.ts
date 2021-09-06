@@ -1,4 +1,5 @@
 import { Component, OnInit, Output, ViewChild } from '@angular/core';
+import { SortService } from '@services';
 import { PopupBase } from 'src/app/popup.base';
 import { AccReceivableDebitDetailModel } from 'src/app/shared/models/accouting/accounting-receivable.model';
 
@@ -20,6 +21,7 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
         { title: 'Unpaid VND', field: 'unpaidAmountVND', sortable: true },
         { title: "Unpaid USD", field: 'unpaidAmountUSD', sortable: true },
         { title: "Overdue Days", field: 'overdueDays', sortable: true },
+        { title: "Due Days", field: 'paymentDueDate', sortable: true },
         { title: 'Office', field: 'code', sortable: true },
     ];
 
@@ -33,8 +35,10 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
     };
 
     constructor(
+        private _sortService: SortService,
     ) {
         super();
+        this.requestSort = this.sortTrialOfficalList;
     }
 
     ngOnInit() {
@@ -55,6 +59,9 @@ export class AccReceivableDebitDetailPopUpComponent extends PopupBase implements
         this.sumTotalObj.totalpaidUSD = 0;
         this.sumTotalObj.totalunpaidVND = 0;
         this.sumTotalObj.totalunpaidUSD = 0;
+    }
+    sortTrialOfficalList(sortField: string, order: boolean) {
+        this.dataDebitList = this._sortService.sort(this.dataDebitList, sortField, order);
     }
 
     calculateTotal() {
