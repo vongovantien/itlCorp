@@ -2810,8 +2810,7 @@ namespace eFMS.API.Accounting.DL.Services
                 detail.ChargeType = (payment.Type == "CREDITSOA" || payment.Type == "CREDITNOTE") ? "NETOFF" : payment.Type;
 
                 // [CR] get debit account
-                //detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
-                var debitAccount = string.Empty;
+                detail.DebitAccount = (detail.ChargeType == "NETOFF") ? payment.InvoiceNo : invoice?.AccountNo;
                 if (payment.Type.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER)
                 {
                     detail.DebitAccount = "7118";
