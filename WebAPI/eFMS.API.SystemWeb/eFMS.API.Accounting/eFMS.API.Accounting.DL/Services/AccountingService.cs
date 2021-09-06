@@ -2471,13 +2471,16 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID).FirstOrDefault()?.Email;
-            List<string> emails = emailAccountantDept.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+            List<string> emails = new List<string>();
+            if (!string.IsNullOrEmpty(emailAccountantDept)) {
+                emails = emailAccountantDept.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+            }
 
             List<string> toEmails = emails;
             List<string> attachments = null;
 
             List<string> emailCCs = emailCcs;
-            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com", "andy.hoa@itlvn.com" };
+            List<string> emailBCCs = new List<string> { "alex.phuong@itlvn.com", "kenny.thuong@itlvn.com" };
             var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs, emailBCCs);
 
             #region --- Ghi Log Send Mail ---
