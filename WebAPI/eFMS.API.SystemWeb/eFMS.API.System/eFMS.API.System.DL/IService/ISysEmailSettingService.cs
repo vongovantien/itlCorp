@@ -27,5 +27,7 @@ namespace eFMS.API.System.DL.IService
         bool CheckExistsEmailInDept(SysEmailSettingModel model);
 
         bool CheckValidEmail(SysEmailSettingModel model);
+
+        bool CheckExistsEmailInDeptInsert(SysEmailSettingModel model);
     }
 }
