@@ -34,7 +34,14 @@ namespace eFMS.API.Common.Infrastructure.Common
                     message = hs.Exception.Message;
                     break;
                 default:
-                    message = LanguageSub.MSG_DATA_NOT_FOUND;
+                    if(hs.Message != null)
+                    {
+                        message = hs.Message.ToString();
+                    }
+                    else
+                    {
+                        message = LanguageSub.MSG_DATA_NOT_FOUND;
+                    }
                     break;
             }
             return message;

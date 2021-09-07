@@ -998,7 +998,7 @@ namespace eFMS.API.Accounting.DL.Services
                 List<CatContract> contractChildOfPartner = new List<CatContract>();
                 if (partnerChildIds != null)
                 {
-                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.Id.ToString()) && x.ContractType == "Parent Contract").ToList();
+                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.PartnerId.ToString()) && x.ContractType == "Parent Contract").ToList();
                 }
 
                 agreement.BillingAmount = receivables.Sum(su => (su.BillingAmount ?? 0) + (su.ObhBilling ?? 0)); //Sum BillingAmount + BillingOBH
@@ -1022,7 +1022,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (parentId != null)
                     {
                         //Lấy Credit Rate của đối tượng cha (Partner)
-                        var creditRateContractParent = contractPartnerRepo.Get(x => x.Id.ToString() == parentId && x.Active == true).FirstOrDefault()?.CreditRate;
+                        var creditRateContractParent = contractPartnerRepo.Get(x => x.PartnerId.ToString() == parentId && x.Active == true).FirstOrDefault()?.CreditRate;
                         _creditRate = (creditRateContractParent != null) ? creditRateContractParent : agreement.CreditRate;
                     }
                 }
@@ -1386,7 +1386,7 @@ namespace eFMS.API.Accounting.DL.Services
             var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
-                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
+                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
                               where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
@@ -1403,7 +1403,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
-                    PartnerId = s.First().acctReceivable != null ? s.First().acctReceivable.AcRef : null,
+                    PartnerId = s.First().acctReceivable != null ? s.First().acctReceivable.PartnerId : null,
                     PartnerCode = string.Empty, //Get data bên dưới
                     PartnerNameEn = string.Empty, //Get data bên dưới
                     PartnerNameLocal = string.Empty, //Get data bên dưới
@@ -1575,7 +1575,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountReceivable, bool>> query = q => q.Office != null;
             if (criteria != null && !string.IsNullOrEmpty(criteria.AcRefId))
             {
-                query = query.And(x => x.AcRef == criteria.AcRefId);
+                query = query.And(x => x.PartnerId == criteria.AcRefId);
             }
             return query;
         }
@@ -2008,7 +2008,7 @@ namespace eFMS.API.Accounting.DL.Services
             var argeement = contractPartnerRepo.Get(x => x.Id == argeementId).FirstOrDefault();
             if (argeement == null) return null;
 
-            var acctReceivables = DataContext.Get(x => x.Office != null);
+            var acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == argeementId);
             var partners = partnerRepo.Get();
             var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == argeement.ContractType);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
