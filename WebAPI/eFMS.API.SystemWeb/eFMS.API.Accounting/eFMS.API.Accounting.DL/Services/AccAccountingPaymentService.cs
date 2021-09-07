@@ -1727,6 +1727,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     payment.PaymentAmountUsd,
                                     payment.UnpaidPaymentAmountUsd,
                                     payment.CreditAmountUsd,
+                                    payment.NetOffUsd,
                                     rcpts.PaymentRefNo,
                                     rcpts.PaymentDate,
                                     rcpts.PaidAmountUsd
@@ -1757,6 +1758,21 @@ namespace eFMS.API.Accounting.DL.Services
             //    x.invoice.ServiceType
             //});
 
+            //var resultGroups = resultsQuery.ToList().GroupBy(x => new
+            //{
+            //    x.invoice.PartnerId,
+            //    x.PartnerCode,
+            //    x.PartnerName,
+            //    x.ParentCode,
+            //    x.Hblno,
+            //    x.Mblno,
+            //    x.JobNo,
+            //    x.CreditNo,
+            //    x.InvoiceNo,
+            //    x.PaidDate,
+            //    //x.RefNo
+            //}).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.Soano, z.CreditNo }), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.PaymentDate, z.PaymentAmountUsd, z.UnpaidPaymentAmountUsd, z.CreditAmountUsd ,z.NetOffUsd}) });
+
             var resultGroups = resultsQuery.ToList().GroupBy(x => new
             {
                 x.invoice.PartnerId,
@@ -1765,7 +1781,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.ParentCode,
                 x.RefNo,
                 x.PaidDate,
-            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno,z.Soano,z.CreditNo }), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.PaymentDate, z.PaymentAmountUsd, z.UnpaidPaymentAmountUsd, z.CreditAmountUsd }) });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.Soano, z.CreditNo }), payment = x.Select(z => new { z.PaymentType, z.PaymentRefNo, z.PaymentDate, z.PaymentAmountUsd, z.UnpaidPaymentAmountUsd, z.CreditAmountUsd,z.NetOffUsd }) });
 
             var results = new List<AccountingAgencyPaymentExport>();
             var soaLst = soaRepository.Get().ToLookup(x => x.Soano);
@@ -1787,7 +1803,7 @@ namespace eFMS.API.Accounting.DL.Services
                 agent.InvoiceNo = invoice.FirstOrDefault()?.InvoiceNoReal;
                 agent.InvoiceDate = invoice.FirstOrDefault()?.IssuedDate;
                 agent.PaidDate = item.grp.PaidDate;
-                agent.RefNo = item.grp.RefNo;
+                agent.RefNo = item.payment.FirstOrDefault()?.PaymentRefNo;
 
                 //var billingDebit = surchargeRepository.Get(x => x.DebitNo == agent.RefNo || x.Soano == agent.RefNo).FirstOrDefault();
                 agent.JobNo = sur?.JobNo;
@@ -1806,10 +1822,23 @@ namespace eFMS.API.Accounting.DL.Services
                 //var a = currencyExchangeService.CurrencyExchangeRateConvert(agent.UnpaidAmountInv, item.Key.IssuedDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
                 //agent.UnpaidAmountOBH = currencyExchangeService.CurrencyExchangeRateConvert(agent.UnpaidAmountOBH, item.Key.IssuedDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
 
-                if (acctPayment.PaymentType == "CREDIT")
-                    agent.CreditAmount = acctPayment == null ? (invoice.FirstOrDefault()?.UnpaidAmountVnd ?? 0) : item.payment.Distinct().Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountUsd ?? 0;
-                else
-                    agent.CreditAmount = acctPayment == null ? 0 : acctPayment.CreditAmountUsd ?? 0;
+                //if (acctPayment.PaymentType == "CREDIT")
+                //    agent.CreditAmount = acctPayment == null ? (invoice.FirstOrDefault()?.UnpaidAmountVnd ?? 0) : item.payment.Distinct().Where(x => x.PaymentType != "OBH").FirstOrDefault()?.UnpaidPaymentAmountUsd ?? 0;
+                //else
+                //    agent.CreditAmount = acctPayment == null ? 0 : acctPayment.CreditAmountUsd ?? 0;
+
+                if (sur?.Soano != null)
+                {
+                    var soa = soaLst.Where(x => x.FirstOrDefault().Soano == sur.Soano).FirstOrDefault();
+                    agent.CreditAmount = soa?.FirstOrDefault().CreditAmount ?? 0;
+                }
+                else if(sur?.CreditNo != null)
+                {
+                    var cdnote = cdNoteLst.Where(x => x.FirstOrDefault().Code == sur.CreditNo).Where(x=>x.FirstOrDefault().Type == "CREDIT").FirstOrDefault();
+                    agent.CreditAmount = cdnote?.FirstOrDefault().Total ?? 0;
+                }
+
+                agent.NetOff = item.payment.FirstOrDefault().NetOffUsd;
 
                 //Get saleman name
                 var salemanId = catContractRepository.Get(x => x.Active == true && x.PartnerId == item.grp.PartnerId
@@ -1822,10 +1851,10 @@ namespace eFMS.API.Accounting.DL.Services
                         agent.Salesman = salemanId == null ? string.Empty : employeeLst[employeeId].FirstOrDefault().EmployeeNameEn;
                     }
                 // Get creator name
-                var creatorId = soaLst[item.grp.RefNo].FirstOrDefault()?.UserCreated;
+                var creatorId = soaLst[item.payment.FirstOrDefault()?.PaymentRefNo].FirstOrDefault()?.UserCreated;
                 if (string.IsNullOrEmpty(creatorId))
                 {
-                    creatorId = cdNoteLst[item.grp.RefNo].FirstOrDefault()?.UserCreated;
+                    creatorId = cdNoteLst[item.payment.FirstOrDefault()?.PaymentRefNo].FirstOrDefault()?.UserCreated;
                     var creator = string.IsNullOrEmpty(creatorId) ? string.Empty : userLst[creatorId].FirstOrDefault()?.EmployeeId;
                     agent.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                 }
@@ -1835,19 +1864,21 @@ namespace eFMS.API.Accounting.DL.Services
                     agent.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                 }
 
-                var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentDate, z.PaymentType, z.PaymentAmountUsd, z.CreditAmountUsd }) });
+                var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentDate, z.PaymentType, z.PaymentAmountUsd, z.CreditAmountUsd}) });
 
                 agent.details = new List<AccountingAgencyPaymentExportDetail>();
                 foreach (var rcp in receiptGroup)
                 {
                     var detail = new AccountingAgencyPaymentExportDetail();
+
                     detail.RefNo = rcp.grp.PaymentRefNo;
                     detail.PaidDate = rcp.Payment.FirstOrDefault().PaymentDate;
                     var dt = rcp.Payment.Where(z => z.PaymentType != "OBH").FirstOrDefault()?.PaymentAmountUsd ?? 0;
                     var obh = rcp.Payment.Where(z => z.PaymentType == "OBH").Sum(x => x.PaymentAmountUsd ?? 0);
                     detail.Debit = dt + obh;
                     var payCredit = rcp.Payment.Where(z => z.PaymentType != "CREDIT").FirstOrDefault()?.PaymentAmountUsd ?? 0;
-                    detail.Credit = payCredit > 0 ? obh - payCredit : rcp.Payment.FirstOrDefault()?.CreditAmountUsd ?? 0;
+                    //detail.Credit = payCredit > 0 ? obh - payCredit : rcp.Payment.FirstOrDefault()?.CreditAmountUsd ?? 0;
+                    //detail.Credit = rcp.Payment.FirstOrDefault().NetOffUsd ?? 0;
 
                     agent.details.Add(detail);
                 }
