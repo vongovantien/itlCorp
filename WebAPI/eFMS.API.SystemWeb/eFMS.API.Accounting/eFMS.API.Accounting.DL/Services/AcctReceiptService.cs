@@ -1784,6 +1784,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AgencyDebitCreditModel> GetCreditNoteForIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
+            
             var expQuery = CreditNoteExpressionQuery(criteria);
             var creditNotes = cdNoteRepository.Get(expQuery);
             var surcharges = surchargeRepository.Get();

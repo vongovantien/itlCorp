@@ -23,5 +23,6 @@ namespace eFMS.API.Accounting.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public string SurchargeId { get; set; }
+        public bool? NetOff { get; set; }
     }
 }
