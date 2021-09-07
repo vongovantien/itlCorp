@@ -389,7 +389,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var startRow = 4;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 2;
-                var totalAdvAmount = 0m;
+               
                 if (settlementList.Count == 0)
                 {
                     settlementList.Add(new AccountingSettlementExportGroup());
@@ -401,75 +401,75 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 foreach (var settle in settlementList)
                 {
-                    var listKeyData = new Dictionary<string, object>();
                     excel.IndexOfGroup = 1; // Set index of group 1
                     excel.SetGroupsTable(); // Set group 1
-                    listKeyData.Add("SettlementNo", settle.SettlementNo);
-                    listKeyData.Add("Requester", settle.Requester);
-                    listKeyData.Add("RequestDate", settle.RequestDate?.ToString("dd/MM/yyyy"));
-
-                    var shipmentGroup = settle.ShipmentDetail.GroupBy(x => new { x.JobID, x.MBL, x.HBL });
-                    totalAdvAmount += shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0);
-
-                    listKeyData.Add("NetAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.NetAmount ?? 0)));
-                    listKeyData.Add("VatAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.VatAmount ?? 0)));
-                    listKeyData.Add("TotalAmountG1", shipmentGroup.Sum(x => x.Sum(z => z.TotalAmount ?? 0)));
-                    listKeyData.Add("TotalAmountVndG1", shipmentGroup.Sum(x => x.Sum(z => z.TotalAmountVnd ?? 0)));
-                    listKeyData.Add("AdvanceAmountG1", shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0));
-                    listKeyData.Add("BalanceG1", shipmentGroup.Sum(x => x.FirstOrDefault().AdvanceAmount ?? 0) - (settle.SettlementAmount ?? 0));
-
-                    listKeyData.Add("ApproveDate", settle.ApproveDate?.ToString("dd/MM/yyyy"));
-                    listKeyData.Add("PaymentMethod", settle.PaymentMethod);
-                    listKeyData.Add("DueDate", settle.DueDate?.ToString("dd/MM/yyyy"));
-                    listKeyData.Add("BankAccountNo", settle.BankAccountNo);
-                    listKeyData.Add("BankAccountName", settle.BankAccountName);
-                    listKeyData.Add("BankName", settle.BankName);
+                    var listKeyData = new Dictionary<string, object>()
+                    {
+                        {"SettlementNo", settle.SettlementNo},
+                        {"Requester", settle.Requester},
+                        {"RequestDate", settle.RequestDate?.ToString("dd/MM/yyyy")},
+                        {"NetAmountG1", settle.TotalNetAmount},
+                        {"VatAmountG1", settle.TotalVatAmount},
+                        {"TotalAmountG1", settle.TotalAmount},
+                        {"TotalAmountVndG1", settle.TotalAmountVnd},
+                        {"AdvanceAmountG1", settle.TotalAdvanceAmount},
+                        {"BalanceG1", settle.TotalAdvanceAmount - (settle.SettlementAmount ?? 0)},
+                        {"ApproveDate", settle.ApproveDate?.ToString("dd/MM/yyyy")},
+                        {"PaymentMethod", settle.PaymentMethod},
+                        {"DueDate", settle.DueDate?.ToString("dd/MM/yyyy")},
+                        {"BankAccountNo", settle.BankAccountNo},
+                        {"BankAccountName", settle.BankAccountName},
+                        {"BankName", settle.BankName},
+                    };
                     excel.SetData(listKeyData);
                     startRow++;
-                    foreach (var shipment in shipmentGroup)
+                    foreach (var shipment in settle.ShipmentDetail)
                     {
-                        listKeyData = new Dictionary<string, object>();
                         excel.IndexOfGroup = 2; // Set index of group 2
                         excel.SetGroupsTable(); // Set group 2
-                        listKeyData.Add("JobIDG2", shipment.Key.JobID);
-                        listKeyData.Add("MBLG2", shipment.Key.MBL);
-                        listKeyData.Add("HBLG2", shipment.Key.HBL);
-                        listKeyData.Add("CustomNoG2", string.Join(',', shipment.Select(x => x.CustomNo).Distinct()));
-                        listKeyData.Add("NetAmountG2", shipment.Sum(x => x.NetAmount ?? 0));
-                        listKeyData.Add("VatAmountG2", shipment.Sum(x => x.VatAmount ?? 0));
-                        listKeyData.Add("TotalAmountG2", shipment.Sum(x => x.TotalAmount ?? 0));
-                        listKeyData.Add("TotalAmountVndG2", shipment.Sum(x => x.TotalAmountVnd ?? 0));
-                        listKeyData.Add("AdvanceNo", shipment.FirstOrDefault().AdvanceNo);
-                        listKeyData.Add("AdvanceAmountG2", shipment.FirstOrDefault().AdvanceAmount ?? 0);
-                        var totalShipment = settle.Currency == "VND" ? shipment.Sum(x => x.TotalAmountVnd ?? 0) : shipment.Sum(x => x.TotalAmountVnd ?? 0);
-                        listKeyData.Add("BalanceG2", (shipment.FirstOrDefault().AdvanceAmount ?? 0) - totalShipment);
+                        listKeyData = new Dictionary<string, object>()
+                        {
+                            {"JobIDG2", shipment.JobID},
+                            {"MBLG2", shipment.MBL},
+                            {"HBLG2", shipment.HBL},
+                            {"CustomNoG2", shipment.CustomNo},
+                            {"NetAmountG2", shipment.NetAmount},
+                            {"VatAmountG2", shipment.VatAmount},
+                            {"TotalAmountG2", shipment.TotalAmount},
+                            {"TotalAmountVndG2", shipment.TotalAmountVnd},
+                            {"AdvanceNo", shipment.AdvanceNo},
+                            {"AdvanceAmountG2", shipment.AdvanceAmount ?? 0},
+                            {"BalanceG2", (shipment.Balance ?? 0)}
+                        };
                         excel.SetData(listKeyData);
                         startRow++;
-                        foreach (var charge in shipment)
+                        foreach (var charge in shipment.surchargesDetail)
                         {
-                            listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
-                            listKeyData.Add("JobID", shipment.Key.JobID);
-                            listKeyData.Add("MBL", shipment.Key.MBL);
-                            listKeyData.Add("HBL", shipment.Key.HBL);
-                            listKeyData.Add("CustomNo", string.Join(',', shipment.Select(x => x.CustomNo).Distinct()));
-                            listKeyData.Add("ChargeCode", charge.ChargeCode);
-                            listKeyData.Add("ChargeName", charge.ChargeName);
-                            listKeyData.Add("Quantity", charge.Quantity);
-                            listKeyData.Add("ChargeUnit", charge.ChargeUnit);
-                            listKeyData.Add("UnitPrice", charge.UnitPrice);
-                            listKeyData.Add("Currency", charge.CurrencyId);
-                            listKeyData.Add("NetAmount", charge.NetAmount);
-                            listKeyData.Add("Vatrate", charge.Vatrate);
-                            listKeyData.Add("VatAmount", charge.VatAmount);
-                            listKeyData.Add("TotalAmount", charge.TotalAmount);
-                            listKeyData.Add("TotalAmountVnd", charge.TotalAmountVnd);
-                            listKeyData.Add("Payee", charge.Payee);
-                            listKeyData.Add("OBHPartnerName", charge.OBHPartnerName);
-                            listKeyData.Add("InvoiceNo", charge.InvoiceNo);
-                            listKeyData.Add("SeriesNo", charge.SeriesNo);
-                            listKeyData.Add("InvoiceDate", charge.InvoiceDate);
-                            listKeyData.Add("VatPartner", charge.VatPartner);
+                            listKeyData = new Dictionary<string, object>()
+                            {
+                                {"JobID", shipment.JobID},
+                                {"MBL", shipment.MBL},
+                                {"HBL", shipment.HBL},
+                                {"CustomNo", shipment.CustomNo},
+                                {"ChargeCode", charge.ChargeCode},
+                                {"ChargeName", charge.ChargeName},
+                                {"Quantity", charge.Quantity},
+                                {"ChargeUnit", charge.ChargeUnit},
+                                {"UnitPrice", charge.UnitPrice},
+                                {"Currency", charge.CurrencyId},
+                                {"NetAmount", charge.NetAmount},
+                                {"Vatrate", charge.Vatrate},
+                                {"VatAmount", charge.VatAmount},
+                                {"TotalAmount", charge.TotalAmount},
+                                {"TotalAmountVnd", charge.TotalAmountVnd},
+                                {"Payee", charge.Payee},
+                                {"OBHPartnerName", charge.OBHPartnerName},
+                                {"InvoiceNo", charge.InvoiceNo},
+                                {"SeriesNo", charge.SeriesNo},
+                                {"InvoiceDate", charge.InvoiceDate},
+                                {"VatPartner", charge.VatPartner}
+                            };
                             excel.SetData(listKeyData);
                             startRow++;
                         }
@@ -479,6 +479,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Set total
                 var listKeyTotal = new Dictionary<string, object>();
                 var totalSettleAmount = settlementList.Sum(x => x.SettlementAmount ?? 0);
+                var totalAdvAmount = settlementList.Sum(x => x.TotalAdvanceAmount ?? 0);
                 listKeyTotal.Add("TotalSettle", totalSettleAmount);
                 listKeyTotal.Add("TotalAdv", totalAdvAmount);
                 listKeyTotal.Add("TotalBalance", totalAdvAmount - totalSettleAmount);
