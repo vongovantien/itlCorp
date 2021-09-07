@@ -132,6 +132,9 @@
                                                                 </span>
                                                             </td>
                                                             <td>
+                                                                <span>{{cps.description}}</span>
+                                                            </td>
+                                                            <td>
                                                                 <div
                                                                     *ngIf="cps.fromDate !=null|| cps.toDate !=null; else DateNo">
                                                                     <span>{{cps.fromDate | date :'dd/MM/yyyy'}}
