@@ -744,11 +744,11 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentLst = surchargesCreditNote.Select(x => x.Hblid).Distinct().ToList();
             // Ge credit management list will be delete
             var acctCreditMngData = acctCreditManagementArRepository.Get();
-            var acctCreditDelete = mapper.Map<List<AcctCreditManagementModel>>(acctCreditMngData.Where(x => x.Code == creditNo && x.Type == "CREDITNOTE" && shipmentLst.Any(s => s == x.Hblid))).ToList();
+            var acctCreditDelete = mapper.Map<List<AcctCreditManagementModel>>(acctCreditMngData.Where(x => x.Code == creditNo && x.Type == DocumentConstants.CREDIT_NOTE_TYPE_CODE && shipmentLst.Any(s => s == x.Hblid))).ToList();
 
             foreach (var shipment in shipmentLst)
             {
-                var existCredit = acctCreditMngData.Where(x => x.Code == creditNo && x.Type == "CREDITNOTE" && x.Hblid == shipment).FirstOrDefault();
+                var existCredit = acctCreditMngData.Where(x => x.Code == creditNo && x.Type == DocumentConstants.CREDIT_NOTE_TYPE_CODE && x.Hblid == shipment).FirstOrDefault();
                 IEnumerable<CsShipmentSurcharge> surchargeLst = null;
                 if (existCredit == null) // Get data to add new credit AR
                 {
@@ -766,7 +766,7 @@ namespace eFMS.API.Documentation.DL.Services
                     // Get detail to update Credit AR
                     var acctCredit = new AcctCreditManagementModel();
                     acctCredit.Code = creditNo;
-                    acctCredit.Type = "CREDITNOTE";
+                    acctCredit.Type = DocumentConstants.CREDIT_NOTE_TYPE_CODE;
                     acctCredit.PartnerId = customer;
                     acctCredit.Currency = currency;
                     acctCredit.Hblid = shipment;
