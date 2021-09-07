@@ -179,7 +179,7 @@ namespace eFMS.API.Accounting.DL.Services
                     //[ADD][16236][27/08/2021][Collect Amount: Nếu receipt Currency Là VND: Lấy Giá trị Cột VND, Nếu receipt Currency là USD là Cột Collect USD]
                     if (criteria.Currency != null)
                     {
-                        d.CurrencyId = criteria.Currency;
+                        d.CurrencyId = criteria.Currency=="VND"?"VND":"USD";
                     }
                     //[END]
                     list.Add(d);
