@@ -4183,19 +4183,20 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("InvoiceNo", item.InvoiceNo);
                     listKeyData.Add("CreditNoGrp", item.CreditNo == null ? "" : item.CreditNo);
                     listKeyData.Add("JobNoGrp", item.JobNo);
-                    listKeyData.Add("MBLGrp", item.JobNo);
-                    listKeyData.Add("HBLGrp", item.JobNo);
+                    listKeyData.Add("MBLGrp", item.MBL);
+                    listKeyData.Add("HBLGrp", item.HBL);
                    
                     listKeyData.Add("ETD", item.EtdDate);
                     listKeyData.Add("ETA", item.EtaDate);
                     var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
                     listKeyData.Add("DebitAmount", debit);
                     listKeyData.Add("CreditAmount", item.CreditAmount);
+                    listKeyData.Add("NetOff", item.NetOff);
 
                     var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
                     var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
                     listKeyData.Add("Debit_Ending", remainDb + remainObh);
-                    listKeyData.Add("Credit_Ending", item.CreditAmount);
+                    listKeyData.Add("Credit_Ending",item.CreditAmount - item.NetOff);
 
                     listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("Creator", item.Creator);
