@@ -208,7 +208,7 @@ namespace eFMS.API.Accounting.DL.Services
                     // Add Credit AR
                     if (soa.Type == "Credit" && updateChargeSoa.Success && surchargeSoa.Count() > 0)
                     {
-                        UpdateAcctCreditManagement(surchargeSoa, soa.Soano, soa.Currency, soa.Customer, "Add");
+                        UpdateAcctCreditManagement(surchargeSoa, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Add");
                     }
                 }
                 return hs;
@@ -349,7 +349,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var exceptId = surchargeSoa.Select(z => z.Id);
                         surchargesUpdateSoa = surchargesUpdateSoa.Where(x => !exceptId.Any(z => z == x.Id)).ToList();
                         surchargeSoa.AddRange(surchargesUpdateSoa);
-                        UpdateAcctCreditManagement(surchargeSoa, soa.Soano, soa.Currency, soa.Customer, "Update");
+                        UpdateAcctCreditManagement(surchargeSoa, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Update");
                     }
                 }
 
@@ -441,7 +441,7 @@ namespace eFMS.API.Accounting.DL.Services
             // Delete Credit AR
             if (soa.Type == "Credit" && hs.Success)
             {
-                UpdateAcctCreditManagement(surcharges, soa.Soano, soa.Currency, soa.Customer, "Delete");
+                UpdateAcctCreditManagement(surcharges, soa.Soano, soa.Currency, soa.ExcRateUsdToLocal, soa.Customer, "Delete");
             }
             return hs;
         }
@@ -644,7 +644,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="department"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        private HandleState UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string currency, string customer, string action)
+        private HandleState UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesSoa, string soaNo, string currency, decimal? exchangeRateUsdToVnd, string customer, string action)
         {
             var hs = new HandleState();
             var acctCreditLst = new List<AcctCreditManagementModel>();
@@ -677,20 +677,24 @@ namespace eFMS.API.Accounting.DL.Services
                     acctCredit.Code = soaNo;
                     acctCredit.Type = AccountingConstants.CREDIT_SOA_TYPE_CODE;
                     acctCredit.PartnerId = customer;
+                    acctCredit.JobNo = surchargeLst.FirstOrDefault().JobNo;
+                    acctCredit.Mblno = surchargeLst.FirstOrDefault().Mblno;
+                    acctCredit.Hblno = surchargeLst.FirstOrDefault().Hblno;
                     acctCredit.Hblid = shipment;
                     acctCredit.SurchargeId = string.Join(';', surchargeLst.Select(x => x.Id));
                     acctCredit.Currency = currency;
                     acctCredit.ExchangeRate = existCredit == null ? surchargeLst.FirstOrDefault().FinalExchangeRate : existCredit.ExchangeRate;
-                    acctCredit.AmountVnd = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                    acctCredit.AmountUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
-                    acctCredit.RemainVnd = 0;
-                    acctCredit.RemainUsd = 0;
+                    acctCredit.ExchangeRateUsdToLocal = existCredit == null ? exchangeRateUsdToVnd : existCredit.ExchangeRateUsdToLocal;
+                    acctCredit.AmountVnd = acctCredit.RemainVnd = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    acctCredit.AmountUsd = acctCredit.RemainUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                    acctCredit.CompanyId = currentUser.CompanyID;
                     acctCredit.OfficeId = currentUser.OfficeID == null ? null : currentUser.OfficeID.ToString();
                     acctCredit.DepartmentId = currentUser.DepartmentId;
                     acctCredit.DatetimeCreated = existCredit == null ? DateTime.Now : existCredit.DatetimeCreated;
                     acctCredit.UserCreated = existCredit == null ? userCurrent : existCredit.UserCreated;
                     acctCredit.DatetimeModified = DateTime.Now;
                     acctCredit.UserModified = userCurrent;
+                    acctCredit.NetOff = false;
                     acctCreditLst.Add(acctCredit);
                 }
                 surchargeLst = surchargesSoa.Where(x => x.Hblid == shipment && string.IsNullOrEmpty(x.PaySoano) && !string.IsNullOrEmpty(x.CreditNo));
@@ -717,21 +721,28 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         // Get detail to update Credit AR
                         var acctCredit = new AcctCreditManagementModel();
+                        var acctCdnote = acctCdnoteRepo.Get(x => x.Code == surchargeLst.FirstOrDefault().CreditNo).FirstOrDefault();
                         acctCredit.Code = surchargeLst.FirstOrDefault().CreditNo;
                         acctCredit.Type = AccountingConstants.CREDIT_NOTE_TYPE_CODE;
                         acctCredit.PartnerId = customer;
+                        acctCredit.JobNo = surchargeLst.FirstOrDefault().JobNo;
+                        acctCredit.Mblno = surchargeLst.FirstOrDefault().Mblno;
+                        acctCredit.Hblno = surchargeLst.FirstOrDefault().Hblno;
                         acctCredit.Hblid = shipment;
                         acctCredit.SurchargeId = string.Join(';', surchargeLst.Select(x => x.Id));
                         acctCredit.Currency = currency;
                         acctCredit.ExchangeRate = surchargeLst.FirstOrDefault().FinalExchangeRate;
+                        acctCredit.ExchangeRateUsdToLocal = acctCdnote.ExcRateUsdToLocal;
                         acctCredit.AmountVnd = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
                         acctCredit.AmountUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
                         acctCredit.RemainVnd = 0;
                         acctCredit.RemainUsd = 0;
+                        acctCredit.CompanyId = currentUser.CompanyID;
                         acctCredit.OfficeId = currentUser.OfficeID == null ? null : currentUser.OfficeID.ToString();
                         acctCredit.DepartmentId = currentUser.DepartmentId;
                         acctCredit.DatetimeCreated = acctCredit.DatetimeModified = DateTime.Now;
                         acctCredit.UserCreated = acctCredit.UserModified = userCurrent;
+                        acctCredit.NetOff = false;
                         acctCreditLst.Add(acctCredit);
                     }
                 }

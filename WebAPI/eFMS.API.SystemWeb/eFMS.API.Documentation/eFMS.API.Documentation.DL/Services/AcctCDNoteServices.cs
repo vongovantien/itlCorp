@@ -421,7 +421,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
                 {
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.PartnerId, "Add");
+                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
                 }
                 return hs;
             }
@@ -616,7 +616,7 @@ namespace eFMS.API.Documentation.DL.Services
                     var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
                     surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
                     surchargesCDNote.AddRange(surchargeUpdate);
-                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.PartnerId, "Update");
+                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
                 }
                 return hs;
             }
@@ -735,7 +735,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// <param name="department"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        private HandleState UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesCreditNote, string creditNo, string currency, string customer, string action)
+        private HandleState UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesCreditNote, string creditNo, string currency, decimal? exchangeRateUsdToVnd, string customer, string action)
         {
             var hs = new HandleState();
             var acctCreditLst = new List<AcctCreditManagementModel>(); // List insert/update
@@ -769,19 +769,23 @@ namespace eFMS.API.Documentation.DL.Services
                     acctCredit.Type = DocumentConstants.CREDIT_NOTE_TYPE_CODE;
                     acctCredit.PartnerId = customer;
                     acctCredit.Currency = currency;
+                    acctCredit.JobNo = surchargeLst.FirstOrDefault().JobNo;
+                    acctCredit.Mblno = surchargeLst.FirstOrDefault().Mblno;
+                    acctCredit.Hblno = surchargeLst.FirstOrDefault().Hblno;
                     acctCredit.Hblid = shipment;
                     acctCredit.SurchargeId = string.Join(';', surchargeLst.Select(x => x.Id));
                     acctCredit.ExchangeRate = existCredit == null ? surchargeLst.FirstOrDefault().FinalExchangeRate : existCredit.ExchangeRate;
-                    acctCredit.AmountVnd = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                    acctCredit.AmountUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
-                    acctCredit.RemainVnd = 0;
-                    acctCredit.RemainUsd = 0;
+                    acctCredit.ExchangeRateUsdToLocal = existCredit == null ? exchangeRateUsdToVnd : existCredit.ExchangeRateUsdToLocal;
+                    acctCredit.AmountVnd = acctCredit.RemainVnd  = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    acctCredit.AmountUsd = acctCredit.RemainUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                    acctCredit.CompanyId = currentUser.CompanyID;
                     acctCredit.OfficeId = currentUser.OfficeID == null ? null : currentUser.OfficeID.ToString();
                     acctCredit.DepartmentId = currentUser.DepartmentId;
                     acctCredit.DatetimeCreated = existCredit == null ? DateTime.Now : existCredit.DatetimeCreated;
                     acctCredit.UserCreated = existCredit == null ? userCurrent : existCredit.UserCreated;
                     acctCredit.DatetimeModified = DateTime.Now;
                     acctCredit.UserModified = userCurrent;
+                    acctCredit.NetOff = false;
                     acctCreditLst.Add(acctCredit);
                 }
             }
@@ -1164,7 +1168,7 @@ namespace eFMS.API.Documentation.DL.Services
                         // Delete credit AR
                         if (cdNote.Type == "CREDIT" && hsSur.Success)
                         {
-                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.PartnerId, "Delete");
+                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
                         }
                     }
                 }
