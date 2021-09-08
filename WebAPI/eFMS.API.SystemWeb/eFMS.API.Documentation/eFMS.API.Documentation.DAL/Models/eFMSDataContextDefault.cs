@@ -720,6 +720,8 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
+
                 entity.Property(e => e.Currency)
                     .HasMaxLength(30)
                     .IsUnicode(false);
@@ -732,7 +734,23 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.ExchangeRate).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.ExchangeRateUsdToLocal).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.Hblid).HasColumnName("HBLID");
+
+                entity.Property(e => e.Hblno)
+                    .HasColumnName("HBLNo")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.JobNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Mblno)
+                    .HasColumnName("MBLNo")
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
