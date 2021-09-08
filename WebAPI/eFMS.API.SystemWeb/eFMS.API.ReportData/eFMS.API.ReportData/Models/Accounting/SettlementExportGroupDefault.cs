@@ -32,6 +32,11 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string BankAccountName { get; set; }
         public string BankName { get; set; }
         public decimal? SettlementAmount { get; set; }
+        public decimal? TotalNetAmount { get; set; }
+        public decimal? TotalVatAmount { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAdvanceAmount { get; set; }
         public List<ShipmentSettlementExportGroup> ShipmentDetail;
     }
 }
