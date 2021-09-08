@@ -36,6 +36,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IUnlockRequestApproveService unlockRequestApproveService;
         readonly IUserBaseService userBaseService;
         private string typeApproval = "Unlock Shipment";
+        readonly IContextBase<AcctSoa> soaRepo;
 
         public UnlockRequestService(
             IContextBase<SetUnlockRequest> repository,
@@ -52,6 +53,7 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> surcharge,
             IContextBase<SysAuthorizedApproval> authourizedApproval,
+            IContextBase<AcctSoa> SOA,
             IUnlockRequestApproveService unlockRequestApprove,
             IUserBaseService userBase) : base(repository, mapper)
         {
@@ -69,6 +71,7 @@ namespace eFMS.API.Setting.DL.Services
             unlockRequestApproveService = unlockRequestApprove;
             userBaseService = userBase;
             authourizedApprovalRepo = authourizedApproval;
+            soaRepo = SOA;
         }
 
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -674,5 +677,82 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
         #endregion -- EXPORT --
+
+        #region -- Generate ID --
+        public HandleState GenerateID(string paymentNo, int type)
+        {
+            try
+            {
+                if (type == 3)
+                {
+                    var advanceCurrent = advancePaymentRepo.Get(x => x.AdvanceNo == paymentNo).FirstOrDefault();
+                    if (advanceCurrent == null) return new HandleState("Not found advance payment");
+
+                    if (!advanceCurrent.StatusApproval.Contains("Done"))
+                    {
+                        return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
+                    }
+                    if (!string.IsNullOrEmpty(advanceCurrent.SyncStatus))
+                    {
+                        if (advanceCurrent.SyncStatus.Contains("Synced") || advanceCurrent.SyncStatus.Contains("Rejected"))
+                        {
+                            advanceCurrent.SyncStatus = null;
+                        }
+                    }
+                    var hs= advancePaymentRepo.Delete(x => x.Id==advanceCurrent.Id);
+                    if (hs.Success)
+                    {
+                        advanceCurrent.Id = Guid.NewGuid();
+                        advancePaymentRepo.Add(advanceCurrent);
+                    }
+                    return hs;
+                }
+                if (type == 2)
+                {
+                    var settlementCurrent = settlementPaymentRepo.Get(x => x.SettlementNo == paymentNo).FirstOrDefault();
+                    if (settlementCurrent == null) return new HandleState("Not found advance payment");
+
+                    if (!settlementCurrent.StatusApproval.Contains("Done"))
+                    {
+                        return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
+                    }
+                    if (!string.IsNullOrEmpty(settlementCurrent.SyncStatus))
+                    {
+                        if (settlementCurrent.SyncStatus.Contains("Synced") || settlementCurrent.SyncStatus.Contains("Rejected"))
+                        {
+                            settlementCurrent.SyncStatus = null;
+                        }
+                    }
+
+                    var hs=settlementPaymentRepo.Delete(x => x.Id == settlementCurrent.Id);
+                    if (hs.Success)
+                    {
+                        settlementCurrent.Id = Guid.NewGuid();
+                        settlementPaymentRepo.Add(settlementCurrent);
+                    }
+                    return hs;
+                }
+                else
+                {
+                    var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
+                    if (SOACurrent == null) return new HandleState("Not found advance payment");
+                    
+                    var hs=soaRepo.Delete(x => x.Id == SOACurrent.Id);
+                    if (hs.Success)
+                    {
+                        SOACurrent.Id = Guid.NewGuid().ToString();
+                        soaRepo.Add(SOACurrent);
+                    }
+                    return hs;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                var hs = new HandleState(ex.Message);
+                return hs;
+            }
+        }
+        #endregion -- Generate ID --
     }
 }

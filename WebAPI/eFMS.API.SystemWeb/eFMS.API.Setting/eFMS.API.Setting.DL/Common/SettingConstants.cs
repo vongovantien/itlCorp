@@ -29,6 +29,8 @@ namespace eFMS.API.Setting.DL.Common
         public static readonly string LEVEL_MANAGER = "Manager";
         public static readonly string LEVEL_ACCOUNTANT = "Accountant";
         public static readonly string LEVEL_BOD = "BOD";
-        
+
+        public static readonly string MSG_STATUS_MUST_BE_DONE = "MSG_STATUS_MUST_BE_DONE";
+
     }
 }

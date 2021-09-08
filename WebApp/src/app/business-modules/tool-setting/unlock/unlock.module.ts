@@ -1,3 +1,4 @@
+import { GenerateIdComponent } from './components/generate-id/generate-id.component';
 import { NgModule } from '@angular/core';
 import { UnlockComponent } from './unlock.component';
 import { Route, RouterModule } from '@angular/router';
@@ -31,7 +32,8 @@ const routing: Route[] = [
         UnlockShipmentComponent,
         UnlockAccountingComponent,
         UnlockHistoryPopupComponent,
-        LockShipmentComponent
+        LockShipmentComponent,
+        GenerateIdComponent
     ],
     providers: [],
 })

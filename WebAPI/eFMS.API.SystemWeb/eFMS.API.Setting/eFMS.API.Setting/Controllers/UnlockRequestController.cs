@@ -10,6 +10,7 @@ using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
+using eFMS.API.Setting.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
@@ -29,18 +30,21 @@ namespace eFMS.API.Setting.Controllers
         private readonly IUnlockRequestService unlockRequestService;
         private readonly IStringLocalizer stringLocalizer;
         private readonly IUnlockRequestApproveService unlockRequestApproveService;
+        readonly IUserBaseService baseUser;
+
         /// <summary>
         /// Contructor
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="currUser"></param>
-        public UnlockRequestController(IStringLocalizer<LanguageSub> localizer, IUnlockRequestService service, ICurrentUser currUser, IUnlockRequestApproveService unlockRequestApprove)
+        public UnlockRequestController(IStringLocalizer<LanguageSub> localizer, IUnlockRequestService service, ICurrentUser currUser, IUnlockRequestApproveService unlockRequestApprove, IUserBaseService userService)
         {
             stringLocalizer = localizer;
             unlockRequestService = service;
             currentUser = currUser;
             unlockRequestApproveService = unlockRequestApprove;
+            baseUser = userService;
         }
 
         [HttpGet()]
@@ -251,6 +255,33 @@ namespace eFMS.API.Setting.Controllers
         {
             var data = unlockRequestService.GetUnlockRequestsExport(criteria);
             return Ok(data);
+        }
+
+        /// <summary>
+        /// Generate PaymentID
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("GeneratePaymentId")]
+        [Authorize]
+        public IActionResult GeneratePaymentId(Payment payment)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            if (baseUser.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, null, null)==false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+           
+            var hs = unlockRequestService.GenerateID(payment.paymentNo, payment.Type);
+
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data= payment.paymentNo };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

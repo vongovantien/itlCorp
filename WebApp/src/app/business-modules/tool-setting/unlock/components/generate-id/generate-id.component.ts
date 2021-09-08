@@ -1,45 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { ToastrService } from 'ngx-toastr';
-import { DocumentationRepo } from '@repositories';
+import { Component, OnInit } from "@angular/core";
+import { ToastrService } from "ngx-toastr";
+import { SettingRepo } from "@repositories";
 
 @Component({
-    selector: 'lock-shipment',
-    templateUrl: './lock-shipment.component.html'
+    selector: "generate-id",
+    templateUrl: "./generate-id.component.html",
 })
-
-export class LockShipmentComponent implements OnInit {
-    options: CommonInterface.INg2Select[] = [
-        { id: 1, text: 'Job ID' },
-        // { id: 2, text: 'MBL' },
-        // { id: 3, text: 'HBL' },
-        // { id: 4, text: 'Custom No' },
+export class GenerateIdComponent implements OnInit {
+    types: CommonInterface.INg2Select[] = [
+        { id: 1, text: "SOA" },
+        { id: 2, text: "Settlement" },
+        { id: 3, text: "Advance" },
     ];
-    selectedOption: string = this.options[0].id;
+    selectedType: number = this.types[0].id;
+
     keyword: string;
-
-
     constructor(
         private _toastService: ToastrService,
-        private _documentRepo: DocumentationRepo,
-    ) {
-    }
+        private _settingRepo: SettingRepo
+    ) {}
 
-    ngOnInit() { }
+    ngOnInit() {}
 
-    lock() {
+    generatePaymentId() {
         if (!this.keyword) {
             return;
         }
-
-        const jobIds: string[] = this.keyword.replace(/(?:\r\n|\r|\n|\\n|\\r)/g, ',').trim().split(',').map((item: any) => item.trim());
-
-        this._documentRepo.lockShipmentList(jobIds || [])
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                    }
+        this._settingRepo
+            .generatePaymentId(this.keyword, this.selectedType)
+            .subscribe((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success(
+                        `Update successfully"}`,
+                        "Update Success !"
+                    );
+                } else {
+                    this._toastService.error(res.data.message);
                 }
-            )
+            });
     }
 }
