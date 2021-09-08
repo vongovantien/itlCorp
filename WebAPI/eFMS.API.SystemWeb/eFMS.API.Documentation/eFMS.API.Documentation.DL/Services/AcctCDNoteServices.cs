@@ -776,10 +776,8 @@ namespace eFMS.API.Documentation.DL.Services
                     acctCredit.SurchargeId = string.Join(';', surchargeLst.Select(x => x.Id));
                     acctCredit.ExchangeRate = existCredit == null ? surchargeLst.FirstOrDefault().FinalExchangeRate : existCredit.ExchangeRate;
                     acctCredit.ExchangeRateUsdToLocal = existCredit == null ? exchangeRateUsdToVnd : existCredit.ExchangeRateUsdToLocal;
-                    acctCredit.AmountVnd = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
-                    acctCredit.AmountUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
-                    acctCredit.RemainVnd = 0;
-                    acctCredit.RemainUsd = 0;
+                    acctCredit.AmountVnd = acctCredit.RemainVnd  = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    acctCredit.AmountUsd = acctCredit.RemainUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
                     acctCredit.CompanyId = currentUser.CompanyID;
                     acctCredit.OfficeId = currentUser.OfficeID == null ? null : currentUser.OfficeID.ToString();
                     acctCredit.DepartmentId = currentUser.DepartmentId;
