@@ -1092,6 +1092,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaidAmount = x.PaidAmount,
                 UnpaidAmount = x.UnpaidAmount,
                 UnpaidAmountVnd = x.UnpaidAmountVnd,
+                TotalAmount = x.TotalAmount,
                 TotalAmountVnd = x.TotalAmountVnd,
                 TotalAmountUsd = x.TotalAmountUsd,
                 VoucherId = x.VoucherId,
