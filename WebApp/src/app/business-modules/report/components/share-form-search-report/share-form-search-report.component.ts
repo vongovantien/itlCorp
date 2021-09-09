@@ -909,7 +909,7 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     async getPartnerData(type: string) {
-        if (this.isSheetDebitRpt) { // Partner for Accountant Report
+        if (!this.isGeneralReport) { // Partner for Accountant Report
             // Get All Partner
             if (type === 'customer') {
                 this.customers = await this._catalogueRepo.getPartnerByGroups(null, null);
