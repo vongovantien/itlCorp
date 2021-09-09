@@ -467,7 +467,7 @@ namespace eFMS.API.ReportData.FormatExcel
                                 {"OBHPartnerName", charge.OBHPartnerName},
                                 {"InvoiceNo", charge.InvoiceNo},
                                 {"SeriesNo", charge.SeriesNo},
-                                {"InvoiceDate", charge.InvoiceDate},
+                                {"InvoiceDate", charge.InvoiceDate?.ToString("dd/MM/yyyy")},
                                 {"VatPartner", charge.VatPartner}
                             };
                             excel.SetData(listKeyData);
