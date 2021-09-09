@@ -237,7 +237,7 @@
                 </div>
             </tab>
             <tab heading="Email Setting"
-                *ngIf="!!department&&(department.deptType=='AR'||department.deptType=='Accountant')">
+            *ngIf="!!departmentType&&(departmentType.value=='AR'||departmentType.value=='ACCOUNTANT')">
                 <app-department-email [department]="department"></app-department-email>
             </tab>
 

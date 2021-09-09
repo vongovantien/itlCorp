@@ -1853,7 +1853,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var userCurrent = currentUser.UserID;
                 var settlement = mapper.Map<AcctSettlementPayment>(model.Settlement);
                 settlement.Id = model.Settlement.Id = Guid.NewGuid();
-                settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo();
+                settlement.SettlementNo = model.Settlement.SettlementNo = CreateSettlementNo(); 
                 settlement.StatusApproval = model.Settlement.StatusApproval = string.IsNullOrEmpty(model.Settlement.StatusApproval) ? AccountingConstants.STATUS_APPROVAL_NEW : model.Settlement.StatusApproval;
                 settlement.UserCreated = settlement.UserModified = userCurrent;
                 settlement.DatetimeCreated = settlement.DatetimeModified = DateTime.Now;
@@ -1861,6 +1861,10 @@ namespace eFMS.API.Accounting.DL.Services
                 settlement.DepartmentId = currentUser.DepartmentId;
                 settlement.OfficeId = currentUser.OfficeID;
                 settlement.CompanyId = currentUser.CompanyID;
+
+                if(DataContext.Any(x => x.SettlementNo == settlement.SettlementNo && x.Id != settlement.Id)) {
+                    return new HandleState((object)string.Format("Settlement {0} was existied", model.Settlement.SettlementNo));
+                }
 
                 decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
 
@@ -5609,9 +5613,9 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="settlementNo"></param>
         /// <param name="currency"></param>
         /// <returns></returns>
-        private List<ShipmentSettlementExportGroup> GetDataShipmentOfSettlement(string settlementNo, string currency)
+        private List<ShipmentSettlementExportGroup> GetDataShipmentOfSettlement(IQueryable<AcctSettlementPayment> settlements)
         {
-            var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
+            var surcharges = csShipmentSurchargeRepo.Get();
             var custom = customsDeclarationRepo.Get();
             var sysUser = sysUserRepo.Get();
             var sysEmployee = sysEmployeeRepo.Get();
@@ -5622,7 +5626,8 @@ namespace eFMS.API.Accounting.DL.Services
             var advanceReqData = acctAdvanceRequestRepo.Get();
             var approveSettlement = acctApproveSettlementRepo.Get();
 
-            var data = from sur in surcharges
+            var data = from settle in settlements
+                       join sur in surcharges on settle.SettlementNo equals sur.SettlementCode
                        join par in payer on sur.PayerId equals par.Id into par2
                        from par in par2.DefaultIfEmpty()
                        join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
@@ -5639,6 +5644,7 @@ namespace eFMS.API.Accounting.DL.Services
                        from cus in cus1.DefaultIfEmpty()
                        select new ShipmentSettlementExportGroup
                        {
+                           SettleNo = settle.SettlementNo,
                            JobID = sur.JobNo,
                            HBL = sur.Hblno,
                            MBL = sur.Mblno,
@@ -5662,9 +5668,9 @@ namespace eFMS.API.Accounting.DL.Services
                            InvoiceDate = sur.InvoiceDate,
                            VatPartner = vatPartner == null ? string.Empty : vatPartner.ShortName,
                            AdvanceNo = sur.AdvanceNo,
-                           AdvanceAmount = adv == null ? 0m : (currency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd ?? 0 : adv.AmountUsd ?? 0)
+                           AdvanceAmount = adv == null ? 0m : (settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd ?? 0 : adv.AmountUsd ?? 0)
                        };
-            var groupData = data.OrderBy(x => x.JobID).ThenBy(x => x.MBL).ThenBy(x => x.HBL);
+            var groupData = data.OrderBy(x => x.SettleNo).ThenBy(x => x.MBL).ThenBy(x => x.HBL);
             return groupData.ToList();
         }
 
@@ -5686,32 +5692,87 @@ namespace eFMS.API.Accounting.DL.Services
             var sysEmployee = sysEmployeeRepo.Get();
             var approveSettlement = acctApproveSettlementRepo.Get();
             // Get data
-            var data = (from settle in settlementPayments
-                        join users in sysUser on settle.Requester equals users.Id into grpUser
-                        from user in grpUser.DefaultIfEmpty()
-                        join employees in sysEmployee on user.EmployeeId equals employees.Id into grpEmployee
-                        from employee in grpEmployee.DefaultIfEmpty()
-                        join approveSettle in approveSettlement on settle.SettlementNo equals approveSettle.SettlementNo into grpApprove
-                        from approve in grpApprove.DefaultIfEmpty()
-                        select new AccountingSettlementExportGroup
-                        {
-                            SettlementNo = settle.SettlementNo,
-                            Requester = employee == null ? string.Empty : employee.EmployeeNameVn,
-                            RequestDate = settle.RequestDate,
-                            SettlementAmount = settle.Amount ?? 0,
-                            Currency = settle.SettlementCurrency,
-                            ApproveDate = approve == null ? null : approve.BuheadAprDate,
-                            PaymentMethod = settle.PaymentMethod,
-                            DueDate = settle.DueDate,
-                            BankAccountNo = settle.BankAccountNo,
-                            BankAccountName = settle.BankAccountName,
-                            BankName = settle.BankName,
-                        }).ToList();
-            foreach(var settle in data)
+            var detailShipments = GetDataShipmentOfSettlement(settlementPayments);
+            var data = new List<AccountingSettlementExportGroup>();
+            foreach (var settlement in settlementPayments)
             {
-                settle.ShipmentDetail = GetDataShipmentOfSettlement(settle.SettlementNo, settle.Currency);
+                var shipments = detailShipments.Where(x => x.SettleNo == settlement.SettlementNo).ToList();
+                var shipmentGroup = shipments.GroupBy(x => new { x.JobID, x.MBL, x.HBL });
+                var settle = new AccountingSettlementExportGroup();
+                settle.SettlementNo = settlement.SettlementNo;
+                if (!string.IsNullOrEmpty(settlement.Requester))
+                {
+                    var requesterId = sysUser.Where(x => x.Id == settlement.Requester).FirstOrDefault()?.EmployeeId;
+                    settle.Requester = requesterId == null ? null : sysEmployee.Where(x => x.Id == requesterId).FirstOrDefault()?.EmployeeNameEn;
+                }
+                settle.RequestDate = settlement.RequestDate;
+                settle.SettlementAmount = settlement.Amount ?? 0;
+                settle.Currency = settlement.SettlementCurrency;
+                settle.ApproveDate = approveSettlement.Where(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault()?.BuheadAprDate;
+                settle.PaymentMethod = settlement.PaymentMethod;
+                settle.DueDate = settlement.DueDate;
+                settle.BankAccountNo = settlement.BankAccountNo;
+                settle.BankAccountName = settlement.BankAccountName;
+                settle.BankName = settlement.BankName;
+
+                settle.ShipmentDetail = new List<ShipmentSettlementExportGroup>();
+                settle.TotalNetAmount = 0;
+                settle.TotalVatAmount = 0;
+                settle.TotalAmount = 0;
+                settle.TotalAmountVnd = 0;
+                settle.TotalAdvanceAmount = 0;
+                foreach (var item in shipmentGroup)
+                {
+                    var jobDetail = new ShipmentSettlementExportGroup();
+                    var totalShipment = settle.Currency == "VND" ? item.Sum(x => x.TotalAmountVnd ?? 0) : item.Sum(x => x.TotalAmountUsd ?? 0);
+                    var customNo = string.Join(',', item.Select(x => x.CustomNo).Distinct());
+                    jobDetail.JobID = item.Key.JobID;
+                    jobDetail.MBL = item.Key.MBL;
+                    jobDetail.HBL = item.Key.HBL;
+                    jobDetail.CustomNo = customNo;
+                    jobDetail.AdvanceNo = item.FirstOrDefault().AdvanceNo;
+                    jobDetail.NetAmount = item.Sum(x => x.NetAmount ?? 0);
+                    jobDetail.VatAmount = item.Sum(x => x.VatAmount ?? 0);
+                    jobDetail.TotalAmount = item.Sum(x => x.TotalAmount ?? 0);
+                    jobDetail.TotalAmountVnd = item.Sum(x => x.TotalAmountVnd ?? 0);
+                    jobDetail.AdvanceAmount = item.FirstOrDefault().AdvanceAmount ?? 0;
+                    jobDetail.Balance = jobDetail.AdvanceAmount - totalShipment;
+
+                    settle.TotalNetAmount += jobDetail.NetAmount;
+                    settle.TotalVatAmount += jobDetail.VatAmount;
+                    settle.TotalAmount += jobDetail.TotalAmount;
+                    settle.TotalAmountVnd += jobDetail.TotalAmountVnd;
+                    settle.TotalAdvanceAmount += jobDetail.AdvanceAmount;
+                    var surcharges = from charge in item
+                                    select new SurchargesShipmentSettlementExportGroup
+                                    {
+                                        ChargeCode = charge.ChargeCode,
+                                        ChargeName = charge.ChargeName,
+                                        Quantity = charge.Quantity,
+                                        ChargeUnit = charge.ChargeUnit,
+                                        UnitPrice = charge.UnitPrice,
+                                        CurrencyId = charge.CurrencyId,
+                                        NetAmount = charge.NetAmount,
+                                        Vatrate = charge.Vatrate,
+                                        VatAmount = charge.VatAmount,
+                                        TotalAmount = charge.TotalAmount,
+                                        TotalAmountVnd = charge.TotalAmountVnd,
+                                        Payee = charge.Payee,
+                                        OBHPartnerName = charge.OBHPartnerName,
+                                        InvoiceNo = charge.InvoiceNo,
+                                        SeriesNo = charge.SeriesNo,
+                                        InvoiceDate = charge.InvoiceDate,
+                                        VatPartner = charge.VatPartner
+                                    };
+
+                    jobDetail.surchargesDetail = new List<SurchargesShipmentSettlementExportGroup>();
+                    jobDetail.surchargesDetail.AddRange(surcharges.OrderBy(x=>x.ChargeCode).AsQueryable());
+                    settle.ShipmentDetail.Add(jobDetail);
+                }
+                data.Add(settle);
             }
-            return data;
+            var result = data.OrderBy(x => x.SettlementNo).ThenBy(x => x.ShipmentDetail.OrderBy(z => z.JobID)).AsQueryable();
+            return result.ToList();
         }
     }
 }
