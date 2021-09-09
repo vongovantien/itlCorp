@@ -1,6 +1,6 @@
 import { GenerateIdComponent } from './components/generate-id/generate-id.component';
 import { NgModule } from '@angular/core';
-import { UnlockComponent } from './unlock.component';
+import { OtherComponent } from './other.component';
 import { Route, RouterModule } from '@angular/router';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -13,7 +13,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { LockShipmentComponent } from './components/lock-shipment/lock-shipment.component';
 
 const routing: Route[] = [
-    { path: '', component: UnlockComponent, data: { name: "" } },
+    { path: '', component: OtherComponent, data: { name: "" } },
 
 ];
 
@@ -28,7 +28,7 @@ const routing: Route[] = [
     ],
     exports: [],
     declarations: [
-        UnlockComponent,
+        OtherComponent,
         UnlockShipmentComponent,
         UnlockAccountingComponent,
         UnlockHistoryPopupComponent,
@@ -37,4 +37,4 @@ const routing: Route[] = [
     ],
     providers: [],
 })
-export class UnlockModule { }
+export class OtherModule { }
