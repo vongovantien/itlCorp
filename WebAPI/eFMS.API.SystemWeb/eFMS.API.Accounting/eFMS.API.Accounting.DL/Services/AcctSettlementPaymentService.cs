@@ -551,21 +551,23 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in surchargeShipment)
                             {
-                                //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
-                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).FirstOrDefault();
-                                if (advanceRequest != null)
+                                var advanceRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).ToList();
+                                foreach(var advanceRequest in advanceRequests)
                                 {
-                                    advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
-                                    advanceRequest.DatetimeModified = DateTime.Now;
-                                    advanceRequest.UserModified = userCurrenct;
-                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
-                                }
+                                    if (advanceRequest != null)
+                                    {
+                                        advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                        advanceRequest.DatetimeModified = DateTime.Now;
+                                        advanceRequest.UserModified = userCurrenct;
+                                        var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    }
 
-                                item.SettlementCode = null;
-                                item.AdvanceNo = null;
-                                item.UserModified = userCurrenct;
-                                item.DatetimeModified = DateTime.Now;
-                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                    item.SettlementCode = null;
+                                    item.AdvanceNo = null;
+                                    item.UserModified = userCurrenct;
+                                    item.DatetimeModified = DateTime.Now;
+                                    var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
+                                }
                             }
                         }
                         //Phí hiện trường (Xóa khỏi surcharge)
