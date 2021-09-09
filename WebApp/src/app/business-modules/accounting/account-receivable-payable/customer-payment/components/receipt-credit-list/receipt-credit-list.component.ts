@@ -6,7 +6,7 @@ import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, Receip
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
 import { ReceiptInvoiceModel } from "@models";
 import { takeUntil } from "rxjs/operators";
-import { RemoveCredit } from "../../store/actions";
+import { RemoveCredit, AddDebitCreditToReceipt } from "../../store/actions";
 import _cloneDeep from 'lodash/cloneDeep'
 import { InjectViewContainerRefDirective } from "@directives";
 import { ConfirmPopupComponent } from "@common";
@@ -205,9 +205,15 @@ export class ARCustomerPaymentReceiptCreditListComponent extends AppList impleme
                 item.totalPaidUsd = +item.paidAmountUsd;
                 break;
             default:
-
                 break;
         }
+
+        // this._store.select(ReceiptCreditListState)
+        //     .pipe(takeUntil(this.ngUnsubscribe))
+        //     .subscribe(
+        //         (data) => {
+        //             this._store.dispatch(AddDebitCreditToReceipt({ data }));
+        //         })
 
         this.calculateSumTotalCredit();
     }

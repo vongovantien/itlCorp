@@ -4,7 +4,7 @@ import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { formatDate, formatCurrency } from '@angular/common';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
-import { Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from '@app';
 import { JobConstants, AccountingConstants } from '@constants';
@@ -22,12 +22,13 @@ import {
     ProcessClearSuccess,
     ToggleAutoConvertPaid,
     SelectReceiptCurrency,
-    UpdateReceiptExchangeRate
+    UpdateReceiptExchangeRate,
+    ReceiptActionTypes
 } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, withLatestFrom, switchMap, switchMapTo, take, filter } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 @Component({
@@ -110,7 +111,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _toastService: ToastrService,
-        private readonly _systemRepo: SystemRepo
+        private readonly _systemRepo: SystemRepo,
+        private readonly _actionStoreSubject: ActionsSubject,
     ) {
         super();
     }
@@ -140,10 +142,44 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 }
             );
 
-        this.class$ = this._store.select(ReceiptClassState)
+        this.class$ = this._store.select(ReceiptClassState);
 
+
+        this._actionStoreSubject
+            .pipe(
+                filter(x => x.type === ReceiptActionTypes.ADD_DEBIT_CREDIT_TO_RECEIPT),
+                switchMapTo(
+                    this._store.select(ReceiptCreditListState)
+                        .pipe(take(1))
+                ),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    this.calculateCreditAmount(data);
+                }
+            )
+    }
+
+    calculateCreditAmount(credits: ReceiptInvoiceModel[]) {
+        let totalCreditAmountVnd: number = 0;
+        let totalCreditAmountUsd: number = 0;
+
+        if (!!credits.length) {
+            for (let index = 0; index < credits.length; index++) {
+                const credit = credits[index];
+                totalCreditAmountVnd += Number(credit.paidAmountVnd);
+                totalCreditAmountUsd += Number(credit.paidAmountUsd);
+            }
+        }
+
+        this.creditAmountVnd.setValue(totalCreditAmountVnd);
+        this.creditAmountUsd.setValue(+totalCreditAmountUsd.toFixed(2));
+
+        this.calculateFinalPaidAmount();
 
     }
+
 
     listenCustomerInfoData() {
         this._store.select(ReceiptPartnerCurrentState)
