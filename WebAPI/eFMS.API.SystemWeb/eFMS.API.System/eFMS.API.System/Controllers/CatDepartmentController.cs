@@ -125,7 +125,8 @@ namespace eFMS.API.System.Controllers
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            ResultHandle result = new ResultHandle 
+            { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return Ok(result);
@@ -154,7 +155,8 @@ namespace eFMS.API.System.Controllers
 
             var message = HandleError.GetMessage(hs, Crud.Update);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle 
+            { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return Ok(result);

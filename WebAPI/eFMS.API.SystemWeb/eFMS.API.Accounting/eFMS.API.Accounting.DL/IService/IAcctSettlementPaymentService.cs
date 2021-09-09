@@ -32,7 +32,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<SettlementPaymentMngt> GetSettlementPaymentMngts(string jobId, string mbl, string hbl, string requester);
 
-        IQueryable<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
+        List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
         IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
@@ -75,6 +75,7 @@ namespace eFMS.API.Accounting.DL.IService
         SettlementExport SettlementExport(Guid settlementId);
 
         List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode);
+        List<AccountingSettlementExportGroup> GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria);
 
         HandleState RecallRequest(Guid settlementId);
 
@@ -97,7 +98,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
-        HandleState CalculatorReceivableSettlement(string settlementCode);
+        List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode);
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);
 
         HandleState CalculateBalanceSettle(List<string> settlementNo);

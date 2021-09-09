@@ -26,6 +26,7 @@ namespace FMS.API.ReportData.Models.Accounting
         public DateTime? EtdDate { get; set; }
         public decimal? CreditAmount { get; set; }
         public decimal? PaymentCredit { get; set; }
+        public decimal? NetOff { get; set; }
 
         public List<AccountingAgencyPaymentExportDetail> details;
     }

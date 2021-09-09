@@ -133,7 +133,13 @@ namespace eFMS.API.Accounting.Controllers
             if (hs.Success)
             {
                 //Tính công nợ sau khi Save Cancel thành công
-                acctReceiptService.CalculatorReceivableForReceipt(id);
+                // acctReceiptService.CalculatorReceivableForReceipt(id);
+
+                Response.OnCompleted(async () =>
+                {
+                    await acctReceiptService.CalculatorReceivableForReceipt(id);
+
+                });
             }
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -196,20 +202,20 @@ namespace eFMS.API.Accounting.Controllers
             }
             else if (saveAction == SaveAction.SAVEDONE)
             {
-                if (hs.Success)
-                {
-                    //Tính công nợ sau khi Save Done thành công
-                    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
-                }
+                //if (hs.Success)
+                //{
+                //    //Tính công nợ sau khi Save Done thành công
+                //    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                //}
                 result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
             }
             else if (saveAction == SaveAction.SAVECANCEL)
             {
-                if (hs.Success)
-                {
-                    //Tính công nợ sau khi Save Cancel thành công
-                    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
-                }
+                //if (hs.Success)
+                //{
+                //    //Tính công nợ sau khi Save Cancel thành công
+                //    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                //}
                 result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
             }
             else
@@ -222,6 +228,14 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptModel };
                 return BadRequest(_result);
             }
+            else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
+            {
+                Response.OnCompleted(async () =>
+                {
+                    await acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+
+                });
+            }
             return Ok(result);
         }
 
@@ -229,11 +243,11 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult SaveDoneReceipt(Guid receiptId)
         {
             var hs = acctReceiptService.SaveDoneReceipt(receiptId);
-            if (hs.Success)
-            {
-                //Tính công nợ sau khi Save Done thành công
-                acctReceiptService.CalculatorReceivableForReceipt(receiptId);
-            }
+            //if (hs.Success)
+            //{
+            //    //Tính công nợ sau khi Save Done thành công
+            //    acctReceiptService.CalculatorReceivableForReceipt(receiptId);
+            //}
             ResultHandle result = new ResultHandle();
             if (!hs.Success)
             {
@@ -244,7 +258,15 @@ namespace eFMS.API.Accounting.Controllers
             {
                 var message = HandleError.GetMessage(hs, Crud.Update);
                 result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
+                Response.OnCompleted(async () =>
+                {
+                    await acctReceiptService.CalculatorReceivableForReceipt(receiptId);
+
+                });
             }
+
+
             return Ok(result);
         }
 

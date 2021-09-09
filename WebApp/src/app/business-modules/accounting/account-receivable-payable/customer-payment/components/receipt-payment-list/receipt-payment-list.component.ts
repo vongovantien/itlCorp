@@ -248,7 +248,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUsd.setValue(+formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const paidAmountUsd = Number((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.paidAmountUsd.setValue(paidAmountUsd);
                     }
                 }
 
@@ -300,7 +301,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.creditAmountUsd.setValue(0);
                     } else {
-                        this.creditAmountUsd.setValue(+formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const creditAmountUsd = Number((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.creditAmountUsd.setValue(creditAmountUsd);
                     }
                 }
                 this.calculateFinalPaidAmount();
@@ -322,12 +324,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.cusAdvanceAmountVnd.setValue(0);
                 }
                 if (!!this.isAutoConvert.value) {
-                    const valueUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                    this.cusAdvanceAmountUsd.setValue(+formatCurrency(valueUsd, 'en', ''));
+                    const cusAdvanceAmountUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
+                    this.cusAdvanceAmountUsd.setValue(cusAdvanceAmountUsd);
                 }
                 this.calculateFinalPaidAmount();
                 break;
             case 'cusAdvanceAmountUsd':
+                debugger
                 if (!data.target.value.length) {
                     this.cusAdvanceAmountUsd.setValue(0);
                 }
@@ -436,6 +439,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
             return;
+        }
+        if (!!this.creditAmountVnd.value || !!this.creditAmountUsd.value) {
+            const isHavenetOff = body.list.every(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && (!!x.netOffVnd || !!x.netOffUsd));
+            if (!isHavenetOff) {
+                this._toastService.warning('Please you check Net Off Amount Detail on Debit List', 'Warning');
+                return;
+            }
         }
 
         this._accountingRepo.processInvoiceReceipt(body)

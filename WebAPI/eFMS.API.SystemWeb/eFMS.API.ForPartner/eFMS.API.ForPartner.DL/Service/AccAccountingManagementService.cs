@@ -620,16 +620,34 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 try
                 {
-                    var data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
-                                                 && x.InvoiceNoReal == model.InvoiceNo
-                                                 && x.Serie == model.SerieNo
-                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
+                    AccAccountingManagement data = null;
+                    HandleState hs = new HandleState();
+
+                    if (model.SerieNo == ForPartnerConstants.TYPE_CHARGE_OBH)
+                    {
+                        data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
+                                                && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
+
+
+                        hs = DataContext.Delete(x => data.Id == x.Id, false);
+                    }
+                    else
+                    {
+                        data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
+                                                && x.InvoiceNoReal == model.InvoiceNo
+                                                && x.Serie == model.SerieNo
+                                                && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
+
+
+                        hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
+                                                              && x.InvoiceNoReal == model.InvoiceNo
+                                                              && x.Serie == model.SerieNo
+                                                              && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
+                    }
+                   
                     if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
 
-                    HandleState hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
-                                                          && x.InvoiceNoReal == model.InvoiceNo
-                                                          && x.Serie == model.SerieNo
-                                                          && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
+                   
                     if (hs.Success)
                     {
                         var charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
@@ -665,9 +683,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         if(sm.Success)
                         {
                             CalculatorInvoiceReceivable(data);
-                            accReceivableRepository.SubmitChanges();
                         }
-                        
 
                         trans.Commit();
                     }
@@ -749,7 +765,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
                         receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) + _totalAmount;
 
-                        receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+                        receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivableCurrent.AdvanceAmount ?? 0);
                         accReceivableRepository.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
                     }
                 }
@@ -770,12 +786,15 @@ namespace eFMS.API.ForPartner.DL.Service
                             receivableCurrent.PaidAmount = (receivableCurrent.BillingAmount ?? 0) - _totalPaid;
                             receivableCurrent.SellingNoVat = (receivableCurrent.SellingNoVat ?? 0) + _totalAmount;
 
-                            receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivable.AdvanceAmount ?? 0);
+                            receivableCurrent.DebitAmount = (receivableCurrent.SellingNoVat ?? 0) + (receivableCurrent.BillingUnpaid ?? 0) + (receivableCurrent.ObhUnpaid ?? 0) + (receivableCurrent.AdvanceAmount ?? 0);
 
                             accReceivableRepository.Update(receivableCurrent, x => x.Id == receivableCurrent.Id, false);
                         }
                     }
                 }
+
+                accReceivableRepository.SubmitChanges();
+
             }
 
         }
@@ -2096,32 +2115,54 @@ namespace eFMS.API.ForPartner.DL.Service
             var hs = new HandleState();
             try
             {
-                foreach (var expense in expenses)
+                //foreach (var expense in expenses)
+                //{
+                //    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
+                //    if (surcharge != null)
+                //    {
+                //        surcharge.UserModified = _currentUser.UserID;
+                //        surcharge.DatetimeModified = DateTime.Now;
+                //        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                //        {
+                //            surcharge.VoucherIdre = expense.VoucherNO;
+                //            surcharge.VoucherIdredate = expense.VoucherDate;
+                //        }
+                //        else
+                //        {
+                //            surcharge.VoucherId = expense.VoucherNO;
+                //            surcharge.VoucherIddate = expense.VoucherDate;
+                //        }
+                //        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
+                //    }
+                //}
+
+                StatusModel result = UpdateSurchargeVoucherExpense(expenses);
+                if(!result.Status)
                 {
-                    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
-                    if (surcharge != null)
-                    {
-                        surcharge.UserModified = _currentUser.UserID;
-                        surcharge.DatetimeModified = DateTime.Now;
-                        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
-                        {
-                            surcharge.VoucherIdre = expense.VoucherNO;
-                            surcharge.VoucherIdredate = expense.VoucherDate;
-                        }
-                        else
-                        {
-                            surcharge.VoucherId = expense.VoucherNO;
-                            surcharge.VoucherIddate = expense.VoucherDate;
-                        }
-                        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
-                    }
+                    return new HandleState((object)result.Message);
                 }
-                return hs;
+                return new HandleState(result.Status,"Success");
             }
             catch(Exception ex)
             {
                 return new HandleState((object)"Error");
             }
+        }
+
+        private StatusModel UpdateSurchargeVoucherExpense(List<VoucherExpenseCharge> listExpense)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(listExpense),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[VoucherExpense]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateVoucherExpense>(parameters);
+            return result.FirstOrDefault();
         }
     }
 }

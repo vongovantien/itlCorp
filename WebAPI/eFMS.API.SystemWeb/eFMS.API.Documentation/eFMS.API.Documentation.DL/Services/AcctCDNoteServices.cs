@@ -21,6 +21,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using eFMS.API.Documentation.Service.ViewModels;
+using System.Data.SqlClient;
+using System.Data;
+using eFMS.API.Documentation.Service.Contexts;
+using ITL.NetCore.Connection;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -53,6 +58,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatCommodityGroup> catCommodityGroupRepository;
         IContextBase<AccAccountingManagement> accountingManagementRepository;
         IContextBase<CatDepartment> departmentRepository;
+        readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -83,7 +89,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<SysUserNotification> sysUsernotifyRepo,
             IContextBase<CatCommodityGroup> catCommodityGroupRepo,
             IContextBase<AccAccountingManagement> accountingManagementRepo,
-            IContextBase<CatDepartment> catDepManagementRepo
+            IContextBase<CatDepartment> catDepManagementRepo,
+            IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -114,6 +121,7 @@ namespace eFMS.API.Documentation.DL.Services
             catCommodityGroupRepository = catCommodityGroupRepo;
             accountingManagementRepository = accountingManagementRepo;
             departmentRepository = catDepManagementRepo;
+            acctCreditManagementArRepository = acctCreditManagementArRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -322,6 +330,7 @@ namespace eFMS.API.Documentation.DL.Services
                 model.ExcRateUsdToLocal = _excRateUsdToLocal;
 
                 decimal _totalCdNote = 0;
+                var surchargesCDNote = new List<CsShipmentSurcharge>();
                 foreach (var c in model.listShipmentSurcharge)
                 {
                     var charge = surchargeRepository.Get(x => x.Id == c.Id).FirstOrDefault();
@@ -375,12 +384,14 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
+                        surchargesCDNote.Add(charge);
                     }
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 model.Total = _totalCdNote;
 
                 var hs = new HandleState();
+                var hsSc = new HandleState();
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -392,7 +403,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (hs.Success)
                         {
-                            var hsSc = surchargeRepository.SubmitChanges();
+                            hsSc = surchargeRepository.SubmitChanges();
                             var hsOt = opstransRepository.SubmitChanges();
                             var hsCt = cstransRepository.SubmitChanges();
                         }
@@ -407,6 +418,10 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         trans.Dispose();
                     }
+                }
+                if (model.Type == "CREDIT" && hsSc.Success) // Add new Credit AR
+                {
+                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Add");
                 }
                 return hs;
             }
@@ -476,7 +491,8 @@ namespace eFMS.API.Documentation.DL.Services
                 //***Note: Khi update CD Note thì không cần cập nhật tỷ giá ExcRateUsdToLocal của CDNote
 
                 decimal _totalCdNote = 0;
-
+                var surchargesCDNote = new List<CsShipmentSurcharge>();
+                var surchargeUpdate = new List<CsShipmentSurcharge>(); ;
                 var chargeOfCdNote = surchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
                 //Cập nhật các credit debit note code của của các charge thành null
                 foreach (var item in chargeOfCdNote)
@@ -491,6 +507,7 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.DebitNo = null;
                     }
+                    surchargeUpdate.Add(item);
                     var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                 }
 
@@ -559,12 +576,14 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             _totalCdNote += (charge.AmountUsd + charge.VatAmountUsd) ?? 0;
                         }
+                        surchargesCDNote.Add(charge);
                     }
                     var hsSurcharge = surchargeRepository.Update(charge, x => x.Id == charge.Id, false);
                 }
                 entity.Total = _totalCdNote;
 
                 var hs = new HandleState();
+                var hsSurSc = new HandleState();
                 using (var trans = DataContext.DC.Database.BeginTransaction())
                 {
                     try
@@ -574,9 +593,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                         UpdateJobModifyTime(model.Id);
 
-                        var hsSurSc = surchargeRepository.SubmitChanges();
+                        hsSurSc = surchargeRepository.SubmitChanges();
                         var hsOtSc = opstransRepository.SubmitChanges();
                         var hsCtSc = cstransRepository.SubmitChanges();
+                        
 
                         trans.Commit();
                     }
@@ -589,6 +609,14 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         trans.Dispose();
                     }
+                }
+                if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
+                {
+                    // Get all origin data and updated soano data
+                    var hblExcept = surchargesCDNote.Select(x => x.Id).ToList();
+                    surchargeUpdate = surchargeUpdate.Where(x => !hblExcept.Any(z => z == x.Id)).ToList();
+                    surchargesCDNote.AddRange(surchargeUpdate);
+                    UpdateAcctCreditManagement(surchargesCDNote, model.Code, model.CurrencyId, model.ExcRateUsdToLocal, model.PartnerId, "Update");
                 }
                 return hs;
             }
@@ -696,6 +724,86 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// Update Credit Management Data List
+        /// </summary>
+        /// <param name="soaNo"></param>
+        /// <param name="surchargesSoa"></param>
+        /// <param name="customer"></param>
+        /// <param name="department"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private HandleState UpdateAcctCreditManagement(List<CsShipmentSurcharge> surchargesCreditNote, string creditNo, string currency, decimal? exchangeRateUsdToVnd, string customer, string action)
+        {
+            var hs = new HandleState();
+            var acctCreditLst = new List<AcctCreditManagementModel>(); // List insert/update
+
+            var userCurrent = currentUser.UserID;
+            var shipmentLst = surchargesCreditNote.Select(x => x.Hblid).Distinct().ToList();
+            // Ge credit management list will be delete
+            var acctCreditMngData = acctCreditManagementArRepository.Get();
+            var acctCreditDelete = mapper.Map<List<AcctCreditManagementModel>>(acctCreditMngData.Where(x => x.Code == creditNo && x.Type == DocumentConstants.CREDIT_NOTE_TYPE_CODE && shipmentLst.Any(s => s == x.Hblid))).ToList();
+
+            foreach (var shipment in shipmentLst)
+            {
+                var existCredit = acctCreditMngData.Where(x => x.Code == creditNo && x.Type == DocumentConstants.CREDIT_NOTE_TYPE_CODE && x.Hblid == shipment).FirstOrDefault();
+                IEnumerable<CsShipmentSurcharge> surchargeLst = null;
+                if (existCredit == null) // Get data to add new credit AR
+                {
+                    surchargeLst = surchargesCreditNote.Where(x => x.Hblid == shipment && !string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.PaySoano) && action != "Delete");
+                }
+                else // Get data to update existed credit AR
+                {
+                    surchargeLst = surchargesCreditNote.Where(x => x.Hblid == shipment && !string.IsNullOrEmpty(x.CreditNo)
+                                                   && (string.IsNullOrEmpty(x.PaySoano) || existCredit.SurchargeId.Split(';').Any(z => z == x.Id.ToString())) && action != "Delete");
+                }
+
+                // Update for credit note  
+                if (surchargeLst.Count() > 0)
+                {
+                    // Get detail to update Credit AR
+                    var acctCredit = new AcctCreditManagementModel();
+                    acctCredit.Code = creditNo;
+                    acctCredit.Type = DocumentConstants.CREDIT_NOTE_TYPE_CODE;
+                    acctCredit.PartnerId = customer;
+                    acctCredit.Currency = currency;
+                    acctCredit.JobNo = surchargeLst.FirstOrDefault().JobNo;
+                    acctCredit.Mblno = surchargeLst.FirstOrDefault().Mblno;
+                    acctCredit.Hblno = surchargeLst.FirstOrDefault().Hblno;
+                    acctCredit.Hblid = shipment;
+                    acctCredit.SurchargeId = string.Join(';', surchargeLst.Select(x => x.Id));
+                    acctCredit.ExchangeRate = existCredit == null ? surchargeLst.FirstOrDefault().FinalExchangeRate : existCredit.ExchangeRate;
+                    acctCredit.ExchangeRateUsdToLocal = existCredit == null ? exchangeRateUsdToVnd : existCredit.ExchangeRateUsdToLocal;
+                    acctCredit.AmountVnd = acctCredit.RemainVnd  = surchargeLst.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd ?? 0));
+                    acctCredit.AmountUsd = acctCredit.RemainUsd = surchargeLst.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd ?? 0));
+                    acctCredit.CompanyId = currentUser.CompanyID;
+                    acctCredit.OfficeId = currentUser.OfficeID == null ? null : currentUser.OfficeID.ToString();
+                    acctCredit.DepartmentId = currentUser.DepartmentId;
+                    acctCredit.DatetimeCreated = existCredit == null ? DateTime.Now : existCredit.DatetimeCreated;
+                    acctCredit.UserCreated = existCredit == null ? userCurrent : existCredit.UserCreated;
+                    acctCredit.DatetimeModified = DateTime.Now;
+                    acctCredit.UserModified = userCurrent;
+                    acctCredit.NetOff = false;
+                    acctCreditLst.Add(acctCredit);
+                }
+            }
+            if (acctCreditLst.Count() > 0 || acctCreditDelete.Count() > 0)
+            {
+                // Update database
+                var addCreditMng = UpdateCreditManagement(acctCreditLst, acctCreditDelete, action);
+                string logName = string.Format("CreditNote_{0}_{1}AcctCreditManagementAR", creditNo, action);
+                string logMessage = string.Format(" * DataTypeCreditNote: {0} \n * Result: {1}",
+                    JsonConvert.SerializeObject(acctCreditLst),
+                    JsonConvert.SerializeObject(addCreditMng));
+                new LogHelper(logName, logMessage);
+                if (!addCreditMng.Status)
+                {
+                    hs = new HandleState((object)addCreditMng.Message);
+                }
+            }
+            return hs;
         }
 
         private List<CsShipmentSurchargeDetailsModel> Query(Guid hbId)
@@ -1008,6 +1116,7 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         var _hs = DataContext.Delete(x => x.Id == idSoA, false);
+                        var surchargeUpdate = new List<CsShipmentSurcharge>();
                         if (hs.Success)
                         {
                             foreach (var item in charges)
@@ -1033,6 +1142,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 }
                                 item.UserModified = cdNote.UserModified;
                                 item.DatetimeModified = DateTime.Now;
+                                surchargeUpdate.Add(item);
                                 surchargeRepository.Update(item, x => x.Id == item.Id, false);
                             }
                             DataContext.SubmitChanges();
@@ -1052,9 +1162,14 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
                         DataContext.SubmitChanges();
-                        surchargeRepository.SubmitChanges();
+                        var hsSur = surchargeRepository.SubmitChanges();
                         opstransRepository.SubmitChanges();
                         cstransRepository.SubmitChanges();
+                        // Delete credit AR
+                        if (cdNote.Type == "CREDIT" && hsSur.Success)
+                        {
+                            UpdateAcctCreditManagement(surchargeUpdate, cdNote.Code, cdNote.CurrencyId, cdNote.ExcRateUsdToLocal, cdNote.PartnerId, "Delete");
+                        }
                     }
                 }
 
@@ -2926,5 +3041,39 @@ namespace eFMS.API.Documentation.DL.Services
             var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();
             return res;
         }
+
+        #region -- Store procedures
+        /// <summary>
+        /// Store Proceduce to insert/update Credit Manegement AR Table
+        /// </summary>
+        /// <param name="updateLst">List to insert/update</param>
+        /// <param name="deleteLst">List to delete</param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private sp_AcctInsertUpdateCreditMng UpdateCreditManagement(List<AcctCreditManagementModel> updateLst, List<AcctCreditManagementModel> deleteLst, string action)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@AcctCreditMng",
+                    Value = DataHelper.ToDataTable(updateLst),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[AcctCreditMngTable]"
+                },
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@AcctCreditMngDelete",
+                    Value = DataHelper.ToDataTable(deleteLst),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[AcctCreditMngTable]"
+                },
+                new SqlParameter(){ ParameterName="@action", Value=action}
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_AcctInsertUpdateCreditMng>(parameters);
+            return result.FirstOrDefault();
+        }
+        #endregion
     }
 }

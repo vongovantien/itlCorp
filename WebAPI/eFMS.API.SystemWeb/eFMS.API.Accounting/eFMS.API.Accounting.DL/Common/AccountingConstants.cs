@@ -159,6 +159,7 @@
         public static readonly string ARGEEMENT_TYPE_OFFICIAL = "Official";
         public static readonly string ARGEEMENT_TYPE_GUARANTEED = "Guaranteed";
         public static readonly string ARGEEMENT_TYPE_CASH = "Cash";
+        public static readonly string ARGEEMENT_TYPE_PARENT= "Parent Contract";
 
         public static readonly string STATUS_ACTIVE = "Active";
         public static readonly string STATUS_INACTIVE = "Inactive";
@@ -199,6 +200,11 @@
         public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
         public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
         public static readonly string PAYMENT_TYPE_NAME_ADVANCE = "ADV";
+        #endregion
+
+        #region -- AR CREDIT TYPE --
+        public static readonly string CREDIT_NOTE_TYPE_CODE = "CREDITNOTE";
+        public static readonly string CREDIT_SOA_TYPE_CODE = "CREDITSOA";
         #endregion
     }
 }

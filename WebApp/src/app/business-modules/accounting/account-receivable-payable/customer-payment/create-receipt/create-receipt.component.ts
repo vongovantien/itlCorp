@@ -155,7 +155,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd))) {
+        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd)) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             this._toastService.warning("Paid amount is required");
             return;
         }
@@ -167,7 +167,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
+            // const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
+            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT).some(x => !x.netOffVnd || !x.netOffUsd);
             if (isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
@@ -344,6 +345,11 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     setPaymentListFormDefault(res: ReceiptModel) {
+        if (res.currencyId !== 'VND') {
+            this.listInvoice.paidAmountUsd.enable();
+            this.listInvoice.creditAmountUsd.enable();
+            this.listInvoice.cusAdvanceAmountUsd.enable();
+        }
         if (this.actionReceiptFromParams === 'debit') {
             this.setPaymentListFormForClearDebit(res);
             return;
