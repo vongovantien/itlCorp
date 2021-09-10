@@ -1689,8 +1689,14 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
-
-                    paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
+                    if(invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
+                    {
+                        paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
+                    }
+                    else
+                    {
+                        paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
+                    }
                 }
                 if (paidUsd > 0)
                 {
@@ -1702,7 +1708,14 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                     }
-                    paidUsd = paidUsd - (invoice.TotalPaidUsd ?? 0);
+                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
+                    {
+                        paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
+                    }
+                    else
+                    {
+                        paidUsd = paidUsd - (invoice.TotalPaidUsd ?? 0);
+                    }
                 }
             }
             return new ProcessClearInvoiceModel
