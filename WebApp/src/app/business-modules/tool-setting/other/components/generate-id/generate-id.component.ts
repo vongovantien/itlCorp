@@ -31,7 +31,7 @@ export class GenerateIdComponent implements OnInit {
             .subscribe((res: CommonInterface.IResult) => {
                 if (res.status) {
                     this._toastService.success(
-                        `Update successfully"}`,
+                        `Update successfully`,
                         "Update Success !"
                     );
                 } else {
