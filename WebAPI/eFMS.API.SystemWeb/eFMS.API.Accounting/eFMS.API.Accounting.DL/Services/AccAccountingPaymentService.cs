@@ -1751,7 +1751,7 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaidAmount += (detail.PaidAmount ?? 0);
                     payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
                     payment.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
-                    payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
+                    payment.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
                     payment.receiptDetail.Add(detail);
                 }
                 results.Add(payment);
