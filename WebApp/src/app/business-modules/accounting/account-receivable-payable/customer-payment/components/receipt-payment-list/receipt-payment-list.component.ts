@@ -512,6 +512,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
                 this.cusAdvanceAmountUsd.setValue(+formatCurrency(_advanceUsd, 'en', ''));
 
+                const paidAmountUsd: number = +((+this.paidAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                this.paidAmountUsd.setValue(+formatCurrency(paidAmountUsd, 'en', ''))
+
+                const creditAmountUsd: number = +((+this.creditAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                this.creditAmountUsd.setValue(+formatCurrency(creditAmountUsd, 'en', ''))
+
                 this.cusAdvanceAmountUsd.disable();
                 this.creditAmountUsd.disable();
                 this.paidAmountUsd.disable();
@@ -524,6 +530,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
+
+                const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                this.paidAmountVnd.setValue(paidAmountVnd);
+
+                const creditAmountVnd: number = +((this.creditAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                this.creditAmountVnd.setValue(creditAmountVnd);
 
                 this.cusAdvanceAmountVnd.disable();
                 this.paidAmountVnd.disable();
@@ -540,6 +552,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
         this.paidAmountVnd.updateValueAndValidity();
         this.paidAmountUsd.updateValueAndValidity();
+
+        this.calculateFinalPaidAmount();
 
     }
 
