@@ -1741,7 +1741,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 debits = GetDebitForIssueCustomerPayment(criteria);
                 obhs = GetObhForIssueCustomerPayment(criteria);
-                // soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
+                //soaCredits = GetSoaCreditForIssueCustomerPayment(criteria);
                 //creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
             }
 
@@ -2000,9 +2000,9 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerId = se.Invoice.inv.PartnerId,
                 CurrencyId = se.Invoice.inv.Currency,
                 Amount = se.Invoice.inv.TotalAmount,
-                UnpaidAmount = se.Invoice.inv.Currency == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
-                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
-                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmount = se.Invoice.inv.UnpaidAmount,
+                UnpaidAmountVnd = se.Invoice.inv.UnpaidAmountVnd,
+                UnpaidAmountUsd = se.Invoice.inv.UnpaidAmountUsd,
                 PaymentTerm = se.Invoice.inv.PaymentTerm,
                 DueDate = se.Invoice.inv.PaymentDueDate,
                 PaymentStatus = se.Invoice.inv.PaymentStatus,
