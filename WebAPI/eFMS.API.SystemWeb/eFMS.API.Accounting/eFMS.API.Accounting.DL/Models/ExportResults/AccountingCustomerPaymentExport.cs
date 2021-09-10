@@ -15,9 +15,13 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? BillingDate { get; set; }
         public DateTime? DueDate { get; set; }
         public decimal? UnpaidAmountInv { get; set; }
+        public decimal? UnpaidAmountInvUsd { get; set; }
         public decimal? UnpaidAmountOBH { get; set; }
+        public decimal? UnpaidAmountOBHUsd { get; set; }
         public decimal? PaidAmount { get; set; }
+        public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBH { get; set; }
+        public decimal? PaidAmountOBHUsd { get; set; }
         public string JobNo { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
@@ -34,5 +38,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? PaidAmountOBH { get; set; }
+        public decimal? PaidAmountUsd { get; set; }
+        public decimal? PaidAmountOBHUsd { get; set; }
     }
 }
