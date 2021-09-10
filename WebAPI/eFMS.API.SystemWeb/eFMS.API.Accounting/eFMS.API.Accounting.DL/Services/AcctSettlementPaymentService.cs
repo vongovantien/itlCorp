@@ -5639,9 +5639,9 @@ namespace eFMS.API.Accounting.DL.Services
                        join units in UnitDatas on sur.UnitId equals units.Id into grpUnit
                        from unit in grpUnit.DefaultIfEmpty()
                        join advanceReq in advanceReqData on new { sur.AdvanceNo, sur.JobNo, sur.Hblno } equals new { advanceReq.AdvanceNo, JobNo = advanceReq.JobId, Hblno = advanceReq.Hbl } into grpAdv
-                       from adv in grpAdv.DefaultIfEmpty()
+                       from adv in grpAdv.GroupBy(x => new { x.JobId, x.Hblid, x.AdvanceNo }).Select(x => new { AmountVnd = x.Sum(z => z.AmountVnd ?? 0), AmountUsd = x.Sum(z => z.AmountUsd ?? 0) }).Take(1).DefaultIfEmpty()
                        join cus in custom on sur.JobNo equals cus.JobNo into cus1
-                       from cus in cus1.DefaultIfEmpty()
+                       from cus in cus1.OrderBy(c => c.DatetimeCreated).Take(1).DefaultIfEmpty()
                        select new ShipmentSettlementExportGroup
                        {
                            SettleNo = settle.SettlementNo,
@@ -5668,7 +5668,7 @@ namespace eFMS.API.Accounting.DL.Services
                            InvoiceDate = sur.InvoiceDate,
                            VatPartner = vatPartner == null ? string.Empty : vatPartner.ShortName,
                            AdvanceNo = sur.AdvanceNo,
-                           AdvanceAmount = adv == null ? 0m : (settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd ?? 0 : adv.AmountUsd ?? 0)
+                           AdvanceAmount = adv == null ? 0m : (settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd : adv.AmountUsd)
                        };
             var groupData = data.OrderBy(x => x.SettleNo).ThenBy(x => x.MBL).ThenBy(x => x.HBL);
             return groupData.ToList();
