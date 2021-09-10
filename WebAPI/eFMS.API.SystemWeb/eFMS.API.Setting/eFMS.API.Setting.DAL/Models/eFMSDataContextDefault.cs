@@ -176,6 +176,7 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.BuheadAprDate)
                     .HasColumnName("BUHeadAprDate")
+                    .HasColumnName("BUHeadAprDate")
                     .HasColumnType("datetime");
 
                 entity.Property(e => e.DateCreated).HasColumnType("datetime");

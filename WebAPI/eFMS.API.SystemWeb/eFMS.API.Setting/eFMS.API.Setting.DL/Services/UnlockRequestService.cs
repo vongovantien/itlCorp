@@ -1,17 +1,24 @@
 ﻿using AutoMapper;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
+using eFMS.API.Setting.Service.Contexts;
 using eFMS.API.Setting.Service.Models;
+using eFMS.API.Setting.Service.ViewModels;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
+using ITL.NetCore.Connection;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
@@ -692,20 +699,22 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
                     }
-                    if (!string.IsNullOrEmpty(advanceCurrent.SyncStatus))
+                    var newID = Guid.NewGuid();
+                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
+                    string logName = string.Format("UpdateAdvancePayment_{0}_eFMS_Log", (
+                        updatePaymentId.Status ? "Success" : "Fail"
+                   ));
+                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                        JsonConvert.SerializeObject("AdvancePayment"),
+                        JsonConvert.SerializeObject(advanceCurrent.Id),
+                        JsonConvert.SerializeObject(newID));
+                    new LogHelper(logName, logMessage);
+                    if (!updatePaymentId.Status)
                     {
-                        if (advanceCurrent.SyncStatus.Contains("Synced") || advanceCurrent.SyncStatus.Contains("Rejected"))
-                        {
-                            advanceCurrent.SyncStatus = null;
-                        }
+                        return new HandleState((object)updatePaymentId.Message);
                     }
-                    var hs= advancePaymentRepo.Delete(x => x.Id==advanceCurrent.Id);
-                    if (hs.Success)
-                    {
-                        advanceCurrent.Id = Guid.NewGuid();
-                        advancePaymentRepo.Add(advanceCurrent);
-                    }
-                    return hs;
+                    return new HandleState(true, (object)updatePaymentId.Message);
                 }
                 if (type == 2)
                 {
@@ -716,36 +725,45 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
                     }
-                    if (!string.IsNullOrEmpty(settlementCurrent.SyncStatus))
-                    {
-                        if (settlementCurrent.SyncStatus.Contains("Synced") || settlementCurrent.SyncStatus.Contains("Rejected"))
-                        {
-                            settlementCurrent.SyncStatus = null;
-                        }
-                    }
+                    var newID = Guid.NewGuid();
+                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
+                    string logName = string.Format("UpdateSettlementPayment_{0}_eFMS_Log", (
+                         updatePaymentId.Status ? "Success" : "Fail"
+                    ));
+                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                        JsonConvert.SerializeObject("SettlementPayment"),
+                        JsonConvert.SerializeObject(settlementCurrent.Id),
+                        JsonConvert.SerializeObject(newID));
+                    new LogHelper(logName, logMessage);
 
-                    var hs=settlementPaymentRepo.Delete(x => x.Id == settlementCurrent.Id);
-                    if (hs.Success)
+                    if (!updatePaymentId.Status)
                     {
-                        settlementCurrent.Id = Guid.NewGuid();
-                        settlementPaymentRepo.Add(settlementCurrent);
+                        return new HandleState((object)updatePaymentId.Message);
                     }
-                    return hs;
+                    return new HandleState(true, (object)updatePaymentId.Message);
                 }
                 else
                 {
                     var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
                     if (SOACurrent == null) return new HandleState("Not found advance payment");
-                    
-                    var hs=soaRepo.Delete(x => x.Id == SOACurrent.Id);
-                    if (hs.Success)
+                    var newID = Guid.NewGuid();
+                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
+                    string logName = string.Format("UpdateSOAPayment_{0}_eFMS_Log", (
+                        updatePaymentId.Status ? "Success" : "Fail"
+                   ));
+                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                        JsonConvert.SerializeObject("SOA"),
+                        JsonConvert.SerializeObject(SOACurrent.Id),
+                        JsonConvert.SerializeObject(newID));
+                    new LogHelper(logName, logMessage);
+                    if (!updatePaymentId.Status)
                     {
-                        SOACurrent.Id = Guid.NewGuid().ToString();
-                        soaRepo.Add(SOACurrent);
+                        return new HandleState((object)updatePaymentId.Message);
                     }
-                    return hs;
+                    return new HandleState(true, (object)updatePaymentId.Message);
                 }
-
             }
             catch (Exception ex)
             {
@@ -753,6 +771,19 @@ namespace eFMS.API.Setting.DL.Services
                 return hs;
             }
         }
+
+        #region -- Excute Store Procedure sp_UpdatePaymentId --
+        private sp_UpdatePaymentId UpdatePaymentId(string paymentNo, int type, Guid newId)
+        {
+            var parameters = new[]{
+                new SqlParameter(){ ParameterName = "@PaymentNo", Value = paymentNo },
+                new SqlParameter(){ ParameterName = "@Type", Value = type },
+                new SqlParameter(){ ParameterName = "@NewID", Value = newId },
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdatePaymentId>(parameters);
+            return result.FirstOrDefault();
+        }
+        #endregion -- Excute Store Procedure sp_UpdatePaymentId --
         #endregion -- Generate ID --
     }
 }

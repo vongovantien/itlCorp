@@ -263,25 +263,26 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("GeneratePaymentId")]
-        [Authorize]
+        //[Authorize]
         public IActionResult GeneratePaymentId(Payment payment)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (baseUser.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, null, null)==false)
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
+            //if (baseUser.CheckIsUserAdmin(currentUser.UserID, currentUser.OfficeID, currentUser.CompanyID, null, null)==false)
+            //{
+            //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            //}
            
             var hs = unlockRequestService.GenerateID(payment.paymentNo, payment.Type);
 
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data= payment.paymentNo };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                var message = HandleError.GetMessage(hs, Crud.Update);
+                ResultHandle resultError = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = payment.paymentNo };
+                return BadRequest(resultError);
             }
-            return Ok(result);
+                ResultHandle result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = payment.paymentNo };
+                return Ok(result);
         }
     }
 }
