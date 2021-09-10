@@ -470,7 +470,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             finalExchangeRate: this.exchangeRate.value,
             paidAmountVnd: +this.finalPaidAmountVnd.value,
             paidAmountUsd: +this.finalPaidAmountUsd.value,
-            list: listInvoice.filter(x => x.type !== AccountingConstants.RECEIPT_ADVANCE_TYPE),
+            list: listInvoice.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT
+                || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH
+                || x.type === AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
