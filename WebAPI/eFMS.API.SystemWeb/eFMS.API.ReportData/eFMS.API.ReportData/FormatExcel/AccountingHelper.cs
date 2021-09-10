@@ -467,7 +467,7 @@ namespace eFMS.API.ReportData.FormatExcel
                                 {"OBHPartnerName", charge.OBHPartnerName},
                                 {"InvoiceNo", charge.InvoiceNo},
                                 {"SeriesNo", charge.SeriesNo},
-                                {"InvoiceDate", charge.InvoiceDate},
+                                {"InvoiceDate", charge.InvoiceDate?.ToString("dd/MM/yyyy")},
                                 {"VatPartner", charge.VatPartner}
                             };
                             excel.SetData(listKeyData);
@@ -622,9 +622,14 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("OBHPaidAmount", item.PaidAmountOBH);
                     var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
                     var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
+                    var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
+                    var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
                     listKeyData.Add("RemainDb", remainDb);
-                    listKeyData.Add("ReamainOBH", remainObh);
+                    listKeyData.Add("RemainOBH", remainObh);
+                    listKeyData.Add("RemainDbUsd", remainDbUsd);
+                    listKeyData.Add("RemainOBHUsd", remainObhUsd);
                     listKeyData.Add("TotalAmount", remainDb + remainObh);
+                    listKeyData.Add("TotalAmountUsd", remainDbUsd + remainObhUsd);
                     listKeyData.Add("JobNo", item.JobNo);
                     listKeyData.Add("MBL", item.MBL);
                     listKeyData.Add("HBL", item.HBL);
@@ -663,9 +668,16 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumOBHPaidAmount", customerPayment.Sum(x => (x.PaidAmountOBH ?? 0)));
                 var sumRemainDb = customerPayment.Sum(x => (x.UnpaidAmountInv ?? 0) - (x.PaidAmount ?? 0));
                 var sumRemainObh = customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0) - (x.PaidAmountOBH ?? 0));
+                var sumRemainDbUsd = customerPayment.Sum(x => (x.UnpaidAmountInvUsd ?? 0) - (x.PaidAmountUsd ?? 0));
+                var sumRemainObhUsd = customerPayment.Sum(x => (x.UnpaidAmountOBHUsd ?? 0) - (x.PaidAmountOBHUsd ?? 0));
+                // Sum total VND
                 listKeyTotal.Add("SumRemainDb", sumRemainDb);
                 listKeyTotal.Add("SumRemainOBH", sumRemainObh);
                 listKeyTotal.Add("SumTotalAmount", sumRemainDb + sumRemainObh);
+                // Sum total USD
+                listKeyTotal.Add("SumRemainDbUsd", sumRemainDbUsd);
+                listKeyTotal.Add("SumRemainOBHUsd", sumRemainObhUsd);
+                listKeyTotal.Add("SumTotalAmountUsd", sumRemainDbUsd + sumRemainObhUsd);
                 excel.SetData(listKeyTotal);
                 return excel.ExcelStream();
             }

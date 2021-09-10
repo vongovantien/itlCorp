@@ -1693,20 +1693,13 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
             if (arPartnerContracts == null || !arPartnerContracts.Any())
             {
-                var arPartnerNoContracts = GetARNoContract(acctReceivables, contracts, partners);
-                if(arPartnerNoContracts == null)
-                {
-                    return null;
-                }
-                var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
-                arPartnerNoContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0).OrderByDescending(x => x.DatetimeModified);
-                return arPartnerNoContracts;
+                return null;
             }
             else
             {
                 arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
-                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0).OrderByDescending(x => x.DatetimeModified);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
         }
