@@ -397,8 +397,16 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              IsRefund = 0,
                                                                                              AdvanceNo = surcharge.AdvanceNo,
                                                                                              HblId = surcharge.Hblid,
-                                                                                             ClearanceNo = surcharge.ClearanceNo
+                                                                                             ClearanceNo = surcharge.ClearanceNo,
+
+                                                                                             // Amount
+                                                                                             AmountVND = surcharge.AmountVnd,
+                                                                                             AmountUSD = surcharge.AmountUsd,
+                                                                                             VatAmountVND= surcharge.VatAmountVnd,
+                                                                                             VatAmountUSD=surcharge.VatAmountUsd
+                                                                                             
                                                                                          };
+                            
                             if (querySettlementReq.Count() > 0)
                             {
                                 item.Details = querySettlementReq.ToList();
@@ -426,6 +434,20 @@ namespace eFMS.API.Accounting.DL.Services
                                     else
                                     {
                                         x.RefundAmount = null;
+                                    }
+                                    if (currentSettle.SettlementCurrency.Contains("VND") && (!x.CurrencyCode.Contains("VND")))
+                                    {
+                                        x.CurrencyCode = "VND";
+                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "USD", "VND");
+                                        x.OriginalAmount = x.AmountVND;
+                                        x.OriginalAmount3 = x.VatAmountVND;
+                                    }
+                                    else if(currentSettle.SettlementCurrency.Contains("USD") && x.CurrencyCode.Contains("VND"))
+                                    {
+                                        x.CurrencyCode = "USD";
+                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "VND", "USD");
+                                        x.OriginalAmount = x.AmountUSD;
+                                        x.OriginalAmount3 = x.VatAmountUSD;
                                     }
                                 });
 
