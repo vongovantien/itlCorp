@@ -67,7 +67,7 @@ build_prod_en:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/15-08-2021-sprint-24
+    - prod/25-08-2021-sprint24
   artifacts:
     name: "angular_build_prod_en"
     paths:
@@ -87,7 +87,7 @@ build_prod_vi:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/15-08-2021-sprint-24
+    - prod/25-08-2021-sprint24
   artifacts:
     name: "angular_build_prod_vi"
     paths:
