@@ -16,12 +16,17 @@ import { ShareSystemAddUserComponent } from "./components/add-user/add-user.comp
 import { ShareSystemDetailPermissionComponent } from "./components/permission/permission-detail.component";
 import { PermissionFormCreateComponent } from "./permission/components/form-create-permission/form-create-permission.component";
 import { reducers, shareSystemEffects } from "./store";
+import { ShareSystemAddEmailComponent } from "./components/add-email/add-email.component";
+
+import { ModalModule } from 'ngx-bootstrap/modal';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 
 const COMPONENTS = [
     ShareSystemAddUserComponent,
     ShareSystemDetailPermissionComponent,
     PermissionFormCreateComponent,
+    ShareSystemAddEmailComponent,
 
 ]
 @NgModule({
@@ -37,6 +42,9 @@ const COMPONENTS = [
         PipeModule,
         TabsModule.forRoot(),
         CollapseModule.forRoot(),
+        ModalModule.forRoot(),
+        NgSelectModule,
+
 
         // * STORE
         StoreModule.forFeature('share-system', reducers),
@@ -49,7 +57,4 @@ const COMPONENTS = [
     providers: [],
 })
 
-export class ShareSystemModule {
-
-
-}
+export class ShareSystemModule {}

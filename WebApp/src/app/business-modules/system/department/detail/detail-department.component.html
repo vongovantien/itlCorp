@@ -236,6 +236,11 @@
                     </table>
                 </div>
             </tab>
+            <tab heading="Email Setting"
+            *ngIf="!!departmentType&&(departmentType.value=='AR'||departmentType.value=='ACCOUNTANT')">
+                <app-department-email [department]="department"></app-department-email>
+            </tab>
+
             <tab heading="Management Group">
                 <div class="bg-white">
                     <ng-container *ngIf="!!SelectedDepartment">
@@ -246,3 +251,5 @@
         </tabset>
     </div>
 </div>
+<confirm-popup [body]="'Are you sure you want to delete?'" [labelConfirm]="'Yes'" (onSubmit)="onDeleteEmail()">
+</confirm-popup>
