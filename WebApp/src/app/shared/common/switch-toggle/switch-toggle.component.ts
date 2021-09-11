@@ -62,7 +62,7 @@ export class SwitchToggleComponent implements ControlValueAccessor {
             this.onChange(val);
             this.onTouch(val);
 
-            this.toggleChange.emit(this.toggle);
+            // this.toggleChange.emit(this.toggle);
         }
     }
 
