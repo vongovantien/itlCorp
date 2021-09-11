@@ -435,7 +435,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
-                                    if (currentSettle.SettlementCurrency.Contains("VND") && (!x.CurrencyCode.Contains("VND")))
+                                    if (currentSettle.SettlementCurrency.Contains("VND") && x.CurrencyCode.Contains("USD"))
                                     {
                                         x.CurrencyCode = "VND";
                                         x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "USD", "VND");
