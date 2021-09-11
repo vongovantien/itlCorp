@@ -320,6 +320,7 @@ namespace eFMS.API.Accounting.Controllers
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
                 shipment.AdvanceNo = advanceLst.FirstOrDefault();
+                shipment.OriginAdvanceNo = advanceLst.FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
                 shipment.CustomNo = item.Select(x => x.ClearanceNo).FirstOrDefault();
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
