@@ -26,8 +26,8 @@ const routes: Routes = [
         }
     },
     {
-        path: 'unlock', loadChildren: () => import('./unlock/unlock.module').then(m => m.UnlockModule),
-        data: { name: 'Unlock', title: 'eFMS Unlock' }
+        path: 'other', loadChildren: () => import('./other/other.module').then(m => m.OtherModule),
+        data: { name: 'Other', title: 'eFMS Other' }
     },
     {
         path: 'unlock-request', loadChildren: () => import('./unlock-request/unlock-request.module').then(m => m.UnlockRequestModule),
