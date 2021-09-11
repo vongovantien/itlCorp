@@ -435,14 +435,14 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
-                                    if (currentSettle.SettlementCurrency.Contains("VND") && x.CurrencyCode.Contains("USD"))
+                                    if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
                                     {
                                         x.CurrencyCode = "VND";
                                         x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "USD", "VND");
                                         x.OriginalAmount = x.AmountVND;
                                         x.OriginalAmount3 = x.VatAmountVND;
                                     }
-                                    else if(currentSettle.SettlementCurrency.Contains("USD") && x.CurrencyCode.Contains("VND"))
+                                    else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
                                     {
                                         x.CurrencyCode = "USD";
                                         x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "VND", "USD");
