@@ -112,6 +112,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'VAT Partner', field: '', sortable: true, width: 250 },
             { title: 'Serial No', field: 'seriesNo', sortable: true },
+            { title: 'AdvanceNo', field: 'advanceNo', sortable: true },
             { title: 'Note', field: 'notes', sortable: true },
         ];
 
@@ -338,6 +339,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.hbl = surcharge.hbl;
             shipment.hblId = surcharge.hblid;
             shipment.advanceNo = surcharge.advanceNo;
+            shipment.originAdvanceNo = surcharge.advanceNo;
             shipment.customNo = surcharge.clearanceNo;
             shipment.chargeSettlements = surcharges.map((surcharge: Surcharge) => new Surcharge(surcharge));
             shipment.totalNetAmount = surcharges.filter((charge: Surcharge) => charge.currencyId === 'USD').reduce((net: number, charge: Surcharge) => net += charge.netAmount, 0);
@@ -350,6 +352,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             shipment.totalVATUSD = surcharges.reduce((net: number, charge: Surcharge) => net += charge.vatAmountUSD, 0);
             shipment.totalVND = shipment.totalNetVND + shipment.totalVATVND;
             this.shipments = [...this.shipments, shipment];
+            this.shipments.map(item => item.advanceNoList = item.chargeSettlements.filter(x=>x.advanceNo !=null).map(x=> x.advanceNo).filter((value, index, self) => self.indexOf(value) === index));
             this.total.totalUSDStr = formatCurrency(this.shipments[0].totalNetUSD + this.shipments[0].totalVATUSD, 'en', '') + ' = ' + formatCurrency(this.shipments[0].totalNetUSD, 'en', '') + ' + ' + formatCurrency(this.shipments[0].totalVATUSD, 'en', '');
             this.totalAmountVnd = this.formatNumberCurrency(this.shipments[0].totalVND) + ' = ' + this.formatNumberCurrency(this.shipments[0].totalNetVND) + ' + ' + this.formatNumberCurrency(this.shipments[0].totalVATVND);
             this.total.totalShipment = 1;
@@ -375,7 +378,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             }))
             .subscribe(
                 (res: any[]) => {
-                    this.shipments.map(x => x.advanceNoList = res);
+                    this.shipments.map(x => x.advanceNoList = x.advanceNoList.concat(res).filter((value, index, self) => self.indexOf(value) === index))
                 },
             );
     }
@@ -487,9 +490,23 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }
     }
 
-    setAdvanceToSurcharge(shipment: any, advanceNo: string) {
+    setAdvanceToSurcharge(shipment: any, advanceNoOld: any, advanceNoNew: string) {
+        // Set charge with chosen advance with new advance when change new advance
         shipment.chargeSettlements.forEach(element => {
-            element.advanceNo = advanceNo;
+            if (element.isSelected && element.advanceNo == advanceNoOld && advanceNoOld !== advanceNoNew) {
+                element.advanceNo = element.originAdvanceNo = advanceNoNew;
+            }
+        });
+        shipment.advanceNo = shipment.originAdvanceNo = advanceNoNew;
+    }
+
+    clearAdvance(shipment: any){
+        // Set advance no = null when clear advance
+        shipment.advanceNo = shipment.originAdvanceNo = null;
+        shipment.chargeSettlements.forEach(element => {
+            if (element.isSelected) {
+                element.advanceNo = element.originAdvanceNo = null;
+            }
         });
     }
 
@@ -565,10 +582,10 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                             this.shipments = res.shipmentSettlement;
                             this.total = res.total;
                             this.totalAmountVnd = this.total.totalVNDStr;
-                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
-                            });
                             this.checkedAllCharges();
+                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                                this.setAdvanceToSurcharge(shipment, null, shipment.originAdvanceNo);
+                            });
                             this.getVatpartnerDataSource();
                             this.getInvoiceAndVatPartner();
                             this.orgChargeShipment = cloneDeep(res);
@@ -580,87 +597,86 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     }
 
     searchWithSOAOrCDNote(body: any) {
-        if (!this.selectedPartnerData) {
-            this._accoutingRepo.getPartnerForSettlement(body)
-                .pipe(
-                    catchError(this.catchError), finalize(() => this.isLoading = false),
-                    concatMap((res) => {
-                        if (!res) {
-                            this.isSubmitted = false;
-                            return of(false);
-                        }
-                        if (res.length > 1) {
-                            this._toastService.warning('Please Select Partner!');
-                            this.isSubmitted = false;
-                            return of(false);
-                        }
-                        this.selectedPartnerData = res[0];
-                        this.selectedPartner = { field: 'id', value: res[0].id };
-                        body.partnerId = this.selectedPartnerData.id;
-                        if (!!res.length) {
-                            return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                                catchError(this.catchError),
-                                concatMap((rs: any) => {
-                                    if (!rs.status) {
-                                        this._toastService.error(rs.message);
-                                        this.isSubmitted = false;
-                                        return of(false);
-                                    } else {
-                                        return this._accoutingRepo.getExistingCharge(body);
-                                    }
-                                })
-                            );
-                        }
-                    }))
-                .subscribe(
-                    (res: IGetExistsCharge) => {
-                        if (!!res) {
-                            this.orgChargeShipment = cloneDeep(res);
-                            this.shipments = res.shipmentSettlement;
-                            this.total = res.total;
-                            this.totalAmountVnd = this.total.totalVNDStr;
-                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
-                            });
-                            this.checkedAllCharges();
-                            this.getVatpartnerDataSource();
-                            this.getInvoiceAndVatPartner();
-                            this.isSubmitted = false;
-                        }
-                    }
-                );
-        } else {
-            this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
-                catchError(this.catchError),
-                concatMap((rs: any) => {
-                    if (!rs.status) {
-                        console.log('mess', rs)
-                        this._toastService.error(rs.message);
+        this._accoutingRepo.getPartnerForSettlement(body)
+            .pipe(
+                catchError(this.catchError), finalize(() => this.isLoading = false),
+                concatMap((res) => {
+                    if (!res) {
                         this.isSubmitted = false;
                         return of(false);
-                    } else {
-                        return this._accoutingRepo.getExistingCharge(body);
                     }
-                })
-            )
-                .subscribe(
-                    (res: IGetExistsCharge) => {
-                        if (!!res) {
-                            this.orgChargeShipment = cloneDeep(res);
-                            this.shipments = res.shipmentSettlement;
-                            this.total = res.total;
-                            this.totalAmountVnd = this.total.totalVNDStr;
-                            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
-                                this.setAdvanceToSurcharge(shipment, shipment.advanceNo);
-                            });
-                            this.checkedAllCharges();
-                            this.getVatpartnerDataSource();
-                            this.getInvoiceAndVatPartner();
-                            this.isSubmitted = false;
-                        }
+                    if (res.length > 1) {
+                        this._toastService.warning('Please Select Partner!');
+                        this.isSubmitted = false;
+                        return of(false);
                     }
-                );
-        }
+                    this.selectedPartnerData = res[0];
+                    this.selectedPartner = { field: 'id', value: res[0].id };
+                    body.partnerId = this.selectedPartnerData.id;
+                    if (!!res.length) {
+                        return this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
+                            catchError(this.catchError),
+                            concatMap((rs: any) => {
+                                if (!rs.status) {
+                                    this._toastService.error(rs.message);
+                                    this.isSubmitted = false;
+                                    return of(false);
+                                } else {
+                                    return this._accoutingRepo.getExistingCharge(body);
+                                }
+                            })
+                        );
+                    }
+                }))
+            .subscribe(
+                (res: IGetExistsCharge) => {
+                    if (!!res) {
+                        this.orgChargeShipment = cloneDeep(res);
+                        this.shipments = res.shipmentSettlement;
+                        this.total = res.total;
+                        this.totalAmountVnd = this.total.totalVNDStr;
+                        this.checkedAllCharges();
+                        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                            this.setAdvanceToSurcharge(shipment, null, res.shipmentSettlement.filter(x => x.hblId === shipment.hblId)[0].advanceNo);
+                        });
+                        this.getVatpartnerDataSource();
+                        this.getInvoiceAndVatPartner();
+                        this.isSubmitted = false;
+                    }
+                }
+            );
+        // else {
+        //     this._accoutingRepo.checkSoaCDNoteIsSynced(body).pipe(
+        //         catchError(this.catchError),
+        //         concatMap((rs: any) => {
+        //             if (!rs.status) {
+        //                 console.log('mess', rs)
+        //                 this._toastService.error(rs.message);
+        //                 this.isSubmitted = false;
+        //                 return of(false);
+        //             } else {
+        //                 return this._accoutingRepo.getExistingCharge(body);
+        //             }
+        //         })
+        //     )
+        //         .subscribe(
+        //             (res: IGetExistsCharge) => {
+        //                 if (!!res) {
+        //                     this.orgChargeShipment = cloneDeep(res);
+        //                     this.shipments = res.shipmentSettlement;
+        //                     this.total = res.total;
+        //                     this.totalAmountVnd = this.total.totalVNDStr;
+        //                     this.checkedAllCharges();
+        //                     this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+        //                         this.setAdvanceToSurcharge(shipment, null, res.shipmentSettlement.filter(x=>x.hblId === shipment.hblId)[0].advanceNo);
+        //                     });
+        //                     this.getVatpartnerDataSource();
+        //                     this.getInvoiceAndVatPartner();
+        //                     this.isSubmitted = false;
+        //                 }
+        //             }
+        //         );
+        // }
     }
 
     checkedAllCharges() {
@@ -772,6 +788,7 @@ class ShipmentChargeSettlement {
     shipmentId: string = '';
     customNo: string = '';
     advanceNo: string = '';
+    originAdvanceNo: string = '';
     advanceNoList: string[] = [];
     totalNetAmount: number = 0;
     totalNetAmountVND: number = 0;
