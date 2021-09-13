@@ -206,6 +206,59 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:eFMS.API.System.Controllers.SysEmailSettingController">
+            <summary>
+            Controller EmailSetting
+            </summary>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.System.DL.IService.ISysEmailSettingService)">
+            <summary>
+            Contructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="service"></param>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.Get">
+            <summary>
+            Get list EmailSetting
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.GetEmailSettingById(System.Int32)">
+            <summary>
+            Get EmailSetting by id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.GetEmailSettingByDeptId(System.Int32)">
+            <summary>
+            Get List EmailSetting by Dept id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.Insert(eFMS.API.System.DL.Models.SysEmailSettingModel)">
+            <summary>
+            Insert EmailSetting
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.Update(eFMS.API.System.DL.Models.SysEmailSettingModel)">
+            <summary>
+            Update EmailSetting
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.System.Controllers.SysEmailSettingController.Delete(System.Int32)">
+            <summary>
+            Delete EmailSetting
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.System.Controllers.SysGroupController">
             <summary>
             
