@@ -170,6 +170,26 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
+            if(receiptModel.Id == Guid.Empty)
+            {
+                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId);
+                if(isExisted == true)
+                {
+                    string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
+                    string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                    return BadRequest(_result);
+                }
+               
+            }
+
+            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                return BadRequest(_result);
+            }
+
             string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
             if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
             {
@@ -325,6 +345,16 @@ namespace eFMS.API.Accounting.Controllers
                 valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
             }
 
+            return valid;
+        }
+
+        private bool ValidateReceiptExistedReference(Guid Id, string reference)
+        {
+            bool valid = true;
+            if(Id == Guid.Empty)
+            {
+                valid = !acctReceiptService.Any(x => x.ReferenceId.ToString() == reference);
+            }
             return valid;
         }
 

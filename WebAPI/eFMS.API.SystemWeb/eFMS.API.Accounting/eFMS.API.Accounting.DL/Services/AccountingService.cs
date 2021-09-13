@@ -2692,8 +2692,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                select new PaymentDetailModel
                                                                {
                                                                    RowId = payment.Id.ToString(),
-                                                                   Amount = GetAmountReceiptPayment(receiptItem, payment, type),
-                                                                   OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type),
+                                                                   Amount = GetAmountReceiptPayment(receiptItem, payment, type,"amount"),
+                                                                   OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type,"origin"),
                                                                    CustomerCode = partner.AccountNo,
                                                                    BankAccountNo = partner.BankAccountNo,
                                                                    ObhPartnerCode = receiptItem.ObhpartnerId == null ? string.Empty : partner.AccountNo,
@@ -2971,7 +2971,7 @@ namespace eFMS.API.Accounting.DL.Services
             return _description;
         }
 
-        decimal? GetAmountReceiptPayment(AcctReceipt receipt, AccAccountingPayment payment, string type)
+        decimal? GetAmountReceiptPayment(AcctReceipt receipt, AccAccountingPayment payment, string type, string key)
         {
             decimal? _paidAmount = 0;
 
@@ -2985,6 +2985,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     _paidAmount = payment.NetOffUsd;
                 }
+                if(key == "amount")
+                {
+                    _paidAmount = payment.NetOffVnd;
+                }
             }
             else
             {
@@ -2995,6 +2999,10 @@ namespace eFMS.API.Accounting.DL.Services
                 else if ((receipt.CurrencyId == payment.CurrencyId && receipt.CurrencyId == AccountingConstants.CURRENCY_USD) || receipt.CurrencyId != payment.CurrencyId)
                 {
                     _paidAmount = payment.PaymentAmountUsd;
+                }
+                if(key == "amount")
+                {
+                    _paidAmount = payment.PaymentAmountVnd;
                 }
             }
 
