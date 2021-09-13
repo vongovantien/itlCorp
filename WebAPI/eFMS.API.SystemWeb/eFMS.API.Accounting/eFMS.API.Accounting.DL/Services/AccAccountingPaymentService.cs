@@ -462,7 +462,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => false);
             }
-            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.DueDate != null)
             {
                 query = query.And(x => false);
             }
@@ -658,7 +658,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => false);
             }
-            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.DueDate != null)
             {
                 query = query.And(x => false);
             }
@@ -793,7 +793,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromIssuedDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.DueDate != null)
             {
                 query = query.And(x => false);
             }
@@ -893,9 +893,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromIssuedDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.DueDate != null)
             {
-                query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
+                query = query.And(x => x.PaymentDueDate.Value.Date <= criteria.DueDate.Value.Date);
             }
             if (criteria.FromUpdatedDate != null)
             {
@@ -1065,9 +1065,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.Date.Value.Date >= criteria.FromIssuedDate.Value.Date && x.Date.Value.Date <= criteria.ToIssuedDate.Value.Date);
             }
-            if (criteria.FromDueDate != null && criteria.ToDueDate != null)
+            if (criteria.DueDate != null)
             {
-                query = query.And(x => x.PaymentDueDate.Value.Date >= criteria.FromDueDate.Value.Date && x.PaymentDueDate.Value.Date <= criteria.ToDueDate.Value.Date);
+                query = query.And(x => x.PaymentDueDate.Value.Date <= criteria.DueDate.Value.Date);
             }
             if (perQuery != null)
             {
@@ -1099,7 +1099,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ConfirmBillingDate = x.ConfirmBillingDate,
                 Type = x.Type,
                 OfficeId = x.OfficeId,
-                ServiceType = x.ServiceType
+                ServiceType = x.ServiceType,
+                PaymentTerm = x.PaymentTerm
             });
             if (results == null) return null;
             switch (criteria.OverDueDays)
@@ -1658,7 +1659,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var payment = new AccountingCustomerPaymentExport();
                 var isValidObh = true;
-                var invoice = item.invoice.GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.Type, z.UnpaidAmountVnd, z.TotalAmountVnd, z.TotalAmountUsd, z.InvoiceNoReal, z.IssuedDate, z.ConfirmBillingDate, z.DueDate }) });
+                var invoice = item.invoice.GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.Type, z.UnpaidAmountVnd, z.TotalAmountVnd, z.TotalAmountUsd, z.InvoiceNoReal, z.IssuedDate, z.ConfirmBillingDate, z.DueDate, z.PaymentTerm, z.OverdueDays }) });
                 var invoiceDe = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE);
                 var invoiceObh = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
                 if (criteria.PaymentStatus.Count > 0 && invoiceObh.Count() > 0)
@@ -1697,6 +1698,8 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.BillingRefNo = item.grp.BillingRefNo;
                 payment.BillingDate = invoice.FirstOrDefault().invc.FirstOrDefault()?.ConfirmBillingDate;
                 payment.DueDate = invoice.FirstOrDefault().invc.FirstOrDefault()?.DueDate;
+                payment.OverdueDays = invoice.FirstOrDefault().invc.FirstOrDefault()?.OverdueDays;
+                payment.PaymentTerm = invoice.FirstOrDefault().invc.FirstOrDefault()?.PaymentTerm;
 
                 // [CR]: Unpaid => TotalAmount
                 //payment.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0;
