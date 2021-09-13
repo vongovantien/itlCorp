@@ -199,7 +199,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
                             overdueDate: data.overDueDays ? data.overDueDays : this.overDueDays[0].id,
                             paidDate: (!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
                                 { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
-                            dueDate: !!data?.dueDate ? { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
+                                dueDate: !!data?.dueDate ? { startDate: new Date(data?.dueDate), endDate: new Date(data?.dueDate) } : null,
                             issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
                                 { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
                         };

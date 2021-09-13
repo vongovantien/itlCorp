@@ -67,7 +67,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((type: string) => {
-                console.log(type);
                 this._store.dispatch(RegistTypeReceipt({ data: type.toUpperCase() }));
                 this.type = type.toUpperCase()
                 this.titleReceipt = `Create ${this.type} Receipt`;
@@ -315,6 +314,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     setFormCreateDefault(res: ReceiptModel) {
+        this.formCreate.isUpdate = true;  // * Prevent payment refno auto generate.
         const formMapping = {
             date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
             customerId: res.customerId,
@@ -332,15 +332,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
 
         if (this.actionReceiptFromParams === 'bank') {
-            const formMappingBank = {
+            this.formCreate.formSearchInvoice.patchValue({
                 paymentRefNo: res.paymentRefNo + '_BANK',
-            }
-            this.formCreate.formSearchInvoice.patchValue(formMappingBank);
-            this.formCreate.receiptReference = res.paymentRefNo + res.class;
+                referenceNo: res.paymentRefNo + '_' + res.class
+            });
 
         } else if (this.actionReceiptFromParams === 'other') {
-            this.formCreate.formSearchInvoice.patchValue({ paymentRefNo: res.paymentRefNo + '_OTH001' });
-            this.formCreate.receiptReference = res.paymentRefNo + '_' + res.class;
+            this.formCreate.formSearchInvoice.patchValue({
+                paymentRefNo: res.paymentRefNo + '_OTH001',
+                referenceNo: res.paymentRefNo + '_' + res.class
+            });
+
         }
     }
 
@@ -429,17 +431,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
         listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
             if (c.currencyId === 'VND') {
-                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
+                c.unpaidAmount = c.unpaidAmountVnd - c.totalPaidVnd;
             } else {
-                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
+                c.unpaidAmount = c.unpaidAmountUsd - c.totalPaidUsd;
             }
-            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
-            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.totalPaidVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.totalPaidUsd;
         })
         listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
             x.paidAmountVnd = x.unpaidAmountVnd;
             x.paidAmountUsd = x.unpaidAmountUsd;
             x.notes = "Bank Fee/Other Receipt";
+            x.netOff = false;
+            x.netOffVnd = 0;
+            x.netOffUsd = 0;
             x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
         })
 
