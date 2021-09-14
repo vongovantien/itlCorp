@@ -1,8 +1,8 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
   APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
-  APP_OUT_PATH_PROD_EN: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
-  APP_OUT_PATH_PROD_VI: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
+  APP_OUT_PATH_PROD_EN: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
+  APP_OUT_PATH_PROD_VI: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
 
 image: node:12
 
