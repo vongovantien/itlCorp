@@ -206,52 +206,47 @@ namespace eFMS.API.Accounting.Controllers
                 }
             }
 
-            var hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
+            HandleState hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);
 
             ResultHandle result = new ResultHandle();
-            if (saveAction == SaveAction.SAVEDRAFT_ADD || saveAction == SaveAction.SAVEBANK_ADD)
-            {
-                var message = HandleError.GetMessage(hs, Crud.Insert);
-                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
+            string message = string.Empty;
+            switch (saveAction)
+            {   
+                case SaveAction.SAVEDRAFT_ADD:
+                case SaveAction.SAVEBANK_ADD:
+                    message = HandleError.GetMessage(hs, Crud.Insert);
+                    result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
+                    break;
+                case SaveAction.SAVEDRAFT_UPDATE:
+                    message = HandleError.GetMessage(hs, Crud.Update);
+                    result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
+                    break;
+                case SaveAction.SAVEDONE:
+                    result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
+                    break;
+                case SaveAction.SAVECANCEL:
+                    result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
+                    break;
+                default:
+                    result = new ResultHandle { Status = false, Message = "Save Receipt fail" };
+                    break;
             }
-            else if (saveAction == SaveAction.SAVEDRAFT_UPDATE)
-            {
-                var message = HandleError.GetMessage(hs, Crud.Update);
-                result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = receiptModel };
-            }
-            else if (saveAction == SaveAction.SAVEDONE)
-            {
-                //if (hs.Success)
-                //{
-                //    //Tính công nợ sau khi Save Done thành công
-                //    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
-                //}
-                result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
-            }
-            else if (saveAction == SaveAction.SAVECANCEL)
-            {
-                //if (hs.Success)
-                //{
-                //    //Tính công nợ sau khi Save Cancel thành công
-                //    acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
-                //}
-                result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
-            }
-            else
-            {
-                return BadRequest(new ResultHandle { Status = false, Message = "Save Receipt fail" });
-            }
-
+            
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptModel };
                 return BadRequest(_result);
             }
             else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
-            {
+            {                
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                    if (saveAction == SaveAction.SAVEDONE && !string.IsNullOrEmpty(receiptModel.NotifyDepartment))
+                    {
+                        List<int> deptIds = receiptModel.NotifyDepartment.Split(",").Select(x => Int32.Parse(x)).Distinct().ToList();
+                        acctReceiptService.AlertReceiptToDeppartment(deptIds, receiptModel);
+                    }
 
                 });
             }

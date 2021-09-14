@@ -5,6 +5,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Service.Models;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Models;
@@ -14,10 +15,12 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
@@ -43,6 +46,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
         private readonly IContextBase<AcctCreditManagementAr> creditMngtArRepository;
+        private readonly IContextBase<SysEmailTemplate> emailTemplaterepository;
+        private readonly IContextBase<SysEmailSetting> emailSettingRepository;
+        private readonly IOptions<WebUrl> webUrl;
 
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
@@ -65,7 +71,10 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysCompany> companyRepo,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<AcctReceiptSync> receiptSyncRepo,
-            IContextBase<AcctCreditManagementAr> creditMngtArRepo
+            IContextBase<AcctCreditManagementAr> creditMngtArRepo,
+            IContextBase<SysEmailTemplate> emailTemplate,
+            IContextBase<SysEmailSetting> emailSetting,
+            IOptions<WebUrl> wUrl
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -86,6 +95,9 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             receiptSyncRepository = receiptSyncRepo;
             creditMngtArRepository = creditMngtArRepo;
+            emailTemplaterepository = emailTemplate;
+            emailSettingRepository = emailSetting;
+            webUrl = wUrl;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -981,7 +993,8 @@ namespace eFMS.API.Accounting.DL.Services
                 if (payment.PaymentType == "OTHER")
                 {
                     _payment.PaymentNo = receipt.PaymentRefNo;
-                } else
+                }
+                else
                 {
                     _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
                 }
@@ -1147,7 +1160,7 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
                         invoice.UnpaidAmountUsd = (invoice.TotalAmountUsd ?? 0) - invoice.PaidAmountUsd;
                         invoice.UnpaidAmountVnd = (invoice.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;
-                        
+
                         invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
                         invoice.UserModified = currentUser.UserID;
                         invoice.DatetimeModified = DateTime.Now;
@@ -1212,12 +1225,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     remainAmountVnd = 0;
                                     remainAmount = 0;
                                 }
-                                
+
                                 item.PaymentStatus = GetAndUpdateStatusInvoice(item);
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
 
-                                if(item.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                                if (item.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
                                 {
                                     item.UnpaidAmount = item.UnpaidAmountVnd = item.UnpaidAmountUsd = 0;
                                 }
@@ -1227,7 +1240,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         break;
                     case "CREDITNOTE":
-                        HandleState hsCredit =  UpdateNetOffCredit(payment);
+                        HandleState hsCredit = UpdateNetOffCredit(payment);
                         break;
                     case "CREDITSOA":
                         HandleState hsSoa = UpdateNetOffSoa(payment);
@@ -1280,7 +1293,8 @@ namespace eFMS.API.Accounting.DL.Services
               .Sum();
 
 
-            if (action != SaveAction.SAVECANCEL) {
+            if (action != SaveAction.SAVECANCEL)
+            {
                 if (agreement != null)
                 {
                     decimal _cusAdv = 0;
@@ -1693,11 +1707,11 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
-                    if(invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
+                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                     }
-                    if(invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
+                    if (invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                     }
@@ -1806,7 +1820,7 @@ namespace eFMS.API.Accounting.DL.Services
                     obhs = GetObhForIssueAgencyPayment(criteria);
                     soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
                     creditNote = GetCreditNoteForIssueAgencyPayment(criteria);
-                    break;  
+                    break;
             }
 
             if (creditNote != null && creditNote.Count() > 0)
@@ -2103,8 +2117,8 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
-            var grpInvoiceCharge = query.GroupBy(g => new {g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
-                .Select(s => new {s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
+            var grpInvoiceCharge = query.GroupBy(g => new { g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)), g.sur.JobNo, g.sur.Mblno, g.sur.Hblno, g.sur.Hblid })
+                .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(se => se.sur), Job = s.Key });
             var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
             {
                 RefNo = se.RefNo,
@@ -2114,9 +2128,9 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerId = se.PartnerId,
                 CurrencyId = se.Invoice.Select(s => s.Currency).FirstOrDefault(),
                 Amount = se.Invoice.Sum(su => su.TotalAmount),
-                UnpaidAmount = se.Invoice.Select(s => s.Currency).FirstOrDefault() == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
-                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
-                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmount = se.Invoice.FirstOrDefault().UnpaidAmount,
+                UnpaidAmountVnd = se.Invoice.FirstOrDefault().UnpaidAmountUsd,
+                UnpaidAmountUsd = se.Invoice.FirstOrDefault().UnpaidAmountVnd,
                 PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
                 DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
                 PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
@@ -2671,7 +2685,7 @@ namespace eFMS.API.Accounting.DL.Services
                         join sur in surcharges on inv.Id equals sur.AcctManagementId
                         select new { inv, sur };
 
-            if(criteria.ReferenceNos.Count > 0)
+            if (criteria.ReferenceNos.Count > 0)
             {
                 switch (criteria.SearchType)
                 {
@@ -2691,7 +2705,7 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
-            
+
             var grpInvoiceCharge = query.GroupBy(g => new { g.inv.PartnerId, RefNo = (g.sur.SyncedFrom == "CDNOTE" ? g.sur.DebitNo : (g.sur.SyncedFrom == "SOA" ? g.sur.Soano : null)) })
                 .Select(s => new { s.Key.PartnerId, s.Key.RefNo, Invoice = s.Select(se => se.inv), Surcharge = s.Select(x => x.sur) });
             var data = grpInvoiceCharge.Select(se => new CustomerDebitCreditModel
@@ -3027,6 +3041,58 @@ namespace eFMS.API.Accounting.DL.Services
 
             }
             return dept;
+        }
+
+        public void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receipt)
+        {
+            foreach (int Id in Ids)
+            {
+                CatDepartment dept = departmentRepository.Get(x => x.Id == Id)?.FirstOrDefault();
+                if (dept == null)
+                {
+                    break;
+                }
+                List<string> toEmails = new List<string>();
+                var emailSettingDept = emailSettingRepository.Get(x => x.DeptId == Id)?.FirstOrDefault();
+                if (emailSettingDept == null)
+                {
+                    if (!string.IsNullOrEmpty(dept.Email))
+                    {
+                        toEmails = dept.Email.Split(";").ToList();
+                    }
+                }
+                else if (emailSettingDept.EmailType == AccountingConstants.EMAIL_SETTING_AR_ALERT && !string.IsNullOrEmpty(emailSettingDept.EmailInfo))
+                {
+                    toEmails = emailSettingDept.EmailInfo.Split(";").ToList();
+                }
+
+                if (toEmails.Count > 0)
+                {
+                    SendMailAlertReceipt(toEmails, receipt);
+                }
+            }
+        }
+
+        private void SendMailAlertReceipt(List<string> toEmails, AcctReceiptModel receipt)
+        {
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == receipt.CustomerId)?.FirstOrDefault();
+            SysEmailTemplate emailTemplate = emailTemplaterepository.Get(x => x.Code == "AR-RECEIPT")?.FirstOrDefault();
+
+            StringBuilder sb = new StringBuilder(emailTemplate.Subject);
+            sb.Replace("{{receiptType}}", receipt.Class);
+            sb.Replace("{{customerName}}", partner.PartnerNameEn);
+            sb.Replace("{{customerCode}}", partner.TaxCode);
+
+            StringBuilder bd = new StringBuilder(emailTemplate.Body);
+            string paidAmountVnd = string.Format("{0:n0}", receipt.FinalPaidAmountVnd);
+            string paidAmountUsd = string.Format("{0:n2}", receipt.FinalPaidAmountUsd);
+            bd.Replace("{{receiptType}}", receipt.Class);
+            bd.Replace("{{receiptNo}}", receipt.PaymentRefNo);
+            bd.Replace("{{finalPaidAmountVnd}}", paidAmountVnd);
+            bd.Replace("{{finalPaidAmountUSD}}", paidAmountUsd);
+            bd.Replace("{{url}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/account-receivable-payable/receipt/" + receipt.Id.ToString());
+
+            var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
     }
 }
