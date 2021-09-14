@@ -114,7 +114,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (pageSize > 1)
             {
                 if (pageNumber < 1) { pageNumber = 1; }
-                results.OrderByDescending(x => x.DatetimeModified).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsQueryable();
+                results = results.OrderByDescending(x => x.DatetimeModified).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsQueryable();
             }
             return results;
         }
