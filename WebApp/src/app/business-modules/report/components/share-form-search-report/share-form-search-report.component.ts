@@ -909,28 +909,26 @@ export class ShareFormSearchReportComponent extends AppForm {
     }
 
     async getPartnerData(type: string) {
-        if (!this.isGeneralReport) { // Partner for Accountant Report
-            // Get All Partner
-            if (type === 'customer') {
-                this.customers = await this._catalogueRepo.getPartnerByGroups(null, null);
-            }
-        } else {
-            switch (type) {
-                case 'customer':
+        switch (type) {
+            case 'customer':
+                if (!this.isGeneralReport) { // Partner for Accountant Report
+                    // Get All Partner
+                    this.customers = await this._catalogueRepo.getPartnerByGroups(null, null);
+                } else {
                     this.customers = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CUSTOMER, null);
-                    break;
-                case 'agent':
-                    this.agents = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
-                    break;
-                case 'carrier':
-                    this.carriers = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
-                    break;
-                case 'partner':
-                    if (this.isCommissionIncentive) {
-                        this.partners = await this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
-                    }
-                    break;
-            }
+                }
+                break;
+            case 'agent':
+                this.agents = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.AGENT, null);
+                break;
+            case 'carrier':
+                this.carriers = await this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.CARRIER, null);
+                break;
+            case 'partner':
+                if (this.isCommissionIncentive) {
+                    this.partners = await this._catalogueRepo.getListPartner(null, null, { partnerGroup: PartnerGroupEnum.ALL });
+                }
+                break;
         }
     }
 }
