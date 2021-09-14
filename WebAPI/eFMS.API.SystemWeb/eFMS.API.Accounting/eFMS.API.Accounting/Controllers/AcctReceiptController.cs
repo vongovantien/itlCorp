@@ -253,6 +253,11 @@ namespace eFMS.API.Accounting.Controllers
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(receiptModel.Id);
+                    if(saveAction == SaveAction.SAVEBANK_DONE && !string.IsNullOrEmpty(receiptModel.NotifyDepartment))
+                    {
+                        List<int> deptIds = receiptModel.NotifyDepartment.Split(",").Select(x => Int32.Parse(x)).Distinct().ToList();
+                        await acctReceiptService.AlertToDeppartment(deptIds);
+                    }
 
                 });
             }
