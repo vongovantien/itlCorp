@@ -172,7 +172,7 @@ namespace eFMS.API.Accounting.Controllers
 
             if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
             {
-                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId);
+                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
                 if(isExisted == true)
                 {
                     string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
@@ -180,7 +180,6 @@ namespace eFMS.API.Accounting.Controllers
                     var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
                     return BadRequest(_result);
                 }
-               
             }
 
             if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
