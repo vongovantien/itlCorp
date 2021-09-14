@@ -15,6 +15,7 @@ using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
 using ITL.NetCore.Connection.EF;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<AcctCreditManagementAr> creditMngtArRepository;
         private readonly IContextBase<SysEmailTemplate> emailTemplaterepository;
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
+        private readonly IOptions<WebUrl> webUrl;
 
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
@@ -71,7 +73,8 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctReceiptSync> receiptSyncRepo,
             IContextBase<AcctCreditManagementAr> creditMngtArRepo,
             IContextBase<SysEmailTemplate> emailTemplate,
-            IContextBase<SysEmailSetting> emailSetting
+            IContextBase<SysEmailSetting> emailSetting,
+            IOptions<WebUrl> wUrl
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -94,6 +97,7 @@ namespace eFMS.API.Accounting.DL.Services
             creditMngtArRepository = creditMngtArRepo;
             emailTemplaterepository = emailTemplate;
             emailSettingRepository = emailSetting;
+            webUrl = wUrl;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -2124,9 +2128,9 @@ namespace eFMS.API.Accounting.DL.Services
                 PartnerId = se.PartnerId,
                 CurrencyId = se.Invoice.Select(s => s.Currency).FirstOrDefault(),
                 Amount = se.Invoice.Sum(su => su.TotalAmount),
-                UnpaidAmount = se.Invoice.Select(s => s.Currency).FirstOrDefault() == "VND" ? se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd) : se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
-                UnpaidAmountVnd = se.Surcharge.Sum(su => su.AmountVnd + su.VatAmountVnd),
-                UnpaidAmountUsd = se.Surcharge.Sum(su => su.AmountUsd + su.VatAmountUsd),
+                UnpaidAmount = se.Invoice.FirstOrDefault().UnpaidAmount,
+                UnpaidAmountVnd = se.Invoice.FirstOrDefault().UnpaidAmountUsd,
+                UnpaidAmountUsd = se.Invoice.FirstOrDefault().UnpaidAmountVnd,
                 PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
                 DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
                 PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
@@ -3039,10 +3043,8 @@ namespace eFMS.API.Accounting.DL.Services
             return dept;
         }
 
-        public Task AlertToDeppartment(List<int> Ids, AcctReceiptModel receipt)
+        public void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receipt)
         {
-            HandleState result = new HandleState();
-            
             foreach (int Id in Ids)
             {
                 CatDepartment dept = departmentRepository.Get(x => x.Id == Id)?.FirstOrDefault();
@@ -3050,32 +3052,47 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     break;
                 }
-
+                List<string> toEmails = new List<string>();
                 var emailSettingDept = emailSettingRepository.Get(x => x.DeptId == Id)?.FirstOrDefault();
                 if (emailSettingDept == null)
                 {
-                    // send mail đến dept đó
+                    if (!string.IsNullOrEmpty(dept.Email))
+                    {
+                        toEmails = dept.Email.Split(";").ToList();
+                    }
                 }
                 else if (emailSettingDept.EmailType == AccountingConstants.EMAIL_SETTING_AR_ALERT && !string.IsNullOrEmpty(emailSettingDept.EmailInfo))
                 {
-                    CatPartner partner = catPartnerRepository.Get(x => x.Id == receipt.CustomerId)?.FirstOrDefault();
-                    SysEmailTemplate emailTemplate = emailTemplaterepository.Get(x => x.Code == "AR-RECEIPT")?.FirstOrDefault();
+                    toEmails = emailSettingDept.EmailInfo.Split(";").ToList();
+                }
 
-                    List<string> toEmails = emailSettingDept.EmailInfo.Split(";").ToList();
-
-                    StringBuilder sb = new StringBuilder(emailTemplate.Subject);
-                    sb.Replace("{{receiptType}}", receipt.Class);
-                    sb.Replace("{{customerName}}", partner.PartnerNameEn);
-                    sb.Replace("{{customerCode}}", receipt.TaxCode);
-
-                    StringBuilder bd = new StringBuilder(emailTemplate.Body);
-                    bd.Replace("{{receiptType}}", receipt.Class);
-                    bd.Replace("{{finalPaidAmountVnd}}", partner.PartnerNameEn);
-                    bd.Replace("{{finalPaidAmountUSD}}", receipt.TaxCode);
-
-                    var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
+                if (toEmails.Count > 0)
+                {
+                    SendMailAlertReceipt(toEmails, receipt);
                 }
             }
+        }
+
+        private void SendMailAlertReceipt(List<string> toEmails, AcctReceiptModel receipt)
+        {
+            CatPartner partner = catPartnerRepository.Get(x => x.Id == receipt.CustomerId)?.FirstOrDefault();
+            SysEmailTemplate emailTemplate = emailTemplaterepository.Get(x => x.Code == "AR-RECEIPT")?.FirstOrDefault();
+
+            StringBuilder sb = new StringBuilder(emailTemplate.Subject);
+            sb.Replace("{{receiptType}}", receipt.Class);
+            sb.Replace("{{customerName}}", partner.PartnerNameEn);
+            sb.Replace("{{customerCode}}", partner.TaxCode);
+
+            StringBuilder bd = new StringBuilder(emailTemplate.Body);
+            string paidAmountVnd = string.Format("{0:n0}", receipt.FinalPaidAmountVnd);
+            string paidAmountUsd = string.Format("{0:n2}", receipt.FinalPaidAmountUsd);
+            bd.Replace("{{receiptType}}", receipt.Class);
+            bd.Replace("{{receiptNo}}", receipt.PaymentRefNo);
+            bd.Replace("{{finalPaidAmountVnd}}", paidAmountVnd);
+            bd.Replace("{{finalPaidAmountUSD}}", paidAmountUsd);
+            bd.Replace("{{url}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/account-receivable-payable/receipt/" + receipt.Id.ToString());
+
+            var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
     }
 }
