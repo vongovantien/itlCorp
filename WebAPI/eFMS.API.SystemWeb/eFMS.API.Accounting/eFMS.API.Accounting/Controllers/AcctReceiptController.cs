@@ -170,7 +170,7 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
-            if(receiptModel.Id == Guid.Empty)
+            if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
             {
                 bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId);
                 if(isExisted == true)
