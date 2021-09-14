@@ -2634,7 +2634,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingPayment> payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
 
                 IQueryable<AccAccountingPayment> paymentsDebit = payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
-                IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => x.NetOffVnd != null || x.NetOffUsd != null);
+                IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => (x.NetOffVnd != null && x.NetOffVnd != 0) || (x.NetOffUsd != null && x.NetOffUsd != 0));
 
                 if (paymentsDebit.Count() > 0)
                 {
