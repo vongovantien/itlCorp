@@ -561,13 +561,12 @@ namespace eFMS.API.Accounting.DL.Services
                                         advanceRequest.UserModified = userCurrenct;
                                         var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
                                     }
-
-                                    item.SettlementCode = null;
-                                    item.AdvanceNo = null;
-                                    item.UserModified = userCurrenct;
-                                    item.DatetimeModified = DateTime.Now;
-                                    var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                                 }
+                                item.SettlementCode = null;
+                                item.AdvanceNo = null;
+                                item.UserModified = userCurrenct;
+                                item.DatetimeModified = DateTime.Now;
+                                var hsUpdateSurcharge = csShipmentSurchargeRepo.Update(item, x => x.Id == item.Id);
                             }
                         }
                         //Phí hiện trường (Xóa khỏi surcharge)
