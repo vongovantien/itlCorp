@@ -1913,25 +1913,28 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 agent.details = new List<AccountingAgencyPaymentExportDetail>();
-                var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentAmountUsd, z.UnpaidPaymentAmountUsd, z.PaymentAmountVnd, z.UnpaidPaymentAmountVnd }) });
-                foreach (var rcp in receiptGroup)
+                if (criteria.DueDate == null)
                 {
-                    var detail = new AccountingAgencyPaymentExportDetail();
-                    detail.RefNo = rcp.grp.PaymentRefNo;
-                    detail.PaidDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
-                    var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
-                    var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
-                    detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
-                    detail.PaidAmountOBH = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                    var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentAmountUsd, z.UnpaidPaymentAmountUsd, z.PaymentAmountVnd, z.UnpaidPaymentAmountVnd }) });
+                    foreach (var rcp in receiptGroup)
+                    {
+                        var detail = new AccountingAgencyPaymentExportDetail();
+                        detail.RefNo = rcp.grp.PaymentRefNo;
+                        detail.PaidDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
+                        var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
+                        var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
+                        detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
+                        detail.PaidAmountOBH = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
 
-                    detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
-                    detail.PaidAmountOBHUsd = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0;
+                        detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
+                        detail.PaidAmountOBHUsd = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0;
 
-                    agent.PaidAmount += (detail.PaidAmount ?? 0);
-                    agent.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
-                    agent.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
-                    agent.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
-                    agent.details.Add(detail);
+                        agent.PaidAmount += (detail.PaidAmount ?? 0);
+                        agent.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
+                        agent.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
+                        agent.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
+                        agent.details.Add(detail);
+                    }
                 }
                 results.Add(agent);
             }
