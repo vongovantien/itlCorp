@@ -64,11 +64,13 @@ namespace eFMS.API.Catalogue.DL.Services
                 entity.DatetimeModified = DateTime.Now;
                 entity.BankNameEn = model.BankNameEn;
                 entity.BankNameVn = model.BankNameVn;
+                entity.Active = model.Active;
 
                 if (entity.Active == false)
                     entity.InactiveOn = DateTime.Now;
 
                 result = DataContext.Update(entity, x => x.Id == model.Id, false);
+
                 if (result.Success)
                 {
                     DataContext.SubmitChanges();
@@ -112,7 +114,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (pageSize > 1)
             {
                 if (pageNumber < 1) { pageNumber = 1; }
-                results.OrderByDescending(x => x.DatetimeModified).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsQueryable();
+                results = results.OrderByDescending(x => x.DatetimeModified).Skip((pageNumber - 1) * pageSize).Take(pageSize).AsQueryable();
             }
             return results;
         }
