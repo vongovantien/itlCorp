@@ -374,7 +374,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              MasterBillNo = surcharge.Mblno,
                                                                                              DeptCode = string.IsNullOrEmpty(charge.ProductDept) ? GetDeptCode(surcharge.JobNo) : charge.ProductDept,
                                                                                              Quantity9 = surcharge.Quantity,
-                                                                                             OriginalUnitPrice = Math.Round((decimal)(surcharge.UnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, surcharge.CurrencyId, item.CurrencyCode)),2), // quy đổi về currency của settle: 15709
+                                                                                             OriginalUnitPrice = surcharge.UnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, surcharge.CurrencyId, item.CurrencyCode), // quy đổi về currency của settle: 15709
                                                                                              TaxRate = surcharge.Vatrate < 0 ? null : (decimal?)(surcharge.Vatrate ?? 0) / 100, //Thuế suất /100
                                                                                              //Nếu phí OBH thì OriginalAmount = thành tiền sau thuế; Ngược lại OriginalAmount = thành tiền trước thuế
                                                                                              OriginalAmount = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? NumberHelper.RoundNumber(surcharge.Total, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)) : NumberHelper.RoundNumber(surcharge.NetAmount ?? 0, (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2)), //CR: 15500
@@ -435,11 +435,19 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
+                                    if (x.CurrencyCode == "USD")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
+                                    }
+                                    else if (x.CurrencyCode == "VND")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                    }
                                     if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
                                     {
                                         x.CurrencyCode = "VND";
                                         x.OriginalAmount = x.AmountVND;
-                                        x.OriginalAmount3 = x.VatAmountVND;
+                                        x.OriginalAmount3 = x.VatAmountVND; 
                                     }
                                     else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
                                     {
