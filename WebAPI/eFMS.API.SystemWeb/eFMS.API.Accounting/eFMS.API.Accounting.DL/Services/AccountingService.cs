@@ -438,14 +438,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
                                     {
                                         x.CurrencyCode = "VND";
-                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "USD", "VND");
                                         x.OriginalAmount = x.AmountVND;
                                         x.OriginalAmount3 = x.VatAmountVND;
                                     }
                                     else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
                                     {
                                         x.CurrencyCode = "USD";
-                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "VND", "USD");
                                         x.OriginalAmount = x.AmountUSD;
                                         x.OriginalAmount3 = x.VatAmountUSD;
                                     }
