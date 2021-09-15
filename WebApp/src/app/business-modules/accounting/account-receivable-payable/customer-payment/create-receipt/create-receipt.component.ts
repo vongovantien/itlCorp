@@ -159,15 +159,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
+        const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
+        const CREDIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT);
+
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
             this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
-        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            // const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
-            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT).some(x => !x.netOffVnd || !x.netOffUsd);
+        if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            const isCreditHaveInvoice = DEBIT_LIST.some(x => !x.netOffVnd || !x.netOffUsd);
             if (isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;

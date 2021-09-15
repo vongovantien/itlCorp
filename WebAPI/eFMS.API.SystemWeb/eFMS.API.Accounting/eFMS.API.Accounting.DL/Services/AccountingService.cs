@@ -438,14 +438,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
                                     {
                                         x.CurrencyCode = "VND";
-                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "USD", "VND");
                                         x.OriginalAmount = x.AmountVND;
                                         x.OriginalAmount3 = x.VatAmountVND;
                                     }
                                     else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
                                     {
                                         x.CurrencyCode = "USD";
-                                        x.OriginalUnitPrice = x.OriginalUnitPrice * currencyExchangeService.CurrencyExchangeRateConvert(null, item.DocDate, "VND", "USD");
                                         x.OriginalAmount = x.AmountUSD;
                                         x.OriginalAmount3 = x.VatAmountUSD;
                                     }
@@ -2409,7 +2407,9 @@ namespace eFMS.API.Accounting.DL.Services
                         partnerEn = partner?.PartnerNameEn;
                         taxCode = partner?.TaxCode;
                         serviceName = GetServiceNameOfCdNote(debitNote.Code);
-                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code).GroupBy(g => new { g.CurrencyId }).Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
+                        var listAmounGrpByCurrency = SurchargeRepository.Get(x => x.DebitNo == debitNote.Code)
+                            .GroupBy(g => new { g.CurrencyId })
+                            .Select(s => new { amountCurrency = string.Format("{0:n" + (s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? 0 : 2) + "}", s.Select(se => se.Total).Sum()) + " " + s.Key.CurrencyId }).ToList();
                         amountCurr = string.Join("; ", listAmounGrpByCurrency.Select(s => s.amountCurrency));
                         urlFunc = GetLinkCdNote(debitNote.Code, debitNote.JobId, debitNote.CurrencyId);
 
@@ -2634,7 +2634,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingPayment> payments = accountingPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
 
                 IQueryable<AccAccountingPayment> paymentsDebit = payments.Where(x => x.PaymentType != "CREDIT" && x.PaymentAmount != 0); // trường hợp treo OBH (paymentAmount = 0)
-                IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => x.NetOffVnd != null || x.NetOffUsd != null);
+                IQueryable<AccAccountingPayment> paymentNetOff = payments.Where(x => (x.NetOffVnd != null && x.NetOffVnd != 0) || (x.NetOffUsd != null && x.NetOffUsd != 0));
 
                 if (paymentsDebit.Count() > 0)
                 {
@@ -2695,7 +2695,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    Amount = GetAmountReceiptPayment(receiptItem, payment, type,"amount"),
                                                                    OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type,"origin"),
                                                                    CustomerCode = partner.AccountNo,
-                                                                   BankAccountNo = partner.BankAccountNo,
+                                                                   BankAccountNo = receiptItem.BankAccountNo,
                                                                    ObhPartnerCode = receiptItem.ObhpartnerId == null ? string.Empty : partner.AccountNo,
                                                                    Description = GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = type == "NETOFF" ? "NETOFF" : payment.Type,
