@@ -1257,7 +1257,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsInvoiceUpdate = new HandleState();
 
-            var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && (x.Type == "DEBIT" || x.Type == "OBH")).Where(x => x.PaymentAmount < 0).ToList();
+            var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && (x.Type == "DEBIT" || x.Type == "OBH")).Where(x => x.Negative == true).ToList();
 
             if (payments.Count > 0)
             {
@@ -1265,9 +1265,9 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
 
-                    invoice.PaidAmount = (invoice.PaidAmount ?? 0) + (payment.PaymentAmount ?? 0);
-                    invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + (payment.PaymentAmountVnd ?? 0);
-                    invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + (payment.PaymentAmountUsd ?? 0);
+                    invoice.PaidAmount = (invoice.PaidAmount ?? 0) + (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.TotalPaidVnd ?? 0) : (payment.TotalPaidUsd ?? 0));
+                    invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + (payment.TotalPaidVnd ?? 0);
+                    invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + (payment.TotalPaidUsd ?? 0);
 
                     invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
                     invoice.UnpaidAmountVnd = (invoice.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;

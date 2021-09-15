@@ -4209,41 +4209,62 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
                     listKeyData.Add("InvoiceDate", item.InvoiceDate);
                     listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("CreditNoGrp", item.CreditNo == null ? "" : item.CreditNo);
-                    listKeyData.Add("JobNoGrp", item.JobNo);
-                    listKeyData.Add("MBLGrp", item.MBL);
-                    listKeyData.Add("HBLGrp", item.HBL);
-                   
-                    listKeyData.Add("ETD", item.EtdDate);
-                    listKeyData.Add("ETA", item.EtaDate);
-                    var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
-                    listKeyData.Add("DebitAmount", debit);
-                    listKeyData.Add("CreditAmount", item.CreditAmount);
-                    listKeyData.Add("NetOff", item.NetOff);
+                    listKeyData.Add("DebitNo", item.DebitNo==null?"":item.DebitNo);
+                    listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("MBLNo", item.MBL);
+                    listKeyData.Add("HBLNo", item.HBL);
 
                     var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
                     var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
-                    listKeyData.Add("Debit_Ending", remainDb + remainObh);
-                    listKeyData.Add("Credit_Ending",item.CreditAmount - item.NetOff);
+                    var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
+                    var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
+
+                    listKeyData.Add("DebitAmount", item.UnpaidAmountInvUsd);
+                    listKeyData.Add("CreditAmount", item.UnpaidAmountOBHUsd);
+
+                    listKeyData.Add("PaidAmount", item.PaidAmount);
+                    listKeyData.Add("PaidAmountOBH", item.PaidAmountOBH);
+
+                    listKeyData.Add("RemainDbUsd", remainDbUsd);
+                    listKeyData.Add("RemainOBHUsd", item.RemainOBHUsd > 0 ? item.RemainOBHUsd: remainObhUsd);
+                    listKeyData.Add("RemainDb", remainDb);
+                    listKeyData.Add("RemainOBH", item.RemainOBH > 0?item.RemainOBH : remainObh);
+
+                    listKeyData.Add("ETD", item.EtdDate);
+                    listKeyData.Add("ETA", item.EtaDate);
+
+                    listKeyData.Add("CreditTerm",item.CreditTerm);
+                    listKeyData.Add("DueDate",item.DueDate);
+                    listKeyData.Add("OverDueDays",item.OverDueDays);
+                    listKeyData.Add("VoucherNo", item.VoucherNo);
 
                     listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    foreach (var detail in item.details)
+                    if (item.details.Count > 0)
                     {
-                        listKeyData = new Dictionary<string, object>();
-                        excel.SetDataTable();
-                        listKeyData.Add("PaidDate", detail.PaidDate);
-                        listKeyData.Add("RefNo", detail.RefNo);
-                        listKeyData.Add("Debit", detail.Debit);
-                        listKeyData.Add("Credit", detail.Credit);
-                        listKeyData.Add("JobNo", item.JobNo);
-                        listKeyData.Add("MBL", item.MBL);
-                        listKeyData.Add("HBL", item.HBL);
-                        listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
-                        excel.SetData(listKeyData);
-                        startRow++;
+                        foreach (var detail in item.details)
+                        {
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("InvoiceDateDt", item.InvoiceDate);
+                            listKeyData.Add("DebitNoDt", item.DebitNo);
+                            listKeyData.Add("CreditNoDt", item.CreditNo);
+                            listKeyData.Add("JobNoDt", item.JobNo);
+                            listKeyData.Add("MBLNoDt", item.MBL);
+                            listKeyData.Add("HBLNoDt", item.HBL);
+
+                            listKeyData.Add("PaidDate", detail.PaidDate);
+                            listKeyData.Add("RefNo", detail.RefNo);
+
+                            listKeyData.Add("PaidAmountUsdDt", detail.PaidAmountUsd);
+                            listKeyData.Add("PaidAmountOBHUsdDt", detail.PaidAmountOBHUsd);
+
+                            excel.SetData(listKeyData);
+                            startRow++;
+                        }
                     }
                 }
                 return excel.ExcelStream();
