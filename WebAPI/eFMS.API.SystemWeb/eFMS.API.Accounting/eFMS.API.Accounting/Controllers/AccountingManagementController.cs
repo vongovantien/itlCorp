@@ -37,6 +37,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICurrentUser currentUser;
         private readonly IAccAccountReceivableService accountReceivableService;
+        private readonly IAcctDebitManagementARService acctDebitArService;
         /// <summary>
         /// Contructor
         /// </summary>
@@ -49,6 +50,7 @@ namespace eFMS.API.Accounting.Controllers
             IHostingEnvironment hostingEnvironment,
             IAccountingManagementService accService,
             IAccAccountReceivableService accountReceivable,
+            IAcctDebitManagementARService acctDebitAr,
             ICurrentUser currUser)
         {
             stringLocalizer = localizer;
@@ -56,6 +58,7 @@ namespace eFMS.API.Accounting.Controllers
             _hostingEnvironment = hostingEnvironment;
             currentUser = currUser;
             accountReceivableService = accountReceivable;
+            acctDebitArService = acctDebitAr;
         }
 
         [Authorize]
@@ -75,7 +78,12 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult Delete(Guid id)
         {
             currentUser.Action = "DeleteAcctMngt";
-            
+            var data = accountingService.Get(x => x.Id == id)?.FirstOrDefault();
+            if(data == null)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value });
+            }
+            string type = data.Type;
             HandleState hs = accountingService.Delete(id);
             if (hs.Code == 403)
             {
@@ -95,6 +103,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(id);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    if(type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    {
+                        acctDebitArService.DeleteDebit(id);
+                    }
 
                 });
             }
@@ -214,6 +226,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                    if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    {
+                        await acctDebitArService.AddAndUpdate(model.Id);
+                    }
 
                 });
             }
@@ -291,7 +307,10 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     List<ObjectReceivableModel> modelReceivableList = accountingService.CalculatorReceivableAcctMngt(model.Id);
                     await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
-
+                    if (model.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE)
+                    {
+                        await acctDebitArService.AddAndUpdate(model.Id);
+                    }
                 });
             }
             return Ok(result);
