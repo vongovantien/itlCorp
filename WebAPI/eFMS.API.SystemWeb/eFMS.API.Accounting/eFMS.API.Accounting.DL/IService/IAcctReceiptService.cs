@@ -27,7 +27,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
         AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria);
         Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
-
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
+        void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
     }
 }

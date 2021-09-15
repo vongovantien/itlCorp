@@ -206,5 +206,7 @@
         public static readonly string CREDIT_NOTE_TYPE_CODE = "CREDITNOTE";
         public static readonly string CREDIT_SOA_TYPE_CODE = "CREDITSOA";
         #endregion
+
+        public static readonly string EMAIL_SETTING_AR_ALERT = "AR - Alert";
     }
 }

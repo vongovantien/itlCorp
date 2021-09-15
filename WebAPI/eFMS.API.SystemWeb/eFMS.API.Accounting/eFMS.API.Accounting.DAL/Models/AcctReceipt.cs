@@ -45,5 +45,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? CreditAmountVnd { get; set; }
         public decimal? CreditAmountUsd { get; set; }
         public decimal? CusAdvanceAmountUsd { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

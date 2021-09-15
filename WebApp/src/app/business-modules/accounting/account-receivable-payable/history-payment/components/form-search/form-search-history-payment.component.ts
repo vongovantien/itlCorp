@@ -139,8 +139,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
             fromUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.startDate) ? formatDate(dataForm.paidDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.endDate) ? formatDate(dataForm.paidDate.endDate, 'yyyy-MM-dd', 'en') : null,
-            fromDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            toDueDate: (!!dataForm.dueDate && !!dataForm.dueDate.endDate) ? formatDate(dataForm.dueDate.endDate, 'yyyy-MM-dd', 'en') : null,
+            dueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
             paymentType: PaymentType.Invoice
         };
         this._store.dispatch(SearchListHistoryPayment(body));
@@ -200,8 +199,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
                             overdueDate: data.overDueDays ? data.overDueDays : this.overDueDays[0].id,
                             paidDate: (!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
                                 { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
-                            dueDate: (!!data?.fromDueDate && !!data?.toDueDate) ?
-                                { startDate: new Date(data?.fromDueDate), endDate: new Date(data?.toDueDate) } : null,
+                                dueDate: !!data?.dueDate ? { startDate: new Date(data?.dueDate), endDate: new Date(data?.dueDate) } : null,
                             issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
                                 { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
                         };
@@ -222,8 +220,7 @@ interface ISearchAccPayment {
     toIssuedDate: string;
     fromUpdatedDate: string;
     toUpdatedDate: string;
-    fromDueDate: string;
-    toDueDate: string;
+    dueDate: string;
     paymentType: number;
 }
 export enum PaymentType {
