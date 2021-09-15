@@ -2695,7 +2695,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    Amount = GetAmountReceiptPayment(receiptItem, payment, type,"amount"),
                                                                    OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type,"origin"),
                                                                    CustomerCode = partner.AccountNo,
-                                                                   BankAccountNo = partner.BankAccountNo,
+                                                                   BankAccountNo = receiptItem.BankAccountNo,
                                                                    ObhPartnerCode = receiptItem.ObhpartnerId == null ? string.Empty : partner.AccountNo,
                                                                    Description = GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = type == "NETOFF" ? "NETOFF" : payment.Type,
