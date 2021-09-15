@@ -2685,6 +2685,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                 List<PaymentDetailModel> details = new List<PaymentDetailModel>();
 
+                string obhAccountNo = string.Empty;
+                if(receiptItem.ObhpartnerId != Guid.Empty)
+                {
+                    CatPartner partnerOBH = PartnerRepository.Get(x => x.Id == receiptItem.ObhpartnerId.ToString())?.FirstOrDefault();
+                    if(partnerOBH != null)
+                    {
+                        obhAccountNo = partnerOBH.AccountNo;
+                    }
+
+                }
+
                 IQueryable<PaymentDetailModel> queryPayments = from payment in payments
                                                                join partner in partners on payment.PartnerId equals partner.Id
                                                                join invoice in invoices on payment.RefId equals invoice.Id.ToString() into invoiceGrps
@@ -2696,7 +2707,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type,"origin"),
                                                                    CustomerCode = partner.AccountNo,
                                                                    BankAccountNo = receiptItem.BankAccountNo,
-                                                                   ObhPartnerCode = receiptItem.ObhpartnerId == null ? string.Empty : partner.AccountNo,
+                                                                   ObhPartnerCode = obhAccountNo,
                                                                    Description = GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = type == "NETOFF" ? "NETOFF" : payment.Type,
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo),
