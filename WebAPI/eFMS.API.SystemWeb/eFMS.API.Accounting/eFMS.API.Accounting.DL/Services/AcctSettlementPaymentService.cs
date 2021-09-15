@@ -5337,6 +5337,25 @@ namespace eFMS.API.Accounting.DL.Services
                                     // push user notification
                                     if (hsUpdateApproval.Success)
                                     {
+                                        //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
+                                        var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settle.SettlementNo && !string.IsNullOrEmpty(x.AdvanceNo)).ToList();
+                                        if (surchargeShipment != null && surchargeShipment.Count > 0)
+                                        {
+                                            var surchargeGroup = surchargeShipment.GroupBy(x => new { x.Hblid, x.AdvanceNo }).Select(x => x.Key);
+                                            foreach (var shipment in surchargeGroup)
+                                            {
+                                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == shipment.Hblid && x.AdvanceNo == shipment.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED);
+                                                foreach(var advRq in advanceRequest)
+                                                {
+                                                    advRq.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                                    advRq.DatetimeModified = DateTime.Now;
+                                                    advRq.UserModified = currentUser.UserID;
+                                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advRq, x => x.Id == advRq.Id, false);
+                                                }
+                                            }
+                                            acctAdvanceRequestRepo.SubmitChanges();
+                                        }
+
                                         string title = string.Format(@"Accountant Denied Data Settlement {0}", settle.SettlementNo);
                                         string desc = string.Format(@"Settlement {0} has denied by {1}, Click to view", settle.SettlementNo, currentUser.UserName);
                                         SysNotifications sysNotify = new SysNotifications
@@ -5504,18 +5523,10 @@ namespace eFMS.API.Accounting.DL.Services
             var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
             // Check if adv existed in another settlement
-            var advanceNotExist = csShipmentSurchargeRepo.Get(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid == hblId);
-            var settleNum = advanceNotExist.Count();
-            if (settleNum > 0)
+            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid != hblId).Select(x => x.AdvanceNo).ToList();
+            if (advanceExp?.Count() != 0)
             {
-                foreach (var adv in advanceNo)
-                {
-                    var advanceExist = advanceNotExist.Count(x => x.AdvanceNo == adv);
-                    if (advanceExist == settleNum)
-                    {
-                        advanceNo = advanceNo.Where(x => x != adv).ToList();
-                    }
-                }
+                advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
             }
 
             if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
