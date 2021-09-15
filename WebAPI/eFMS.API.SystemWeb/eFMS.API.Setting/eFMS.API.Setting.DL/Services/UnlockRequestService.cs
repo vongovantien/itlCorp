@@ -719,7 +719,7 @@ namespace eFMS.API.Setting.DL.Services
                 if (type == 2)
                 {
                     var settlementCurrent = settlementPaymentRepo.Get(x => x.SettlementNo == paymentNo).FirstOrDefault();
-                    if (settlementCurrent == null) return new HandleState("Not found advance payment");
+                    if (settlementCurrent == null) return new HandleState("Not found settlement payment");
 
                     if (!settlementCurrent.StatusApproval.Contains("Done"))
                     {
@@ -746,7 +746,7 @@ namespace eFMS.API.Setting.DL.Services
                 else
                 {
                     var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
-                    if (SOACurrent == null) return new HandleState("Not found advance payment");
+                    if (SOACurrent == null) return new HandleState("Not found SOA");
                     var newID = Guid.NewGuid();
                     var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
                     string logName = string.Format("UpdateSOAPayment_{0}_eFMS_Log", (
