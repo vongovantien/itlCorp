@@ -455,6 +455,14 @@ namespace eFMS.API.Accounting.DL.Services
                                         x.OriginalAmount = x.AmountUSD;
                                         x.OriginalAmount3 = x.VatAmountUSD;
                                     }
+                                    if (x.CurrencyCode == "USD")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
+                                    }
+                                    else if (x.CurrencyCode == "VND")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                    }
                                 });
 
                                 if (hasAdvancePayment == true && currentSettle.BalanceAmount != 0)
