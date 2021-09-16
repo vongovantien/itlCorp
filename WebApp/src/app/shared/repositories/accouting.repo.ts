@@ -229,8 +229,8 @@ export class AccountingRepo {
     }
 
 
-    getExistingCharge(body: any = {}) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body).pipe(
+    getExistingCharge(body: any = {}, settlementCode: string = null) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body, {settlementCode: settlementCode}).pipe(
             map((data: any) => data)
         );
     }
