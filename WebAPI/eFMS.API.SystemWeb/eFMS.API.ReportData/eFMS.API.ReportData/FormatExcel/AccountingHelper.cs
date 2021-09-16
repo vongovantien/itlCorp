@@ -3954,17 +3954,19 @@ namespace eFMS.API.ReportData.FormatExcel
                 "MBLNo",//2
                 "HBLNo",//3
                 "VoucherID",//4
-                "CDNote_Code",//5
-                "Code_Type",//6
-                "ChargeType",//7
-                "PayerID",//8
-                "Payer_Name",//9
-                "PartnerType",//10
-                "Curr",//10
-                "Amount",//11
-                "Issued_by",//12
-                "BU",//13
-                "Service Date"//14
+                "Accounting Date",//5
+                "CDNote_Code",//6
+                "Code_Type",//7
+                "ChargeType",//8
+                "PayerID",//9
+                "Payer_Name",//10
+                "PartnerType",//11
+                "Curr",//12
+                "Amount",//13
+                "Issued_by",//14
+                "BU",//15
+                "Service Date",//16
+                "Issue Date"//17
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -3985,28 +3987,32 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 3].Value = item.Mbl;
                 workSheet.Cells[rowStart, 4].Value = item.Hbl;
                 workSheet.Cells[rowStart, 5].Value = item.VoucherId;
-                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 8].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 9].Value = item.PayerId;
-                workSheet.Cells[rowStart, 10].Value = item.PayerName;
-                workSheet.Cells[rowStart, 11].Value = item.PayerType;
-                workSheet.Cells[rowStart, 12].Value = item.Currency;
+                workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
+                workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
+                workSheet.Cells[rowStart, 8].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 9].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 10].Value = item.PayerId;
+                workSheet.Cells[rowStart, 11].Value = item.PayerName;
+                workSheet.Cells[rowStart, 12].Value = item.PayerType;
+                workSheet.Cells[rowStart, 13].Value = item.Currency;
 
-                workSheet.Cells[rowStart, 13].Value = item.Amount;
-                workSheet.Cells[rowStart, 13].Style.Numberformat.Format = decimalFormat;
+                workSheet.Cells[rowStart, 14].Value = item.Amount;
+                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = decimalFormat;
 
-                workSheet.Cells[rowStart, 14].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 15].Value = item.Bu;
-                workSheet.Cells[rowStart, 16].Value = item.ServiceDate;
-                workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 15].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 16].Value = item.Bu;
+                workSheet.Cells[rowStart, 17].Value = item.ServiceDate;
+                workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 18].Value = item.IssueDate;
+                workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
