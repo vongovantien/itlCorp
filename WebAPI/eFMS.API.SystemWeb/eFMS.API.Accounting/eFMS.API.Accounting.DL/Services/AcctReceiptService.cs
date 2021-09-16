@@ -1731,15 +1731,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
                     }
-                    if (paidVnd < invoice.PaidAmountVnd)
+                    else if (paidVnd < invoice.PaidAmountVnd)
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
-                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
-                    {
-                        paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
-                    }
-                    if (invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                        || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                     }
@@ -1754,15 +1751,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
                     }
-                    if (paidUsd < invoice.PaidAmountUsd)
+                    else if (paidUsd < invoice.PaidAmountUsd)
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                     }
-                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
-                    {
-                        paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
-                    }
-                    if (invoice.NetOffVnd != 0 || invoice.NetOffVnd != null || invoice.NetOffUsd != 0 || invoice.NetOffUsd != null)
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                        || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
                     }
@@ -1842,6 +1836,10 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
                 case "SOA":
                     soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
+                    break;
+                case "VAT Invoice":
+                    debits = GetDebitForIssueAgentPayment(criteria);
+                    obhs = GetObhForIssueAgencyPayment(criteria);
                     break;
                 default:
                     debits = GetDebitForIssueAgentPayment(criteria);

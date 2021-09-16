@@ -368,7 +368,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
@@ -408,7 +409,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMappingFormOther = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
