@@ -4093,9 +4093,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 //workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat2 + " %";
 
                 workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
-                workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
-                workSheet.Cells[rowStart, 7].Value = item.PaidAmount;
-                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid;
+                workSheet.Cells[rowStart, 6].Value = item.BillingAmount+item.ObhBillingAmount;
+                workSheet.Cells[rowStart, 7].Value = item.PaidAmount+item.ObhPaidAmount;
+                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid+item.ObhUnPaidAmount;
                 workSheet.Cells[rowStart, 9].Value = item.Over1To15Day;
                 workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
                 workSheet.Cells[rowStart, 11].Value = item.Over30Day;
