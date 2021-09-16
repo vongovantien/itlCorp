@@ -678,7 +678,7 @@
             <param name="requester"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria,System.String)">
             <summary>
             Get exists charge by shipment
             </summary>
@@ -805,13 +805,14 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String,System.String)">
             <summary>
             Get List AdvanceNo For Shipment
             </summary>
             <param name="hblId"></param>
             <param name="payeeId">use in get existing charge</param>
             <param name="requester">use in get existing charge</param>
+            <param name="settlementCode"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">

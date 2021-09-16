@@ -5518,12 +5518,12 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="mbl"></param>
         /// <param name="hbl"></param>
         /// <returns></returns>
-        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null)
+        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null, string settlementNo = null)
         {
             var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
             // Check if adv existed in another settlement
-            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid != hblId).Select(x => x.AdvanceNo).ToList();
+            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && (x.SettlementCode != settlementNo || string.IsNullOrEmpty(settlementNo))).Select(x => x.AdvanceNo).ToList();
             if (advanceExp?.Count() != 0)
             {
                 advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
@@ -5531,17 +5531,17 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
             {
-                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)));
+                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo))).OrderBy(x=>x.RequestDate);
             }
             else
             {
                 if (!string.IsNullOrEmpty(payeeId))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId));
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId)).OrderBy(x => x.RequestDate);
                 }
                 if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester).OrderBy(x => x.RequestDate);
                 }
             }
             return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
