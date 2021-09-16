@@ -441,9 +441,10 @@ namespace eFMS.API.Documentation.DL.Services
             return hs;
         }
 
-        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list)
+        public HandleState AddAndUpdate(List<CsShipmentSurchargeModel> list, out List<Guid> Ids)
         {
             var result = new HandleState();
+            Ids = new List<Guid>(); // ds các charge phí update công nợ.
             var surcharges = mapper.Map<List<CsShipmentSurcharge>>(list);
 
             var surchargesAdd = new List<CsShipmentSurcharge>();
@@ -587,6 +588,8 @@ namespace eFMS.API.Documentation.DL.Services
                         surchargesUpdate.Add(surcharge);
                     }
                 }
+
+                Ids.Add(item.Id);
             }
 
             using (var trans = DataContext.DC.Database.BeginTransaction())
@@ -1415,13 +1418,13 @@ namespace eFMS.API.Documentation.DL.Services
                     short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
                     item.UnitId = UnitId;
                     item.PaymentObjectId = PartnerId;
-                    Guid HblId = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim()).Select(t => t.Hblid).FirstOrDefault();
-                    item.Hblid = HblId;
                     item.Quantity = (decimal)item.Qty;
-                    
-                    item.JobNo = opsTransRepository.Get(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
+
+                    OpsTransaction currentOpsJob = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).FirstOrDefault();
+                    item.Hblid = currentOpsJob.Hblid;
+                    item.JobNo = currentOpsJob.JobNo;
                     item.TransactionType = "CL";
-                    string jobNo = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).Select(t => t.JobNo).FirstOrDefault();
+                    string jobNo = currentOpsJob.JobNo;
                     if (item.Type.ToLower() == "obh")
                     {
                         item.PayerId = PartnerId;

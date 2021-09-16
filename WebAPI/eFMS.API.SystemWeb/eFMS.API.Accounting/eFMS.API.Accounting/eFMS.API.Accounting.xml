@@ -44,7 +44,7 @@
             <summary>
             Func Test (Get List Receipt)
             </summary>
-            <param name="Ids"></param>
+            <param name="ids"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">
@@ -54,12 +54,19 @@
             <param name="request"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingController.SyncListReceiptAllInToAccountant(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.Accounting.RequestGuidListModel})">
+            <summary>
+            Sync list Receipt to Accountant (Option - sync đc tất cả các type trong cùng 1 phiếu thu)
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountingManagementController">
             <summary>
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Accounting.DL.IService.IAccountingManagementService,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor
             </summary>
@@ -67,7 +74,6 @@
             <param name="hostingEnvironment"></param>
             <param name="accService"></param>
             <param name="currUser"></param>
-            <param name="accAccountReceivable"></param>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingManagementController.GetChargeSellForInvoiceByCriteria(eFMS.API.Accounting.DL.Models.Criteria.PartnerOfAcctManagementCriteria)">
             <summary>
@@ -187,11 +193,12 @@
             <param name="pageSize"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetBy(System.String,System.String)">
             <summary>
             get list payment by refNo
             </summary>
-            <param name="refId"></param>
+            <param name="refNo">Payment RefNo</param>
+            <param name="type">payment type</param>s
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.DownloadInvoicePaymentExcel">
@@ -245,7 +252,7 @@
             <summary>
             get extended date of an invoice
             </summary>
-            <param name="id"></param>
+            <param name="refNo">billing no</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetOBHSOAExtendedDate(System.String)">
@@ -260,6 +267,20 @@
             upload OBH payment template
             </summary>
             <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingCustomerPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Customers
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountingPaymentController.GetDataExportAccountingAgencyPayment(eFMS.API.Accounting.DL.Models.Criteria.PaymentCriteria)">
+            <summary>
+            Get data export Statement of Receivable Agency
+            </summary>
+            <param name="criteria"></param>
             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AccountReceivableController">
@@ -287,11 +308,18 @@
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(eFMS.API.Accounting.DL.Models.ObjectReceivableModel)">
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.CalculatorReceivableNotAuthorize(eFMS.API.Accounting.DL.Models.CalculatorReceivableNotAuthorizeModel)">
+            <summary>
+            Calculator Receivable Not Authorize
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.InsertOrUpdateReceivable(System.Collections.Generic.List{eFMS.API.Accounting.DL.Models.ObjectReceivableModel})">
             <summary>
             Insert Or Update Receivable
             </summary>
-            <param name="model"></param>
+            <param name="models"></param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.GetDetailAccountReceivableByArgeementId(System.Guid)">
@@ -337,7 +365,6 @@
             <param name="service"></param>
             <param name="user"></param>
             <param name="hostingEnvironment"></param>
-            <param name="accAccountReceivable"></param>
         </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController.Paging(eFMS.API.Accounting.DL.Models.Criteria.AcctAdvancePaymentCriteria,System.Int32,System.Int32)">
             <summary>
@@ -536,6 +563,14 @@
             <param name="id">id of receipt</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.CancelReceipt(System.Guid)">
+            <summary>
+            Update Cancel Receipt
+            </summary>
+            <param name="id">id of receipt</param>
+            <returns></returns>
+            
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.SaveReceipt(eFMS.API.Accounting.DL.Models.AcctReceiptModel,eFMS.API.Accounting.DL.Models.SaveAction)">
             <summary>
             Save Receipt
@@ -549,12 +584,26 @@
             </param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueCustomerPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetDataIssueAgencyPayment(eFMS.API.Accounting.DL.Models.Receipt.CustomerDebitCreditCriteria)">
+            <summary>
+            Get Data Issue Customer Payment
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController">
             <summary>
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSettlementPaymentService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,AutoMapper.IMapper,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
             <summary>
             Contructor
             </summary>
@@ -629,7 +678,7 @@
             <param name="requester"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetExistsCharge(eFMS.API.Accounting.DL.Models.Criteria.ExistsChargeCriteria,System.String)">
             <summary>
             Get exists charge by shipment
             </summary>
@@ -756,21 +805,29 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetListAdvanceNoForShipment(System.Guid,System.String,System.String,System.String)">
             <summary>
             Get List AdvanceNo For Shipment
             </summary>
             <param name="hblId"></param>
             <param name="payeeId">use in get existing charge</param>
             <param name="requester">use in get existing charge</param>
+            <param name="settlementCode"></param>
             <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSettlementPaymentController.GetDataExportSettlementDetail(eFMS.API.Accounting.DL.Models.Criteria.AcctSettlementPaymentCriteria)">
+             <summary>
+            Settlement export List within Shipment.
+             </summary>
+             <param name="criteria"></param>
+             <returns></returns>
         </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctSOAController">
             <summary>
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
+        <member name="M:eFMS.API.Accounting.Controllers.AcctSOAController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Accounting.DL.IService.IAcctSOAService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Accounting.DL.IService.IAccAccountReceivableService)">
             <summary>
             constructor
             </summary>

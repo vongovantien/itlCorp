@@ -14,6 +14,9 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { RoutingConstants } from '@constants';
 import { environment } from 'src/environments/environment';
+import { ConfirmPopupComponent } from '@common';
+import { EmailSetting } from '@models';
+import { DepartmentEmailComponent } from '../email/email-department.component';
 
 declare var $: any;
 @Component({
@@ -24,6 +27,9 @@ declare var $: any;
 
 export class DepartmentDetailComponent extends AppList {
     @ViewChild('image') el: ElementRef;
+    @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild(DepartmentEmailComponent)
+    departmentEmailComponent:DepartmentEmailComponent;
     
     formDetail: FormGroup;
     departmentCode: AbstractControl;
@@ -46,10 +52,14 @@ export class DepartmentDetailComponent extends AppList {
 
     grpHeaders: CommonInterface.IHeaderTable[];
     userHeaders: CommonInterface.IHeaderTable[];
+    emailHeaders: CommonInterface.IHeaderTable[];
 
     groups: Group[] = [];
     SelectedDepartment: any;
     photoUrl: string = '';
+
+    emailSettings: EmailSetting[] = [];
+    selectedEmail: EmailSetting;
 
     isReadonly: Observable<boolean>;
 
@@ -92,6 +102,30 @@ export class DepartmentDetailComponent extends AppList {
                     { title: 'Level Permission', field: 'levelPermission', sortable: true },
                     { title: 'Status', field: 'active', sortable: true },
                 ];
+                this.emailHeaders = [
+                    { title: "Action", field: "action", sortable: false },
+                    {
+                        title: "Email Type",
+                        field: "emailType",
+                        sortable: false,
+                    },
+                    {
+                        title: "Email Info",
+                        field: "emailInfo",
+                        sortable: false,
+                    },
+                    {
+                        title: "Modified Date",
+                        field: "modifiedDate",
+                        sortable: false,
+                    },
+                    {
+                        title: "Create Date",
+                        field: "createDate",
+                        sortable: false,
+                    },
+                ];
+
             }
         });
         this.isReadonly = this._store.select(checkShareSystemUserLevel);
@@ -272,6 +306,52 @@ export class DepartmentDetailComponent extends AppList {
                     this.departmentTypeList = data.map((item: any) => ({ id: item.value, text: item.displayName }));
                 },
             );
+    }
+
+    getEmailByDeptId() {
+        this._systemRepo
+            .getListEmailSettingByDeptID(this.departmentId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe((data: any) => {
+                this.emailSettings = data;
+            });
+    }
+
+    showDeletePopup(emailSetting: EmailSetting) {
+        this.selectedEmail = emailSetting;
+        this.confirmDeletePopup.show();
+    }
+
+    onDeleteEmail() {
+        this.confirmDeletePopup.hide();
+        this.deleteEmailSetting(this.selectedEmail.id);
+    }
+
+    deleteEmailSetting(id: number) {
+        this._progressRef.start();
+        this._systemRepo
+            .deleteEmailSetting(id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => {
+                    this.isLoading = false;
+                    this._progressRef.complete();
+                })
+            )
+            .subscribe((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success(res.message, "");
+                    this.getEmailByDeptId();
+                } else {
+                    this._toastService.error(
+                        res.message || "Có lỗi xảy ra",
+                        ""
+                    );
+                }
+            });
     }
 
     initImageLibary() {

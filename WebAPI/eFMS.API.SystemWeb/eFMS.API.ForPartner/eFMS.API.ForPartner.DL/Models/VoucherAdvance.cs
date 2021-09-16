@@ -29,7 +29,7 @@ namespace eFMS.API.ForPartner.DL.Models
     
     public class VoucherExpense
     {
-        public Guid DocID { get; set; }
+        public string DocID { get; set; }
         public string DocNO { get; set; }
         public string DocType { get; set; }
         public List<VoucherExpenseCharge> Detail { get; set; }

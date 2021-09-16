@@ -11,6 +11,8 @@ import { ShareSystemModule } from '../share-system.module';
 import { ShareSystemDetailPermissionComponent } from './../components/permission/permission-detail.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FroalaEditorModule, FroalaViewModule } from 'angular-froala-wysiwyg';
+import { DepartmentEmailComponent } from './email/email-department.component';
+import { ModalModule } from 'ngx-bootstrap/modal';
 const routing: Routes = [
     {
         path: '', data: { name: "" },
@@ -41,14 +43,16 @@ const routing: Routes = [
         FroalaEditorModule.forRoot(),
         FroalaViewModule.forRoot(),
         ShareSystemModule,
-        TabsModule.forRoot()
+        TabsModule.forRoot(),
+        ModalModule.forRoot(),
     ],
     exports: [],
     declarations: [
         DepartmentComponent,
         DepartmentFormSearchComponent,
         DepartmentAddNewComponent,
-        DepartmentDetailComponent
+        DepartmentDetailComponent,
+        DepartmentEmailComponent
     ],
     providers: [],
 })

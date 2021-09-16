@@ -13,9 +13,13 @@ namespace eFMS.API.ForPartner.Service.Models
         public string Status { get; set; }
         public Guid? AgreementId { get; set; }
         public decimal? PaidAmount { get; set; }
+        public decimal? PaidAmountVnd { get; set; }
+        public decimal? PaidAmountUsd { get; set; }
         public string Type { get; set; }
         public decimal? CusAdvanceAmount { get; set; }
         public decimal? FinalPaidAmount { get; set; }
+        public decimal? FinalPaidAmountVnd { get; set; }
+        public decimal? FinalPaidAmountUsd { get; set; }
         public decimal? Balance { get; set; }
         public string PaymentMethod { get; set; }
         public string CurrencyId { get; set; }

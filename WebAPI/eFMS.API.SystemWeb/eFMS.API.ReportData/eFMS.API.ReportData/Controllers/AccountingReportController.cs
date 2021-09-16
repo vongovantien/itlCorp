@@ -10,6 +10,7 @@ using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
+using FMS.API.ReportData.Models.Accounting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -85,7 +86,7 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
-        
+
 
         /// <summary>
         /// Export Settlement Payment
@@ -138,6 +139,29 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Settlement List With Charge Detail
+        /// </summary>
+        /// <param name="settlementPaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportSettlementPaymentDetailSurCharges")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportSettlementPaymentDetailSurCharges(SettlementPaymentCriteria settlementPaymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.SettlementPaymentDetailListUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingSettlementExportGroup>>();
+
+            var stream = new AccountingHelper().ExportSettlementPaymentDetailSurCharges(dataObjects.Result, "Settlement-Detail Template.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement-Detail Template.xlsx");
+
+            return fileContent;
+        }
+
         /// <summary>
         /// Export Advance Payment with each Request.
         /// </summary>
@@ -155,11 +179,30 @@ namespace eFMS.API.ReportData.Controllers
                 new AccountingHelper().GenerateInvoicePaymentShipmentExcel(accountingPayments.Result) :
                 new AccountingHelper().GenerateOBHPaymentShipmentExcel(accountingPayments.Result);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, 
-                accountingPaymentCriteria.PaymentType == PaymentType.Invoice ? 
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream,
+                accountingPaymentCriteria.PaymentType == PaymentType.Invoice ?
                 "Invoice Payment List.xlsx":"OBH Payment List.xlsx");
             return fileContent;
         }
+
+        [Route("ExportAccountingCustomerPayment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingCustomerPayment(AccountingPaymentCriteria paymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.CustomerPaymentUrl, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingCustomerPaymentExport>>();
+
+            var stream = new AccountingHelper().GenerateExportCustomerHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Customer.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Customer - eFMS.xlsx");
+
+            return fileContent;
+        }
+
         /// <summary>
         /// Export detail advance payment
         /// </summary>
@@ -367,7 +410,7 @@ namespace eFMS.API.ReportData.Controllers
         public async Task<IActionResult> ExportAccountingManagement(AccAccountingManagementCriteria criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.AccountingManagementExportUrl, accessToken);            
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.AccountingManagementExportUrl, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingManagementExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
@@ -379,6 +422,29 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        /// <summary>
+        /// Export accounting receivable
+        /// </summary>
+        /// <param name="criteria">AccountReceivableCriteria</param>
+        /// <returns></returns>
+        [Route("ExportAccountingReceivableArSumary")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingReceivableArSumary(AccountReceivableCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.AccountingGetDataARSumaryExportUrl, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+
+            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Trial" + " - eFMS.xlsx");
+
+            return fileContent;
+        }
 
         /// <summary>
         /// Export detail settlement payment
@@ -401,6 +467,25 @@ namespace eFMS.API.ReportData.Controllers
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
+
+            return fileContent;
+        }
+
+        [Route("ExportAccountingAgencyPayment")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportAccountingAgencyPayment(AccountingPaymentCriteria paymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(paymentCriteria, aPis.AccountingAPI + Urls.Accounting.AgencyPaymentUrl, accessToken);
+             
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
+            if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
+
+            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Agency - eFMS.xlsx");
 
             return fileContent;
         }

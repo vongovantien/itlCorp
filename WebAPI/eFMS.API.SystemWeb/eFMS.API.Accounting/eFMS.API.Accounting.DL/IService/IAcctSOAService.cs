@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -64,5 +65,7 @@ namespace eFMS.API.Accounting.DL.IService
         List<Guid> GetSurchargeIdBySoaId(string soaId);
 
         HandleState RejectSoaCredit(RejectSoaModel model);
+
+        List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo);
     }
 }

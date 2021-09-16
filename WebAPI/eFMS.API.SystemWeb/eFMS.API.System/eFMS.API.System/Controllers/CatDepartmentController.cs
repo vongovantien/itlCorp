@@ -63,11 +63,11 @@ namespace eFMS.API.System.Controllers
         [HttpPost("QueryData")]
         public IActionResult QueryData(CatDepartmentCriteria criteria)
         {
-            var _criteria = new CatDepartmentCriteria {
-                Type = !string.IsNullOrEmpty(criteria.Type) ? criteria.Type.Trim() : criteria.Type,
-                Keyword = !string.IsNullOrEmpty(criteria.Keyword) ? criteria.Keyword.Trim() : criteria.Keyword,
-            };            
-            var data = catDepartmentService.QueryData(_criteria);
+            //var _criteria = new CatDepartmentCriteria {
+            //    Type = !string.IsNullOrEmpty(criteria.Type) ? criteria.Type.Trim() : criteria.Type,
+            //    Keyword = !string.IsNullOrEmpty(criteria.Keyword) ? criteria.Keyword.Trim() : criteria.Keyword,
+            //};            
+            var data = catDepartmentService.QueryData(criteria);
             return Ok(data);
         }
 
@@ -125,7 +125,8 @@ namespace eFMS.API.System.Controllers
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
+            ResultHandle result = new ResultHandle 
+            { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return Ok(result);
@@ -154,7 +155,8 @@ namespace eFMS.API.System.Controllers
 
             var message = HandleError.GetMessage(hs, Crud.Update);
 
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            ResultHandle result = new ResultHandle 
+            { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return Ok(result);

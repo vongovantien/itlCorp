@@ -229,8 +229,8 @@ export class AccountingRepo {
     }
 
 
-    getExistingCharge(body: any = {}) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body).pipe(
+    getExistingCharge(body: any = {}, settlementCode: string = null) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body, {settlementCode: settlementCode}).pipe(
             map((data: any) => data)
         );
     }
@@ -559,14 +559,14 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    getPaymentByrefId(refId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refId: refId }).pipe(
+    getPaymentByrefNo(refNo: string, type: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refNo: refNo, type: type}).pipe(
             map((data: any) => data)
         );
     }
 
-    getInvoiceExtendedDate(refId: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refId }).pipe(
+    getInvoiceExtendedDate(refNo: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetInvoiceExtendedDate`, { id: refNo }).pipe(
             map((data: any) => data)
         );
     }
@@ -723,7 +723,7 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    /// Search Customer Payment 
+    /// Search Customer Payment
 
     getListConfirmBilling(page?: number, size?: number, body: any = {}) {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingManagement/ConfirmBillingPaging`, body, {
@@ -745,12 +745,31 @@ export class AccountingRepo {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/Paging`, body, {
                 page: '' + page,
                 size: '' + size
-            }).pipe(
+            }, { "hideSpinner": "true" }).pipe(
                 catchError((error) => throwError(error)),
                 map((data: any) => data)
             );
         }
     }
+
+    getDataIssueCustomerPayment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueCustomerPayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDataIssueAgencyPayment(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GetDataIssueAgencyPayment`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    cancelReceipt(id: string) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CancelReceipt/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
     checkAllowDeleteCusPayment(id: string) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/CheckAllowDelete/${id}`).pipe(
             map((data: any) => data)
@@ -828,7 +847,7 @@ export class AccountingRepo {
         );
     }
 
-    uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string, ) {
+    uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string) {
         if (!!child) {
             return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
         }
@@ -847,10 +866,14 @@ export class AccountingRepo {
         return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/DeleteAttachedFile/${folder}/${id}`);
     }
 
-    getListAdvanceNoForShipment(hblId: string, payeeId: string = '', requester: string = '') {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId, payeeId: payeeId, requester: requester }).pipe(
+    getListAdvanceNoForShipment(hblId: string, payeeId: string = '', requester: string = '', settlementCode: string = null) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId, payeeId: payeeId, requester: requester, settlementCode: settlementCode }).pipe(
             map((data: any) => data)
         );
+    }
+
+    syncReceiptToAccountant(list: any[]) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list)
     }
 
     checkVoucherIdDuplicate(voucherId: string, acctId: string) {
@@ -858,8 +881,15 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body:any) {
-        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`,body).pipe(
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    getDataDebitDetail(agreementId: any,option : any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`,{ argeementId: agreementId,option :option }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

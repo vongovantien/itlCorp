@@ -46,7 +46,7 @@ export {
     AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel
 } from './accouting/accounting-receivable.model';
 export * from './accouting/accounting-approve';
-export { ReceiptInvoiceModel, Receipt, ReceiptModel } from './accouting/receipt.model';
+export { ReceiptInvoiceModel, Receipt, ReceiptModel, ReceiptCreditDebitModel } from './accouting/receipt.model';
 
 export * from './document/csShipmentSurcharge';
 export * from './document/csTransaction';
@@ -76,6 +76,7 @@ export { ExchangeRateHistory } from './tool-setting/exchange-rate';
 export * from './system/user';
 export * from './system/company';
 export * from './system/office';
+export * from './system/emailSetting';
 export { PermissionGeneralItem, Permission, PermissionGeneral, PermissionSample, PermissionSampleGeneral, PermissionSampleSpecial } from './system/permission';
 
 export * from './system/role';

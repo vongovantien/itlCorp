@@ -14,6 +14,11 @@ using Newtonsoft.Json;
 using eFMS.API.ForPartner.Infrastructure.Extensions;
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.Options;
+using System.Net.Http;
+using eFMS.API.ForPartner.DL.Infrastructure.Http;
+using System.Threading.Tasks;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -29,16 +34,20 @@ namespace eFMS.API.ForPartner.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAccountingManagementService accountingManagementService;
         private readonly IActionFuncLogService actionFuncLogService;
+        private readonly IOptions<ApiUrl> apiUrl;
+
         /// <summary>
         /// Accounting Contructor
         /// </summary>
         public AccountingController(IAccountingManagementService service,
             IStringLocalizer<LanguageSub> localizer,
-            IActionFuncLogService actionFuncLog)
+            IActionFuncLogService actionFuncLog,
+            IOptions<ApiUrl> aUrl)
         {
             accountingManagementService = service;
             stringLocalizer = localizer;
             actionFuncLogService = actionFuncLog;
+            apiUrl = aUrl;
         }
 
         /// <summary>
@@ -166,7 +175,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPost("CreateInvoiceData")]
-        public IActionResult CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> CreateInvoiceData(InvoiceCreateInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -214,9 +223,26 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
-            if (!hs.Success)
+            try
+            {
+                if (!hs.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
+            }
+            finally
+            {
+                if (hs.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi tạo mới hóa đơn thành công
+                        var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -227,7 +253,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("ReplaceInvoiceData")]
-        public IActionResult ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> ReplaceInvoiceData(InvoiceUpdateInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             if (!accountingManagementService.ValidateApiKey(apiKey))
@@ -305,10 +331,27 @@ namespace eFMS.API.ForPartner.Controllers
             string _major = "Tạo Hóa Đơn";
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
-
-            if (!hsInsertInvoice.Success)
+            
+            try
+            {
+                if (!hsInsertInvoice.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
+            }
+            finally
+            {
+                if (hsInsertInvoice.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi replace invoice thành công
+                        var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -319,7 +362,7 @@ namespace eFMS.API.ForPartner.Controllers
         /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("CancellingInvoice")]
-        public IActionResult CancellingInvoice(InvoiceInfo model, [Required] string apiKey, [Required] string hash)
+        public async Task<IActionResult> CancellingInvoice(InvoiceInfo model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
 
@@ -349,6 +392,26 @@ namespace eFMS.API.ForPartner.Controllers
             if (!hs.Success)
                 return Ok(result);
             return Ok(result);
+            //try
+            //{
+            //    if (!hs.Success)
+            //        return Ok(result);
+            //    return Ok(result);
+            //}
+            //finally
+            //{
+            //    if (hs.Success)
+            //    {
+            //        //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+            //        Response.OnCompleted(async () =>
+            //        {
+            //            //Tính công nợ sau khi cancel invoice thành công
+            //            var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+            //            var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+            //            await CalculatorReceivable(modelReceivable);
+            //        });
+            //    }
+            //}
         }
 
         /// <summary>
@@ -544,7 +607,22 @@ namespace eFMS.API.ForPartner.Controllers
             return message;
         }
         #endregion --- PRIVATE ---
-
+        
+        [HttpPost("CalculatorReceivableNotAuthorize_Test")]
+        public async Task<IActionResult> CalculatorReceivableNotAuthorize(CalculatorReceivableNotAuthorizeModel model)
+        {
+            var cr = await CalculatorReceivable(model);
+            return Ok(cr);
+        }
+        
+        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
+        {
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";//"http://localhost:44368";//
+            HttpResponseMessage resquest = await HttpService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
+        }
+        
         /// <summary>
         /// Cập nhật thông tin phiếu chi và số HT
         /// </summary>

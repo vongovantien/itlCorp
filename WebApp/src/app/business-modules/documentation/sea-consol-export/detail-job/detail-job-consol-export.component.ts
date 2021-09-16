@@ -22,7 +22,7 @@ import { ICrystalReport } from '@interfaces';
 import { delayTime } from '@decorators';
 import { HttpErrorResponse } from '@angular/common/http';
 
-type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES'| 'HBL';
+type TAB = 'SHIPMENT' | 'CDNOTE' | 'ASSIGNMENT' | 'FILES' | 'HBL';
 
 @Component({
     selector: 'app-detail-job-consol-export',
@@ -41,7 +41,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
     params: any;
-    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE','FILES'];
+    tabList: string[] = ['SHIPMENT', 'CDNOTE', 'ASSIGNMENT', 'ADVANCE-SETTLE', 'FILES'];
     jobId: string;
     selectedTab: TAB | string = 'SHIPMENT';
     action: any = {};
@@ -78,7 +78,7 @@ export class SeaConsolExportDetailJobComponent extends SeaConsolExportCreateJobC
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param: any) => {
                 this.params = param;
-                this.selectedTab = (!!param.tab && this.tabList.includes(param.tab.toUpperCase()))? param.tab.toUpperCase() : 'SHIPMENT';
+                this.selectedTab = (!!param.tab && this.tabList.includes(param.tab.toUpperCase())) ? param.tab.toUpperCase() : 'SHIPMENT';
                 this.jobId = !!param.jobId ? param.jobId : '';
                 if (param.action) {
                     this.ACTION = param.action.toUpperCase();

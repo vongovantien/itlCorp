@@ -12,6 +12,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public string PartnerNameAbbr { get; set; }
         public string TaxCode { get; set; }
         public string PartnerStatus { get; set; }
+        public string ParentNameAbbr { get; set; }
         public string AgreementNo { get; set; }
         public string AgreementType { get; set; }
         public string AgreementStatus { get; set; }
@@ -31,7 +32,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? SaleDebitAmount { get; set; }
         public decimal? SaleDebitRate { get; set; }
         public decimal? DebitAmount { get; set; }
-        public decimal? ObhAmount { get; set; }
+        public decimal? ObhAmount { get; set; }       
         public decimal? DebitRate { get; set; }
         public decimal? CusAdvance { get; set; }
         public decimal? BillingAmount { get; set; }
@@ -42,5 +43,10 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? Over16To30Day { get; set; }
         public decimal? Over30Day { get; set; }
         public string ArCurrency { get; set; }
+        public string CreditCurrency { get; set; }
+        public decimal? ObhBillingAmount { get; set; }
+        public decimal? ObhPaidAmount { get; set; }
+        public decimal? ObhUnPaidAmount { get; set; }
+
     }
 }

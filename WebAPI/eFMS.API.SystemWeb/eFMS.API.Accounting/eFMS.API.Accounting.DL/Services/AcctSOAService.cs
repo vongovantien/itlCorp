@@ -51,6 +51,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
+        private readonly IAccAccountReceivableService accAccountReceivableService;
 
         public AcctSOAService(IContextBase<AcctSoa> repository,
             IMapper mapper,
@@ -74,7 +75,8 @@ namespace eFMS.API.Accounting.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<SysCompany> sysCompany,
             IContextBase<SysNotifications> sysNotifyRepo,
-            IContextBase<SysUserNotification> sysUsernotifyRepo) : base(repository, mapper)
+            IContextBase<SysUserNotification> sysUsernotifyRepo,
+            IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
             currentUser = user;
             csShipmentSurchargeRepo = csShipmentSurcharge;
@@ -97,6 +99,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysCompanyRepo = sysCompany;
             sysNotificationRepository = sysNotifyRepo;
             sysUserNotificationRepository = sysUsernotifyRepo;
+            accAccountReceivableService = accAccountReceivable;
         }
 
         #region -- Insert & Update SOA
@@ -192,6 +195,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
                 soa.Soano = model.Soano = CreateSoaNo();
+                soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
                 if (hs.Success && surchargesSoa != null)
@@ -233,6 +237,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.LastSyncDate = soaCurrent.LastSyncDate;
                 soa.ReasonReject = soaCurrent.ReasonReject;
                 soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
+                soa.NetOff = soaCurrent.NetOff;
 
                 //Check exists OBH Debit Charge
                 var isExistObhDebitCharge = csShipmentSurchargeRepo.Get(x => model.Surcharges != null
@@ -2878,6 +2883,7 @@ namespace eFMS.API.Accounting.DL.Services
             return surchargeIds;
         }
 
+        #region --- Reject SOA Type Credit ---
         public HandleState RejectSoaCredit(RejectSoaModel model)
         {
             var soa = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
@@ -3009,6 +3015,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
         }
+        #endregion --- Reject SOA Type Credit ---
 
         #region --- PRIVATE METHOD ---
         private sp_UpdateRejectCharge UpdateRejectCharge(List<RejectChargeTable> charges)
@@ -3059,5 +3066,17 @@ namespace eFMS.API.Accounting.DL.Services
             return result.FirstOrDefault();
         }
         #endregion --- PRIVATE METHOD ---
+
+        #region --- Calculator Receivable SOA ---
+        public List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo)
+        {
+            //Get list charge of by Soa No
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.Soano == soaNo || x.PaySoano == soaNo);
+            var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
+            //Tính công nợ từng Partner, Service, Office có trong list charge của SOA
+            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return objectReceivablesModel;
+        }
+        #endregion --- Calculator Receivable SOA ---
     }
 }

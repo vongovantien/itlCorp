@@ -11,6 +11,7 @@ using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Common.Infrastructure.Common;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -26,6 +27,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private readonly IAcctSOAService acctSOAService;
         private readonly ICurrentUser currentUser;
+        private readonly IAccAccountReceivableService accountReceivableService;
 
         /// <summary>
         /// constructor
@@ -33,11 +35,12 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="localizer"></param>
         /// <param name="service"></param>
         /// <param name="user"></param>
-        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user)
+        public AcctSOAController(IStringLocalizer<LanguageSub> localizer, IAcctSOAService service, ICurrentUser user, IAccAccountReceivableService accountReceivable)
         {
             stringLocalizer = localizer;
             acctSOAService = service;
             currentUser = user;
+            accountReceivableService = accountReceivable;
         }
 
         /// <summary>
@@ -58,12 +61,27 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            //if (hs.Success)
+            //{
+            //    // Tính công nợ sau khi Add SOA thành công
+            //    acctSOAService.CalculatorReceivableSoa(model.Soano);
+            //}
+
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
                 return BadRequest(_result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -94,12 +112,27 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
+            //if (hs.Success)
+            //{
+            //    // Tính công nợ sau khi Update SOA thành công
+            //    acctSOAService.CalculatorReceivableSoa(model.Soano);
+            //}
+
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = model };
                 return BadRequest(_result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(model.Soano);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -145,6 +178,7 @@ namespace eFMS.API.Accounting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
+            var soaNo = acctSOAService.Get(x => x.Id == soaId).FirstOrDefault()?.Soano;
             var hs = acctSOAService.DeleteSOA(soaId);
             if (hs.Code == 403)
             {
@@ -153,11 +187,28 @@ namespace eFMS.API.Accounting.Controllers
 
             //Update SOANo = NULL & PaySOANo = NULL for ShipmentSurcharge (Đã xử lý bên trong hàm DeleteSOA)
             //acctSOAService.UpdateSOASurCharge(soaNo);
+
+            //if (hs.Success)
+            //{
+            //    // Tính công nợ sau khi Delete SOA thành công
+                
+            //    acctSOAService.CalculatorReceivableSoa(soaNo);
+            //}
+
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSOAService.CalculatorReceivableSoa(soaNo);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }

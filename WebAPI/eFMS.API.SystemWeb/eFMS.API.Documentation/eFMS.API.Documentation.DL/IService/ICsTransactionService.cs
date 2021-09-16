@@ -22,7 +22,7 @@ namespace eFMS.API.Documentation.DL.IService
         //CsTransactionModel GetById(Guid id);
         CsTransactionModel GetDetails(Guid id);
         object AddCSTransaction(CsTransactionEditModel model);
-        ResultHandle ImportCSTransaction(CsTransactionEditModel model);
+        ResultHandle ImportCSTransaction(CsTransactionEditModel model, out List<Guid> surchargeIds);
         HandleState UpdateCSTransaction(CsTransactionEditModel model);
         bool CheckAllowDelete(Guid jobId);
         HandleState DeleteCSTransaction(Guid jobId);

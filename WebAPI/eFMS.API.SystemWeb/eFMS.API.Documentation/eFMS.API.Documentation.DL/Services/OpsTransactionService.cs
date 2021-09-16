@@ -1537,8 +1537,9 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="model">OpsTransactionModel</param>
         /// <returns></returns>
-        public ResultHandle ImportDuplicateJob(OpsTransactionModel model)
+        public ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds)
         {
+            surchargeIds = new List<Guid>(); // ds các charge phí update công nợ.
             PermissionRange permissionRange = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.Write);
             int code = GetPermissionToUpdate(new ModelUpdate { BillingOpsId = model.BillingOpsId, SaleManId = model.SalemanId, UserCreated = model.UserCreated, CompanyId = model.CompanyId, OfficeId = model.OfficeId, DepartmentId = model.DepartmentId, GroupId = model.GroupId }, permissionRange);
             if (code == 403) return new ResultHandle { Status = false, Message = "You can't duplicate this job." };
@@ -1626,6 +1627,7 @@ namespace eFMS.API.Documentation.DL.Services
                         }
 
                         trans.Commit();
+                        surchargeIds = newSurcharges.Select(x => x.Id).ToList();
                         return new ResultHandle { Status = true, Message = "The job have been saved!", Data = entity };
                     }
                     trans.Rollback();

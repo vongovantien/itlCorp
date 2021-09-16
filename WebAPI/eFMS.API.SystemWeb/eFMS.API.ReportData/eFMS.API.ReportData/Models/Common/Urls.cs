@@ -39,12 +39,15 @@
 
             public const string InvoicePaymentUrl = "/api/v1/en-US/AccountingPayment/ExportAccountingPayment";
 
+            public const string CustomerPaymentUrl = "/api/v1/en-US/AccountingPayment/GetDataExportAccountingCustomerPayment";
+
             public const string GetDataBravoSOAUrl = "/api/v1/en-US/AcctSOA/GetDataExporttBravoFromSOA?soaNo=";
 
             public const string GetDataSOAOPSUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOAOPS?soaNo=";
 
 
             public const string SettlementPaymentUrl = "/api/v1/en-US/AcctSettlementPayment/QueryData";
+            public const string SettlementPaymentDetailListUrl = "/api/v1/en-US/AcctSettlementPayment/GetDataExportSettlementDetail";
             public const string DetailAdvancePaymentExportUrl = "/api/v1/en-US/AcctAdvancePayment/DetailAdvancePaymentExport";
             public const string DetailSettlementPaymentExportUrl = "/api/v1/en-US/AcctSettlementPayment/DetailSettlementPaymentExport";
             public const string GeneralSettlementPaymentExport = "/api/v1/en-US/AcctSettlementPayment/GeneralSettlementPaymentExport";
@@ -54,6 +57,9 @@
             public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
             public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
             public const string AccountingManagementExportUrl = "/api/v1/en-US/AccountingManagement/GetDataAcctMngtExport";
+            public const string AccountingGetDataARSumaryExportUrl = "/api/v1/en-US/AccountReceivable/GetDataARSumaryExport";
+
+            public const string AgencyPaymentUrl = "/api/v1/en-US/AccountingPayment/GetDataExportAccountingAgencyPayment";
         }
 
         public class Documentation

@@ -6,7 +6,7 @@ export abstract class eFMSPopup {
     @ViewChild("popup") popup: ModalDirective;
 
     options: ModalOptions = {
-        animated: false,
+        animated: true,
         keyboard: true,
         backdrop: 'static'
     };

@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
 using eFMS.API.Documentation.DL.Common;
 using eFMS.API.Documentation.DL.IService;
 using eFMS.API.Documentation.DL.Models;
 using eFMS.API.Documentation.DL.Models.Criteria;
+using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
@@ -18,6 +21,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SystemManagementAPI.Infrastructure.Middlewares;
 
@@ -39,7 +43,8 @@ namespace eFMS.API.Documentation.Controllers
         private readonly ICurrentUser currentUser;
         private readonly ICsShipmentSurchargeService surchargeService;
         private readonly ISysImageService sysImageService;
-
+        private readonly IAccAccountReceivableService AccAccountReceivableService;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
         /// <summary>
         /// constructor
         /// </summary>
@@ -47,11 +52,14 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="service">inject ICsTransactionService</param>
         /// <param name="user">inject ICurrentUser</param>
         /// <param name="serviceSurcharge">inject ICsShipmentSurchargeService</param>
+        /// <param name="AccAccountReceivaService"></param>
         /// <param name="imageService"></param>
         public CsTransactionController(IStringLocalizer<DocumentationLanguageSub> localizer,
             ICsTransactionService service,
             ICurrentUser user,
             ICsShipmentSurchargeService serviceSurcharge,
+            IAccAccountReceivableService AccAccountReceivaService,
+            IOptions<ApiServiceUrl> serviceUrl,
             ISysImageService imageService)
         {
             stringLocalizer = localizer;
@@ -59,6 +67,8 @@ namespace eFMS.API.Documentation.Controllers
             currentUser = user;
             surchargeService = serviceSurcharge;
             sysImageService = imageService;
+            AccAccountReceivableService = AccAccountReceivaService;
+            apiServiceUrl = serviceUrl;
         }
 
         /// <summary>
@@ -438,8 +448,34 @@ namespace eFMS.API.Documentation.Controllers
                 return Ok(new ResultHandle { Status = false, Message = checkExistMessage });
             }
             model.UserCreated = currentUser.UserID;
-            var result = csTransactionService.ImportCSTransaction(model);
+            var result = csTransactionService.ImportCSTransaction(model, out List<Guid> surchargeIds);
+
+
+            if (!result.Status)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = result.Message });
+            }
+            else if (surchargeIds.Count > 0)
+            {
+
+                Response.OnCompleted(async () =>
+                {
+                    //Tính công nợ sau khi tạo mới hóa đơn thành công
+                    List<ObjectReceivableModel> modelReceivableList = AccAccountReceivableService.GetListObjectReceivableBySurchargeIds(surchargeIds);
+                    await CalculatorReceivable(new CalculatorReceivableModel { ObjectReceivable = modelReceivableList });
+                });
+            }
             return Ok(result);
+        }
+
+        private async Task<HandleState> CalculatorReceivable(CalculatorReceivableModel model)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/CalculatorReceivable", model, accessToken);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
         }
 
         [Authorize]

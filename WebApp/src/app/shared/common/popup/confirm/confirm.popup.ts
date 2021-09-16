@@ -18,6 +18,7 @@ export class ConfirmPopupComponent extends eFMSPopup implements ConfirmPopupConf
     @Input() iconCancel: string = 'la la-ban';
     @Input() classConfirmButton: string = 'btn-brand';
     @Input() classCancelButton: string = 'btn-default';
+    @Input() center: boolean = false;
 
     @Output() onSubmit: EventEmitter<any> = new EventEmitter<any>();
     @Output() onCancel: EventEmitter<any> = new EventEmitter<any>();

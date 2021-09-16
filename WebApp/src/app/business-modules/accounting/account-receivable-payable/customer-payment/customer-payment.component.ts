@@ -1,5 +1,4 @@
 import { Component, ViewChild } from "@angular/core";
-import { NgProgress } from "@ngx-progressbar/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
@@ -10,9 +9,21 @@ import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants } from "@constants";
 
-
-import { catchError, finalize } from "rxjs/operators";
+import { catchError, finalize, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
+import { IAppState } from "@store";
+import { Store } from "@ngrx/store";
+import { LoadListCustomerPayment, RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
+import { InjectViewContainerRefDirective } from "@directives";
+import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
+
+enum PAYMENT_TAB {
+    CUSTOMER = 'CUSTOMER',
+    AGENCY = 'AGENCY',
+    ARSUMMARY = 'ARSUMMARY',
+    HISTORY = 'HISTORY'
+
+}
 @Component({
     selector: 'app-customer-payment',
     templateUrl: './customer-payment.component.html',
@@ -20,13 +31,15 @@ import { formatDate } from "@angular/common";
 export class ARCustomerPaymentComponent extends AppList implements IPermissionBase {
 
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(InfoPopupComponent) infoPopup: InfoPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
+
 
     CPs: ReceiptModel[] = [];
 
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
+    selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
     dataSearch = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
@@ -34,36 +47,57 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     constructor(
-        private _sortService: SortService,
-        private _toastService: ToastrService,
-        private _progressService: NgProgress,
-        private _router: Router,
-        private _accountingRepo: AccountingRepo,
+        private readonly _sortService: SortService,
+        private readonly _toastService: ToastrService,
+        private readonly _router: Router,
+        private readonly _accountingRepo: AccountingRepo,
+        private readonly _store: Store<IAppState>
     ) {
         super();
-        this._progressRef = this._progressService.ref();
-        this.requestList = this.getCPs;
+        this.requestList = this.requestLoadListCustomerPayment;
         this.requestSort = this.sortLocal;
     }
 
     ngOnInit() {
+
         this.headers = [
-            { title: 'Payment Ref No', field: 'paymentRefNo', sortable: true },
+            { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
             { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
             { title: 'Payment Amount', field: 'paidAmount', sortable: true },
             { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
-            { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
             { title: 'Description', field: 'description', sortable: true },
-            { title: 'Status', field: 'status', sortable: true },
             { title: 'Creator', field: 'userNameCreated', sortable: true },
             { title: 'Create Date', field: 'datetimeCreated', sortable: true },
             { title: 'Modifie Date', field: 'datetimeModiflied', sortable: true },
 
         ];
-        this.getCPs(this.dataSearch);
+        this.isLoading = this._store.select(customerPaymentReceipLoadingState)
+        this.getCPs();
+
+
+        this._store.select(customerPaymentReceipSearchState)
+            .pipe(
+                withLatestFrom(this._store.select(customerPaymentReceipPagingState)),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch })),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe(
+                (data) => {
+                    if (!!data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                    }
+
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+
+                    this.requestLoadListCustomerPayment();
+                }
+            );
     }
 
     checkAllowDetail(data: ReceiptModel) {
@@ -71,7 +105,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             .checkAllowGetDetailCPS(data.id)
             .subscribe((value: boolean) => {
                 if (value) {
-                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/customer/receipt/${data.id}`]);
+                    this._store.dispatch(ResetInvoiceList());
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
                     this.permissionPopup.show();
                 }
@@ -85,59 +120,75 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                 if (value) {
                     this.selectedCPs = new ReceiptModel(data);
                     this.messageDelete = `Do you want to delete Receipt ${data.paymentRefNo} ? `;
-                    this.confirmPopup.show();
+                    this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+                        title: 'Delete Receipt',
+                        body: this.messageDelete,
+                        labelConfirm: 'Yes',
+                        classConfirmButton: 'btn-danger',
+                        iconConfirm: 'la la-trash'
+                    }, () => this.onConfirmDeleteCP())
                 } else {
                     this.permissionPopup.show();
                 }
             });
     }
 
-    getCPs(dataSearch) {
-        this.isLoading = true;
-        this._progressRef.start();
-        this._accountingRepo
-            .getListCustomerPayment(
-                this.page,
-                this.pageSize,
-                Object.assign({}, dataSearch)
-            )
+    cancelReceipt(id: string) {
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Cancel Receipt',
+            body: 'This Receipt will be canceled. Are you sure you want to continue?',
+            labelConfirm: 'Yes',
+            classConfirmButton: 'btn-danger',
+            iconConfirm: 'la la-times'
+        }, () => {
+            this._accountingRepo.cancelReceipt(id)
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success('Cancel Receipt Success!');
+                            this.requestLoadListCustomerPayment();
+                        } else {
+                            this._toastService.warning(res.message);
+                        }
+                    },
+                );
+        })
+    }
+
+    getCPs() {
+        // this.page = 1;
+        this._store.select(customerPaymentReceipListState)
             .pipe(
                 catchError(this.catchError),
-                finalize(() => {
-                    this.isLoading = false;
-                    this._progressRef.complete();
-                })
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new ReceiptModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                }),
+                takeUntil(this.ngUnsubscribe),
             )
-            .subscribe((res: any) => {
-                this.CPs = (res.data || []).map((item: ReceiptModel) => new ReceiptModel(item));
-                this.totalItems = res.totalItems || 0;
-            });
+            .subscribe(
+                (res: any) => {
+                    this.CPs = res.data || [];
+                    this.totalItems = res.totalItems || 0;
+                },
+            );
     }
-    onSearchCPs(data: any) {
-        this.page = 1;
-        this.dataSearch = data;
-        this.getCPs(this.dataSearch);
 
-    }
     sortCPsList(sortField: string, order: boolean) {
         this.CPs = this._sortService.sort(this.CPs, sortField, order);
     }
 
     onConfirmDeleteCP() {
-        this._progressRef.start();
         this._accountingRepo
             .deleteCusPayment(this.selectedCPs.id)
-            .pipe(
-                catchError(this.catchError),
-                finalize(() => {
-                    this.confirmPopup.hide();
-                    this._progressRef.complete();
-                })
-            )
             .subscribe((res: any) => {
                 this._toastService.success(res.message);
                 // * search cps when success.
-                this.onSearchCPs(this.dataSearch);
+
+                this.requestLoadListCustomerPayment();
             });
     }
 
@@ -145,19 +196,29 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         this.CPs = this._sortService.sort(this.CPs, sort, this.order);
     }
 
-    onSelectTab(tab: string) {
-        switch (tab) {
-            case 'agency':
-                this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/agency`]);
-                break;
-            case 'ar':
+    onSelectTab(tabName: PAYMENT_TAB | string) {
+        switch (tabName) {
+            case 'AR':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`]);
                 break;
-            case 'history':
+            case 'HISTORY':
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment`]);
                 break;
+
             default:
                 break;
         }
+        this.selectedTab = tabName;
     }
+
+    gotoCreateReceipt(type: string) {
+        this._store.dispatch(ResetInvoiceList());
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${type.toLowerCase()}/new`]);
+    }
+
+    requestLoadListCustomerPayment() {
+        this._store.dispatch(LoadListCustomerPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
 }
+
