@@ -14,9 +14,9 @@ namespace eFMS.API.ForPartner.DL.IService
         string GenerateHashStringTest(object body, string apiKey);
         HandleState UpdateVoucherAdvance(VoucherAdvance model, string apiKey);
         HandleState RemoveVoucherAdvance(string voucherNo, string apiKey);
-        HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey);
+        HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, out Guid Id);
         HandleState UpdateInvoice(InvoiceUpdateInfo model, string apiKey);
-        HandleState DeleteInvoice(InvoiceInfo model, string apiKey);
+        HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id);
         HandleState RejectData(RejectData model, string apiKey);
         HandleState RemoveVoucher(RejectData model, string apiKey);
         CalculatorReceivableNotAuthorizeModel GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(List<Guid> surchargeIds, string apiKey, string action);
