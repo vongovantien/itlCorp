@@ -150,7 +150,7 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #region --- CRUD INVOICE ---
-        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
+        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, out Guid Id)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -160,15 +160,16 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "InsertInvoice";
 
-            var hsInsertInvoice = InsertInvoice(model, currentUser);
+            var hsInsertInvoice = InsertInvoice(model, currentUser, out AccAccountingManagement invoiceDebit);
+            Id = invoiceDebit.Id;
             return hsInsertInvoice;
         }
 
-        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser)
+        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser, out AccAccountingManagement invoiceDebit)
         {
             var chargeInvoiceDebitUpdate = new List<ChargeInvoiceUpdateTable>();
             var chargeInvoiceObhUpdate = new List<ChargeInvoiceUpdateTable>();
-            var invoiceDebit = new AccAccountingManagement();
+            invoiceDebit = new AccAccountingManagement();
             var invoicesObh = new List<AccAccountingManagement>();
 
             decimal kickBackExcRate = companyRepository.Get(x => x.Id == _currentUser.CompanyID).FirstOrDefault()?.KbExchangeRate ?? 20000;
@@ -405,6 +406,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     WriteLogInsertInvoice(hsObh.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, hsObh.Message.ToString());
                     return hsObh;
                 }
+
                 WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
                 return hsDebit;                
             }
@@ -600,7 +602,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return new HandleState();
         }
 
-        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey)
+        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -610,26 +612,27 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "DeleteInvoice";
 
-            var hsDeleteInvoice = DeleteInvoice(model, currentUser);
+            var hsDeleteInvoice = DeleteInvoice(model, currentUser, out AccAccountingManagement data);
+            Id = data.Id;
             return hsDeleteInvoice;
         }
 
-        HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser)
+        private HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser, out AccAccountingManagement data)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    AccAccountingManagement data = null;
+                    data = new AccAccountingManagement();
                     HandleState hs = new HandleState();
 
                     if (model.SerieNo == ForPartnerConstants.TYPE_CHARGE_OBH)
                     {
-                        data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
+                        AccAccountingManagement invObh = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
                                                 && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
 
 
-                        hs = DataContext.Delete(x => data.Id == x.Id, false);
+                        hs = DataContext.Delete(x => invObh.Id == x.Id, false);
                     }
                     else
                     {
@@ -644,8 +647,11 @@ namespace eFMS.API.ForPartner.DL.Service
                                                               && x.Serie == model.SerieNo
                                                               && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
                     }
-                   
-                    if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
+
+                    if (data == null)
+                    {
+                        return new HandleState((object)"Không tìm thấy hóa đơn");
+                    }
 
                    
                     if (hs.Success)
@@ -692,6 +698,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    data = new AccAccountingManagement();
                     return new HandleState((object)ex.Message);
                 }
                 finally
