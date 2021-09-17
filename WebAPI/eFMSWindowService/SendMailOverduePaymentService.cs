@@ -2,6 +2,7 @@
 using eFMSWindowService.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
@@ -24,6 +25,7 @@ namespace eFMSWindowService
 
         public void Start()
         {
+            FileHelper.WriteToFile("SendMailOverduePaymentService", "[SendMailOverduePaymentServiceService] [START]:" + DateTime.Now);
             // Tạo 1 timer từ libary System.Timers
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
@@ -44,7 +46,7 @@ namespace eFMSWindowService
         {
             try
             {
-                FileHelper.WriteToFile("SendMailOverduePayment", "Service send mail overdue payment is recall at " + DateTime.Now);
+                FileHelper.WriteToFile("SendMailOverduePaymentService", "[RECALL] at " + DateTime.Now);
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
                     var dt = db.Database.SqlQuery<sp_GetOverDuePayment_Result>("[dbo].[sp_GetOverDuePayment]").ToList();
@@ -95,8 +97,8 @@ namespace eFMSWindowService
                         string body = dear + headerBody + tableBody + footerBody;
                         body = string.Format("<div style='font-family: Calibri; font-size: 12pt; color: #004080'>{0}</div>", body);
                         List<string> mail = new List<string> { item.Key.Email };
-                        List<string> emailBCCs = CommonData.EmailBCCsOverDuePayment;
-
+                        var configBCC = ConfigurationManager.AppSettings["SendMailBCC"];
+                        List<string> emailBCCs = configBCC.Split(',').ToList<string>();
                         var s = SendMailHelper.Send(subject, body, mail, null, null, emailBCCs);
 
                         #region --- Ghi Log Send Mail ---
@@ -125,12 +127,13 @@ namespace eFMSWindowService
             catch (Exception ex)
             {
                 throw ex;
+                FileHelper.WriteToFile("SendMailOverduePaymentService", "[ERROR][Timer_Elapsed]:" + ex.Message);
             }
         }
 
         public new void Stop()
         {
-            FileHelper.WriteToFile("SendMailOverduePayment", "Service send mail overdue payment is stopped at " + DateTime.Now);
+            FileHelper.WriteToFile("SendMailOverduePaymentService", "[SendMailOverduePaymentServiceService] [STOP]:" + DateTime.Now);
             _timer.Stop();
             _timer.Dispose();
         }

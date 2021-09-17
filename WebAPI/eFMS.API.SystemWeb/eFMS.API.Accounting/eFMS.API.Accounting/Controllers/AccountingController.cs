@@ -1044,7 +1044,6 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="ids"></param>
         /// <returns></returns>
         [HttpPut("GetListReceipt")]
-        [Authorize]
         public IActionResult GetListReceipt(List<Guid> ids)
         {
             List<AcctReceiptSyncModel> _receiptSyncs = new List<AcctReceiptSyncModel>();

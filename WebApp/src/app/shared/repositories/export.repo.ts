@@ -256,6 +256,13 @@ export class ExportRepo {
         );
     }
 
+    exportSettlementPaymentShipmentDetail(searchObject: any = {}) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSettlementPaymentDetailSurCharges`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportAcountingPaymentShipment(searchObject: any = {}) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingPayment`, searchObject).pipe(
             catchError((error) => throwError(error)),

@@ -551,16 +551,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in surchargeShipment)
                             {
-                                //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
-                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).FirstOrDefault();
-                                if (advanceRequest != null)
+                                var advanceRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).ToList();
+                                foreach(var advanceRequest in advanceRequests)
                                 {
-                                    advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
-                                    advanceRequest.DatetimeModified = DateTime.Now;
-                                    advanceRequest.UserModified = userCurrenct;
-                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    if (advanceRequest != null)
+                                    {
+                                        advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                        advanceRequest.DatetimeModified = DateTime.Now;
+                                        advanceRequest.UserModified = userCurrenct;
+                                        var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    }
                                 }
-
                                 item.SettlementCode = null;
                                 item.AdvanceNo = null;
                                 item.UserModified = userCurrenct;
@@ -1137,6 +1138,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
                                     AdvanceNo = sur.AdvanceNo,
+                                    OriginAdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
                                     TypeService = "OPS",
                                     IsLocked = opst.IsLocked,
@@ -1209,6 +1211,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
                                    AdvanceNo = sur.AdvanceNo,
+                                   OriginAdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
                                    TypeService = "DOC",
                                    IsLocked = cst.IsLocked,
@@ -5335,6 +5338,25 @@ namespace eFMS.API.Accounting.DL.Services
                                     // push user notification
                                     if (hsUpdateApproval.Success)
                                     {
+                                        //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
+                                        var surchargeShipment = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settle.SettlementNo && !string.IsNullOrEmpty(x.AdvanceNo)).ToList();
+                                        if (surchargeShipment != null && surchargeShipment.Count > 0)
+                                        {
+                                            var surchargeGroup = surchargeShipment.GroupBy(x => new { x.Hblid, x.AdvanceNo }).Select(x => x.Key);
+                                            foreach (var shipment in surchargeGroup)
+                                            {
+                                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == shipment.Hblid && x.AdvanceNo == shipment.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED);
+                                                foreach(var advRq in advanceRequest)
+                                                {
+                                                    advRq.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                                    advRq.DatetimeModified = DateTime.Now;
+                                                    advRq.UserModified = currentUser.UserID;
+                                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advRq, x => x.Id == advRq.Id, false);
+                                                }
+                                            }
+                                            acctAdvanceRequestRepo.SubmitChanges();
+                                        }
+
                                         string title = string.Format(@"Accountant Denied Data Settlement {0}", settle.SettlementNo);
                                         string desc = string.Format(@"Settlement {0} has denied by {1}, Click to view", settle.SettlementNo, currentUser.UserName);
                                         SysNotifications sysNotify = new SysNotifications
@@ -5497,38 +5519,30 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="mbl"></param>
         /// <param name="hbl"></param>
         /// <returns></returns>
-        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null)
+        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null, string settlementNo = null)
         {
             var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
             // Check if adv existed in another settlement
-            var advanceNotExist = csShipmentSurchargeRepo.Get(x => !string.IsNullOrEmpty(x.SettlementCode) && x.Hblid == hblId);
-            var settleNum = advanceNotExist.Count();
-            if (settleNum > 0)
+            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && (x.SettlementCode != settlementNo || string.IsNullOrEmpty(settlementNo))).Select(x => x.AdvanceNo).ToList();
+            if (advanceExp?.Count() != 0)
             {
-                foreach (var adv in advanceNo)
-                {
-                    var advanceExist = advanceNotExist.Count(x => x.AdvanceNo == adv);
-                    if (advanceExist == settleNum)
-                    {
-                        advanceNo = advanceNo.Where(x => x != adv).ToList();
-                    }
-                }
+                advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
             }
 
             if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
             {
-                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)));
+                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo))).OrderBy(x=>x.RequestDate);
             }
             else
             {
                 if (!string.IsNullOrEmpty(payeeId))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId));
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId)).OrderBy(x => x.RequestDate);
                 }
                 if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester).OrderBy(x => x.RequestDate);
                 }
             }
             return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
@@ -5540,14 +5554,14 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="settlementCode"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableSettlement(string settlementCode)
+        public List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode)
         {
             //Get list charge by SettlementCode
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementCode);
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ cho Partner, Service, Office có trong charge của Settlement
-            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
-            return hs;
+            // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
+            return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Settlement ---
         
@@ -5603,6 +5617,174 @@ namespace eFMS.API.Accounting.DL.Services
             }
             
             return rs;
+        }
+
+        /// <summary>
+        /// Get detail shipment of settle to export
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        private List<ShipmentSettlementExportGroup> GetDataShipmentOfSettlement(IQueryable<AcctSettlementPayment> settlements)
+        {
+            var surcharges = csShipmentSurchargeRepo.Get();
+            var custom = customsDeclarationRepo.Get();
+            var sysUser = sysUserRepo.Get();
+            var sysEmployee = sysEmployeeRepo.Get();
+            var chargeDatas = catChargeRepo.Get();
+            var UnitDatas = catUnitRepo.Get();
+            var payer = catPartnerRepo.Get();
+            var payee = catPartnerRepo.Get();
+            var advanceReqData = acctAdvanceRequestRepo.Get();
+            var approveSettlement = acctApproveSettlementRepo.Get();
+
+            var data = from settle in settlements
+                       join sur in surcharges on settle.SettlementNo equals sur.SettlementCode
+                       join par in payer on sur.PayerId equals par.Id into par2
+                       from par in par2.DefaultIfEmpty()
+                       join pae in payee on sur.PaymentObjectId equals pae.Id into pae2
+                       from pae in pae2.DefaultIfEmpty()
+                       join vatPartner in payee on sur.VatPartnerId equals vatPartner.Id into vatPgrps
+                       from vatPartner in vatPgrps.DefaultIfEmpty()
+                       join charges in chargeDatas on sur.ChargeId equals charges.Id into grpCharge
+                       from charge in grpCharge.DefaultIfEmpty()
+                       join units in UnitDatas on sur.UnitId equals units.Id into grpUnit
+                       from unit in grpUnit.DefaultIfEmpty()
+                       join advanceReq in advanceReqData on new { sur.AdvanceNo, sur.JobNo, sur.Hblno } equals new { advanceReq.AdvanceNo, JobNo = advanceReq.JobId, Hblno = advanceReq.Hbl } into grpAdv
+                       from adv in grpAdv.GroupBy(x => new { x.JobId, x.Hblid, x.AdvanceNo }).Select(x => new { AmountVnd = x.Sum(z => z.AmountVnd ?? 0), AmountUsd = x.Sum(z => z.AmountUsd ?? 0) }).Take(1).DefaultIfEmpty()
+                       join cus in custom on sur.JobNo equals cus.JobNo into cus1
+                       from cus in cus1.OrderBy(c => c.DatetimeCreated).Take(1).DefaultIfEmpty()
+                       select new ShipmentSettlementExportGroup
+                       {
+                           SettleNo = settle.SettlementNo,
+                           JobID = sur.JobNo,
+                           HBL = sur.Hblno,
+                           MBL = sur.Mblno,
+                           CustomNo = cus == null ? string.Empty : cus.ClearanceNo,
+                           ChargeCode = charge == null ? string.Empty : charge.Code,
+                           ChargeName = charge == null ? string.Empty : charge.ChargeNameEn,
+                           Quantity = sur.Quantity,
+                           ChargeUnit = unit == null ? string.Empty : unit.UnitNameEn,
+                           UnitPrice = sur.UnitPrice,
+                           CurrencyId = sur.CurrencyId,
+                           NetAmount = sur.NetAmount ?? 0,
+                           Vatrate = sur.Vatrate ?? 0,
+                           VatAmount = sur.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (sur.VatAmountVnd ?? 0) : (sur.VatAmountUsd ?? 0),
+                           TotalAmount = sur.Total,
+                           TotalAmountVnd = (sur.VatAmountVnd ?? 0) + (sur.AmountVnd ?? 0),
+                           TotalAmountUsd = (sur.VatAmountUsd ?? 0) + (sur.AmountUsd ?? 0),
+                           Payee = sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? (pae == null ? string.Empty : pae.ShortName) : (par == null ? string.Empty : par.ShortName),
+                           OBHPartnerName = sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? (pae == null ? string.Empty : pae.ShortName) : (par == null ? string.Empty : par.ShortName),
+                           InvoiceNo = sur.InvoiceNo,
+                           SeriesNo = sur.SeriesNo,
+                           InvoiceDate = sur.InvoiceDate,
+                           VatPartner = vatPartner == null ? string.Empty : vatPartner.ShortName,
+                           AdvanceNo = sur.AdvanceNo,
+                           AdvanceAmount = adv == null ? 0m : (settle.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? adv.AmountVnd : adv.AmountUsd)
+                       };
+            var groupData = data.OrderBy(x => x.SettleNo).ThenBy(x => x.MBL).ThenBy(x => x.HBL);
+            return groupData.ToList();
+        }
+
+        /// <summary>
+        /// Get data to export settlement list detail
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        public List<AccountingSettlementExportGroup> GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria)
+        {
+            var results = new List<AccountingSettlementExportGroup>();
+            var settlementPayments = GetSettlementsByCriteria(criteria);
+            if(settlementPayments == null ||settlementPayments.Count() == 0)
+            {
+                return results;
+            }
+            
+            var sysUser = sysUserRepo.Get();
+            var sysEmployee = sysEmployeeRepo.Get();
+            var approveSettlement = acctApproveSettlementRepo.Get();
+            // Get data
+            var detailShipments = GetDataShipmentOfSettlement(settlementPayments);
+            var data = new List<AccountingSettlementExportGroup>();
+            foreach (var settlement in settlementPayments)
+            {
+                var shipments = detailShipments.Where(x => x.SettleNo == settlement.SettlementNo).ToList();
+                var shipmentGroup = shipments.GroupBy(x => new { x.JobID, x.MBL, x.HBL });
+                var settle = new AccountingSettlementExportGroup();
+                settle.SettlementNo = settlement.SettlementNo;
+                if (!string.IsNullOrEmpty(settlement.Requester))
+                {
+                    var requesterId = sysUser.Where(x => x.Id == settlement.Requester).FirstOrDefault()?.EmployeeId;
+                    settle.Requester = requesterId == null ? null : sysEmployee.Where(x => x.Id == requesterId).FirstOrDefault()?.EmployeeNameEn;
+                }
+                settle.RequestDate = settlement.RequestDate;
+                settle.SettlementAmount = settlement.Amount ?? 0;
+                settle.Currency = settlement.SettlementCurrency;
+                settle.ApproveDate = approveSettlement.Where(x => x.SettlementNo == settlement.SettlementNo).FirstOrDefault()?.BuheadAprDate;
+                settle.PaymentMethod = settlement.PaymentMethod;
+                settle.DueDate = settlement.DueDate;
+                settle.BankAccountNo = settlement.BankAccountNo;
+                settle.BankAccountName = settlement.BankAccountName;
+                settle.BankName = settlement.BankName;
+
+                settle.ShipmentDetail = new List<ShipmentSettlementExportGroup>();
+                settle.TotalNetAmount = 0;
+                settle.TotalVatAmount = 0;
+                settle.TotalAmount = 0;
+                settle.TotalAmountVnd = 0;
+                settle.TotalAdvanceAmount = 0;
+                foreach (var item in shipmentGroup)
+                {
+                    var jobDetail = new ShipmentSettlementExportGroup();
+                    var totalShipment = settle.Currency == "VND" ? item.Sum(x => x.TotalAmountVnd ?? 0) : item.Sum(x => x.TotalAmountUsd ?? 0);
+                    var customNo = string.Join(',', item.Select(x => x.CustomNo).Distinct());
+                    jobDetail.JobID = item.Key.JobID;
+                    jobDetail.MBL = item.Key.MBL;
+                    jobDetail.HBL = item.Key.HBL;
+                    jobDetail.CustomNo = customNo;
+                    jobDetail.AdvanceNo = item.FirstOrDefault().AdvanceNo;
+                    jobDetail.NetAmount = item.Sum(x => x.NetAmount ?? 0);
+                    jobDetail.VatAmount = item.Sum(x => x.VatAmount ?? 0);
+                    jobDetail.TotalAmount = item.Sum(x => x.TotalAmount ?? 0);
+                    jobDetail.TotalAmountVnd = item.Sum(x => x.TotalAmountVnd ?? 0);
+                    jobDetail.AdvanceAmount = item.FirstOrDefault().AdvanceAmount ?? 0;
+                    jobDetail.Balance = jobDetail.AdvanceAmount - totalShipment;
+
+                    settle.TotalNetAmount += jobDetail.NetAmount;
+                    settle.TotalVatAmount += jobDetail.VatAmount;
+                    settle.TotalAmount += jobDetail.TotalAmount;
+                    settle.TotalAmountVnd += jobDetail.TotalAmountVnd;
+                    settle.TotalAdvanceAmount += jobDetail.AdvanceAmount;
+                    var surcharges = from charge in item
+                                    select new SurchargesShipmentSettlementExportGroup
+                                    {
+                                        ChargeCode = charge.ChargeCode,
+                                        ChargeName = charge.ChargeName,
+                                        Quantity = charge.Quantity,
+                                        ChargeUnit = charge.ChargeUnit,
+                                        UnitPrice = charge.UnitPrice,
+                                        CurrencyId = charge.CurrencyId,
+                                        NetAmount = charge.NetAmount,
+                                        Vatrate = charge.Vatrate,
+                                        VatAmount = charge.VatAmount,
+                                        TotalAmount = charge.TotalAmount,
+                                        TotalAmountVnd = charge.TotalAmountVnd,
+                                        Payee = charge.Payee,
+                                        OBHPartnerName = charge.OBHPartnerName,
+                                        InvoiceNo = charge.InvoiceNo,
+                                        SeriesNo = charge.SeriesNo,
+                                        InvoiceDate = charge.InvoiceDate,
+                                        VatPartner = charge.VatPartner
+                                    };
+
+                    jobDetail.surchargesDetail = new List<SurchargesShipmentSettlementExportGroup>();
+                    jobDetail.surchargesDetail.AddRange(surcharges.OrderBy(x=>x.ChargeCode).AsQueryable());
+                    settle.ShipmentDetail.Add(jobDetail);
+                }
+                data.Add(settle);
+            }
+            var result = data.OrderBy(x => x.SettlementNo).ThenBy(x => x.ShipmentDetail.OrderBy(z => z.JobID)).AsQueryable();
+            return result.ToList();
         }
     }
 }

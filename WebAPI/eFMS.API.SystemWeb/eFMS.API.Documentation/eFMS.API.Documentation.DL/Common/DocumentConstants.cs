@@ -81,5 +81,10 @@
         public const string Summary_Sale_Report = "Summary Sale Report";
         public const string Combination_Statistic_Report = "Combination Statistic Report";
         public const string Sale_KickBack_Report = "Sale KickBack Report";
+
+        #region -- AR CREDIT TYPE --
+        public static readonly string CREDIT_NOTE_TYPE_CODE = "CREDITNOTE";
+        public static readonly string CREDIT_SOA_TYPE_CODE = "CREDITSOA";
+        #endregion
     }
 }

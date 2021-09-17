@@ -121,7 +121,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         // * Mapping credit to credit[]
-        // this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
