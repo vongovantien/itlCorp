@@ -437,27 +437,22 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                     if (currentSettle.SettlementCurrency == "VND")
                                     {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
-                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountUSD + x.VatAmountVND), 2);
-                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountUSD, 2);
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
+                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 0);
                                         if (x.CurrencyCode == "USD")
                                         {
                                             x.CurrencyCode = "VND";
-                                            x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
-                                            x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 0);
                                         }    
                                     }
                                     else if (currentSettle.SettlementCurrency == "USD")
                                     {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
-                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
-                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 0);
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
+                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 2);
+                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 2);
                                         if (x.CurrencyCode == "VND")
                                         {
                                             x.CurrencyCode = "USD";
-                                            x.OriginalAmount = Math.Round((decimal)(x.NetAmountUSD + x.VatAmountVND), 2);
-                                            x.OriginalAmount3 = Math.Round((decimal)x.VatAmountUSD, 2);
-
                                         }
                                     }
                                 });
@@ -476,7 +471,6 @@ namespace eFMS.API.Accounting.DL.Services
                                         // DeptCode = reqItem.DeptCode,
                                         Quantity9 = 0,
                                         OriginalUnitPrice = 0,
-                                        //OriginalAmount = currentSettle.BalanceAmount,
                                         OriginalAmount = currentSettle.BalanceAmount==null? currentSettle.BalanceAmount:Math.Round((decimal)currentSettle.BalanceAmount,item.CurrencyCode == "VND" ? 0 : 2),
                                         OriginalAmount3 = 0,
                                         ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
@@ -528,9 +522,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 DeptCode = reqItem.DeptCode,
                                                 Quantity9 = 0,
                                                 OriginalUnitPrice = 0,
-                                                //OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
-                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceInfo.AdvanceAmount 
-                                                : Math.Round((decimal)balanceInfo.AdvanceAmount, item.CurrencyCode == "VND" ? 0 : 2),
+                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceInfo.AdvanceAmount : Math.Round((decimal)balanceInfo.AdvanceAmount, item.CurrencyCode == "VND" ? 0 : 2),    // Số tiền tạm ứng của hbl
                                                 OriginalAmount3 = 0,
                                                 ChargeType = "CLEAR_ADVANCE",
                                                 CustomerCodeBook = _requesterAdvanceCode,
