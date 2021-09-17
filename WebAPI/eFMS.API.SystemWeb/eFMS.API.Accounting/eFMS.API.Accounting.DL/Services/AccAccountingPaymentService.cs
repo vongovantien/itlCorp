@@ -1950,8 +1950,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  join surcharge in surchargeData on credit.Code equals surcharge.PaySoano
                                  join payments in paymentData on soa.Id equals payments.RefId into grpPayment
                                  from payment in grpPayment.DefaultIfEmpty()
-                                 join partner in partners on soa.Customer equals partner.Id into grpPartners
-                                 from part in grpPartners.DefaultIfEmpty()
+                                 join part in partners on soa.Customer equals part.Id
                                  join con in contractData on part.ParentId equals con.PartnerId into grpContracts
                                  from con in grpContracts.DefaultIfEmpty()
                                  join rcpt in receiptData on payment.ReceiptId equals rcpt.Id into grpReceipts
@@ -1991,8 +1990,7 @@ namespace eFMS.API.Accounting.DL.Services
                                  join surcharge in surchargeData on cdNote.Code equals surcharge.CreditNo
                                  join payments in paymentData on cdNote.Id.ToString() equals payments.RefId into grpPayment
                                  from payment in grpPayment.DefaultIfEmpty()
-                                 join part in partners on credit.PartnerId equals part.Id into grpPartners
-                                 from part in grpPartners.DefaultIfEmpty()
+                                 join part in partners on credit.PartnerId equals part.Id
                                  join con in contractData on part.ParentId equals con.PartnerId into grpContracts
                                  from con in grpContracts.DefaultIfEmpty()
                                  join rcpt in receiptData on payment.ReceiptId equals rcpt.Id into grpReceipts
@@ -2115,7 +2113,7 @@ namespace eFMS.API.Accounting.DL.Services
                 results.Add(agent);
             }
 
-            return results.AsQueryable();
+            return results.AsQueryable().OrderByDescending(x=>x.JobNo);
         }
     }
 }

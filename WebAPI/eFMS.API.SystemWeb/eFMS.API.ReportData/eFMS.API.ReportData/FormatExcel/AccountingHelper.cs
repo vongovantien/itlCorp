@@ -4202,6 +4202,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
+                if (result.Count == 0)
+                    result.Add(new AccountingAgencyPaymentExport());
+                if (result.FirstOrDefault().details == null || result.Count(x => x.details.Count() > 0) == 0 )
+                    excel.DeleteRow(7);
+
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
@@ -4226,8 +4231,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("DebitAmount", item.UnpaidAmountInvUsd);
                     listKeyData.Add("CreditAmount", item.UnpaidAmountOBHUsd);
 
-                    listKeyData.Add("PaidAmount", item.PaidAmount);
-                    listKeyData.Add("PaidAmountOBH", item.PaidAmountOBH);
+                    listKeyData.Add("PaidAmount", item.PaidAmountUsd);
+                    listKeyData.Add("PaidAmountOBH", item.PaidAmountOBHUsd);
 
                     listKeyData.Add("RemainDbUsd", remainDbUsd);
                     listKeyData.Add("RemainOBHUsd", item.RemainOBHUsd > 0 ? item.RemainOBHUsd: remainObhUsd);
