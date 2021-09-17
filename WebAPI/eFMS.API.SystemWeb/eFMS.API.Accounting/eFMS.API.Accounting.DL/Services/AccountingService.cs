@@ -2678,6 +2678,8 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<PaymentModel> query = from receipt in receipts
                                              join office in offices on receipt.OfficeId equals office.Id
                                              join partner in partners on receipt.CustomerId equals partner.Id
+                                             join obhP in obhPartners on receipt.ObhpartnerId.ToString() equals obhP.Id into grpObhs
+                                             from grpobh in grpObhs.DefaultIfEmpty()
                                              where receipt.Id == receiptItem.Id
                                              select new PaymentModel
                                              {
@@ -2691,7 +2693,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                  CustomerName = partner.PartnerNameVn,
                                                  Description0 = string.Format("{0}", type == "NETOFF" ? "Công Nợ Cấn Trừ" : "Công Nợ Phải Thu"),
                                                  PaymentMethod = type == "DEBIT" ? receipt.PaymentMethod : AccountingConstants.PAYMENT_METHOD_OTHER,
-                                                 DataType = "PAYMENT"
+                                                 DataType = "PAYMENT",
+                                                 LocalBranchCode = grpobh.InternalCode
                                              };
             if (query != null)
             {
@@ -2944,17 +2947,21 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetPaymentReceiptAccount(AcctReceipt receipt, string paymentType, string invoiceAccountNo)
         {
             string account = invoiceAccountNo;
+
             if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
             {
                 account = receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? "13111" : "13121";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER)
             {
                 account = "7118";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
             {
-                account = "336";
+                account = "3368";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_PAY_OBH)
             {
