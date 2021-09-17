@@ -316,7 +316,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     }
 
     setFormCreateDefault(res: ReceiptModel) {
-        this.formCreate.isUpdate = true;  // * Prevent payment refno auto generate.
         const formMapping = {
             date: !!res.fromDate && !!res.toDate ? { startDate: new Date(res.fromDate), endDate: new Date(res.toDate) } : null,
             customerId: res.customerId,
@@ -332,20 +331,27 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         if (this.actionReceiptFromParams !== 'debit') {
             this.formCreate.isReadonly = true;
         }
-
-        if (this.actionReceiptFromParams === 'bank') {
-            this.formCreate.formSearchInvoice.patchValue({
-                paymentRefNo: res.paymentRefNo + '_BANK',
-                referenceNo: res.paymentRefNo + '_' + res.class
-            });
-
-        } else if (this.actionReceiptFromParams === 'other') {
-            this.formCreate.formSearchInvoice.patchValue({
-                paymentRefNo: res.paymentRefNo + '_OTH001',
-                referenceNo: res.paymentRefNo + '_' + res.class
-            });
-
+        let paymentRefNo: string = null;
+        switch (this.actionReceiptFromParams) {
+            case 'bank':
+                paymentRefNo = res.paymentRefNo + '_BANK';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'other':
+                paymentRefNo = res.paymentRefNo + '_OTH001';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'debit':
+                this.formCreate.isUpdate = false; // allow generate receipt
+                break;
+            default:
+                break;
         }
+
+        this.formCreate.formSearchInvoice.patchValue({
+            paymentRefNo: paymentRefNo,
+            referenceNo: res.paymentRefNo + '_' + res.class
+        });
     }
 
     setPaymentListFormDefault(res: ReceiptModel) {

@@ -1,10 +1,9 @@
 import { Injectable } from "@angular/core";
-import { Actions, createEffect, Effect, ofType } from "@ngrx/effects";
+import { Actions, createEffect, ofType } from "@ngrx/effects";
 import { AccountingRepo } from "@repositories";
-import { AccountReceivableActionTypes,LoadListAccountReceivableSuccess } from "../actions";
-import { mergeMap, map, catchError, switchMap } from "rxjs/operators";
-import { LoadListAccountingMngtSuccess } from "src/app/business-modules/accounting/accounting-management/store";
-import { EMPTY, Observable, of } from "rxjs";
+import { AccountReceivableActionTypes, LoadListAccountReceivableSuccess } from "../actions";
+import { map, catchError, switchMap } from "rxjs/operators";
+import { EMPTY, Observable } from "rxjs";
 import { Action } from "@ngrx/store";
 
 @Injectable()
@@ -16,15 +15,15 @@ export class AccountReceivableEffects {
     ) { }
 
     getListAccountReceivableEffect$: Observable<Action> = createEffect(() => this.actions$
-    .pipe(
-        ofType(AccountReceivableActionTypes.LOAD_LIST),
-        switchMap(
-            (param: CommonInterface.IParamPaging) => this._accountingRepo.receivablePaging(param.page, param.size, param.dataSearch)
-                .pipe(
-                    catchError(() => EMPTY),
-                    map((data: CommonInterface.IResponsePaging) => LoadListAccountReceivableSuccess(data)),
+        .pipe(
+            ofType(AccountReceivableActionTypes.LOAD_LIST),
+            switchMap(
+                (param: CommonInterface.IParamPaging) => this._accountingRepo.receivablePaging(param.page, param.size, param.dataSearch)
+                    .pipe(
+                        catchError(() => EMPTY),
+                        map((data: CommonInterface.IResponsePaging) => LoadListAccountReceivableSuccess(data)),
 
-                )
-        )
-    ));
+                    )
+            )
+        ));
 }

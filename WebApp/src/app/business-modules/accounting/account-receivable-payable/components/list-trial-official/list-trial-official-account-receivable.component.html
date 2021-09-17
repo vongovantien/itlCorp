@@ -5,7 +5,8 @@
                 <div class="col-lg-8 m--align-left">
                     <div class="form-group">
                         <div class="c-button-actions">
-                            <ng-container *ngIf="menuSpecialPermission | async | specialPermission: 'ExportARSumaryTrial'">
+                            <ng-container
+                                *ngIf="menuSpecialPermission | async | specialPermission: 'ExportARSumaryTrial'">
                                 <app-permission-button type="export" (onClick)="exportExcel()"></app-permission-button>
                             </ng-container>
                         </div>
@@ -15,7 +16,7 @@
             <div class="row">
                 <div class="col-lg-12 m--margin-top-20">
                     <div class="table-wrapper table-scrollable" id="payment-table">
-                        <table class="table table-hover table-brand dataTable table-hover" >
+                        <table class="table table-hover table-brand dataTable table-hover">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <th class="m--w-50 first table-actions-col">
                                     Action
@@ -47,46 +48,58 @@
                                             <td class="text-right">{{ item.debitAmount | number: '.0-3' }}</td>
 
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Unpaid')">
-                                                {{ item.billingAmount + (item.obhBillingAmount!=null?item.obhBillingAmount:0) |number: '.0-3' }}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item.agreementId,'Unpaid')">
+                                                    {{ item.billingAmount +
+                                                    (item.obhBillingAmount!=null?item.obhBillingAmount:0) |number:
+                                                    '.0-3' }}
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Paid A Part')">
-                                                    {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)  | number:'.0-3'}}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item.agreementId,'Paid A Part')">
+                                                    {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)
+                                                    | number:'.0-3'}}
                                                 </a>
                                             </td>
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'OutStanding')">
-                                                    {{ item.billingUnpaid + (item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0) |number: '.0-3' }}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item.agreementId,'OutStanding')">
+                                                    {{ item.billingUnpaid +
+                                                    (item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0) |number: '.0-3'
+                                                    }}
                                                 </a>
                                             </td>
                                             <!-- <td>{{ item.obhAmount | number: '.0-3'}}</td> -->
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Over1To15Day')">
-                                                    {{ item.over1To15Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail(item.agreementId,'Over1To15Day')">
+                                                        {{ item.over1To15Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Over16To30Day')">
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail(item.agreementId,'Over16To30Day')">
                                                         {{ item.over16To30Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Over30Day')">
-                                                    {{ item.over30Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)"
+                                                        (click)="showDebitDetail(item.agreementId,'Over30Day')">
+                                                        {{ item.over30Day | number: '.0-3' }}
                                                     </a>
                                                 </span>
                                             </td>
-                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited)| number: '.0-3' }}</td>
+                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited)| number:
+                                                '.0-3' }}</td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
                                             <td class="text-right">{{ item.creditLimited | number: '.0-3' }}</td>
-                                            <td class="text-center">{{ item.agreementSalesmanName}}</td>
+                                            <td class="text-center text-success">{{ item.agreementSalesmanName}}</td>
                                             <td>
                                                 {{ item.agreementNo}}
                                                 <span class="m--margin-right-5 badge "
