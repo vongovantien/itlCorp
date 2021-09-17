@@ -305,7 +305,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetExistsCharge")]
-        public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
+        public IActionResult GetExistsCharge(ExistsChargeCriteria criteria, string settlementCode)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
             var dataGroups = data.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
@@ -313,13 +313,14 @@ namespace eFMS.API.Accounting.Controllers
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
-                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester);
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester, settlementCode);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
                 shipment.AdvanceNo = advanceLst.FirstOrDefault();
+                shipment.OriginAdvanceNo = advanceLst.FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
                 shipment.CustomNo = item.Select(x => x.ClearanceNo).FirstOrDefault();
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
@@ -1061,12 +1062,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="hblId"></param>
         /// <param name="payeeId">use in get existing charge</param>
         /// <param name="requester">use in get existing charge</param>
+        /// <param name="settlementCode"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetListAdvanceNoForShipment")]
-        public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester)
+        public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode)
         {
-            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester);
+            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester, settlementCode);
             return Ok(_result);
         }
 
