@@ -47,12 +47,12 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.headers = [
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Custom No', field: 'customNo', sortable: true },
-            { title: 'JobID', field: 'jobId', sortable: true },
-            { title: 'Settle Status', field: 'statusPayment', sortable: false },
+            { title: 'JobID', field: 'jobId', sortable: true }, 
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
             { title: 'Type', field: 'advanceType', sortable: true },
+            { title: 'Settle Status', field: 'statusPayment', sortable: false },
             { title: 'Note', field: 'requestNote', sortable: true },
         ];
         this.getRequestAdvancePayment();
