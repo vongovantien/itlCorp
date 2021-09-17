@@ -175,5 +175,3 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.isCheckAll = false;
     }
 }
-
-

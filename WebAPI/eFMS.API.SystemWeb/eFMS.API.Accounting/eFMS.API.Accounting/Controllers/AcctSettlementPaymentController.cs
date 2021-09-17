@@ -36,6 +36,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly ICurrentUser currentUser;
         private readonly IMapper mapper;
         private string typeApproval = "Settlement";
+        private IAccAccountReceivableService accountReceivableService;
 
         /// <summary>
         /// Contructor
@@ -46,13 +47,15 @@ namespace eFMS.API.Accounting.Controllers
         public AcctSettlementPaymentController(
             IStringLocalizer<LanguageSub> localizer, 
             IAcctSettlementPaymentService service, 
-            ICurrentUser user, IMapper _mapper
+            ICurrentUser user, IMapper _mapper,
+            IAccAccountReceivableService accountReceivable
             )
         {
             stringLocalizer = localizer;
             acctSettlementPaymentService = service;
             currentUser = user;
             mapper = _mapper;
+            accountReceivableService = accountReceivable;
         }
 
         /// <summary>
@@ -176,11 +179,11 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Sau khi xóa thành công >> tính lại công nợ dựa vào settlement no
-                acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
-            }
+            //if (hs.Success)
+            //{
+            //    // Sau khi xóa thành công >> tính lại công nợ dựa vào settlement no
+            //    acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
@@ -188,6 +191,15 @@ namespace eFMS.API.Accounting.Controllers
             {
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString() };
                 return BadRequest(_result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(settlementNo);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -305,7 +317,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetExistsCharge")]
-        public IActionResult GetExistsCharge(ExistsChargeCriteria criteria)
+        public IActionResult GetExistsCharge(ExistsChargeCriteria criteria, string settlementCode)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
             var dataGroups = data.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid });
@@ -313,13 +325,14 @@ namespace eFMS.API.Accounting.Controllers
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
-                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester);
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester, settlementCode);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
                 shipment.ChargeSettlements = item.ToList();
                 shipment.HblId = item.Key.Hblid;
                 shipment.AdvanceNo = advanceLst.FirstOrDefault();
+                shipment.OriginAdvanceNo = advanceLst.FirstOrDefault();
                 shipment.AdvanceNoList = advanceLst;
                 shipment.CustomNo = item.Select(x => x.ClearanceNo).FirstOrDefault();
                 shipment.TotalNetAmount = item.Where(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL).Sum(x => x.NetAmount ?? 0);
@@ -430,17 +443,26 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Tính công nợ sau khi insert Settlement
-                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-            }
+            //if (hs.Success)
+            //{
+            //    // Tính công nợ sau khi insert Settlement
+            //    acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -518,17 +540,26 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Tính công nợ sau khi update Settlement
-                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
-            }
+            //if (hs.Success)
+            //{
+            //    // Tính công nợ sau khi update Settlement
+            //    acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+            //}
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -715,7 +746,12 @@ namespace eFMS.API.Accounting.Controllers
                 }
 
                 // Tính công nợ sau khi Save And Send Request
-                acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctSettlementPaymentService.CalculatorReceivableSettlement(model.Settlement.SettlementNo);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
 
                 return Ok(result);
             }
@@ -1061,12 +1097,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="hblId"></param>
         /// <param name="payeeId">use in get existing charge</param>
         /// <param name="requester">use in get existing charge</param>
+        /// <param name="settlementCode"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("GetListAdvanceNoForShipment")]
-        public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester)
+        public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode)
         {
-            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester);
+            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester, settlementCode);
             return Ok(_result);
         }
 

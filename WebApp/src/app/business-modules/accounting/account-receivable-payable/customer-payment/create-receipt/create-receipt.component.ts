@@ -67,7 +67,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((type: string) => {
-                console.log(type);
                 this._store.dispatch(RegistTypeReceipt({ data: type.toUpperCase() }));
                 this.type = type.toUpperCase()
                 this.titleReceipt = `Create ${this.type} Receipt`;
@@ -160,14 +159,17 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
 
+        const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
+        const CREDIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT);
+
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
             this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
-        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
+        if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            const isCreditHaveInvoice = DEBIT_LIST.some(x => !x.netOffVnd || !x.netOffUsd);
             if (isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
@@ -329,18 +331,27 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         if (this.actionReceiptFromParams !== 'debit') {
             this.formCreate.isReadonly = true;
         }
-
-        if (this.actionReceiptFromParams === 'bank') {
-            const formMappingBank = {
-                paymentRefNo: res.paymentRefNo + '_BANK',
-            }
-            this.formCreate.formSearchInvoice.patchValue(formMappingBank);
-            this.formCreate.receiptReference = res.paymentRefNo + res.class;
-
-        } else if (this.actionReceiptFromParams === 'other') {
-            this.formCreate.formSearchInvoice.patchValue({ paymentRefNo: res.paymentRefNo + '_OTH001' });
-            this.formCreate.receiptReference = res.paymentRefNo + '_' + res.class;
+        let paymentRefNo: string = null;
+        switch (this.actionReceiptFromParams) {
+            case 'bank':
+                paymentRefNo = res.paymentRefNo + '_BANK';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'other':
+                paymentRefNo = res.paymentRefNo + '_OTH001';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'debit':
+                this.formCreate.isUpdate = false; // allow generate receipt
+                break;
+            default:
+                break;
         }
+
+        this.formCreate.formSearchInvoice.patchValue({
+            paymentRefNo: paymentRefNo,
+            referenceNo: res.paymentRefNo + '_' + res.class
+        });
     }
 
     setPaymentListFormDefault(res: ReceiptModel) {
@@ -363,7 +374,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
@@ -403,7 +415,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMappingFormOther = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
@@ -428,17 +441,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
         listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
             if (c.currencyId === 'VND') {
-                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
+                c.unpaidAmount = c.unpaidAmountVnd - c.totalPaidVnd;
             } else {
-                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
+                c.unpaidAmount = c.unpaidAmountUsd - c.totalPaidUsd;
             }
-            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
-            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.totalPaidVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.totalPaidUsd;
         })
         listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
             x.paidAmountVnd = x.unpaidAmountVnd;
             x.paidAmountUsd = x.unpaidAmountUsd;
             x.notes = "Bank Fee/Other Receipt";
+            x.netOff = false;
+            x.netOffVnd = 0;
+            x.netOffUsd = 0;
             x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
         })
 

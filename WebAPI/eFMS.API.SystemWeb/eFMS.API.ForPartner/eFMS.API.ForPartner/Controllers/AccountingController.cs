@@ -617,7 +617,7 @@ namespace eFMS.API.ForPartner.Controllers
         
         private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
         {
-            var urlApiAcct = apiUrl.Value.Url + "Accounting";//"http://localhost:44368";//
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";//"http://localhost:44368";//
             HttpResponseMessage resquest = await HttpService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;

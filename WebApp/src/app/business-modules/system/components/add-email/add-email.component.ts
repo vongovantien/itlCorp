@@ -39,7 +39,7 @@ export class ShareSystemAddEmailComponent extends PopupBase {
     minDateEffective: any = null;
 
     emailTypeList = [
-        { name: "Active Agrmeent" },
+        { name: "Active Agreement" },
         { name: "Active Partner" },
         { name: "Approve Settlement" },
         { name: "Approve Advance" },

@@ -5,7 +5,7 @@ import { AccountingRepo } from '@repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
-import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList, AddDebitCreditToReceipt } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState } from '../../store/reducers';
 import { SortService } from '@services';
@@ -394,6 +394,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         });
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+        this._store.dispatch(AddDebitCreditToReceipt({ data: datatoReceipt }));
         this.onAddToReceipt.emit(this.partnerId);
         // this.hide();
     }

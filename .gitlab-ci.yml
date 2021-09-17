@@ -1,8 +1,8 @@
 variables:
   PROJECT_PATH: "$CI_PROJECT_DIR"
   APP_OUTPUT_PATH: "$CI_PROJECT_DIR/WebApp/dist/uat/eFMS-en"
-  APP_OUT_PATH_PROD_EN: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
-  APP_OUT_PATH_PROD_VI: = "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
+  APP_OUT_PATH_PROD_EN: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-en"
+  APP_OUT_PATH_PROD_VI: "$CI_PROJECT_DIR/WebApp/dist/prod/eFMS-vi"
 
 image: node:12
 
@@ -67,11 +67,11 @@ build_prod_en:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/15-08-2021-sprint-24
+    - production
   artifacts:
     name: "angular_build_prod_en"
     paths:
-      - APP_OUT_PATH_PROD_EN
+      - $APP_OUT_PATH_PROD_EN
 
 build_prod_vi:
   stage: build
@@ -87,8 +87,8 @@ build_prod_vi:
     - echo "job_build doing something..."
     - echo "end job_build"
   only:
-    - prod/15-08-2021-sprint-24
+    - production
   artifacts:
     name: "angular_build_prod_vi"
     paths:
-      - APP_OUT_PATH_PROD_VI
+      - $APP_OUT_PATH_PROD_VI
