@@ -60,7 +60,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     partnerTypeState: string;
     receiptReference: string = null;
     isShowGetDebit: boolean = true;
-
     constructor(
         private readonly _fb: FormBuilder,
         private readonly _store: Store<IAppState>,

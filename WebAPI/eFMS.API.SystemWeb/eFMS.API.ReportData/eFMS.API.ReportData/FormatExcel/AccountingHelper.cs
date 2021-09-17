@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
+using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing.Controls;
@@ -582,7 +583,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="customerPayment"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, string fileName)
+        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
         {
             try
             {
@@ -600,7 +601,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null)
                 {
                     excel.DeleteRow(7);
                 }
@@ -653,7 +654,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.receiptDetail != null)
+                    if (item.receiptDetail != null && paymentCriteria.DueDate == null)
                     {
                         foreach (var detail in item.receiptDetail)
                         {
@@ -681,10 +682,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumOBHUnpaidAmount", customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0)));
                 listKeyTotal.Add("SumPaidAmount", customerPayment.Sum(x => (x.PaidAmount ?? 0)));
                 listKeyTotal.Add("SumOBHPaidAmount", customerPayment.Sum(x => (x.PaidAmountOBH ?? 0)));
-                //var sumRemainDb = customerPayment.Sum(x => (x.UnpaidAmountInv ?? 0) - (x.PaidAmount ?? 0));
-                //var sumRemainObh = customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0) - (x.PaidAmountOBH ?? 0));
-                //var sumRemainDbUsd = customerPayment.Sum(x => (x.UnpaidAmountInvUsd ?? 0) - (x.PaidAmountUsd ?? 0));
-                //var sumRemainObhUsd = customerPayment.Sum(x => (x.UnpaidAmountOBHUsd ?? 0) - (x.PaidAmountOBHUsd ?? 0));
                 // Sum total VND
                 listKeyTotal.Add("SumRemainDb", sumRemainDb);
                 listKeyTotal.Add("SumRemainOBH", sumRemainObh);
@@ -3954,17 +3951,19 @@ namespace eFMS.API.ReportData.FormatExcel
                 "MBLNo",//2
                 "HBLNo",//3
                 "VoucherID",//4
-                "CDNote_Code",//5
-                "Code_Type",//6
-                "ChargeType",//7
-                "PayerID",//8
-                "Payer_Name",//9
-                "PartnerType",//10
-                "Curr",//10
-                "Amount",//11
-                "Issued_by",//12
-                "BU",//13
-                "Service Date"//14
+                "Accounting Date",//5
+                "CDNote_Code",//6
+                "Code_Type",//7
+                "ChargeType",//8
+                "PayerID",//9
+                "Payer_Name",//10
+                "PartnerType",//11
+                "Curr",//12
+                "Amount",//13
+                "Issued_by",//14
+                "BU",//15
+                "Service Date",//16
+                "Issue Date"//17
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -3985,28 +3984,32 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 3].Value = item.Mbl;
                 workSheet.Cells[rowStart, 4].Value = item.Hbl;
                 workSheet.Cells[rowStart, 5].Value = item.VoucherId;
-                workSheet.Cells[rowStart, 6].Value = item.CdNoteNo;
-                workSheet.Cells[rowStart, 7].Value = item.CdNoteType;
-                workSheet.Cells[rowStart, 8].Value = item.ChargeType;
-                workSheet.Cells[rowStart, 9].Value = item.PayerId;
-                workSheet.Cells[rowStart, 10].Value = item.PayerName;
-                workSheet.Cells[rowStart, 11].Value = item.PayerType;
-                workSheet.Cells[rowStart, 12].Value = item.Currency;
+                workSheet.Cells[rowStart, 6].Value = item.VoucherIddate;
+                workSheet.Cells[rowStart, 6].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 7].Value = item.CdNoteNo;
+                workSheet.Cells[rowStart, 8].Value = item.CdNoteType;
+                workSheet.Cells[rowStart, 9].Value = item.ChargeType;
+                workSheet.Cells[rowStart, 10].Value = item.PayerId;
+                workSheet.Cells[rowStart, 11].Value = item.PayerName;
+                workSheet.Cells[rowStart, 12].Value = item.PayerType;
+                workSheet.Cells[rowStart, 13].Value = item.Currency;
 
-                workSheet.Cells[rowStart, 13].Value = item.Amount;
-                workSheet.Cells[rowStart, 13].Style.Numberformat.Format = decimalFormat;
+                workSheet.Cells[rowStart, 14].Value = item.Amount;
+                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = decimalFormat;
 
-                workSheet.Cells[rowStart, 14].Value = item.IssueBy;
-                workSheet.Cells[rowStart, 15].Value = item.Bu;
-                workSheet.Cells[rowStart, 16].Value = item.ServiceDate;
-                workSheet.Cells[rowStart, 16].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 15].Value = item.IssueBy;
+                workSheet.Cells[rowStart, 16].Value = item.Bu;
+                workSheet.Cells[rowStart, 17].Value = item.ServiceDate;
+                workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
+                workSheet.Cells[rowStart, 18].Value = item.IssueDate;
+                workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:P" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
@@ -4093,9 +4096,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 //workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat2 + " %";
 
                 workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
-                workSheet.Cells[rowStart, 6].Value = item.BillingAmount;
-                workSheet.Cells[rowStart, 7].Value = item.PaidAmount;
-                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid;
+                workSheet.Cells[rowStart, 6].Value = item.BillingAmount+item.ObhBillingAmount;
+                workSheet.Cells[rowStart, 7].Value = item.PaidAmount+item.ObhPaidAmount;
+                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid+item.ObhUnPaidAmount;
                 workSheet.Cells[rowStart, 9].Value = item.Over1To15Day;
                 workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
                 workSheet.Cells[rowStart, 11].Value = item.Over30Day;
@@ -4199,6 +4202,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
+                if (result.Count == 0)
+                    result.Add(new AccountingAgencyPaymentExport());
+                if (result.FirstOrDefault().details == null || result.Count(x => x.details.Count() > 0) == 0 )
+                    excel.DeleteRow(7);
+
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
@@ -4209,41 +4217,62 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("AgentPartnerName", item.AgentPartnerName);
                     listKeyData.Add("InvoiceDate", item.InvoiceDate);
                     listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("CreditNoGrp", item.CreditNo == null ? "" : item.CreditNo);
-                    listKeyData.Add("JobNoGrp", item.JobNo);
-                    listKeyData.Add("MBLGrp", item.MBL);
-                    listKeyData.Add("HBLGrp", item.HBL);
-                   
-                    listKeyData.Add("ETD", item.EtdDate);
-                    listKeyData.Add("ETA", item.EtaDate);
-                    var debit = item.UnpaidAmountInv + item.UnpaidAmountOBH;
-                    listKeyData.Add("DebitAmount", debit);
-                    listKeyData.Add("CreditAmount", item.CreditAmount);
-                    listKeyData.Add("NetOff", item.NetOff);
+                    listKeyData.Add("DebitNo", item.DebitNo==null?"":item.DebitNo);
+                    listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
+                    listKeyData.Add("JobNo", item.JobNo);
+                    listKeyData.Add("MBLNo", item.MBL);
+                    listKeyData.Add("HBLNo", item.HBL);
 
                     var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
                     var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
-                    listKeyData.Add("Debit_Ending", remainDb + remainObh);
-                    listKeyData.Add("Credit_Ending",item.CreditAmount - item.NetOff);
+                    var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
+                    var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
+
+                    listKeyData.Add("DebitAmount", item.UnpaidAmountInvUsd);
+                    listKeyData.Add("CreditAmount", item.UnpaidAmountOBHUsd);
+
+                    listKeyData.Add("PaidAmount", item.PaidAmountUsd);
+                    listKeyData.Add("PaidAmountOBH", item.PaidAmountOBHUsd);
+
+                    listKeyData.Add("RemainDbUsd", remainDbUsd);
+                    listKeyData.Add("RemainOBHUsd", item.RemainOBHUsd > 0 ? item.RemainOBHUsd: remainObhUsd);
+                    listKeyData.Add("RemainDb", remainDb);
+                    listKeyData.Add("RemainOBH", item.RemainOBH > 0?item.RemainOBH : remainObh);
+
+                    listKeyData.Add("ETD", item.EtdDate);
+                    listKeyData.Add("ETA", item.EtaDate);
+
+                    listKeyData.Add("CreditTerm",item.CreditTerm);
+                    listKeyData.Add("DueDate",item.DueDate);
+                    listKeyData.Add("OverDueDays",item.OverDueDays);
+                    listKeyData.Add("VoucherNo", item.VoucherNo);
 
                     listKeyData.Add("Salesman", item.Salesman);
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    foreach (var detail in item.details)
+                    if (item.details.Count > 0)
                     {
-                        listKeyData = new Dictionary<string, object>();
-                        excel.SetDataTable();
-                        listKeyData.Add("PaidDate", detail.PaidDate);
-                        listKeyData.Add("RefNo", detail.RefNo);
-                        listKeyData.Add("Debit", detail.Debit);
-                        listKeyData.Add("Credit", detail.Credit);
-                        listKeyData.Add("JobNo", item.JobNo);
-                        listKeyData.Add("MBL", item.MBL);
-                        listKeyData.Add("HBL", item.HBL);
-                        listKeyData.Add("CreditNo", item.CreditNo == null ? "" : item.CreditNo);
-                        excel.SetData(listKeyData);
-                        startRow++;
+                        foreach (var detail in item.details)
+                        {
+                            listKeyData = new Dictionary<string, object>();
+                            excel.SetDataTable();
+                            listKeyData.Add("InvoiceDateDt", item.InvoiceDate);
+                            listKeyData.Add("DebitNoDt", item.DebitNo);
+                            listKeyData.Add("CreditNoDt", item.CreditNo);
+                            listKeyData.Add("JobNoDt", item.JobNo);
+                            listKeyData.Add("MBLNoDt", item.MBL);
+                            listKeyData.Add("HBLNoDt", item.HBL);
+
+                            listKeyData.Add("PaidDate", detail.PaidDate);
+                            listKeyData.Add("RefNo", detail.RefNo);
+
+                            listKeyData.Add("PaidAmountUsdDt", detail.PaidAmountUsd);
+                            listKeyData.Add("PaidAmountOBHUsdDt", detail.PaidAmountOBHUsd);
+
+                            excel.SetData(listKeyData);
+                            startRow++;
+                        }
                     }
                 }
                 return excel.ExcelStream();

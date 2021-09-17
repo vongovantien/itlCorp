@@ -837,6 +837,21 @@ namespace eFMS.API.Accounting.DL.Services
                                 results.Add(_paymentOBH);
                             }
                         }
+                        else
+                        {
+                            AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
+                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
+                            _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
+
+                            _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmount - _paymentOBH.PaymentAmountUsd;
+                            _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
+
+                            remainOBHAmountVnd = remainOBHAmountVnd - _paymentOBH.PaymentAmountVnd ?? 0;
+                            remainOBHAmountUsd = remainOBHAmountUsd - _paymentOBH.PaymentAmountUsd ?? 0;
+
+                            results.Add(_paymentOBH);
+
+                        }
                     }
                 }
             }
@@ -1153,17 +1168,26 @@ namespace eFMS.API.Accounting.DL.Services
                         decimal totalAmountVndPaymentOfInv = payment.TotalPaidVnd ?? 0;
                         decimal totalAmountUsdPaymentOfInv = payment.TotalPaidUsd ?? 0;
 
-                        invoice.PaidAmount = (invoice.PaidAmount ?? 0) + totalAmountPayment;
                         invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + totalAmountUsdPaymentOfInv;
                         invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + totalAmountVndPaymentOfInv;
 
-                        invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
                         invoice.UnpaidAmountUsd = (invoice.TotalAmountUsd ?? 0) - invoice.PaidAmountUsd;
                         invoice.UnpaidAmountVnd = (invoice.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;
 
-                        invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
                         invoice.UserModified = currentUser.UserID;
                         invoice.DatetimeModified = DateTime.Now;
+
+                        if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                        {
+                            invoice.PaidAmount = invoice.PaidAmountVnd;
+                            invoice.UnpaidAmount = invoice.UnpaidAmountVnd;
+                        }
+                        else
+                        {
+                            invoice.PaidAmount = invoice.PaidAmountUsd;
+                            invoice.UnpaidAmount = invoice.UnpaidAmountUsd;
+                        }
+                        invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
 
                         if (invoice.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
                         {
@@ -1177,47 +1201,34 @@ namespace eFMS.API.Accounting.DL.Services
                         IQueryable<AccAccountingManagement> invoicesTemp = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE && x.Id.ToString() == payment.RefId);
                         if (invoicesTemp != null && invoicesTemp.Count() > 0)
                         {
-                            decimal remainAmount = payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.TotalPaidVnd ?? 0) : (payment.TotalPaidUsd ?? 0); // Số tiền đã thu của hóa đơn;
+                            decimal remainAmount = payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.TotalPaidVnd ?? 0) : (payment.TotalPaidUsd ?? 0); // Số tiền đã thu của phiếu thu;
                             decimal remainAmountUsd = payment.TotalPaidUsd ?? 0;
                             decimal remainAmountVnd = payment.TotalPaidVnd ?? 0;
                             foreach (AccAccountingManagement item in invoicesTemp)
                             {
                                 //1. Số tiền còn lại của payment lớn hơn số tiền phải thu của invoice
-                                if (remainAmount > 0 && remainAmount >= item.UnpaidAmount)
+                                if (remainAmountVnd > 0 && remainAmountVnd >= item.UnpaidAmountVnd)
                                 {
                                     decimal _invoiceAmountUnpaid = (item.UnpaidAmount ?? 0); // số tiền còn lại cần thu
                                     decimal _invoiceAmountUnpaidVnd = (item.UnpaidAmountVnd ?? 0);
                                     decimal _invoiceAmountUnpaidUsd = (item.UnpaidAmountUsd ?? 0);
 
-                                    item.PaidAmount = (item.PaidAmount ?? 0) + item.UnpaidAmount;
+                                    // item.PaidAmount = (item.PaidAmount ?? 0) + item.UnpaidAmount;
                                     item.PaidAmountVnd = (item.PaidAmountVnd ?? 0) + item.UnpaidAmountVnd;
                                     item.PaidAmountUsd = (item.PaidAmountUsd ?? 0) + item.UnpaidAmountUsd;
 
                                     // Số tiền còn lại của hóa đơn
-                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - _invoiceAmountUnpaid;
+                                    // item.UnpaidAmount = (item.UnpaidAmount ?? 0) - _invoiceAmountUnpaid;
                                     item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - _invoiceAmountUnpaidUsd;
                                     item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - _invoiceAmountUnpaidVnd;
-
-                                    if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
-                                    {
-                                        // Cập nhật lại số tiền còn lại sau khi trừ cho hđ này
-                                        remainAmount = remainAmount - _invoiceAmountUnpaidVnd;
-                                    }
-                                    else
-                                    {
-                                        remainAmount = remainAmount - _invoiceAmountUnpaidUsd;
-                                    }
-
-                                    remainAmountVnd = remainAmountVnd - _invoiceAmountUnpaidVnd;
-                                    remainAmountUsd = remainAmountUsd - _invoiceAmountUnpaidUsd;
                                 }
-                                else
+                                else 
                                 {
-                                    item.PaidAmount = (item.PaidAmount ?? 0) + remainAmount;
+                                    // item.PaidAmount = (item.PaidAmount ?? 0) + remainAmount;
                                     item.PaidAmountVnd = (item.PaidAmountVnd ?? 0) + remainAmountVnd;
                                     item.PaidAmountUsd = (item.PaidAmountUsd ?? 0) + remainAmountUsd;
 
-                                    item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount;
+                                    // item.UnpaidAmount = (item.UnpaidAmount ?? 0) - item.PaidAmount;
                                     item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - item.PaidAmountVnd;
                                     item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - item.PaidAmountUsd;
 
@@ -1225,11 +1236,21 @@ namespace eFMS.API.Accounting.DL.Services
                                     remainAmountVnd = 0;
                                     remainAmount = 0;
                                 }
-
-                                item.PaymentStatus = GetAndUpdateStatusInvoice(item);
+                             
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
 
+                                if(item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                {
+                                    item.PaidAmount = item.PaidAmountVnd;
+                                    item.UnpaidAmount = item.UnpaidAmountVnd;
+                                }
+                                else
+                                {
+                                    item.PaidAmount = item.PaidAmountUsd;
+                                    item.UnpaidAmount = item.UnpaidAmountUsd;
+                                }
+                                item.PaymentStatus = GetAndUpdateStatusInvoice(item);
                                 if (item.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
                                 {
                                     item.UnpaidAmount = item.UnpaidAmountVnd = item.UnpaidAmountUsd = 0;
@@ -1265,18 +1286,25 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
 
-                    invoice.PaidAmount = (invoice.PaidAmount ?? 0) + (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.TotalPaidVnd ?? 0) : (payment.TotalPaidUsd ?? 0));
                     invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + (payment.TotalPaidVnd ?? 0);
                     invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + (payment.TotalPaidUsd ?? 0);
 
-                    invoice.UnpaidAmount = (invoice.TotalAmount ?? 0) - invoice.PaidAmount;
                     invoice.UnpaidAmountVnd = (invoice.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;
                     invoice.UnpaidAmountUsd = (invoice.TotalAmountUsd ?? 0) - invoice.PaidAmountUsd;
 
-                    invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
-
                     invoice.UserModified = currentUser.UserID;
                     invoice.DatetimeModified = DateTime.Now;
+                    if(invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    {
+                        invoice.PaidAmount = invoice.PaidAmountVnd;
+                        invoice.UnpaidAmount = invoice.UnpaidAmountVnd;
+                    }
+                    else
+                    {
+                        invoice.PaidAmount = invoice.PaidAmountUsd;
+                        invoice.UnpaidAmount = invoice.UnpaidAmountUsd;
+                    }
+                    invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
 
                     hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
                 }
@@ -1703,15 +1731,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
                     }
-                    if (paidVnd < invoice.PaidAmountVnd)
+                    else if (paidVnd < invoice.PaidAmountVnd)
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                     }
-                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
-                    {
-                        paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
-                    }
-                    if (invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                        || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
                     }
@@ -1726,15 +1751,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
                     }
-                    if (paidUsd < invoice.PaidAmountUsd)
+                    else if (paidUsd < invoice.PaidAmountUsd)
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                     }
-                    if (invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
-                    {
-                        paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
-                    }
-                    if (invoice.NetOffVnd != 0 || invoice.NetOffVnd != null || invoice.NetOffUsd != 0 || invoice.NetOffUsd != null)
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                        || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
                     }
@@ -1814,6 +1836,10 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
                 case "SOA":
                     soaCredit = GetSoaCreditForIssueAgentPayment(criteria);
+                    break;
+                case "VAT Invoice":
+                    debits = GetDebitForIssueAgentPayment(criteria);
+                    obhs = GetObhForIssueAgencyPayment(criteria);
                     break;
                 default:
                     debits = GetDebitForIssueAgentPayment(criteria);

@@ -79,6 +79,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     selectedSurcharge: Surcharge;
     selectedIndexCharge: number = -1;
     requester: string = '';
+    settlementCode: string = '';
 
     constructor(
         private _catalogue: CatalogueRepo,
@@ -569,7 +570,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             if (!this.selectedPartnerData) {
                 return;
             }
-            this._accoutingRepo.getExistingCharge(body)
+            this._accoutingRepo.getExistingCharge(body, this.settlementCode)
                 .pipe(catchError(this.catchError), finalize(() => this.isLoading = false))
                 .subscribe(
                     (res: any = {}) => {
@@ -622,7 +623,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                                     this.isSubmitted = false;
                                     return of(false);
                                 } else {
-                                    return this._accoutingRepo.getExistingCharge(body);
+                                    return this._accoutingRepo.getExistingCharge(body, this.settlementCode);
                                 }
                             })
                         );

@@ -435,17 +435,33 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
+                                    if (x.CurrencyCode == "USD")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
+                                    }
+                                    else if (x.CurrencyCode == "VND")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                    }
                                     if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
                                     {
                                         x.CurrencyCode = "VND";
                                         x.OriginalAmount = x.AmountVND;
-                                        x.OriginalAmount3 = x.VatAmountVND;
+                                        x.OriginalAmount3 = x.VatAmountVND; 
                                     }
                                     else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
                                     {
                                         x.CurrencyCode = "USD";
                                         x.OriginalAmount = x.AmountUSD;
                                         x.OriginalAmount3 = x.VatAmountUSD;
+                                    }
+                                    if (x.CurrencyCode == "USD")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
+                                    }
+                                    else if (x.CurrencyCode == "VND")
+                                    {
+                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
                                     }
                                 });
 
@@ -2662,6 +2678,8 @@ namespace eFMS.API.Accounting.DL.Services
             IQueryable<PaymentModel> query = from receipt in receipts
                                              join office in offices on receipt.OfficeId equals office.Id
                                              join partner in partners on receipt.CustomerId equals partner.Id
+                                             join obhP in obhPartners on receipt.ObhpartnerId.ToString() equals obhP.Id into grpObhs
+                                             from grpobh in grpObhs.DefaultIfEmpty()
                                              where receipt.Id == receiptItem.Id
                                              select new PaymentModel
                                              {
@@ -2675,7 +2693,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                  CustomerName = partner.PartnerNameVn,
                                                  Description0 = string.Format("{0}", type == "NETOFF" ? "Công Nợ Cấn Trừ" : "Công Nợ Phải Thu"),
                                                  PaymentMethod = type == "DEBIT" ? receipt.PaymentMethod : AccountingConstants.PAYMENT_METHOD_OTHER,
-                                                 DataType = "PAYMENT"
+                                                 DataType = "PAYMENT",
+                                                 LocalBranchCode = grpobh.InternalCode
                                              };
             if (query != null)
             {
@@ -2684,6 +2703,17 @@ namespace eFMS.API.Accounting.DL.Services
                 result.Stt = receiptSyncExist == null ? Guid.NewGuid().ToString() : receiptSyncExist.Id.ToString();
 
                 List<PaymentDetailModel> details = new List<PaymentDetailModel>();
+
+                string obhAccountNo = string.Empty;
+                if(receiptItem.ObhpartnerId != Guid.Empty)
+                {
+                    CatPartner partnerOBH = PartnerRepository.Get(x => x.Id == receiptItem.ObhpartnerId.ToString())?.FirstOrDefault();
+                    if(partnerOBH != null)
+                    {
+                        obhAccountNo = partnerOBH.AccountNo;
+                    }
+
+                }
 
                 IQueryable<PaymentDetailModel> queryPayments = from payment in payments
                                                                join partner in partners on payment.PartnerId equals partner.Id
@@ -2696,7 +2726,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    OriginalAmount = GetAmountReceiptPayment(receiptItem, payment, type,"origin"),
                                                                    CustomerCode = partner.AccountNo,
                                                                    BankAccountNo = receiptItem.BankAccountNo,
-                                                                   ObhPartnerCode = receiptItem.ObhpartnerId == null ? string.Empty : partner.AccountNo,
+                                                                   ObhPartnerCode = obhAccountNo,
                                                                    Description = GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = type == "NETOFF" ? "NETOFF" : payment.Type,
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo),
@@ -2917,17 +2947,21 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetPaymentReceiptAccount(AcctReceipt receipt, string paymentType, string invoiceAccountNo)
         {
             string account = invoiceAccountNo;
+
             if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
             {
                 account = receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? "13111" : "13121";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER)
             {
                 account = "7118";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
             {
-                account = "336";
+                account = "3368";
+                return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_PAY_OBH)
             {
