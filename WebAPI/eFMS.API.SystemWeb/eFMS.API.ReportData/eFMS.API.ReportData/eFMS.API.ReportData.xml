@@ -494,7 +494,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria,System.String)">
             <summary>
             GenerateExportCutomerHistoryPayment
             </summary>

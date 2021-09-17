@@ -2,6 +2,7 @@
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
 using eFMS.API.ReportData.Models.Common.Enums;
+using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
 using OfficeOpenXml.Drawing.Controls;
@@ -582,7 +583,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="customerPayment"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, string fileName)
+        public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
         {
             try
             {
@@ -600,7 +601,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null)
                 {
                     excel.DeleteRow(7);
                 }
@@ -653,7 +654,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.receiptDetail != null)
+                    if (item.receiptDetail != null && paymentCriteria.DueDate == null)
                     {
                         foreach (var detail in item.receiptDetail)
                         {
@@ -681,10 +682,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumOBHUnpaidAmount", customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0)));
                 listKeyTotal.Add("SumPaidAmount", customerPayment.Sum(x => (x.PaidAmount ?? 0)));
                 listKeyTotal.Add("SumOBHPaidAmount", customerPayment.Sum(x => (x.PaidAmountOBH ?? 0)));
-                //var sumRemainDb = customerPayment.Sum(x => (x.UnpaidAmountInv ?? 0) - (x.PaidAmount ?? 0));
-                //var sumRemainObh = customerPayment.Sum(x => (x.UnpaidAmountOBH ?? 0) - (x.PaidAmountOBH ?? 0));
-                //var sumRemainDbUsd = customerPayment.Sum(x => (x.UnpaidAmountInvUsd ?? 0) - (x.PaidAmountUsd ?? 0));
-                //var sumRemainObhUsd = customerPayment.Sum(x => (x.UnpaidAmountOBHUsd ?? 0) - (x.PaidAmountOBHUsd ?? 0));
                 // Sum total VND
                 listKeyTotal.Add("SumRemainDb", sumRemainDb);
                 listKeyTotal.Add("SumRemainOBH", sumRemainObh);
