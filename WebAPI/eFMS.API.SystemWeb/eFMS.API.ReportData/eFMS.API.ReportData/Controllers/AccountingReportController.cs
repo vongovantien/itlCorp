@@ -139,6 +139,29 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        /// <summary>
+        /// Export Settlement List With Charge Detail
+        /// </summary>
+        /// <param name="settlementPaymentCriteria"></param>
+        /// <returns></returns>
+        [Route("ExportSettlementPaymentDetailSurCharges")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportSettlementPaymentDetailSurCharges(SettlementPaymentCriteria settlementPaymentCriteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(settlementPaymentCriteria, aPis.AccountingAPI + Urls.Accounting.SettlementPaymentDetailListUrl, accessToken);
+            var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingSettlementExportGroup>>();
+
+            var stream = new AccountingHelper().ExportSettlementPaymentDetailSurCharges(dataObjects.Result, "Settlement-Detail Template.xlsx");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement-Detail Template.xlsx");
+
+            return fileContent;
+        }
+
         /// <summary>
         /// Export Advance Payment with each Request.
         /// </summary>
