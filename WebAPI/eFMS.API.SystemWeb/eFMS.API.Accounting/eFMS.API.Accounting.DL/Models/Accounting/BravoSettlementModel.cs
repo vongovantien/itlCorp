@@ -70,8 +70,8 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string ClearanceNo { get; set; }
 
         // Amount
-        public decimal? AmountVND { get; set; }
-        public decimal? AmountUSD { get; set; }
+        public decimal? NetAmountVND { get; set; }
+        public decimal? NetAmountUSD { get; set; }
         public decimal? VatAmountVND { get; set; }
         public decimal? VatAmountUSD { get; set; }
     }

@@ -400,8 +400,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                                                              ClearanceNo = surcharge.ClearanceNo,
 
                                                                                              // Amount
-                                                                                             AmountVND = surcharge.AmountVnd,
-                                                                                             AmountUSD = surcharge.AmountUsd,
+                                                                                             NetAmountVND = surcharge.AmountVnd,   
+                                                                                             NetAmountUSD = surcharge.AmountUsd,  
                                                                                              VatAmountVND= surcharge.VatAmountVnd,
                                                                                              VatAmountUSD=surcharge.VatAmountUsd
                                                                                              
@@ -435,33 +435,25 @@ namespace eFMS.API.Accounting.DL.Services
                                     {
                                         x.RefundAmount = null;
                                     }
-                                    if (x.CurrencyCode == "USD")
-                                    {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
-                                    }
-                                    else if (x.CurrencyCode == "VND")
+                                    if (currentSettle.SettlementCurrency == "VND")
                                     {
                                         x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
+                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 0);
+                                        if (x.CurrencyCode == "USD")
+                                        {
+                                            x.CurrencyCode = "VND";
+                                        }    
                                     }
-                                    if (currentSettle.SettlementCurrency=="VND" && x.CurrencyCode=="USD")
-                                    {
-                                        x.CurrencyCode = "VND";
-                                        x.OriginalAmount = x.AmountVND;
-                                        x.OriginalAmount3 = x.VatAmountVND; 
-                                    }
-                                    else if(currentSettle.SettlementCurrency=="USD" && x.CurrencyCode=="VND")
-                                    {
-                                        x.CurrencyCode = "USD";
-                                        x.OriginalAmount = x.AmountUSD;
-                                        x.OriginalAmount3 = x.VatAmountUSD;
-                                    }
-                                    if (x.CurrencyCode == "USD")
+                                    else if (currentSettle.SettlementCurrency == "USD")
                                     {
                                         x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
-                                    }
-                                    else if (x.CurrencyCode == "VND")
-                                    {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
+                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 2);
+                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 2);
+                                        if (x.CurrencyCode == "VND")
+                                        {
+                                            x.CurrencyCode = "USD";
+                                        }
                                     }
                                 });
 
@@ -479,7 +471,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         // DeptCode = reqItem.DeptCode,
                                         Quantity9 = 0,
                                         OriginalUnitPrice = 0,
-                                        OriginalAmount = currentSettle.BalanceAmount,
+                                        OriginalAmount = currentSettle.BalanceAmount==null? currentSettle.BalanceAmount:Math.Round((decimal)currentSettle.BalanceAmount,item.CurrencyCode == "VND" ? 0 : 2),
                                         OriginalAmount3 = 0,
                                         ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
                                         CustomerCodeBook = _staffCodeRequester,
@@ -531,7 +523,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 DeptCode = reqItem.DeptCode,
                                                 Quantity9 = 0,
                                                 OriginalUnitPrice = 0,
-                                                OriginalAmount = balanceInfo.AdvanceAmount, // Số tiền tạm ứng của hbl
+                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceInfo.AdvanceAmount : Math.Round((decimal)balanceInfo.AdvanceAmount, item.CurrencyCode == "VND" ? 0 : 2),    // Số tiền tạm ứng của hbl
                                                 OriginalAmount3 = 0,
                                                 ChargeType = "CLEAR_ADVANCE",
                                                 CustomerCodeBook = _requesterAdvanceCode,
