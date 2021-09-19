@@ -51,6 +51,7 @@ export class Contract {
     viewDetail: boolean = false;
     creditUnlimited: boolean = false;
     creditCurrency: string = null;
+    autoExtendDays: number = null;
     constructor(data?: any) {
         const self = this;
         for (const key in data) {
