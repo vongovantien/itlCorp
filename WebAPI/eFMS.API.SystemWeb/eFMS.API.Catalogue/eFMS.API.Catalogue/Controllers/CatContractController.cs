@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Catalogue.Authorize;
@@ -18,11 +19,13 @@ using eFMS.API.Common;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Options;
 using OfficeOpenXml;
 
 namespace eFMS.API.Catalogue.Controllers
@@ -37,15 +40,22 @@ namespace eFMS.API.Catalogue.Controllers
         private readonly ICatContractService catContractService;
         private readonly ICatPartnerService partnerService;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IOptions<ApiServiceUrl> apiServiceUrl;
 
         private readonly IMapper mapper;
-        public CatContractController(IStringLocalizer<LanguageSub> localizer, ICatContractService service, ICatPartnerService partnerSv, IMapper iMapper, IHostingEnvironment hostingEnvironment)
+        public CatContractController(IStringLocalizer<LanguageSub> localizer,
+            ICatContractService service,
+            ICatPartnerService partnerSv,
+            IOptions<ApiServiceUrl> serviceUrl,
+            IMapper iMapper,
+            IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             catContractService = service;
             mapper = iMapper;
             partnerService = partnerSv;
             _hostingEnvironment = hostingEnvironment;
+            apiServiceUrl = serviceUrl;
         }
 
         /// <summary>
@@ -191,14 +201,41 @@ namespace eFMS.API.Catalogue.Controllers
             {
                 model.Active = false;
             }
-            var hs = catContractService.Update(model);
+            var isChangeAgrmentType = false;
+            var hs = catContractService.Update(model, out isChangeAgrmentType);
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
             }
+            else
+            {
+                if (isChangeAgrmentType == true)
+                {
+                    Response.OnCompleted(async () =>
+                    {
+                        // Update due date invoice và công nợ quá hạn
+                        await UpdateDueDateAndOverDaysAfterChangePaymentTerm(model);
+                    });
+                }
+            }
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Call function update due date và tính công nợ quá hạn
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private async Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel model)
+        {
+            Uri urlAccounting = new Uri(apiServiceUrl.Value.ApiUrlAccounting);
+            string accessToken = Request.Headers["Authorization"].ToString();
+
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlAccounting + "/api/v1/e/AccountReceivable/UpdateDueDateAndOverDaysAfterChangePaymentTerm", model, accessToken);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
         }
 
         /// <summary>
