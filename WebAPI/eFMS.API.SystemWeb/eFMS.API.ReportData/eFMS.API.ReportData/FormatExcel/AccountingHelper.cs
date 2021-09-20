@@ -973,7 +973,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[43]; //Ngày dịch vụ 
-                workSheet.Cells[j, 3].Value = advanceExport.InfoAdvance.RequestDate;
+                workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].ServiceDate;
                 workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
                 workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 j = j + 1;

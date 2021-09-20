@@ -77,4 +77,8 @@
   <ItemGroup>
     <Folder Include="Helpers\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.Accounting.DAL\eFMS.API.Accounting.Service.csproj" />
+  </ItemGroup>
 </Project>
