@@ -437,9 +437,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                     if (currentSettle.SettlementCurrency == "VND")
                                     {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 0);
-                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
-                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 0);
+                                        x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 0);
+                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
+                                        x.OriginalAmount3 = NumberHelper.RoundNumber((decimal)x.VatAmountVND, 0);
                                         if (x.CurrencyCode == "USD")
                                         {
                                             x.CurrencyCode = "VND";
@@ -447,9 +447,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     }
                                     else if (currentSettle.SettlementCurrency == "USD")
                                     {
-                                        x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
-                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountUSD + x.VatAmountUSD), 2);
-                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountUSD, 2);
+                                        x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 2);
+                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountUSD + x.VatAmountUSD), 2);
+                                        x.OriginalAmount3 = NumberHelper.RoundNumber((decimal)x.VatAmountUSD, 2);
                                         if (x.CurrencyCode == "VND")
                                         {
                                             x.CurrencyCode = "USD";
