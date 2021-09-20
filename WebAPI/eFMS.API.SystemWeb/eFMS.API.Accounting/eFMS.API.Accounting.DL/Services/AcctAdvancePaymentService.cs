@@ -654,15 +654,6 @@ namespace eFMS.API.Accounting.DL.Services
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
 
-            // Setting ServiceDate from opsTransaction
-            //foreach (var x in request)
-            //{
-            //    foreach (var y in advanceModel.AdvanceRequests)
-            //    {
-            //        y.ServiceDate = opsTransactionRepo.Get(z => z.JobNo == x.JobId).FirstOrDefault().ServiceDate;
-            //    }
-            //}
-
             advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
             advanceModel.UserNameCreated = sysUserRepo.Get(x => x.Id == advance.UserCreated).FirstOrDefault()?.Username;
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
