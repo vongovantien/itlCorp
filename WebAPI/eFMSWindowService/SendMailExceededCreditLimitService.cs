@@ -62,8 +62,7 @@ namespace eFMSWindowService
                         string subject = item.Key.UserName != null ? $"Thông báo Khách hàng VƯỢT HẠN MỨC CÔNG NỢ của sale {item.Key.UserName}" : "Thông báo Khách hàng VƯỢT HẠN MỨC CÔNG NỢ";
                         string dear = item.Key.UserName != null ? $"<strong>Dear {item.Key.UserName},</strong> </br></br>" : "<strong>Dear All,</strong> </br></br>";
 
-                        string headerBody = @"<strong>Dear All,</strong> </br></br>"
-                                          + @"<p>Dưới đây là danh sách Khách hàng <strong style='color: red;'>vượt hạn mức công nợ</strong> do anh/chị phụ trách:</p>"
+                        string headerBody = @"<p>Dưới đây là danh sách Khách hàng <strong style='color: red;'>vượt hạn mức công nợ</strong> do anh/chị phụ trách:</p>"
                                           + @"<p><i>Below is the list of your customers which has been <strong>exceeded credit limit:</strong></i></p>";
 
                         string footerBody = @"</br></br>"
