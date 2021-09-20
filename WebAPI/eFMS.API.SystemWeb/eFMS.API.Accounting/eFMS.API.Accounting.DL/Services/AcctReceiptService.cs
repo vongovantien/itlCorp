@@ -1734,6 +1734,7 @@ namespace eFMS.API.Accounting.DL.Services
                     else if (paidVnd < invoice.PaidAmountVnd)
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
+                        paidVnd = 0;
                     }
                     else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
@@ -1745,6 +1746,10 @@ namespace eFMS.API.Accounting.DL.Services
                         paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
                     }
                 }
+                else
+                {
+                    invoice.PaidAmountVnd = invoice.TotalPaidVnd = 0;
+                }
                 if (paidUsd > 0)
                 {
                     if (invoice.PaidAmountUsd == 0)
@@ -1754,6 +1759,7 @@ namespace eFMS.API.Accounting.DL.Services
                     else if (paidUsd < invoice.PaidAmountUsd)
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
+                        paidUsd = 0;
                     }
                     else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
@@ -1764,6 +1770,10 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         paidUsd = paidUsd - (invoice.TotalPaidUsd ?? 0);
                     }
+                }
+                else
+                {
+                    invoice.PaidAmountUsd = invoice.TotalPaidUsd = 0;
                 }
             }
             return new ProcessClearInvoiceModel

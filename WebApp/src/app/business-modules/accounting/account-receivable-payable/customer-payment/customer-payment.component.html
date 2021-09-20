@@ -112,7 +112,12 @@
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
                                                             </td>
                                                             <td class="text-right">
-                                                                <span>{{(cps.currencyId === 'VND'?cps.paidAmountVnd:cps.paidAmountUsd) | number :'.0-3'}}</span>
+                                                                <span>{{(cps.currencyId ===
+                                                                    'VND'?cps.paidAmountVnd:cps.paidAmountUsd) | number
+                                                                    :'.0-3'}}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.description}}</span>
                                                             </td>
                                                             <td>
                                                                 <span>{{cps.currencyId}}</span>
@@ -130,9 +135,6 @@
                                                                 <span>
                                                                     {{cps.paymentDate | date :'dd/MM/yyyy'}}
                                                                 </span>
-                                                            </td>
-                                                            <td>
-                                                                <span>{{cps.description}}</span>
                                                             </td>
                                                             <td>
                                                                 <div
