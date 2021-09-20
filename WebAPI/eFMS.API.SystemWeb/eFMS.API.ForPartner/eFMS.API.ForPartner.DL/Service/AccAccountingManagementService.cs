@@ -628,8 +628,36 @@ namespace eFMS.API.ForPartner.DL.Service
                         data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
                                                 && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
 
+                        CsShipmentSurcharge charge = surchargeRepo.First(x => x.ReferenceNo == model.ReferenceNo && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        if(charge == null || string.IsNullOrEmpty(charge.SyncedFrom))
+                        {
+                            return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
 
-                        hs = DataContext.Delete(x => data.Id == x.Id, false);
+                        // Find and Delete Inoice Temp with same debit/soa
+                        IQueryable<CsShipmentSurcharge> surchargeHadSynced = null;
+                        if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.DebitNo == charge.DebitNo 
+                            &&  x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE 
+                            && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        else if(charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.Soano == charge.Soano
+                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA
+                           && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+
+                        if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
+                        {
+                            List<Guid?> IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId).Distinct().ToList();
+
+                            foreach (var Id in IdsInvoiceTemps)
+                            {
+                                DataContext.Delete(x => x.Id == Id, false);
+                            }
+                        }
                     }
                     else
                     {
@@ -672,7 +700,6 @@ namespace eFMS.API.ForPartner.DL.Service
                             //Update Status Removed Inv For Debit Note (Debit Note synced)
                             UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
                         }
-
 
                         var smSoa = acctSOARepository.SubmitChanges();
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
