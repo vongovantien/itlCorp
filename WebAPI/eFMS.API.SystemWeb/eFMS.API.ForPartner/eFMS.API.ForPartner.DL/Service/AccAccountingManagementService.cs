@@ -152,6 +152,7 @@ namespace eFMS.API.ForPartner.DL.Service
         #region --- CRUD INVOICE ---
         public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, out Guid Id)
         {
+            Id = Guid.Empty;
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -161,7 +162,10 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.Action = "InsertInvoice";
 
             var hsInsertInvoice = InsertInvoice(model, currentUser, out AccAccountingManagement invoiceDebit);
-            Id = invoiceDebit.Id;
+            if(invoiceDebit != null)
+            {
+                Id = invoiceDebit.Id;
+            }
             return hsInsertInvoice;
         }
 
@@ -631,8 +635,6 @@ namespace eFMS.API.ForPartner.DL.Service
                     if (model.SerieNo == ForPartnerConstants.TYPE_CHARGE_OBH)
                     {
                         invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
-                        data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
-                                                && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
 
                         CsShipmentSurcharge charge = surchargeRepo.First(x => x.ReferenceNo == model.ReferenceNo && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
                         if(charge == null || string.IsNullOrEmpty(charge.SyncedFrom))
