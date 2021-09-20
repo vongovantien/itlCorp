@@ -105,7 +105,7 @@
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
                                 </td>
                                 <td ALIGN="right">
-                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH' ">
                                         <input type="text" class="form-control text-right text-success font-15"
                                             [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
                                             [disabled]="isReadonly"
@@ -113,7 +113,7 @@
                                     </ng-container>
                                 </td>
                                 <td>
-                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                    <ng-container *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH'">
                                         <input type="text" class="form-control text-right text-success font-15"
                                             [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
                                             [disabled]="isReadonly"
