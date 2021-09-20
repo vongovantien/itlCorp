@@ -471,7 +471,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         // DeptCode = reqItem.DeptCode,
                                         Quantity9 = 0,
                                         OriginalUnitPrice = 0,
-                                        OriginalAmount = currentSettle.BalanceAmount==null? currentSettle.BalanceAmount:Math.Round((decimal)currentSettle.BalanceAmount,item.CurrencyCode == "VND" ? 0 : 2),
+                                        OriginalAmount = currentSettle.BalanceAmount==null? currentSettle.BalanceAmount:NumberHelper.RoundNumber((decimal)currentSettle.BalanceAmount,item.CurrencyCode == "VND" ? 0 : 2),
                                         OriginalAmount3 = 0,
                                         ChargeType = GenerateChargeTypeSettleWithBalanceAdvance(currentSettle.BalanceAmount ?? 0, item.PaymentMethod),
                                         CustomerCodeBook = _staffCodeRequester,
@@ -523,7 +523,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 DeptCode = reqItem.DeptCode,
                                                 Quantity9 = 0,
                                                 OriginalUnitPrice = 0,
-                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceInfo.AdvanceAmount : Math.Round((decimal)balanceInfo.AdvanceAmount, item.CurrencyCode == "VND" ? 0 : 2),    // Số tiền tạm ứng của hbl
+                                                OriginalAmount = balanceInfo.AdvanceAmount == null ? balanceInfo.AdvanceAmount : NumberHelper.RoundNumber((decimal)balanceInfo.AdvanceAmount, item.CurrencyCode == "VND" ? 0 : 2),    // Số tiền tạm ứng của hbl
                                                 OriginalAmount3 = 0,
                                                 ChargeType = "CLEAR_ADVANCE",
                                                 CustomerCodeBook = _requesterAdvanceCode,
