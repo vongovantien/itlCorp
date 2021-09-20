@@ -448,8 +448,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     else if (currentSettle.SettlementCurrency == "USD")
                                     {
                                         x.OriginalUnitPrice = Math.Round((decimal)x.OriginalUnitPrice, 2);
-                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountVND + x.VatAmountVND), 2);
-                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountVND, 2);
+                                        x.OriginalAmount = Math.Round((decimal)(x.NetAmountUSD + x.VatAmountUSD), 2);
+                                        x.OriginalAmount3 = Math.Round((decimal)x.VatAmountUSD, 2);
                                         if (x.CurrencyCode == "VND")
                                         {
                                             x.CurrencyCode = "USD";
