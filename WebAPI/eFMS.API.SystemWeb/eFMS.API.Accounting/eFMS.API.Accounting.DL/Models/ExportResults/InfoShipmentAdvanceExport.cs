@@ -19,6 +19,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? NormAmount { get; set; }
         public decimal? InvoiceAmount { get; set; }
         public decimal? OtherAmount { get; set; }
-        public DateTime ServiceDate { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }

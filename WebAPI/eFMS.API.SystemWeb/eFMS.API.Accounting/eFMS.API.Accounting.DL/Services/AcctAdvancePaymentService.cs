@@ -3696,8 +3696,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
-                    ServiceDate = (DateTime)opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault()==null?
-                    (DateTime)csTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(): (DateTime)opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(),
+                    ServiceDate = opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault()==null?
+                    csTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(): (DateTime)opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(),
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl

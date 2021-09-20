@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models.ExportResults
 {
@@ -18,5 +19,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? Cbm { get; set; }
         public List<InfoShipmentChargeSettlementExport> ShipmentCharges { get; set; }
         public List<InfoAdvanceExport> InfoAdvanceExports { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }
