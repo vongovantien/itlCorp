@@ -98,6 +98,6 @@ namespace eFMS.API.Accounting.DL.IService
 
         HandleState DenyAdvancePayments(List<Guid> Ids);
 
-        HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests);
+        List<ObjectReceivableModel> CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests);
     }
 }

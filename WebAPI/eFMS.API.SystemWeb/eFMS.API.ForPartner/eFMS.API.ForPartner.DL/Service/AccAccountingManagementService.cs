@@ -2115,32 +2115,54 @@ namespace eFMS.API.ForPartner.DL.Service
             var hs = new HandleState();
             try
             {
-                foreach (var expense in expenses)
+                //foreach (var expense in expenses)
+                //{
+                //    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
+                //    if (surcharge != null)
+                //    {
+                //        surcharge.UserModified = _currentUser.UserID;
+                //        surcharge.DatetimeModified = DateTime.Now;
+                //        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                //        {
+                //            surcharge.VoucherIdre = expense.VoucherNO;
+                //            surcharge.VoucherIdredate = expense.VoucherDate;
+                //        }
+                //        else
+                //        {
+                //            surcharge.VoucherId = expense.VoucherNO;
+                //            surcharge.VoucherIddate = expense.VoucherDate;
+                //        }
+                //        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
+                //    }
+                //}
+
+                StatusModel result = UpdateSurchargeVoucherExpense(expenses);
+                if(!result.Status)
                 {
-                    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
-                    if (surcharge != null)
-                    {
-                        surcharge.UserModified = _currentUser.UserID;
-                        surcharge.DatetimeModified = DateTime.Now;
-                        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
-                        {
-                            surcharge.VoucherIdre = expense.VoucherNO;
-                            surcharge.VoucherIdredate = expense.VoucherDate;
-                        }
-                        else
-                        {
-                            surcharge.VoucherId = expense.VoucherNO;
-                            surcharge.VoucherIddate = expense.VoucherDate;
-                        }
-                        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
-                    }
+                    return new HandleState((object)result.Message);
                 }
-                return hs;
+                return new HandleState(result.Status,"Success");
             }
             catch(Exception ex)
             {
                 return new HandleState((object)"Error");
             }
+        }
+
+        private StatusModel UpdateSurchargeVoucherExpense(List<VoucherExpenseCharge> listExpense)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(listExpense),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[VoucherExpense]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateVoucherExpense>(parameters);
+            return result.FirstOrDefault();
         }
     }
 }

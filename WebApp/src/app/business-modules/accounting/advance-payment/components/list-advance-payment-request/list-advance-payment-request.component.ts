@@ -21,6 +21,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(InjectViewContainerRefDirective) confirmDeleteContainerRef: InjectViewContainerRefDirective;
 
     @Input() state: string = 'update';
+    @Input() statusApproval:string='';
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -34,7 +35,6 @@ export class AdvancePaymentListRequestComponent extends AppList {
     totalAmount: number = 0;
     currency: string = 'VND';
     advanceNo: string = '';
-
     constructor(
         private _sortService: SortService,
         private _toastService: ToastrService
@@ -48,6 +48,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
             { title: 'Description', field: 'description', sortable: true },
             { title: 'Custom No', field: 'customNo', sortable: true },
             { title: 'JobID', field: 'jobId', sortable: true },
+            { title: 'Settle Status', field: 'statusPayment', sortable: false },
             { title: 'HBL', field: 'hbl', sortable: true },
             { title: 'Amount', field: 'amount', sortable: true },
             { title: 'Currency', field: 'requestCurrency', sortable: true },
@@ -55,8 +56,9 @@ export class AdvancePaymentListRequestComponent extends AppList {
             { title: 'Note', field: 'requestNote', sortable: true },
         ];
         this.getRequestAdvancePayment();
+        console.log(this.listRequestAdvancePayment);
     }
-
+    
     getRequestAdvancePayment() {
         this.$listRequestAdvancePayment
             .pipe(
@@ -66,9 +68,9 @@ export class AdvancePaymentListRequestComponent extends AppList {
             .subscribe(
                 (data: any) => {
                     this.listRequestAdvancePayment.push(data);
-
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
+                    
                 },
             );
     }
@@ -173,5 +175,3 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.isCheckAll = false;
     }
 }
-
-

@@ -122,9 +122,9 @@
                                                             </td> -->
                                                             <td>{{j+1}}</td>
                                                             <td>{{ payment.receiptNo }}</td>
-                                                            <td class="text-right">{{ payment.paymentAmount| number: '.0-3'  }} {{payment.currencyId}}
+                                                            <td class="text-right">{{ payment.paymentAmount| number: '.0-3'  }} {{item.currency}}
                                                             </td>
-                                                            <td class="text-right">{{ payment.balance| number: '.0-3' }} {{payment.currencyId}}
+                                                            <td class="text-right">{{ payment.balance| number: '.0-3' }} {{item.currency}}
                                                             </td>
                                                             <td>{{ payment.paidDate | date: 'dd/MM/yyyy'}}
                                                             </td>

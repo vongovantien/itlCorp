@@ -23,11 +23,19 @@ namespace eFMS.API.Setting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
-        public DateTime? VoucherDate { get; set; }
         public string VoucherNo { get; set; }
+        public DateTime? VoucherDate { get; set; }
         public DateTime? LastSyncDate { get; set; }
         public string SyncStatus { get; set; }
         public string ReasonReject { get; set; }
         public string Payee { get; set; }
+        public string SettlementType { get; set; }
+        public string BankAccountNo { get; set; }
+        public string BankAccountName { get; set; }
+        public string BankName { get; set; }
+        public decimal? AdvanceAmount { get; set; }
+        public decimal? BalanceAmount { get; set; }
+        public string BankCode { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

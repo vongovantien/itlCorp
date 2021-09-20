@@ -46,6 +46,13 @@
             <param name="settlementPaymentCriteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSettlementPaymentDetailSurCharges(eFMS.API.ReportData.Models.Criteria.SettlementPaymentCriteria)">
+            <summary>
+            Export Settlement List With Charge Detail
+            </summary>
+            <param name="settlementPaymentCriteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportAccountingPayment(eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria)">
             <summary>
             Export Advance Payment with each Request.
@@ -479,6 +486,14 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.ExportSettlementPaymentDetailSurCharges(System.Collections.Generic.List{eFMS.API.ReportData.Models.Accounting.AccountingSettlementExportGroup},System.String)">
+            <summary>
+            Set settlement detail data to excel
+            </summary>
+            <param name="settlementList"></param>
+            <param name="fileName"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
             <summary>
             GenerateExportCutomerHistoryPayment
@@ -651,17 +666,23 @@
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.EndCol">
             <summary>End of column in excel</summary>
         </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.NumberOfGroup">
+            <summary>Number of group to copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.IndexOfGroup">
+            <summary>Index currenct of group</summary>
+        </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.GroupRowCopy">
             <summary>Row of group copied</summary>
+        </member>
+        <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.GroupRowValue">
+            <summary>List values of group copied</summary>
         </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.DetailRowCopy">
             <summary>Row of detail copied</summary>
         </member>
         <member name="P:eFMS.API.ReportData.FormatExcel.ExcelExport.StartDetailTable">
             <summary>Start index of table</summary>
-        </member>
-        <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._groupRowValue">
-            <summary>Values of group copied</summary>
         </member>
         <member name="F:eFMS.API.ReportData.FormatExcel.ExcelExport._detailRowValue">
             <summary>Values of detail copied</summary>
