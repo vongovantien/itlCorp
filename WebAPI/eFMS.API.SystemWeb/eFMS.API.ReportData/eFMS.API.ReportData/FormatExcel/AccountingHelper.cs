@@ -752,6 +752,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Tiền mặt",//41
                 "Ngày đến hạn",//42
                 //END
+
+                //20/09/2021 - #16169 - Add Field Service Date
+                //ADD
+                "Ngày dịch vụ"//43
+                //END
             };
 
             List<string> engHeaders = new List<string>()
@@ -965,6 +970,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[j, 2].Value = headers[19]; //Số lô hàng
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].JobNo;
+                j = j + 1;
+
+                workSheet.Cells[j, 2].Value = headers[43]; //Ngày dịch vụ 
+                workSheet.Cells[j, 3].Value = advanceExport.InfoAdvance.RequestDate;
+                workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
+                workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[20]; //Số tờ khai
