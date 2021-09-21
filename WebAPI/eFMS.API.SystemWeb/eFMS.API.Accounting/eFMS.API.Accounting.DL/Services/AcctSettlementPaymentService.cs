@@ -1955,7 +1955,7 @@ namespace eFMS.API.Accounting.DL.Services
                         settlement.Amount = _totalAmount;
 
                         // Tính Balance trong settle
-                        decimal? advanceAmount = CalculateBalanceSettle(model.ShipmentCharge, settlement.SettlementNo, settlement.SettlementCurrency);
+                        decimal? advanceAmount = GetAdvanceAmountSettle(model.ShipmentCharge, settlement.SettlementCurrency);
                         if(advanceAmount != null)
                         {
                             settlement.AdvanceAmount = advanceAmount;
@@ -2297,7 +2297,7 @@ namespace eFMS.API.Accounting.DL.Services
                         settlement.Amount = _totalAmount;
 
                         // Tính Balance trong settle
-                        decimal? advanceAmount = CalculateBalanceSettle(model.ShipmentCharge, settlement.SettlementNo, settlement.SettlementCurrency);
+                        decimal? advanceAmount = GetAdvanceAmountSettle(model.ShipmentCharge, settlement.SettlementCurrency);
                         if (advanceAmount != null)
                         {
                             settlement.AdvanceAmount = advanceAmount;                           
@@ -5516,7 +5516,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            if (string.IsNullOrEmpty(payeeId) && string.IsNullOrEmpty(requester))
+            if (string.IsNullOrEmpty(payeeId))
             {
                 advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)));
             }
@@ -5526,10 +5526,11 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId));
                 }
-                if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
-                {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
-                }
+                // [CR]: tam thoi bo search theo requester
+                //if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
+                //{
+                //    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
+                //}
             }
             return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
         }
@@ -5603,6 +5604,60 @@ namespace eFMS.API.Accounting.DL.Services
             }
             
             return rs;
+        }
+
+        /// <summary>
+        /// Get total Advance amount of Settlement
+        /// </summary>
+        /// <param name="charges"></param>
+        /// <param name="currency"></param>
+        /// <returns></returns>
+        private decimal? GetAdvanceAmountSettle(List<ShipmentChargeSettlement> charges, string currency)
+        {
+            decimal? _advanceAmount = null;
+
+            IEnumerable<ShipmentSettlement> dataGroups = charges.GroupBy(x => new { x.JobId, x.HBL, x.MBL, x.Hblid, x.AdvanceNo, x.ClearanceNo })
+                                    .Select(x => new ShipmentSettlement
+                                    {
+                                        JobId = x.Key.JobId,
+                                        HBL = x.Key.HBL,
+                                        MBL = x.Key.MBL,
+                                        HblId = x.Key.Hblid,
+                                        AdvanceNo = x.Key.AdvanceNo,
+                                        CustomNo = x.Key.ClearanceNo
+                                    });
+
+            if (dataGroups != null && dataGroups.Count() > 0)
+            {
+                decimal? _totalAdvanceAmount = 0;
+
+                foreach (ShipmentSettlement item in dataGroups)
+                {
+                    if (!string.IsNullOrEmpty(item.AdvanceNo))
+                    {
+                        var advData = from advP in acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                                      join advR in acctAdvanceRequestRepo.Get() on advP.AdvanceNo equals advR.AdvanceNo
+                                      where advR.Hblid == item.HblId && advR.AdvanceNo == item.AdvanceNo
+                                      select new
+                                      {
+                                          AdvAmount = advR.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, advP.RequestDate, advR.RequestCurrency, currency), // tính theo tỷ giá ngày request adv và currency settlement
+                                      };
+                        var AdvanceAmount = advData.ToList().Sum(x => x.AdvAmount ?? 0);
+                        _totalAdvanceAmount += AdvanceAmount;
+                    }
+                }
+                if (_totalAdvanceAmount == 0)
+                {
+                    _advanceAmount = null;
+                }
+                else
+                {
+                    _advanceAmount = _totalAdvanceAmount;
+                }
+            }
+
+            return _advanceAmount;
+
         }
     }
 }
