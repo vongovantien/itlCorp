@@ -21,7 +21,7 @@ namespace eFMSWindowService
         public SendMailExceededCreditLimitService()
         {
             InitializeComponent();
-            _scheduleTime = DateTime.Today.AddDays(1).AddHours(8);
+            _scheduleTime = DateTime.Today.AddDays(1).AddHours(9);
         }
 
         public void Start()
@@ -31,7 +31,7 @@ namespace eFMSWindowService
             _timer = new Timer();
             // Execute mỗi ngày vào lúc 8h sáng
             _timer.Interval = _scheduleTime.Subtract(DateTime.Now).TotalSeconds * 1000;
-            //_timer.Interval = 30000;
+            //_timer.Interval = 10000;
             // Những gì xảy ra khi timer đó dc tick
             _timer.Elapsed += Timer_Elapsed;
             // Enable timer
@@ -40,7 +40,8 @@ namespace eFMSWindowService
 
         protected override void OnStart(string[] args)
         {
-            this.Start();
+            if (ConfigurationManager.AppSettings["Start_SendMailExceededCreditLimitService"] == "1")
+                this.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -184,9 +185,9 @@ namespace eFMSWindowService
                     content.Append(@"<td style='width: 6%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + no + "</td>");
                     content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + item.Office + "</td>");
                     content.Append(@"<td style='width: 20%; border: 1px solid #dddddd; border-collapse: collapse;'>&nbsp;&nbsp;" + item.Customer + "</td>");
-                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:n0}", item.CreditLimit) + "</td>");
-                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + string.Format("{0:n0}", item.CurrentCredit) + " %</td>");
-                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:n0}", item.CurrentDebts) + "</td>");
+                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", item.CreditLimit) + "</td>");
+                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: center;'>" + string.Format("{0:#,##0.00}", item.CurrentCredit) + " %</td>");
+                    content.Append(@"<td style='width: 18%; border: 1px solid #dddddd; border-collapse: collapse; text-align: right;'>" + string.Format("{0:#,##0.00}", item.CurrentDebts) + "</td>");
                     content.Append(@"</tr>");
                     no = no + 1;
                 }
