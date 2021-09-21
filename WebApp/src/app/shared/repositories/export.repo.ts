@@ -186,6 +186,13 @@ export class ExportRepo {
         );
     }
 
+    exportSOAAirFreightWithHBL(soaNo: string, officeId: string) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreightWithHBL`, null, { soaNo: soaNo, officeId: officeId }).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     exportSOASupplierAirFreight(soaNo: string, officeId: string) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOASupplierAirfreight`, null, { soaNo: soaNo, officeId: officeId }).pipe(
             catchError((error) => throwError(error)),

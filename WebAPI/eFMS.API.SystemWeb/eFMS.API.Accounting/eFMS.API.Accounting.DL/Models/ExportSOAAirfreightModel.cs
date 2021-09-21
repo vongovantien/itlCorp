@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string BankNameEn { get; set; }
         public string AddressEn { get; set; }
         public string SwiftCode { get; set; }
+        public string HBLNo { get; set; }
 
         public string SoaNo { get; set; }
         public DateTime? DateSOA { get; set; }
@@ -26,6 +27,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string IssuedBy { get; set; }
         public string ApprovedBy { get; set; }
         public string Account { get; set; }
+
 
 
     

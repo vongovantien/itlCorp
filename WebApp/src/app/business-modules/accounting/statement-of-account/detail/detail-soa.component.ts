@@ -156,6 +156,25 @@ export class StatementOfAccountDetailComponent extends AppList {
             );
     }
 
+    exportSOAAFWithHBL() {
+        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
+        this._progressRef.start();
+        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO, userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight With HBL.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
     exportSOASupplierAF() {
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this._progressRef.start();
