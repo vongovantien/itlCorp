@@ -19,5 +19,6 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? Cbm { get; set; }
         public List<InfoShipmentChargeSettlementExport> ShipmentCharges { get; set; }
         public List<InfoAdvanceExport> InfoAdvanceExports { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }
