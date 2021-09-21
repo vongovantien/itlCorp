@@ -105,7 +105,7 @@ export const receiptManagementReducer = createReducer(
                     }]
                 };
             }
-        } else if (payload.data.cusAdvanceAmountVnd > 0) {
+        } else if (payload.data.cusAdvanceAmountUsd > 0) {
             return {
                 ...state, debitList: [...payload.data.invoices, {
                     type: 'ADV',
