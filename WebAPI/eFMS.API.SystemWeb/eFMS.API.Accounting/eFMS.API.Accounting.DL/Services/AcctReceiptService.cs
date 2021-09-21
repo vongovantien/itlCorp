@@ -472,8 +472,8 @@ namespace eFMS.API.Accounting.DL.Services
                     UnpaidAmountUsd = s.FirstOrDefault().UnpaidPaymentAmountUsd,
                     PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
                     PaidAmountUsd = s.Sum(x => x.PaymentAmountUsd),
-                    TotalPaidVnd = s.FirstOrDefault().TotalPaidVnd,
-                    TotalPaidUsd = s.FirstOrDefault().TotalPaidUsd,
+                    TotalPaidVnd = s.Sum(x => x.PaymentAmountVnd),
+                    TotalPaidUsd = s.Sum(x => x.PaymentAmountUsd),
                     Notes = s.FirstOrDefault().Note,
                     OfficeId = s.FirstOrDefault().OfficeInvoiceId,
                     OfficeName = officeRepository.Get(x => x.Id == s.FirstOrDefault().OfficeInvoiceId)?.FirstOrDefault().ShortName,
@@ -775,8 +775,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;// Số tiền thu
-                                _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = _paymentOBH.TotalPaidVnd = invTemp.UnpaidAmountVnd;// Số tiền thu
+                                _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidUsd = invTemp.UnpaidAmountUsd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd; // Số tiền còn lại
                                 _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
@@ -792,8 +792,8 @@ namespace eFMS.API.Accounting.DL.Services
                         else
                         {
                             AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
-                            _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
+                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountVnd = _paymentOBH.TotalPaidVnd = remainOBHAmountVnd;
+                            _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidUsd = remainOBHAmountUsd;
 
                             _paymentOBH.Balance = _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
                             _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
@@ -812,8 +812,8 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = invTemp.UnpaidAmountUsd;
-                                _paymentOBH.PaymentAmountVnd = invTemp.UnpaidAmountVnd;
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidVnd =  invTemp.UnpaidAmountUsd;
+                                _paymentOBH.PaymentAmountVnd = _paymentOBH.TotalPaidUsd = invTemp.UnpaidAmountVnd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
                                 _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
@@ -840,8 +840,8 @@ namespace eFMS.API.Accounting.DL.Services
                         else
                         {
                             AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = remainOBHAmountUsd;
-                            _paymentOBH.PaymentAmountVnd = remainOBHAmountVnd;
+                            _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidVnd = remainOBHAmountUsd;
+                            _paymentOBH.PaymentAmountVnd = _paymentOBH.TotalPaidUsd = remainOBHAmountVnd;
 
                             _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmount - _paymentOBH.PaymentAmountUsd;
                             _paymentOBH.BalanceVnd = invTemp.UnpaidAmountVnd - _paymentOBH.PaymentAmountVnd;
