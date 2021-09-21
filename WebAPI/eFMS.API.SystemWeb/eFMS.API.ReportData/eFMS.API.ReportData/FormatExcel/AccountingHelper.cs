@@ -912,6 +912,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Tiền mặt",//41
                 "Ngày đến hạn",//42
                 //END
+
+                //20/09/2021 - #16169 - Add Field Service Date
+                //ADD
+                "Ngày dịch vụ:"//43
+                //END
             };
 
             List<string> engHeaders = new List<string>()
@@ -963,6 +968,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 "By cash",//41
                 "Due date",//42
                  //END
+
+                //20/09/2021 - #16169 - Add Field Service Date
+                //ADD
+                "Service date:"//43
+                //END
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -1125,6 +1135,12 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[j, 2].Value = headers[19]; //Số lô hàng
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].JobNo;
+                j = j + 1;
+
+                workSheet.Cells[j, 2].Value = headers[43]; //Ngày dịch vụ 
+                workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].ServiceDate;
+                workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
+                workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[20]; //Số tờ khai
@@ -3062,6 +3078,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số tiền trước thuế", // 46
                 "Tiền thuế", // 47
                 "Tổng tiền", // 48
+                "Ngày dịch vụ:" //49
             };
 
             List<string> engHeaders = new List<string>()
@@ -3115,6 +3132,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Amount befor Tax", // 46
                 "Tax", // 47
                 "Amount after Tax", // 48
+                "Service date:" //49
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -3356,6 +3374,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 #region --- Thông tin chung ---
                 workSheet.Cells[j, 2].Value = headers[16]; //Số lô hàng
                 workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].JobNo;
+                j = j + 1;
+
+                workSheet.Cells[j, 2].Value = headers[49]; //Ngày dịch vụ 
+                workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].ServiceDate;
+                workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
+                workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 j = j + 1;
 
                 workSheet.Cells[j, 2].Value = headers[17]; //Số tờ khai
