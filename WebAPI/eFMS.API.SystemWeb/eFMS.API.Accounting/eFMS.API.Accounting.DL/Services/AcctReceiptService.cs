@@ -1727,16 +1727,23 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (paidVnd > 0)
                 {
-                    if (invoice.PaidAmountVnd == 0)
+                    if (invoice.PaidAmountVnd == 0 )
                     {
-                        invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
+                        if(invoice.NetOffVnd != 0 && invoice.NetOffVnd != null)
+                        {
+                            paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
+                        }
+                        else
+                        {
+                            invoice.PaidAmountVnd = invoice.TotalPaidVnd = invoice.UnpaidAmountVnd;
+                        }
                     }
                     else if (paidVnd < invoice.PaidAmountVnd)
                     {
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                         paidVnd = 0;
                     }
-                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null ) 
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
@@ -1754,14 +1761,21 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     if (invoice.PaidAmountUsd == 0)
                     {
-                        invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
+                        if (invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
+                        {
+                            paidUsd = paidUsd - (invoice.TotalPaidUsd ?? 0);
+                        }
+                        else
+                        {
+                            invoice.PaidAmountUsd = invoice.TotalPaidUsd = invoice.UnpaidAmountUsd;
+                        }
                     }
                     else if (paidUsd < invoice.PaidAmountUsd)
                     {
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                         paidUsd = 0;
                     }
-                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null && invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                    else if ((invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);
