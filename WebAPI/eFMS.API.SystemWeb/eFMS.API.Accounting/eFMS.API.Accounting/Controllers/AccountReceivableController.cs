@@ -5,7 +5,10 @@ using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
 using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Infrastructure.Common;
+using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -80,8 +83,11 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
         {
-            var insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
-            return Ok(insertOrUpdateReceivable);
+            HandleState insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
+
+            var message = HandleError.GetMessage(insertOrUpdateReceivable, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = insertOrUpdateReceivable.Success, Message = stringLocalizer[message].Value };
+            return Ok(result);
         }
 
         /// <summary>
