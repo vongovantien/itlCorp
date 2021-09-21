@@ -1193,7 +1193,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         // Lấy currency của contract & user created of contract gán cho Receivable
                         receivable.ContractId = contractPartner.Id;
-                        receivable.ContractCurrency = contractPartner.CurrencyId;
+                        receivable.ContractCurrency = contractPartner.CreditCurrency;
                         receivable.SaleMan = contractPartner.SaleManId;
                         receivable.UserCreated = contractPartner.UserCreated;
                         receivable.UserModified = contractPartner.UserCreated;

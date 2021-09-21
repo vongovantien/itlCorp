@@ -154,13 +154,30 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd)) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd) && !x.netOff && x.type !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             this._toastService.warning("Paid amount is required");
             return;
         }
 
         const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
+        const OBH_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH);
         const CREDIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT);
+
+        const paymentDebitObh = [...DEBIT_LIST, ...OBH_LIST];
+        let sumTotalPaidUsd: number = 0;
+        let sumTotalPaidVnd: number = 0;
+
+        for (let index = 0; index < paymentDebitObh.length; index++) {
+            const element = paymentDebitObh[index];
+
+            sumTotalPaidUsd += element.totalPaidUsd;
+            sumTotalPaidVnd += element.totalPaidUsd;
+        }
+
+        if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
+            this._toastService.warning("Final paid amount < sum total paid amount");
+            return;
+        }
 
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
