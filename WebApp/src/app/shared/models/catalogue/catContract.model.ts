@@ -31,7 +31,6 @@ export class Contract {
     billingAmount: number = null;
     paidAmount: number = null;
     unpaidAmount: number = null;
-    customerAdvanceAmount: number = null;
     creditRate: number = null;
     userCreated: string = null;
     datetimeCreated: string = null;
@@ -51,6 +50,9 @@ export class Contract {
     viewDetail: boolean = false;
     creditUnlimited: boolean = false;
     creditCurrency: string = null;
+    customerAdvanceAmountVnd: number = null;
+    customerAdvanceAmountUsd: number = null;
+
     constructor(data?: any) {
         const self = this;
         for (const key in data) {

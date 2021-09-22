@@ -1051,6 +1051,8 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.Arconfirmed).HasColumnName("ARConfirmed");
 
+                entity.Property(e => e.AutoExtendDays).HasColumnType("decimal(18, 2)");
+
                 entity.Property(e => e.BaseOn)
                     .HasMaxLength(20)
                     .IsUnicode(false);
@@ -1081,7 +1083,9 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.CustomerAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CustomerAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")

@@ -34,7 +34,8 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? DebitAmount { get; set; }
         public decimal? ObhAmount { get; set; }       
         public decimal? DebitRate { get; set; }
-        public decimal? CusAdvance { get; set; }
+        public decimal? CusAdvanceVnd { get; set; }
+        public decimal? CusAdvanceUsd { get; set; }
         public decimal? BillingAmount { get; set; }
         public decimal? BillingUnpaid { get; set; }
         public decimal? PaidAmount { get; set; }
