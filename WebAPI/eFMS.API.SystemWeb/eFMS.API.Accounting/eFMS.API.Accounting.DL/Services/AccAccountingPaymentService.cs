@@ -2101,7 +2101,7 @@ namespace eFMS.API.Accounting.DL.Services
                     agent.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                 }
                 agent.details = new List<AccountingAgencyPaymentExportDetail>();
-                if (agent.CreditAmountUsd > agent.RemainCreditUsd)
+                if (agent.CreditAmountUsd > agent.RemainCreditUsd && criteria.DueDate == null)
                 {
                     var pay = DataContext.Get(x => x.BillingRefNo == agent.CreditNo).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
                     var dataPM = pay.Join(receiptData, pm => pm.ReceiptId, re => re.Id, (pm, rc) => new { rc.PaidAmountUsd,rc.PaidAmountVnd, rc.PaymentRefNo, rc.PaymentDate,rc.CreditAmountUsd,rc.CreditAmountVnd});
