@@ -16,7 +16,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? PaidAmountVnd { get; set; }
         public decimal? PaidAmountUsd { get; set; }
         public string Type { get; set; }
-        public decimal? CusAdvanceAmountVnd { get; set; }
         public decimal? FinalPaidAmount { get; set; }
         public decimal? FinalPaidAmountVnd { get; set; }
         public decimal? FinalPaidAmountUsd { get; set; }
@@ -44,7 +43,9 @@ namespace eFMS.API.ForPartner.Service.Models
         public string NotifyDepartment { get; set; }
         public decimal? CreditAmountVnd { get; set; }
         public decimal? CreditAmountUsd { get; set; }
+        public decimal? CusAdvanceAmountVnd { get; set; }
         public decimal? CusAdvanceAmountUsd { get; set; }
-        public string ReferenceNo { get; set; }
+        public decimal? AgreementAdvanceAmountVnd { get; set; }
+        public decimal? AgreementAdvanceAmountUsd { get; set; }
     }
 }

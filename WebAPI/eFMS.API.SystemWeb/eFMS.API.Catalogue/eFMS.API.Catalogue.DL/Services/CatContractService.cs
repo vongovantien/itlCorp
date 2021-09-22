@@ -1730,9 +1730,9 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractNo = x.contract.ContractNo,
                             ExpiredDate = x.contract.ExpiredDate,
                             ContractType = x.contract.ContractType,
-                            CusAdvanceAmount = x.contract.CustomerAdvanceAmount ?? 0,
+                            CustomerAdvanceAmountVnd = x.contract.CustomerAdvanceAmountVnd ?? 0,
                             CreditCurrency = x.contract.CreditCurrency,
-                            CustomerAdvanceAmount = x.contract.CustomerAdvanceAmount,
+                            CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }

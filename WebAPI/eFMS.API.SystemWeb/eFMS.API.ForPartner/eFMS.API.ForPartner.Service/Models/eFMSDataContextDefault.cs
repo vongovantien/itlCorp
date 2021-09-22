@@ -592,6 +592,10 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AgreementAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.AgreementAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.AgreementId).HasColumnName("AgreementID");
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
@@ -666,10 +670,6 @@ namespace eFMS.API.ForPartner.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ReferenceId).HasColumnName("ReferenceID");
-
-                entity.Property(e => e.ReferenceNo)
-                    .HasMaxLength(30)
-                    .IsUnicode(false);
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
@@ -949,7 +949,9 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.CustomerAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CustomerAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")

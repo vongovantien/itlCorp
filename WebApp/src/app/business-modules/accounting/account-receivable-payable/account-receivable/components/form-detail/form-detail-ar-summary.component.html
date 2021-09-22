@@ -427,11 +427,20 @@
                         <h6 class="font-weight-bold">Cus Advance:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div>{{ accReceivableDetail.cusAdvance | number: '.0-3'}}
-                            <span *ngIf="accReceivableDetail.cusAdvance">
-                                {{ accReceivableDetail.arCurrency }}
-                            </span>
-                        </div>
+                        <ng-container *ngIf="accReceivableDetail.arCurrency === 'VND'; else cusUsdTpl">
+                            <div>{{ accReceivableDetail.cusAdvanceVnd | number: '.0-3'}}
+                                <span *ngIf="accReceivableDetail.cusAdvanceVnd">
+                                    {{ accReceivableDetail.arCurrency }}
+                                </span>
+                            </div>
+                        </ng-container>
+                        <ng-template #cusUsdTpl>
+                            <div>{{ accReceivableDetail.cusAdvanceUsd | number: '.0-2'}}
+                                <span *ngIf="accReceivableDetail.cusAdvanceUsd">
+                                    {{ accReceivableDetail.arCurrency }}
+                                </span>
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
             </div>
