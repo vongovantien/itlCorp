@@ -186,8 +186,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            const isCreditHaveInvoice = DEBIT_LIST.some(x => !x.netOffVnd || !x.netOffUsd);
-            if (isCreditHaveInvoice) {
+            const isCreditHaveInvoice = DEBIT_LIST.some(x => !!x.netOffVnd || !!x.netOffUsd);
+            if (!isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
             }
