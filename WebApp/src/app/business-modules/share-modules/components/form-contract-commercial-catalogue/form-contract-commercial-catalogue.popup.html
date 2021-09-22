@@ -178,16 +178,16 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Invoice Currency</label>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
+                                <label required>Invoice Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="currencyId" placeholder="Select Currency">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Credit Currency</label>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
+                                <label required>Credit Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="creditCurrency"
                                     placeholder="Select Credit Currency">
