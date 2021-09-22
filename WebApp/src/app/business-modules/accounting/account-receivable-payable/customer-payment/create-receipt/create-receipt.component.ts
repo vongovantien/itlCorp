@@ -171,14 +171,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             const element = paymentDebitObh[index];
 
             sumTotalPaidUsd += element.totalPaidUsd;
-            sumTotalPaidVnd += element.totalPaidUsd;
+            sumTotalPaidVnd += element.totalPaidVnd;
         }
 
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
             this._toastService.warning("Final paid amount < sum total paid amount");
             return;
         }
-
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
