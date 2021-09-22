@@ -22,5 +22,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string IssueBy { get; set; }
         public string Bu { get; set; }
         public DateTime? ServiceDate { get; set; }
+        public DateTime? VoucherIddate { get; set; }
+        public DateTime? IssueDate { get; set; }
     }
 }

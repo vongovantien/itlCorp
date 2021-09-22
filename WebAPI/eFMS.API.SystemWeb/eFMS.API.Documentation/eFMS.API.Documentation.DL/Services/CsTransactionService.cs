@@ -902,8 +902,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
                 var transaction = houseDetail != null ?
                     transactionRepository
-                    .Get(x => x.TransactionType == shipmentType)
-                    .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight,y.ChargeWeight,y.PackageQty })
+                    .Get(x => x.TransactionType == shipmentType && x.CurrentStatus != TermData.Canceled)
+                    .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty })
                     : null;
 
                 if (transaction?.Count() == 1)
@@ -928,10 +928,10 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     else // không có hbl nào -> tìm theo mawb
                     {
-                        var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo).FirstOrDefault();
+                        var masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.Mawb == mblNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                         if (masDetail == null)
                         {
-                            masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo).FirstOrDefault();
+                            masDetail = transactionRepository.Get(x => x.TransactionType == shipmentType && x.BookingNo == mblNo && x.CurrentStatus != TermData.Canceled).FirstOrDefault();
                         }
                         jobNo = masDetail?.JobNo.ToString();
                         jobId = masDetail?.Id.ToString();
@@ -992,6 +992,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case "Sea FCL":
+                case "SeaFCL":
                     if (serviceMode == "Import")
                     {
                         type = TermData.SeaFCLImport;
@@ -1002,6 +1003,7 @@ namespace eFMS.API.Documentation.DL.Services
                     }
                     break;
                 case "Sea LCL":
+                case "SeaLCL":
                     if (serviceMode == "Import")
                     {
                         type = TermData.SeaLCLImport;

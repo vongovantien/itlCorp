@@ -24,7 +24,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string Payee { get; set; }
         public decimal? SettleAmount { get; set; }
         public List<BravoSettlementRequestModel> Details { get; set; }
-       
+
     }
 
     public class BravoSettlementRequestModel
@@ -68,5 +68,11 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string AdvanceNo { get; set; }
         public Guid HblId { get; set; }
         public string ClearanceNo { get; set; }
+
+        // Amount
+        public decimal? NetAmountVND { get; set; }
+        public decimal? NetAmountUSD { get; set; }
+        public decimal? VatAmountVND { get; set; }
+        public decimal? VatAmountUSD { get; set; }
     }
 }
