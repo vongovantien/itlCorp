@@ -2575,6 +2575,7 @@ namespace eFMS.API.Accounting.DL.Services
                     AmountVND = sur.AmountVnd,
                     AmountUSD = sur.AmountUsd,
                     SeriesNo = sur.SeriesNo,
+                    InvoiceDate = sur.InvoiceDate,
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? catPartnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty
                 };
                 result.Add(chg);
