@@ -494,6 +494,8 @@ namespace eFMS.API.Catalogue.Service.Models
 
                 entity.Property(e => e.Arconfirmed).HasColumnName("ARConfirmed");
 
+                entity.Property(e => e.AutoExtendDays).HasColumnType("decimal(18, 2)");
+
                 entity.Property(e => e.BaseOn)
                     .HasMaxLength(20)
                     .IsUnicode(false);

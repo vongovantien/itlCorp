@@ -159,5 +159,18 @@ namespace eFMS.API.Accounting.Controllers
             var data = accountReceivableService.GetDataDebitDetail(argeementId,option);
             return Ok(data);
         }
+
+        /// <summary>
+        /// Update due date invoice và công nợ quá hạn sau khi update HĐ
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <returns></returns>
+        [HttpPost("UpdateDueDateAndOverDaysAfterChangePaymentTerm")]
+        [Authorize]
+        public IActionResult UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
+        {
+            var result = accountReceivableService.UpdateDueDateAndOverDaysAfterChangePaymentTerm(contractModel);
+            return Ok(result);
+        }
     }
 }
