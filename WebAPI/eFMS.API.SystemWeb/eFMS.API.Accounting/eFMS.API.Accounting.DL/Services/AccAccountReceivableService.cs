@@ -2269,7 +2269,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                models.ForEach(fe => fe.Over1To15Day = 0);
+                models.ForEach(fe => fe.Over30Day = 0);
             }
             return models;
         }
