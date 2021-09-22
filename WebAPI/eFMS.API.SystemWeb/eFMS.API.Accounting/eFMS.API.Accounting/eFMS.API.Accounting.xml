@@ -352,6 +352,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AccountReceivableController.UpdateDueDateAndOverDaysAfterChangePaymentTerm(eFMS.API.Accounting.DL.Models.CatContractModel)">
+            <summary>
+            Update due date invoice và công nợ quá hạn sau khi update HĐ
+            </summary>
+            <param name="contractModel"></param>
+            <returns></returns>
+        </member>
         <member name="T:eFMS.API.Accounting.Controllers.AcctAdvancePaymentController">
             <summary>
             A base class for an MVC controller without view support.

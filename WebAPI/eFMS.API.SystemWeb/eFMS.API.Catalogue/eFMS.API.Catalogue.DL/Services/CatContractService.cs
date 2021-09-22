@@ -387,12 +387,13 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
-        public HandleState Update(CatContractModel model)
+        public HandleState Update(CatContractModel model, out bool isChangeAgrmentType)
         {
             var entity = mapper.Map<CatContract>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
