@@ -479,7 +479,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             return;
         }
         if (!!this.creditAmountVnd.value || !!this.creditAmountUsd.value) {
-            const isHavenetOff = body.list.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT).every(x => (!!x.netOffVnd || !!x.netOffUsd));
+            const isHavenetOff = body.list.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT).some(x => (!!x.netOffVnd || !!x.netOffUsd));
             if (!isHavenetOff) {
                 this._toastService.warning('Please you check Net Off Amount Detail on Debit List', 'Warning');
                 return;
