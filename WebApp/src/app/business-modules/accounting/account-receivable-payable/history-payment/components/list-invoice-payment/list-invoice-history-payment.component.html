@@ -75,9 +75,12 @@
                                             <td>{{ item.type }} </td>
                                             <td>{{ item.invoiceNoReal }} </td>
                                             <td>{{ item.partnerName }}</td>
-                                            <td class="text-right">{{ item.amount | number: '.0-3'}} {{item.currency}}</td>
-                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}} {{item.currency}}</td>
-                                            <td class="text-right">{{ item.unpaidAmount | number: '.0-3'}} {{item.currency}}</td>
+                                            <td class="text-right">{{ item.totalAmountVnd | number: '.0-3'}} VND</td>
+                                            <td class="text-right">{{ item.totalAmountUsd | number: '.0-3'}} USD</td>
+                                            <td class="text-right">{{ item.paidAmountVnd | number: '.0-3'}} VND</td>
+                                            <td class="text-right">{{ item.paidAmountUsd | number: '.0-3'}} VND</td>
+                                            <td class="text-right">{{ item.unpaidAmountVnd | number: '.0-3'}} VND</td>
+                                            <td class="text-right">{{ item.unpaidAmountUsd | number: '.0-3'}} VND</td>
                                             <td>
                                                 <ng-container [ngSwitch]="item.status">
                                                     <span class="text-danger" *ngSwitchCase="'Unpaid'">
@@ -98,6 +101,9 @@
                                             <td class="text-right">{{ item.extendDays}}</td>
                                             <td>{{ item.issuedDate | date: 'dd/MM/yyyy' }}</td>
                                             <td>{{ item.serie}}</td>
+                                            <td class="text-right">{{ item.amount | number: '.0-3'}} {{item.currency}}</td>
+                                            <td class="text-right">{{ item.paidAmount | number: '.0-3'}} {{item.currency}}</td>
+                                            <td class="text-right">{{ item.unpaidAmount | number: '.0-3'}} {{item.currency}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
                                             [id]="'id-00' + item.refNo + item.type" [parentId]="'#payment-table'">
