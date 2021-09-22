@@ -4252,16 +4252,28 @@ namespace eFMS.API.ReportData.FormatExcel
                     var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
                     var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
 
-                    listKeyData.Add("DebitAmount", item.UnpaidAmountInvUsd);
-                    listKeyData.Add("CreditAmount", item.UnpaidAmountOBHUsd);
+                    listKeyData.Add("DebitAmountUsd", item.DebitAmountUsd);
+                    listKeyData.Add("CreditAmountUsd", item.CreditAmountUsd);
 
-                    listKeyData.Add("PaidAmount", item.PaidAmountUsd);
-                    listKeyData.Add("PaidAmountOBH", item.PaidAmountOBHUsd);
+                    listKeyData.Add("Debit", item.DebitUsd);
+                    listKeyData.Add("Credit", item.CreditUsd);
 
-                    listKeyData.Add("RemainDbUsd", remainDbUsd);
-                    listKeyData.Add("RemainOBHUsd", item.RemainOBHUsd > 0 ? item.RemainOBHUsd: remainObhUsd);
-                    listKeyData.Add("RemainDb", remainDb);
-                    listKeyData.Add("RemainOBH", item.RemainOBH > 0?item.RemainOBH : remainObh);
+                    if (item.DebitAmountUsd > 0)
+                    {
+                        listKeyData.Add("RemainDebitUsd", item.DebitAmountUsd - item.DebitUsd);
+                        listKeyData.Add("RemainCreditUsd",0);
+
+                        listKeyData.Add("RemainDebitVnd", item.DebitAmountVnd - item.DebitVnd);
+                        listKeyData.Add("RemainCreditVnd", 0);
+                    }
+                    else if(item.CreditAmountUsd > 0)
+                    {
+                        listKeyData.Add("RemainDebitUsd", 0);
+                        listKeyData.Add("RemainCreditUsd", item.RemainCreditUsd);
+
+                        listKeyData.Add("RemainDebitVnd",0);
+                        listKeyData.Add("RemainCreditVnd", item.RemainCreditVnd);
+                    }
 
                     listKeyData.Add("ETD", item.EtdDate);
                     listKeyData.Add("ETA", item.EtaDate);
@@ -4291,8 +4303,16 @@ namespace eFMS.API.ReportData.FormatExcel
                             listKeyData.Add("PaidDate", detail.PaidDate);
                             listKeyData.Add("RefNo", detail.RefNo);
 
-                            listKeyData.Add("PaidAmountUsdDt", detail.PaidAmountUsd);
-                            listKeyData.Add("PaidAmountOBHUsdDt", detail.PaidAmountOBHUsd);
+                            if (item.DebitAmountUsd > 0)
+                            {
+                                listKeyData.Add("DebitDt", detail.DebitUsd);
+                                listKeyData.Add("CreditDt", 0);
+                            }
+                            else if (item.CreditAmountUsd > 0)
+                            {
+                                listKeyData.Add("DebitDt", 0 );
+                                listKeyData.Add("CreditDt", detail.CreditUsd);
+                            }
 
                             excel.SetData(listKeyData);
                             startRow++;
