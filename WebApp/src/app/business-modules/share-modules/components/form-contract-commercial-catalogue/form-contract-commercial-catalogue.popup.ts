@@ -217,8 +217,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             customerAmount: [],
             creditRate: [],
             description: [],
-            currencyId: [],
-            creditCurrency: [],
+            currencyId: [null, Validators.required],
+            creditCurrency: [null, Validators.required],
             creditUnlimited: [],
             autoExtendDays: []
         });
@@ -698,7 +698,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.creditUnlimited = this.formGroup.controls['creditUnlimited'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
-        this.selectedContract.creditCurrency = !!this.creditCurrency.value ? !!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value : null;
+        this.selectedContract.creditCurrency = !!this.creditCurrency.value ? (!!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value) : this.selectedContract.currencyId;
         this.selectedContract.autoExtendDays = this.autoExtendDays.value
     }
 
