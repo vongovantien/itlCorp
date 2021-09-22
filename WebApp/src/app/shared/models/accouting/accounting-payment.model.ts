@@ -7,11 +7,17 @@ export class AccountingPaymentModel {
     partnerId: string = null;
     partnerName: string = null;
     amount: number = 0;
+    totalAmountVnd: number = 0;
+    totalAmountUsd: number = 0;
     currency: string = null;
     issuedDate: Date = null;
     serie: string = null;
     unpaidAmount: number = null;
+    unpaidAmountVnd: number = 0;
+    unpaidAmountUsd: number = 0;
     paidAmount: number = null;
+    paidAmountVnd: number = 0;
+    paidAmountUsd: number = 0;
     dueDate: Date = null;
     overdueDays: number = 0;
     status: string = null;

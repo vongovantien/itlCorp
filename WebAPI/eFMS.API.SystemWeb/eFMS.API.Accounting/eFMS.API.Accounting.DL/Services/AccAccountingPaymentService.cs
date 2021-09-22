@@ -166,7 +166,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results != null ? results.Union(advData) : advData;
             }
-            return results?.OrderBy(x => x.PartnerName).ThenBy(x => x.RefNo);
+            return results?.OrderBy(x => x.PartnerName).ThenBy(x => x.RefNo).ThenBy(x=>x.Type);
         }
 
 
@@ -327,7 +327,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.Type,
                 x.ShortName,
                 x.InvoiceNo,
-            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.ReceiptId, f.PaymentRefNo, f.payment?.Type, f.payment?.PaymentAmount }) });
+            }).Select(s => new { invoice = s.Select(i => i.invoice), s.Key, payment = s.Select(f => new { f.payment?.ReceiptId, f.PaymentRefNo, f.payment?.Type, f.payment?.PaymentAmount, f.payment?.PaymentAmountVnd, f.payment?.PaymentAmountUsd }) });
             var results = new List<AccountingPaymentModel>();
             foreach (var item in resultGroups)
             {
@@ -339,6 +339,8 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.InvoiceNoReal = item.Key.InvoiceNo;
                 payment.PartnerName = item.Key.ShortName;
                 payment.Amount = item.Key.Type == "OBH" ? item.invoice.Sum(z => z.Amount) : item.invoice.FirstOrDefault().Amount;
+                payment.TotalAmountVnd = item.Key.Type == "OBH" ? item.invoice.Sum(z => z.TotalAmountVnd) : item.invoice.FirstOrDefault().TotalAmountVnd;
+                payment.TotalAmountUsd = item.Key.Type == "OBH" ? item.invoice.Sum(z => z.TotalAmountUsd) : item.invoice.FirstOrDefault().TotalAmountUsd;
                 payment.Currency = item.invoice.FirstOrDefault().Currency;
                 payment.IssuedDate = item.Key.BillingRefNoType == "DEBIT" && item.Key.Type == "OBH" ? null : item.invoice.FirstOrDefault().IssuedDate;
                 payment.Serie = item.invoice.FirstOrDefault().Serie;
@@ -364,14 +366,20 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 payment.Status = item.Key.Type != "OBH" ? item.invoice.FirstOrDefault()?.Status : statusOBH;
                 payment.ExtendDays = item.invoice.FirstOrDefault()?.ExtendDays;
-                payment.PaidAmount = 0;
-                var invoiceObh = item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.UnpaidAmount }) });
+                payment.PaidAmount = payment.PaidAmountVnd = payment.PaidAmountUsd = 0;
+                var invoiceObh = item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).GroupBy(x => x.RefId).Select(x => new { invc = x.Select(z => new { z.UnpaidAmount, z.UnpaidAmountVnd, z.UnpaidAmountUsd }) });
                 payment.UnpaidAmount = item.Key.Type == "OBH" ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.UnpaidAmount ?? 0) :
                         item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault()?.UnpaidAmount ?? 0;
+                payment.UnpaidAmountVnd = item.Key.Type == "OBH" ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.UnpaidAmountVnd ?? 0) :
+                        item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault()?.UnpaidAmountVnd ?? 0;
+                payment.UnpaidAmountUsd = item.Key.Type == "OBH" ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.UnpaidAmountUsd ?? 0) :
+                        item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault()?.UnpaidAmountUsd ?? 0;
                 if (item.payment.Any(x => !string.IsNullOrEmpty(x.PaymentRefNo)))
                 {
-                    var paymentUniq = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { key = x.Key, p = x.Select(z => new { z.PaymentAmount }) });
+                    var paymentUniq = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.PaymentRefNo }).Select(x => new { key = x.Key, p = x.Select(z => new { z.PaymentAmount, z.PaymentAmountVnd, z.PaymentAmountUsd }) });
                     payment.PaidAmount = item.Key.Type == "OBH" ? paymentUniq.Sum(x => x.p.Sum(z => z.PaymentAmount ?? 0)) : paymentUniq.Sum(x => x.p.FirstOrDefault()?.PaymentAmount ?? 0);
+                    payment.PaidAmountVnd = item.Key.Type == "OBH" ? paymentUniq.Sum(x => x.p.Sum(z => z.PaymentAmountVnd ?? 0)) : paymentUniq.Sum(x => x.p.FirstOrDefault()?.PaymentAmountVnd ?? 0);
+                    payment.PaidAmountUsd = item.Key.Type == "OBH" ? paymentUniq.Sum(x => x.p.Sum(z => z.PaymentAmountUsd ?? 0)) : paymentUniq.Sum(x => x.p.FirstOrDefault()?.PaymentAmountUsd ?? 0);
                 }
 
                 results.Add(payment);
@@ -490,7 +498,7 @@ namespace eFMS.API.Accounting.DL.Services
             var soaData = soaRepository.Get(querySoa).Select(x => new { x.Id, x.Soano, x.Customer, x.NetOff, x.Currency, x.CreditAmount });
             var queryCdNote = CreditNoteExpressionQuery(criteria);
             var cdNoteData = cdNoteRepository.Get(queryCdNote).Select(x => new { x.Id, x.Code, x.PartnerId, x.NetOff, x.Total, x.CurrencyId });
-            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)).Select(x => new { x.Type, x.CreditNo, x.PaySoano, x.InvoiceNo, x.VoucherId, x.VoucherIdre });
+            var surchargeData = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.VoucherIdre)).Select(x => new { x.Type, x.CreditNo, x.PaySoano, x.InvoiceNo, x.VoucherId, x.VoucherIdre, x.AmountVnd, x.VatAmountVnd, x.AmountUsd, x.VatAmountUsd });
 
             var creditSoaData = (from soa in soaData
                                  join surcharge in surchargeData on soa.Soano equals surcharge.PaySoano
@@ -508,9 +516,15 @@ namespace eFMS.API.Accounting.DL.Services
                                      soa.Currency,
                                      VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
                                      Amount = soa.CreditAmount,
+                                     TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
+                                     TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
                                      InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
                                      PaidAmount = payment == null ? 0 : payment.PaymentAmount,
-                                     UnpaidAmount = payment == null ? soa.CreditAmount : soa.Currency == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0),
+                                     PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
+                                     PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
+                                     UnpaidAmount = payment == null ? soa.CreditAmount : (soa.Currency == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0)),
+                                     UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
+                                     UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
                                      PaidDate = payment == null ? null : payment.PaidDate,
                                      ReceiptId = payment == null ? null : payment.ReceiptId
                                  });
@@ -532,20 +546,26 @@ namespace eFMS.API.Accounting.DL.Services
                                       Currency = cdNote.CurrencyId,
                                       VoucherId = surcharge.Type == "OBH" ? surcharge.VoucherIdre : surcharge.VoucherId,
                                       Amount = cdNote.Total,
+                                      TotalAmountVnd = (surcharge.AmountVnd ?? 0) + (surcharge.VatAmountVnd ?? 0),
+                                      TotalAmountUsd = (surcharge.AmountUsd ?? 0) + (surcharge.VatAmountUsd ?? 0),
                                       InvoiceNo = payment == null ? surcharge.InvoiceNo : payment.InvoiceNo,
                                       PaidAmount = payment == null ? 0 : payment.PaymentAmount,
+                                      PaidAmountVnd = payment == null ? 0 : payment.PaymentAmountVnd,
+                                      PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
                                       UnpaidAmount = payment == null ? cdNote.Total : cdNote.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.UnpaidPaymentAmountVnd ?? 0) : (payment.UnpaidPaymentAmountUsd ?? 0),
+                                      UnpaidAmountVnd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountVnd ?? 0),
+                                      UnpaidAmountUsd = payment == null ? (decimal?)null : (payment.UnpaidPaymentAmountUsd ?? 0),
                                       PaidDate = payment == null ? null : payment.PaidDate,
                                       ReceiptId = payment == null ? null : payment.ReceiptId
                                   });
-            var data = (creditSoaData.Union(creditNoteData)).ToList();
+            var data = (creditSoaData.Concat(creditNoteData)).ToList();
             var resultGroups = data.GroupBy(x => new
             {
                 x.BillingRefNo,
                 x.Type,
                 x.PartnerId,
                 x.ShortName,
-            }).Select(x => new { grp = x.Key, payment = x.Select(z => new { z.NetOff, z.VoucherId, z.PaidDate, z.InvoiceNo, z.ReceiptId, z.Amount, z.Currency, z.PaidAmount, z.UnpaidAmount }) });
+            }).Select(x => new { grp = x.Key, payment = x.Select(z => new { z.NetOff, z.VoucherId, z.PaidDate, z.InvoiceNo, z.ReceiptId, z.Amount, z.TotalAmountVnd, z.TotalAmountUsd, z.Currency, z.PaidAmount, z.PaidAmountVnd, z.PaidAmountUsd, z.UnpaidAmount, z.UnpaidAmountVnd, z.UnpaidAmountUsd }) });
             foreach (var item in resultGroups)
             {
                 var payment = new AccountingPaymentModel();
@@ -558,9 +578,15 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.InvoiceNoReal = acctPayment.InvoiceNo;
                 payment.PartnerName = item.grp.ShortName;
                 payment.Amount = acctPayment.Amount ?? 0;
+                payment.TotalAmountVnd = item.payment.Sum(x => x.TotalAmountVnd);
+                payment.TotalAmountUsd = item.payment.Sum(x => x.TotalAmountUsd);
                 payment.Currency = acctPayment.Currency;
                 payment.PaidAmount = acctPayment.PaidAmount ?? 0;
+                payment.PaidAmountVnd = acctPayment.PaidAmountVnd ?? 0;
+                payment.PaidAmountUsd = acctPayment.PaidAmountUsd ?? 0;
                 payment.UnpaidAmount = acctPayment.UnpaidAmount;
+                payment.UnpaidAmountVnd = acctPayment.UnpaidAmountVnd == null ? payment.TotalAmountVnd : acctPayment.UnpaidAmountVnd;
+                payment.UnpaidAmountUsd = acctPayment.UnpaidAmountUsd == null ? payment.TotalAmountUsd : acctPayment.UnpaidAmountUsd;
                 payment.Status = acctPayment.NetOff == true ? "Paid" : "Unpaid";
                 payment.PaidDate = acctPayment.PaidDate;
                 results.Add(payment);
@@ -745,9 +771,15 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.InvoiceNoReal = acctPayment.InvoiceNo;
                 payment.PartnerName = item.grp.ShortName;
                 payment.Amount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.PaymentAmountVnd ?? 0) : (acctPayment.PaymentAmountUsd ?? 0);
+                payment.TotalAmountVnd = (acctPayment.PaymentAmountVnd ?? 0);
+                payment.TotalAmountUsd = (acctPayment.PaymentAmountUsd ?? 0);
                 payment.Currency = acctPayment.CurrencyId;
                 payment.PaidAmount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.PaymentAmountVnd ?? 0) : (acctPayment.PaymentAmountUsd ?? 0);
+                payment.PaidAmountVnd = (acctPayment.PaymentAmountVnd ?? 0);
+                payment.PaidAmountUsd = (acctPayment.PaymentAmountUsd ?? 0);
                 payment.UnpaidAmount = acctPayment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (acctPayment.UnpaidPaymentAmountVnd ?? 0) : (acctPayment.UnpaidPaymentAmountUsd ?? 0);
+                payment.UnpaidAmountVnd = (acctPayment.UnpaidPaymentAmountVnd ?? 0);
+                payment.UnpaidAmountUsd = (acctPayment.UnpaidPaymentAmountUsd ?? 0);
                 payment.Status = "Paid";
                 results.Add(payment);
             }
@@ -986,6 +1018,7 @@ namespace eFMS.API.Accounting.DL.Services
                 PaidAmount = x.PaidAmount,
                 UnpaidAmount = x.UnpaidAmount,
                 UnpaidAmountVnd = x.UnpaidAmountVnd,
+                UnpaidAmountUsd = x.UnpaidAmountUsd,
                 TotalAmount = x.TotalAmount,
                 TotalAmountVnd = x.TotalAmountVnd,
                 TotalAmountUsd = x.TotalAmountUsd,
