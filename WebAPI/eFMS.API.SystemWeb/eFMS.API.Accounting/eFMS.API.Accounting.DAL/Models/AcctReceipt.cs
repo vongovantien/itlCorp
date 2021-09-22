@@ -47,5 +47,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? CusAdvanceAmountUsd { get; set; }
         public decimal? AgreementAdvanceAmountVnd { get; set; }
         public decimal? AgreementAdvanceAmountUsd { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

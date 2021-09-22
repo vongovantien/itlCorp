@@ -175,7 +175,7 @@ namespace eFMS.API.Accounting.Controllers
                 bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
                 if(isExisted == true)
                 {
-                    string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).PaymentRefNo;
+                    string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
                     string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
                     var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
                     return BadRequest(_result);
