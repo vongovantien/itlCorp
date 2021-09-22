@@ -2368,12 +2368,15 @@ namespace eFMS.API.Accounting.DL.Services
 
         private Expression<Func<AcctCreditManagementAr, bool>> CreditARExpressionQuery(CustomerDebitCreditCriteria criteria)
         {
-
             Expression<Func<AcctCreditManagementAr, bool>> expQueryCreditAR = q => q.NetOff == false;
 
             if (!string.IsNullOrEmpty(criteria.PartnerId))
             {
-                expQueryCreditAR = expQueryCreditAR.And(q => q.PartnerId == criteria.PartnerId);
+                List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+                        .Select(x => x.Id)
+                        .ToList();
+                expQueryCreditAR = expQueryCreditAR.And(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
+
             }
 
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
