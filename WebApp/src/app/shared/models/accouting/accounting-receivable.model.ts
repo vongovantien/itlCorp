@@ -30,7 +30,7 @@ export class TrialOfficialOtherModel {
     obhBillingAmount: number = 0;
     obhUnPaidAmount: number = 0;
     obhPaidAmount: number = 0;
-    agreementCurrency:string = null;
+    agreementCurrency: string = null;
 
     agreementSalesmanName: string = null;
 
@@ -87,7 +87,8 @@ export class AccReceivableDetailModel {
     creditLimited: number = 0;
     creditRateLimit: number = 0;
     creditTerm: number = 0;
-    cusAdvance: number = 0;
+    cusAdvanceVnd: number = 0;
+    cusAdvanceUsd: number = 0;
     debitAmount: number = 0;
     debitRate: number = 0;
     effectiveDate: Date = null;
@@ -171,18 +172,18 @@ export class AccReceivableServicesDetailModel {
 }
 
 export class AccReceivableDebitDetailModel {
-    billingNo :string = null
-    type :string = null
-    invoiceNo :string = null
-    totalAmountVND:number = 0;
-    totalAmountUSD:number = 0;
-    paidAmountVND:number = 0;
-    paidAmountUSD:number = 0;
-    unpaidAmountVND:number = 0;
-    unpaidAmountUSD:number = 0;
-    overdueDays :string = null;
-    code :string = null;
-    paymentStatus :string = null;
+    billingNo: string = null
+    type: string = null
+    invoiceNo: string = null
+    totalAmountVND: number = 0;
+    totalAmountUSD: number = 0;
+    paidAmountVND: number = 0;
+    paidAmountUSD: number = 0;
+    unpaidAmountVND: number = 0;
+    unpaidAmountUSD: number = 0;
+    overdueDays: string = null;
+    code: string = null;
+    paymentStatus: string = null;
     paymentDueDate: Date = null;
 
     constructor(data?: any) {

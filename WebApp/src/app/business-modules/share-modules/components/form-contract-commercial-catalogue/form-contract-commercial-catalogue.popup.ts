@@ -213,7 +213,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             billingAmount: [],
             paidAmount: [],
             unpaidAmount: [],
-            customerAmount: [],
+            customerAdvanceAmountVnd: [],
+            customerAdvanceAmountUsd: [],
             creditRate: [],
             description: [],
             currencyId: [],
@@ -601,7 +602,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             billingAmount: this.selectedContract.billingAmount,
             paidAmount: this.selectedContract.paidAmount,
             unpaidAmount: this.selectedContract.unpaidAmount,
-            customerAmount: this.selectedContract.customerAdvanceAmount,
+            customerAdvanceAmountVnd: this.selectedContract.customerAdvanceAmountVnd,
+            customerAdvanceAmountUsd: this.selectedContract.customerAdvanceAmountUsd,
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
             saleService: this.activeServices,
@@ -686,7 +688,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.billingAmount = this.formGroup.controls['billingAmount'].value;
         this.selectedContract.paidAmount = this.formGroup.controls['paidAmount'].value;
         this.selectedContract.unpaidAmount = this.formGroup.controls['unpaidAmount'].value;
-        this.selectedContract.customerAdvanceAmount = this.formGroup.controls['customerAmount'].value;
+        this.selectedContract.customerAdvanceAmountVnd = this.formGroup.controls['customerAdvanceAmountVnd'].value;
+        this.selectedContract.customerAdvanceAmountUsd = this.formGroup.controls['customerAdvanceAmountUsd'].value;
         this.selectedContract.creditRate = this.formGroup.controls['creditRate'].value;
         this.selectedContract.description = this.formGroup.controls['description'].value;
         this.selectedContract.creditUnlimited = this.formGroup.controls['creditUnlimited'].value;

@@ -812,7 +812,7 @@ namespace eFMS.API.Accounting.DL.Services
                             {
                                 // Phát sinh payment
                                 AccAccountingPayment _paymentOBH = GeneratePaymentOBH(paymentOBH, receipt, invTemp);
-                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidUsd =  invTemp.UnpaidAmountUsd;
+                                _paymentOBH.PaymentAmount = _paymentOBH.PaymentAmountUsd = _paymentOBH.TotalPaidUsd = invTemp.UnpaidAmountUsd;
                                 _paymentOBH.PaymentAmountVnd = _paymentOBH.TotalPaidVnd = invTemp.UnpaidAmountVnd;
 
                                 _paymentOBH.Balance = _paymentOBH.BalanceUsd = invTemp.UnpaidAmountUsd - _paymentOBH.PaymentAmountUsd;
@@ -1222,7 +1222,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.UnpaidAmountUsd = (item.UnpaidAmountUsd ?? 0) - _invoiceAmountUnpaidUsd;
                                     item.UnpaidAmountVnd = (item.UnpaidAmountVnd ?? 0) - _invoiceAmountUnpaidVnd;
                                 }
-                                else 
+                                else
                                 {
                                     // item.PaidAmount = (item.PaidAmount ?? 0) + remainAmount;
                                     item.PaidAmountVnd = (item.PaidAmountVnd ?? 0) + remainAmountVnd;
@@ -1236,11 +1236,11 @@ namespace eFMS.API.Accounting.DL.Services
                                     remainAmountVnd = 0;
                                     remainAmount = 0;
                                 }
-                             
+
                                 item.UserModified = currentUser.UserID;
                                 item.DatetimeModified = DateTime.Now;
 
-                                if(item.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                if (item.Currency == AccountingConstants.CURRENCY_LOCAL)
                                 {
                                     item.PaidAmount = item.PaidAmountVnd;
                                     item.UnpaidAmount = item.UnpaidAmountVnd;
@@ -1294,7 +1294,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     invoice.UserModified = currentUser.UserID;
                     invoice.DatetimeModified = DateTime.Now;
-                    if(invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                    if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
                     {
                         invoice.PaidAmount = invoice.PaidAmountVnd;
                         invoice.UnpaidAmount = invoice.UnpaidAmountVnd;
@@ -1312,48 +1312,48 @@ namespace eFMS.API.Accounting.DL.Services
 
             return hsInvoiceUpdate;
         }
-        private HandleState UpdateCusAdvanceOfAgreement(AcctReceipt receipt, SaveAction action)
+        private HandleState UpdateCusAdvanceOfAgreement(AcctReceipt receipt, SaveAction action, out decimal advUsd, out decimal advVnd)
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            decimal? totalAdvPayment = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV")
-              .Select(s => s.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.PaymentAmountVnd : s.PaymentAmountUsd)
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV");
+
+            decimal? totalAdvPaymentVnd = payments
+              .Select(s => s.PaymentAmountVnd)
               .Sum();
 
+            decimal? totalAdvPaymentUsd = payments
+              .Select(s => s.PaymentAmountUsd)
+              .Sum();
 
             if (action != SaveAction.SAVECANCEL)
             {
                 if (agreement != null)
                 {
-                    decimal _cusAdv = 0;
-                    if (agreement.CreditCurrency != AccountingConstants.CURRENCY_LOCAL)
-                    {
-                        _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
-                    }
-                    else
-                    {
-                        _cusAdv = (totalAdvPayment ?? 0) + (agreement.CustomerAdvanceAmount ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
-                    }
-                    agreement.CustomerAdvanceAmount = _cusAdv;
+                    decimal _cusAdvUsd = 0;
+                    decimal _cusAdvVnd = 0;
+
+                    _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
+                    _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+
+                    agreement.CustomerAdvanceAmountUsd = _cusAdvUsd;
+                    agreement.CustomerAdvanceAmountVnd = _cusAdvVnd;
                 }
             }
             else
             {
                 if (agreement != null)
                 {
-                    if (agreement.CreditCurrency != AccountingConstants.CURRENCY_LOCAL)
-                    {
-                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPayment ?? 0);
-                    }
-                    else
-                    {
-                        agreement.CustomerAdvanceAmount = (agreement.CustomerAdvanceAmount ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPayment ?? 0);
-                    }
+                    agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
+                    agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
                 }
             }
 
             agreement.UserModified = currentUser.UserID;
             agreement.DatetimeModified = DateTime.Now;
+
+            advUsd = agreement.CustomerAdvanceAmountUsd ?? 0;
+            advVnd = agreement.CustomerAdvanceAmountVnd ?? 0;
 
             hsAgreementUpdate = catContractRepository.Update(agreement, x => x.Id == agreement.Id);
             return hsAgreementUpdate;
@@ -1522,9 +1522,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
                                 // Cập nhật CusAdvance cho hợp đồng
-                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel, SaveAction.SAVEDONE);
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
 
-                                //TODO: Tính lại công nợ trên hợp đồng (Tính công nợ ở bên ngoài Controller)
+                                // cập nhật lại adv lũy tiến cho receipt
+                                receiptData.AgreementAdvanceAmountVnd = advVnd;
+                                receiptData.AgreementAdvanceAmountUsd = advUsd;
+                                hs = DataContext.Update(receiptData, x => x.Id == receiptData.Id);
+
                                 trans.Commit();
                             }
 
@@ -1559,8 +1563,13 @@ namespace eFMS.API.Accounting.DL.Services
                                 hs = UpdateInvoiceOfPayment(receiptModel.Id);
 
                                 // Cập nhật CusAdvance cho hợp đồng
-                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE);
-                                //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
+                                HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
+
+                                // cập nhật lại adv lũy tiến cho receipt
+                                receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
+                                receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
+                                hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
+
                                 trans.Commit();
                             }
 
@@ -1607,18 +1616,18 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id, false);
-                        if (hs.Success)
-                        {
-                            // cấn trừ cho hóa đơn
-                            hs = UpdateInvoiceOfPayment(receiptId);
-                            //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
-                            // Cập nhật Cus Advance của Agreement
-                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE);
+                        // cấn trừ cho hóa đơn
+                        hs = UpdateInvoiceOfPayment(receiptId);
+                        //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
+                        // Cập nhật Cus Advance của Agreement
+                        HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
 
-                            DataContext.SubmitChanges();
-                            trans.Commit();
-                        }
+                        receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
+                        receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
+
+                        hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
+
+                        trans.Commit();
                         return hs;
                     }
                     catch (Exception ex)
@@ -1665,38 +1674,39 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        HandleState hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id, false);
-                        if (hs.Success)
+                      
+                        // Lấy ra ds payment của Receipt
+                        List<AccAccountingPayment> paymentsReceipt = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).ToList();
+                        // Phát sinh những dòng payment âm cho DEBIT & OBH
+                        List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
+                        HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
+                        // Cập nhật invoice cho những payment DEBIT, OBH
+                        HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
+                        // Cập nhật Netoff cho CREDIT or SOA.
+                        List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
+                        if (paymentCredit.Count > 0)
                         {
-                            // Lấy ra ds payment của Receipt
-                            List<AccAccountingPayment> paymentsReceipt = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).ToList();
-                            // Phát sinh những dòng payment âm cho DEBIT & OBH
-                            List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
-                            HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
-                            // Cập nhật invoice cho những payment DEBIT, OBH
-                            HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
-                            // Cập nhật Netoff cho CREDIT or SOA.
-                            List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
-                            if (paymentCredit.Count > 0)
+                            foreach (var item in paymentCredit)
                             {
-                                foreach (var item in paymentCredit)
+                                if (item.Type == "CREDITNOTE")
                                 {
-                                    if (item.Type == "CREDITNOTE")
-                                    {
-                                        UpdateNetOffCredit(item, true);
-                                    }
-                                    if (item.Type == "CREDITSOA")
-                                    {
-                                        UpdateNetOffSoa(item, true);
-                                    }
+                                    UpdateNetOffCredit(item, true);
+                                }
+                                if (item.Type == "CREDITSOA")
+                                {
+                                    UpdateNetOffSoa(item, true);
                                 }
                             }
-                            // Cập nhật Cus Advance của Agreement
-                            HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVECANCEL);
-
-                            DataContext.SubmitChanges();
-                            trans.Commit();
                         }
+                        // Cập nhật Cus Advance của Agreement
+                        HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVECANCEL, out decimal advUsd, out decimal advVnd);
+                        receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
+                        receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
+
+                        HandleState hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
+
+                        trans.Commit();
+
                         return hs;
                     }
                     catch (Exception ex)
@@ -1727,9 +1737,9 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (paidVnd > 0)
                 {
-                    if (invoice.PaidAmountVnd == 0 )
+                    if (invoice.PaidAmountVnd == 0)
                     {
-                        if(invoice.NetOffVnd != 0 && invoice.NetOffVnd != null)
+                        if (invoice.NetOffVnd != 0 && invoice.NetOffVnd != null)
                         {
                             paidVnd = paidVnd - (invoice.TotalPaidVnd ?? 0);
                         }
@@ -1743,7 +1753,7 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.PaidAmountVnd = invoice.TotalPaidVnd = paidVnd;
                         paidVnd = 0;
                     }
-                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null ) 
+                    else if ((invoice.NetOffVnd != 0 && invoice.NetOffVnd != null)
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidVnd = paidVnd - (invoice.PaidAmountVnd ?? 0);
@@ -1775,7 +1785,7 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.PaidAmountUsd = invoice.TotalPaidUsd = paidUsd;
                         paidUsd = 0;
                     }
-                    else if ((invoice.NetOffUsd != 0 && invoice.NetOffUsd != null) 
+                    else if ((invoice.NetOffUsd != 0 && invoice.NetOffUsd != null)
                         || invoice.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
                     {
                         paidUsd = paidUsd - (invoice.PaidAmountUsd ?? 0);

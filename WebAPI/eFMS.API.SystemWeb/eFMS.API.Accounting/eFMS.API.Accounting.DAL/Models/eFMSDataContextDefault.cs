@@ -989,6 +989,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.AgreementAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.AgreementAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.AgreementId).HasColumnName("AgreementID");
 
                 entity.Property(e => e.Balance).HasColumnType("decimal(18, 4)");
@@ -1522,7 +1526,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Arconfirmed).HasColumnName("ARConfirmed");
 
-                entity.Property(e => e.AutoExtendDays).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.AutoExtendDays).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.BaseOn)
                     .HasMaxLength(20)
@@ -1554,7 +1558,9 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.CustomerAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CustomerAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")
