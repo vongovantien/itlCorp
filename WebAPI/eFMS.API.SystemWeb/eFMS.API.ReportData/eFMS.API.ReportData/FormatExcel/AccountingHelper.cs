@@ -912,7 +912,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //20/09/2021 - #16169 - Add Field Service Date
                 //ADD
-                "Ngày dịch vụ:"//43
+                "Ngày dịch vụ:",//43
+                "Hình thức thanh toán:",//44
+                "Đối tượng thanh toán:"//45
                 //END
             };
 
@@ -968,7 +970,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //20/09/2021 - #16169 - Add Field Service Date
                 //ADD
-                "Service date:"//43
+                "Service date:",//43
+                "Payment Method:",//44
+                "Supplier Name:"//45
                 //END
             };
 
@@ -1027,12 +1031,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A6"].Style.Font.Bold = true;
             workSheet.Cells["C6"].Value = advanceExport.InfoAdvance.Department;
 
-            workSheet.Cells["A9"].Value = headers[36];
-            workSheet.Cells["A9"].Style.Font.Bold = true;
-            workSheet.Cells["C9"].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
-
-            workSheet.Cells["J9"].Value = headers[41];
+            workSheet.Cells["J9"].Value = headers[36];
             workSheet.Cells["J9"].Style.Font.Bold = true;
+            workSheet.Cells["K9"].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
+
+            workSheet.Cells["B11"].Value = headers[41];
+            workSheet.Cells["B11"].Style.Font.Bold = true;
 
             //var check = workSheet.Drawings.AddCheckBoxControl("");
 
@@ -1047,32 +1051,42 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 // check.SetPosition(7, 15, 10, 0);
                 // check.Checked = eCheckState.Checked;
-                workSheet.Cells["C9"].Value = "X";
-                workSheet.Cells["C9"].Style.Font.Bold = true;
+                workSheet.Cells["K9"].Value = "X";
+                workSheet.Cells["K9"].Style.Font.Bold = true;
             }
 
-
-            workSheet.Cells["A10"].Value = headers[37];
-            workSheet.Cells["A10"].Style.Font.Bold = true;
-            workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
-
-            workSheet.Cells["J10"].Value = headers[42];
+            workSheet.Cells["J10"].Value = headers[37];
             workSheet.Cells["J10"].Style.Font.Bold = true;
-            workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.DeadlinePayment;
-            workSheet.Cells["K10"].Style.Numberformat.Format = "dd MMM, yyyy";
-            workSheet.Cells["K10"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            //workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
+            workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.BankAccountName;
 
-            workSheet.Cells["A11"].Value = headers[38];
-            workSheet.Cells["A11"].Style.Font.Bold = true;
-            workSheet.Cells["C11"].Value = advanceExport.InfoAdvance.BankAccountNo;
+            workSheet.Cells["A7:B7"].Merge = true;
+            workSheet.Cells["A7:B7"].Value = headers[45];
+            workSheet.Cells["A7:B7"].Style.Font.Bold = true;
 
-            workSheet.Cells["A12"].Value = headers[39];
-            workSheet.Cells["A12"].Style.Font.Bold = true;
-            workSheet.Cells["C12"].Value = advanceExport.InfoAdvance.BankName;
+            workSheet.Cells["A9:B9"].Merge = true;
+            workSheet.Cells["A9:B9"].Value = headers[42];
+            workSheet.Cells["A9:B9"].Style.Font.Bold = true;
 
-            workSheet.Cells["A13"].Value = headers[40];
-            workSheet.Cells["A13"].Style.Font.Bold = true;
-            workSheet.Cells["C13"].Value = advanceExport.InfoAdvance.BankCode;
+            workSheet.Cells["A10:B10"].Merge = true;
+            workSheet.Cells["A10:B10"].Value = headers[44];
+            workSheet.Cells["A10:B10"].Style.Font.Bold = true;
+
+            workSheet.Cells["C9"].Value = advanceExport.InfoAdvance.DeadlinePayment;
+            workSheet.Cells["C9"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["C9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+            workSheet.Cells["J11"].Value = headers[38];
+            workSheet.Cells["J11"].Style.Font.Bold = true;
+            workSheet.Cells["K11"].Value = advanceExport.InfoAdvance.BankAccountNo;
+
+            workSheet.Cells["J12"].Value = headers[39];
+            workSheet.Cells["J12"].Style.Font.Bold = true;
+            workSheet.Cells["K12"].Value = advanceExport.InfoAdvance.BankName;
+
+            workSheet.Cells["J13"].Value = headers[40];
+            workSheet.Cells["J13"].Style.Font.Bold = true;
+            workSheet.Cells["K13"].Value = advanceExport.InfoAdvance.BankCode;
 
 
             //Bôi đen header
@@ -3094,7 +3108,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Số tiền trước thuế", // 46
                 "Tiền thuế", // 47
                 "Tổng tiền", // 48
-                "Ngày dịch vụ:" //49
+                "Ngày dịch vụ:", //49
+                "Hình thức thanh toán:",//50
             };
 
             List<string> engHeaders = new List<string>()
@@ -3148,7 +3163,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Amount befor Tax", // 46
                 "Tax", // 47
                 "Amount after Tax", // 48
-                "Service date:" //49
+                "Service date:", //49
+                "Payment method:"//50
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -3215,50 +3231,51 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["L6:M6"].Merge = true;
             workSheet.Cells["L6"].Value = settlementExport.InfoSettlement.SettlementNo;
 
+            // Hình thức thanh toán
+            workSheet.Cells["A10:B10"].Merge = true;
+            workSheet.Cells["A10"].Value = headers[50];
+            workSheet.Cells["A10"].Style.Font.Bold = true;
+
             // Đối tượng thanh toán
             workSheet.Cells["A7:B7"].Merge = true;
             workSheet.Cells["A7"].Value = headers[38];
             workSheet.Cells["A7"].Style.Font.Bold = true;
 
             // By Bank transfer
-            workSheet.Cells["A9:B9"].Merge = true;
-            workSheet.Cells["A9"].Value = headers[39];
-            workSheet.Cells["A9"].Style.Font.Bold = true;
-            workSheet.Cells["C9"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("BANK") ? "X" : string.Empty;
+            workSheet.Cells["K10"].Value = headers[39];
+            workSheet.Cells["K10"].Style.Font.Bold = true;
+            workSheet.Cells["L10"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("BANK") ? "X" : string.Empty;
 
             // Beneficiary
-            workSheet.Cells["A10:B10"].Merge = true;
-            workSheet.Cells["A10"].Value = headers[40];
-            workSheet.Cells["A10"].Style.Font.Bold = true;
-            workSheet.Cells["C10"].Value = settlementExport.InfoSettlement.BankAccountName;
+            workSheet.Cells["K11"].Value = headers[40];
+            workSheet.Cells["K11"].Style.Font.Bold = true;
+            workSheet.Cells["L11"].Value = settlementExport.InfoSettlement.BankAccountName;
 
             // Acc No
-            workSheet.Cells["A11:B11"].Merge = true;
-            workSheet.Cells["A11"].Value = headers[41];
-            workSheet.Cells["A11"].Style.Font.Bold = true;
-            workSheet.Cells["C11"].Value = settlementExport.InfoSettlement.BankAccountNo;
+            workSheet.Cells["K12"].Value = headers[41];
+            workSheet.Cells["K12"].Style.Font.Bold = true;
+            workSheet.Cells["L12"].Value = settlementExport.InfoSettlement.BankAccountNo;
 
             // Bank
-            workSheet.Cells["A12:B12"].Merge = true;
-            workSheet.Cells["A12"].Value = headers[42];
-            workSheet.Cells["A12"].Style.Font.Bold = true;
-            workSheet.Cells["C12"].Value = settlementExport.InfoSettlement.BankName;
+            workSheet.Cells["K13"].Value = headers[42];
+            workSheet.Cells["K13"].Style.Font.Bold = true;
+            workSheet.Cells["L13"].Value = settlementExport.InfoSettlement.BankName;
 
             // Bank Code
-            workSheet.Cells["A13:B13"].Merge = true;
-            workSheet.Cells["A13"].Value = headers[43];
-            workSheet.Cells["A13"].Style.Font.Bold = true;
-            workSheet.Cells["C13"].Value = settlementExport.InfoSettlement.BankCode;
+            workSheet.Cells["K14"].Value = headers[43];
+            workSheet.Cells["K14"].Style.Font.Bold = true;
+            workSheet.Cells["L14"].Value = settlementExport.InfoSettlement.BankCode;
 
             // By Cash
-            workSheet.Cells["K9"].Value = headers[44];
-            workSheet.Cells["K9"].Style.Font.Bold = true;
-            workSheet.Cells["L9"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("CASH") ? "X" : string.Empty;
+            workSheet.Cells["B11"].Value = headers[44];
+            workSheet.Cells["B11"].Style.Font.Bold = true;
+            workSheet.Cells["C11"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("CASH") ? "X" : string.Empty;
 
             // Due Date
-            workSheet.Cells["K10"].Value = headers[45];
-            workSheet.Cells["K10"].Style.Font.Bold = true;
-            workSheet.Cells["L10"].Value = settlementExport.InfoSettlement.DueDate?.ToString("dd/MM/yyyy");
+            workSheet.Cells["A9:B9"].Merge = true;
+            workSheet.Cells["A9"].Value = headers[45];
+            workSheet.Cells["A9"].Style.Font.Bold = true;
+            workSheet.Cells["C9"].Value = settlementExport.InfoSettlement.DueDate?.ToString("dd/MM/yyyy");
             #endregion
             //Bôi đen header
             //workSheet.Cells["A15:K15"].Style.Font.Bold = true;
