@@ -79,6 +79,11 @@
                                 </td>
                                 <td>{{request.customNo}}</td>
                                 <td>{{request.jobId}}</td>
+                                <!-- <td *ngIf="request.statusPayment==='Settled'")>{{request.statusPayment}}</td> -->
+                                <td>{{request.hbl}}</td>
+                                <td>{{request.amount | number : '.0-3'}}</td>
+                                <td>{{request.requestCurrency}}</td>
+                                <td>{{request.advanceType | titlecase}}</td>
                                 <td [ngSwitch]="request.statusPayment">
                                     <ng-container *ngIf="this.statusApproval === '' else empty">
                                         <div class="text-success" *ngSwitchCase="'Settled'">
@@ -96,12 +101,6 @@
                                     </ng-container>
                                     <ng-template #empty>-</ng-template>
                                 </td>
-
-                                <!-- <td *ngIf="request.statusPayment==='Settled'")>{{request.statusPayment}}</td> -->
-                                <td>{{request.hbl}}</td>
-                                <td>{{request.amount | number : '.0-3'}}</td>
-                                <td>{{request.requestCurrency}}</td>
-                                <td>{{request.advanceType | titlecase}}</td>
                                 <td>{{request.requestNote}}</td>
                             </tr>
                         </ng-container>
