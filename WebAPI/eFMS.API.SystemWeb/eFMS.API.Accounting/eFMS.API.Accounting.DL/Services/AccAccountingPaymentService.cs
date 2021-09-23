@@ -585,8 +585,8 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.PaidAmountVnd = acctPayment.PaidAmountVnd ?? 0;
                 payment.PaidAmountUsd = acctPayment.PaidAmountUsd ?? 0;
                 payment.UnpaidAmount = acctPayment.UnpaidAmount;
-                payment.UnpaidAmountVnd = acctPayment.UnpaidAmountVnd == null ? payment.TotalAmountVnd : acctPayment.UnpaidAmountVnd;
-                payment.UnpaidAmountUsd = acctPayment.UnpaidAmountUsd == null ? payment.TotalAmountUsd : acctPayment.UnpaidAmountUsd;
+                payment.UnpaidAmountVnd = acctPayment.UnpaidAmountVnd == 0 ? payment.TotalAmountVnd : acctPayment.UnpaidAmountVnd;
+                payment.UnpaidAmountUsd = acctPayment.UnpaidAmountUsd == 0 ? payment.TotalAmountUsd : acctPayment.UnpaidAmountUsd;
                 payment.Status = acctPayment.NetOff == true ? "Paid" : "Unpaid";
                 payment.PaidDate = acctPayment.PaidDate;
                 results.Add(payment);
