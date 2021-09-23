@@ -152,7 +152,9 @@ export class CommercialAgentComponent extends AppList implements OnInit {
 
         this.formContractPopup.contractType.setValue('Trial');
         this.formContractPopup.currencyId.setValue('VND');
+        this.formContractPopup.creditCurrency.setValue('VND');
         this.formContractPopup.baseOn.setValue('Invoice Date');
+        this.formContractPopup.autoExtendDays.setValue(0);
 
         this.formContractPopup.trialEffectDate.setValue(null);
         this.formContractPopup.trialExpiredDate.setValue(null);
