@@ -1,3 +1,5 @@
+import { getCurrentUserState } from './../../../../store/reducers/index';
+import { takeUntil } from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -46,6 +48,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     reasonReject: string = '';
     messageValidate: string = '';
     attachFiles: SysImage[] = [];
+
+    userLogged: Partial<SystemInterface.IClaimUser>;
     
     constructor(
         private _activedRoute: ActivatedRoute,
@@ -91,6 +95,13 @@ export class StatementOfAccountDetailComponent extends AppList {
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
             }
         });
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((u) => {
+                if (!!u) {
+                    this.userLogged = u;
+                }
+            })
     }
 
     getDetailSOA(soaNO: string, currency: string) {
@@ -158,7 +169,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     exportSOAAFWithHBL() {
         this._progressRef.start();
-        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO)
+        this._exportRepo.exportSOAAirFreight(this.soaNO, this.userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
