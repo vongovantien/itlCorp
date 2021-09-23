@@ -117,7 +117,7 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
 
 
-
+        this.formContractPopup.autoExtendDays.setValue(0);
         this.formContractPopup.contractType.setValue('Trial');
         this.formContractPopup.baseOn.setValue('Invoice Date');
 

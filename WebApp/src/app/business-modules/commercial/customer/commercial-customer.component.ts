@@ -175,9 +175,11 @@ export class CommercialCustomerComponent extends AppList implements OnInit {
         this.formContractPopup.salesmanId.setValue(userLogged.id);
         this.formContractPopup.formGroup.controls['paymentTerm'].setValue(30);
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
+        this.formContractPopup.autoExtendDays.setValue(0);
 
         this.formContractPopup.contractType.setValue('Trial');
         this.formContractPopup.currencyId.setValue('VND');
+        this.formContractPopup.creditCurrency.setValue('VND');
         this.formContractPopup.baseOn.setValue('Invoice Date');
 
         this.formContractPopup.trialEffectDate.setValue(null);

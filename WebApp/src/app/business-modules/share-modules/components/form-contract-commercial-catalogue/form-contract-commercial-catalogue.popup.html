@@ -137,7 +137,6 @@
                                         <label>Auto Extend Days
                                         </label>
                                         <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
-                                            [attr.disabled]="(menuSpecialPermission | async | specialPermission: 'AccountReceivable') === true  ?  null : 'disabled'"
                                             class="form-control" formControlName="autoExtendDays">
                                     </div>
                                 </div>
