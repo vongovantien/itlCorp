@@ -54,7 +54,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
             IQueryable<AcctDebitManagementAr> debits = surchargeRepository.Get(x => x.Type == AccountingConstants.TYPE_CHARGE_SELL && x.AcctManagementId == Id)
-                .GroupBy(x => new { x.Hblid, surcharges = x })
+                .GroupBy(x => new { x.Hblid })
                 .Select(x => new AcctDebitManagementAr
                 {
                     Id = Guid.NewGuid(),

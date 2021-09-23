@@ -126,9 +126,9 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!isLoading && !trialOfficialList.length">
+                                <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
                                 </tr>
-                                <tr app-table-row-loading *ngIf="isLoading"></tr>
+                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                             </tbody>
                         </table>
                     </div>
