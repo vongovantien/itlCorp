@@ -72,7 +72,7 @@ export class ShareSystemAddEmailComponent extends PopupBase {
                 '',
                 Validators.compose([
                     Validators.required,
-                    Validators.maxLength(50),
+                    Validators.maxLength(500),
                 ]),
             ],
         });
@@ -118,6 +118,7 @@ export class ShareSystemAddEmailComponent extends PopupBase {
         this.isSubmited = false;
         this.emailSetting = new EmailSetting();
         this.formEmailSetting.reset();
+        this._progressRef.complete()
     }
     onCancelEmailSetting() {
         this.confirmCancelPopup.hide();
