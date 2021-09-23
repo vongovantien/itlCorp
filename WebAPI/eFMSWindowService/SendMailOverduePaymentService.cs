@@ -20,7 +20,7 @@ namespace eFMSWindowService
         public SendMailOverduePaymentService()
         {
             InitializeComponent();
-            _scheduleTime = DateTime.Today.AddDays(1).AddHours(9);
+            _scheduleTime = DateTime.Today.AddDays(1).AddHours(3);
         }
 
         public void Start()
