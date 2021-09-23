@@ -362,12 +362,38 @@ namespace eFMS.API.ReportData.Controllers
             {
                 return Ok();
             }
-            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result,null,null);
             if (stream == null)
             {
                 return null;
             }
             string fileName = "Export SOA Air Freight " + soaNo + ".xlsx";
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+            return fileContent;
+        }
+
+        /// Export detail SOA
+        /// </summary>
+        /// <param name="soaNo">soaNo of SOA</param>
+        /// <param name="officeId">officeId of user</param>
+        /// <returns></returns>
+        [Route("ExportSOAAirfreightWithHBL")]
+        [HttpGet]
+        public async Task<IActionResult> ExportSOAAirfreightWithHBL(string soaNo)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAAirfreightWithHBLExportUrl + soaNo);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
+            if (dataObjects.Result.HawbAirFrieghts == null)
+            {
+                return Ok();
+            }
+            var stream = new AccountingHelper().GenerateSOAAirfreightExcel(dataObjects.Result, "WithHBL", null);
+            if (stream == null)
+            {
+                return null;
+            }
+            string fileName = "Customer SOA AirFreight  With HBL " + soaNo + ".xlsx";
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
             return fileContent;
         }
