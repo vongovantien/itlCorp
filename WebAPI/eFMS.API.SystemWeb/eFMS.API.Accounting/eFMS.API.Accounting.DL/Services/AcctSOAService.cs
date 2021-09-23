@@ -2245,6 +2245,7 @@ namespace eFMS.API.Accounting.DL.Services
                     air.Pcs = chargeData.PackageQty;
                     air.CW = chargeData.ChargeWeight;
                     air.GW = chargeData.GrossWeight;
+                    air.HBLNo = chargeData.HBL;
 
                     air.TotalAmount = 0;
                     // Airfrieght
