@@ -16,7 +16,7 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
-import { getDataSearchHistoryPaymentState, getHistoryPaymentPagingState } from '../../store/reducers';
+import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
 
 
@@ -86,26 +86,40 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getDataSearchHistoryPaymentState)
+        .pipe(
+            withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
+            takeUntil(this.ngUnsubscribe),
+            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+        )
+        .subscribe(
+            (data) => {
+                this.dataSearch = data.dataSearch;
+                this.page = data.page;
+                this.pageSize = data.pageSize;
+            }
+        );
     }
 
     ngAfterViewInit() {
     }
 
     getPagingData() {
-        this._store.select(getDataSearchHistoryPaymentState)
+        this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+            this._store.select(getHistoryPaymentListState)
             .pipe(
-                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
-                takeUntil(this.ngUnsubscribe),
-                map(([dataSearch]) => ({  dataSearch: dataSearch }))
-            )
-            .subscribe(
-                (data) => {
-                    if (!!data.dataSearch) {
-                        this.dataSearch = data.dataSearch;
-                    }
-
-                    this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-                }
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new AccountingPaymentModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                        this.refPayments = res.data || [];
+                        this.totalItems = res.totalItems;
+                },
             );
     }
 

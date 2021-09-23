@@ -23,11 +23,15 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string ExtendNote { get; set; }
         public string Type { get; set; }
         public string VoucherId { get; set; }
+        public decimal? PaymentTerm { get; set; }
         public Guid? ReceiptId { get; set; }
         public DateTime? ConfirmBillingDate { get; set; }
         public Guid? OfficeId { get; set; }
         public string ServiceType { get; set; }
         public DateTime? PaidDate { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
+        public decimal? TotalAmount { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
     }
 }

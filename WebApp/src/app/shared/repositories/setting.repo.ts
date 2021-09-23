@@ -140,6 +140,13 @@ export class SettingRepo {
                 map((data: any) => data)
             );
     }
+
+    generatePaymentId(paymentNo: string, type: number){
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/UnlockRequest/GeneratePaymentId/`,{paymentNo:paymentNo,type:type})
+        .pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

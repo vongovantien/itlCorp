@@ -61,6 +61,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     charges: Surcharge[] = [];
 
     isUpdate: boolean = false;
+    isSelected: boolean = true;
 
     initShipments: OperationInteface.IShipment[];
     initCDs: CustomDeclaration[] = [];
@@ -94,6 +95,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             { title: 'VAT Partner', field: 'vatPartnerId', sortable: true, width: 250 },
             { title: 'Note', field: 'notes', sortable: true },
             { title: 'Cont No', field: 'contNo', sortable: true },
+            { title: 'AdvanceNo', field: 'advanceno', sortable: true },
             { title: 'Synced From', field: 'syncedFrom', sortable: true },
         ];
 
@@ -334,13 +336,16 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
                 break;
             case 'advanceNo':
+                if (!!this.charges.length) {
+
+                    this.charges.forEach(element => {
+                        if (element.advanceNo == this.advanceNo.value && element.isSelected) {
+                            element.advanceNo = element.originAdvanceNo = data.advanceNo;
+                        }
+                    });
+                }
                 this.selectedAdvance = data;
                 this.advanceNo.setValue(data.advanceNo);
-
-                if (!!this.charges.length) {
-                    this.charges.forEach(c => c.advanceNo = this.selectedAdvance.advanceNo);
-                }
-
                 break;
             case 'vat-partner':
 
@@ -488,6 +493,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
     addCharge() {
         this.isSubmitted = false;
         this.charges.push(new Surcharge({
+            isSelected: true,
             currencyId: this.currencyId,
             id: SystemConstants.EMPTY_GUID,
             hblid: this.selectedShipment.hblid,
@@ -501,6 +507,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             chargeId: null,
             unitId: null,
             advanceNo: !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null,
+            originAdvanceNo: !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null,
             jobNo: this.selectedShipment.jobId,
             mblno: this.selectedShipment.mbl,
             hblno: this.selectedShipment.hbl,
@@ -520,7 +527,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.jobId = this.selectedShipment.jobId;
         newCharge.mbl = this.selectedShipment.mbl;
         newCharge.hbl = this.selectedShipment.hbl;
-        newCharge.advanceNo = !!this.selectedAdvance ? this.selectedAdvance.advanceNo : null;
+        newCharge.advanceNo = newCharge.originAdvanceNo =!!this.advanceNo ? this.advanceNo.value : null;
         newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
         newCharge.debitNo = null;
@@ -573,7 +580,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         for (const charge of listChargesToSave) {
             // *start: cập nhật shipment charges
             charge.clearanceNo = formData.customNo;
-            charge.advanceNo = formData.advanceNo;
+            // charge.advanceNo = formData.advanceNo;
             charge.jobId = this.selectedShipment.jobId;
             charge.jobNo = this.selectedShipment.jobId;
             charge.mblno = this.selectedShipment.mbl;
@@ -582,6 +589,9 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             charge.hbl = this.selectedShipment.hbl;
             charge.hblid = this.selectedShipment.hblid;
             // *end: cập nhật shipment charges
+            if(charge.finalExchangeRate <= 0){
+                charge.finalExchangeRate = null;
+            }
 
             if (charge.type === CommonEnum.CHARGE_TYPE.OBH) {
                 // swap để map field cho chage obh
@@ -600,7 +610,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 }
             }
         }
-        console.log(listChargesToSave);
+        console.log('listChargesToSave', listChargesToSave);
         if (this.isUpdate) {
             this.onUpdate.emit(listChargesToSave);
         } else {
@@ -611,7 +621,11 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     calculateTotal(vat: number, quantity: number, unitPrice: number, chargeItem: Surcharge) {
         this.isSubmitted = false;
-        chargeItem.total = Math.round(this.utility.calculateTotalAmountWithVat(vat, quantity, unitPrice));
+        if (chargeItem.currencyId === 'VND') {
+            chargeItem.total = Math.round(this.utility.calculateTotalAmountWithVat(vat || 0, quantity, unitPrice));
+        } else {
+            chargeItem.total = (Math.round(this.utility.calculateTotalAmountWithVat(vat || 0, quantity, unitPrice) * 1000)) / 1000;
+        }
     }
 
     getPartnerById(id: string) {
@@ -703,7 +717,12 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
-    removeAdvanceNo(advNo: string) {
+    removeAdvanceNo() {
+        this.charges.forEach(element => {
+            if(element.advanceNo == this.advanceNo.value && element.isSelected){
+                element.advanceNo = element.originAdvanceNo = null;
+            }
+        });
         this.resetFormControl(this.advanceNo);
         this.selectedAdvance = null;
     }
@@ -732,6 +751,13 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         }
     }
 
+    checkUncheckAllCharge() {
+        this.charges.forEach(c => c.isSelected = this.isSelected);
+    }
+
+    onChangeCheckBoxCharge() {
+        this.isSelected = this.charges.every(c => c.isSelected);
+    }
 }
 
 interface IAdvanceShipment {

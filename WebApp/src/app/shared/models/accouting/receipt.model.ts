@@ -40,6 +40,8 @@ export class ReceiptCreditDebitModel {
     voucherIdre: string = null;
     paymentType: string = null;
     netOff: boolean = null;
+    netOffVnd: number;
+    netOffUsd: number;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -114,6 +116,8 @@ export class Receipt {
     cusAdvanceAmount: number = 0;
     paidAmountUsd: number = 0;
     paidAmountVnd: number = 0;
+    referenceNo: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -131,7 +135,6 @@ export class ReceiptModel extends Receipt {
     userNameModified: string = null;
     subRejectReceipt: string = null;
     isReceiptBankFee: boolean = false;
-    referenceNo: string = null;
 
     constructor(object?: any) {
         super();

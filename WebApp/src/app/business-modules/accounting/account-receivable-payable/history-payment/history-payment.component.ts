@@ -40,7 +40,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
         private _store: Store<IHistoryPaymentState>) {
         super();
         this._progressRef = this._ngProgessSerice.ref();
-        this.requestList = this.requestLoadListHistoryPayment;
+        // this.requestList = this.requestLoadListHistoryPayment;
     }
 
     ngOnInit() {
@@ -51,13 +51,6 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
     }
 
     ngAfterViewInit() {
-        this.dataSearch.paymentStatus = ["Unpaid", "Paid A Part"];
-        this.invoiceListComponent.dataSearch = this.dataSearch;
-
-        this.invoiceListComponent.getPagingData();
-
-        this.requestSearchShipment();
-
         this._store.select(getDataSearchHistoryPaymentState)
             .pipe(
                 withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
@@ -68,14 +61,20 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
                 (data) => {
                     if (!!data.dataSearch) {
                         this.dataSearch = data.dataSearch;
+                    }else{
+                        this.dataSearch.searchType = 'VatInvoice';
+                        this.dataSearch.paymentStatus = ["Unpaid", "Paid A Part"];
                     }
 
                     this.page = data.page;
                     this.pageSize = data.pageSize;
 
-                    this.requestLoadListHistoryPayment();
+                    // this.requestLoadListHistoryPayment();
                 }
             );
+        this.invoiceListComponent.dataSearch = this.dataSearch;
+        this.invoiceListComponent.getPagingData();
+
         this._cd.detectChanges();
 
     }
@@ -94,8 +93,7 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
         this.dataSearch.paymentType = this.getPaymentType();
         if (this.dataSearch.paymentType === 0) {
             this.invoiceListComponent.dataSearch = this.dataSearch;
-            this.requestLoadListHistoryPayment();
-            // this.requestSearchShipment();
+            this.invoiceListComponent.getPagingData();
         }
     }
 

@@ -22,6 +22,7 @@ using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -244,7 +245,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IQueryable<AccAccountingManagement> invGrps = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service)
                         .Select(se => se.Invoices.AsQueryable())
                         .FirstOrDefault();
-                if(invGrps == null)
+                if (invGrps == null)
                 {
                     return;
                 }
@@ -292,7 +293,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Get VAT Invoice have type Invoice & payment status # Paid
             var acctMngts = accAccountings.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE
                                                    && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-            
+
             var invoices = from acctMngt in acctMngts
                            join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
                            select new ReceivableInvoice
@@ -351,7 +352,7 @@ namespace eFMS.API.Accounting.DL.Services
                                Service = surcharge.TransactionType,
                                Invoice = acctMngt
                            };
-            if(invoices.Count() == 0)
+            if (invoices.Count() == 0)
             {
                 return models;
             }
@@ -504,8 +505,8 @@ namespace eFMS.API.Accounting.DL.Services
             //Lấy ra các phí thu (OBH - OBH Partner) đã issue VAT Invoice
             var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH
                                              && x.AcctManagementId != null);
-            
-            if(surcharges.Count() == 0)
+
+            if (surcharges.Count() == 0)
             {
                 return models;
             }
@@ -585,7 +586,7 @@ namespace eFMS.API.Accounting.DL.Services
             //Get VAT Invoice have type Invoice Temp & payment status # Paid
             var acctMngts = accAccountings.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE
                                                    && x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-          
+
             var invoices = from surcharge in surcharges
                            join acctMngt in acctMngts on surcharge.AcctManagementId equals acctMngt.Id
                            select new ReceivableInvoice
@@ -807,7 +808,7 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                if(invs != null)
+                if (invs != null)
                 {
                     // Group By InvoiceID
                     IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
@@ -830,7 +831,7 @@ namespace eFMS.API.Accounting.DL.Services
                     });
                     fe.Over1To15Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
                 }
-               
+
             });
 
             return models;
@@ -881,7 +882,8 @@ namespace eFMS.API.Accounting.DL.Services
             models.ForEach(fe =>
             {
                 var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
-                if (invs != null) {
+                if (invs != null)
+                {
                     // Group By InvoiceID
                     IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
                     {
@@ -903,7 +905,7 @@ namespace eFMS.API.Accounting.DL.Services
                     });
                     fe.Over16To30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
                 }
-                
+
             });
 
             return models;
@@ -975,7 +977,7 @@ namespace eFMS.API.Accounting.DL.Services
                     });
                     fe.Over30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
                 }
-                    
+
             });
 
             return models;
@@ -997,7 +999,7 @@ namespace eFMS.API.Accounting.DL.Services
                 List<CatContract> contractChildOfPartner = new List<CatContract>();
                 if (partnerChildIds != null)
                 {
-                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.Id.ToString()) && x.ContractType == "Parent Contract").ToList();
+                    contractChildOfPartner = contractPartnerRepo.Get(x => partnerChildIds.Any(a => a == x.PartnerId.ToString()) && x.ContractType == "Parent Contract").ToList();
                 }
 
                 agreement.BillingAmount = receivables.Sum(su => (su.BillingAmount ?? 0) + (su.ObhBilling ?? 0)); //Sum BillingAmount + BillingOBH
@@ -1013,7 +1015,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = agreement.CreditLimit == null? 0:(((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
@@ -1021,7 +1023,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (parentId != null)
                     {
                         //Lấy Credit Rate của đối tượng cha (Partner)
-                        var creditRateContractParent = contractPartnerRepo.Get(x => x.Id.ToString() == parentId && x.Active == true).FirstOrDefault()?.CreditRate;
+                        var creditRateContractParent = contractPartnerRepo.Get(x => x.PartnerId.ToString() == parentId && x.Active == true).FirstOrDefault()?.CreditRate;
                         _creditRate = (creditRateContractParent != null) ? creditRateContractParent : agreement.CreditRate;
                     }
                 }
@@ -1064,96 +1066,188 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds)
+        {
+            var hs = new HandleState();
+            foreach (var partnerId in partnerIds)
+            {
+                var partner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault();
+                if (partner != null)
+                {
+                    //Agreement của partner
+                    var contractPartner = contractPartnerRepo.Get(x => x.Active == true
+                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                    if (contractPartner != null)
+                    {
+                        var agreementPartner = CalculatorAgreement(contractPartner);
+                        hs = await contractPartnerRepo.UpdateAsync(agreementPartner, x => x.Id == agreementPartner.Id);
+                    }
+                    else
+                    {
+                        //Agreement của AcRef của partner
+                        var contractParent = contractPartnerRepo.Get(x => x.Active == true
+                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                        if (contractParent != null)
+                        {
+                            var agreementParent = CalculatorAgreement(contractParent);
+                            hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
+                        }
+                    }
+                }
+            }
+            return hs;
+        }
+
+        public async Task<HandleState> CalculatorReceivableAsync(List<ObjectReceivableModel> model)
+        {
+            var receivables = new List<AccAccountReceivableModel>();
+            HandleState hs = new HandleState();
+
+            receivables = CalculatorReceivableData(model);
+            var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
+
+            var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
+            if (!hsInsertOrUpdate.Status)
+            {
+                hs = new HandleState((object)hsInsertOrUpdate.Message);
+            }
+            WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+
+            //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
+            var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+            UpdateAgreementPartners(partnerIds);
+
+            return hs;
+        }
+
+        public async Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models)
+        {
+            //Insert Or Update Receivable Multiple
+            var receivables = new List<AccAccountReceivableModel>();
+            HandleState hs = new HandleState();
+
+            try
+            {
+                receivables = CalculatorReceivableData(models);
+                var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
+
+                var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
+                if (!hsInsertOrUpdate.Status)
+                {
+                    hs = new HandleState((object)hsInsertOrUpdate.Message);
+                }
+                WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, receivables);
+
+                //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
+                var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+                await UpdateAgreementPartnersAsync(partnerIds);
+
+                return hs;
+            }
+            catch (Exception ex)
+            {
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, receivables);
+                return new HandleState((object)ex.Message);
+            }
+        }
+
+        private List<AccAccountReceivableModel> CalculatorReceivableData(List<ObjectReceivableModel> models)
+        {
+            var receivables = new List<AccAccountReceivableModel>();
+            foreach (var model in models)
+            {
+                var receivable = new AccAccountReceivableModel();
+                receivable.Over30Day = 0;
+                receivable.Over1To15Day = 0;
+                receivable.Over16To30Day = 0;
+                receivable.ObhAmount = 0;
+                receivable.ObhBilling = 0;
+                receivable.ObhPaid = 0;
+                receivable.ObhUnpaid = 0;
+                receivable.DebitAmount = 0;
+                var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
+                //Không tính công nợ cho đối tượng Internal
+                if (partner != null && partner.PartnerMode != "Internal")
+                {
+                    receivable.PartnerId = model.PartnerId;
+                    receivable.Office = model.Office;
+                    receivable.Service = model.Service;
+                    receivable.AcRef = partner.ParentId ?? partner.Id;
+                    var contractPartner = contractPartnerRepo.Get(x => x.Active == true
+                                                                    && x.PartnerId == model.PartnerId
+                                                                    && x.OfficeId.Contains(model.Office.ToString())
+                                                                    && x.SaleService.Contains(model.Service)).FirstOrDefault();
+                    if (contractPartner == null)
+                    {
+                        // Lấy currency local và use created of partner gán cho Receivable
+                        receivable.ContractId = null;
+                        receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
+                        receivable.SaleMan = null;
+                        receivable.UserCreated = partner.UserCreated;
+                        receivable.UserModified = partner.UserCreated;
+                        receivable.GroupId = partner.GroupId;
+                        receivable.DepartmentId = partner.DepartmentId;
+                        receivable.OfficeId = partner.OfficeId;
+                        receivable.CompanyId = partner.CompanyId;
+                    }
+                    else
+                    {
+                        // Lấy currency của contract & user created of contract gán cho Receivable
+                        receivable.ContractId = contractPartner.Id;
+                        receivable.ContractCurrency = contractPartner.CurrencyId;
+                        receivable.SaleMan = contractPartner.SaleManId;
+                        receivable.UserCreated = contractPartner.UserCreated;
+                        receivable.UserModified = contractPartner.UserCreated;
+                        receivable.GroupId = null;
+                        receivable.DepartmentId = null;
+                        receivable.OfficeId = model.Office;
+                        receivable.CompanyId = contractPartner.CompanyId;
+                    }
+                }
+                receivables.Add(receivable);
+            }
+
+            if (receivables.Count > 0)
+            {
+                //Surcharge thuộc Office, Service, PartnerId của Receivable
+                var surcharges = surchargeRepo.Get(x => models.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
+                //List Invoice (Type = Invoice or InvoiceTemp)
+                var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
+
+                receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmo
+                                                                                          //receivables = CalculatorBillingUnpaid(receivables, surcharges, invoices); //Billing Unpaid
+                receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
+                receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
+                receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
+                receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)               
+                receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
+                receivables = CalculatorAdvanceAmount(receivables); //Advance Amount
+                receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
+                receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
+                receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
+                receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
+                receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
+            }
+            receivables.ForEach(fe => {
+                //Calculator Debit Amount
+                fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0); // Công nợ chưa billing
+                fe.DatetimeCreated = DateTime.Now;
+                fe.DatetimeModified = DateTime.Now;
+            });
+            return receivables;
+        }
+
         public HandleState InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
         {
             //Insert Or Update Receivable Multiple
             var receivables = new List<AccAccountReceivableModel>();
+            HandleState hs = new HandleState();
+
             try
             {
-                foreach (var model in models)
-                {
-                    var receivable = new AccAccountReceivableModel();
-                    receivable.Over30Day = 0;
-                    receivable.Over1To15Day = 0;
-                    receivable.Over16To30Day = 0;
-                    receivable.ObhAmount = 0;
-                    receivable.ObhBilling = 0;
-                    receivable.ObhPaid = 0;
-                    receivable.ObhUnpaid = 0;
-                    receivable.DebitAmount = 0;
-                    var partner = partnerRepo.Get(x => x.Id == model.PartnerId).FirstOrDefault();
-                    //Không tính công nợ cho đối tượng Internal
-                    if (partner != null && partner.PartnerMode != "Internal")
-                    {
-                        receivable.PartnerId = model.PartnerId;
-                        receivable.Office = model.Office;
-                        receivable.Service = model.Service;
-                        receivable.AcRef = partner.ParentId ?? partner.Id;
-                        var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                        && x.PartnerId == model.PartnerId
-                                                                        && x.OfficeId.Contains(model.Office.ToString())
-                                                                        && x.SaleService.Contains(model.Service)).FirstOrDefault();
-                        if (contractPartner == null)
-                        {
-                            // Lấy currency local và use created of partner gán cho Receivable
-                            receivable.ContractId = null;
-                            receivable.ContractCurrency = AccountingConstants.CURRENCY_LOCAL;
-                            receivable.SaleMan = null;
-                            receivable.UserCreated = partner.UserCreated;
-                            receivable.UserModified = partner.UserCreated;
-                            receivable.GroupId = partner.GroupId;
-                            receivable.DepartmentId = partner.DepartmentId;
-                            receivable.OfficeId = partner.OfficeId;
-                            receivable.CompanyId = partner.CompanyId;
-                        }
-                        else
-                        {
-                            // Lấy currency của contract & user created of contract gán cho Receivable
-                            receivable.ContractId = contractPartner.Id;
-                            receivable.ContractCurrency = contractPartner.CurrencyId;
-                            receivable.SaleMan = contractPartner.SaleManId;
-                            receivable.UserCreated = contractPartner.UserCreated;
-                            receivable.UserModified = contractPartner.UserCreated;
-                            receivable.GroupId = null;
-                            receivable.DepartmentId = null;
-                            receivable.OfficeId = model.Office;
-                            receivable.CompanyId = contractPartner.CompanyId;
-                        }
-                    }
-                    receivables.Add(receivable);
-                }
-
-                if (receivables.Count > 0)
-                {
-                    //Surcharge thuộc Office, Service, PartnerId của Receivable
-                    var surcharges = surchargeRepo.Get(x => models.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
-                    //List Invoice (Type = Invoice or InvoiceTemp)
-                    var invoices = accountingManagementRepo.Get(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
-
-                    receivables = CalculatorBillingAmount(receivables, surcharges, invoices); //Billing Amount, UnpaidAmo
-                    //receivables = CalculatorBillingUnpaid(receivables, surcharges, invoices); //Billing Unpaid
-                    receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
-                    receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
-                    receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
-                    receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)               
-                    receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
-                    receivables = CalculatorAdvanceAmount(receivables); //Advance Amount
-                    receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
-                    receivables = CalculatorSellingNoVat(receivables, surcharges); //Selling No Vat
-                    receivables = CalculatorOver1To15Day(receivables, surcharges, invoices); //Over 1 To 15 Day
-                    receivables = CalculatorOver16To30Day(receivables, surcharges, invoices); //Over 16 To 30 Day
-                    receivables = CalculatorOver30Day(receivables, surcharges, invoices); //Over 30 Day
-                }
-
-                receivables.ForEach(fe => {
-                    //Calculator Debit Amount
-                    fe.DebitAmount = (fe.SellingNoVat ?? 0) + (fe.BillingUnpaid ?? 0) + (fe.ObhAmount ?? 0) + (fe.AdvanceAmount ?? 0 ); // Công nợ chưa billing
-                    fe.DatetimeCreated = DateTime.Now;
-                    fe.DatetimeModified = DateTime.Now;
-                });
-
-                HandleState hs = new HandleState();
+                receivables = CalculatorReceivableData(models);
                 var receivablesModel = mapper.Map<List<ReceivableTable>>(receivables);
+
                 var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
                 if (!hsInsertOrUpdate.Status)
                 {
@@ -1173,7 +1267,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return new HandleState((object)ex.Message);
             }
         }
-        
+
         public HandleState CalculatorReceivable(CalculatorReceivableModel model)
         {
             HandleState hs = new HandleState();
@@ -1189,6 +1283,26 @@ namespace eFMS.API.Accounting.DL.Services
                 if (objReceivalble.Count > 0)
                 {
                     hs = InsertOrUpdateReceivable(objReceivalble);
+                }
+            }
+            return hs;
+        }
+
+        public async Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model)
+        {
+            HandleState hs = new HandleState();
+            currentUser.Action = "CalculatorReceivable";
+            if (model != null && model.ObjectReceivable.Count() > 0)
+            {
+                // PartnerId, Office, Service # Empty And # Null
+                var objReceivalble = model.ObjectReceivable.Where(x => !string.IsNullOrEmpty(x.PartnerId)
+                                                                  && (x.Office != null && x.Office != Guid.Empty)
+                                                                  && !string.IsNullOrEmpty(x.Service))
+                                                                  .GroupBy(g => new { g.PartnerId, g.Office, g.Service })
+                                                                  .Select(s => new ObjectReceivableModel { PartnerId = s.Key.PartnerId, Office = s.Key.Office, Service = s.Key.Service }).ToList();
+                if (objReceivalble.Count > 0)
+                {
+                    hs = await InsertOrUpdateReceivableAsync(objReceivalble);
                 }
             }
             return hs;
@@ -1273,9 +1387,9 @@ namespace eFMS.API.Accounting.DL.Services
             var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
-                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.AcRef into acctReceivables2
+                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
-                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString())
+                              where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
             if (selectQuery == null || !selectQuery.Any()) return null;
 
@@ -1290,7 +1404,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
-                    PartnerId = s.First().acctReceivable != null ? s.First().acctReceivable.AcRef : null,
+                    PartnerId = s.First().acctReceivable != null ? s.First().acctReceivable.PartnerId : null,
                     PartnerCode = string.Empty, //Get data bên dưới
                     PartnerNameEn = string.Empty, //Get data bên dưới
                     PartnerNameLocal = string.Empty, //Get data bên dưới
@@ -1322,12 +1436,12 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) /(s.First().contract.TrialCreditLimited)
-                                                                    :0) * 100 ?? 0,3) :
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited)
+                                                                    : 0) * 100 ?? 0, 3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
-                                                                    s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited)
+                                                                    s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.CreditLimit)
                                                                     : 0) * 100 ?? 0, 3):0),
                     CusAdvance = s.First().contract.CustomerAdvanceAmount ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
@@ -1339,13 +1453,14 @@ namespace eFMS.API.Accounting.DL.Services
                     Over30Day = s.Select(se => se.acctReceivable != null ? se.acctReceivable.Over30Day : 0).Sum(),
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                     CreditCurrency = s.First().contract.CreditCurrency,
-                    ParentNameAbbr = string.Empty, //Get data bên dưới
+                    ParentNameAbbr = string.Empty, //Get data bên dưới,
+                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified
                 });
 
             var data = from contract in groupByContract
                        join partner in partners on contract.PartnerId equals partner.Id
                        join parent in acRefPartner on partner.ParentId equals parent.Id into parents
-                       from parent  in parents.DefaultIfEmpty()
+                       from parent in parents.DefaultIfEmpty()
                        join user in users on contract.AgreementSalesmanId equals user.Id into users2
                        from user in users2.DefaultIfEmpty()
                        join employee in employees on user.EmployeeId equals employee.Id into employees2
@@ -1394,7 +1509,8 @@ namespace eFMS.API.Accounting.DL.Services
                            Over30Day = contract.Over30Day,
                            ArCurrency = contract.ArCurrency,
                            CreditCurrency = contract.CreditCurrency,
-                           ParentNameAbbr = parent.ShortName
+                           ParentNameAbbr = parent.ShortName,
+                           DatetimeModified = contract.DatetimeModified
                        };
             return data;
         }
@@ -1460,7 +1576,7 @@ namespace eFMS.API.Accounting.DL.Services
             Expression<Func<AccAccountReceivable, bool>> query = q => q.Office != null;
             if (criteria != null && !string.IsNullOrEmpty(criteria.AcRefId))
             {
-                query = query.And(x => x.AcRef == criteria.AcRefId);
+                query = query.And(x => x.PartnerId == criteria.AcRefId);
             }
             return query;
         }
@@ -1565,14 +1681,17 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
-        private IQueryable<object> GetDataTrialOfficial(AccountReceivableCriteria criteria)
+        private IQueryable<AccountReceivableResult> GetDataTrialOfficial(AccountReceivableCriteria criteria)
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
             var partners = partnerRepo.Get();
-            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL);
+            var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL 
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT);
             var partnerContracts = QueryContractPartner(contracts, criteria);
-            var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
+
+            IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
             if (arPartnerContracts == null || !arPartnerContracts.Any())
             {
                 return null;
@@ -1581,7 +1700,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
-                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).Where(x => x.DebitAmount > 0);
+                arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
         }
@@ -1755,7 +1874,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ParentNameAbbr = s.First().ParentNameAbbr,
                         ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
                         ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
-                        ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount)
+                        ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
+                        DatetimeModified = s.First().DatetimeModified
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -1867,7 +1987,7 @@ namespace eFMS.API.Accounting.DL.Services
                            TotalOver1To15Day = ar.TotalOver1To15Day,
                            TotalOver15To30Day = ar.TotalOver15To30Day,
                            TotalOver30Day = ar.TotalOver30Day,
-                           Currency= ar.Currency,
+                           Currency = ar.Currency,
                            TotalObhBillingAmount = ar.TotalObhBillingAmount,
                            TotalObhPaidAmount = ar.TotalObhPaidAmount,
                            TotalObhUnPaidAmount = ar.TotalObhUnPaidAmount,
@@ -1882,7 +2002,7 @@ namespace eFMS.API.Accounting.DL.Services
             var argeement = contractPartnerRepo.Get(x => x.Id == argeementId).FirstOrDefault();
             if (argeement == null) return null;
 
-            var acctReceivables = DataContext.Get(x => x.Office != null);
+            var acctReceivables = DataContext.Get(x => x.Office != null && x.ContractId == argeementId);
             var partners = partnerRepo.Get();
             var partnerContracts = contractPartnerRepo.Get(x => x.ContractType == argeement.ContractType);
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
@@ -1921,7 +2041,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ObhAmount = s.Sum(sum => sum.ObhAmount),
                 ObhBillingAmount = s.Sum(sum => sum.ObhBillingAmount),
                 ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
-                ObhUnPaidAmount= s.Sum(sum => sum.ObhUnPaidAmount),
+                ObhUnPaidAmount = s.Sum(sum => sum.ObhUnPaidAmount),
                 DebitRate = s.Sum(sum => sum.DebitRate),
                 CusAdvance = s.Select(se => se.CusAdvance).FirstOrDefault(),
                 BillingAmount = s.Sum(sum => sum.BillingAmount),
@@ -1992,5 +2112,284 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
         #endregion --- DETAIL ---
+
+        #region -- Update AcctManagement and overdays AccountReceivable after change payment term contract
+        /// <summary>
+        /// UpdateDueDateAndOverDays
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <returns></returns>
+        public async Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel)
+        {
+            var listInvoices = new List<AccAccountingManagement>();
+            var hs = UpdateDueDateAcctManagement(contractModel, out listInvoices);
+            if (listInvoices.Count > 0)
+            {
+                await UpdateOverDayAcctReceivables(contractModel, listInvoices);
+            }
+            return hs;
+        }
+
+        /// <summary>
+        /// Update payment due date
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <param name="listInvoices"></param>
+        /// <returns></returns>
+        public HandleState UpdateDueDateAcctManagement(CatContractModel contractModel, out List<AccAccountingManagement> listInvoices)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                HandleState hs = new HandleState();
+                listInvoices = new List<AccAccountingManagement>();
+                try
+                {
+                    currentUser.Action = "UpdateDueDateAcctMngAfterChangePaymentTerm";
+                    var invoiceData = accountingManagementRepo.Get().Where(x => x.PartnerId == contractModel.PartnerId &&
+                                             contractModel.SaleService.Contains(x.ServiceType) &&
+                                            contractModel.OfficeId.Contains(x.OfficeId.ToString()) &&
+                                            (x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE || x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE) &&
+                                            x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID).ToList();
+                    if (invoiceData.Count > 0)
+                    {
+                        foreach (var invoice in invoiceData)
+                        {
+                            invoice.PaymentTerm = contractModel.PaymentTerm;
+                            //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
+                            if (contractModel.BaseOn == "Invoice Date")
+                            {
+                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.Date;
+                            }
+                            //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
+                            if (contractModel.BaseOn == "Billing Date")
+                            {
+                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.ConfirmBillingDate;
+                            }
+                            var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
+                        }
+                    }
+                    listInvoices = invoiceData;
+                    accountingManagementRepo.SubmitChanges();
+                    trans.Commit();
+                    return hs;
+                }
+                catch (Exception ex)
+                {
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update over due amount
+        /// </summary>
+        /// <param name="contractModel"></param>
+        /// <param name="invoiceData"></param>
+        /// <returns></returns>
+        public Task<HandleState> UpdateOverDayAcctReceivables(CatContractModel contractModel, List<AccAccountingManagement> invoiceData)
+        {
+            var acctReceivablesModel = new List<AccAccountReceivableModel>();
+            try
+            {
+                HandleState hs = new HandleState();
+                currentUser.Action = "UpdateOverDayReceivableAfterChangePaymentTerm";
+                //Get DS Công nợ có cùng PartnerId, Saleman, Service, Office của Agreement
+                var receivables = DataContext.Get(x => x.PartnerId == contractModel.PartnerId
+                                                    && x.SaleMan == contractModel.SaleManId
+                                                    && contractModel.SaleService.Contains(x.Service)
+                                                    && contractModel.OfficeId.Contains(x.Office.ToString())).ToList();
+                if (receivables != null && receivables.Count() > 0)
+                {
+                    var acctMngts = invoiceData.Where(x => x.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID
+                                                           && x.Status == AccountingConstants.ACCOUNTING_INVOICE_STATUS_UPDATED
+                                                           && x.PaymentDueDate.HasValue).AsQueryable();
+                    //Surcharge thuộc Office, Service, PartnerId của Receivable
+                    var surcharges = surchargeRepo.Get(x => receivables.Any(a => a.Office == x.OfficeId && a.Service == x.TransactionType && a.PartnerId == x.PaymentObjectId));
+
+                    var resultReceivables = CalculatorOverDaysAmount(receivables, surcharges, acctMngts);
+                    var receivablesModel = mapper.Map<List<ReceivableTable>>(resultReceivables);
+                    acctReceivablesModel = mapper.Map<List<AccAccountReceivableModel>>(resultReceivables);
+                    var hsInsertOrUpdate = InsertOrUpdateReceivableList(receivablesModel);
+                    if (!hsInsertOrUpdate.Status)
+                    {
+                        hs = new HandleState((object)hsInsertOrUpdate.Message);
+                    }
+                    WriteLogInsertOrUpdateReceivable(hsInsertOrUpdate.Status, hsInsertOrUpdate.Message, acctReceivablesModel);
+                }
+                return Task.FromResult(hs);
+            }
+            catch (Exception ex)
+            {
+                WriteLogInsertOrUpdateReceivable(false, ex.Message, acctReceivablesModel);
+                return Task.FromResult(new HandleState((object)ex.Message));
+            }
+        }
+
+        /// <summary>
+        /// Caculate Over amount of Receivables
+        /// </summary>
+        /// <param name="models"></param>
+        /// <param name="surcharges"></param>
+        /// <param name="accAccountings"></param>
+        /// <returns></returns>
+        private List<AccAccountReceivable> CalculatorOverDaysAmount(List<AccAccountReceivable> models, IQueryable<CsShipmentSurcharge> surcharges, IQueryable<AccAccountingManagement> accAccountings)
+        {
+            // Get công nợ quá hạn từ 1->15 ngày
+            var invoiceOver1To15 = accAccountings.Where(x => (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 31
+                                                       && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15);
+            var invoices = from acctMngt in invoiceOver1To15
+                           join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
+                           select new ReceivableInvoice
+                           {
+                               Office = surcharge.OfficeId,
+                               PartnerId = surcharge.PaymentObjectId,
+                               Service = surcharge.TransactionType,
+                               Invoice = acctMngt
+                           };
+            if (invoices.Count() > 0)
+            {
+                //Group by Office, PartnerId, Service
+                var grpInvoices = invoices.ToList()
+                    .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
+                    {
+                        Office = s.Key.Office,
+                        PartnerId = s.Key.PartnerId,
+                        Service = s.Key.Service,
+                        Invoices = s.Select(se => se.Invoice).ToList()
+                    });
+
+                models.ForEach(fe =>
+                {
+                    var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
+                    if (invs != null)
+                    {
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        {
+                            Id = s.Key.Id,
+                            DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                            UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                            UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                            ServiceType = s.FirstOrDefault().ServiceType
+
+                        });
+                        fe.Over1To15Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    }
+
+                });
+            }
+            else
+            {
+                models.ForEach(fe => fe.Over1To15Day = 0);
+            }
+
+            // Get công nợ quá hạn từ 16->30 ngày
+            var invoiceOver16To30 = accAccountings.Where(x => (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 15
+                                                       && (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days < 31);
+            invoices = from acctMngt in invoiceOver16To30
+                       join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
+                       select new ReceivableInvoice
+                       {
+                           Office = surcharge.OfficeId,
+                           PartnerId = surcharge.PaymentObjectId,
+                           Service = surcharge.TransactionType,
+                           Invoice = acctMngt
+                       };
+            if (invoices.Count() > 0)
+            {
+
+                //Group by Office, PartnerId, Service
+                var grpInvoices = invoices.ToList()
+                    .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
+                    {
+                        Office = s.Key.Office,
+                        PartnerId = s.Key.PartnerId,
+                        Service = s.Key.Service,
+                        Invoices = s.Select(se => se.Invoice).ToList()
+                    });
+
+                models.ForEach(fe =>
+                {
+                    var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
+                    if (invs != null)
+                    {
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        {
+                            Id = s.Key.Id,
+                            DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                            UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                            UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                            ServiceType = s.FirstOrDefault().ServiceType
+
+                        });
+                        fe.Over16To30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    }
+
+                });
+            }
+            else
+            {
+                models.ForEach(fe => fe.Over16To30Day = 0);
+            }
+
+            // Get công nợ quá hạn hơn 30 ngày
+            var invoiceOver30 = accAccountings.Where(x => (DateTime.Now.Date - x.PaymentDueDate.Value.Date).Days > 30);
+            invoices = from acctMngt in invoiceOver30
+                       join surcharge in surcharges on acctMngt.Id equals surcharge.AcctManagementId
+                       select new ReceivableInvoice
+                       {
+                           Office = surcharge.OfficeId,
+                           PartnerId = surcharge.PaymentObjectId,
+                           Service = surcharge.TransactionType,
+                           Invoice = acctMngt
+                       };
+            if (invoices.Count() > 0)
+            {
+
+                //Group by Office, PartnerId, Service
+                var grpInvoices = invoices.ToList()
+                    .GroupBy(g => new { Office = g.Office, PartnerId = g.PartnerId, Service = g.Service }).Select(s => new ReceivableInvoices
+                    {
+                        Office = s.Key.Office,
+                        PartnerId = s.Key.PartnerId,
+                        Service = s.Key.Service,
+                        Invoices = s.Select(se => se.Invoice).ToList()
+                    });
+
+                models.ForEach(fe =>
+                {
+                    var invs = grpInvoices.Where(x => x.Office == fe.Office && x.PartnerId == fe.PartnerId && x.Service == fe.Service).Select(se => se.Invoices.AsQueryable()).FirstOrDefault();
+                    if (invs != null)
+                    {
+                    // Group By InvoiceID
+                    IQueryable<AccAccountingManagement> invoiceQ = invs.GroupBy(g => new { g.Id }).Select(s => new AccAccountingManagement
+                        {
+                            Id = s.Key.Id,
+                            DatetimeCreated = s.FirstOrDefault().DatetimeCreated,
+                            UnpaidAmount = s.FirstOrDefault().UnpaidAmount,
+                            UnpaidAmountVnd = s.FirstOrDefault().UnpaidAmountVnd,
+                            UnpaidAmountUsd = s.FirstOrDefault().UnpaidAmountUsd,
+                            ServiceType = s.FirstOrDefault().ServiceType
+
+                        });
+                        fe.Over30Day = SumUnpaidAmountOfInvoices(invoiceQ, fe.ContractCurrency);
+                    }
+
+                });
+            }
+            else
+            {
+                models.ForEach(fe => fe.Over30Day = 0);
+            }
+            return models;
+        }
+        #endregion
     }
 }

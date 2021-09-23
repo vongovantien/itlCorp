@@ -526,7 +526,8 @@ export class AddPartnerDataComponent extends AppList {
             creditRate: null,
             description: null,
             vas: null,
-            saleService: null
+            saleService: null,
+            autoExtendDays: null
         });
         this.formContractPopup.files = null;
         this.formContractPopup.fileList = null;

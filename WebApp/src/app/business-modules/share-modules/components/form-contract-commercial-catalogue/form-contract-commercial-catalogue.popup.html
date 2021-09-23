@@ -114,19 +114,31 @@
                             </div>
                         </div>
                         <div class="col-lg-4">
-                            <div class="form-group">
-                                <label>Expired Date</label>
-                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
-                                        [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
-                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
-                                        name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
-                                        [minDate]="minDateExpired" />
-                                    <span class="m-input-icon__icon m-input-icon__icon--right">
-                                        <span>
-                                            <i class="la la-calendar"></i>
-                                        </span>
-                                    </span>
+                            <div class="row">
+                                <div class="col-lg-7">
+                                    <div class="form-group">
+                                        <label>Expired Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                [attr.disabled]="!isDisabledExpiredDateField ?  null : 'disabled'"
+                                                [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                                name="daterange" [autoApply]="true" formControlName="expiredDate" readonly
+                                                [minDate]="minDateExpired" />
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5">
+                                    <div class="form-group">
+                                        <label>Auto Extend Days
+                                        </label>
+                                        <input type="number" min="0" numeric [decimals]="digitDecimal" autoFormatCurrency (change)="formatAutoExtendDays()"
+                                            class="form-control" formControlName="autoExtendDays">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -165,16 +177,16 @@
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Currency</label>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !currencyId.value}">
+                                <label required>Invoice Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="currencyId" placeholder="Select Currency">
                                 </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-2">
-                            <div class="form-group">
-                                <label>Credit Currency</label>
+                            <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
+                                <label required>Credit Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="creditCurrency"
                                     placeholder="Select Credit Currency">
@@ -194,7 +206,7 @@
                         </div>
                     </div>
                     <ng-container>
-                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && contractType.value ==='Official')">
+                        <div class="row" *ngIf=" isUpdate ||  (!isUpdate && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                             <div class="col-lg-12">
                                 <div class="alert-block__heading font-weight-bold collapse-toggle "
                                     data-toggle="collapse" data-target="#data-form-contact">
@@ -266,7 +278,7 @@
                                     </div>
                                 </div>
                             </ng-container>
-                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && contractType.value ==='Official')">
+                            <ng-container *ngIf=" isUpdate ||  (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                                 <div class="col-lg-2">
                                     <div class="form-group">
                                         <label>Payment Term</label>
@@ -333,8 +345,8 @@
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <label>Customer Advance Amount</label>
-                                        <input formatDecimalFormControl minimum="0" disabled type="text"
-                                            class="form-control" formControlName="customerAmount">
+                                        <input formatDecimalFormControl disabled type="text" class="form-control"
+                                            formControlName="customerAmount">
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
@@ -366,7 +378,7 @@
                                 </div>
                             </ng-container>
                         </div>
-                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && contractType.value ==='Official')">
+                        <div class="row" *ngIf=" isUpdate || (!isUpdate  && (contractType.value ==='Official' || contractType.value ==='Trial'))">
                             <div class="col-lg-8">
                                 <div class="form-group">
                                     <label>Description</label>
