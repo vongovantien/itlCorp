@@ -1953,8 +1953,8 @@ namespace eFMS.API.Accounting.DL.Services
                                      PaymentDate = rcpt == null ? null : rcpt.PaymentDate
                                  });
 
-            var dta = (creditSoaData.Union(creditNoteData)).ToList();
-            var resultGroups2 = dta.GroupBy(x => new
+            var dta = (creditSoaData != null && creditSoaData.ToList().Count() > 0)?(creditSoaData.Union(creditNoteData)):creditNoteData;
+            var resultGroups2 = dta.ToList().GroupBy(x => new
             {
                 x.BillingRefNo,
                 x.PartnerId,
@@ -2028,8 +2028,8 @@ namespace eFMS.API.Accounting.DL.Services
                 if (agent.CreditAmountUsd > agent.RemainCreditUsd && criteria.DueDate == null)
                 {
                     var pay = DataContext.Get(x => x.BillingRefNo == agent.CreditNo).OrderBy(x => x.PaidDate).ThenBy(x => x.PaymentNo);
-                    var dataPM = pay.Join(receiptData, pm => pm.ReceiptId, re => re.Id, (pm, rc) => new { rc.PaidAmountUsd,rc.PaidAmountVnd, rc.PaymentRefNo, rc.PaymentDate,rc.CreditAmountUsd,rc.CreditAmountVnd});
-                    var receiptGroup = dataPM.GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new {z.PaymentDate,z.PaidAmountUsd,z.PaidAmountVnd,z.CreditAmountVnd,z.CreditAmountUsd }) });
+                    var dataPM = pay.Join(receiptData, pm => pm.ReceiptId, re => re.Id, (pm, rc) => new { rc.PaidAmountUsd,rc.PaidAmountVnd, rc.PaymentRefNo, rc.PaymentDate,rc.CreditAmountUsd,rc.CreditAmountVnd,pm.PaymentAmountUsd,pm.PaymentAmountVnd});
+                    var receiptGroup = dataPM.GroupBy(x => new { x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new {z.PaymentDate,z.PaidAmountUsd,z.PaidAmountVnd,z.CreditAmountVnd,z.CreditAmountUsd,z.PaymentAmountUsd,z.PaymentAmountVnd }) });
 
                     foreach (var rcp in receiptGroup)
                     {
@@ -2037,10 +2037,10 @@ namespace eFMS.API.Accounting.DL.Services
                         detail.RefNo = rcp.grp.PaymentRefNo;
                         detail.PaidDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
 
-                        detail.CreditUsd = rcp.Payment.FirstOrDefault().CreditAmountUsd;
+                        detail.CreditUsd = rcp.Payment.FirstOrDefault().PaymentAmountUsd;
                         agent.CreditUsd += (detail.CreditUsd ?? 0);
 
-                        detail.CreditVnd = rcp.Payment.FirstOrDefault().CreditAmountVnd;
+                        detail.CreditVnd = rcp.Payment.FirstOrDefault().PaymentAmountVnd;
                         agent.CreditVnd += (detail.CreditVnd ?? 0);
 
                         agent.details.Add(detail);
