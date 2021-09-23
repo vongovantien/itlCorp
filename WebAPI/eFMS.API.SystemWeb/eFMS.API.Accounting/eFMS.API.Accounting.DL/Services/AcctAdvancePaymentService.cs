@@ -3648,6 +3648,7 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal? _cw = 0;
                 decimal? _pcs = 0;
                 decimal? _cbm = 0;
+                DateTime? serviceDate;
                 if (request.JobId.Contains("LOG"))
                 {
                     var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
@@ -3661,6 +3662,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                         _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
+                    serviceDate = ops.ServiceDate;
                 }
                 else
                 {
@@ -3681,6 +3683,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
                         _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
+                    serviceDate = trans.ServiceDate;
                 }
                 var shipmentAdvance = new InfoShipmentAdvanceExport
                 {
@@ -3696,8 +3699,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
-                    ServiceDate = opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault()==null?
-                    csTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(): (DateTime)opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(),
+                    ServiceDate = serviceDate,
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl
