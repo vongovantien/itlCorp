@@ -1354,7 +1354,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstCc.Add(objInfoCreator?.Email);
                 lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
-                resultSendEmail = true;// SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
+                resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
             }
 
             var logSendMail = new SysSentEmailHistory
