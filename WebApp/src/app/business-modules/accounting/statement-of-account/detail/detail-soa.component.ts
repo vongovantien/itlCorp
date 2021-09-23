@@ -157,9 +157,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     }
 
     exportSOAAFWithHBL() {
-        const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this._progressRef.start();
-        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO, userLogged.officeId)
+        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

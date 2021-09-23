@@ -356,9 +356,9 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportSOAAirfreightWithHBL")]
         [HttpGet]
-        public async Task<IActionResult> ExportSOAAirfreightWithHBL(string soaNo, string officeId)
+        public async Task<IActionResult> ExportSOAAirfreightWithHBL(string soaNo)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAAirfreightExportUrl + soaNo + "&&officeId=" + officeId);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataSOAAirfreightWithHBLExportUrl + soaNo);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<ExportSOAAirfreightModel>();
             if (dataObjects.Result.HawbAirFrieghts == null)
