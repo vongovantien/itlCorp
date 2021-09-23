@@ -32,19 +32,26 @@
             </span>
         </button>
         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
-            <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
-                aria-controls="dropdown-nested">
-                <i class="la la-download"></i>Export<span class="caret"></span>
-            </button>
-            <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAAF()">Air - SOA Customer
-                        Template</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOASupplierAF()">Air - SOA Supplier
-                        Template</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAOPS()">SOA OPS</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="export()">For Import Bravo</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Standard</a></li>
-            </ul>
+            <app-permission-button type="export" title="Export" [dpToggle]="dropdownMenu" position="bottomLeft"
+            mode="dropdown">
+            </app-permission-button>
+            <app-dropdown #dropdownMenu>
+                <a class="dropdown-item pointer" (click)="exportSOAAF()">
+                    <span>Air - SOA Customer Template</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportSOASupplierAF()">
+                    <span>Air - SOA Supplier Template</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportSOAOPS()">
+                    <span>SOA OPS</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="export()">
+                    <span>For Import Bravo</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportExcelSOA()">
+                    <span>Standard</span>
+                </a>
+            </app-dropdown>
         </div>
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
             (click)="previewAccountStatementFull(soa.soano)">
