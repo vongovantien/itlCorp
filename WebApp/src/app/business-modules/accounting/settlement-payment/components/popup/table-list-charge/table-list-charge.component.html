@@ -43,7 +43,7 @@
                                     (itemSelected)="onSelectDataFormInfo($event, 'advanceNo')"
                                     [selectedDisplayFields]="['advanceNo','amount','requestCurrency']"
                                     [dataSources]="advs" [displayFields]="configAdvanceDisplayFields"
-                                    (remove)="removeAdvanceNo(advanceNo.value)" placeholder="Advance No">
+                                    (remove)="removeAdvanceNo()" placeholder="Advance No">
                                 </app-combo-grid-virtual-scroll>
                             </div>
                         </div>
@@ -54,7 +54,11 @@
                         <table class="table table-bordered dataTable-edit">
                             <thead app-table-header [headers]="headers"
                                 (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                <th class="m--w-50 first table-actions-col">
+                                <th class="first table-actions-col fixed-side">
+                                    <label class="m-checkbox">
+                                        <input type="checkbox" [(ngModel)]="isSelected" (change)="checkUncheckAllCharge()">
+                                        <span></span>
+                                    </label>
                                 </th>
                             </thead>
                             <tbody class="tbody-group">
@@ -62,6 +66,10 @@
                                     <tr *ngFor="let charge of charges; let i = index; trackBy: trackByFn">
                                         <td class="table-actions-col fixed-side">
                                             <div class="table-actions">
+                                                <label class="m-checkbox">
+                                                    <input type="checkbox" value="{{charge}}" [(ngModel)]="charge.isSelected" (change)="onChangeCheckBoxCharge()">
+                                                    <span></span>
+                                                </label>
                                                 <button
                                                     class="btn btn-success btn-sm  m-btn--icon m-btn--icon-only text-white"
                                                     title="Duplicate" (click)="duplicateCharge(i)"><i
@@ -128,8 +136,7 @@
                                                     <input type="number" class="form-control"
                                                         [(ngModel)]="charge.quantity"
                                                         (ngModelChange)="calculateTotal(charge.vatrate,$event,charge.unitPrice, charge)"
-                                                        placeholder="Quantity" min="0" numeric
-                                                        [decimals]="digitDecimal">
+                                                        placeholder="Quantity" min="0" autoFormatCurrency>
                                                 </ng-container>
                                                 <ng-template #qtyTpl>
                                                     <span style="cursor: not-allowed;">
@@ -192,12 +199,7 @@
                                                 </ng-template>
                                             </div>
                                         </td>
-                                        <td class="disabled">
-                                            <div class="form-group ">
-                                                <input type="text" class="form-control" [(ngModel)]="charge.total"
-                                                    readonly disabled currencyMask placeholder="Total" min="0">
-                                            </div>
-                                        </td>
+                                        <td class="text-right">{{charge.total| number:'1.0-3'}}</td>
                                         <td>
                                             <ng-container *ngIf="!charge.syncedFromBy;else obhPartnerTpl ">
                                                 <div class="form-group col-md-12 dropdown-partner e--combogrid" dropdown
@@ -313,6 +315,7 @@
                                                 </ng-template>
                                             </div>
                                         </td>
+                                        <td>{{charge.advanceNo}}</td>
                                         <td class="text-danger">
                                             <ng-container
                                                 *ngIf="!charge.isFromShipment && charge.type === 'OBH' && !!charge.syncedFrom">

@@ -96,7 +96,7 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group">
-                <label>Credit VND</label>
+                <label>Total Netoff VND</label>
                 <input class="form-control text-success" type="number" formControlName="creditAmountVnd" numeric
                     [decimals]="0" autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'creditAmountVnd')">
@@ -104,7 +104,7 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group">
-                <label>Credit USD</label>
+                <label>Total Netoff USD</label>
                 <input class="form-control text-success" type="number" formControlName="creditAmountUsd" [decimals]="2"
                     autoFormatCurrency [attr.readOnly]="isReadonly"
                     (change)="onSelectDataFormInfo($event,'creditAmountUsd')">
@@ -196,7 +196,7 @@
                     <ng-container
                         *ngIf="((class$ | async) === 'Clear Debit') ||((class$ | async) === 'Net Off');else advTpl">
                         <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10 dropdown-toggle"
-                            type="button" [dpToggle]="dropdownMenu">
+                            type="button" [dpToggle]="dropdownMenu" position="bottomCenter">
                             <i class="la la-plus"></i>
                             Add Other
                         </button>

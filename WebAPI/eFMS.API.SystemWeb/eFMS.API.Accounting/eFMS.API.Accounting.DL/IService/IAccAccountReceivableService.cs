@@ -24,5 +24,7 @@ namespace eFMS.API.Accounting.DL.IService
         IEnumerable<object> GetDataARSumaryExport(AccountReceivableCriteria criteria);
         IEnumerable<object> GetDataDebitDetail(Guid argeementId,string option);
         Task<HandleState> UpdateDueDateAndOverDaysAfterChangePaymentTerm(CatContractModel contractModel);
+        Task<HandleState> CalculatorReceivableAsync(CalculatorReceivableModel model);
+        Task<HandleState> InsertOrUpdateReceivableAsync(List<ObjectReceivableModel> models);
     }
 }

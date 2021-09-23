@@ -128,6 +128,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     showExistingCharge() {
         this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
         this.existingChargePopup.requester = this.requester;
+        this.existingChargePopup.settlementCode = this.settlementCode || null;
         this.existingChargePopup.show();
     }
 
@@ -408,6 +409,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
             this.existingChargePopup.state = 'update';
             this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
             this.existingChargePopup.requester = this.requester;
+            this.existingChargePopup.settlementCode = this.settlementCode || null;
             this.existingChargePopup.show();
         } else {
             const shipment = this.tableListChargePopup.shipments.find(s => s.jobId === charge.jobId && s.hbl === charge.hbl && s.mbl === charge.mbl);
@@ -430,6 +432,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
 
                     this.tableListChargePopup.charges.forEach(item => {
                         item.isDuplicate = false; // * Reset duplicate state
+                        item.isSelected = true;
 
                         if (item.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase()) {
                             // get partner theo payerId.
@@ -470,6 +473,7 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
                         customNo: !!surcharges[0].clearanceNo ? surcharges[0].clearanceNo : null
                     });
                     this.tableListChargePopup.isUpdate = true;
+                    this.tableListChargePopup.isSelected = true;
                     this.tableListChargePopup.show();
                 }
             } else {

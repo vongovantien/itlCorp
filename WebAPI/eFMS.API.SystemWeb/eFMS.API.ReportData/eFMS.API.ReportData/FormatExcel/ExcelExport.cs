@@ -21,15 +21,23 @@ namespace eFMS.API.ReportData.FormatExcel
         private static int StartCol { get; set; }
         /// <summary>End of column in excel</summary>
         private static int EndCol { get; set; }
+
+        #region -- Info of Group
+        /// <summary>Number of group to copied</summary>
+        public int NumberOfGroup { get; set; }
+        /// <summary>Index currenct of group</summary>
+        public int IndexOfGroup { get; set; }
         /// <summary>Row of group copied</summary>
-        protected ExcelRange GroupRowCopy { get; set; }
+        protected List<object> GroupRowCopy { get; set; }
+        /// <summary>List values of group copied</summary>
+        private List<object> GroupRowValue { get; set; }
+        #endregion
+        #region -- Infor of row detail
         /// <summary>Row of detail copied</summary>
         protected ExcelRange DetailRowCopy { get; set; }
-
         /// <summary>Start index of table</summary>
         public int StartDetailTable { get; set; }
-        /// <summary>Values of group copied</summary>
-        private object _groupRowValue;
+        #endregion
         /// <summary>Values of detail copied</summary>
         private object _detailRowValue;
         
@@ -47,13 +55,17 @@ namespace eFMS.API.ReportData.FormatExcel
             { 
                 PackageExcel = new ExcelPackage(newStream);
                 var workBook = PackageExcel.Workbook;
+                #region Init value
                 Worksheet = workBook.Worksheets[0];
                 StartRow = Worksheet.Dimension.Start.Row;
                 EndRow = Worksheet.Dimension.End.Row;
                 StartCol = Worksheet.Dimension.Start.Column;
                 EndCol = Worksheet.Dimension.End.Column;
+                NumberOfGroup = 1;
+                IndexOfGroup = 1;
+                #endregion
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 PackageExcel.Dispose();
             }
@@ -217,15 +229,25 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             if (GroupRowCopy == null)
             {
-                _groupRowValue = new object();
-                GroupRowCopy = Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol];
-                _groupRowValue = GroupRowCopy.Value;
+                GroupRowCopy = new List<object>();
+                GroupRowValue = new List<object>();
+                for (int i = 0; i < NumberOfGroup; i++)
+                {
+                    GroupRowCopy.Add(null);
+                    GroupRowValue.Add(null);
+                }
+            }
+            if (GroupRowCopy[IndexOfGroup - 1] == null)
+            {
+                var groupExcel = Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol];
+                GroupRowCopy[IndexOfGroup - 1] = (groupExcel);
+                GroupRowValue[IndexOfGroup - 1] = ((ExcelRange)GroupRowCopy[IndexOfGroup - 1]).Value;
             }
             else
             {
                 Worksheet.InsertRow(StartDetailTable, 1);
-                GroupRowCopy.Copy(Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol]);
-                Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol].Value = _groupRowValue;
+                ((ExcelRange)GroupRowCopy[IndexOfGroup - 1]).Copy(Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol]);
+                Worksheet.Cells[StartDetailTable, StartCol, StartDetailTable, EndCol].Value = GroupRowValue[IndexOfGroup - 1];
             }
             StartRow = StartDetailTable;
             StartDetailTable++;

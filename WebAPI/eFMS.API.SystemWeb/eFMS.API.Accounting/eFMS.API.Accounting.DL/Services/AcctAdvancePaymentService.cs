@@ -645,6 +645,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
             var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
+
             //Không tìm thấy Advance Request thì trả về null
             if (request == null) return null;
 
@@ -652,12 +653,13 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
+
             advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
             advanceModel.UserNameCreated = sysUserRepo.Get(x => x.Id == advance.UserCreated).FirstOrDefault()?.Username;
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
             advanceModel.RequesterName = sysUserRepo.Get(x => x.Id == advance.Requester).FirstOrDefault()?.Username;
             advanceModel.PayeeName = catPartnerRepo.Get(x => x.Id == advance.Payee).FirstOrDefault()?.ShortName;
-
+            
             var advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
 
             advanceModel.IsRequester = (currentUser.UserID == advance.Requester
@@ -668,6 +670,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel.IsManager = CheckUserIsManager(currentUser, advance, advanceApprove);
             advanceModel.IsApproved = CheckUserIsApproved(currentUser, advance, advanceApprove);
             advanceModel.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, advance, advanceApprove);
+
             return advanceModel;
         }
         #endregion --- DETAIL ---
@@ -3693,6 +3696,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
+                    ServiceDate = opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault()==null?
+                    csTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(): (DateTime)opsTransactionRepo.Get(x => x.JobNo == request.JobId).Select(x => x.ServiceDate).FirstOrDefault(),
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl
@@ -3975,15 +3980,15 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="acctAdvanceRequests"></param>
         /// <returns></returns>
-        public HandleState CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
+        public List<ObjectReceivableModel> CalculatorReceivableAdvancePayment(List<AcctAdvanceRequestModel> acctAdvanceRequests)
         {
             var hblIds = acctAdvanceRequests.Select(s => s.Hblid).Distinct().ToList();
             //Get list charge of by hblid
             var surcharges = csShipmentSurchargeRepo.Get(x => hblIds.Any(a => a == x.Hblid));
             var objectReceivablesModel = accAccountReceivableService.GetObjectReceivableBySurcharges(surcharges);
             //Tính công nợ Partner, Service, Office có trong Advance
-            var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
-            return hs;
+            // var hs = accAccountReceivableService.InsertOrUpdateReceivableAsync(objectReceivablesModel);
+            return objectReceivablesModel;
         }
         #endregion --- Calculator Receivable Advance ---
 

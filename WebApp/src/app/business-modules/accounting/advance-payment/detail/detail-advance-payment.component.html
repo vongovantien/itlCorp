@@ -43,7 +43,8 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [state]="actionList"></adv-payment-list-request>
+                    <adv-payment-list-request [state]="actionList" [statusApproval]="statusApproval">
+                    </adv-payment-list-request>
                 </div>
                 <div class="row height-row-12" *ngIf="!!advancePayment">
                     <div class="col-12">
