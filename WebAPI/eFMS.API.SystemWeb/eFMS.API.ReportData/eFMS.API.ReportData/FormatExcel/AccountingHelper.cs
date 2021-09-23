@@ -4807,10 +4807,10 @@ namespace eFMS.API.ReportData.FormatExcel
                     else if(item.CreditAmountUsd > 0)
                     {
                         listKeyData.Add("RemainDebitUsd", 0);
-                        listKeyData.Add("RemainCreditUsd", item.RemainCreditUsd);
+                        listKeyData.Add("RemainCreditUsd", item.CreditAmountUsd - item.CreditUsd);
 
                         listKeyData.Add("RemainDebitVnd",0);
-                        listKeyData.Add("RemainCreditVnd", item.RemainCreditVnd);
+                        listKeyData.Add("RemainCreditVnd", item.CreditAmountVnd-item.CreditVnd);
                     }
 
                     listKeyData.Add("ETD", item.EtdDate);

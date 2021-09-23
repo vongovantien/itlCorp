@@ -408,7 +408,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<AccAccountReceivableModel> CalculatorObhAmount(List<AccAccountReceivableModel> models, IQueryable<CsShipmentSurcharge> charges)
         {
             //Get OBH charge by OBH Partner (PaymentObjectId)
-            var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
+            var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(x.ReferenceNo));
 
             models.ForEach(fe =>
             {

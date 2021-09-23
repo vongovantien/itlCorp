@@ -16,7 +16,7 @@ import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
-import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState } from '../../store/reducers';
+import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
 
 
@@ -93,18 +93,20 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getDataSearchHistoryPaymentState)
-        .pipe(
-            withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
-            takeUntil(this.ngUnsubscribe),
-            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-        )
-        .subscribe(
-            (data) => {
-                this.dataSearch = data.dataSearch;
-                this.page = data.page;
-                this.pageSize = data.pageSize;
-            }
-        );
+            .pipe(
+                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    this.dataSearch = data.dataSearch;
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+                }
+            );
+
+        this.isLoading = this._store.select(getHistoryPaymentLoadingListState);
     }
 
     ngAfterViewInit() {
@@ -112,7 +114,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
 
     getPagingData() {
         this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-            this._store.select(getHistoryPaymentListState)
+        this._store.select(getHistoryPaymentListState)
             .pipe(
                 catchError(this.catchError),
                 map((data: any) => {
@@ -123,8 +125,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                 })
             ).subscribe(
                 (res: any) => {
-                        this.refPayments = res.data || [];
-                        this.totalItems = res.totalItems;
+                    this.refPayments = res.data || [];
+                    this.totalItems = res.totalItems;
                 },
             );
     }
@@ -225,7 +227,6 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     onDeletePayment() {
-        this.isLoading = true;
         this._accountingRepo.deletePayment(this.selectedPayment.id)
             .pipe(
                 catchError(this.catchError),
@@ -292,7 +293,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    exportStatementReceivableAgency(){
+    exportStatementReceivableAgency() {
         if (!this.refPayments.length) {
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
