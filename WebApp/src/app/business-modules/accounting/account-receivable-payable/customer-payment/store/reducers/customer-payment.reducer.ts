@@ -133,7 +133,7 @@ export const receiptManagementReducer = createReducer(
         ...state, agreement: { ...payload }
     })),
     on(ReceiptActions.SearchListCustomerPayment, (state: IReceiptState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
     })),
     on(ReceiptActions.LoadListCustomerPayment, (state: IReceiptState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }

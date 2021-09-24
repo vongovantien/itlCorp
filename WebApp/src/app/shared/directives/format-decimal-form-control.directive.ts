@@ -39,7 +39,7 @@ export class FormatDecimalFormControlDirective {
             .pipe(takeUntil(this._destroyService))
             .subscribe(
                 (value: string) => {
-                    if (!!value) {
+                    if (value !== null && value !== undefined) {
                         const result = this.formatNumber(value);
                         if (result.indexOf('.', result.length - 1) === -1) {
                             this._el.nativeElement.value = this.decimalPipe.transform(result, this.format);
@@ -50,7 +50,7 @@ export class FormatDecimalFormControlDirective {
     }
 
     private formatNumber(value: any) {
-        if (!!value) {
+        if (value !== null && value !== undefined) {
             value = value.toString().replace(/[^-0-9.]+/g, '');
         }
         return this.check(value);

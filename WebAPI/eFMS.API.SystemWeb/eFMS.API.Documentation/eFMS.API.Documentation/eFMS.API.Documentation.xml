@@ -438,7 +438,7 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
-        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Documentation.DL.IService.ICurrencyExchangeService,AutoMapper.IMapper,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl})">
+        <member name="M:eFMS.API.Documentation.Controllers.CsShipmentSurchargeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Documentation.DL.IService.ICsShipmentSurchargeService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,Microsoft.AspNetCore.Hosting.IHostingEnvironment,eFMS.API.Documentation.DL.IService.ICurrencyExchangeService,AutoMapper.IMapper,eFMS.API.Documentation.DL.IService.IAccAccountReceivableService,Microsoft.Extensions.Options.IOptions{eFMS.API.Documentation.DL.Common.ApiServiceUrl})">
             <summary>
             constructor
             </summary>

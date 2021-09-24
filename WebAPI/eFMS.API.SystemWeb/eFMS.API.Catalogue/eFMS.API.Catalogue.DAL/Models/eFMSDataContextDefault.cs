@@ -51,6 +51,8 @@ namespace eFMS.API.Catalogue.Service.Models
         public virtual DbSet<OpsStageAssigned> OpsStageAssigned { get; set; }
         public virtual DbSet<OpsTransaction> OpsTransaction { get; set; }
         public virtual DbSet<SysCompany> SysCompany { get; set; }
+        public virtual DbSet<SysEmailSetting> SysEmailSetting { get; set; }
+        public virtual DbSet<SysEmailTemplate> SysEmailTemplate { get; set; }
         public virtual DbSet<SysEmployee> SysEmployee { get; set; }
         public virtual DbSet<SysImage> SysImage { get; set; }
         public virtual DbSet<SysOffice> SysOffice { get; set; }
@@ -69,7 +71,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -491,6 +493,8 @@ namespace eFMS.API.Catalogue.Service.Models
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.Arconfirmed).HasColumnName("ARConfirmed");
+
+                entity.Property(e => e.AutoExtendDays).HasColumnType("decimal(18, 2)");
 
                 entity.Property(e => e.BaseOn)
                     .HasMaxLength(20)
@@ -2795,6 +2799,48 @@ namespace eFMS.API.Catalogue.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.Website).HasMaxLength(1600);
+            });
+
+            modelBuilder.Entity<SysEmailSetting>(entity =>
+            {
+                entity.ToTable("sysEmailSetting");
+
+                entity.Property(e => e.Id).HasColumnName("ID");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.DeptId).HasColumnName("DeptID");
+
+                entity.Property(e => e.EmailInfo).HasMaxLength(50);
+
+                entity.Property(e => e.EmailType).HasMaxLength(50);
+
+                entity.Property(e => e.ModifiedDate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserCreated)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<SysEmailTemplate>(entity =>
+            {
+                entity.ToTable("sysEmailTemplate");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DatetimeCreated).HasColumnType("datetime");
+
+                entity.Property(e => e.DatetimeModified).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<SysEmployee>(entity =>

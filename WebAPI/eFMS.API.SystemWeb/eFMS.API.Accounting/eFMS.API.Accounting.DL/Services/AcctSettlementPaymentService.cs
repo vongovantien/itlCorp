@@ -551,16 +551,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in surchargeShipment)
                             {
-                                //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
-                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).FirstOrDefault();
-                                if (advanceRequest != null)
+                                var advanceRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).ToList();
+                                foreach(var advanceRequest in advanceRequests)
                                 {
-                                    advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
-                                    advanceRequest.DatetimeModified = DateTime.Now;
-                                    advanceRequest.UserModified = userCurrenct;
-                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    if (advanceRequest != null)
+                                    {
+                                        advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                        advanceRequest.DatetimeModified = DateTime.Now;
+                                        advanceRequest.UserModified = userCurrenct;
+                                        var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    }
                                 }
-
                                 item.SettlementCode = null;
                                 item.AdvanceNo = null;
                                 item.UserModified = userCurrenct;
@@ -4827,6 +4828,7 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Cw = ops.SumChargeWeight;
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
+                    shipmentSettlement.ServiceDate = ops.ServiceDate;
 
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
@@ -4857,6 +4859,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
                             _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                             shipmentSettlement.PersonInCharge = _personInCharge;
+                            shipmentSettlement.ServiceDate = trans.ServiceDate;
                         }
                         listData.Add(shipmentSettlement);
                     }

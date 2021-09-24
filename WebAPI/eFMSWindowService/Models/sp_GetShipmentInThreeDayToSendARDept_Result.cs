@@ -39,4 +39,17 @@ namespace eFMSWindowService.Models
         public decimal Over16To30Day { get; set; }
         public decimal Over30Day { get; set; }
     }
+
+
+    public partial class sp_GetOverDuePaymentCredit_Result
+    {
+        public System.Guid ID { get; set; }
+        public string BranchName_EN { get; set; }
+        public string PartnerName_EN { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public decimal CreditRate { get; set; }
+        public decimal? CreditLimit { get; set; }
+        public decimal DebitAmount { get; set; }
+    }
 }
