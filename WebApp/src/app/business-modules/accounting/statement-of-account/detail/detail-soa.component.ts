@@ -169,7 +169,7 @@ export class StatementOfAccountDetailComponent extends AppList {
 
     exportSOAAFWithHBL() {
         this._progressRef.start();
-        this._exportRepo.exportSOAAirFreight(this.soaNO, this.userLogged.officeId)
+        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO, this.userLogged.officeId)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
