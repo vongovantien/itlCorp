@@ -24,7 +24,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState SaveDoneReceipt(Guid receiptId);
         HandleState SaveCancel(Guid receiptId);
         ProcessClearInvoiceModel ProcessReceiptInvoice(ProcessReceiptInvoice criteria);
-        List<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
+        IQueryable<CustomerDebitCreditModel> GetDataIssueCustomerPayment(CustomerDebitCreditCriteria criteria);
         AgencyDebitCreditDetailModel GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria);
         Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
