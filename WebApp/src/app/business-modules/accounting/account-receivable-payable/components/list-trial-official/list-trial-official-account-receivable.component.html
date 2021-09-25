@@ -34,7 +34,9 @@
                                                     </app-permission-button>
                                                 </div>
                                             </td>
-                                            <td><a class="pointer" (click)="viewDetail(item.agreementId)">{{
+                                            <td>
+                                                <a class="pointer" [routerLink]="'./detail'"
+                                                    [queryParams]="{agreementId: item.agreementId}">{{
                                                     item.partnerCode }}</a>
                                             </td>
                                             <td style="min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}
