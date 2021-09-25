@@ -39,12 +39,12 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
         { title: 'NetOff VND', field: '', width: 150, align: this.right },
         { title: 'Total Paid USD', field: '', width: 150, align: this.right },
         { title: 'Total Paid VND', field: '', width: 150, align: this.right },
+        { title: 'NetOff Only', field: '', width: 150 },
         { title: 'Remain USD', field: '', width: 150, align: this.right },
         { title: 'Remain VND', field: '', width: 150, align: this.right },
         { title: 'Note', field: '', width: 200 },
         { title: 'BU Handle', field: '' },
         { title: 'Office', field: '' },
-        { title: 'NetOff Only', field: '', width: 150 },
         { title: 'Job No', field: '', width: 150 },
         { title: 'MBL No', field: '', width: 150 },
         { title: 'HBL No', field: '', width: 150 },
@@ -102,7 +102,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
             { title: 'Note', field: '', width: 200 },
             { title: 'BU Handle', field: '' },
             { title: 'Office', field: '' },
-            { title: 'NetOff Only', field: '', width: 150 }
         ];
 
 
