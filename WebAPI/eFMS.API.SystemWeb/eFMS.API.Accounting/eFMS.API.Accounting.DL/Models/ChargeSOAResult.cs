@@ -72,5 +72,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string PIC { get; set; }
         public bool IsSynced { get; set; }
         public string SeriesNo { get; set; }
+        public DateTime? InvoiceDate { get; set; }
     }
 }

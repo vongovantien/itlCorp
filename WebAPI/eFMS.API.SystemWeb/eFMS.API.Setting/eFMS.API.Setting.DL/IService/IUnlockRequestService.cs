@@ -20,5 +20,6 @@ namespace eFMS.API.Setting.DL.IService
         HandleState CheckExistVoucherNoOfAdvance(UnlockJobCriteria criteria);
         HandleState CheckExistInvoiceNoOfSettlement(UnlockJobCriteria criteria);
         List<UnlockRequestExport> GetUnlockRequestsExport(UnlockRequestCriteria criteria);
+        HandleState GenerateID(string paymentNo, int type);
     }
 }

@@ -19,7 +19,7 @@ namespace eFMS.API.Catalogue.DL.IService
 
         List<CatContractViewModel> Paging(CatContractCriteria criteria, int page, int size, out int rowsCount);
         HandleState Delete(Guid id);
-        HandleState Update(CatContractModel model);
+        HandleState Update(CatContractModel model, out bool isChangeAgrmentType);
         HandleState CustomerRequest(CatContractModel model);
 
         List<CatContractModel> GetBy(string partnerId, bool? all);

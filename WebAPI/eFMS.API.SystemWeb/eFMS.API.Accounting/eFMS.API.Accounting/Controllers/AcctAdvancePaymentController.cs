@@ -36,6 +36,7 @@ namespace eFMS.API.Accounting.Controllers
         private readonly IAcctAdvancePaymentService acctAdvancePaymentService;
         private readonly ICurrentUser currentUser;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IAccAccountReceivableService accountReceivableService;
         private string typeApproval = "Advance";
 
         /// <summary>
@@ -45,12 +46,13 @@ namespace eFMS.API.Accounting.Controllers
         /// <param name="service"></param>
         /// <param name="user"></param>
         /// <param name="hostingEnvironment"></param>
-        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment)
+        public AcctAdvancePaymentController(IStringLocalizer<LanguageSub> localizer, IAcctAdvancePaymentService service, ICurrentUser user, IHostingEnvironment hostingEnvironment, IAccAccountReceivableService accountReceivable)
         {
             stringLocalizer = localizer;
             acctAdvancePaymentService = service;
             currentUser = user;
             _hostingEnvironment = hostingEnvironment;
+            accountReceivableService = accountReceivable;
         }
 
         /// <summary>
@@ -156,24 +158,6 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(_result);
                     }
                 }
-
-                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi 
-                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
-                //foreach(var item in model.AdvanceRequests)
-                //{
-                //    var shipment = new ShipmentAdvancePaymentCriteria
-                //    {
-                //        JobId = item.JobId,
-                //        HBL = item.Hbl,
-                //        MBL = item.Mbl,
-                //        AdvanceNo = item.AdvanceNo
-                //    };
-                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
-                //    {
-                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
-                //        return BadRequest(_result);
-                //    }
-                //}
             }
 
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
@@ -182,17 +166,20 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Tính lại công nợ sau khi Add thành công
-                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }
-
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -251,17 +238,20 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            if (hs.Success)
-            {
-                // Sau khi xóa thành công >> tính lại công nợ dựa vào list request của advance no
-                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
-            }
-
             var message = HandleError.GetMessage(hs, Crud.Delete);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(advanceRequests);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
             }
             return Ok(result);
         }
@@ -339,16 +329,8 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
 
-            //Đã check bên trong function UpdateAdvancePayment
-            //if (!model.StatusApproval.Equals(Constants.STATUS_APPROVAL_NEW) && !model.StatusApproval.Equals(Constants.STATUS_APPROVAL_DENIED))
-            //{
-            //    ResultHandle _result = new ResultHandle { Status = false, Message = "Only allowed to edit the advance payment status is New or Deny" };
-            //    return BadRequest(_result);
-            //}
-
             if (model.AdvanceRequests.Count > 0)
             {
-                //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
                 if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
                 {
                     var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
@@ -358,43 +340,28 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(_result);
                     }
                 }
-
-                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
-                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
-                //foreach (var item in model.AdvanceRequests)
-                //{
-                //    var shipment = new ShipmentAdvancePaymentCriteria
-                //    {
-                //        JobId = item.JobId,
-                //        HBL = item.Hbl,
-                //        MBL = item.Mbl,
-                //        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
-                //    };
-                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
-                //    {
-                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
-                //        return BadRequest(_result);
-                //    }
-                //}
             }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-            }
-
-            if (hs.Success)
-            {
-                // Tính công nợ sau khi Update Advance thành công
-                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
-            }
+            }          
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             if (!hs.Success)
             {
                 return BadRequest(result);
+            }
+            else
+            {
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+                   
+                });
             }
             return Ok(result);
         }
@@ -438,25 +405,7 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
                         return BadRequest(_result);
                     }
-                }
-
-                //Kiểm tra tồn tại shipment trong 1 Advance Payment khác. Nếu đã tồn tại thì báo lỗi
-                //Updated 27/08/2019 by Andy.Hoa - [ĐÃ THAY ĐỔI YÊU CẦU - 1 SHIPMENT CHO PHÉP ĐƯỢC TẠO TRONG NHIỀU ADVANCE PAYMENT]
-                //foreach (var item in model.AdvanceRequests)
-                //{
-                //    var shipment = new ShipmentAdvancePaymentCriteria
-                //    {
-                //        JobId = item.JobId,
-                //        HBL = item.Hbl,
-                //        MBL = item.Mbl,
-                //        AdvanceNo = model.AdvanceNo//Truyền vào Advance No cần update
-                //    };
-                //    if (acctAdvancePaymentService.CheckShipmentsExistInAdvancePayment(shipment))
-                //    {
-                //        ResultHandle _result = new ResultHandle { Status = false, Message = "Duplicate Shipment" };
-                //        return BadRequest(_result);
-                //    }
-                //}
+                }                
             }
 
             #region -- Check Validate Email Requester --
@@ -566,8 +515,12 @@ namespace eFMS.API.Accounting.Controllers
                     return BadRequest(_result);
                 }
 
-                // Tính công nợ sau khi Save & Send Request Advance thành công
-                acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                Response.OnCompleted(async () =>
+                {
+                    List<ObjectReceivableModel> modelReceivableList = acctAdvancePaymentService.CalculatorReceivableAdvancePayment(model.AdvanceRequests);
+                    await accountReceivableService.InsertOrUpdateReceivableAsync(modelReceivableList);
+
+                });
 
                 return Ok(result);
             }
