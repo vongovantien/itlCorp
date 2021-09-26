@@ -43,6 +43,7 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
+        readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         private readonly IContextBase<CatContract> catContractRepository;
@@ -86,6 +87,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUserNotifyRepo,
             IContextBase<AccAccountReceivable> accAccountRepo,
             IContextBase<SysUserLevel> userLevelRepo,
+            IContextBase<AcctAdvancePayment> acctAdvancePayment,
             IUserBaseService userBase,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
@@ -118,6 +120,7 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
             accAccountReceivableService = accAccountReceivable;
+            acctAdvancePaymentRepo = acctAdvancePayment;
         }
 
         #region --- LIST & PAGING ---
@@ -540,19 +543,48 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = se.First().Mbl,
                     Description = se.FirstOrDefault().Description,
                     DatetimeModified = se.First().DatetimeModified
-                }).ToList().OrderByDescending(o => o.DatetimeModified);
+
+                })
+                .ToList().OrderByDescending(o => o.DatetimeModified);
+            //var innerJoint = advancePayments.Join(list, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) =>
+            //    new AcctAdvanceRequestModel
+            //    {
+            //        JobId = j.JobId,
+            //        Hbl = j.Hbl,
+            //        CustomNo = j.CustomNo,
+            //        Amount = j.Amount,
+            //        RequestCurrency = j.RequestCurrency,
+            //        StatusPayment = j.StatusPayment,
+            //        AdvanceNo = j.AdvanceNo,
+            //        Mbl = j.Mbl,
+            //        Description = j.Description,
+            //        DatetimeModified = j.DatetimeModified,
+            //        PaymentMethod = u.PaymentMethod,
+            //        DeadlinePayment = u.DeadlinePayment,
+            //        BankAccountName = u.BankAccountName,
+            //        BankAccountNo = u.BankAccountNo,
+            //        BankName = u.BankName,
+            //    }
+            //).ToList().OrderByDescending(o => o.DatetimeModified); ;
+            //var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
 
             foreach (var item in datamap)
             {
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
+                var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
                 if (!string.IsNullOrEmpty(requesterID))
                 {
                     string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
                     item.Requester = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
                 }
 
+                item.PaymentMethod = advancePayment.PaymentMethod;
+                item.DeadlinePayment = advancePayment.DeadlinePayment;
+                item.BankAccountName = advancePayment.BankAccountName;
+                item.BankAccountNo = advancePayment.BankAccountNo;
+                item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
 
