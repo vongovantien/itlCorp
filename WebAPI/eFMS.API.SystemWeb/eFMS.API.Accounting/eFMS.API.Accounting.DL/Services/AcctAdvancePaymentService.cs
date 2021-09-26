@@ -3633,7 +3633,8 @@ namespace eFMS.API.Accounting.DL.Services
                     JobId = s.First().JobId,
                     Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
-                    CustomNo = s.First().CustomNo
+                    CustomNo = s.First().CustomNo,
+                    RequestNote=s.First().RequestNote,
                 });
             foreach (var request in groupJobByHbl)
             {
@@ -3693,6 +3694,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
+                    RequestNote=request.RequestNote,
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl

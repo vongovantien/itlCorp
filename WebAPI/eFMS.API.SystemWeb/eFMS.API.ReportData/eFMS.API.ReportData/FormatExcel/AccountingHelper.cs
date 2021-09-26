@@ -877,6 +877,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Tiền mặt",//41
                 "Ngày đến hạn",//42
                 //END
+                "Note", //43
             };
 
             List<string> engHeaders = new List<string>()
@@ -928,6 +929,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "By cash",//41
                 "Due date",//42
                  //END
+                 "Note",    //43
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -1080,6 +1082,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[16, 10].Value = headers[16]; //Chi phí khác
             workSheet.Cells[16, 11].Value = headers[17]; //Tổng cộng
 
+            workSheet.Cells[15, 12, 16, 12].Merge = true;
+            workSheet.Cells[15, 12, 16, 12].Value = headers[43];//Note
+            workSheet.Cells[15, 12, 16, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[15, 12, 16, 12].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
             int p = 17;
             int j = 17;
             for (int i = 0; i < advanceExport.ShipmentsAdvance.Count; i++)
@@ -1135,7 +1142,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 4, j - 1, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 4, j - 1, 4].Style.WrapText = true;
 
-                for (int x = 5; x < 12; x++)
+                for (int x = 5; x < 13; x++)
                 {
                     workSheet.Cells[p, x, j - 1, x].Merge = true;
                     workSheet.Cells[p, x, j - 1, x].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
@@ -1148,6 +1155,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[p, 9, j - 1, 9].Value = advanceExport.ShipmentsAdvance[i].InvoiceAmount; //Value chi phí có hóa đơn
                 workSheet.Cells[p, 10, j - 1, 10].Value = advanceExport.ShipmentsAdvance[i].OtherAmount; //Value chi phí khác
                 workSheet.Cells[p, 11, j - 1, 11].Value = advanceExport.ShipmentsAdvance[i].NormAmount + advanceExport.ShipmentsAdvance[i].InvoiceAmount + advanceExport.ShipmentsAdvance[i].OtherAmount; //Value Tổng cộng
+                workSheet.Cells[p, 12, j - 1, 12].Value = advanceExport.ShipmentsAdvance[i].RequestNote; //Request Note
 
                 p = j;
                 /////
@@ -1172,13 +1180,13 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A" + p + ":K" + p].Style.Font.Bold = true;
             workSheet.Cells["A" + p + ":K" + p].Style.Numberformat.Format = numberFormat;
 
-            workSheet.Cells[14, 1, 14, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            workSheet.Cells[14, 1, 14, 12].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + p + ":K" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":K" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
 
             //All border
-            workSheet.Cells[15, 1, p, 11].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells[15, 1, p, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[15, 1, p, 12].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[15, 1, p, 12].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
             for (var i = 15; i < p + 1; i++)
             {
@@ -1189,7 +1197,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 //In đậm border Cột 7
                 workSheet.Cells[i, 7].Style.Border.Right.Style = ExcelBorderStyle.Medium;
                 //In đậm border Cột 11
-                workSheet.Cells[i, 11].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+                workSheet.Cells[i, 12].Style.Border.Right.Style = ExcelBorderStyle.Medium;
             }
 
             //Clear border Shipment

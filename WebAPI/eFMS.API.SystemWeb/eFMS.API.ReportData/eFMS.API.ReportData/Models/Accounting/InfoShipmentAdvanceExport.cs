@@ -17,5 +17,6 @@
         public decimal? NormAmount { get; set; }
         public decimal? InvoiceAmount { get; set; }
         public decimal? OtherAmount { get; set; }
+        public string RequestNote { get; set; }
     }
 }
