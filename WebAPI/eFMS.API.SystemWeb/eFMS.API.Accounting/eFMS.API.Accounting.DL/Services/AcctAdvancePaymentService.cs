@@ -546,27 +546,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 })
                 .ToList().OrderByDescending(o => o.DatetimeModified);
-            //var innerJoint = advancePayments.Join(list, u => u.AdvanceNo, j => j.AdvanceNo, (u, j) =>
-            //    new AcctAdvanceRequestModel
-            //    {
-            //        JobId = j.JobId,
-            //        Hbl = j.Hbl,
-            //        CustomNo = j.CustomNo,
-            //        Amount = j.Amount,
-            //        RequestCurrency = j.RequestCurrency,
-            //        StatusPayment = j.StatusPayment,
-            //        AdvanceNo = j.AdvanceNo,
-            //        Mbl = j.Mbl,
-            //        Description = j.Description,
-            //        DatetimeModified = j.DatetimeModified,
-            //        PaymentMethod = u.PaymentMethod,
-            //        DeadlinePayment = u.DeadlinePayment,
-            //        BankAccountName = u.BankAccountName,
-            //        BankAccountNo = u.BankAccountNo,
-            //        BankName = u.BankName,
-            //    }
-            //).ToList().OrderByDescending(o => o.DatetimeModified); ;
-            //var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
 
