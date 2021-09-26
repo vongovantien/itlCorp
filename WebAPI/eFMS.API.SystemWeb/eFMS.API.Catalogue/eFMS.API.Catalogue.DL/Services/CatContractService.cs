@@ -1274,12 +1274,12 @@ namespace eFMS.API.Catalogue.DL.Services
                 body.Replace("{{address}}", address);
                 body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
-                lstTo = listEmailViewModel.ListAccountant;
+                lstCc = listEmailViewModel.ListAccountant;
 
-                lstCc.Add(objInfoSalesman?.Email);
-                lstCc.Add(objInfoCreatorPartner?.Email);
-                lstCc.Add(objInfoCreator?.Email);
-                lstCc = lstCc.Where(t => !string.IsNullOrEmpty(t)).ToList();
+                lstTo.Add(objInfoSalesman?.Email);
+                lstTo.Add(objInfoCreatorPartner?.Email);
+                lstTo.Add(objInfoCreator?.Email);
+                lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
                 resultSendEmail = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
             }
@@ -1321,6 +1321,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 // Body
                 body = new StringBuilder(emailTemplate.Body);
                 urlToSend = UrlClone.Replace("Catalogue", "");
+                body.Replace("{{title}}", "Customer");
                 body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
                 body.Replace("{{accountNo}}", partner.AccountNo);
                 body.Replace("{{partnerNameVn}}", partner.PartnerNameVn);
@@ -1334,7 +1335,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 if (partner.ContractType == "Cash")
                 {
                     lstTo = listEmailViewModel.ListAccountant;
-                    if (listEmailViewModel.ListAccountant != null)
+                    if (listEmailViewModel.ListCCAccountant != null)
                     {
                         lstCc.AddRange(listEmailViewModel.ListCCAccountant);
                     }
@@ -1346,7 +1347,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstCc.AddRange(listEmailViewModel.ListCCAR);
                     }
-
                 }
                 lstCc.Add(objInfoSalesman?.Email);
                 lstCc.Add(objInfoCreatorPartner?.Email);
