@@ -86,7 +86,6 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<SysUserNotification> sysUserNotifyRepo,
             IContextBase<AccAccountReceivable> accAccountRepo,
             IContextBase<SysUserLevel> userLevelRepo,
-            IContextBase<AcctAdvancePayment> acctAdvancePayment,
             IUserBaseService userBase,
             IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
         {
