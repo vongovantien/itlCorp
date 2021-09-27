@@ -43,7 +43,6 @@ namespace eFMS.API.Accounting.DL.Services
         readonly IContextBase<CatCurrencyExchange> catCurrencyExchangeRepo;
         readonly ICurrencyExchangeService currencyExchangeService;
         readonly IContextBase<AcctApproveSettlement> acctApproveSettlementRepo;
-        readonly IContextBase<AcctAdvancePayment> acctAdvancePaymentRepo;
         readonly IUserBaseService userBaseService;
         readonly IContextBase<SysSentEmailHistory> sentEmailHistoryRepo;
         private readonly IContextBase<CatContract> catContractRepository;
@@ -120,7 +119,6 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
             accAccountReceivableService = accAccountReceivable;
-            acctAdvancePaymentRepo = acctAdvancePayment;
         }
 
         #region --- LIST & PAGING ---
@@ -552,7 +550,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in datamap)
             {
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
-                var advancePayment = acctAdvancePaymentRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
+                var advancePayment = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
                 if (!string.IsNullOrEmpty(requesterID))
                 {
                     string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
