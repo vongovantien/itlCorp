@@ -19,10 +19,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? NormAmount { get; set; }
         public decimal? InvoiceAmount { get; set; }
         public decimal? OtherAmount { get; set; }
-<<<<<<< HEAD
         public DateTime? ServiceDate { get; set; }
-=======
         public string RequestNote { get; set; }
->>>>>>> origin/prod/cherrypick/16394-Add-Note-to-Advance-Request
     }
 }
