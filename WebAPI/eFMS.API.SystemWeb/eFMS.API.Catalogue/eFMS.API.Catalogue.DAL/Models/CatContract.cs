@@ -42,5 +42,6 @@ namespace eFMS.API.Catalogue.Service.Models
         public bool? CreditUnlimited { get; set; }
         public string CreditCurrency { get; set; }
         public decimal? DebitAmount { get; set; }
+        public decimal? AutoExtendDays { get; set; }
     }
 }

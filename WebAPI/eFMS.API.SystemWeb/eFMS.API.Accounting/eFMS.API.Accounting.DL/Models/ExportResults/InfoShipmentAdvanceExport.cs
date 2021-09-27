@@ -1,4 +1,6 @@
-﻿namespace eFMS.API.Accounting.DL.Models.ExportResults
+﻿using System;
+
+namespace eFMS.API.Accounting.DL.Models.ExportResults
 {
     public class InfoShipmentAdvanceExport
     {
@@ -16,6 +18,7 @@
         public decimal? Cbm { get; set; }
         public decimal? NormAmount { get; set; }
         public decimal? InvoiceAmount { get; set; }
-        public decimal? OtherAmount { get; set; }        
+        public decimal? OtherAmount { get; set; }
+        public DateTime? ServiceDate { get; set; }
     }
 }

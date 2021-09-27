@@ -46,6 +46,7 @@ export class Surcharge {
     mblno: string = null;
     hblno: string = null;
     advanceNo: string = null;
+    originAdvanceNo: string = '';
     chargeGroup: string = null;
 
     shipmentId: string = SystemConstants.EMPTY_GUID; // * Id trong OpsTransation,CsTransation.

@@ -19,6 +19,7 @@ namespace eFMS.API.Accounting.DL.Models.Accounting
         public string Description0 { get; set; }
         public string PaymentMethod { get; set; }
         public string DataType { get; set; }
+        public string LocalBranchCode { get; set; }
         public List<PaymentDetailModel> Details { get; set; }
     }
 
