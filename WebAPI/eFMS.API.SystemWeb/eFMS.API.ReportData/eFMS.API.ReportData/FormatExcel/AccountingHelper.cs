@@ -4866,5 +4866,27 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
+        public Stream GenerateReceiptAdvance(List<AcctReceipt> receipts, AcctReceiptCriteria criteria)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+
+                var excel = new ExcelExport(path);
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
     }
 }
