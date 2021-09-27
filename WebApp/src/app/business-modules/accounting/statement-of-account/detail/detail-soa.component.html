@@ -32,20 +32,29 @@
             </span>
         </button>
         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
-            <button id="button-nested" dropdownToggle type="button" class="btn btn-danger dropdown-toggle"
-                aria-controls="dropdown-nested">
-                <i class="la la-download"></i>Export<span class="caret"></span>
-            </button>
-            <ul id="dropdown-nested" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-nested">
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAAF()">Air - SOA Customer
-                        Template</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOASupplierAF()">Air - SOA Supplier
-                        Template</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAOPS()">SOA OPS</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="export()">For Import Bravo</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportExcelSOA()">Standard</a></li>
-                <li role="menuitem"><a class="dropdown-item pointer" (click)="exportSOAAFWithHBL()">Air- SOA for Cusotmer With HBL</a></li>
-            </ul>
+            <app-permission-button type="export" title="Export" [dpToggle]="dropdownMenu" position="bottomLeft"
+                mode="dropdown">
+            </app-permission-button>
+            <app-dropdown #dropdownMenu>
+                <a class="dropdown-item pointer" (click)="exportSOAAF()">
+                    <span>Air - SOA Customer Template</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportSOASupplierAF()">
+                    <span>Air - SOA Supplier Template</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportSOAOPS()">
+                    <span>SOA OPS</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="export()">
+                    <span>For Import Bravo</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportExcelSOA()">
+                    <span>Standard</span>
+                </a>
+                <a class="dropdown-item pointer" (click)="exportSOAAFWithHBL()">
+                    <span>Air - SOA for Cusotmer With HBL</span>
+                </a>
+            </app-dropdown>
         </div>
         <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
             (click)="previewAccountStatementFull(soa.soano)">
@@ -67,7 +76,7 @@
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
                     <tab heading="Info" [active]="true">
-                        <br/>
+                        <br />
                         <div class="row">
                             <div class="col-lg-4 m--margin-bottom-10">
                                 <span class="m--font-bolder">SOA No:</span>
@@ -75,11 +84,13 @@
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">From Date:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.soaformDate | date: 'dd/MM/yyyy'}}</span>
+                                <span class="m--font-brand m--margin-left-5">{{soa.soaformDate | date:
+                                    'dd/MM/yyyy'}}</span>
                             </div>
                             <div class="col-lg-4 m--margin-bottom-10">
                                 <span class="m--font-bolder">To Date:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.soatoDate | date: 'dd/MM/yyyy'}}</span>
+                                <span class="m--font-brand m--margin-left-5">{{soa.soatoDate | date:
+                                    'dd/MM/yyyy'}}</span>
                             </div>
                         </div>
                         <div class="row">
@@ -92,20 +103,24 @@
                                 <span class="m--font-bolder">Status:</span>
                                 <span *ngSwitchCase="'New'" class="text-danger m--margin-left-5">{{soa.status}}</span>
                                 <span *ngSwitchCase="'Done'" class="text-success m--margin-left-5">{{soa.status}}</span>
-                                <span *ngSwitchCase="'Issued Invoice'" class="text-info m--margin-left-5">{{soa.status}}</span>
-                                <span *ngSwitchCase="'Issued Voucher'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                                <span *ngSwitchCase="'Issued Invoice'"
+                                    class="text-info m--margin-left-5">{{soa.status}}</span>
+                                <span *ngSwitchCase="'Issued Voucher'"
+                                    class="text-info m--margin-left-5">{{soa.status}}</span>
                                 <span *ngSwitchDefault class="text-primary m--margin-left-5">{{soa.status}}</span>
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Type:</span>
-                                <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
+                                <span
+                                    class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Total Amount:</span>
                                 <span class="m--font-brand m--margin-left-5"
-                                    *ngIf="soa.totalAmount > 0 else negativeNumber">{{soa.totalAmount | number: '.0-3'}}</span>
+                                    *ngIf="soa.totalAmount > 0 else negativeNumber">{{soa.totalAmount | number:
+                                    '.0-3'}}</span>
                                 <ng-template #negativeNumber class="m--font-brand m--margin-left-5">
                                     <span class="m--font-brand m--margin-left-5">
                                         ({{soa.totalAmount | abs | number: '.0-3'}})
@@ -126,7 +141,8 @@
                         <div class="row">
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Total Shipment/Charge:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}/{{soa.totalCharge
+                                <span class="m--font-brand m--margin-left-5">{{soa.shipment | number:
+                                    '.0-2'}}/{{soa.totalCharge
                                     | number: '.0-2'}}</span>
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
@@ -181,17 +197,13 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <accounting-attach-file-list  
-                        *ngIf="!!soa.id" 
-                        (onChange)="attachFiles = $event" 
-                        [fileNo]="soaNO" 
-                        [folderModuleName]="folderModuleName" 
-                        [objId]="soa.id" 
-                        [readOnly]="soa.syncStatus === 'Synced'?'':null">
+                        <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
+                            [folderModuleName]="folderModuleName" [objId]="soa.id"
+                            [readOnly]="soa.syncStatus === 'Synced'?'':null">
                         </accounting-attach-file-list>
                     </tab>
                 </tabset>
-                
+
             </div>
         </div>
     </div>
