@@ -20,5 +20,6 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? InvoiceAmount { get; set; }
         public decimal? OtherAmount { get; set; }
         public DateTime? ServiceDate { get; set; }
+        public string RequestNote { get; set; }
     }
 }

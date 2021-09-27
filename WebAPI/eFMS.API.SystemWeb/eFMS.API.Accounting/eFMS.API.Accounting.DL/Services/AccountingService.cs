@@ -443,6 +443,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         if (x.CurrencyCode == "USD")
                                         {
                                             x.CurrencyCode = "VND";
+                                            x.ExchangeRate = 1;
                                         }    
                                     }
                                     else if (currentSettle.SettlementCurrency == "USD")
