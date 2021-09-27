@@ -914,7 +914,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 //ADD
                 "Ngày dịch vụ:",//43
                 "Hình thức thanh toán:",//44
-                "Đối tượng thanh toán:"//45
+                "Đối tượng thanh toán:",//45
                 //END
                 "Note", //46
             };
@@ -973,7 +973,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 //ADD
                 "Service date:",//43
                 "Payment Method:",//44
-                "Supplier Name:"//45
+                "Supplier Name:",//45
                 //END
                  "Note",    //46
             };
