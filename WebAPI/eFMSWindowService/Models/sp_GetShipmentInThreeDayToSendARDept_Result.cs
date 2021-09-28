@@ -66,17 +66,8 @@ namespace eFMSWindowService.Models
         public string AREmail { get; set; }
     }
 
-    public partial class sp_GetContractExpiredWithin15And30Days_Result
+    public partial class sp_GetContractExpiredWithin15And30Days_Result: sp_GetExpiredContract_Result
     {
-        public string SaleManId { get; set; }
-        public string SaleManName { get; set; }
-        public string PartnerName { get; set; }
-        public string ContractNo { get; set; }
-        public DateTime? EffectiveDate { get; set; }
-        public DateTime? ExpiredDate { get; set; }
         public int? ExpiredIn { get; set; }
-        public string SaleManEmail { get; set; }
-        public string AccountantEmail { get; set; }
-        public string AREmail { get; set; }
     }
 }
