@@ -182,7 +182,7 @@ namespace eFMS.API.Operation.DL.Services
                     type = ClearanceConstants.Import_Type_Value;
                 }
             }
-            var serviceType = GetServiceType(clearance, out string cargoType);
+            var serviceType = GetServiceType(clearance.MA_HIEU_PTVC, out string cargoType);
             var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
             //var partnerTaxCode = clearance.MA_DV;
             if (clearance.MA_DV != null)
@@ -244,11 +244,11 @@ namespace eFMS.API.Operation.DL.Services
             return route;
         }
 
-        private string GetServiceType(DTOKHAIMD clearance, out string cargoType)
+        private string GetServiceType(string MA_HIEU_PTVC, out string cargoType)
         {
             cargoType = string.Empty;
             var serviceType = string.Empty;
-            switch (clearance.MA_HIEU_PTVC)
+            switch (MA_HIEU_PTVC)
             {
                 case ClearanceConstants.Air_Service_Type:
                     serviceType = ClearanceConstants.Air_Service;
@@ -1374,6 +1374,120 @@ namespace eFMS.API.Operation.DL.Services
                 return false;
             }
             return true;
+        }
+
+        public HandleState ImportClearancesOlaFromEcus()
+        {
+            string userId = currentUser.UserID;
+            var connections = ecusCconnectionService.Get(x => x.UserId == userId && x.Active == true);
+            var result = new HandleState();
+            var lists = new List<CustomsDeclaration>();
+            try
+            {
+                foreach (var item in connections)
+                {
+                    var clearanceEcus = ecusCconnectionService.GetDataOlaEcusByUser(item.UserId, item.ServerName, item.Dbusername, item.Dbpassword, item.Dbname);
+                    if (clearanceEcus == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        var clearances = DataContext.Get();
+                        var cleancesNotExsitInFMS = clearanceEcus.Where(x => !checkExistEcusInEFMS(x.SOTK.ToString()));
+                        if (cleancesNotExsitInFMS.Count() > 0)
+                        {
+                            foreach (var d in cleancesNotExsitInFMS)
+                            {
+                                var newClearance = MapOlaEcusClearanceToCustom(d, d.SOTK?.ToString().Trim());
+                                newClearance.Source = OperationConstants.FromEcus;
+                                lists.Add(newClearance);
+                            }
+                        }
+                    }
+                }
+                if (lists.Count > 0)
+                {
+                    HandleState hs = DataContext.Add(lists);
+                    if (hs.Success)
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, lists.Count]);
+
+                        string logErr = String.Format("Import Ecus thành công {0} \n {1} Tờ khai {2}", currentUser.UserName, lists.Count, DateTime.Now);
+                        new LogHelper("ECUS", logErr);
+                    }
+                    else
+                    {
+                        result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_SUCCESS, 0]);
+                        string logErr = String.Format("{0} Import thất bại {1} Tờ khai do {2} at {3}", currentUser.UserName, lists.Count, hs.Message, DateTime.Now);
+                        new LogHelper("ECUS", logErr);
+                    }
+                }
+                else
+                {
+                    result = new HandleState(true, stringLocalizer[OperationLanguageSub.MSG_CUSTOM_CLEARANCE_ECUS_CONVERT_NO_DATA]);
+                    string logErr = String.Format("Import thất bại {0} \n {1} Tờ khai {2}", currentUser.UserName, lists.Count, DateTime.Now);
+                    new LogHelper("ECUS", logErr);
+                }
+            }
+            catch (Exception ex)
+            {
+                string logErr = String.Format("Lỗi import Ecus {0} \n {1} {2}", currentUser.UserID, ex.ToString(), DateTime.Now);
+                new LogHelper("ECUS", logErr);
+                result = new HandleState(ex.Message);
+            }
+            return result;
+        }
+
+        private CustomsDeclaration MapOlaEcusClearanceToCustom(D_OLA clearance, string clearanceNo)
+        {
+            var type = ClearanceConstants.Export_Type_Value;
+            if (clearance._XorN != null)
+            {
+                if (clearance._XorN.Contains(ClearanceConstants.Import_Type))
+                {
+                    type = ClearanceConstants.Import_Type_Value;
+                }
+            }
+            var serviceType = GetServiceType(clearance.MA_HIEU_PTVC, out string cargoType);
+            var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
+
+            if (clearance.MA_DV != null)
+            {
+                Regex pattern = new Regex("[-_ ]");
+                pattern.Replace(clearance.MA_DV, "");
+            }
+
+            var newItem = new CustomsDeclaration
+            {
+                IdfromEcus = clearance.D_OLAID,
+                ClearanceNo = clearanceNo,
+                FirstClearanceNo = clearance.SOTK,
+                ClearanceDate = clearance.NGAY_KB,
+                PartnerTaxCode = clearance.MA_DV,
+                Mblid = clearance.SO_VAN_DON,
+                Hblid = clearance.SO_VAN_DON,
+                Gateway = clearance.MA_CANGNN,
+                PortCodeNn = clearance.MA_CANGNN,
+                UnitCode = clearance.MA_DVT,
+                QtyCont = (int?)clearance.SO_CONTAINER ?? null,
+                GrossWeight = clearance.TRLUONG,
+                Route = route,
+                Type = type,
+                CargoType = cargoType,
+                ServiceType = serviceType,
+                Shipper = clearance.TEN_DVXK,
+                UserCreated = currentUser.UserID,
+                DatetimeCreated = DateTime.Now,
+                DatetimeModified = DateTime.Now,
+                GroupId = currentUser.GroupId,
+                DepartmentId = currentUser.DepartmentId,
+                OfficeId = currentUser.OfficeID,
+                CompanyId = currentUser.CompanyID,
+                AccountNo = clearance.MA_DV
+            };
+
+            return newItem;
         }
     }
 }

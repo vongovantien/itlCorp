@@ -48,6 +48,15 @@
                                 </span>
                             </span>
                         </button>
+                        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
+                        (click)="getDataOlaFromEcus()" *ngIf="!!menuPermission && menuPermission.allowAdd">
+                        <span>
+                            <i class="la la-refresh"></i>
+                            <span>
+                                get ola from ecus
+                            </span>
+                        </span>
+                    </button>
                     </div>
                 </div>
             </div>
