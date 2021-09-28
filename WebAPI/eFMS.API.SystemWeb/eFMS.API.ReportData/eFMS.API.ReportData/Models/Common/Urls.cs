@@ -53,14 +53,13 @@
             public const string GeneralSettlementPaymentExport = "/api/v1/en-US/AcctSettlementPayment/GeneralSettlementPaymentExport";
             public const string DetailSOAExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOABySOANo?soaNo=";
             public const string GetDataSOAAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANo?soaNo=";
-            public const string GetDataSOAAirfreightWithHBLExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportAirFrieghtBySOANoWithHBL?soaNo=";
             public const string GetDataSOASupplierAirfreightExportUrl = "/api/v1/en-US/AcctSOA/GetDataExportSOASupplierAirFrieghtBySOANo?soaNo=";
             public const string GetGroupRequestsByAdvanceNoList = "/api/v1/en-US/AcctAdvancePayment/GetGroupRequestsByAdvanceNoList";
             public const string QueryDataSettlementExport = "/api/v1/en-US/AcctSettlementPayment/QueryDataSettlementExport";
             public const string AccountingManagementExportUrl = "/api/v1/en-US/AccountingManagement/GetDataAcctMngtExport";
             public const string AccountingGetDataARSumaryExportUrl = "/api/v1/en-US/AccountReceivable/GetDataARSumaryExport";
-
             public const string AgencyPaymentUrl = "/api/v1/en-US/AccountingPayment/GetDataExportAccountingAgencyPayment";
+            public const string GetDataExportReceiptAdvance = "/api/v1/en-US/AcctReceipt/GetDataExportReceiptAdvance";
         }
 
         public class Documentation

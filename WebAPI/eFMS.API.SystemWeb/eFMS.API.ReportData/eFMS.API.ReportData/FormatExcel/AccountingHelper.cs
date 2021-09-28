@@ -1035,8 +1035,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J9"].Style.Font.Bold = true;
             workSheet.Cells["K9"].Style.VerticalAlignment = ExcelVerticalAlignment.Bottom;
 
-            workSheet.Cells["B11"].Value = headers[41];
-            workSheet.Cells["B11"].Style.Font.Bold = true;
+            workSheet.Cells["B10"].Value = headers[41];
+            workSheet.Cells["B10"].Style.Font.Bold = true;
 
             //var check = workSheet.Drawings.AddCheckBoxControl("");
 
@@ -1060,21 +1060,17 @@ namespace eFMS.API.ReportData.FormatExcel
             //workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
             workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.BankAccountName;
 
-            workSheet.Cells["A7:B7"].Merge = true;
-            workSheet.Cells["A7:B7"].Value = headers[45];
-            workSheet.Cells["A7:B7"].Style.Font.Bold = true;
+            workSheet.Cells["A8:B8"].Merge = true;
+            workSheet.Cells["A8:B8"].Value = headers[42];
+            workSheet.Cells["A8:B8"].Style.Font.Bold = true;
 
             workSheet.Cells["A9:B9"].Merge = true;
-            workSheet.Cells["A9:B9"].Value = headers[42];
+            workSheet.Cells["A9:B9"].Value = headers[44];
             workSheet.Cells["A9:B9"].Style.Font.Bold = true;
 
-            workSheet.Cells["A10:B10"].Merge = true;
-            workSheet.Cells["A10:B10"].Value = headers[44];
-            workSheet.Cells["A10:B10"].Style.Font.Bold = true;
-
-            workSheet.Cells["C9"].Value = advanceExport.InfoAdvance.DeadlinePayment;
-            workSheet.Cells["C9"].Style.Numberformat.Format = "dd MMM, yyyy";
-            workSheet.Cells["C9"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["C8"].Value = advanceExport.InfoAdvance.DeadlinePayment;
+            workSheet.Cells["C8"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["C8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
             workSheet.Cells["J11"].Value = headers[38];
             workSheet.Cells["J11"].Style.Font.Bold = true;
@@ -3789,30 +3785,30 @@ namespace eFMS.API.ReportData.FormatExcel
             #region #Format Header Table
             for (var col = 1; col < 14; col++)
             {
-                workSheet.Cells[15, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
-                workSheet.Cells[15, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-                workSheet.Cells[15, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-                workSheet.Cells[15, col].Style.WrapText = true;
-                workSheet.Cells[15, col].Style.Font.Bold = true;
+                workSheet.Cells[16, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[16, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[16, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[16, col].Style.WrapText = true;
+                workSheet.Cells[16, col].Style.Font.Bold = true;
             }
-            workSheet.Cells["A15"].Value = headers[7]; // STT
+            workSheet.Cells["A16"].Value = headers[7]; // STT
 
-            workSheet.Cells["B15:C15"].Merge = true;
-            workSheet.Cells["B15:C15"].Value = headers[8]; // Thông tin chung
+            workSheet.Cells["B16:C16"].Merge = true;
+            workSheet.Cells["B16:C16"].Value = headers[8]; // Thông tin chung
 
-            workSheet.Cells["D15:E15"].Merge = true;
-            workSheet.Cells["D15:E15"].Value = headers[9]; // Diễn giải
+            workSheet.Cells["D16:E16"].Merge = true;
+            workSheet.Cells["D16:E16"].Value = headers[9]; // Diễn giải
 
-            workSheet.Cells["F15"].Value = headers[46]; // Số tiền trước thuế
-            workSheet.Cells["G15"].Value = headers[47]; // Tiền thuế
-            workSheet.Cells["H15"].Value = headers[48]; // Tổng tiền
-            workSheet.Cells["I15"].Value = headers[11]; // Số hóa đơn
-            workSheet.Cells["J15"].Value = headers[12]; // Ghi chú
-            workSheet.Cells["K15"].Value = headers[13]; // Số tiền đã tạm ứng
-            workSheet.Cells["L15"].Value = headers[14]; // Ngày tạm ứng
-            workSheet.Cells["M15"].Value = headers[15]; // Chênh lệch
-            workSheet.Row(15).Height = 30;
-            workSheet.Cells[15, 1, 15, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["F16"].Value = headers[46]; // Số tiền trước thuế
+            workSheet.Cells["G16"].Value = headers[47]; // Tiền thuế
+            workSheet.Cells["H16"].Value = headers[48]; // Tổng tiền
+            workSheet.Cells["I16"].Value = headers[11]; // Số hóa đơn
+            workSheet.Cells["J16"].Value = headers[12]; // Ghi chú
+            workSheet.Cells["K16"].Value = headers[13]; // Số tiền đã tạm ứng
+            workSheet.Cells["L16"].Value = headers[14]; // Ngày tạm ứng
+            workSheet.Cells["M16"].Value = headers[15]; // Chênh lệch
+            workSheet.Row(16).Height = 30;
+            workSheet.Cells[16, 1, 16, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             #endregion
 
             decimal? _sumTotalNetAmount = 0;
@@ -3821,9 +3817,9 @@ namespace eFMS.API.ReportData.FormatExcel
             decimal? _sumTotalAdvancedAmount = 0;
             decimal? _sumTotalDifference = 0;
 
-            int p = 16;
-            int j = 16;
-            int k = 16;
+            int p = 17;
+            int j = 17;
+            int k = 17;
             for (int i = 0; i < settlementExport.ShipmentsSettlement.Count; i++)
             {
                 #region --- Diễn giải ---
@@ -4122,12 +4118,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A" + p + ":M" + p].Style.Font.Bold = true;
             workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = numberFormat;
 
-            //In đậm border dòng 14
-            workSheet.Cells[14, 1, 14, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            //In đậm border dòng 15
+            workSheet.Cells[15, 1, 15, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + p + ":M" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":M" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
 
-            for (var i = 15; i < p + 1; i++)
+            for (var i = 16; i < p + 1; i++)
             {
                 //In đậm border bên trái của Cột 1
                 workSheet.Cells[i, 1].Style.Border.Left.Style = ExcelBorderStyle.Medium;
@@ -4870,5 +4866,59 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
+        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+
+                var excel = new ExcelExport(path);
+
+                var map = new Dictionary<string, object>();
+
+                map.Add("taxCode", result.TaxCode);
+                map.Add("nameEn", result.PartnerNameEn);
+                map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
+                excel.SetData(map);
+
+                int startRow = 5;
+                excel.StartDetailTable = startRow;
+                int _length = result.Details.Count;
+
+                for (int i = 0; i < _length; i++)
+                {
+                    AcctREceiptAdvanceRow item = result.Details[i];
+                    Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+
+                    mappingKeyValue.Add("paidDate",item.PaidDate);
+                    mappingKeyValue.Add("receiptNo",item.ReceiptNo);
+                    mappingKeyValue.Add("totalAdvPaymentVnd",item.TotalAdvancePaymentVnd);
+                    mappingKeyValue.Add("cusAdvAmountVnd",item.CusAdvanceAmountVnd);
+                    mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
+                    mappingKeyValue.Add("description", item.Description);
+
+                    excel.SetData(mappingKeyValue);
+                    startRow++;
+                }
+
+                //var listKeyFormula = new Dictionary<string, string>();
+                //var _formular = string.Format("SUM({0}{1}:{0}{2})", "C", startRow, _length);
+                //listKeyFormula.Add(totalFormat, _formular);
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
     }
 }
