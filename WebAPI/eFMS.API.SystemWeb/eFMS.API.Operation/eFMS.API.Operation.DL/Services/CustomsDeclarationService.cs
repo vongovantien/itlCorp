@@ -1462,7 +1462,7 @@ namespace eFMS.API.Operation.DL.Services
             {
                 IdfromEcus = clearance.D_OLAID,
                 ClearanceNo = clearanceNo,
-                FirstClearanceNo = clearance.SOTK,
+                FirstClearanceNo = clearance.SOTK?.ToString(),
                 ClearanceDate = clearance.NGAY_KB,
                 PartnerTaxCode = clearance.MA_DV,
                 Mblid = clearance.SO_VAN_DON,
