@@ -19,8 +19,6 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? PaidAmount { get; set; }
         public decimal? ObhAmount { get; set; }
         public decimal? ObhUnpaid { get; set; }
-        public decimal? ObhPaid { get; set; }
-        public decimal? ObhBilling { get; set; }
         public decimal? AdvanceAmount { get; set; }
         public decimal? CreditAmount { get; set; }
         public decimal? SellingNoVat { get; set; }
@@ -35,5 +33,7 @@ namespace eFMS.API.Accounting.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
+        public decimal? ObhPaid { get; set; }
+        public decimal? ObhBilling { get; set; }
     }
 }
