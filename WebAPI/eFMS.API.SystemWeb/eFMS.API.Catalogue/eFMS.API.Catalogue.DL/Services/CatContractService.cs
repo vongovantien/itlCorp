@@ -1479,7 +1479,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
-            ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(contract.OfficeId, DataEnums.EMAIL_TYPE_ACTIVE_CONTRACT);
             lstTo = listEmailViewModel.ListAccountant;
             lstCc = listEmailViewModel.ListCCAccountant;
 
