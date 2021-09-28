@@ -17,5 +17,6 @@ namespace eFMS.API.Operation.DL.IService
         IQueryable<SetEcusConnectionModel> Paging(SetEcusConnectionCriteria criteria, int page_num, int page_size, out int total_items);
 
         bool CheckAllowPermissionAction(int id, PermissionRange permissionRange);
+        List<D_OLA> GetDataOlaEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string dbname);
     }
 }
