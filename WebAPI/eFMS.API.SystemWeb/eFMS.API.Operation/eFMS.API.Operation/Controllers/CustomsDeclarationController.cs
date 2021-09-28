@@ -87,7 +87,7 @@ namespace eFMS.API.Operation.Controllers
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="keySearch"></param>
         /// <param name="customerNo"></param>
@@ -228,11 +228,28 @@ namespace eFMS.API.Operation.Controllers
         [HttpPost("ImportClearancesFromEcus")]
         public IActionResult ImportClearancesFromEcus()
         {
-          
+
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
             var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
             if (code == 403) return Forbid();
             var hs = customsDeclarationService.ImportClearancesFromEcus();
+            var message = hs.Message?.ToString();
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpPost("ImportClearancesOlaFromEcus")]
+        public IActionResult ImportClearancesOlaFromEcus()
+        {
+
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.opsCustomClearance);
+            var code = CheckForbitUpdate(_user.UserMenuPermission.Write);
+            if (code == 403) return Forbid();
+            var hs = customsDeclarationService.ImportClearancesOlaFromEcus();
             var message = hs.Message?.ToString();
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
             if (!hs.Success)
@@ -269,7 +286,7 @@ namespace eFMS.API.Operation.Controllers
                     return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[OperationLanguageSub.MSG_NOT_ALLOW_DELETED].Value });
                 }
             }
-          
+
             var result = customsDeclarationService.UpdateJobToClearances(clearances);
             return Ok(result);
         }
@@ -322,7 +339,7 @@ namespace eFMS.API.Operation.Controllers
             if (statusCode == 403) return Ok(false);
             return Ok(true);
         }
-        
+
         ///
         [HttpPost("CheckDeletePermission")]
         [Authorize]
@@ -486,7 +503,7 @@ namespace eFMS.API.Operation.Controllers
         }
 
         /// <summary>
-        /// Get list custom of shipment operation (not locked, shipment asign or PIC is current user) 
+        /// Get list custom of shipment operation (not locked, shipment asign or PIC is current user)
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetListCustomNoAsignPIC")]
