@@ -75,7 +75,7 @@ namespace eFMS.API.Accounting.DL.Services
                     UnpaidAmountUsd = x.Sum(s => s.AmountUsd + s.VatAmountUsd),
                     TotalAmount = invoice.Currency == AccountingConstants.CURRENCY_LOCAL ? x.Sum(s => s.AmountVnd + s.VatAmountVnd) : x.Sum(s => s.AmountUsd + s.VatAmountUsd),
                     TotalAmountVnd = x.Sum(s => s.AmountVnd + s.VatAmountVnd),
-                    TotalAmountUsd = x.Sum(s => s.AmountVnd + s.VatAmountUsd),
+                    TotalAmountUsd = x.Sum(s => s.AmountUsd + s.VatAmountUsd),
                     UserCreated = currentUser.UserID,
                     UserModified = currentUser.UserID,
                     DatetimeCreated = DateTime.Now,
