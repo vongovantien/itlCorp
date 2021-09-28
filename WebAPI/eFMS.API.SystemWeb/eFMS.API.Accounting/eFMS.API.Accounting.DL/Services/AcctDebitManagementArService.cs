@@ -21,19 +21,22 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly ICurrentUser currentUser;
         private readonly IAccountingManagementService accMngtService;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepository;
+        private readonly IContextBase<AccAccountingManagement> accMngtRepository;
         public AcctDebitManagementArService(
             IContextBase<AcctDebitManagementAr> repository,
             IMapper mapper,
             ICurrentUser curUser,
             IStringLocalizer<AccountingLanguageSub> localizer,
             IAccountingManagementService accMngt,
-            IContextBase<CsShipmentSurcharge> surchargeRepo
+            IContextBase<CsShipmentSurcharge> surchargeRepo,
+            IContextBase<AccAccountingManagement> accMngtRepo
             ) : base(repository, mapper)
         {
             currentUser = curUser;
             stringLocalizer = localizer;
             accMngtService = accMngt;
             surchargeRepository = surchargeRepo;
+            accMngtRepository = accMngtRepo;
         }
 
         public async Task<HandleState> AddAndUpdate(Guid Id)
@@ -59,6 +62,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     Id = Guid.NewGuid(),
                     Hblid = x.Key.Hblid,
+                    RefNo = !string.IsNullOrEmpty(x.FirstOrDefault().Soano) ? x.FirstOrDefault().Soano : x.FirstOrDefault().DebitNo,
                     AcctManagementId = Id,
                     CompanyId = currentUser.CompanyID,
                     PartnerId = x.FirstOrDefault().PaymentObjectId,
@@ -66,9 +70,12 @@ namespace eFMS.API.Accounting.DL.Services
                     PaidAmountUsd = 0,
                     PaidAmountVnd = 0,
                     PaymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
-                    UnpaidAmount = x.Sum(s => s.AmountVnd + s.VatAmountVnd),
+                    UnpaidAmount = invoice.Currency == AccountingConstants.CURRENCY_LOCAL ? x.Sum(s => s.AmountVnd + s.VatAmountVnd) : x.Sum(s => s.AmountUsd + s.VatAmountUsd),
                     UnpaidAmountVnd = x.Sum(s => s.AmountVnd + s.VatAmountVnd),
                     UnpaidAmountUsd = x.Sum(s => s.AmountUsd + s.VatAmountUsd),
+                    TotalAmount = invoice.Currency == AccountingConstants.CURRENCY_LOCAL ? x.Sum(s => s.AmountVnd + s.VatAmountVnd) : x.Sum(s => s.AmountUsd + s.VatAmountUsd),
+                    TotalAmountVnd = x.Sum(s => s.AmountVnd + s.VatAmountVnd),
+                    TotalAmountUsd = x.Sum(s => s.AmountVnd + s.VatAmountUsd),
                     UserCreated = currentUser.UserID,
                     UserModified = currentUser.UserID,
                     DatetimeCreated = DateTime.Now,

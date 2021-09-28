@@ -211,7 +211,8 @@ namespace eFMSWindowService
                     PartnerName = x.PartnerName,
                     ContractNo = x.ContractNo,
                     EffectiveDate = x.EffectiveDate,
-                    ExpiredDate = x.ExpiredDate
+                    ExpiredDate = x.ExpiredDate,
+                    ExpiredIn = x.ExpiredIn
                 }).ToList();
 
                 StringBuilder content = new StringBuilder();
