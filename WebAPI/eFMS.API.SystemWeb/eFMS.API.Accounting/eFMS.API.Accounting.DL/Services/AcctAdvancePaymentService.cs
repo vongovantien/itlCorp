@@ -540,19 +540,27 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = se.First().Mbl,
                     Description = se.FirstOrDefault().Description,
                     DatetimeModified = se.First().DatetimeModified
-                }).ToList().OrderByDescending(o => o.DatetimeModified);
+
+                })
+                .ToList().OrderByDescending(o => o.DatetimeModified);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
 
             foreach (var item in datamap)
             {
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
+                var advancePayment = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
                 if (!string.IsNullOrEmpty(requesterID))
                 {
                     string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
                     item.Requester = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
                 }
 
+                item.PaymentMethod = advancePayment.PaymentMethod;
+                item.DeadlinePayment = advancePayment.DeadlinePayment;
+                item.BankAccountName = advancePayment.BankAccountName;
+                item.BankAccountNo = advancePayment.BankAccountNo;
+                item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
 
