@@ -124,6 +124,12 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
+    <Compile Include="SendMailExpiredAgreementService.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="SendMailExpiredAgreementService.Designer.cs">
+      <DependentUpon>SendMailExpiredAgreementService.cs</DependentUpon>
+    </Compile>
     <Compile Include="SendMailExceededCreditLimitService.cs">
       <SubType>Component</SubType>
     </Compile>
