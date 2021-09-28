@@ -18,6 +18,7 @@ using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Extensions;
 using ITL.NetCore.Common;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -430,6 +431,17 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             var result = acctReceiptService.GetDataIssueAgencyPayment(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("GetDataExportReceiptAdvance")]
+        [Authorize]
+        public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
+        {
+            var resultQuery = acctReceiptService.Query(criteria);
+
+            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria, resultQuery);
+
             return Ok(result);
         }
     }

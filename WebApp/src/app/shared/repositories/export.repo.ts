@@ -187,7 +187,7 @@ export class ExportRepo {
     }
 
     exportSOAAirFreightWithHBL(soaNo: string, officeId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreightWithHBL`, null, { soaNo: soaNo, officeId: officeId}).pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportSOAAirfreightWithHBL`, null, { soaNo: soaNo, officeId: officeId }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -442,6 +442,13 @@ export class ExportRepo {
 
     exportStatementReceivableAgency(searchObject: any) {
         return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportAccountingAgencyPayment`, searchObject).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    exportAdvanceReceipt(criteria: any) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportReceiptAdvance`, criteria).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

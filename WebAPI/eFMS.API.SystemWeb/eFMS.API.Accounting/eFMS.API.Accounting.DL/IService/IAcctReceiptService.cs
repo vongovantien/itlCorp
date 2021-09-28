@@ -9,6 +9,7 @@ using eFMS.API.Accounting.DL.Models.Criteria;
 using System.Collections.Generic;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using System.Threading.Tasks;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 
 namespace eFMS.API.Accounting.DL.IService
 {
@@ -29,5 +30,6 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
+        AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts);
     }
 }
