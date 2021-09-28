@@ -4866,5 +4866,59 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
+        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria)
+        {
+            try
+            {
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                {
+                    return null;
+                }
+
+                var excel = new ExcelExport(path);
+
+                var map = new Dictionary<string, object>();
+
+                map.Add("taxCode", result.TaxCode);
+                map.Add("nameEn", result.PartnerNameEn);
+                map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
+                excel.SetData(map);
+
+                int startRow = 5;
+                excel.StartDetailTable = startRow;
+                int _length = result.Details.Count;
+
+                for (int i = 0; i < _length; i++)
+                {
+                    AcctREceiptAdvanceRow item = result.Details[i];
+                    Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
+                    excel.SetGroupsTable();
+
+                    mappingKeyValue.Add("paidDate",item.PaidDate);
+                    mappingKeyValue.Add("receiptNo",item.ReceiptNo);
+                    mappingKeyValue.Add("totalAdvPaymentVnd",item.TotalAdvancePaymentVnd);
+                    mappingKeyValue.Add("cusAdvAmountVnd",item.CusAdvanceAmountVnd);
+                    mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
+                    mappingKeyValue.Add("description", item.Description);
+
+                    excel.SetData(mappingKeyValue);
+                    startRow++;
+                }
+
+                //var listKeyFormula = new Dictionary<string, string>();
+                //var _formular = string.Format("SUM({0}{1}:{0}{2})", "C", startRow, _length);
+                //listKeyFormula.Add(totalFormat, _formular);
+
+                return excel.ExcelStream();
+            }
+            catch (Exception ex)
+            {
+
+                return null;
+            }
+        }
     }
 }

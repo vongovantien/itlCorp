@@ -26,7 +26,6 @@ namespace eFMS.API.ReportData.Controllers
     public class AccountingReportController : ControllerBase
     {
         private readonly APIs aPis;
-
         /// <summary>
         /// Contructor controller Accounting Report
         /// </summary>
@@ -515,5 +514,25 @@ namespace eFMS.API.ReportData.Controllers
 
             return fileContent;
         }
+
+        [Route("ExportReceiptAdvance")]
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportReceiptAdvance(AcctReceiptCriteria criteria)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataExportReceiptAdvance, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<AcctReceiptAdvanceModelExport>();
+            if (dataObjects.Result == null)  return Ok(null);
+
+            var stream = new AccountingHelper().GenerateReceiptAdvance(dataObjects.Result, criteria);
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Receipt Advance - eFMS.xlsx");
+
+            return fileContent;
+        }
+
     }
 }

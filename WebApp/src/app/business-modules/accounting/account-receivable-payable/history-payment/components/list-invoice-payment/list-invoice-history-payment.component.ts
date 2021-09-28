@@ -158,6 +158,27 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         }
     }
 
+    exportAdvanceReceipt() {
+        if (!this.dataSearch || !this.dataSearch.partnerId) {
+            this._toastService.warning('No Data To View, Please Select Partner');
+            return;
+        }
+        const body = {
+            customerId: this.dataSearch.partnerId,
+            status: "Done",
+        };
+        this._exportRepo.exportAdvanceReceipt(body)
+            .subscribe(
+                (res: ArrayBuffer) => {
+                    if (!res) {
+                        this._toastService.warning('No Data To View');
+                        return;
+                    }
+                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms Receipt_Advance.xlsx');
+                }
+            );
+    }
+
     getPayments(refNo: string, type: string) {
         this._accountingRepo.getPaymentByrefNo(refNo, type)
             .pipe(

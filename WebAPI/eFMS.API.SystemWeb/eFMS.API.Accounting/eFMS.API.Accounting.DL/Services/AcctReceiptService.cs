@@ -3,6 +3,7 @@ using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.Receipt;
 using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Common;
@@ -3192,17 +3193,19 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
                 }
                 List<string> toEmails = new List<string>();
-                var emailSettingDept = emailSettingRepository.Get(x => x.DeptId == Id)?.FirstOrDefault();
-                if (emailSettingDept == null)
+                var emailSettingDept = emailSettingRepository.Get(x => x.DeptId == Id);
+                if (emailSettingDept.FirstOrDefault() == null)
                 {
                     if (!string.IsNullOrEmpty(dept.Email))
                     {
                         toEmails = dept.Email.Split(";").ToList();
                     }
                 }
-                else if (emailSettingDept.EmailType == AccountingConstants.EMAIL_SETTING_AR_ALERT && !string.IsNullOrEmpty(emailSettingDept.EmailInfo))
+
+                var emailAlertSettng = emailSettingDept.Where(x => x.EmailType == AccountingConstants.EMAIL_SETTING_AR_ALERT).FirstOrDefault();
+                if (emailAlertSettng != null && !string.IsNullOrEmpty(emailAlertSettng.EmailInfo))
                 {
-                    toEmails = emailSettingDept.EmailInfo.Split(";").ToList();
+                    toEmails = emailAlertSettng.EmailInfo.Split(";").ToList();
                 }
 
                 if (toEmails.Count > 0)
@@ -3232,6 +3235,58 @@ namespace eFMS.API.Accounting.DL.Services
             bd.Replace("{{url}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/account-receivable-payable/receipt/" + receipt.Id.ToString());
 
             var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
+        }
+
+        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts)
+        {
+            if(receipts.Count() == 0)
+            {
+                return null;
+            }
+            AcctReceiptAdvanceModelExport result = new AcctReceiptAdvanceModelExport();
+
+            CatPartner partner = catPartnerRepository.Get(x => x.Id.ToString() == criteria.CustomerID)?.FirstOrDefault();
+            if(partner == null)
+            {
+                return null;
+            }
+
+            result.TaxCode = partner.TaxCode;
+            result.PartnerNameVn = partner.PartnerNameVn;
+            result.PartnerNameEn = partner.PartnerNameEn;
+            result.UserExport = currentUser.UserName;
+
+            result.Details = receipts.Select(receipt => new AcctReceiptAdvanceRowModel
+            {
+                Description = receipt.Description,
+                ReceiptNo = receipt.PaymentRefNo,
+                PaidDate = receipt.PaymentDate,
+                CusAdvanceAmountVnd = receipt.CusAdvanceAmountVnd ?? 0,
+                CusAdvanceAmountUsd = receipt.CusAdvanceAmountUsd ?? 0,
+                AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0,
+                AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
+                TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD),
+                TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
+            });
+
+            return result;
+        }
+
+        private decimal GetTotalAdvancePayment(Guid receiptId, string currency)
+        {
+            decimal totalAdv = 0;
+
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE);
+            if(currency == AccountingConstants.CURRENCY_LOCAL)
+            {
+                totalAdv = payments.Sum(x => x.PaymentAmountVnd) ?? 0;
+            }
+            else
+            {
+                totalAdv = payments.Sum(x => x.PaymentAmountUsd) ?? 0;
+            }
+
+            return totalAdv;
         }
     }
 }
