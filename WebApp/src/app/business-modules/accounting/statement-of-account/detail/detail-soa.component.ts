@@ -11,7 +11,6 @@ import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
@@ -21,7 +20,6 @@ import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
-     animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
@@ -31,7 +29,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild('validateSyncedSOAPopup') validateSyncedPopup: InfoPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
-    folderModuleName:string='SOA';
+    folderModuleName: string = 'SOA';
 
     soa: SOA = new SOA();
     headers: CommonInterface.IHeaderTable[] = [];
@@ -50,7 +48,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     attachFiles: SysImage[] = [];
 
     userLogged: Partial<SystemInterface.IClaimUser>;
-    
+
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
