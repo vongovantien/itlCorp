@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-namespace eFMS.API.ReportData.Models.Accounting
+using System.Linq;
+
+namespace eFMS.API.Accounting.DL.Models.ExportResults
 {
     public class AcctReceiptAdvanceModelExport
     {
@@ -8,14 +10,14 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string PartnerNameEn { get; set; }
         public string PartnerNameVn { get; set; }
         public string UserExport { get; set; }
-        public List<AcctREceiptAdvanceRow> Details { get; set; }
+        public IQueryable<AcctReceiptAdvanceRowModel> Details { get; set; }
     }
 
-    public class AcctREceiptAdvanceRow
+    public class AcctReceiptAdvanceRowModel
     {
         public string ReceiptNo { get; set; }
         public string Description { get; set; }
-        public DateTime PaidDate { get; set; }
+        public DateTime? PaidDate { get; set; }
         public decimal TotalAdvancePaymentVnd { get; set; }
         public decimal TotalAdvancePaymentUsd { get; set; }
         public decimal CusAdvanceAmountVnd { get; set; }

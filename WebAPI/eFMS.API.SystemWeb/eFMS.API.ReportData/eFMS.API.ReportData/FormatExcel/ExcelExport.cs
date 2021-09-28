@@ -36,7 +36,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <summary>Row of detail copied</summary>
         protected ExcelRange DetailRowCopy { get; set; }
         /// <summary>Start index of table</summary>
-        public int StartDetailTable { get; set; }
+        public int StartDetailTable { get; set; } = 1;
         #endregion
         /// <summary>Values of detail copied</summary>
         private object _detailRowValue;
