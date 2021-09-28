@@ -50,6 +50,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<SysEmailTemplate> emailTemplaterepository;
         private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IOptions<WebUrl> webUrl;
+        private readonly IContextBase<AcctDebitManagementAr> debitMngtArRepository;
 
         public AcctReceiptService(
             IContextBase<AcctReceipt> repository,
@@ -75,7 +76,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AcctCreditManagementAr> creditMngtArRepo,
             IContextBase<SysEmailTemplate> emailTemplate,
             IContextBase<SysEmailSetting> emailSetting,
-            IOptions<WebUrl> wUrl
+            IOptions<WebUrl> wUrl,
+            IContextBase<AcctDebitManagementAr> debitMngtArRepo
+
             ) : base(repository, mapper)
         {
             currentUser = curUser;
@@ -99,6 +102,7 @@ namespace eFMS.API.Accounting.DL.Services
             emailTemplaterepository = emailTemplate;
             emailSettingRepository = emailSetting;
             webUrl = wUrl;
+            debitMngtArRepository = debitMngtArRepo;
         }
 
         private IQueryable<AcctReceipt> GetQueryBy(AcctReceiptCriteria criteria)
@@ -1086,6 +1090,26 @@ namespace eFMS.API.Accounting.DL.Services
             return _paymentStatus;
         }
 
+        private string GetAndUpdateStatusDebitAr(AcctDebitManagementAr invoice)
+        {
+            string _paymentStatus = invoice.PaymentStatus;
+            if (invoice.UnpaidAmount <= 0)
+            {
+                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+            }
+            else if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
+            {
+                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+            }
+            else
+            {
+                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            }
+
+            return _paymentStatus;
+        }
+
+
         private HandleState UpdateNetOffCredit(AccAccountingPayment payment, bool isCancel = false)
         {
             HandleState hs = new HandleState();
@@ -1153,21 +1177,21 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private HandleState UpdateInvoiceOfPayment(Guid receiptId)
+        private HandleState UpdateInvoiceOfPayment(AcctReceipt receipt)
         {
             HandleState hsInvoiceUpdate = new HandleState();
-            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId);
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id);
             foreach (AccAccountingPayment payment in payments)
             {
                 switch (payment.Type)
                 {
                     case "DEBIT":
-                        // Tổng thu của invoice bao gôm VND/USD.
-                        AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
-
                         decimal totalAmountPayment = payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? (payment.TotalPaidVnd ?? 0) : (payment.TotalPaidUsd ?? 0);
                         decimal totalAmountVndPaymentOfInv = payment.TotalPaidVnd ?? 0;
                         decimal totalAmountUsdPaymentOfInv = payment.TotalPaidUsd ?? 0;
+
+                        // Tổng thu của invoice bao gôm VND/ USD.
+                        AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId && x.Type != AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).FirstOrDefault();
 
                         invoice.PaidAmountUsd = (invoice.PaidAmountUsd ?? 0) + totalAmountUsdPaymentOfInv;
                         invoice.PaidAmountVnd = (invoice.PaidAmountVnd ?? 0) + totalAmountVndPaymentOfInv;
@@ -1196,6 +1220,42 @@ namespace eFMS.API.Accounting.DL.Services
                         }
 
                         hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
+
+                        // Update AR Debit
+                        if (hsInvoiceUpdate.Success && receipt.Type == "Agent")
+                        {
+                            AcctDebitManagementAr invoiceDebitAr = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == payment.RefId)?.FirstOrDefault();
+                            if(invoiceDebitAr != null)
+                            {
+                                invoiceDebitAr.PaidAmountUsd = (invoiceDebitAr.PaidAmountUsd ?? 0) + totalAmountUsdPaymentOfInv;
+                                invoiceDebitAr.PaidAmountVnd = (invoiceDebitAr.PaidAmountVnd ?? 0) + totalAmountVndPaymentOfInv;
+
+                                invoiceDebitAr.UnpaidAmountUsd = (invoiceDebitAr.TotalAmountUsd ?? 0) - invoiceDebitAr.PaidAmountUsd;
+                                invoiceDebitAr.UnpaidAmountVnd = (invoiceDebitAr.TotalAmountVnd ?? 0) - invoiceDebitAr.PaidAmountVnd;
+
+                                invoiceDebitAr.UserModified = currentUser.UserID;
+                                invoiceDebitAr.DatetimeModified = DateTime.Now;
+
+                                if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                                {
+                                    invoiceDebitAr.PaidAmount = invoiceDebitAr.PaidAmountVnd;
+                                    invoiceDebitAr.UnpaidAmount = invoiceDebitAr.UnpaidAmountVnd;
+                                }
+                                else
+                                {
+                                    invoiceDebitAr.PaidAmount = invoiceDebitAr.PaidAmountUsd;
+                                    invoiceDebitAr.UnpaidAmount = invoiceDebitAr.UnpaidAmountUsd;
+                                }
+                                invoiceDebitAr.PaymentStatus = GetAndUpdateStatusDebitAr(invoiceDebitAr);
+
+                                if (invoiceDebitAr.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID)
+                                {
+                                    invoiceDebitAr.UnpaidAmount = invoiceDebitAr.UnpaidAmountVnd = invoiceDebitAr.UnpaidAmountUsd = 0;
+                                }
+
+                                hsInvoiceUpdate = debitMngtArRepository.Update(invoiceDebitAr, x => x.Id == invoiceDebitAr.Id);
+                            }
+                        }
                         break;
                     case "OBH":
                         // Lấy ra từng hóa đơn tạm để cấn trừ
@@ -1275,11 +1335,11 @@ namespace eFMS.API.Accounting.DL.Services
             return hsInvoiceUpdate;
         }
 
-        private HandleState UpdateInvoiceOfPaymentCancel(Guid receiptId)
+        private HandleState UpdateInvoiceOfPaymentCancel(AcctReceipt receipt)
         {
             HandleState hsInvoiceUpdate = new HandleState();
 
-            var payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && (x.Type == "DEBIT" || x.Type == "OBH")).Where(x => x.Negative == true).ToList();
+            List<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receipt.Id && (x.Type == "DEBIT" || x.Type == "OBH")).Where(x => x.Negative == true).ToList();
 
             if (payments.Count > 0)
             {
@@ -1308,6 +1368,37 @@ namespace eFMS.API.Accounting.DL.Services
                     invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
 
                     hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
+
+                    // Update AR Debit
+                    if(hsInvoiceUpdate.Success && receipt.Type == "Agent")
+                    {
+                        AcctDebitManagementAr arDebits = debitMngtArRepository.Get(x => x.AcctManagementId.ToString() == payment.RefId)?.FirstOrDefault();
+                        if(arDebits != null)
+                        {
+                            arDebits.PaidAmountVnd = (arDebits.PaidAmountVnd ?? 0) + (payment.TotalPaidVnd ?? 0);
+                            arDebits.PaidAmountUsd = (arDebits.PaidAmountUsd ?? 0) + (payment.TotalPaidUsd ?? 0);
+
+                            arDebits.UnpaidAmountVnd = (arDebits.TotalAmountVnd ?? 0) - invoice.PaidAmountVnd;
+                            arDebits.UnpaidAmountUsd = (arDebits.TotalAmountUsd ?? 0) - invoice.PaidAmountUsd;
+
+                            arDebits.UserModified = currentUser.UserID;
+                            arDebits.DatetimeModified = DateTime.Now;
+                            if (invoice.Currency == AccountingConstants.CURRENCY_LOCAL)
+                            {
+                                arDebits.PaidAmount = arDebits.PaidAmountVnd;
+                                arDebits.UnpaidAmount = arDebits.UnpaidAmountVnd;
+                            }
+                            else
+                            {
+                                arDebits.PaidAmount = arDebits.PaidAmountUsd;
+                                arDebits.UnpaidAmount = arDebits.UnpaidAmountUsd;
+                            }
+                            arDebits.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
+
+                            hsInvoiceUpdate = debitMngtArRepository.Update(arDebits, x => x.Id == arDebits.Id);
+                        }
+                       
+                    }
                 }
             }
 
@@ -1521,7 +1612,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 // Phát sinh Payment
                                 HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
                                 // cấn trừ cho hóa đơn
-                                hs = UpdateInvoiceOfPayment(receiptModel.Id);
+                                hs = UpdateInvoiceOfPayment(receiptData);
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
 
@@ -1561,7 +1652,7 @@ namespace eFMS.API.Accounting.DL.Services
                             if (hs.Success)
                             {
                                 // cấn trừ cho hóa đơn
-                                hs = UpdateInvoiceOfPayment(receiptModel.Id);
+                                hs = UpdateInvoiceOfPayment(receiptCurrent);
 
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
@@ -1618,7 +1709,7 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                         // cấn trừ cho hóa đơn
-                        hs = UpdateInvoiceOfPayment(receiptId);
+                        hs = UpdateInvoiceOfPayment(receiptCurrent);
                         //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
                         // Cập nhật Cus Advance của Agreement
                         HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
@@ -1682,7 +1773,7 @@ namespace eFMS.API.Accounting.DL.Services
                         List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
                         HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
                         // Cập nhật invoice cho những payment DEBIT, OBH
-                        HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent.Id);
+                        HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent);
                         // Cập nhật Netoff cho CREDIT or SOA.
                         List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
                         if (paymentCredit.Count > 0)
@@ -1829,16 +1920,8 @@ namespace eFMS.API.Accounting.DL.Services
             //    //creditNotes = GetCreditNoteForIssueCustomerPayment(criteria);
             //}
 
-            switch (criteria.SearchType)
-            {
-                case "VAT Invoice":
-                    debits = GetDebitForIssueCustomerPayment(criteria);
-                    break;
-                default:
-                    debits = GetDebitForIssueCustomerPayment(criteria);
-                    obhs = GetObhForIssueCustomerPayment(criteria);
-                    break;
-            }
+            debits = GetDebitForIssueCustomerPayment(criteria);
+            obhs = GetObhForIssueCustomerPayment(criteria);
 
 
             if (debits != null && debits.Count() > 0)
@@ -2059,15 +2142,28 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AgencyDebitCreditModel> GetDebitForIssueAgentPayment(CustomerDebitCreditCriteria criteria)
         {
-            var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
-            var invoices = acctMngtRepository.Get(expQuery);
+            
+            Expression<Func<AcctDebitManagementAr, bool>> expQueryDebitAr = q => q.PaymentStatus != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+
+            if (!string.IsNullOrEmpty(criteria.PartnerId))
+            {
+                List<string> childPartnerIds = catPartnerRepository.Get(x => x.ParentId == criteria.PartnerId)
+                        .Select(x => x.Id)
+                        .ToList();
+                expQueryDebitAr = expQueryDebitAr.And(q => q.PartnerId == criteria.PartnerId || childPartnerIds.Contains(q.PartnerId));
+            }
+
+            // var expQuery = InvoiceExpressionQuery(criteria, AccountingConstants.ACCOUNTING_INVOICE_TYPE);
+            var debitsAr = debitMngtArRepository.Get(expQueryDebitAr);
             var surcharges = surchargeRepository.Get();
             var partners = catPartnerRepository.Get();
             var departments = departmentRepository.Get();
             var offices = officeRepository.Get();
+            var invoice = acctMngtRepository.Get(x => x.Type == AccountingConstants.ACCOUNTANT_TYPE_INVOICE && x.PartnerId == criteria.PartnerId);
 
-            var query = from inv in invoices
-                        join sur in surcharges on inv.Id equals sur.AcctManagementId
+            var query = from inv in debitsAr
+                        join sur in surcharges on inv.AcctManagementId equals sur.AcctManagementId
+                        where inv.Hblid == sur.Hblid
                         select new { inv, sur };
             if (criteria.ReferenceNos.Count > 0)
             {
@@ -2085,77 +2181,103 @@ namespace eFMS.API.Accounting.DL.Services
                     case "Customs No":
                         query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
                         break;
+                    case "VAT Invoice":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.InvoiceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "SOA":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Debit/Credit/Invoice":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.DebitNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.sur.InvoiceNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        break;
                     default:
                         break;
                 }
             }
-
-            var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
-            var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
-            {
-                RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano))
-                ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault()
-                : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
-                Type = "DEBIT",
-                InvoiceNo = se.Invoice.inv.InvoiceNoReal,
-                InvoiceDate = se.Invoice.inv.Date,
-                PartnerId = se.Invoice.inv.PartnerId,
-                CurrencyId = se.Invoice.inv.Currency,
-                Amount = se.Invoice.inv.TotalAmount,
-                UnpaidAmount = se.Invoice.inv.UnpaidAmount,
-                UnpaidAmountVnd = se.Invoice.inv.UnpaidAmountVnd,
-                UnpaidAmountUsd = se.Invoice.inv.UnpaidAmountUsd,
-                PaymentTerm = se.Invoice.inv.PaymentTerm,
-                DueDate = se.Invoice.inv.PaymentDueDate,
-                PaymentStatus = se.Invoice.inv.PaymentStatus,
-                DepartmentId = se.Invoice.inv.DepartmentId,
-                OfficeId = se.Invoice.inv.OfficeId,
-                CompanyId = se.Invoice.inv.CompanyId,
-                RefIds = new List<string> { se.Invoice.inv.Id.ToString() },
-                JobNo = se.Invoice.JobNo,
-                Mbl = se.Invoice.Mblno,
-                Hbl = se.Invoice.Hblno,
-                Hblid = se.Invoice.Hblid,
-                ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo)
+            var data = query.Select(x => new AgencyDebitCreditModel {
+               RefNo = x.inv.RefNo,
+               Type = AccountingConstants.ACCOUNTANT_TYPE_DEBIT,
+               PartnerId = x.inv.PartnerId,
+               RefIds = new List<string> { x.inv.AcctManagementId.ToString() },
+               Hblid = x.inv.Hblid,
+               JobNo = x.sur.JobNo,
+               Mbl = x.sur.Mblno,
+               Hbl = x.sur.Hblno,
+               UnpaidAmount = x.inv.UnpaidAmount,
+               UnpaidAmountUsd = x.inv.UnpaidAmountUsd,
+               UnpaidAmountVnd = x.inv.UnpaidAmountVnd,
+               PaymentStatus = x.inv.PaymentStatus
             });
-            var joinData = from inv in data
-                           join par in partners on inv.PartnerId equals par.Id into parGrp
+            //var grpInvoiceCharge = query.GroupBy(g => new { g.inv, g.sur.Hblno, g.sur.JobNo, g.sur.Mblno, g.sur.Hblid }).Select(s => new { Invoice = s.Key, Surcharge = s.Select(se => se.sur), Soa_DebitNo = s.Select(se => new { se.sur.Soano, se.sur.DebitNo }) });
+            //var data = grpInvoiceCharge.Select(se => new AgencyDebitCreditModel
+            //{
+            //    RefNo = se.Soa_DebitNo.Any(w => !string.IsNullOrEmpty(w.Soano))
+            //    ? se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.Soano)).Select(s => s.Soano).FirstOrDefault()
+            //    : se.Soa_DebitNo.Where(w => !string.IsNullOrEmpty(w.DebitNo)).Select(s => s.DebitNo).FirstOrDefault(),
+            //    Type = "DEBIT",
+            //    InvoiceNo = se.Invoice.inv.InvoiceNoReal,
+            //    InvoiceDate = se.Invoice.inv.Date,
+            //    PartnerId = se.Invoice.inv.PartnerId,
+            //    CurrencyId = se.Invoice.inv.Currency,
+            //    Amount = se.Invoice.inv.TotalAmount,
+            //    UnpaidAmount = se.Invoice.inv.UnpaidAmount,
+            //    UnpaidAmountVnd = se.Invoice.inv.UnpaidAmountVnd,
+            //    UnpaidAmountUsd = se.Invoice.inv.UnpaidAmountUsd,
+            //    PaymentTerm = se.Invoice.inv.PaymentTerm,
+            //    DueDate = se.Invoice.inv.PaymentDueDate,
+            //    PaymentStatus = se.Invoice.inv.PaymentStatus,
+            //    DepartmentId = se.Invoice.inv.DepartmentId,
+            //    OfficeId = se.Invoice.inv.OfficeId,
+            //    CompanyId = se.Invoice.inv.CompanyId,
+            //    RefIds = new List<string> { se.Invoice.inv.Id.ToString() },
+            //    JobNo = se.Invoice.JobNo,
+            //    Mbl = se.Invoice.Mblno,
+            //    Hbl = se.Invoice.Hblno,
+            //    Hblid = se.Invoice.Hblid,
+            //    ExchangeRateBilling = GetExchangeRateDebitBilling(se.Soa_DebitNo)
+            //});
+            var joinData = from d in data
+                           join inv in invoice on d.RefIds.FirstOrDefault() equals inv.Id.ToString() into grpInvs
+                           from grpInv in grpInvs.DefaultIfEmpty()
+                           join par in partners on d.PartnerId equals par.Id into parGrp
                            from par in parGrp.DefaultIfEmpty()
-                           join dept in departments on inv.DepartmentId equals dept.Id into deptGrp
+                           join dept in departments on grpInv.DepartmentId equals dept.Id into deptGrp
                            from dept in deptGrp.DefaultIfEmpty()
-                           join ofi in offices on inv.OfficeId equals ofi.Id into ofiGrp
+                           join ofi in offices on grpInv.OfficeId equals ofi.Id into ofiGrp
                            from ofi in ofiGrp.DefaultIfEmpty()
                            select new AgencyDebitCreditModel
                            {
-                               RefNo = inv.RefNo,
-                               Type = inv.Type,
-                               InvoiceNo = inv.InvoiceNo,
-                               InvoiceDate = inv.InvoiceDate,
-                               PartnerId = inv.PartnerId,
+                               RefNo = d.RefNo,
+                               PartnerId = d.PartnerId,
+                               Type = d.Type,
+                               InvoiceNo = grpInv.InvoiceNoReal,
+                               InvoiceDate = grpInv.Date,
                                PartnerName = par.ShortName,
                                TaxCode = par.TaxCode,
-                               CurrencyId = inv.CurrencyId,
-                               Amount = inv.Amount,
+                               CurrencyId = grpInv.Currency,
+                               Amount = grpInv.TotalAmount,
                                //PaidAmountUsd = inv.UnpaidAmountUsd,
                                //PaidAmountVnd = inv.UnpaidAmountVnd,
-                               UnpaidAmount = inv.UnpaidAmount,
-                               UnpaidAmountVnd = inv.UnpaidAmountVnd,
-                               UnpaidAmountUsd = inv.UnpaidAmountUsd,
-                               PaymentTerm = inv.PaymentTerm,
-                               DueDate = inv.DueDate,
-                               PaymentStatus = inv.PaymentStatus,
-                               DepartmentId = inv.DepartmentId,
+                               UnpaidAmount = d.UnpaidAmount,
+                               UnpaidAmountVnd = d.UnpaidAmountVnd,
+                               UnpaidAmountUsd = d.UnpaidAmountUsd,
+                               PaymentTerm = grpInv.PaymentTerm,
+                               DueDate = grpInv.PaymentDueDate,
+                               PaymentStatus = d.PaymentStatus,
+                               DepartmentId = grpInv.DepartmentId,
                                DepartmentName = dept != null ? dept.DeptNameAbbr : null,
-                               OfficeId = inv.OfficeId,
+                               OfficeId = grpInv.OfficeId,
                                OfficeName = ofi != null ? ofi.ShortName : null,
-                               CompanyId = inv.CompanyId,
-                               RefIds = inv.RefIds,
-                               Mbl = inv.Mbl,
-                               Hbl = inv.Hbl,
-                               JobNo = inv.JobNo,
-                               Hblid = inv.Hblid,
-                               ExchangeRateBilling = inv.ExchangeRateBilling,
-                               PaymentType = inv.Type,
+                               CompanyId = grpInv.CompanyId,
+                               RefIds = d.RefIds,
+                               Mbl = d.Mbl,
+                               Hbl = d.Hbl,
+                               JobNo = d.JobNo,
+                               Hblid = d.Hblid,
+                               ExchangeRateBilling = grpInv.TotalExchangeRate,
+                               PaymentType = d.Type,
                            };
             return joinData;
         }
@@ -2188,6 +2310,17 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                     case "Customs No":
                         query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "VAT Invoice":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.inv.InvoiceNoReal, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "SOA":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "Debit/Credit/Invoice":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.DebitNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.sur.InvoiceNo, StringComparer.OrdinalIgnoreCase)
+                        || criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
                         break;
                     default:
                         break;
