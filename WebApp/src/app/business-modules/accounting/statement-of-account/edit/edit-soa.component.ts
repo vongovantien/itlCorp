@@ -11,11 +11,9 @@ import { formatDate } from '@angular/common';
 import { SystemConstants } from 'src/constants/system.const';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
-import { listAnimation } from '@animations';
 @Component({
     selector: 'app-statement-of-account-edit',
     templateUrl: './edit-soa.component.html',
-    animations: [listAnimation]
 })
 export class StatementOfAccountEditComponent extends AppList {
     @ViewChild(StatementOfAccountAddChargeComponent) addChargePopup: StatementOfAccountAddChargeComponent;

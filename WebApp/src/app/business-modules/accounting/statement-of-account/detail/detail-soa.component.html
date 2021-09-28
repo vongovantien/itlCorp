@@ -33,7 +33,7 @@
         </button>
         <div class="btn-group" [autoClose]="!isClickSubMenu" dropdown container="body">
             <app-permission-button type="export" title="Export" [dpToggle]="dropdownMenu" position="bottomLeft"
-            mode="dropdown">
+                mode="dropdown">
             </app-permission-button>
             <app-dropdown #dropdownMenu>
                 <a class="dropdown-item pointer" (click)="exportSOAAF()">
@@ -73,7 +73,7 @@
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
                     <tab heading="Info" [active]="true">
-                        <br/>
+                        <br />
                         <div class="row">
                             <div class="col-lg-4 m--margin-bottom-10">
                                 <span class="m--font-bolder">SOA No:</span>
@@ -81,11 +81,13 @@
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">From Date:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.soaformDate | date: 'dd/MM/yyyy'}}</span>
+                                <span class="m--font-brand m--margin-left-5">{{soa.soaformDate | date:
+                                    'dd/MM/yyyy'}}</span>
                             </div>
                             <div class="col-lg-4 m--margin-bottom-10">
                                 <span class="m--font-bolder">To Date:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.soatoDate | date: 'dd/MM/yyyy'}}</span>
+                                <span class="m--font-brand m--margin-left-5">{{soa.soatoDate | date:
+                                    'dd/MM/yyyy'}}</span>
                             </div>
                         </div>
                         <div class="row">
@@ -98,20 +100,24 @@
                                 <span class="m--font-bolder">Status:</span>
                                 <span *ngSwitchCase="'New'" class="text-danger m--margin-left-5">{{soa.status}}</span>
                                 <span *ngSwitchCase="'Done'" class="text-success m--margin-left-5">{{soa.status}}</span>
-                                <span *ngSwitchCase="'Issued Invoice'" class="text-info m--margin-left-5">{{soa.status}}</span>
-                                <span *ngSwitchCase="'Issued Voucher'" class="text-info m--margin-left-5">{{soa.status}}</span>
+                                <span *ngSwitchCase="'Issued Invoice'"
+                                    class="text-info m--margin-left-5">{{soa.status}}</span>
+                                <span *ngSwitchCase="'Issued Voucher'"
+                                    class="text-info m--margin-left-5">{{soa.status}}</span>
                                 <span *ngSwitchDefault class="text-primary m--margin-left-5">{{soa.status}}</span>
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Type:</span>
-                                <span class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
+                                <span
+                                    class="m-badge m-badge--primary m-badge--wide m--margin-left-5">{{soa.type}}</span>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Total Amount:</span>
                                 <span class="m--font-brand m--margin-left-5"
-                                    *ngIf="soa.totalAmount > 0 else negativeNumber">{{soa.totalAmount | number: '.0-3'}}</span>
+                                    *ngIf="soa.totalAmount > 0 else negativeNumber">{{soa.totalAmount | number:
+                                    '.0-3'}}</span>
                                 <ng-template #negativeNumber class="m--font-brand m--margin-left-5">
                                     <span class="m--font-brand m--margin-left-5">
                                         ({{soa.totalAmount | abs | number: '.0-3'}})
@@ -132,7 +138,8 @@
                         <div class="row">
                             <div class="col-lg-4  m--margin-bottom-10">
                                 <span class="m--font-bolder">Total Shipment/Charge:</span>
-                                <span class="m--font-brand m--margin-left-5">{{soa.shipment | number: '.0-2'}}/{{soa.totalCharge
+                                <span class="m--font-brand m--margin-left-5">{{soa.shipment | number:
+                                    '.0-2'}}/{{soa.totalCharge
                                     | number: '.0-2'}}</span>
                             </div>
                             <div class="col-lg-4  m--margin-bottom-10">
@@ -187,17 +194,13 @@
                             <span class="badge badge-success"
                                 *ngIf="attachFiles.length > 0">{{attachFiles.length}}</span>
                         </ng-template>
-                        <accounting-attach-file-list  
-                        *ngIf="!!soa.id" 
-                        (onChange)="attachFiles = $event" 
-                        [fileNo]="soaNO" 
-                        [folderModuleName]="folderModuleName" 
-                        [objId]="soa.id" 
-                        [readOnly]="soa.syncStatus === 'Synced'?'':null">
+                        <accounting-attach-file-list *ngIf="!!soa.id" (onChange)="attachFiles = $event" [fileNo]="soaNO"
+                            [folderModuleName]="folderModuleName" [objId]="soa.id"
+                            [readOnly]="soa.syncStatus === 'Synced'?'':null">
                         </accounting-attach-file-list>
                     </tab>
                 </tabset>
-                
+
             </div>
         </div>
     </div>
@@ -230,7 +233,7 @@
             <div class="table-horizontal" style="max-height:800px">
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
-                    <tbody class="tbody-group" [@listAnimation]="!isLoading">
+                    <tbody class="tbody-group">
                         <ng-container *ngIf="TYPE === 'GROUP'">
                             <ng-container
                                 *ngFor="let groupShipment of soa.groupShipments ; let i = index; trackBy: trackByFn">
