@@ -4772,7 +4772,7 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         #endregion --- ACCOUTING MANAGEMENT ---
 
-        public Stream GenerateExportAgencyHistoryPayment(List<AccountingAgencyPaymentExport> result, string fileName)
+        public Stream GenerateExportAgencyHistoryPayment(List<AccountingAgencyPaymentExport> result, string fileName, AccountingPaymentCriteria paymentCriteria)
         {
             try
             {
@@ -4847,7 +4847,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0)
+                    if (item.details.Count > 0 && paymentCriteria.DueDate == null)
                     {
                         foreach (var detail in item.details)
                         {
