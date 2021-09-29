@@ -438,7 +438,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     if (currentSettle.SettlementCurrency == "VND")
                                     {
                                         x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 0);
-                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountVND + x.VatAmountVND), 0);
+                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountVND), 0);
                                         x.OriginalAmount3 = NumberHelper.RoundNumber((decimal)x.VatAmountVND, 0);
                                         if (x.CurrencyCode == "USD")
                                         {
@@ -449,7 +449,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     else if (currentSettle.SettlementCurrency == "USD")
                                     {
                                         x.OriginalUnitPrice = NumberHelper.RoundNumber((decimal)x.OriginalUnitPrice, 2);
-                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountUSD + x.VatAmountUSD), 2);
+                                        x.OriginalAmount = NumberHelper.RoundNumber((decimal)(x.NetAmountUSD), 2);
                                         x.OriginalAmount3 = NumberHelper.RoundNumber((decimal)x.VatAmountUSD, 2);
                                         if (x.CurrencyCode == "VND")
                                         {
