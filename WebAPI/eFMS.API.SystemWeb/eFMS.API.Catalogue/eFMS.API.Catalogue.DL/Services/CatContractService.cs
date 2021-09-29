@@ -1363,6 +1363,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 SentUser = SendMail._emailFrom,
                 Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
                 Ccs = lstCc != null ? string.Join("; ", lstCc) : string.Empty,
+                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
                 Subject = subject.ToString(),
                 Sent = resultSendEmail,
                 SentDateTime = DateTime.Now,
@@ -1435,13 +1436,13 @@ namespace eFMS.API.Catalogue.DL.Services
             lstCC = lstCC.Where(t => !string.IsNullOrEmpty(t)).ToList();
             lstTo = lstTo.Where(t => !string.IsNullOrEmpty(t)).ToList();
 
-            //return SendMail.Send(subject, body, lstTo, null, null, lstCc);
-            bool result = SendMail.Send(subject, body, lstTo,null, lstCC, lstBCc);
+            bool result = SendMail.Send(subject, body, lstTo, null, lstCC, lstBCc);
             var logSendMail = new SysSentEmailHistory
             {
                 SentUser = SendMail._emailFrom,
-                Receivers = string.Join("; ", lstTo),
-                Ccs = string.Join("; ", lstCC),
+                Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
+                Ccs = lstCC != null ? string.Join("; ", lstCC) : string.Empty,
+                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
                 Subject = subject,
                 Sent = result,
                 SentDateTime = DateTime.Now,
@@ -1566,7 +1567,8 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 SentUser = SendMail._emailFrom,
                 Receivers = lstTo != null ? string.Join("; ", lstTo) : string.Empty,
-                Ccs = lstCc != null ? string.Join("; ", lstBCc) : string.Empty,
+                Ccs = lstCc != null ? string.Join("; ", lstCc) : string.Empty,
+                Bccs = lstBCc != null ? string.Join("; ", lstBCc) : string.Empty,
                 Subject = subject.ToString(),
                 Sent = result,
                 SentDateTime = DateTime.Now,

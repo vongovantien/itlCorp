@@ -1484,7 +1484,9 @@ namespace eFMS.API.Operation.DL.Services
                 DepartmentId = currentUser.DepartmentId,
                 OfficeId = currentUser.OfficeID,
                 CompanyId = currentUser.CompanyID,
-                AccountNo = clearance.MA_DV
+                AccountNo = clearance.MA_DV,
+                Cbm = clearance.THE_TICH,
+                Pcs = (int?)clearance.LUONG,
             };
 
             return newItem;
