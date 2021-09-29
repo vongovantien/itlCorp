@@ -507,7 +507,7 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountingAgencyPaymentExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
-            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency.xlsx");
+            var stream = new AccountingHelper().GenerateExportAgencyHistoryPayment(dataObjects.Result, "Statement_of_Receivable-Agency.xlsx",paymentCriteria);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Statement of Receivable Agency - eFMS.xlsx");
