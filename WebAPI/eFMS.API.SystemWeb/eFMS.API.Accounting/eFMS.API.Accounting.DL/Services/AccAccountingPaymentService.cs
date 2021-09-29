@@ -1695,7 +1695,7 @@ namespace eFMS.API.Accounting.DL.Services
             //GetDebit
             var data = Query(criteria);
             if (data == null) return null;
-            var partners = criteria.PartnerId!=null? partnerRepository.Get(x => x.PartnerType == "Agent" && x.ParentId == criteria.PartnerId): partnerRepository.Get(x=>x.PartnerType =="Agent");
+            var partners = criteria.PartnerId != null? partnerRepository.Get(x => x.PartnerType == "Agent" && x.Id == criteria.PartnerId): partnerRepository.Get(x=>x.PartnerType =="Agent");
             var paymentData = QueryInvoiceDataPayment(criteria);
             var surchargeData = surchargeRepository.Get();
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
@@ -1715,6 +1715,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     surcharge.Mblno,
                                     surcharge.AmountUsd,
                                     surcharge.VatAmountUsd,
+                                    surcharge.VatAmountVnd,
+                                    surcharge.AmountVnd,
                                     surcharge.VoucherId,
                                     PartnerCode = part.AccountNo,
                                     ParentCode = part != null ? part.ParentId : string.Empty,
@@ -1742,7 +1744,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.Mblno,
                 x.Hblno
 
-            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.AmountUsd, z.VatAmountUsd, z.VoucherId }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, z.PaymentDate, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.UnpaidPaymentAmountVnd }) });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno, z.AmountUsd, z.VatAmountUsd, z.VoucherId,z.AmountVnd,z.VatAmountVnd }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, z.PaymentDate, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.UnpaidPaymentAmountVnd }) });
 
             var results = new List<AccountingAgencyPaymentExport>();
             var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated }).ToLookup(x => x.Soano);
@@ -1805,11 +1807,17 @@ namespace eFMS.API.Accounting.DL.Services
                 agent.EtaDate = trans?.Eta;
                 agent.EtdDate = trans?.Etd;
 
-                agent.UnpaidAmountInvUsd = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0;
-                agent.UnpaidAmountOBHUsd = isValidObh ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0) : 0;
+                //agent.UnpaidAmountInvUsd = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0;
+                //agent.UnpaidAmountOBHUsd = isValidObh ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0) : 0;
 
-                agent.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0;
-                agent.UnpaidAmountOBH = isValidObh ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0) : 0;
+                //agent.UnpaidAmountInv = invoiceDe.FirstOrDefault()?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0;
+                //agent.UnpaidAmountOBH = isValidObh ? invoiceObh.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0) : 0;
+
+                agent.UnpaidAmountInvUsd = item.surcharge.Where(x=>x.Hblno == item.grp.Hblno).Sum(x=>x.AmountUsd);
+                agent.UnpaidAmountOBHUsd = item.surcharge.Where(x => x.Hblno == item.grp.Hblno).Sum(x => x.VatAmountUsd); 
+
+                agent.UnpaidAmountInv = item.surcharge.Where(x => x.Hblno == item.grp.Hblno).Sum(x => x.AmountVnd);
+                agent.UnpaidAmountOBH = item.surcharge.Where(x => x.Hblno == item.grp.Hblno).Sum(x => x.VatAmountVnd);
 
                 agent.DebitAmountUsd = agent.UnpaidAmountInvUsd + agent.UnpaidAmountOBHUsd;
                 agent.DebitAmountVnd = agent.UnpaidAmountInv + agent.UnpaidAmountOBH;
@@ -1899,7 +1907,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      credit.RemainVnd,
                                      credit.OfficeId,
                                      VoucherId = surcharge.VoucherId == null ? surcharge.VoucherIdre : surcharge.VoucherId,
-                                     DueDate = surcharge.VoucherIdredate,
+                                     DueDate = surcharge.VoucherId == null ? surcharge.VoucherIdredate : surcharge.VoucherIddate,
                                      CreditTerm = con.PaymentTerm,
                                      PaidAmount = payment == null ? 0 : payment.PaymentAmountVnd,
                                      PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
@@ -1940,7 +1948,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      credit.RemainVnd,
                                      credit.OfficeId,
                                      VoucherId = surcharge.VoucherId == null ? surcharge.VoucherIdre : surcharge.VoucherId,
-                                     DueDate = surcharge.VoucherIdredate,
+                                     DueDate = surcharge.VoucherId == null ? surcharge.VoucherIdredate : surcharge.VoucherIddate,
                                      CreditTerm = con.PaymentTerm,
                                      PaidAmount = payment == null ? 0 : payment.PaymentAmountVnd,
                                      PaidAmountUsd = payment == null ? 0 : payment.PaymentAmountUsd,
