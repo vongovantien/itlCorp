@@ -84,10 +84,13 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult InsertOrUpdateReceivable(List<ObjectReceivableModel> models)
         {
             HandleState insertOrUpdateReceivable = accountReceivableService.InsertOrUpdateReceivable(models);
-
             var message = HandleError.GetMessage(insertOrUpdateReceivable, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = insertOrUpdateReceivable.Success, Message = stringLocalizer[message].Value };
-            return Ok(result);
+            if (insertOrUpdateReceivable.Success)
+            {
+                ResultHandle result = new ResultHandle { Status = insertOrUpdateReceivable.Success, Message = stringLocalizer[message].Value };
+                return Ok(result);
+            }
+            return BadRequest(message);
         }
 
         /// <summary>
