@@ -752,6 +752,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Tiền mặt",//41
                 "Ngày đến hạn",//42
                 //END
+
+                //20/09/2021 - #16169 - Add Field Service Date
+                //ADD
+                "Ngày dịch vụ:",//43
+                "Hình thức thanh toán:",//44
+                "Đối tượng thanh toán:",//45
+                //END
+                "Note", //46
             };
 
             List<string> engHeaders = new List<string>()
@@ -803,6 +811,14 @@ namespace eFMS.API.ReportData.FormatExcel
                 "By cash",//41
                 "Due date",//42
                  //END
+
+                //20/09/2021 - #16169 - Add Field Service Date
+                //ADD
+                "Service date:",//43
+                "Payment Method:",//44
+                "Supplier Name:",//45
+                //END
+                 "Note",    //46
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
@@ -1815,7 +1831,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 9].Value = item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceDate?.ToString("dd/MM/yyyy"));
                     workSheet.Cells[i + addressStartContent, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 7, i + addressStartContent, 7].Style.WrapText = true;
 
                     workSheet.Cells[i + addressStartContent, 10].Value = item.GW;
@@ -1880,6 +1895,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 3].Value = itemCharge.Quantity;
                         workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
                         workSheet.Cells[i + addressStartContent, 8].Value = itemCharge.InvoiceNo;
+                        workSheet.Cells[i + addressStartContent, 9].Value = itemCharge.InvoiceDate;
                         workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
                         workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = null;
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
