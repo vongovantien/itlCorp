@@ -1279,8 +1279,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells["B" + r + ":C" + c].Style.Border.Bottom.Style = ExcelBorderStyle.None;//Xóa border bottom
                 workSheet.Cells["B" + r + ":B" + c].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right
                 workSheet.Cells["B" + r + ":B" + (c + 1)].Style.Border.Right.Style = ExcelBorderStyle.None;//Xóa border right (dư)
-                r = r + 9;
-                c = c + 9;
+                r = r + 10;
+                c = c + 10;
             }
 
             ////Bỏ qua 2 dòng
