@@ -1449,7 +1449,7 @@ namespace eFMS.API.Operation.DL.Services
                     type = ClearanceConstants.Import_Type_Value;
                 }
             }
-            var serviceType = GetServiceType(clearance.MA_HIEU_PTVC, out string cargoType);
+            var serviceType = GetServiceTypeOla(clearance.MA_HIEU_PTVC, out string cargoType);
             var route = clearance.PLUONG != null ? GetRouteType(clearance.PLUONG) : string.Empty;
 
             if (clearance.MA_DV != null)
@@ -1490,6 +1490,23 @@ namespace eFMS.API.Operation.DL.Services
             };
 
             return newItem;
+        }
+
+        private string GetServiceTypeOla(string MA_HIEU_PTVC, out string cargoType)
+        {
+            cargoType = string.Empty;
+            var serviceType = string.Empty;
+            switch (MA_HIEU_PTVC)
+            {
+                case "MAY BAY":
+                    serviceType = ClearanceConstants.Air_Service;
+                    break;
+                default:
+                    serviceType = ClearanceConstants.Sea_Service;
+                    cargoType = ClearanceConstants.CargoTypeFCL;
+                    break;
+            }
+            return serviceType;
         }
     }
 }
