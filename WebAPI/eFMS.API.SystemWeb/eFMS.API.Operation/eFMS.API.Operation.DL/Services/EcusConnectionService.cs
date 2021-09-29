@@ -267,6 +267,7 @@ namespace eFMS.API.Operation.DL.Services
                                     ,H.TRLUONG 
 	                                ,H.MA_DVT
                                     ,H.THE_TICH
+                                    ,SO_CONTAINER
                                     ,H.LUONG
 	                                ,PLUONG
                                     ,_XorN

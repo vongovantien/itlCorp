@@ -14,7 +14,7 @@ namespace eFMS.API.Operation.DL.Models.Ecus
         public string MA_DVT { get; set; }
         public Nullable<decimal> THE_TICH { get; set; }
         public Nullable<decimal> LUONG { get; set; }
-        public Nullable<decimal> SO_CONTAINER { get; set; }
+        public Nullable<int> SO_CONTAINER { get; set; }
         public string PLUONG { get; set; }
         public string _XorN { get; set; }
         public string TEN_DVXK { get; set; }
