@@ -2943,7 +2943,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
             {
-                account = receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? "13111" : "13121";
+                account = receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? "13114" : "13124";
                 return account;
             }
             else if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OTHER)

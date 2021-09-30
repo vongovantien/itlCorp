@@ -18,6 +18,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
+import { formatDate } from '@angular/common';
 
 
 
@@ -158,14 +159,17 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         }
     }
 
-    exportAdvanceReceipt() {
+    exportAdvanceReceiptData() {
         if (!this.dataSearch || !this.dataSearch.partnerId) {
-            this._toastService.warning('No Data To View, Please Select Partner');
+            this._toastService.warning('No Data To View, Please Select Partner and Apply');
             return;
         }
         const body = {
             customerId: this.dataSearch.partnerId,
             status: "Done",
+            dateFrom: this.dataSearch.fromUpdatedDate,
+            dateTo: this.dataSearch.toUpdatedDate,
+            dateType: "Paid Date"
         };
         this._exportRepo.exportAdvanceReceipt(body)
             .subscribe(
