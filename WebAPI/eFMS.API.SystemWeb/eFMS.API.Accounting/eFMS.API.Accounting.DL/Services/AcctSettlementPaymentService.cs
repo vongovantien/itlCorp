@@ -1476,7 +1476,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<sp_GetDataExistsCharge> GetExistingChargeData(ExistsChargeCriteria criteria)
         {
             var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
+                new cleaSqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
                 new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.serviceDateTo },
                 new SqlParameter(){ ParameterName = "@partnerId", Value = criteria.partnerId },
                 new SqlParameter(){ ParameterName = "@jobIds", Value = string.Join(';',criteria.jobIds) },
@@ -4809,7 +4809,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo, s.Soano }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo, s.Key.Soano });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
