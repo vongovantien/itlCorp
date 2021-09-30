@@ -2803,6 +2803,7 @@ namespace eFMS.API.Documentation.DL.Services
                JobNo = s.JobNo,
                InvoiceNo = s.InvoiceNo,
                VoucherId = s.VoucherId,
+               VoucherIddate = s.VoucherIddate,
                AcctManagementId = s.AcctManagementId,
                Hblno = s.Hblno,
                Mblno=s.Mblno,
@@ -2856,6 +2857,8 @@ namespace eFMS.API.Documentation.DL.Services
                ChargeType =se.Charge.FirstOrDefault().Type,
                PayerId = se.Charge.FirstOrDefault().PayerId,
                DepartmentId = se.CdNote.FirstOrDefault().DepartmentId,
+               IssueDate= se.CdNote.FirstOrDefault().DatetimeCreated,
+               VoucherIddate = se.Charge.FirstOrDefault().VoucherIddate
             });
 
             var _resultDatas = GetByStatus(criteria.Status, selectData).ToArray();
@@ -2892,7 +2895,9 @@ namespace eFMS.API.Documentation.DL.Services
                               Amount= cd.Total,
                               IssueBy= creator!= null?creator.Username:"",
                               Bu= departs != null? departs.DeptNameEn:"",
-                              ServiceDate=trans != null ?trans.ServiceDate:null
+                              ServiceDate=trans != null ?trans.ServiceDate:null,
+                              VoucherIddate = cd.VoucherIddate,
+                              IssueDate = cd.IssueDate
                           };
 
             var dataOps = from cd in _resultDatas
@@ -2920,7 +2925,9 @@ namespace eFMS.API.Documentation.DL.Services
                               Amount = cd.Total,
                               IssueBy = creator != null ? creator.Username : "",
                               Bu = departs!=null?departs.DeptNameEn:"",
-                              ServiceDate = trans != null ? trans.ServiceDate : null
+                              ServiceDate = trans != null ? trans.ServiceDate : null,
+                              VoucherIddate = cd.VoucherIddate,
+                              IssueDate = cd.IssueDate
                           };
 
             var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();
