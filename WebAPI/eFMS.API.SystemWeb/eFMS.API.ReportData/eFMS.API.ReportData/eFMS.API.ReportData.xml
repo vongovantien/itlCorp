@@ -91,6 +91,14 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String)">
+            <summary>
+            Export detail settlement template payment
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportGeneralSettlementPayment(System.Guid)">
             <summary>
             Export General Preview in Settlement detail
@@ -523,7 +531,7 @@
         <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSOAAirfreightExcel(eFMS.API.ReportData.Models.ExportSOAAirfreightModel,System.String,System.IO.Stream)">
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.String,System.IO.Stream)">
             <summary>
             Generate detail settlement payment excel
             </summary>
