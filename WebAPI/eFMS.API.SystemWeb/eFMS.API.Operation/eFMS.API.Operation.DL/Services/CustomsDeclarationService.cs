@@ -1473,6 +1473,7 @@ namespace eFMS.API.Operation.DL.Services
                 UnitCode = clearance.MA_DVT,
                 QtyCont = (int?)clearance.SO_CONTAINER ?? null,
                 GrossWeight = clearance.TRLUONG,
+                NetWeight = clearance.TRLUONG,
                 Route = route,
                 Type = type,
                 CargoType = cargoType,
