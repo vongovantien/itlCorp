@@ -198,6 +198,15 @@ namespace eFMS.API.Operation.DL.Services
             }
             return results;
         }
+        public List<D_OLA> GetDataOlaEcusByUser(string userId, string serverName, string dbusername, string dbpassword, string database)
+        {
+            List<D_OLA> results = null;
+            if (DataContext.Any(x => x.UserId == userId))
+            {
+                results = GetDataOlaFromEcus(serverName, dbusername, dbpassword, database);
+            }
+            return results;
+        }
 
         private List<DTOKHAIMD> GetDataFromEcus(string serverName, string dbusername, string dbpassword, string database)
         {
@@ -235,6 +244,49 @@ namespace eFMS.API.Operation.DL.Services
                 {
                     DataTable dt = data.Tables[0];
                     return dt.DataTableToList<DTOKHAIMD>();
+                }
+            }
+            catch (Exception ex)
+            {
+                string logErr = String.Format("Lỗi query Ecus {0} {1} {2} \n {3}", serverName, dbusername, database, ex.ToString());
+                new LogHelper("ECUS", logErr);
+                return null;
+            }
+            return null;
+        }
+        private List<D_OLA> GetDataOlaFromEcus(string serverName, string dbusername, string dbpassword, string database)
+        {
+            string queryString = @"
+                                DECLARE @eoMonth DATETIME = DATEADD(month, ((YEAR(GETDATE()) - 1900) * 12) + MONTH(GETDATE()), -1)
+                                SELECT TOP (1000) c.D_OLAID
+                                    ,SOTK
+	                                ,NGAY_KB
+	                                ,MA_DV
+	                                ,MA_CANGNN
+	                                ,H.SO_VAN_DON
+                                    ,H.TRLUONG 
+	                                ,H.MA_DVT
+                                    ,H.THE_TICH
+                                    ,SO_CONTAINER
+                                    ,H.LUONG
+	                                ,PLUONG
+                                    ,_XorN
+	                                ,H.TEN_DVXK
+                                    ,H.MA_HIEU_PTVC
+                                  FROM " + database + @".[dbo].[D_OLA] C
+                                        INNER JOIN " + database + @".[dbo].[D_OLA_Hang] H
+                                    ON H.D_OLAID = c.D_OLAID
+                                  WHERE DATEADD(MONTH, -3, @eoMonth) < NGAY_KB AND NGAY_KB <= @eoMonth and SOTK is not null
+                                  ORDER by NGAY_KB DESC";
+
+            string connectionString = @"Server=" + serverName + ",1433; Database=" + database + "; User ID=" + dbusername + "; Password=" + dbpassword;
+            try
+            {
+                var data = Helper.Helper.ExecuteDataSet(connectionString, queryString);
+                if (data != null)
+                {
+                    DataTable dt = data.Tables[0];
+                    return dt.DataTableToList<D_OLA>();
                 }
             }
             catch (Exception ex)

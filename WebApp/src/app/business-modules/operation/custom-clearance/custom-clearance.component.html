@@ -39,15 +39,17 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-default  m-btn--icon m-btn--uppercase"
-                            (click)="getDataFromEcus()" *ngIf="!!menuPermission && menuPermission.allowAdd">
-                            <span>
-                                <i class="la la-refresh"></i>
-                                <span>
-                                    get from ecus
-                                </span>
-                            </span>
-                        </button>
+
+                        <div class="dropdown m-dropdown m-dropdown--inline">
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                data-toggle="dropdown">
+                                <i class="la la-refresh"></i> Get From Ecus<span class="caret"></span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item pointer" (click)="getDataFromEcus()"> Get From Ecus</a>
+                                <a class="dropdown-item pointer" (click)="getDataOlaFromEcus()"> Get Ola From Ecus</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
