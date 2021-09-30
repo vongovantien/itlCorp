@@ -129,13 +129,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             // Tìm theo ngày sync/ngày thu
-            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Sync")
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Last Sync")
             {
-                query = query.And(x => x.LastSyncDate.Value.Date >= criteria.DateFrom.Value.Date && x.FromDate.Value.Date <= criteria.DateTo.Value.Date);
+                query = query.And(x => x.LastSyncDate.Value.Date >= criteria.DateFrom.Value.Date && x.LastSyncDate.Value.Date <= criteria.DateTo.Value.Date);
             }
-            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid")
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid Date")
             {
-                query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.ToDate.Value.Date <= criteria.DateTo.Value.Date);
+                query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
+            }
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Create Date")
+            {
+                query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.DateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.DateTo.Value.Date);
             }
 
             // Tìm theo số phiếu thu/số invoice

@@ -4919,7 +4919,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     Dictionary<string, object> mappingKeyValue = new Dictionary<string, object>();
                     excel.SetGroupsTable();
 
-                    mappingKeyValue.Add("paidDate",item.PaidDate);
+                    mappingKeyValue.Add("paidDate",item.PaidDate.ToString("dd/MM/yyyy"));
                     mappingKeyValue.Add("receiptNo",item.ReceiptNo);
                     mappingKeyValue.Add("totalAdvPaymentVnd",item.TotalAdvancePaymentVnd);
                     mappingKeyValue.Add("cusAdvAmountVnd",item.CusAdvanceAmountVnd);
