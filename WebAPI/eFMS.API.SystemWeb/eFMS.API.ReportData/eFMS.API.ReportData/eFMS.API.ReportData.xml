@@ -91,9 +91,9 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportPaymentSOA(System.Guid,System.String)">
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String)">
             <summary>
-            Export detail settlement payment
+            Export detail settlement template payment
             </summary>
             <param name="settlementId">Id of settlement payment</param>
             <param name="language">VN (Việt Nam) or ENG (English)</param>

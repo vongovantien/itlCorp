@@ -324,25 +324,25 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         /// <summary>
-        /// Export detail settlement payment
+        /// Export detail settlement template payment
         /// </summary>
         /// <param name="settlementId">Id of settlement payment</param>
         /// <param name="language">VN (Việt Nam) or ENG (English)</param>
         /// <returns></returns>
-        [Route("ExportPaymentSOA")]
+        [Route("ExportDetailSettlementPaymentTemplate")]
         [HttpGet]
         //[Authorize]
-        public async Task<IActionResult> ExportPaymentSOA(Guid settlementId, string lang)
+        public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
-            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "SOATemplate");
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "SettlementPaymentTemplate");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Template Form - eFMS.xlsx");
 
             return fileContent;
         }

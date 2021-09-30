@@ -2945,7 +2945,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     string sheetName = language == "VN" ? "(V)" : "(E)";
                     excelPackage.Workbook.Worksheets.Add("Đề nghị thanh toán " + sheetName);
                     var workSheet = excelPackage.Workbook.Worksheets.First();
-                    if (type == "SOATemplate")
+                    if (type == "SettlementPaymentTemplate")
                     {
                         BindingDataDetailSettlementPaymentSOAExcel(workSheet, settlementExport, language);
                     }
