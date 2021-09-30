@@ -207,6 +207,7 @@ namespace eFMS.API.Operation.DL.Services
                 UnitCode = clearance.DVT_KIEN,
                 QtyCont = (int?)clearance.SO_CONTAINER ?? null,
                 GrossWeight = clearance.TR_LUONG,
+                NetWeight = clearance.TR_LUONG,
                 Route = route,
                 Type = type,
                 CargoType = cargoType,
