@@ -49,6 +49,8 @@ namespace eFMS.API.Catalogue.DL.Services
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IOptions<ApiUrl> ApiUrl;
         private readonly ICacheServiceBase<CatPartner> cache;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
+        private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
 
         public CatPartnerService(IContextBase<CatPartner> repository,
             ICacheServiceBase<CatPartner> cacheService,
@@ -69,6 +71,8 @@ namespace eFMS.API.Catalogue.DL.Services
             IContextBase<SysUserLevel> userlevelRepo,
             IContextBase<CatPartnerEmail> emailRepo,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
+            IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
+            IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IOptions<ApiUrl> apiurl) : base(repository, cacheService, mapper)
         {
             stringLocalizer = localizer;
@@ -90,6 +94,8 @@ namespace eFMS.API.Catalogue.DL.Services
             customsDeclarationRepository = customsDeclarationRepo;
             ApiUrl = apiurl;
             cache = cacheService;
+            sysEmailTemplateRepository = sysEmailTemplateRepo;
+            sysEmailSettingRepository = sysEmailSettingRepo;
 
             SetChildren<CsTransaction>("Id", "ColoaderId");
             SetChildren<CsTransaction>("Id", "AgentId");
@@ -284,7 +290,7 @@ namespace eFMS.API.Catalogue.DL.Services
             return result;
         }
 
-        private ListEmailViewModel GetListAccountantAR(string OfficeId)
+        private ListEmailViewModel GetListAccountantAR(string OfficeId, string typeOfActive)
         {
             List<string> lstAccountant = new List<string>();
             List<string> lstCCAccountant = new List<string>();
@@ -299,33 +305,125 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (lengthOffice == 1)
             {
-                var listEmailAccountant = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
-                lstAccountant = listEmailAccountant?.Split(";").ToList();
+                // Get email of accountant, AR
+                if (OfficeId == null)
+                {
+                    lstAccountant = null;
+                    lstAR = null;
+                }
+                else
+                {
+                    var departmentAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == new Guid(OfficeId.Replace(";", ""))).FirstOrDefault();
+                    var emailSetting = departmentAccountant == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAccountant.Id).FirstOrDefault()?.EmailInfo;
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstAccountant = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailAccountant = departmentAccountant?.Email;
+                        lstAccountant = listEmailAccountant?.Split(";").ToList();
+                    }
 
-                var listEmailAR = OfficeId == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", "")))?.Select(t => t.Email).FirstOrDefault();
-                lstAR = listEmailAR?.Split(";").ToList();
+                    var departmentAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == new Guid(OfficeId.Replace(";", ""))).FirstOrDefault();
+                    emailSetting = departmentAR == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAR.Id).FirstOrDefault()?.EmailInfo;
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstAR = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailAR = departmentAR?.Email;
+                        lstAR = listEmailAR?.Split(";").ToList();
+                    }
+                }
 
                 var DataHeadOfficeAR = officeRepository.Get(x => x.OfficeType == "Head").FirstOrDefault();
-
-                var listEmailCCAR = DataHeadOfficeAR == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id)?.Select(t => t.Email).FirstOrDefault();
-                lstCCAR = listEmailCCAR?.Split(";").ToList();
+                if (DataHeadOfficeAR == null)
+                {
+                    lstCCAR = null;
+                }
+                else
+                {
+                    var departmentHeadAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOfficeAR.Id).FirstOrDefault();
+                    var emailSetting = departmentHeadAR == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentHeadAR.Id).FirstOrDefault()?.EmailInfo;
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstCCAR = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailCCAR = departmentHeadAR?.Email;
+                        lstCCAR = listEmailCCAR?.Split(";").ToList();
+                    }
+                }
             }
             else if (lengthOffice > 1)
             {
-
                 // list mail to Accountant, AR
-                var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
-                lstAccountant = listEmailAccountant?.Split(";").ToList();
+                if (DataHeadOffice == null)
+                {
+                    lstAccountant = null;
+                    lstAR = null;
+                }
+                else
+                {
+                    var departmentAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == DataHeadOffice.Id).FirstOrDefault();
+                    var emailSetting = departmentAccountant == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAccountant.Id).FirstOrDefault()?.EmailInfo;
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstAccountant = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailAccountant = departmentAccountant?.Email;
+                        lstAccountant = listEmailAccountant?.Split(";").ToList();
+                    }
 
-                var listEmailAR = DataHeadOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id)?.Select(t => t.Email).FirstOrDefault();
-                lstAR = listEmailAR?.Split(";").ToList();
-
+                    var departmentAR = DataHeadOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == DataHeadOffice.Id).FirstOrDefault();
+                    emailSetting = departmentAR == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAR.Id).FirstOrDefault()?.EmailInfo;
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstAR = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailAR = departmentAR?.Email;
+                        lstAR = listEmailAR?.Split(";").ToList();
+                    }
+                }
                 // list mail cc Accountant, AR
-                var listEmailCCAcountant = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
-                lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
+                if (DataBranchOffice == null)
+                {
+                    lstCCAccountant = null;
+                    lstCCAR = null;
+                }
+                else
+                {
+                    var departmentAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && DataBranchOffice.Contains((Guid)x.BranchId)).FirstOrDefault();
+                    var emailSetting = departmentAccountant == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAccountant.Id).Select(x => x.EmailInfo).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstCCAccountant = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailCCAcountant = departmentAccountant?.Email;
+                        lstCCAccountant = listEmailCCAcountant?.Split(";").ToList();
+                    }
 
-                var listEmailCCAR = DataBranchOffice == null ? null : catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId))?.Select(t => t.Email).FirstOrDefault();
-                lstCCAR = listEmailCCAR?.Split(";").ToList();
+                    var departmentAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && DataBranchOffice.Contains((Guid)x.BranchId)).FirstOrDefault();
+                    emailSetting = departmentAR == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == typeOfActive && x.DeptId == departmentAR.Id).Select(x => x.EmailInfo).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(emailSetting))
+                    {
+                        lstCCAR = emailSetting.Split(";").ToList();
+                    }
+                    else
+                    {
+                        var listEmailCCAR = departmentAR?.Email;
+                        lstCCAR = listEmailCCAR?.Split(";").ToList();
+                    }
+                }
             }
             EmailModel.ListAccountant = lstAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
             EmailModel.ListCCAccountant = lstCCAccountant?.Where(t => !string.IsNullOrEmpty(t)).ToList();
@@ -353,7 +451,7 @@ namespace eFMS.API.Catalogue.DL.Services
             string UrlClone = string.Copy(ApiUrl.Value.Url);
 
             // info send to and cc
-            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract);
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(partner.OfficeIdContract, DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
 
             string url = string.Empty;
             string employeeIdSalemans = sysUserRepository.Get(x => x.Id == partner.SalesmanId).Select(t => t.EmployeeId).FirstOrDefault();
@@ -367,41 +465,58 @@ namespace eFMS.API.Catalogue.DL.Services
                     url = "home/commercial/agent/";
                     break;
             }
-            string linkVn = string.Empty;
-            string linkEn = string.Empty;
-            string subject = string.Empty;
-            string body = string.Empty;
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
 
             string title = string.Empty;
             title = partner.PartnerType == "Customer" ? "Customer" : "Agent";
 
+            #region change string to using template
+            //linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            //linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            //subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
 
-            linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
-            linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            subject = "eFMS - Customer Approval Request From " + EnNameCreatetor;
+            //body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
 
-            body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant/AR Team, " + " </br> </br>" +
+            //  "<i> You have a " + title +" Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
+            //  "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
 
-              "<i> You have a " + title +" Approval request from " + EnNameCreatetor + " as info below </i> </br>" +
-              "<i> Bạn có một yêu cầu xác duyệt khách hàng từ " + EnNameCreatetor + " với thông tin như sau: </i> </br> </br>" +
+            //  "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+            //  "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+            //  "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
 
-              "\t  Customer ID  / <i> Mã Agent:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
-              "\t  Customer Name  / <i> Tên khách hàng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-              "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+            //  "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
+            //  "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
+            //  "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
+            //  "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
 
-              "\t  Service  / <i> Dịch vụ: </i>" + "<b>" + partner.ContractService + "</b>" + "</br>" +
-              "\t  Contract type  / <i> Loại hợp đồng: </i> " + "<b>" + partner.ContractType + "</b>" + "</br>" +
-              "\t  Contract No  / <i> Số hợp đồng: </i> " + "<b>" + partner.ContractNo + "</b>" + "</br>" +
-              "\t  Requestor  / <i> Người yêu cầu: </i> " + "<b>" + EnNameCreatetor + "</b>" + "</br> </br>"
+            //  + linkEn + "</br>" + linkVn + "</br> </br>" +
+            //  "<i> Thanks and Regards </i>" + "</br> </br>" +
+            //  "<b> eFMS System, </b>" +
+            //  "</br>"
+            //  + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            //string urlImage = UrlClone.Replace("Catalogue", "");
+            //body = body.Replace("[logoEFMS]", urlImage + "/ReportPreview/Images/logo-eFMS.png");
+            #endregion
 
-              + linkEn + "</br>" + linkVn + "</br> </br>" +
-              "<i> Thanks and Regards </i>" + "</br> </br>" +
-              "<b> eFMS System, </b>" +
-              "</br>"
-              + "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            string urlImage = UrlClone.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", urlImage + "/ReportPreview/Images/logo-eFMS.png");
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "CONTRACT-APPROVEDREQUEST").FirstOrDefault();
+            // Subject
+            var subject = new StringBuilder(emailTemplate.Subject);
+            subject.Replace("{{enNameCreatetor}}", EnNameCreatetor);
+
+            // Body
+            var body = new StringBuilder(emailTemplate.Body);
+            string urlToSend = UrlClone.Replace("Catalogue", "");
+            body.Replace("{{title}}", title);
+            body.Replace("{{enNameCreatetor}}", EnNameCreatetor);
+            body.Replace("{{accountNo}}", partner.AccountNo);
+            body.Replace("{{partnerNameVn}}", partner.PartnerNameVn);
+            body.Replace("{{taxCode}}", partner.TaxCode);
+            body.Replace("{{contractService}}", partner.ContractService);
+            body.Replace("{{contractType}}", partner.ContractType);
+            body.Replace("{{contractNo}}", partner.ContractNo);
+            body.Replace("{{address}}", address);
+            body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> lstBCc = ListMailBCC();
             List<string> lstCc = new List<string>();
@@ -421,7 +536,6 @@ namespace eFMS.API.Catalogue.DL.Services
                     lstCc.AddRange(listEmailViewModel.ListCCAR);
 
                 }
-
             }
 
             lstCc.Add(objInfoSalesman?.Email);
@@ -429,17 +543,17 @@ namespace eFMS.API.Catalogue.DL.Services
             lstCc.Add(objInfoModified?.Email);
             lstCc.Add(objInfoCreator?.Email);
 
-            bool result = SendMail.Send(subject, body, lstTo, null, lstCc, lstBCc);
+            bool result = SendMail.Send(subject.ToString(), body.ToString(), lstTo, null, lstCc, lstBCc);
 
             var logSendMail = new SysSentEmailHistory
             {
                 SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstTo),
                 Ccs = string.Join("; ", lstCc),
-                Subject = subject,
+                Subject = subject.ToString(),
                 Sent = result,
                 SentDateTime = DateTime.Now,
-                Body = body
+                Body = body.ToString()
             };
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
             var hsSm = sendEmailHistoryRepository.SubmitChanges();
@@ -457,18 +571,7 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCcCreator = new List<string>();
             string UrlClone = string.Copy(ApiUrl.Value.Url);
             // info send to and cc
-            var listEmailAR = catDepartmentRepository.Get(x => x.DeptType == "AR" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-            var listEmailAccountant = catDepartmentRepository.Get(x => x.DeptType == "ACCOUNTANT" && x.BranchId == currentUser.OfficeID)?.Select(t => t.Email).FirstOrDefault();
-
-            if (listEmailAR != null && listEmailAR.Any())
-            {
-                lstToAR = listEmailAR.Split(";").Select(x => x.ToLower().Trim()).ToList();
-            }
-
-            if (listEmailAccountant != null && listEmailAccountant.Any())
-            {
-                lstToAccountant = listEmailAccountant.Split(";").Select(x => x.ToLower().Trim()).ToList();
-            }
+            ListEmailViewModel listEmailViewModel = GetListAccountantAR(currentUser.OfficeID.ToString(), DataEnums.EMAIL_TYPE_ACTIVE_PARTNER);
 
             switch (partner.PartnerType)
             {
@@ -484,25 +587,47 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             string address = webUrl.Value.Url + "/en/#/" + url + partner.Id;
-            string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
-            string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
-            string subject = "eFMS - Partner Approval Request From " + infoCreatetor?.EmployeeNameVn;
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant Team: </br> </br>" +
-                "<i> You have a Partner Approval request From " + infoCreatetor?.EmployeeNameVn + " as info bellow: </i> </br>" +
-                "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + infoCreatetor?.EmployeeNameVn + " với thông tin như sau: </i> </br> </br>" +
-                "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
-                "\t  Partner Name  / <i> Tên đối tượng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
-                "\t  Category  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
-                "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
-                "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
-                "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + infoCreatetor?.EmployeeNameVn + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
-                "<i> Thanks and Regards </i>" + "</br> </br>" +
-                "<b> eFMS System, </b>" + "</br>" +
-                "<p><img src = '[logoEFMS]' /></p> " + " </div>");
-            var urlTo = UrlClone.Replace("Catalogue", "");
-            body = body.Replace("[logoEFMS]", urlTo.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #region change string to using template
+            //string linkEn = "You can <a href='" + address + "'> click here </a>" + "to view detail.";
+            //string linkVn = "Bạn click <a href='" + address + "'> vào đây </a>" + "để xem chi tiết.";
+            //string subject = "eFMS - Partner Approval Request From " + infoCreatetor?.EmployeeNameVn;
+            //string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color:#004080;'> Dear Accountant Team: </br> </br>" +
+            //    "<i> You have a Partner Approval request From " + infoCreatetor?.EmployeeNameVn + " as info bellow: </i> </br>" +
+            //    "<i> Bạn có môt yêu cầu xác duyệt đối tượng từ " + infoCreatetor?.EmployeeNameVn + " với thông tin như sau: </i> </br> </br>" +
+            //    "\t  Partner ID  / <i> Mã đối tượng:</i> " + "<b>" + partner.AccountNo + "</b>" + "</br>" +
+            //    "\t  Partner Name  / <i> Tên đối tượng:</i> " + "<b>" + partner.PartnerNameVn + "</b>" + "</br>" +
+            //    "\t  Category  / <i> Danh mục: </i>" + "<b>" + partner.PartnerGroup + "</b>" + "</br>" +
+            //    "\t  Taxcode / <i> Mã số thuế: </i>" + "<b>" + partner.TaxCode + "</b>" + "</br>" +
+            //    "\t  Address  / <i> Địa chỉ: </i> " + "<b>" + partner.AddressEn + "</b>" + "</br>" +
+            //    "\t  Requestor / <i> Người yêu cầu: </i> " + "<b>" + infoCreatetor?.EmployeeNameVn + "</b>" + "</br> </br>" + linkEn + "</br>" + linkVn + "</br> </br>" +
+            //    "<i> Thanks and Regards </i>" + "</br> </br>" +
+            //    "<b> eFMS System, </b>" + "</br>" +
+            //    "<p><img src = '[logoEFMS]' /></p> " + " </div>");
+            //var urlTo = UrlClone.Replace("Catalogue", "");
+            //body = body.Replace("[logoEFMS]", urlTo.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #endregion
+
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "PARTNER-APPROVEDREQUEST").FirstOrDefault();
+            // Subject
+            var subject = new StringBuilder(emailTemplate.Subject);
+            subject.Replace("{{employeeNameVn}}", infoCreatetor?.EmployeeNameVn);
+
+            var body = new StringBuilder(emailTemplate.Body);
+            var urlToSend = UrlClone.Replace("Catalogue", "");
+            body.Replace("{{employeeNameVn}}", infoCreatetor?.EmployeeNameVn);
+            body.Replace("{{accountNo}}", partner.AccountNo);
+            body.Replace("{{partnerNameVn}}", partner.PartnerNameVn);
+            body.Replace("{{partnerGroup}}", partner.PartnerGroup);
+            body.Replace("{{taxCode}}", partner.TaxCode);
+            body.Replace("{{addressEn}}", partner.AddressEn);
+            body.Replace("{{address}}", address);
+            body.Replace("{{logoEFMS}}", urlToSend + "/ReportPreview/Images/logo-eFMS.png");
+
             lstCcCreator.Add(infoCreatetor?.Email);
             bool resultSenmail = false;
+            lstToAccountant = listEmailViewModel.ListAccountant;
+            lstToAR = listEmailViewModel.ListAR;
             if ((partner.PartnerType != "Customer" && partner.PartnerType != "Agent") || string.IsNullOrEmpty(partner.PartnerType))
             {
                 if (lstToAccountant.Any() || lstCc.Any())
@@ -511,7 +636,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     {
                         lstToAccountant = lstCc;
                     }
-                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
+                    resultSenmail = SendMail.Send(subject.ToString(), body.ToString(), lstToAccountant, null, lstCcCreator, lstCc);
                 }
             }
 
@@ -521,7 +646,7 @@ namespace eFMS.API.Catalogue.DL.Services
                 lstToAccountant = lstToAccountant.Where(x => !string.IsNullOrWhiteSpace(x) && !string.IsNullOrEmpty(x)).Distinct().ToList();
                 if (lstToAccountant.Any())
                 {
-                    resultSenmail = SendMail.Send(subject, body, lstToAccountant, null, lstCcCreator, lstCc);
+                    resultSenmail = SendMail.Send(subject.ToString(), body.ToString(), lstToAccountant, null, lstCcCreator, lstCc);
                 }
             }
 
@@ -529,11 +654,12 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", lstToAccountant),
-                Ccs = string.Join("; ", lstCc),
-                Subject = subject,
+                Ccs = string.Join("; ", lstCcCreator),
+                Bccs = string.Join("; ", lstCc),
+                Subject = subject.ToString(),
                 Sent = resultSenmail,
                 SentDateTime = DateTime.Now,
-                Body = body
+                Body = body.ToString()
             };
 
             var hsLogSendMail = sendEmailHistoryRepository.Add(logSendMail);
@@ -546,11 +672,11 @@ namespace eFMS.API.Catalogue.DL.Services
             List<string> lstCc = new List<string>
             {
                 "alex.phuong@itlvn.com",
-                "luis.quang@itlvn.com",
-                "andy.hoa@itlvn.com",
-                "cara.oanh@itlvn.com",
-                //"lynne.loc@itlvn.com",
-                "samuel.an@logtechub.com",
+                //"luis.quang@itlvn.com",
+                //"andy.hoa@itlvn.com",
+                //"cara.oanh@itlvn.com",
+                "lynne.loc@itlvn.com",
+                //"samuel.an@logtechub.com",
                 //"kenny.thuong@itlvn.com"
             };
             return lstCc;
