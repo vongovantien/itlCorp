@@ -616,6 +616,8 @@ namespace eFMS.API.ForPartner.DL.Service
 
         HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser)
         {
+            string invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE;
+            List<Guid?> IdsInvoiceTemps = new List<Guid?>();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
@@ -625,11 +627,40 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     if (model.SerieNo == ForPartnerConstants.TYPE_CHARGE_OBH)
                     {
+                        invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
                         data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
                                                 && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
 
+                        CsShipmentSurcharge charge = surchargeRepo.First(x => x.ReferenceNo == model.ReferenceNo && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        if(charge == null || string.IsNullOrEmpty(charge.SyncedFrom))
+                        {
+                            return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
 
-                        hs = DataContext.Delete(x => data.Id == x.Id, false);
+                        // Find and Delete Inoice Temp with same debit/soa
+                        IQueryable<CsShipmentSurcharge> surchargeHadSynced = null;
+                        if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.DebitNo == charge.DebitNo 
+                            &&  x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE 
+                            && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        else if(charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.Soano == charge.Soano
+                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA
+                           && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+
+                        if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
+                        {
+                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId).Distinct().ToList();
+
+                            foreach (var Id in IdsInvoiceTemps)
+                            {
+                                DataContext.Delete(x => x.Id == Id, false);
+                            }
+                        }
                     }
                     else
                     {
@@ -650,29 +681,53 @@ namespace eFMS.API.ForPartner.DL.Service
                    
                     if (hs.Success)
                     {
-                        var charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
-                        foreach (var charge in charges)
+                        IQueryable<CsShipmentSurcharge> charges = null;
+                        if(invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
                         {
-                            charge.AcctManagementId = null;
-                            charge.ReferenceNo = null;
-                            charge.InvoiceNo = null;
-                            charge.InvoiceDate = null;
-                            charge.VoucherId = null;
-                            charge.VoucherIddate = null;
-                            charge.SeriesNo = null;
-                            //charge.FinalExchangeRate = null;
-                            //charge.AmountVnd = charge.VatAmountVnd = null;
-                            charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = _currentUser.UserID;
-                            charge.SyncedFrom = null;
-                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
-
-                            //Update Status Removed Inv For SOA (SOA synced)
-                            UpdateStatusRemovedInvForSOA(charge.Soano);
-                            //Update Status Removed Inv For Debit Note (Debit Note synced)
-                            UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
+                            charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
                         }
+                        else
+                        {
+                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        
+                        if(charges != null)
+                        {
+                            foreach (var charge in charges)
+                            {
+                                charge.AcctManagementId = null;
+                                charge.ReferenceNo = null;
+                                charge.InvoiceNo = null;
+                                charge.InvoiceDate = null;
+                                charge.VoucherId = null;
+                                charge.VoucherIddate = null;
+                                charge.SeriesNo = null;
+                                //charge.FinalExchangeRate = null;
+                                //charge.AmountVnd = charge.VatAmountVnd = null;
+                                charge.DatetimeModified = DateTime.Now;
+                                charge.UserModified = _currentUser.UserID;
+                                charge.SyncedFrom = null;
 
+                                if(invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
+                                {
+                                    //Update Status Removed Inv For SOA (SOA synced)
+                                    UpdateStatusRemovedInvForSOA(charge.Soano);
+                                    //Update Status Removed Inv For Debit Note (Debit Note synced)
+                                    UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
+                                }
+
+                                var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                            }
+                            if (invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+                            {
+                                string soaNo = charges.First().Soano;
+                                string debitNo = charges.First().DebitNo;
+
+                                UpdateStatusRemovedInvForSOA(soaNo);
+                                UpdateStatusRemovedInvForDebitNote(debitNo);
+                            }
+                        }
+                       
 
                         var smSoa = acctSOARepository.SubmitChanges();
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
@@ -680,10 +735,10 @@ namespace eFMS.API.ForPartner.DL.Service
                         var sm = DataContext.SubmitChanges();
 
                         // Tính lại công nợ của hđ vừa hủy từ bravo.
-                        if(sm.Success)
-                        {
-                            CalculatorInvoiceReceivable(data);
-                        }
+                        //if(sm.Success)
+                        //{
+                        //    CalculatorInvoiceReceivable(data);
+                        //}
 
                         trans.Commit();
                     }
@@ -802,6 +857,10 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
         {
             var hsUpdate = new HandleState();
+            if (string.IsNullOrEmpty(soaNo))
+            {
+                return hsUpdate;
+            }
             var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (soa != null)
             {
@@ -816,6 +875,10 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState UpdateStatusRemovedInvForDebitNote(string debitNo)
         {
             var hsUpdate = new HandleState();
+            if (string.IsNullOrEmpty(debitNo))
+            {
+                return hsUpdate;
+            }
             var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (debitNote != null)
             {
