@@ -315,7 +315,31 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
-            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang);
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
+            if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
+
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
+
+            return fileContent;
+        }
+
+        /// <summary>
+        /// Export detail settlement payment
+        /// </summary>
+        /// <param name="settlementId">Id of settlement payment</param>
+        /// <param name="language">VN (Việt Nam) or ENG (English)</param>
+        /// <returns></returns>
+        [Route("ExportPaymentSOA")]
+        [HttpGet]
+        //[Authorize]
+        public async Task<IActionResult> ExportPaymentSOA(Guid settlementId, string lang)
+        {
+            var accessToken = Request.Headers["Authorization"].ToString();
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
+
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "SOATemplate");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
@@ -463,7 +487,7 @@ namespace eFMS.API.ReportData.Controllers
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
-            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang);
+            var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");

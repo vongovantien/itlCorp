@@ -4765,6 +4765,10 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4783,8 +4787,11 @@ namespace eFMS.API.Accounting.DL.Services
                 BankAccountNo = settlementPayment.BankAccountNo,
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
-                DueDate = settlementPayment.DueDate
-            };
+                DueDate = settlementPayment.DueDate,
+                SOADate = soa?.SoaformDate,
+                SOANo = soa?.Soano,
+                ReasonForRequest = soa?.Note
+    };
             return infoSettlement;
         }
 
@@ -4802,7 +4809,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo, s.Soano }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo, s.Key.Soano });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4827,7 +4834,6 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Cw = ops.SumChargeWeight;
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
-
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;
