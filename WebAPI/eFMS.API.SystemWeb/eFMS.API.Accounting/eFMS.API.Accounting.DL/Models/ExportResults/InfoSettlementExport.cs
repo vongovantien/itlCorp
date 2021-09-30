@@ -12,7 +12,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string SettlementCurrency { get; set; }
         public string PaymentMethod { get; set; }
         public string Manager { get; set; }
-        public string Accountant { get; set; }     
+        public string Accountant { get; set; }
         public bool IsRequesterApproved { get; set; }
         public bool IsManagerApproved { get; set; }
         public bool IsAccountantApproved { get; set; }
@@ -26,5 +26,8 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string Note { get; set; }
         public string BankCode { get; set; }
         public DateTime? DueDate { get; set; }
+        public DateTime? SOADate { get; set; }
+        public string SOANo { get; set; }
+        public string ReasonForRequest { get; set; }
     }
 }

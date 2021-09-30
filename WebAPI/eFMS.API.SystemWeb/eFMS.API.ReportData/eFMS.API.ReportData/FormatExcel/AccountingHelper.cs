@@ -3544,7 +3544,7 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <param name="language"></param>
         /// <param name="stream"></param>
         /// <returns></returns>
-        public Stream GenerateDetailSettlementPaymentExcel(SettlementExport settlementExport, string language, Stream stream = null)
+        public Stream GenerateDetailSettlementPaymentExcel(SettlementExport settlementExport, string language, string type, Stream stream = null)
         {
             try
             {
@@ -3553,7 +3553,14 @@ namespace eFMS.API.ReportData.FormatExcel
                     string sheetName = language == "VN" ? "(V)" : "(E)";
                     excelPackage.Workbook.Worksheets.Add("Đề nghị thanh toán " + sheetName);
                     var workSheet = excelPackage.Workbook.Worksheets.First();
-                    BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    if (type == "SettlementPaymentTemplate")
+                    {
+                        BindingDataDetailSettlementPaymentSOAExcel(workSheet, settlementExport, language);
+                    }
+                    else
+                    {
+                        BindingDataDetailSettlementPaymentExcel(workSheet, settlementExport, language);
+                    }
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -3580,6 +3587,16 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(11).Width = 20; //Cột I
             workSheet.Column(12).Width = 12; //Cột J
             workSheet.Column(13).Width = 18; //Cột K
+        }
+        private void SetWidthColumnExcelDetailSettlementPaymentSOA(ExcelWorksheet workSheet)
+        {
+            workSheet.Column(1).Width = 30; //Cột A
+            workSheet.Column(2).Width = 20; //Cột B
+            workSheet.Column(3).Width = 20; //Cột C
+            workSheet.Column(4).Width = 30; //Cột D
+            workSheet.Column(5).Width = 30; //Cột E
+            workSheet.Column(6).Width = 20; //Cột F
+            workSheet.Column(7).Width = 20; //Cột G
         }
 
         private List<string> GetHeaderExcelDetailSettlementPayment(string language)
@@ -3695,6 +3712,45 @@ namespace eFMS.API.ReportData.FormatExcel
             };
 
             List<string> headers = language == "VN" ? vnHeaders : engHeaders;
+            return headers;
+        }
+        private List<string> GetHeaderExcelDetailSettlementPaymentSOA(string language)
+        {
+            List<string> Headers = new List<string>()
+            {
+                "INDO TRANS LOGISTICS CORPORATION", //0
+                "52-54-65 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+                "PAYMENT REQUEST", //2
+                "Requester:", //3
+                "Date SOA:", //4
+                "SOA No.:", //5
+                "Department:", //6
+                "Reason for request", //7
+                "Job ID:", //8
+                "Invoice No", //9
+                "Custom No:", //10
+                "H-BL No.\n(HAWB):", //11
+                "M-BL No.\n(MAWB):", //12
+                "Amount(VND)",//13
+                "OBH",//14
+                "Credit",//15
+                "Total Amount",//16
+                "Balance", //17
+                "Requester\n(Name, Signature)", //18
+                "Head of Department\n(Name, Signature)", //19
+                "Chief Accountant\n(Name, Signature)", //20
+                "Director\n(Name, Signature)", //21
+                "Supplier name:", // 22
+                "By Bank transfer:", // 23
+                "Beneficiary:", // 24
+                "Acc No:", // 25
+                "Bank:", // 16
+                "Bank code:", // 27
+                "By cash:", // 28
+                "Due date:", // 29
+            };
+
+            List<string> headers = Headers;
             return headers;
         }
 
@@ -4240,6 +4296,344 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 11, p, 13].Merge = true;
             workSheet.Cells[p, 11, p, 13].Value = string.Empty; //Value Giám đốc
         }
+        private void BindingDataDetailSettlementPaymentSOAExcel(ExcelWorksheet workSheet, SettlementExport settlementExport, string language)
+        {
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+            SetWidthColumnExcelDetailSettlementPaymentSOA(workSheet);
+
+            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            {
+                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                //add the image to row 1, column A
+                excelImage.SetPosition(0, 0, 0, 0);
+            }
+
+            List<string> headers = GetHeaderExcelDetailSettlementPaymentSOA(language);
+
+            #region #Header
+            workSheet.Cells["F1:L1"].Merge = true;
+            workSheet.Cells["F1"].Value = headers[0];
+            workSheet.Cells["F1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
+            workSheet.Cells["F1"].Style.Font.Italic = true;
+            workSheet.Cells["F2:M2"].Merge = true;
+            workSheet.Cells["F2"].Style.WrapText = true;
+            workSheet.Cells["F2"].Value = settlementExport.InfoSettlement.ContactOffice;
+            workSheet.Cells["F2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
+            workSheet.Cells["F2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Row(2).Height = 60;
+
+            //Title
+            workSheet.Cells["A3:H3"].Merge = true;
+            workSheet.Cells["A3"].Style.Font.SetFromFont(new Font("Times New Roman", 18));
+            workSheet.Cells["A3"].Value = headers[2]; //Đề nghị thanh toán
+            workSheet.Cells["A3"].Style.Font.Bold = true;
+            workSheet.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells["A3"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 12));
+
+            workSheet.Cells["A5:B5"].Merge = true;
+            workSheet.Cells["A5"].Value = headers[3]; //Người yêu cầu
+            workSheet.Cells["A5"].Style.Font.Bold = true;
+            workSheet.Cells["C5"].Value = settlementExport.InfoSettlement.Requester;
+
+            workSheet.Cells["F5"].Value = headers[4]; //Ngày SOA
+            workSheet.Cells["F5"].Style.Font.Bold = true;
+            workSheet.Cells["G5"].Value = settlementExport.InfoSettlement.SOADate;
+            workSheet.Cells["G5"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["G5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+
+            workSheet.Cells["A6:B6"].Merge = true;
+            workSheet.Cells["A6"].Value = headers[6]; //Bộ phận
+            workSheet.Cells["A6"].Style.Font.Bold = true;
+            workSheet.Cells["C6"].Value = settlementExport.InfoSettlement.Department;
+
+            workSheet.Cells["A7:B7"].Merge = true;
+            workSheet.Cells["A7"].Value = headers[22]; //Supplier
+            workSheet.Cells["A7"].Style.Font.Bold = true;
+            workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.SupplierName;
+
+            workSheet.Cells["F6"].Value = headers[5]; //Số SOA
+            workSheet.Cells["F6"].Style.Font.Bold = true;
+            workSheet.Cells["G6"].Value = settlementExport.InfoSettlement.SOANo;
+
+            // By Bank transfer
+            workSheet.Cells["F12"].Value = headers[23];
+            workSheet.Cells["F12"].Style.Font.Bold = true;
+            workSheet.Cells["G12"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("BANK") ? "X" : string.Empty;
+
+            // Beneficiary
+            workSheet.Cells["F13"].Value = headers[24];
+            workSheet.Cells["F13"].Style.Font.Bold = true;
+            workSheet.Cells["CG3"].Value = settlementExport.InfoSettlement.BankAccountName;
+
+            // Acc No
+            workSheet.Cells["F14"].Value = headers[25];
+            workSheet.Cells["F14"].Style.Font.Bold = true;
+            workSheet.Cells["G14"].Value = settlementExport.InfoSettlement.BankAccountNo;
+
+            // Bank
+            workSheet.Cells["F15"].Value = headers[26];
+            workSheet.Cells["F15"].Style.Font.Bold = true;
+            workSheet.Cells["G15"].Value = settlementExport.InfoSettlement.BankName;
+
+            // Bank Code
+            workSheet.Cells["F16"].Value = headers[27];
+            workSheet.Cells["F16"].Style.Font.Bold = true;
+            workSheet.Cells["G16"].Value = settlementExport.InfoSettlement.BankCode;
+
+            // By Cash
+            workSheet.Cells["B12"].Value = headers[28];
+            workSheet.Cells["B12"].Style.Font.Bold = true;
+            workSheet.Cells["C12"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("CASH") ? "X" : string.Empty;
+
+            // Due Date
+            workSheet.Cells["A10"].Value = headers[29];
+            workSheet.Cells["A10"].Style.Font.Bold = true;
+            workSheet.Cells["C10"].Value = settlementExport.InfoSettlement.DueDate?.ToString("dd/MM/yyyy");
+            #endregion
+            //Bôi đen header
+            //workSheet.Cells["A15:K15"].Style.Font.Bold = true;
+
+            #region #Format Header Table
+            for (var col = 1; col < 8; col++)
+            {
+                workSheet.Cells[18, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[18, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+                workSheet.Cells[18, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[19, col].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[18, col].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[18, col].Style.WrapText = true;
+                workSheet.Cells[18, col].Style.Font.Bold = true;
+
+                workSheet.Cells[19, col].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                workSheet.Cells[19, col].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            }
+
+            workSheet.Cells["A18:A19"].Merge = true;
+            workSheet.Cells["A18:A19"].Value = headers[8]; // Job ID
+
+            workSheet.Cells["B18:B19"].Merge = true;
+            workSheet.Cells["B18:B19"].Value = headers[9]; // Invoice No
+
+            workSheet.Cells["C18:C19"].Merge = true;
+            workSheet.Cells["C18:C19"].Value = headers[10]; // Custom No
+
+            workSheet.Cells["D18:D19"].Merge = true;
+            workSheet.Cells["D18:D19"].Value = headers[11]; // HBL No
+
+            workSheet.Cells["E18:E19"].Merge = true;
+            workSheet.Cells["E18:E19"].Value = headers[12]; // MBL No
+
+            workSheet.Cells["F18:G18"].Merge = true;
+            workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+
+            workSheet.Cells["F19"].Merge = true;
+            workSheet.Cells["F19"].Value = headers[14]; // OBH
+
+            workSheet.Cells["G19"].Merge = true;
+            workSheet.Cells["G19"].Value = headers[15]; // Credit
+
+            workSheet.Row(18).Height = 30;
+            workSheet.Row(19).Height = 30;
+            workSheet.Cells[19, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[17, 1, 17, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            #endregion
+
+            decimal? _sumTotalOBH = 0;
+            decimal? _sumTotalCredit = 0;
+            int p = 20;
+            int j = 20;
+            int k = 20;
+            for (int i = 0; i < settlementExport.ShipmentsSettlement.Count; i++)
+            {
+               
+                var OBHCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "OBH");
+
+                workSheet.Cells[k, 6].Value = headers[14];
+                workSheet.Cells[k, 6].Style.Font.Bold = true;
+                workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount).Sum();
+                workSheet.Cells[k, 6].Style.Font.Bold = true;
+                //workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
+                foreach (var invoice in OBHCharges)
+                {
+                    workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
+                }
+
+                var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "BUY");
+
+                workSheet.Cells[k, 7].Value = headers[15]; 
+                workSheet.Cells[k, 7].Style.Font.Bold = true;
+                workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
+                workSheet.Cells[k, 7].Style.Font.Bold = true;
+                //workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat;
+                foreach (var no_invoice in CreditInvoiceCharges)
+                {
+                    workSheet.Cells[k, 2].Value = no_invoice.InvoiceNo;
+                }
+                #endregion
+
+                workSheet.Cells[j, 1].Value = headers[8]; //Số lô hàng
+                workSheet.Cells[j, 1].Value = settlementExport.ShipmentsSettlement[i].JobNo;
+
+                workSheet.Cells[j, 3].Value = headers[10]; //Số tờ khai
+                workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].CustomNo;
+
+                workSheet.Cells[j, 4].Value = headers[11]; //Số HBL
+                workSheet.Cells[j, 4].Value = settlementExport.ShipmentsSettlement[i].HBL;
+
+                workSheet.Cells[j, 5].Value = headers[12]; //Số MBL
+                workSheet.Cells[j, 5].Value = settlementExport.ShipmentsSettlement[i].MBL;
+
+
+                j = j + 1;
+                k = k + 1;
+                if (k > j)
+                {
+                    j = k;
+                }
+                else
+                {
+                    k = j;
+                }
+                workSheet.Cells[j - 1, 3, j - 1, 5].Style.Border.Top.Style = ExcelBorderStyle.Dotted;
+                workSheet.Cells[j - 1, 1, j - 1, 2].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[j - 1, 6, j - 1, 7].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                workSheet.Cells[j - 1, 1, j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                //workSheet.Cells[p, 1, p, 5].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+                p = j;
+                for (var f = p; f < j - 2; f++)
+                {
+                    workSheet.Cells[f, 4, f, 5].Style.Border.Bottom.Style = ExcelBorderStyle.Dotted;
+                    workSheet.Cells[f, 1, f, 2].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                    workSheet.Cells[f, 6, f, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                }
+                //workSheet.Cells[p, 1, j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            }
+            #region --TOTAL--
+            ////TỔNG CỘNG
+            workSheet.Cells[p, 1, p, 5].Merge = true;
+            workSheet.Cells[p, 1, p, 5].Value = headers[16]; //Title TỔNG CỘNG
+            workSheet.Cells[p, 1, p, 5].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 1, p, 5].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[p, 1, p, 5].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[p, 1, p, 5].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[p, 1, p, 7].Style.Border.BorderAround(ExcelBorderStyle.Medium);
+
+            workSheet.Cells[p, 6].Value = _sumTotalOBH; //Value sum total OBH
+            //workSheet.Cells[p, 6].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+
+            workSheet.Cells[p, 7].Value = _sumTotalCredit; //Value sum total Credit
+            //workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            p=p+2;
+            workSheet.Cells[p, 1, p, 6].Merge = true;
+            workSheet.Cells[p, 1, p, 6].Value = headers[17]; //Title BALANCE
+            workSheet.Cells[p, 1, p, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 1, p, 6].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[p, 1, p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[p, 1, p, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
+
+            workSheet.Cells[p, 7].Value = _sumTotalOBH- _sumTotalCredit; //Value sum total Balance
+            //workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            #endregion--TOTAL--
+            //bôi đen dòng tổng cộng ở cuối
+            workSheet.Cells["a" + (p-2) + ":g" + (p - 2)].Style.Font.Bold = true;
+            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + p + ":g" + p].Style.Font.Bold = true;
+            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat;
+
+            //In đậm border dòng 14
+            workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+            workSheet.Cells["A" + p + ":G" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+            workSheet.Cells["A" + (p + 1) + ":G" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+            #region --END_FORM-- 
+            for (var i = 18; i < p + 1; i++)
+            {
+                workSheet.Cells[i, 7].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+            }
+
+            p = p + 3;
+
+            workSheet.Cells[p, 1, p, 2].Merge = true;
+            workSheet.Cells[p, 1, p, 2].Style.WrapText = true;
+            workSheet.Cells[p, 1, p, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 1, p, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[p, 1, p, 2].Value = headers[18]; //Người yêu cầu 
+
+            workSheet.Cells[p, 4].Merge = true;
+            workSheet.Cells[p, 4].Style.WrapText = true;
+            workSheet.Cells[p, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 4].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Cells[p, 4].Value = headers[19]; //Trưởng bộ phận
+
+            workSheet.Cells[p, 6].Merge = true;
+            workSheet.Cells[p, 6].Style.WrapText = true;
+            workSheet.Cells[p, 6].Value = headers[20]; //Kế toán
+            workSheet.Cells[p, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 6].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+
+            workSheet.Cells[p, 7].Merge = true;
+            workSheet.Cells[p, 7].Value = headers[21]; //Giám đốc
+            workSheet.Cells[p, 7].Style.WrapText = true;
+            workSheet.Cells[p, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 7].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+            workSheet.Row(p).Height = 50;
+
+            p = p + 1;
+
+            if (settlementExport.InfoSettlement.IsRequesterApproved)
+            {
+                AddIconTick(workSheet, p, 1); //Tick Requester
+            }
+
+            if (settlementExport.InfoSettlement.IsManagerApproved)
+            {
+                workSheet.Cells[p, 4].Merge = true;
+                AddIconTick(workSheet, p, 4); //Tick Manager Dept
+            }
+
+            if (settlementExport.InfoSettlement.IsAccountantApproved)
+            {
+                workSheet.Cells[p, 6].Merge = true;
+                AddIconTick(workSheet, p, 6); //Tick Accountant
+            }
+
+            if (settlementExport.InfoSettlement.IsBODApproved)
+            {
+                workSheet.Cells[p, 7].Merge = true;
+                AddIconTick(workSheet, p, 7); //Tick BOD
+            }
+
+            workSheet.Row(p).Height = 50;
+
+            p = p + 1;
+
+            workSheet.Cells[p, 1].Style.WrapText = true;
+            workSheet.Cells[p, 1].Value = settlementExport.InfoSettlement.Requester; //Value Người tạm ứng
+            workSheet.Cells[p, 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells[p, 4].Merge = true;
+            workSheet.Cells[p, 4].Style.WrapText = true;
+            workSheet.Cells[p, 4].Value = settlementExport.InfoSettlement.Manager; //Value Trưởng bộ phận
+            workSheet.Cells[p, 4].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells[p, 6].Merge = true;
+            workSheet.Cells[p, 6].Style.WrapText = true;
+            workSheet.Cells[p, 6].Value = settlementExport.InfoSettlement.Accountant; //Value Kế toán
+            workSheet.Cells[p, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
+            workSheet.Cells[p, 7].Merge = true;
+            workSheet.Cells[p, 7].Value = string.Empty; //Value Giám đốc
+            #endregion--END_FORM--
+        }
 
         private void AddIconTick(ExcelWorksheet workSheet, int row, int col)
         {
@@ -4333,7 +4727,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
-        #endregion --- SETTLEMENT PAYMENT ---
+       
 
         #region --- ACCOUNTING MANAGEMENT ---
         public Stream GenerateAccountingManagementExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)

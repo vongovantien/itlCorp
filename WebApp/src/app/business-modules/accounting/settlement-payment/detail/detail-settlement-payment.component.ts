@@ -305,6 +305,32 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             );
     }
 
+    exportSettlementPaymentTemplate(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        this._exportRepo.exportSettlementPaymentDetailTemplate(this.settlementPayment.settlement.id, language)
+            .pipe(
+                catchError(this.catchError),
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Template Form - eFMS.xlsx`);
+                },
+            );
+    }
+
+    previewExportSettlementPaymentTemplate(language: string) {
+        if (!this.requestSurchargeListComponent.surcharges.length) {
+            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
+            return;
+        }
+
+        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement');
+    }
+
     exportGeneralPreview() {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);

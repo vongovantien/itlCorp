@@ -1477,7 +1477,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<sp_GetDataExistsCharge> GetExistingChargeData(ExistsChargeCriteria criteria)
         {
             var parameters = new[]{
-                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
+                new cleaSqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
                 new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.serviceDateTo },
                 new SqlParameter(){ ParameterName = "@partnerId", Value = criteria.partnerId },
                 new SqlParameter(){ ParameterName = "@jobIds", Value = string.Join(';',criteria.jobIds) },
@@ -4766,6 +4766,10 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4784,8 +4788,11 @@ namespace eFMS.API.Accounting.DL.Services
                 BankAccountNo = settlementPayment.BankAccountNo,
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
-                DueDate = settlementPayment.DueDate
-            };
+                DueDate = settlementPayment.DueDate,
+                SOADate = soa?.SoaformDate,
+                SOANo = soa?.Soano,
+                ReasonForRequest = soa?.Note
+    };
             return infoSettlement;
         }
 
