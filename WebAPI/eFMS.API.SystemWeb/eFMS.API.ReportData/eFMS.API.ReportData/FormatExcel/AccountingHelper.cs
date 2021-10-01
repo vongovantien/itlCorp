@@ -4818,7 +4818,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Debit", item.DebitUsd);
                     listKeyData.Add("Credit", item.CreditUsd);
 
-                    if (item.DebitAmountUsd > 0)
+                    if (item.DebitNo != null)
                     {
                         listKeyData.Add("RemainDebitUsd", item.DebitAmountUsd - item.DebitUsd);
                         listKeyData.Add("RemainCreditUsd",0);
@@ -4826,7 +4826,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("RemainDebitVnd", item.DebitAmountVnd - item.DebitVnd);
                         listKeyData.Add("RemainCreditVnd", 0);
                     }
-                    else if(item.CreditAmountUsd > 0)
+                    else if (item.CreditNo != null)
                     {
                         listKeyData.Add("RemainDebitUsd", 0);
                         listKeyData.Add("RemainCreditUsd", item.CreditAmountUsd - item.CreditUsd);
