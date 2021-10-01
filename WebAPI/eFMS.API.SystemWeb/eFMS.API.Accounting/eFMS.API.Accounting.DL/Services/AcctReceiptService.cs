@@ -643,28 +643,51 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        private string GetPaymentSatusOBH(IEnumerable<AccAccountingManagement> invoices)
+        {
+            string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+            if(invoices.Count() > 0)
+            {
+                _paymentStatus = GetPaymentStatusInvoice(invoices.ToList());
+            }
+            return _paymentStatus;
+        }
+
+
+        private string GetPaymentStatusInvoice(List<AccAccountingManagement> listInvoices)
+        {
+            string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+
+            if (listInvoices.Count == 1)
+            {
+                _paymentStatus = listInvoices.FirstOrDefault().PaymentStatus;
+            }
+            else
+            {
+                bool isPaid = listInvoices.All(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
+                if (isPaid == true)
+                {
+                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                }
+                else if (listInvoices.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART)
+                    || listInvoices.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID))
+                {
+                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
+                }
+            }
+
+            return _paymentStatus;
+        }
+       
+
         private string GetPaymentStatus(List<string> Ids)
         {
             string _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
-            var inv = acctMngtRepository.Get(x => Ids.Contains(x.Id.ToString())).ToList();
-            if (inv.Count > 0)
+            List<AccAccountingManagement> invs = acctMngtRepository.Get(x => Ids.Contains(x.Id.ToString())).ToList();
+
+            if (invs.Count > 0)
             {
-                if (inv.Count == 1)
-                {
-                    _paymentStatus = inv.FirstOrDefault().PaymentStatus;
-                }
-                else
-                {
-                    bool isPaid = inv.All(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID);
-                    if (isPaid == true)
-                    {
-                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
-                    }
-                    else if (inv.Any(x => x.PaymentStatus == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART))
-                    {
-                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID_A_PART;
-                    }
-                }
+                _paymentStatus = GetPaymentStatusInvoice(invs);
             }
             return _paymentStatus;
         }
@@ -2346,7 +2369,7 @@ namespace eFMS.API.Accounting.DL.Services
                 UnpaidAmountUsd = se.Invoice.Sum(su => su.UnpaidAmountUsd),
                 PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
                 DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
-                PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
+                PaymentStatus = GetPaymentSatusOBH(se.Invoice),
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
@@ -2998,7 +3021,7 @@ namespace eFMS.API.Accounting.DL.Services
                 UnpaidAmountUsd = se.Invoice.Sum(su => su.UnpaidAmountUsd),
                 PaymentTerm = se.Invoice.Select(s => s.PaymentTerm).FirstOrDefault(),
                 DueDate = se.Invoice.FirstOrDefault().PaymentDueDate,
-                PaymentStatus = se.Invoice.Select(s => s.PaymentStatus).FirstOrDefault(),
+                PaymentStatus = GetPaymentSatusOBH(se.Invoice),
                 DepartmentId = se.Invoice.Select(s => s.DepartmentId).FirstOrDefault(),
                 OfficeId = se.Invoice.Select(s => s.OfficeId).FirstOrDefault(),
                 CompanyId = se.Invoice.Select(s => s.CompanyId).FirstOrDefault(),
