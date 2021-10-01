@@ -1477,7 +1477,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<sp_GetDataExistsCharge> GetExistingChargeData(ExistsChargeCriteria criteria)
         {
             var parameters = new[]{
-                new cleaSqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
+                new SqlParameter(){ ParameterName = "@serviceDateFrom", Value = criteria.serviceDateFrom },
                 new SqlParameter(){ ParameterName = "@serviceDateTo", Value = criteria.serviceDateTo },
                 new SqlParameter(){ ParameterName = "@partnerId", Value = criteria.partnerId },
                 new SqlParameter(){ ParameterName = "@jobIds", Value = string.Join(';',criteria.jobIds) },
