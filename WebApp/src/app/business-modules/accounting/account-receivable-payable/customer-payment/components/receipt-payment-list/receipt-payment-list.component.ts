@@ -72,6 +72,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     paymentMethods: string[] = [
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
