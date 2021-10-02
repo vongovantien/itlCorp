@@ -44,6 +44,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? CreditVnd { get;  set; }
         public decimal? DebitUsd { get;  set; }
         public decimal? CreditAmountVnd { get;  set; }
+        public string Status { get;  set; }
 
         public List<AccountingAgencyPaymentExportDetail> details;
     }
