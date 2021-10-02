@@ -83,7 +83,7 @@
             <param name="service"></param>
             <param name="currUser"></param>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.IUnlockRequestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Setting.DL.IService.IUnlockRequestApproveService)">
+        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.IUnlockRequestService,eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Setting.DL.IService.IUnlockRequestApproveService,eFMS.API.Setting.DL.IService.IUserBaseService)">
             <summary>
             Contructor
             </summary>
@@ -96,6 +96,12 @@
             Get data Unlock Request to Export
             </summary>
             <param name="criteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.UnlockRequestController.GeneratePaymentId(eFMS.API.Setting.Models.Payment)">
+            <summary>
+            Generate PaymentID
+            </summary>
             <returns></returns>
         </member>
     </members>
