@@ -1435,7 +1435,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             HandleState hsAgreementUpdate = new HandleState();
             CatContract agreement = catContractRepository.Get(x => x.Id == receipt.AgreementId).FirstOrDefault();
-            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id && x.Type == "ADV");
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Where(x => x.ReceiptId == receipt.Id 
+            && (x.Type == "ADV" || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH));
 
             decimal? totalAdvPaymentVnd = payments
               .Select(s => s.PaymentAmountVnd)
@@ -3416,7 +3417,7 @@ namespace eFMS.API.Accounting.DL.Services
             result.PartnerNameEn = partner.PartnerNameEn;
             result.UserExport = currentUser.UserName;
 
-            result.Details = receipts.Select(receipt => new AcctReceiptAdvanceRowModel
+            result.Details = receipts.OrderBy(x => x.PaymentDate).Select(receipt => new AcctReceiptAdvanceRowModel
             {
                 Description = receipt.Description,
                 ReceiptNo = receipt.PaymentRefNo,

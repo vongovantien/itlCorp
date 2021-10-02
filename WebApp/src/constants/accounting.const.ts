@@ -58,6 +58,7 @@ export class AccountingConstants {
     public static RECEIPT_PAYMENT_METHOD = {
         CASH: 'Cash',
         BANK: 'Bank Transfer',
+        CLEAR_ADVANCE: 'Clear-Advance',
         INTERNAL: 'COLL - Internal',
         MANAGEMENT_FEE: 'Management Fee',
         OTHER_FEE: 'Other Fee',
