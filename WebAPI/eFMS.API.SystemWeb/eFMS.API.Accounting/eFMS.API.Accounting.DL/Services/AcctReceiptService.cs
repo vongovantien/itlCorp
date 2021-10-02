@@ -133,11 +133,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.LastSyncDate.Value.Date >= criteria.DateFrom.Value.Date && x.LastSyncDate.Value.Date <= criteria.DateTo.Value.Date);
             }
-            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid Date")
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid Date" && criteria.DateFrom.HasValue && criteria.DateTo.HasValue)
             {
                 query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
             }
-            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Create Date")
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Create Date" && criteria.DateFrom.HasValue && criteria.DateTo.HasValue)
             {
                 query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.DateFrom.Value.Date && x.DatetimeCreated.Value.Date <= criteria.DateTo.Value.Date);
             }
