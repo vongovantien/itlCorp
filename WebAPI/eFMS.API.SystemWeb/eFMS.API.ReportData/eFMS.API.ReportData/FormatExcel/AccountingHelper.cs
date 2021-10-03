@@ -178,11 +178,17 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 3].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 4].Value = item.Requester;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.Amount;
-                        worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0";
+                        if(item.RequestCurrency == "VND"){
+                            worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0";
+                        }
+                        else
+                        {
+                            worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0.00";
+                        }
                         worksheet.Cells[i + addressStartContent, 6].Value = item.RequestCurrency;
                         //
                         worksheet.Cells[i + addressStartContent, 7].Value = item.PaymentMethod;
-                        worksheet.Cells[i + addressStartContent, 8].Value = item.DealinePayment;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item?.DealinePayment;
                         worksheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 9].Value = item.BankAccountNo;
                         worksheet.Cells[i + addressStartContent, 10].Value = item.BankAccountName;
