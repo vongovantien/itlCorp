@@ -130,6 +130,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(11).Width = 20; //Cột K
             workSheet.Column(12).Width = 13; //Cột L
             workSheet.Column(13).Width = 12; //Cột M
+            workSheet.Column(14).Width = 20; //Cột N
+            workSheet.Column(16).Width = 30; //Cột P    
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
