@@ -189,12 +189,12 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargesSoa.Add(surcharge);
                     }
                 }
-
+                var currentOffice = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
                 soa.TotalShipment = _totalShipment;
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
-                soa.Soano = model.Soano = CreateSoaNo();
+                soa.Soano = model.Soano = CreateSoaNo(currentOffice.Code);
                 soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
@@ -571,9 +571,17 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        private string CreateSoaNo()
+        private string CreateSoaNo(string currentOffice)
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
+            if (currentOffice == "ITLHAN")
+            {
+                prefix = "H";
+            }
+            if(currentOffice== "ITLDAD")
+            {
+                prefix = "D";
+            }
             string stt;
             //Lấy ra soa no mới nhất
             var rowLast = DataContext.Get().OrderByDescending(o => o.Soano).FirstOrDefault();
