@@ -824,6 +824,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(9).Width = 20; //Cột I
             workSheet.Column(10).Width = 18; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
         }
 
         private List<string> GetHeaderExcelDetailAdvancePayment(string language)
