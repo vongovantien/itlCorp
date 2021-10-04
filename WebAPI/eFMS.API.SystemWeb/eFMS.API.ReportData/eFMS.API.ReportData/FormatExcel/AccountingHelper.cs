@@ -2028,9 +2028,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 8].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 9].Value = item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceDate?.ToString("dd/MM/yyyy"));
-                    workSheet.Cells[i + addressStartContent, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 7, i + addressStartContent, 7].Style.WrapText = true;
 
                     workSheet.Cells[i + addressStartContent, 10].Value = item.GW;
@@ -2096,8 +2093,6 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
                         workSheet.Cells[i + addressStartContent, 8].Value = itemCharge.InvoiceNo;
                         workSheet.Cells[i + addressStartContent, 9].Value = itemCharge.InvoiceDate?.ToString("dd/MM/yyyy");
-                        workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
-                        workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat2;
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
@@ -2111,8 +2106,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
                         }
-                        workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
+                       
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
@@ -2122,10 +2116,17 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 13].Value = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 14].Value = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 15].Value = numberFormat2;
+                           
 
+                        }
+                        else
+                        {
+                            workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
+                            workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat2;
+                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
+                            workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                            workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
                         }
 
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);
