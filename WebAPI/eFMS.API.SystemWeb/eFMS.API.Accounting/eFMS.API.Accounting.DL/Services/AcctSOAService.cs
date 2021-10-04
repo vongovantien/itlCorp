@@ -576,11 +576,11 @@ namespace eFMS.API.Accounting.DL.Services
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             if (currentOffice == "ITLHAN")
             {
-                prefix = "H";
+                prefix = "H"+prefix;
             }
             if(currentOffice== "ITLDAD")
             {
-                prefix = "D";
+                prefix = "D"+prefix;
             }
             string stt;
             //Lấy ra soa no mới nhất
