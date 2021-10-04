@@ -199,7 +199,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
-                        worksheet.Cells[i + addressStartContent, 17].Value = item.ApproveDate;
+                        worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
                         worksheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = "dd/MM/yyyy";
