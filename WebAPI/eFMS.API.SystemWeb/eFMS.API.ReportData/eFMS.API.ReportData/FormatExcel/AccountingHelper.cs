@@ -132,6 +132,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(11).Width = 20; //Cột K
             workSheet.Column(12).Width = 13; //Cột L
             workSheet.Column(13).Width = 12; //Cột M
+            workSheet.Column(14).Width = 20; //Cột N
+            workSheet.Column(16).Width = 30; //Cột P    
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
@@ -178,11 +180,17 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 3].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 4].Value = item.Requester;
                         worksheet.Cells[i + addressStartContent, 5].Value = item.Amount;
-                        worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0";
+                        if(item.RequestCurrency == "VND"){
+                            worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0";
+                        }
+                        else
+                        {
+                            worksheet.Cells[i + addressStartContent, 5].Style.Numberformat.Format = "#,##0.00";
+                        }
                         worksheet.Cells[i + addressStartContent, 6].Value = item.RequestCurrency;
                         //
                         worksheet.Cells[i + addressStartContent, 7].Value = item.PaymentMethod;
-                        worksheet.Cells[i + addressStartContent, 8].Value = item.DealinePayment;
+                        worksheet.Cells[i + addressStartContent, 8].Value = item?.DeadlinePayment;
                         worksheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 9].Value = item.BankAccountNo;
                         worksheet.Cells[i + addressStartContent, 10].Value = item.BankAccountName;
@@ -195,8 +203,8 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
                         worksheet.Cells[i + addressStartContent, 17].Value = item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
-                        worksheet.Cells[i + addressStartContent, 13].Value = item.SettleDate;
-                        worksheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = "dd/MM/yyyy";
+                        worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
+                        worksheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
 
                         //Add border left right for cells
@@ -2044,9 +2052,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 8].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     workSheet.Cells[i + addressStartContent, 8].Style.Fill.BackgroundColor.SetColor(colFromHex);
-                    workSheet.Cells[i + addressStartContent, 9].Value = item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceDate?.ToString("dd/MM/yyyy"));
-                    workSheet.Cells[i + addressStartContent, 9].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    workSheet.Cells[i + addressStartContent, 9].Style.Fill.BackgroundColor.SetColor(colFromHex);
                     workSheet.Cells[i + addressStartContent, 7, i + addressStartContent, 7].Style.WrapText = true;
 
                     workSheet.Cells[i + addressStartContent, 10].Value = item.GW;
@@ -2112,8 +2117,6 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[i + addressStartContent, 4].Value = itemCharge.Unit;
                         workSheet.Cells[i + addressStartContent, 8].Value = itemCharge.InvoiceNo;
                         workSheet.Cells[i + addressStartContent, 9].Value = itemCharge.InvoiceDate?.ToString("dd/MM/yyyy");
-                        workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
-                        workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat2;
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
@@ -2127,8 +2130,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
                         }
-                        workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
-                        workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
+                       
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
@@ -2138,10 +2140,17 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 13].Value = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 14].Value = numberFormat2;
-                            workSheet.Cells[i + addressStartContent, 15].Value = numberFormat2;
+                           
 
+                        }
+                        else
+                        {
+                            workSheet.Cells[i + addressStartContent, 13].Value = itemCharge.NetAmount;
+                            workSheet.Cells[i + addressStartContent, 13].Style.Numberformat.Format = numberFormat2;
+                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
+                            workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
+                            workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
                         }
 
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);

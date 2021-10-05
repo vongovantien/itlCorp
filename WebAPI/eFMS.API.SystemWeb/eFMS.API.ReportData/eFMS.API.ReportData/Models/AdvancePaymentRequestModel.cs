@@ -23,7 +23,7 @@ namespace eFMS.API.ReportData.Models
         public string StatusPayment { get; set; }
         public string AdvanceNo { get; set; }
         public string PaymentMethod { get; set; }
-        public DateTime DealinePayment { get; set; }
+        public DateTime DeadlinePayment { get; set; }
         public string BankAccountNo { get; set; }
         public string BankAccountName { get; set; }
         public string BankName { get; set; }
