@@ -4,7 +4,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { catchError, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { ARHistoryPaymentListInvoiceComponent } from './components/list-invoice-payment/list-invoice-history-payment.component';
 import { Store } from '@ngrx/store';
 import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, IHistoryPaymentState } from './store/reducers';
@@ -62,8 +62,10 @@ export class ARHistoryPaymentComponent extends AppList implements OnInit {
                     if (!!data.dataSearch) {
                         this.dataSearch = data.dataSearch;
                     }else{
+                        const loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
                         this.dataSearch.searchType = 'VatInvoice';
                         this.dataSearch.paymentStatus = ["Unpaid", "Paid A Part"];
+                        this.dataSearch.office = [loginData.officeId];
                     }
 
                     this.page = data.page;

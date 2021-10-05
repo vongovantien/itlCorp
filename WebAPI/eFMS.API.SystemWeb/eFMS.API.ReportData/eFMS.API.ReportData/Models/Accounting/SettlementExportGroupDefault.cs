@@ -37,6 +37,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? TotalAmount { get; set; }
         public decimal? TotalAmountVnd { get; set; }
         public decimal? TotalAdvanceAmount { get; set; }
+        public string AccountNo { get; set; }
         public List<ShipmentSettlementExportGroup> ShipmentDetail;
     }
 }
