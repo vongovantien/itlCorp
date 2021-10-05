@@ -611,69 +611,96 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
-                if(customerPayment.Count == 0)
+                excel.NumberOfGroup = 2;
+                if (customerPayment.Count == 0)
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
-                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate != null)
                 {
                     excel.DeleteRow(7);
                 }
+                if (customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == 0)
+                {
+                    excel.DeleteRow(8);
+                }
+
                 var sumRemainDb = 0m;
                 var sumRemainObh = 0m;
                 var sumRemainDbUsd = 0m;
                 var sumRemainObhUsd = 0m;
+                var advanceAmountData = customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").ToList();                
                 foreach (var item in customerPayment)
                 {
                     var listKeyData = new Dictionary<string, object>();
-                    excel.SetGroupsTable();
-                    listKeyData.Add("PartnerCode", item.PartnerCode);
-                    listKeyData.Add("ACRefCode", item.ParentCode);
-                    listKeyData.Add("PartnerName", item.PartnerName);
-                    listKeyData.Add("InvoiceDate", item.InvoiceDate);
-                    listKeyData.Add("InvoiceNo", item.InvoiceNo);
-                    listKeyData.Add("SoaNo", item.BillingRefNo);
-                    listKeyData.Add("BillingDate", item.BillingDate);
-                    listKeyData.Add("UnpaidAmount", item.UnpaidAmountInv);
-                    listKeyData.Add("OBHUnpaidAmount", item.UnpaidAmountOBH);
-                    listKeyData.Add("PaidAmount", item.PaidAmount);
-                    listKeyData.Add("OBHPaidAmount", item.PaidAmountOBH);
-                    var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
-                    var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
-                    var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
-                    var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
-                    remainDb = remainDb < 0 ? 0 : remainDb;
-                    remainObh = remainObh < 0 ? 0 : remainObh;
-                    remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
-                    remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
-                    // Sum total
-                    sumRemainDb += remainDb;
-                    sumRemainObh += remainObh;
-                    sumRemainDbUsd += remainDbUsd;
-                    sumRemainObhUsd += remainObhUsd;
-                    listKeyData.Add("RemainDb", remainDb);
-                    listKeyData.Add("RemainOBH", remainObh);
-                    listKeyData.Add("RemainDbUsd", remainDbUsd);
-                    listKeyData.Add("RemainOBHUsd", remainObhUsd);
-                    listKeyData.Add("TotalAmount", remainDb + remainObh);
-                    listKeyData.Add("TotalAmountUsd", remainDbUsd + remainObhUsd);
-                    listKeyData.Add("PaymentTerm", item.PaymentTerm);
-                    listKeyData.Add("DueDate", item.DueDate?.ToString("dd/MM/yy"));
-                    listKeyData.Add("OverdueDays", item.OverdueDays);
-                    listKeyData.Add("JobNo", item.JobNo);
-                    listKeyData.Add("MBL", item.MBL);
-                    listKeyData.Add("HBL", item.HBL);
-                    listKeyData.Add("CustomNo", item.CustomNo);
-                    listKeyData.Add("Salesman", item.Salesman);
-                    listKeyData.Add("Creator", item.Creator);
+                    if (item.BillingRefNo != "ADVANCE AMOUNT")
+                    {
+                        excel.IndexOfGroup = 1;
+                        excel.SetGroupsTable();
+                        listKeyData.Add("PartnerCode", item.PartnerCode);
+                        listKeyData.Add("ACRefCode", item.ParentCode);
+                        listKeyData.Add("PartnerName", item.PartnerName);
+                        listKeyData.Add("InvoiceDate", item.InvoiceDate);
+                        listKeyData.Add("InvoiceNo", item.InvoiceNo);
+                        listKeyData.Add("SoaNo", item.BillingRefNo);
+                        listKeyData.Add("BillingDate", item.BillingDate);
+                        listKeyData.Add("UnpaidAmount", item.UnpaidAmountInv);
+                        listKeyData.Add("OBHUnpaidAmount", item.UnpaidAmountOBH);
+                        listKeyData.Add("PaidAmount", item.PaidAmount);
+                        listKeyData.Add("OBHPaidAmount", item.PaidAmountOBH);
+                        var remainDb = (item.UnpaidAmountInv ?? 0) - (item.PaidAmount ?? 0);
+                        var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
+                        var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
+                        var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
+                        remainDb = remainDb < 0 ? 0 : remainDb;
+                        remainObh = remainObh < 0 ? 0 : remainObh;
+                        remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
+                        remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
+                        // Sum total
+                        sumRemainDb += remainDb;
+                        sumRemainObh += remainObh;
+                        sumRemainDbUsd += remainDbUsd;
+                        sumRemainObhUsd += remainObhUsd;
+                        listKeyData.Add("RemainDb", remainDb);
+                        listKeyData.Add("RemainOBH", remainObh);
+                        listKeyData.Add("RemainDbUsd", remainDbUsd);
+                        listKeyData.Add("RemainOBHUsd", remainObhUsd);
+                        listKeyData.Add("TotalAmount", remainDb + remainObh);
+                        listKeyData.Add("TotalAmountUsd", remainDbUsd + remainObhUsd);
+                        listKeyData.Add("PaymentTerm", item.PaymentTerm?.ToString("N0"));
+                        listKeyData.Add("DueDate", item.DueDate?.ToString("dd/MM/yy"));
+                        listKeyData.Add("OverdueDays", item.OverdueDays?.ToString("N0"));
+                        listKeyData.Add("JobNo", item.JobNo);
+                        listKeyData.Add("MBL", item.MBL);
+                        listKeyData.Add("HBL", item.HBL);
+                        listKeyData.Add("CustomNo", item.CustomNo);
+                        listKeyData.Add("AccountNo", item.AccountNo);
+                        listKeyData.Add("Branch", item.BranchName);
+                        listKeyData.Add("Salesman", item.Salesman);
+                        listKeyData.Add("Creator", item.Creator);
+                    }
+                    else
+                    {
+                        excel.IndexOfGroup = 2;
+                        excel.SetGroupsTable();
+                        listKeyData.Add("PartnerCodeAdv", item.PartnerCode);
+                        listKeyData.Add("ACRefCodeAdv", item.ParentCode);
+                        listKeyData.Add("PartnerNameAdv", item.PartnerName);
+                        listKeyData.Add("SoaNoAdv", item.BillingRefNo);
+                        listKeyData.Add("AdvanceAmount", item.AdvanceAmount);
+                        listKeyData.Add("BranchAdv", item.BranchName);
+                    }
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.receiptDetail != null && paymentCriteria.DueDate == null)
+                    if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate == null)
                     {
                         foreach (var detail in item.receiptDetail)
                         {
                             listKeyData = new Dictionary<string, object>();
                             excel.SetDataTable();
+                            listKeyData.Add("PartnerCodeDt", item.PartnerCode);
+                            listKeyData.Add("ACRefCodeDt", item.ParentCode);
+                            listKeyData.Add("PartnerNameDt", item.PartnerName);
                             listKeyData.Add("InvoiceDatedt", item.InvoiceDate);
                             listKeyData.Add("InvoiceNodt", item.InvoiceNo);
                             listKeyData.Add("SoaNodt", item.BillingRefNo);
