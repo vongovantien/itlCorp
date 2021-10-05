@@ -584,8 +584,15 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 var soaCurrent = rowLast.Soano;
+                var soaOffice = officeRepo.Get(x => x.Id == rowLast.OfficeId).FirstOrDefault();
                 var prefixCurrent = soaCurrent.Substring(0, 2);
                 //Reset về 1 khi qua năm mới
+                if(soaOffice.Code== "ITLHAN"||soaOffice.Code== "ITLDAD")
+                {
+                    stt = (Convert.ToInt32(soaCurrent.Substring(3, 6)) + 1).ToString();
+                    stt = stt.PadLeft(5, '0');
+                    prefixCurrent = soaCurrent.Substring(1, 3);
+                }
                 if (prefixCurrent != prefix)
                 {
                     stt = "00001";
