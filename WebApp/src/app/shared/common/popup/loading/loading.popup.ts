@@ -3,8 +3,7 @@ import { eFMSPopup } from '../popup';
 
 @Component({
   selector: 'loading-popup',
-  templateUrl: './loading.popup.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  templateUrl: './loading.popup.html'
 })
 export class LoadingPopupComponent extends eFMSPopup {
   isCompleted: boolean = false;
