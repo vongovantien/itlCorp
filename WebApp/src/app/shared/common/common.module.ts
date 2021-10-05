@@ -16,6 +16,7 @@ import { PipeModule } from '../pipes/pipe.module';
 import { RouterModule } from '@angular/router';
 import { AppCombogridItemComponent } from './combo-grid-virtual-scroll/combogrid-item/combo-grid-item.component';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { LoadingPopupComponent } from './popup/loading/loading.popup';
 const COMPONENTS = [
     SubHeaderComponent,
     InputTableLayoutComponent,
@@ -42,7 +43,8 @@ const COMPONENTS = [
     AppComboGridIconComponent,
     AppCombogridItemComponent,
     NoneRecordPlaceholderComponent,
-    AppDropdownComponent
+    AppDropdownComponent,
+    LoadingPopupComponent
 ];
 
 @NgModule({

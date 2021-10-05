@@ -6,6 +6,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
 {
     public class AccountingCustomerPaymentExport
     {
+        public string PartnerId { get; set; }
         public string PartnerCode { get; set; }
         public string ParentCode { get; set; }
         public string PartnerName { get; set; }
@@ -24,6 +25,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBH { get; set; }
         public decimal? PaidAmountOBHUsd { get; set; }
+        public decimal? AdvanceAmount { get; set; }
         public string JobNo { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
@@ -31,16 +33,22 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string Salesman { get; set; }
         public string Creator { get; set; }
         public string Status { get; set; }
+        public string AccountNo { get; set; }
+        public string BranchName { get; set; }
         public List<AccountingReceiptDetail> receiptDetail;
     }
     
     public class AccountingReceiptDetail
     {
+        public Guid? ReceiptId { get; set; }
+        public Guid? AgreementId { get; set; }
         public string PaymentRefNo { get; set; }
         public DateTime? PaymentDate { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? PaidAmountOBH { get; set; }
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBHUsd { get; set; }
+        public decimal? CusAdvanceAmountVnd { get; set; }
+        public decimal? AgreementAdvanceAmountVnd { get; set; }
     }
 }

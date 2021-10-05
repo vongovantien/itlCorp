@@ -10,7 +10,7 @@ import { catchError, finalize, concatMap, withLatestFrom, takeUntil, map } from 
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, LoadingPopupComponent } from '@common';
 
 import { PaymentModel, AccountingPaymentModel } from '@models';
 import { RoutingConstants } from '@constants';
@@ -32,6 +32,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoNotAllowDelete: InfoPopupComponent;
     @ViewChild('confirmInvoicePaymentPopup') confirmInvoicePaymentPopup: ConfirmPopupComponent;
+    @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 
@@ -136,11 +137,22 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment/import`]);
     }
 
+    startDownloadReport(data: any, fileName: string){
+        if(data.byteLength > 0){
+            this.downLoadFile(data, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+            this.loadingPopupComponent.downloadSuccess();
+        }else{
+            this.loadingPopupComponent.downloadFail();
+        }
+    }
+    
     exportExcel() {
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
         this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
             .subscribe(
                 (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+                    this.startDownloadReport(res, 'invoice-payment.xlsx');
                 }
             );
     }
@@ -150,10 +162,12 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
         } else {
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
                 .subscribe(
                     (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Customer - eFMS.xlsx');
+                        this.startDownloadReport(res, 'Statement of Receivable Customer - eFMS.xlsx');
                     }
                 );
         }
@@ -171,6 +185,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             dateTo: this.dataSearch.toUpdatedDate,
             dateType: "Paid Date"
         };
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
         this._exportRepo.exportAdvanceReceipt(body)
             .subscribe(
                 (res: ArrayBuffer) => {
@@ -178,7 +194,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                         this._toastService.warning('No Data To View');
                         return;
                     }
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms Receipt_Advance.xlsx');
+                    this.startDownloadReport(res, 'eFms Receipt_Advance.xlsx');
                 }
             );
     }
@@ -323,10 +339,12 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
         } else {
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
                 .subscribe(
                     (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Agency - eFMS.xlsx');
+                        this.startDownloadReport(res, 'Statement of Receivable Agency - eFMS.xlsx');
                     }
                 );
         }
