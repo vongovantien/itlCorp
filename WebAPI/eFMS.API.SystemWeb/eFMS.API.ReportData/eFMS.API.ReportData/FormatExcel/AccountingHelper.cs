@@ -624,11 +624,25 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
+                var isExistDetail = true;
+                var isExistAdvRow = true;
                 if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate != null)
                 {
-                    excel.DeleteRow(7);
+                    isExistDetail = false;
                 }
                 if (customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == 0)
+                {
+                    isExistAdvRow = false;
+                }
+                if (!isExistDetail)
+                {
+                    excel.DeleteRow(7);
+                    if (!isExistAdvRow)
+                    {
+                        excel.DeleteRow(7);
+                    }
+                }
+                else if(!isExistAdvRow)
                 {
                     excel.DeleteRow(8);
                 }
@@ -637,7 +651,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var sumRemainObh = 0m;
                 var sumRemainDbUsd = 0m;
                 var sumRemainObhUsd = 0m;
-                var advanceAmountData = customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").ToList();                
+                var sumAdvanceAmount = 0m;
                 foreach (var item in customerPayment)
                 {
                     var listKeyData = new Dictionary<string, object>();
@@ -691,6 +705,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         excel.IndexOfGroup = 2;
                         excel.SetGroupsTable();
+                        sumAdvanceAmount += (item.AdvanceAmount ?? 0);
                         listKeyData.Add("PartnerCodeAdv", item.PartnerCode);
                         listKeyData.Add("ACRefCodeAdv", item.ParentCode);
                         listKeyData.Add("PartnerNameAdv", item.PartnerName);
@@ -735,6 +750,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumRemainDb", sumRemainDb);
                 listKeyTotal.Add("SumRemainOBH", sumRemainObh);
                 listKeyTotal.Add("SumTotalAmount", sumRemainDb + sumRemainObh);
+                // Sum Advance Amount
+                listKeyTotal.Add("SumAdvanceAmount", sumAdvanceAmount);
                 // Sum total USD
                 listKeyTotal.Add("SumRemainDbUsd", sumRemainDbUsd);
                 listKeyTotal.Add("SumRemainOBHUsd", sumRemainObhUsd);
