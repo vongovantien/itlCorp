@@ -1837,7 +1837,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.BillingRefNo = "ADVANCE AMOUNT";
                         payment.AdvanceAmount = pm.Sum(x => x.PaymentAmountVnd ?? 0);
                         payment.AdvanceAmount += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
-                        payment.BranchName = officeData[(Guid)pm.FirstOrDefault().OfficeId].FirstOrDefault()?.ShortName;
+                        payment.BranchName = pm.FirstOrDefault() == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().OfficeId].FirstOrDefault()?.ShortName;
                         if (payment.AdvanceAmount > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
