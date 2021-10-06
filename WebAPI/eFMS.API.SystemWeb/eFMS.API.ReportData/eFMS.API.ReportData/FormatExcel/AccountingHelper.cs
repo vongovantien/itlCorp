@@ -5235,7 +5235,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (result.FirstOrDefault().details == null || result.Count(x => x.details.Count() > 0) == 0 )
+                if (paymentCriteria.DueDate == null)
                     excel.DeleteRow(7);
 
                 for (int i = 0; i < result.Count; i++)
@@ -5294,7 +5294,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0 && paymentCriteria.DueDate == null)
+                    if (item.details.Count > 0 && paymentCriteria.DueDate != null)
                     {
                         foreach (var detail in item.details)
                         {
@@ -5310,12 +5310,12 @@ namespace eFMS.API.ReportData.FormatExcel
                             listKeyData.Add("PaidDate", detail.PaidDate);
                             listKeyData.Add("RefNo", detail.RefNo);
 
-                            if (item.DebitAmountUsd > 0)
+                            if (item.DebitAmountUsd != null)
                             {
                                 listKeyData.Add("DebitDt", detail.DebitUsd);
                                 listKeyData.Add("CreditDt", 0);
                             }
-                            else if (item.CreditAmountUsd > 0)
+                            else if (item.CreditAmountUsd != null)
                             {
                                 listKeyData.Add("DebitDt", 0 );
                                 listKeyData.Add("CreditDt", detail.CreditUsd);
