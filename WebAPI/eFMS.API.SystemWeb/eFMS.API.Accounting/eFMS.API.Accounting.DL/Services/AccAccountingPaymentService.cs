@@ -1850,13 +1850,12 @@ namespace eFMS.API.Accounting.DL.Services
                 foreach (var item in grpPartner)
                 {
                     var payment = new AccountingCustomerPaymentExport();
-                    var receiptList = new List<AccountingReceiptDetail>();
+                    var agreementIds = new List<Guid>();
                     foreach (var it in item)
                     {
-                        receiptList.AddRange(it.receiptDetail);
+                        agreementIds.AddRange(it.receiptDetail.Select(x => (Guid)x.AgreementId));
                     }
-                    receiptList = receiptList.GroupBy(x => x.AgreementId).Select(x => x.FirstOrDefault()).ToList();
-                    if (receiptList.Count > 0)
+                    if (agreementIds.Count > 0)
                     {
                         var indexOfLastGrp = results.IndexOf(item.Last());
                         payment.PartnerId = item.FirstOrDefault().PartnerId;
@@ -1864,7 +1863,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.AdvanceAmount = receiptList.Sum(x => x.AgreementAdvanceAmountVnd ?? 0);
+                        payment.AdvanceAmount = catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)).Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
                         if (payment.AdvanceAmount > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
