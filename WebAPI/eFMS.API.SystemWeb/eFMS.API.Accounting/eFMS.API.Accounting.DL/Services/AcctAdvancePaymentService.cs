@@ -530,6 +530,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl, g.AdvanceNo })
                 .Select(se => new AcctAdvanceRequest
                 {
+
                     JobId = se.First().JobId,
                     Hbl = se.First().Hbl,
                     CustomNo = se.First().CustomNo,
@@ -538,7 +539,8 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
-                    Description = se.FirstOrDefault().Description,
+
+                    Description = se.Select(x => x.Description.Concat(";")).ToString(),
                     DatetimeModified = se.First().DatetimeModified
 
                 })
