@@ -148,7 +148,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group">
+                                <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':  isSubmitted && !supplierId.value}">
                                     <label class="form-control-label" required>
                                         Supplier/Carrier
                                     </label>
