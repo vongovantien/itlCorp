@@ -27,7 +27,6 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { ISettlementPaymentState, getSettlementPaymentDetailLoadingState, getSettlementPaymentDetailState } from '../store';
 import { Store } from '@ngrx/store';
 import { SystemConstants } from '@constants';
-import { getCurrentUserState } from '@store';
 @Component({
     selector: 'settle-payment-list-charge',
     templateUrl: './list-charge-settlement.component.html',
@@ -127,25 +126,12 @@ export class SettlementListChargeComponent extends AppList implements ICrystalRe
     }
 
     showExistingCharge() {
-        this.existingChargePopup.requester = this.getUserId(this.requester);
         this.existingChargePopup.allowUpdate = this.checkAllowUpdateExistingCharge();
+        this.existingChargePopup.requester = this.requester;
         this.existingChargePopup.settlementCode = this.settlementCode || null;
         this.existingChargePopup.show();
     }
 
-    getUserId(userId: string) {
-        if(userId === 'undefined' || !userId){
-            this._store.select(getCurrentUserState).pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe((res: any) => {
-                    if (!!res) {
-                        userId = res.id;
-                    }
-                })
-            }
-        this.requester = userId;
-        return userId;
-    }
-    
     showCreateCharge() {
         this.tableListChargePopup.isSubmitted = false;
         this.tableListChargePopup.isUpdate = false;

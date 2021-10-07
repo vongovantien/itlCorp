@@ -606,7 +606,7 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
                         this.isSubmitted = false;
                         return of(false);
                     }
-                    if (res.length == 0 && !this.selectedPartnerData) {
+                    if (res.length > 1) {
                         this._toastService.warning('Please Select Partner!');
                         this.isSubmitted = false;
                         return of(false);
