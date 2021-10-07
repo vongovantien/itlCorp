@@ -61,6 +61,9 @@
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
         public static readonly string PAYMENT_METHOD_OTHER = "Other";
         public static readonly string PAYMENT_METHOD_NETOFF_SHPT = "NETOFF_SHPT";
+        public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE = "Clear-Advance";
+        public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_CASH = "Clear-Advance-Cash";
+        public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_BANK = "Clear-Advance-Bank";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --

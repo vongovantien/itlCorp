@@ -1639,10 +1639,22 @@ namespace eFMS.API.Accounting.DL.Services
 
                                 // Phát sinh Payment
                                 HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
+                                if (!hsPaymentUpdate.Success)
+                                {
+                                    throw new Exception("Có lỗi khi Add/Update Payment" + hsPaymentUpdate.Message.ToString());
+                                }
                                 // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptData);
+                                if (!hs.Success)
+                                {
+                                    throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hs.Message.ToString());
+                                }
                                 // Cập nhật CusAdvance cho hợp đồng
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptModel, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
+                                if (!hsUpdateCusAdvOfAgreement.Success)
+                                {
+                                    throw new Exception("Có lỗi khi update thông tin hợp đồng" + hsUpdateCusAdvOfAgreement.Message.ToString());
+                                }
 
                                 // cập nhật lại adv lũy tiến cho receipt
                                 receiptData.AgreementAdvanceAmountVnd = advVnd;
@@ -1662,8 +1674,15 @@ namespace eFMS.API.Accounting.DL.Services
                             // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
                             HandleState hsPaymentUpdate = AddPayments(receiptModel.Payments, receiptCurrent);
-
+                            if(!hsPaymentUpdate.Success)
+                            {
+                                throw new Exception("Có lỗi khi Add/Update Payment" + hsPaymentUpdate.Message.ToString());
+                            }
                             HandleState hsPaymentDelete = DeletePayments(paymentsDelete);
+                            if (!hsPaymentDelete.Success)
+                            {
+                                throw new Exception("Có lỗi khi Add/Update Payment" + hsPaymentDelete.Message.ToString());
+                            }
 
                             // Done Receipt
                             HandleState hs = new HandleState();
@@ -1679,13 +1698,19 @@ namespace eFMS.API.Accounting.DL.Services
                             hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
                             if (hs.Success)
                             {
-                                // cấn trừ cho hóa đơn
                                 hs = UpdateInvoiceOfPayment(receiptCurrent);
 
-                                // Cập nhật CusAdvance cho hợp đồng
+                                if(!hs.Success)
+                                {
+                                    throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hs.Message.ToString());
+                                }
+
                                 HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
 
-                                // cập nhật lại adv lũy tiến cho receipt
+                                if (!hsUpdateCusAdvOfAgreement.Success)
+                                {
+                                    throw new Exception("Có lỗi khi update thông tin hợp đồng" + hsUpdateCusAdvOfAgreement.Message.ToString());
+                                }
                                 receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
                                 receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
                                 hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
@@ -1736,12 +1761,16 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     try
                     {
-                        // cấn trừ cho hóa đơn
                         hs = UpdateInvoiceOfPayment(receiptCurrent);
-                        //TODO: Tính lại công nợ trên hợp đồng (Tính bên ngoài Controller)
-                        // Cập nhật Cus Advance của Agreement
+                        if (!hs.Success)
+                        {
+                            throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hs.Message.ToString());
+                        }
                         HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVEDONE, out decimal advUsd, out decimal advVnd);
-
+                        if (!hs.Success)
+                        {
+                            throw new Exception("Có lỗi khi update hợp đồng" + hs.Message.ToString());
+                        }
                         receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
                         receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
 
@@ -1795,13 +1824,16 @@ namespace eFMS.API.Accounting.DL.Services
                     try
                     {
                       
-                        // Lấy ra ds payment của Receipt
                         List<AccAccountingPayment> paymentsReceipt = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).ToList();
-                        // Phát sinh những dòng payment âm cho DEBIT & OBH
                         List<AccAccountingPayment> paymentDeitOBH = paymentsReceipt.Where(x => (x.Type == "DEBIT" || x.Type == "OBH")).ToList();
+
                         HandleState hsAddPaymentNegative = AddPaymentsNegative(paymentDeitOBH, receiptCurrent);
-                        // Cập nhật invoice cho những payment DEBIT, OBH
+
                         HandleState hsUpdateInvoiceOfPayment = UpdateInvoiceOfPaymentCancel(receiptCurrent);
+                        if (!hsUpdateInvoiceOfPayment.Success)
+                        {
+                            throw new Exception("Có lỗi khi update cấn trừ hóa đơn" + hsUpdateInvoiceOfPayment.Message.ToString());
+                        }
                         // Cập nhật Netoff cho CREDIT or SOA.
                         List<AccAccountingPayment> paymentCredit = paymentsReceipt.Where(x => (x.Type != "DEBIT" && x.Type != "OBH")).ToList();
                         if (paymentCredit.Count > 0)
@@ -1820,6 +1852,10 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         // Cập nhật Cus Advance của Agreement
                         HandleState hsUpdateCusAdvOfAgreement = UpdateCusAdvanceOfAgreement(receiptCurrent, SaveAction.SAVECANCEL, out decimal advUsd, out decimal advVnd);
+                        if (!hsUpdateCusAdvOfAgreement.Success)
+                        {
+                            throw new Exception("Có lỗi khi update hợp đồng" + hsUpdateCusAdvOfAgreement.Message.ToString());
+                        }
                         receiptCurrent.AgreementAdvanceAmountUsd = advUsd;
                         receiptCurrent.AgreementAdvanceAmountVnd = advVnd;
 
@@ -2987,6 +3023,9 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                     case "Customs No":
                         query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.ClearanceNo, StringComparer.OrdinalIgnoreCase));
+                        break;
+                    case "VAT Invoice":
+                        query = query.Where(x => criteria.ReferenceNos.Contains(x.inv.InvoiceNoReal, StringComparer.OrdinalIgnoreCase));
                         break;
                     case "SOA":
                         query = query.Where(x => criteria.ReferenceNos.Contains(x.sur.Soano, StringComparer.OrdinalIgnoreCase));
