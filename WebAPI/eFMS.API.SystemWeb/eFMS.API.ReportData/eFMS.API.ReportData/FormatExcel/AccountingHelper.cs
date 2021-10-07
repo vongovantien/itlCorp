@@ -201,7 +201,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
-                        worksheet.Cells[i + addressStartContent, 17].Value = item.ApproveDate;
+                        worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
                         worksheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = "dd/MM/yyyy";
@@ -5235,7 +5235,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (result.FirstOrDefault().details == null || result.Count(x => x.details.Count() > 0) == 0 )
+                if (paymentCriteria.DueDate == null)
                     excel.DeleteRow(7);
 
                 for (int i = 0; i < result.Count; i++)
@@ -5294,7 +5294,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0 && paymentCriteria.DueDate == null)
+                    if (item.details.Count > 0 && paymentCriteria.DueDate != null)
                     {
                         foreach (var detail in item.details)
                         {
@@ -5310,12 +5310,12 @@ namespace eFMS.API.ReportData.FormatExcel
                             listKeyData.Add("PaidDate", detail.PaidDate);
                             listKeyData.Add("RefNo", detail.RefNo);
 
-                            if (item.DebitAmountUsd > 0)
+                            if (item.DebitAmountUsd != null)
                             {
                                 listKeyData.Add("DebitDt", detail.DebitUsd);
                                 listKeyData.Add("CreditDt", 0);
                             }
-                            else if (item.CreditAmountUsd > 0)
+                            else if (item.CreditAmountUsd != null)
                             {
                                 listKeyData.Add("DebitDt", 0 );
                                 listKeyData.Add("CreditDt", detail.CreditUsd);

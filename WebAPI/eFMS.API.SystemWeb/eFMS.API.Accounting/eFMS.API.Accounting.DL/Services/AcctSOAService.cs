@@ -610,14 +610,6 @@ namespace eFMS.API.Accounting.DL.Services
         private string CreateSoaNo(string currentOffice)
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
-            if (currentOffice == "ITLHAN")
-            {
-                prefix = "H"+prefix;
-            }
-            if(currentOffice== "ITLDAD")
-            {
-                prefix = "D"+prefix;
-            }
             string stt;
             //Lấy ra soa no mới nhất
             var rowLast = DataContext.Get().OrderByDescending(o => o.Soano).FirstOrDefault();
@@ -628,8 +620,15 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 var soaCurrent = rowLast.Soano;
+                var soaOffice = officeRepo.Get(x => x.Id == rowLast.OfficeId).FirstOrDefault();
                 var prefixCurrent = soaCurrent.Substring(0, 2);
                 //Reset về 1 khi qua năm mới
+                if(soaOffice.Code== "ITLHAN"||soaOffice.Code== "ITLDAD")
+                {
+                    stt = (Convert.ToInt32(soaCurrent.Substring(3, 6)) + 1).ToString();
+                    stt = stt.PadLeft(5, '0');
+                    prefixCurrent = soaCurrent.Substring(1, 3);
+                }
                 if (prefixCurrent != prefix)
                 {
                     stt = "00001";
@@ -639,6 +638,14 @@ namespace eFMS.API.Accounting.DL.Services
                     stt = (Convert.ToInt32(soaCurrent.Substring(2, 5)) + 1).ToString();
                     stt = stt.PadLeft(5, '0');
                 }
+            }
+            if (currentOffice == "ITLHAN")
+            {
+                prefix = "H" + prefix;
+            }
+            if (currentOffice == "ITLDAD")
+            {
+                prefix = "D" + prefix;
             }
             return prefix + stt;
         }
