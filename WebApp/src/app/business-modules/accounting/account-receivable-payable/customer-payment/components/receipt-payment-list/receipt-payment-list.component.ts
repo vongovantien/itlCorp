@@ -73,6 +73,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
