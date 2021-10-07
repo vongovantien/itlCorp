@@ -25,7 +25,8 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBH { get; set; }
         public decimal? PaidAmountOBHUsd { get; set; }
-        public decimal? AdvanceAmount { get; set; }
+        public decimal? AdvanceAmountVnd { get; set; }
+        public decimal? AdvanceAmountUsd { get; set; }
         public string JobNo { get; set; }
         public string HBL { get; set; }
         public string MBL { get; set; }
@@ -49,6 +50,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? PaidAmountUsd { get; set; }
         public decimal? PaidAmountOBHUsd { get; set; }
         public decimal? CusAdvanceAmountVnd { get; set; }
+        public decimal? CusAdvanceAmountUsd { get; set; }
         public decimal? AgreementAdvanceAmountVnd { get; set; }
     }
 }
