@@ -1201,7 +1201,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[16, 11].Value = headers[17]; //Tổng cộng
 
             workSheet.Cells[15, 12, 16, 12].Merge = true;
-            workSheet.Cells[15, 12, 16, 12].Value = headers[43];//Note
+            workSheet.Cells[15, 12, 16, 12].Value = headers[46];//Note
             workSheet.Cells[15, 12, 16, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[15, 12, 16, 12].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
