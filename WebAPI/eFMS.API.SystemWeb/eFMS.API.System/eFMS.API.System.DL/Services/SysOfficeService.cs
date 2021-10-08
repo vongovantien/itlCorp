@@ -43,7 +43,8 @@ namespace eFMS.API.System.DL.Services
         {
             try
             {
-                return DataContext.Add(SysOffice);
+                SysOffice office = mapper.Map<SysOffice>(SysOffice);
+                return DataContext.Add(office);
             }
             catch (Exception ex)
             {

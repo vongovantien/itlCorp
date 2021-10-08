@@ -11,6 +11,7 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public DateTime? FromDate { get; set; }
         public DateTime? ToDate { get; set; }
         public string DateType { get; set; }
-        public string Service { get; set; }
+        public List<string> Service { get; set; }
+        public List<string> Office { get; set; }
     }
 }

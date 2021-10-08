@@ -391,6 +391,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             element.totalPaidVnd = element.paidAmountVnd;
             element.totalPaidUsd = element.paidAmountUsd;
             element.creditNos = []
+            element.isValid = null;
         });
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));

@@ -5360,7 +5360,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
                 excel.SetData(map);
 
-                int startRow = 5;
+                int startRow = 6;
                 excel.StartDetailTable = startRow;
                 int _length = result.Details.Count;
 
@@ -5373,8 +5373,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("paidDate",item.PaidDate.ToString("dd/MM/yyyy"));
                     mappingKeyValue.Add("receiptNo",item.ReceiptNo);
                     mappingKeyValue.Add("totalAdvPaymentVnd",item.TotalAdvancePaymentVnd);
+                    mappingKeyValue.Add("totalAdvPaymentUsd",item.TotalAdvancePaymentUsd);
                     mappingKeyValue.Add("cusAdvAmountVnd",item.CusAdvanceAmountVnd);
+                    mappingKeyValue.Add("cusAdvAmountUsd",item.CusAdvanceAmountUsd);
                     mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
+                    mappingKeyValue.Add("agreementAdvAmountUsd", item.AgreementCusAdvanceUsd);
                     mappingKeyValue.Add("description", item.Description);
 
                     excel.SetData(mappingKeyValue);
