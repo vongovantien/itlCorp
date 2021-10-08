@@ -626,7 +626,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 var isExistDetail = true;
                 var isExistAdvRow = true;
-                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate != null)
+                if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate == null)
                 {
                     isExistDetail = false;
                 }
@@ -651,7 +651,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 var sumRemainObh = 0m;
                 var sumRemainDbUsd = 0m;
                 var sumRemainObhUsd = 0m;
-                var sumAdvanceAmount = 0m;
+                var sumAdvanceAmountVnd = 0m;
+                var sumAdvanceAmountUsd = 0m;
                 foreach (var item in customerPayment)
                 {
                     var listKeyData = new Dictionary<string, object>();
@@ -665,7 +666,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("InvoiceDate", item.InvoiceDate);
                         listKeyData.Add("InvoiceNo", item.InvoiceNo);
                         listKeyData.Add("SoaNo", item.BillingRefNo);
-                        listKeyData.Add("BillingDate", item.BillingDate);
+                        //listKeyData.Add("BillingDate", item.BillingDate);
                         listKeyData.Add("UnpaidAmount", item.UnpaidAmountInv);
                         listKeyData.Add("OBHUnpaidAmount", item.UnpaidAmountOBH);
                         listKeyData.Add("PaidAmount", item.PaidAmount);
@@ -705,17 +706,21 @@ namespace eFMS.API.ReportData.FormatExcel
                     {
                         excel.IndexOfGroup = 2;
                         excel.SetGroupsTable();
-                        sumAdvanceAmount += (item.AdvanceAmount ?? 0);
+                        sumAdvanceAmountVnd += (item.AdvanceAmountVnd ?? 0);
+                        sumAdvanceAmountUsd += (item.AdvanceAmountUsd ?? 0);
                         listKeyData.Add("PartnerCodeAdv", item.PartnerCode);
                         listKeyData.Add("ACRefCodeAdv", item.ParentCode);
                         listKeyData.Add("PartnerNameAdv", item.PartnerName);
                         listKeyData.Add("SoaNoAdv", item.BillingRefNo);
-                        listKeyData.Add("AdvanceAmount", item.AdvanceAmount);
+                        listKeyData.Add("AdvanceAmountVnd", item.AdvanceAmountVnd);
+                        listKeyData.Add("TotalAmountAdv", 0);
+                        listKeyData.Add("AdvanceAmountUsd", item.AdvanceAmountUsd);
+                        listKeyData.Add("TotalAmountUsdAdv", 0);
                         listKeyData.Add("BranchAdv", item.BranchName);
                     }
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate == null)
+                    if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate != null)
                     {
                         foreach (var detail in item.receiptDetail)
                         {
@@ -751,7 +756,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 listKeyTotal.Add("SumRemainOBH", sumRemainObh);
                 listKeyTotal.Add("SumTotalAmount", sumRemainDb + sumRemainObh);
                 // Sum Advance Amount
-                listKeyTotal.Add("SumAdvanceAmount", sumAdvanceAmount);
+                listKeyTotal.Add("SumAdvanceAmountVnd", sumAdvanceAmountVnd);
+                listKeyTotal.Add("SumAdvanceAmountUsd", sumAdvanceAmountUsd);
                 // Sum total USD
                 listKeyTotal.Add("SumRemainDbUsd", sumRemainDbUsd);
                 listKeyTotal.Add("SumRemainOBHUsd", sumRemainObhUsd);
@@ -1201,7 +1207,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[16, 11].Value = headers[17]; //Tổng cộng
 
             workSheet.Cells[15, 12, 16, 12].Merge = true;
-            workSheet.Cells[15, 12, 16, 12].Value = headers[43];//Note
+            workSheet.Cells[15, 12, 16, 12].Value = headers[46];//Note
             workSheet.Cells[15, 12, 16, 12].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[15, 12, 16, 12].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
@@ -5320,7 +5326,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
                 excel.SetData(map);
 
-                int startRow = 5;
+                int startRow = 6;
                 excel.StartDetailTable = startRow;
                 int _length = result.Details.Count;
 
@@ -5333,8 +5339,11 @@ namespace eFMS.API.ReportData.FormatExcel
                     mappingKeyValue.Add("paidDate",item.PaidDate.ToString("dd/MM/yyyy"));
                     mappingKeyValue.Add("receiptNo",item.ReceiptNo);
                     mappingKeyValue.Add("totalAdvPaymentVnd",item.TotalAdvancePaymentVnd);
+                    mappingKeyValue.Add("totalAdvPaymentUsd",item.TotalAdvancePaymentUsd);
                     mappingKeyValue.Add("cusAdvAmountVnd",item.CusAdvanceAmountVnd);
+                    mappingKeyValue.Add("cusAdvAmountUsd",item.CusAdvanceAmountUsd);
                     mappingKeyValue.Add("agreementAdvAmountVnd", item.AgreementCusAdvanceVnd);
+                    mappingKeyValue.Add("agreementAdvAmountUsd", item.AgreementCusAdvanceUsd);
                     mappingKeyValue.Add("description", item.Description);
 
                     excel.SetData(mappingKeyValue);

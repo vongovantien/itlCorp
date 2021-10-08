@@ -59,6 +59,8 @@ export class AccountingConstants {
         CASH: 'Cash',
         BANK: 'Bank Transfer',
         CLEAR_ADVANCE: 'Clear-Advance',
+        CLEAR_ADVANCE_BANK: 'Clear-Advance-Bank',
+        CLEAR_ADVANCE_CASH: 'Clear-Advance-Cash',
         INTERNAL: 'COLL - Internal',
         MANAGEMENT_FEE: 'Management Fee',
         OTHER_FEE: 'Other Fee',

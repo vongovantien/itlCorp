@@ -181,7 +181,8 @@ namespace eFMS.API.System.DL.Services
                 SysCompany.DatetimeCreated = SysCompany.DatetimeModified = DateTime.Now;
                 SysCompany.UserCreated = SysCompany.UserModified = userCurrent;
 
-                var hs = DataContext.Add(SysCompany);
+                SysCompany company = mapper.Map<SysCompany>(SysCompany);
+                var hs = DataContext.Add(company);
                
                 if (hs.Success)
                 {
