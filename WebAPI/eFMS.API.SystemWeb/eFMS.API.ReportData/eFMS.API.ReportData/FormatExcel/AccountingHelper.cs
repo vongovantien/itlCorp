@@ -133,7 +133,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(12).Width = 13; //Cột L
             workSheet.Column(13).Width = 12; //Cột M
             workSheet.Column(14).Width = 20; //Cột N
-            workSheet.Column(16).Width = 30; //Cột P    
+            workSheet.Column(16).Width = 30; //Cột P
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
@@ -412,7 +412,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 var startRow = 4;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 2;
-               
+
                 if (settlementList.Count == 0)
                 {
                     settlementList.Add(new AccountingSettlementExportGroup());
@@ -1217,7 +1217,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].JobNo;
                 j = j + 1;
 
-                workSheet.Cells[j, 2].Value = headers[43]; //Ngày dịch vụ 
+                workSheet.Cells[j, 2].Value = headers[43]; //Ngày dịch vụ
                 workSheet.Cells[j, 3].Value = advanceExport.ShipmentsAdvance[i].ServiceDate;
                 workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
                 workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -2147,7 +2147,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
                         }
-                       
+
 
                         if (itemCharge.Type.Contains("OBH"))
                         {
@@ -2157,7 +2157,7 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
-                           
+
 
                         }
                         else
@@ -2351,7 +2351,7 @@ namespace eFMS.API.ReportData.FormatExcel
                "DEBIT NOTE IN " + monthName?.ToUpper() + " " + airfreightObj.SoaFromDate.Value.Year  + " (BẢNG KÊ CƯỚC VCQT)" , //2
                "TOTAL", //3
             };
-                
+
                 List<string> headerTable = new List<string>()
                 {
                     "No", //1
@@ -2381,7 +2381,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     "Total Amount(VND)", //25
 
                 };
-                
+
                 workSheet.Cells["H1:U1"].Merge = true;
                 workSheet.Cells["H1"].Value = headers[0];
                 workSheet.Cells["H1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
@@ -2427,7 +2427,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[8, i + 1].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
                 }
-                
+
                 workSheet.Cells["A8:A9"].Merge = true;
                 workSheet.Cells["A8"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells["A8"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -2545,7 +2545,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     textHead = textHead + "Tax code: " + airfreightObj.PartnerTaxCode;
                 }
                 workSheet.Cells["A4"].Value = textHead;
-                
+
                 workSheet.Cells["A7:V7"].Merge = true;
 
                 string textSOA = string.Empty;
@@ -2562,7 +2562,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells["X8:X9"].Merge = true;
                 workSheet.Cells["W8:W9"].Merge = true;
-                
+
 
                 int addressStartContent = 10;
                 int row = addressStartContent - 1;
@@ -2849,7 +2849,7 @@ namespace eFMS.API.ReportData.FormatExcel
                "DEBIT NOTE IN " + monthName?.ToUpper() + " " + airfreightObj.SoaFromDate.Value.Year  + " (BẢNG KÊ CƯỚC VCQT)" , //2
                "TOTAL", //3
             };
-           
+
             List<string> headerTable = new List<string>()
             {
                 "No", //1
@@ -2877,7 +2877,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Exchange Rate(VND/USD)", //22
                 "Total Amount(VND)", //23
             };
-            
+
             workSheet.Cells["H1:U1"].Merge = true;
             workSheet.Cells["H1"].Value = headers[0];
             workSheet.Cells["H1"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
@@ -3046,7 +3046,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells["X8:X9"].Merge = true;
                 workSheet.Cells["W8:W9"].Merge = true;
-            
+
             int addressStartContent = 10;
             int row = addressStartContent - 1;
             int row1 = addressStartContent - 1;
@@ -4042,7 +4042,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].JobNo;
                 j = j + 1;
 
-                workSheet.Cells[j, 2].Value = headers[49]; //Ngày dịch vụ 
+                workSheet.Cells[j, 2].Value = headers[49]; //Ngày dịch vụ
                 workSheet.Cells[j, 3].Value = settlementExport.ShipmentsSettlement[i].ServiceDate;
                 workSheet.Cells[j, 3].Style.Numberformat.Format = "dd MMM, yyyy";
                 workSheet.Cells[j, 3].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
@@ -4499,7 +4499,7 @@ namespace eFMS.API.ReportData.FormatExcel
             int k = 20;
             for (int i = 0; i < settlementExport.ShipmentsSettlement.Count; i++)
             {
-               
+
                 var OBHCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "OBH");
 
                 workSheet.Cells[k, 6].Value = headers[14];
@@ -4515,7 +4515,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "BUY");
 
-                workSheet.Cells[k, 7].Value = headers[15]; 
+                workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
                 _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
@@ -4604,7 +4604,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + p + ":G" + p].Style.Border.Top.Style = ExcelBorderStyle.Medium;
             workSheet.Cells["A" + (p + 1) + ":G" + (p + 1)].Style.Border.Top.Style = ExcelBorderStyle.Medium;
-            #region --END_FORM-- 
+            #region --END_FORM--
             for (var i = 18; i < p + 1; i++)
             {
                 workSheet.Cells[i, 7].Style.Border.Right.Style = ExcelBorderStyle.Medium;
@@ -4616,7 +4616,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 2].Style.WrapText = true;
             workSheet.Cells[p, 1, p, 2].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells[p, 1, p, 2].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
-            workSheet.Cells[p, 1, p, 2].Value = headers[18]; //Người yêu cầu 
+            workSheet.Cells[p, 1, p, 2].Value = headers[18]; //Người yêu cầu
 
             workSheet.Cells[p, 4].Merge = true;
             workSheet.Cells[p, 4].Style.WrapText = true;
@@ -4777,7 +4777,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 return null;
             }
         }
-       
+
 
         #region --- ACCOUNTING MANAGEMENT ---
         public Stream GenerateAccountingManagementExcel(List<AccountingManagementExport> acctMngts, string typeOfAcctMngt, Stream stream = null)
@@ -5043,119 +5043,83 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
-        public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
+        //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
+        //{
+        //    try
+        //    {
+        //        using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+        //        {
+        //            excelPackage.Workbook.Worksheets.Add("Sheet1");
+        //            var workSheet = excelPackage.Workbook.Worksheets.First();
+        //            if (arType == ARTypeEnum.TrialOrOffical)
+        //            {
+        //                BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
+        //            }else if (arType == ARTypeEnum.Other)
+        //            {
+        //                BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
+        //            }
+        //            excelPackage.Save();
+        //            return excelPackage.Stream;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //    }
+        //    return null;
+        //}
+
+        public Stream GenerateAccountingReceivableArSumary(List<AccountReceivableResultExport> result, string fileName)
         {
             try
             {
-                using (var excelPackage = new ExcelPackage(stream ?? new MemoryStream()))
+                var folderOfFile = GetARExcelFolder();
+                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+                var path = f.FullName;
+                if (!File.Exists(path))
+                    return null;
+
+                var excel = new ExcelExport(path);
+                excel.StartDetailTable = 3;
+
+                for (int i = 0; i < result.Count; i++)
                 {
-                    excelPackage.Workbook.Worksheets.Add("Sheet1");
-                    var workSheet = excelPackage.Workbook.Worksheets.First();
-                    if (arType == ARTypeEnum.TrialOrOffical)
-                    {
-                        BindingDataAccoutingReceivableListTrialExcel(workSheet, acctMngts);
-                    }else if (arType == ARTypeEnum.Other)
-                    {
-                        BindingDataAccoutingReceivableListOrtherExcel(workSheet, acctMngts);
-                    }
-                    excelPackage.Save();
-                    return excelPackage.Stream;
+                    var item = result[i];
+                    var listKeyData = new Dictionary<string, object>();
+                    excel.SetDataTable();
+                    listKeyData.Add("No", i+1);
+                    listKeyData.Add("PartnerId", item.PartnerCode);
+                    listKeyData.Add("PartnerName", item.ParentNameAbbr);
+                    listKeyData.Add("Rate", item.DebitRate);
+                    listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                    listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                    listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                    listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                    listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                    listKeyData.Add("Over30Days", item.Over30Day);
+                    listKeyData.Add("Curr", item.AgreementCurrency);
+                    listKeyData.Add("DebitAmount", item.DebitAmount);
+                    listKeyData.Add("CreditLimited", item.CreditLimited);
+                    listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+                    listKeyData.Add("Salesman",item.AgreementSalesmanName);
+                    listKeyData.Add("ContractType", item.AgreementType);
+                    listKeyData.Add("Status", item.AgreementStatus);
+                    listKeyData.Add("ContractNo", item.AgreementNo);
+                    listKeyData.Add("ExpDate", item.ExpriedDate);
+                    listKeyData.Add("ExpDay", item.ExpriedDay);
+                    listKeyData.Add("ParentPartner", item.ParentNameAbbr);
+
+                    excel.SetData(listKeyData);
                 }
+                return excel.ExcelStream();
             }
             catch (Exception ex)
             {
-
-            }
-            return null;
-        }
-
-        private void BindingDataAccoutingReceivableListTrialExcel(ExcelWorksheet workSheet, List<AccountReceivableResultExport> acctMngts)
-        {
-            SetWidthColumnExcelAccoutingManagement(workSheet);
-
-            workSheet.Column(2).Width = 38;
-            for (int i = 4; i <= 14; i++)
-                workSheet.Column(i).Width = 22;
-            workSheet.Column(15).Width = 26;
-            workSheet.Column(16).Width = 41;
-            workSheet.Column(21).Width = 63;
-
-            List<string> headers = new List<string>
-            {
-                 "No",//0
-                 "Partner ID",//1
-                 "Partner Name",//2
-                 "Rate",//3
-                 "Debit Amount",//4
-                 "Billing",//5
-                 "Paid A Part",//6
-                 "OutStanding Balance",//7
-                 "Over 1-15 Days",//8
-                 "Over 16-30 Days",//9
-                 "Over 30 days",//10
-                 "Over Amount",//11
-                 "Currency",//12
-                 "Credit Limited",//13
-                 "Salesman",//14
-                 "Contract No",//15
-                 "Contract Type",//16
-                 "Status",//17
-                 "Expired Date",//18
-                 "Expired Days",//19
-                 "Parent Partner"//20
-            };
-
-            int rowStart = 1;
-            for (int i = 0; i < headers.Count; i++)
-            {
-                workSheet.Cells[rowStart, i + 1].Value = headers[i];
-                workSheet.Cells[rowStart, i + 1].Style.Font.Bold = true;
-                workSheet.Cells[rowStart, i + 1].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                return null;
             }
 
-            //Cố định dòng đầu tiên (Freeze Row 1 and no column)
-            workSheet.View.FreezePanes(2, 1);
 
-            rowStart += 1;
-            foreach (var item in acctMngts)
-            {
-                workSheet.Cells[rowStart, 1].Value = rowStart;
-                workSheet.Cells[rowStart, 2].Value = item.PartnerCode;
-                workSheet.Cells[rowStart, 3].Value = item.ParentNameAbbr;
-                var debit = item.DebitRate?.ToString(decimalFormat)+" % ";
-                workSheet.Cells[rowStart, 4].Value = debit;
-                //workSheet.Cells[rowStart, 4].Style.Numberformat.Format = decimalFormat2 + " %";
 
-                workSheet.Cells[rowStart, 5].Value = item.DebitAmount ;
-                workSheet.Cells[rowStart, 6].Value = item.BillingAmount+item.ObhBillingAmount;
-                workSheet.Cells[rowStart, 7].Value = item.PaidAmount+item.ObhPaidAmount;
-                workSheet.Cells[rowStart, 8].Value = item.BillingUnpaid+item.ObhUnPaidAmount;
-                workSheet.Cells[rowStart, 9].Value = item.Over1To15Day;
-                workSheet.Cells[rowStart, 10].Value = item.Over16To30Day;
-                workSheet.Cells[rowStart, 11].Value = item.Over30Day;
-                workSheet.Cells[rowStart, 12].Value = item.DebitAmount - item.CreditLimited;
-                workSheet.Cells[rowStart, 13].Value = item.AgreementCurrency;
-                workSheet.Cells[rowStart, 14].Value = item.CreditLimited;
-
-                for (int i = 5; i <= 14; i++)
-                    workSheet.Cells[rowStart, i].Style.Numberformat.Format = decimalFormat;
-
-                workSheet.Cells[rowStart, 15].Value = item.AgreementSalesmanName;
-                workSheet.Cells[rowStart, 16].Value = item.AgreementNo;
-                workSheet.Cells[rowStart, 17].Value = item.AgreementType;
-                workSheet.Cells[rowStart, 18].Value = item.AgreementStatus;
-                workSheet.Cells[rowStart, 19].Value = item.ExpriedDate;
-                workSheet.Cells[rowStart, 19].Style.Numberformat.Format = "dd/MM/yyyy";
-                workSheet.Cells[rowStart, 20].Value = item.ExpriedDay;
-                workSheet.Cells[rowStart, 21].Value = item.ParentNameAbbr;
-
-                rowStart += 1;
-            }
-
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         private void BindingDataAccoutingReceivableListOrtherExcel(ExcelWorksheet workSheet, List<AccountReceivableResultExport> acctMngts)

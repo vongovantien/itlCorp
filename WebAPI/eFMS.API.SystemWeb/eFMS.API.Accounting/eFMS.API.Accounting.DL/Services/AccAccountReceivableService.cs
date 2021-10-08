@@ -1520,9 +1520,10 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AccountReceivableResult> GetARNoContract(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
         {
             var selectQuery = from acctReceivable in acctReceivables
-                              join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
+                                  //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
+                              join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
                               from partnerContract in partnerContract2.DefaultIfEmpty()
-                              where acctReceivable.AcRef != partnerContract.PartnerId
+                              where acctReceivable.PartnerId != partnerContract.PartnerId
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
             var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef })
@@ -1687,13 +1688,18 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
-            var partners = partnerRepo.Get();
+
+            var partners = QueryPartner(criteria);
+
             var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL 
-            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT);
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
+
             var partnerContracts = QueryContractPartner(contracts, criteria);
 
             IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
+
             if (arPartnerContracts == null || !arPartnerContracts.Any())
             {
                 return null;
@@ -1703,9 +1709,14 @@ namespace eFMS.API.Accounting.DL.Services
                 arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
                 arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
+
+                IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
+                if (arPartnerNoContracts!=null)
+                    arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
         }
+
 
         private IQueryable<object> GetDataGuarantee(AccountReceivableCriteria criteria)
         {
@@ -1933,6 +1944,16 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
+        private IQueryable<CatPartner> QueryPartner(AccountReceivableCriteria criteria)
+        {
+            Expression<Func<CatPartner, bool>> query = q => true;
+            if (criteria.ParterType == ParterTypeEnum.Customer)
+                query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Customer.ToString()));
+            if (criteria.ParterType == ParterTypeEnum.Agent)
+                query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Agent.ToString()));
+
+            return partnerRepo.Get();
+        }
         #endregion --- LIST & PAGING ---
 
         #region --- DETAIL ---  
