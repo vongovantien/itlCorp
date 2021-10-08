@@ -713,7 +713,9 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("PartnerNameAdv", item.PartnerName);
                         listKeyData.Add("SoaNoAdv", item.BillingRefNo);
                         listKeyData.Add("AdvanceAmountVnd", item.AdvanceAmountVnd);
+                        listKeyData.Add("TotalAmountAdv", 0);
                         listKeyData.Add("AdvanceAmountUsd", item.AdvanceAmountUsd);
+                        listKeyData.Add("TotalAmountUsdAdv", 0);
                         listKeyData.Add("BranchAdv", item.BranchName);
                     }
                     excel.SetData(listKeyData);
