@@ -2715,14 +2715,17 @@ namespace eFMS.API.Accounting.DL.Services
                 List<PaymentDetailModel> details = new List<PaymentDetailModel>();
 
                 string obhAccountNo = string.Empty;
-                if (receiptItem.ObhpartnerId != Guid.Empty)
+                if(receiptItem.ObhpartnerId != Guid.Empty && receiptItem.ObhpartnerId != null)
                 {
                     CatPartner partnerOBH = PartnerRepository.Get(x => x.Id == receiptItem.ObhpartnerId.ToString())?.FirstOrDefault();
                     if (partnerOBH != null)
                     {
                         obhAccountNo = partnerOBH.AccountNo;
                     }
-
+                }
+                else if(receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE)
+                {
+                    obhAccountNo = result.CustomerCode;
                 }
 
                 IQueryable<PaymentDetailModel> queryPayments = from payment in payments
@@ -2739,9 +2742,9 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    ObhPartnerCode = obhAccountNo,
                                                                    Description = GeneratePaymentReceiptDescription(payment, type),
                                                                    ChargeType = GetChargeTypeReceiptPayment(receiptItem, payment, type),
-                                                                   DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo),
+                                                                   DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
-                                                                   Stt_Cd_Htt = invoicegrp.ReferenceNo
+                                                                   Stt_Cd_Htt = type == "CLEAR_ADV" ? string.Empty : invoicegrp.ReferenceNo
                                                                };
                 if (queryPayments != null)
                 {
@@ -2952,9 +2955,22 @@ namespace eFMS.API.Accounting.DL.Services
             sync.Details = details;
             return sync;
         }
-        private string GetPaymentReceiptAccount(AcctReceipt receipt, string paymentType, string invoiceAccountNo)
+        private string GetPaymentReceiptAccount(AcctReceipt receipt, string paymentType, string invoiceAccountNo, string type)
         {
             string account = invoiceAccountNo;
+            if (type == "CLEAR_ADV")
+            {
+                if(receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
+                {
+                    account = "13114";
+                }
+                else
+                {
+                    account = "13124";
+                }
+
+                return account;
+            }
 
             if (paymentType.ToUpper() == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE)
             {

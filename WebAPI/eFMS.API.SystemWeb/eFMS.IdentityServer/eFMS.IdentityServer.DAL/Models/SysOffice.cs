@@ -21,14 +21,14 @@ namespace eFMS.IdentityServer.Service.Models
         public string Taxcode { get; set; }
         public string BankAccountVnd { get; set; }
         public string BankAccountUsd { get; set; }
+        public string BankNameEn { get; set; }
+        public string BankNameLocal { get; set; }
         public string BankAccountNameEn { get; set; }
         public string BankAccountNameVn { get; set; }
         public string BankAddressLocal { get; set; }
         public string BankAddressEn { get; set; }
-        public string BankNameEn { get; set; }
-        public string BankNameLocal { get; set; }
         public string Location { get; set; }
-        public bool Active { get; set; }
+        public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
         public byte[] Logo { get; set; }
         public string SwiftCode { get; set; }
@@ -37,5 +37,7 @@ namespace eFMS.IdentityServer.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string OfficeType { get; set; }
+        public string InternalCode { get; set; }
     }
 }
