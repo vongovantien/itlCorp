@@ -37,5 +37,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public decimal? TotalAmountVnd { get; set; }
         public decimal? TotalAmountUsd { get; set; }
         public string AccountNo { get; set; }
+        public DateTime? DatetimeSorting { get; set; }
     }
 }
