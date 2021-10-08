@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { ReceiptModel, ReceiptInvoiceModel } from '@models';
+import { ReceiptModel, ReceiptInvoiceModel, ReceiptCreditDebitModel, Partner } from '@models';
 import { AppForm } from '@app';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
@@ -172,6 +172,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
             sumTotalPaidUsd += element.totalPaidUsd;
             sumTotalPaidVnd += element.totalPaidVnd;
+
+            element.isValid = null;
         }
 
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
@@ -196,7 +198,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning('Please you do Process Clear firstly!');
             return;
         }
-        if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
+        const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+        if (hasRowTotalInvalid) {
+            const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+            rowInvalid.forEach(x => {
+                x.isValid = false;
+            })
             this._toastService.warning("Total Paid must <= Unpaid");
             return;
         }
@@ -418,10 +425,23 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             cusAdvanceAmountVnd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountVnd : 0,
             cusAdvanceAmountUsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
 
-            paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+            paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER,
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+
+        if (res.class == AccountingConstants.RECEIPT_CLASS.COLLECT_OBH && !!res.receiptInternalOfficeCode) {
+            this.listInvoice.obhPartners
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((partners: Partner[]) => {
+                    if (!!partners.length) {
+                        const partner: Partner = partners.find(x => x.internalCode === res.receiptInternalOfficeCode);
+                        this.listInvoice.obhpartnerId.setValue(partner?.id);
+                    }
+                })
+        } else if (res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE) {
+            this.listInvoice.paymentMethod.setValue(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE);
+        }
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
@@ -456,13 +476,15 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
+
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.balanceVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.balanceUsd;
+
             if (c.currencyId === 'VND') {
-                c.unpaidAmount = c.unpaidAmountVnd - c.totalPaidVnd;
+                c.unpaidAmount = c.unpaidAmountVnd;
             } else {
-                c.unpaidAmount = c.unpaidAmountUsd - c.totalPaidUsd;
+                c.unpaidAmount = c.unpaidAmountUsd;
             }
-            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.totalPaidVnd;
-            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.totalPaidUsd;
         })
         listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
             x.paidAmountVnd = x.unpaidAmountVnd;

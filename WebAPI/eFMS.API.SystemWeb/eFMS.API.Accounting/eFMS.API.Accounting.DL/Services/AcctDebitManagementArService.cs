@@ -81,7 +81,7 @@ namespace eFMS.API.Accounting.DL.Services
                     DatetimeCreated = DateTime.Now,
                     DatetimeModified = DateTime.Now,
                     DepartmentId = currentUser.DepartmentId,
-                    OfficeId = currentUser.OfficeID.ToString(),
+                    OfficeId = x.FirstOrDefault().OfficeId.ToString(),
                 });
             if (debits != null && debits.Count() > 0)
             {
