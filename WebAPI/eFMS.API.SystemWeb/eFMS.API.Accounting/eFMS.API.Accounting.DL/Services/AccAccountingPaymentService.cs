@@ -1804,13 +1804,16 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.AdvanceAmountVnd = pm.PaymentAmountVnd ?? 0;
-                        payment.AdvanceAmountUsd = pm.PaymentAmountUsd ?? 0;
+                        payment.AdvanceAmountVnd = payment.AdvanceAmountUsd = 0;
                         payment.BranchName = officeData[(Guid)pm.OfficeId].FirstOrDefault()?.ShortName;
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
+                        results.Insert(indexOfLastGrp + 1, payment);
+                        // [CR]: tam thoi khong tinh
+                        //payment.AdvanceAmountVnd = pm.PaymentAmountVnd ?? 0;
+                        //payment.AdvanceAmountUsd = pm.PaymentAmountUsd ?? 0;
+                        //if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+                        //{
+                        //    results.Insert(indexOfLastGrp + 1, payment);
+                        //}
                     }
                 }
             }
@@ -1836,16 +1839,18 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.AdvanceAmountVnd = pm.Sum(x => x.PaymentAmountVnd ?? 0);
-                        payment.AdvanceAmountVnd += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
+                        //payment.AdvanceAmountVnd = pm.Sum(x => x.PaymentAmountVnd ?? 0);
+                        //payment.AdvanceAmountVnd += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
 
-                        payment.AdvanceAmountUsd = pm.Sum(x => x.PaymentAmountUsd ?? 0);
-                        payment.AdvanceAmountUsd += receiptList.Sum(x => x.CusAdvanceAmountUsd ?? 0);
+                        //payment.AdvanceAmountUsd = pm.Sum(x => x.PaymentAmountUsd ?? 0);
+                        //payment.AdvanceAmountUsd += receiptList.Sum(x => x.CusAdvanceAmountUsd ?? 0);
+                        payment.AdvanceAmountVnd = payment.AdvanceAmountUsd = 0;
                         payment.BranchName = pm.FirstOrDefault() == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().OfficeId].FirstOrDefault()?.ShortName;
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
+                        results.Insert(indexOfLastGrp + 1, payment);
+                        //if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+                        //{
+                        //    results.Insert(indexOfLastGrp + 1, payment);
+                        //}
                     }
                 }
             }
@@ -1868,12 +1873,15 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
                         var contractInfo = catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id));
-                        payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
-                        payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
+                        payment.AdvanceAmountVnd = payment.AdvanceAmountUsd = 0;
+                        results.Insert(indexOfLastGrp + 1, payment);
+
+                        //payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
+                        //payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
+                        //if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+                        //{
+                        //    results.Insert(indexOfLastGrp + 1, payment);
+                        //}
                     }
                 }
             }
