@@ -11,6 +11,8 @@ export class NegativeNumberePipe extends DecimalPipe implements PipeTransform {
                 return `(${Math.abs(value)})`;
             }
             return `(${super.transform(Math.abs(value), args[0], '')})`;
+        } else if (!!args.length) {
+            return super.transform(value, args[0], '');
         } else {
             return value;
         }
