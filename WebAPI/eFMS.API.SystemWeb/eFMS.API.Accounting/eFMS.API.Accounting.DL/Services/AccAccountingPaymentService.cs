@@ -1727,7 +1727,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 if (invoiceObh.Count() > 0)
                 {
-                    payment.AccountNo = (string.IsNullOrEmpty(payment.AccountNo) ? "" : (payment.AccountNo + " / ")) + invoiceDe.FirstOrDefault().invc.FirstOrDefault()?.AccountNo;
+                    payment.AccountNo = (string.IsNullOrEmpty(payment.AccountNo) ? "" : (payment.AccountNo + " / ")) + invoiceObh.FirstOrDefault().invc.FirstOrDefault()?.AccountNo;
                 }
                 payment.BranchName = officeData[(Guid)invoice.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
