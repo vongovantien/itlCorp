@@ -30,7 +30,8 @@ export enum ReceiptActionTypes {
 
     INSERT_DATA_SEARCH_CUSTOMER_PAYMENT = '[AR Receipt] Insert data search',
     LOAD_LIST = '[AR Receipt] Load List',
-    LOAD_LIST_SUCCESS = '[AR Receipt] Load List Success'
+    LOAD_LIST_SUCCESS = '[AR Receipt] Load List Success',
+    LOAD_LIST_FAIL = '[AR Receipt] Load List Fail'
     // TODO another action receipt.
 }
 
@@ -62,6 +63,7 @@ export const AddDebitCreditToReceipt = createAction(ReceiptActionTypes.ADD_DEBIT
 export const SearchListCustomerPayment = createAction(ReceiptActionTypes.INSERT_DATA_SEARCH_CUSTOMER_PAYMENT, props<Partial<IAcctReceiptCriteria>>());
 export const LoadListCustomerPayment = createAction(ReceiptActionTypes.LOAD_LIST, props<CommonInterface.IParamPaging>());
 export const LoadListCustomerPaymentSuccess = createAction(ReceiptActionTypes.LOAD_LIST_SUCCESS, props<CommonInterface.IResponsePaging>());
+export const LoadListCustomerPaymentFail = createAction(ReceiptActionTypes.LOAD_LIST_FAIL);
 
 export interface ProcessClearInvoiceModel {
     invoices: ReceiptInvoiceModel[],

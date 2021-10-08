@@ -13,7 +13,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent, InfoPopupComponent, LoadingPopupComponent } from '@common';
 
 import { PaymentModel, AccountingPaymentModel } from '@models';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
@@ -137,15 +137,15 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment/import`]);
     }
 
-    startDownloadReport(data: any, fileName: string){
-        if(data.byteLength > 0){
+    startDownloadReport(data: any, fileName: string) {
+        if (data.byteLength > 0) {
             this.downLoadFile(data, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
             this.loadingPopupComponent.downloadSuccess();
-        }else{
+        } else {
             this.loadingPopupComponent.downloadFail();
         }
     }
-    
+
     exportExcel() {
         this._spinner.hide();
         this.loadingPopupComponent.show();
@@ -178,12 +178,13 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._toastService.warning('No Data To View, Please Select Partner and Apply');
             return;
         }
-        const body = {
+        const body: ICriteriaReceiptAdvance = {
             customerId: this.dataSearch.partnerId,
             status: "Done",
             dateFrom: this.dataSearch.fromUpdatedDate,
             dateTo: this.dataSearch.toUpdatedDate,
-            dateType: "Paid Date"
+            dateType: "Paid Date",
+            // paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
         };
         this._spinner.hide();
         this.loadingPopupComponent.show();
@@ -349,4 +350,13 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                 );
         }
     }
+}
+
+interface ICriteriaReceiptAdvance {
+    customerId: string;
+    status: string;
+    dateFrom: string;
+    dateTo: string;
+    dateType: string;
+    paymentMethod?: string;
 }

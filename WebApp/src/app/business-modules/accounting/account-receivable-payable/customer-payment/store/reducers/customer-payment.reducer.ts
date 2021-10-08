@@ -141,6 +141,9 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.LoadListCustomerPaymentSuccess, (state: IReceiptState, payload: CommonInterface.IResponsePaging) => ({
         ...state, list: payload, isLoading: false, isLoaded: true
     })),
+    on(ReceiptActions.LoadListCustomerPaymentFail, (state: IReceiptState) => ({
+        ...state, isLoading: false, isLoaded: true
+    })),
     on(ReceiptActions.ToggleAutoConvertPaid, (state: IReceiptState, payload: { isAutoConvert: boolean }) => ({
         ...state, isAutoConvertPaid: payload.isAutoConvert
     })),

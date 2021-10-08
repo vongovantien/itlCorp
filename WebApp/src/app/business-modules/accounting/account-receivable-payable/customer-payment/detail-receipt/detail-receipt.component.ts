@@ -129,6 +129,12 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
             this.listInvoice.isReadonly = true;
             this.formCreate.isReadonly = true;
         }
+
+        if (res.class === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT || res.class === AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            this.formCreate.isShowGetDebit = true;
+        } else {
+            this.formCreate.isShowGetDebit = false;
+        }
     }
 
 

@@ -27,8 +27,9 @@ export class ReceiptCreditDebitModel {
     notes: string;
     paidAmountUsd: number;
     paidAmountVnd: number;
-    balanceAmountUsd: number;
-    balanceAmountVnd: number;
+    balance: number;
+    balanceUsd: number;
+    balanceVnd: number;
     totalPaidVnd: number;
     totalPaidUsd: number;
     negative: boolean;
@@ -65,6 +66,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
 
     isChangeValue: boolean = false;
     creditNos: string[] = [];
+    isValid: boolean = true;
 
     constructor(object?: any) {
         super();
@@ -135,6 +137,7 @@ export class ReceiptModel extends Receipt {
     userNameModified: string = null;
     subRejectReceipt: string = null;
     isReceiptBankFee: boolean = false;
+    receiptInternalOfficeCode: string = null;
 
     constructor(object?: any) {
         super();

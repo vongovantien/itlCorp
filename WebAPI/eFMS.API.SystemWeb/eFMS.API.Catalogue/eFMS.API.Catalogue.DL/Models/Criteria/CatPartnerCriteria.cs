@@ -30,5 +30,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public DateTime? DatetimeCreatedFrom { get; set; }
         public DateTime? DatetimeCreatedTo { get; set; }
         public string PartnerMode { get; set; }
+        public string NotEqualInternalCode { get; set; }
+        public string InternalCode { get; set; }
     }
 }
