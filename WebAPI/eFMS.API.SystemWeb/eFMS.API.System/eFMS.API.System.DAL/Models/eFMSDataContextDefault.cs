@@ -86,8 +86,6 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.Description).HasMaxLength(4000);
 
-                entity.Property(e => e.Email).HasMaxLength(150);
-
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
 
                 entity.Property(e => e.SignPath).HasMaxLength(1000);
@@ -367,7 +365,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.DeptId).HasColumnName("DeptID");
 
-                entity.Property(e => e.EmailInfo).HasMaxLength(50);
+                entity.Property(e => e.EmailInfo).HasMaxLength(500);
 
                 entity.Property(e => e.EmailType).HasMaxLength(50);
 
@@ -545,6 +543,7 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.ChildId)
                     .HasColumnName("ChildID")
+                    .HasMaxLength(50)
                     .IsUnicode(false);
 
                 entity.Property(e => e.DateTimeCreated).HasColumnType("datetime");
@@ -724,6 +723,10 @@ namespace eFMS.API.System.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.InactiveOn).HasColumnType("datetime");
+
+                entity.Property(e => e.InternalCode)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Location).HasMaxLength(4000);
 

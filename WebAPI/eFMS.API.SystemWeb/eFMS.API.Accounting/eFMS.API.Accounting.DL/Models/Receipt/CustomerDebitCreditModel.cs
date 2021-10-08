@@ -43,5 +43,9 @@ namespace eFMS.API.Accounting.DL.Models.Receipt
         public bool? NetOff { get; set; }
         public decimal? NetOffVnd { get; set; }
         public decimal? NetOffUsd { get; set; }
+        public decimal? Balance { get; set; }
+        public decimal? BalanceVnd { get; set; }
+        public decimal? BalanceUsd { get; set; }
+        public string RefCurrency { get; set; }
     }
 }

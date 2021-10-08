@@ -21,6 +21,7 @@ namespace SystemInterface {
         bankCode: string;
         photo: string;
         title: string;
+        internalCode: string;
     }
 
     export interface IDepartmentGroup {

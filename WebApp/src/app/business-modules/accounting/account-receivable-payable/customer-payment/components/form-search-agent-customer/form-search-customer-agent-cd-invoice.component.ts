@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AbstractControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { ChargeConstants, JobConstants } from '@constants';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from '@app';
-import { Partner } from '@models';
+import { Partner, Office } from '@models';
 import { Store } from '@ngrx/store';
 import { formatDate } from '@angular/common';
 
@@ -12,9 +12,10 @@ import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
-import { Observable } from 'rxjs';
-import { takeUntil, pluck } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { takeUntil, pluck, switchMap, tap, mergeMap, withLatestFrom, switchAll, takeLast, last, take, filter, startWith, map } from 'rxjs/operators';
 import { SelectPartnerReceipt } from '../../store/actions';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'form-search-customer-agent-cd-invoice',
@@ -30,6 +31,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     date: AbstractControl;
     dateType: AbstractControl;
     service: AbstractControl;
+    office: AbstractControl;
 
     searchOptions: string[] = ['SOA', 'Debit/Credit/Invoice', 'Credit Note', 'VAT Invoice', 'Job No', 'HBL', 'MBL', 'Customs No'];
     dateTypeList: string[] = ['Invoice Date', 'Service Date', 'Billing Date'];
@@ -52,13 +54,17 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     customers: Observable<Partner[]>;
     customerFromReceipt: string;
     partnerTypeState: string;
+    offices: Office[];
+
+    selectedDefaultOffice = { id: 'All', shortName: "All" };
 
     constructor(
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _toastService: ToastrService,
         private readonly poupParentComponent: ARCustomerPaymentCustomerAgentDebitPopupComponent,
-        private readonly _store: Store<IReceiptState>
+        private readonly _store: Store<IReceiptState>,
+        private readonly _systemRepo: SystemRepo
 
     ) { super(); }
 
@@ -69,6 +75,21 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
 
         this.initSubmitClickSubscription(() => this.searchData());
 
+        this._store.select(getCurrentUserState)
+            .pipe(
+                filter(c => !!c.userName),
+                switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+                    if (!!currentUser.userName) {
+                        return this._systemRepo.getOfficePermission(currentUser.id, currentUser.companyId)
+                            .pipe(startWith([]))
+                    }
+                }),
+                map((offices) => [this.selectedDefaultOffice, ...offices]),
+                takeUntil(this.ngUnsubscribe),
+            )
+            .subscribe((offices: Office[]) => {
+                this.offices = offices;
+            })
     }
 
     initForm() {
@@ -79,6 +100,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             date: [],
             dateType: [this.dateTypeList[0]],
             service: [[this.services[0].id]],
+            office: [[this.selectedDefaultOffice.id]]
         });
 
         this.typeSearch = this.formSearch.controls['typeSearch'];
@@ -87,6 +109,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
         this.dateType = this.formSearch.controls['dateType'];
         this.service = this.formSearch.controls['service'];
         this.partnerId = this.formSearch.controls['partnerId'];
+        this.office = this.formSearch.controls['office'];
 
 
         // * Listen partner current state.
@@ -151,23 +174,30 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             );
     }
 
-    selelectedService(event: any) {
+    onSelectMultipleValue(event: any, type: string) {
         if (event.length > 0) {
             if (event[event.length - 1].id === 'All') {
-                this.service.setValue([{ id: 'All', text: 'All' }]);
+                if (type === 'service') {
+                    this.service.setValue(['All']);
+                } else {
+                    this.office.setValue(['All']);
+                }
             } else {
-                const arrNotIncludeAll = event.filter(x => x.id !== 'All');
-                this.service.setValue(arrNotIncludeAll);
+                const arrNotIncludeAll = event.filter(x => x.id !== 'All').map(x => x.id);
+                if (type === 'service') {
+                    this.service.setValue(arrNotIncludeAll);
+                } else {
+                    this.office.setValue(arrNotIncludeAll);
+                }
             }
         }
     }
 
-    mapServiceId() {
-        let serviceId = '';
-        const serv = this.services.filter(service => service.id !== 'All');
-        serviceId = serv.map((item: any) => item.id).toString().replace(/(?:,)/g, ';');
-        return serviceId;
+    mapMultipleValueId(multipleValue: any[]) {
+        const serv = multipleValue.filter(v => v.id !== 'All');
+        return serv.map((item: any) => item.id);
     }
+
 
     searchData() {
         this.isSubmitted = true;
@@ -185,7 +215,8 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                 fromDate: !!this.date.value?.startDate ? formatDate(this.date.value.startDate, 'yyyy-MM-dd', 'en') : null,
                 toDate: !!this.date.value?.endDate ? formatDate(this.date.value?.endDate, 'yyyy-MM-dd', 'en') : null,
                 dateType: this.dateType.value,
-                service: this.service.value[0] === 'All' ? this.mapServiceId() : (this.service.value.length > 0 ? this.service.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : null)
+                service: this.service.value[0] === 'All' ? this.mapMultipleValueId(this.services) : this.service.value,
+                office: this.office.value[0] === 'All' ? this.mapMultipleValueId(this.offices) : this.office.value,
             };
             this.poupParentComponent.onApply(body);
         }
@@ -207,4 +238,5 @@ interface IAcctCustomerDebitCredit {
     toDate: string;
     dateType: string;
     service: string;
+    office: string;
 }

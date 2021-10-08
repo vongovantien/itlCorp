@@ -11,6 +11,9 @@ namespace eFMS.API.Accounting.Service.Models
         public string PartnerId { get; set; }
         public string RefNo { get; set; }
         public Guid? Hblid { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
+        public decimal? TotalAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }
@@ -25,8 +28,5 @@ namespace eFMS.API.Accounting.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public decimal? TotalAmountVnd { get; set; }
-        public decimal? TotalAmountUsd { get; set; }
-        public decimal? TotalAmount { get; set; }
     }
 }
