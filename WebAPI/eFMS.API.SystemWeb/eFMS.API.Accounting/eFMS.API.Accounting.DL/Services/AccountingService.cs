@@ -2651,12 +2651,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         var firstPayment = paymentsDebit.Take<AccAccountingPayment>(1);
                         PaymentModel paymentModelCollectAdv = GenerateReceiptSyncModel("COLL_ADV", receipt, firstPayment, out AcctReceiptSyncModel receiptSyncCollectAdv);
-                        // receiptSyncs.Add(receiptSyncDebit); // Sync cho kt k cần lưu phiếu                        
+                        receiptSyncs.Add(receiptSyncCollectAdv); // Sync cho kt k cần lưu phiếu                        
                         data.Add(paymentModelCollectAdv);
                     }
 
-                    PaymentModel paymentModelClearAdv = GenerateReceiptSyncModel("CLEAR_ADV", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncDebit);
-                    receiptSyncs.Add(receiptSyncDebit);
+                    PaymentModel paymentModelClearAdv = GenerateReceiptSyncModel("CLEAR_ADV", receipt, paymentsDebit, out AcctReceiptSyncModel receiptSyncClearAdv);
+                    receiptSyncs.Add(receiptSyncClearAdv);
                     data.Add(paymentModelClearAdv);
                 }
                 else
@@ -2723,7 +2723,8 @@ namespace eFMS.API.Accounting.DL.Services
                         obhAccountNo = partnerOBH.AccountNo;
                     }
                 }
-                else if(receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE)
+                else if(receiptItem.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE
+                    || type == "CLEAR_ADV")
                 {
                     obhAccountNo = result.CustomerCode;
                 }
@@ -2744,7 +2745,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                                    ChargeType = GetChargeTypeReceiptPayment(receiptItem, payment, type),
                                                                    DebitAccount = GetPaymentReceiptAccount(receiptItem, payment.Type, invoicegrp.AccountNo, type),
                                                                    NganhCode = "FWD",
-                                                                   Stt_Cd_Htt = type == "CLEAR_ADV" ? string.Empty : invoicegrp.ReferenceNo
+                                                                   Stt_Cd_Htt = type == "COLL_ADV" ? string.Empty : invoicegrp.ReferenceNo
                                                                };
                 if (queryPayments != null)
                 {
@@ -2958,7 +2959,7 @@ namespace eFMS.API.Accounting.DL.Services
         private string GetPaymentReceiptAccount(AcctReceipt receipt, string paymentType, string invoiceAccountNo, string type)
         {
             string account = invoiceAccountNo;
-            if (type == "CLEAR_ADV")
+            if (type == "COLL_ADV")
             {
                 if(receipt.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
