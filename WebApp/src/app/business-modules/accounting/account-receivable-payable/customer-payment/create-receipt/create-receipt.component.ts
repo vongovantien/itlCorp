@@ -176,6 +176,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             element.isValid = null;
         }
 
+        sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
+        sumTotalPaidVnd = +sumTotalPaidUsd.toFixed(0);
+
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
             this._toastService.warning("Final paid amount < sum total paid amount");
             return;
