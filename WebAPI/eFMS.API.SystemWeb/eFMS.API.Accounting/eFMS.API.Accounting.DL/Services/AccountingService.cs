@@ -2701,7 +2701,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                  ExchangeRate = receipt.ExchangeRate,
                                                  CustomerCode = partner.AccountNo,
                                                  CustomerName = partner.PartnerNameVn,
-                                                 Description0 = string.Format("{0}", type == "NETOFF" ? "Công Nợ Cấn Trừ" : "Công Nợ Phải Thu"),
+                                                 Description0 = GeneratePaymentReceiptDescription(receipt, type),
                                                  PaymentMethod = GetPaymentMethodReceipt(receipt, type), // 16473
                                                  DataType = "PAYMENT",
                                                  LocalBranchCode = grpobh.InternalCode
@@ -2995,12 +2995,36 @@ namespace eFMS.API.Accounting.DL.Services
 
             return account;
         }
+        private string GeneratePaymentReceiptDescription(AcctReceipt receipt, string type)
+        {
+            string _des = "Công Nợ Phải Thu";
+            if (type == "NETOFF")
+            {
+                return "Công Nợ Cấn Trừ";
+            }
+            if(type == "COLL_ADV")
+            {
+                if (string.IsNullOrEmpty(receipt.Description))
+                {
+                    return "Công Nợ thu ứng trước";
+                }
+                else
+                {
+                    return receipt.Description;
+                }
+            }
+            return _des;
+        }
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)
         {
             string _description = string.Empty;
             if (type == "NETOFF")
             {
                 return "Công Nợ Cấn Trừ";
+            }
+            if(type == "COLL_ADV")
+            {
+                return "Công Nợ thu ứng trước";
             }
             switch (payment.Type)
             {
@@ -3106,7 +3130,7 @@ namespace eFMS.API.Accounting.DL.Services
                 case "COLL_ADV":
                     if (receipt.PaymentMethod.Contains("Bank"))
                     {
-                        _method = AccountingConstants.PAYMENT_METHOD_BANK;
+                        _method = "Bank Transfer";
                     }
                     else if (receipt.PaymentMethod.Contains("Cash"))
                     {
