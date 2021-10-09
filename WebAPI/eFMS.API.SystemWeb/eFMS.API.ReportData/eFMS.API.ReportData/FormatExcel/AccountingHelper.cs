@@ -3748,7 +3748,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Beneficiary
             workSheet.Cells["F13"].Value = headers[24];
             workSheet.Cells["F13"].Style.Font.Bold = true;
-            workSheet.Cells["CG3"].Value = settlementExport.InfoSettlement.BankAccountName;
+            workSheet.Cells["G13"].Value = settlementExport.InfoSettlement.BankAccountName;
 
             // Acc No
             workSheet.Cells["F14"].Value = headers[25];
@@ -3823,8 +3823,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[17, 1, 17, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             #endregion
 
-            decimal? _sumTotalOBH = 0;
-            decimal? _sumTotalCredit = 0;
+            decimal _sumTotalOBH = 0;
+            decimal _sumTotalCredit = 0;
             int p = 20;
             int j = 20;
             int k = 20;
@@ -3836,7 +3836,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
                 //workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
                 foreach (var invoice in OBHCharges)
@@ -3849,7 +3849,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 7].Value = headers[15]; 
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 //workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat;
                 foreach (var no_invoice in CreditInvoiceCharges)
