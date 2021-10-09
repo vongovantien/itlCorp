@@ -2282,7 +2282,7 @@ namespace eFMS.API.Accounting.DL.Services
                     var ids = acctManagementIds.Where(x => criteria.Service.Contains(x.ServiceType)).Select(x => x.Id).ToList();
                     if (acctManagementIds != null && ids.Count > 0)
                     {
-                        expQueryDebitAr = expQueryDebitAr.And(x => ids.Contains(x.Id));
+                        expQueryDebitAr = expQueryDebitAr.And(x => ids.Contains(x.AcctManagementId ?? new Guid()));
                     }
                 }
 
@@ -2292,7 +2292,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     if (acctManagementIds != null && ids.Count > 0)
                     {
-                        expQueryDebitAr = expQueryDebitAr.And(x => ids.Contains(x.Id));
+                        expQueryDebitAr = expQueryDebitAr.And(x => ids.Contains(x.AcctManagementId ?? new Guid()));
                     }
                 }
             }

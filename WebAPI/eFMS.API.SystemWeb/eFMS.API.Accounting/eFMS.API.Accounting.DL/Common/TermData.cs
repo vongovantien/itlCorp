@@ -78,6 +78,13 @@ namespace eFMS.API.Accounting.DL.Common
         Over30,
     }
 
+
+    public enum ParterTypeEnum
+    {
+        All,
+        Customer,
+        Agent,
+    }
     public static class TermData
     {
         public static readonly string Canceled = "Canceled";
