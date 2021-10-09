@@ -653,7 +653,12 @@ namespace eFMS.API.Documentation.DL.Services
             parameter.No = string.Empty;
             parameter.MAWB = houseBill != null ? (houseBill.Mawb?.ToUpper() ?? string.Empty) : string.Empty;
             // Thông tin Company
-            parameter.CompanyName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? companyUser?.BunameVn : companyUser?.BunameEn; // Company Name En of user
+
+            //[ADD][08/10/2021][Change company name -> branch name office ]
+            //parameter.CompanyName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? companyUser?.BunameVn : companyUser?.BunameEn; // Company Name En of user
+            parameter.CompanyName = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser?.BranchNameVn : officeUser?.BranchNameEn;
+            //[END]
+
             parameter.CompanyDescription = string.Empty;
             parameter.CompanyAddress1 = criteria.Currency == DocumentConstants.CURRENCY_LOCAL ? officeUser?.AddressVn : officeUser?.AddressEn; // Office Address En of user 
             parameter.CompanyAddress2 = string.Format(@"Tel: {0}    Fax: {1}", officeUser?.Tel ?? string.Empty, officeUser?.Fax ?? string.Empty); // Tel & Fax of Office user
