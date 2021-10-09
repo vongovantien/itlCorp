@@ -484,7 +484,9 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<List<AccountReceivableResultExport>>();
             if (dataObjects.Result == null || dataObjects.Result.Count == 0) return Ok();
 
-            var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            //var stream = new AccountingHelper().GenerateAccountingReceivableExcel(dataObjects.Result,criteria.ArType);
+            var stream = new AccountingHelper().GenerateAccountingReceivableArSumary(dataObjects.Result, "AR_SUMMARY_TEMPLATE.xlsx");
+
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
             FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Trial" + " - eFMS.xlsx");
