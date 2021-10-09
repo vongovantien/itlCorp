@@ -64,6 +64,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     partners: Observable<Partner[]>;
     salemans: Observable<User[]>;
     offices: Observable<Office[]>;
+    partnerType: AbstractControl;
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
@@ -109,6 +110,11 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         { id: '15Day', text: '< (-15) Days' },
         { id: 'Expried', text: 'Expired' },
     ];
+    partnerTypes: CommonInterface.INg2Select[] = [
+        { id: 'All', text: 'All' },
+        { id: 'Customer', text: 'Customer' },
+        { id: 'Agent', text: 'Agent' },
+    ];
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -141,6 +147,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             agreementExpiredDays: [this.agreementExpiredDayList[0].id],
             salesManId: [],
             officalId: [],
+            partnerType: [this.partnerTypes[0].id],
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
@@ -154,6 +161,9 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.agreementExpiredDays = this.formSearch.controls["agreementExpiredDays"];
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
+        this.partnerType = this.formSearch.controls["partnerType"];
+
+        this.partnerType.setValue("All");
 
         this.subscriptionSearchParamState();
     }
@@ -226,8 +236,10 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             officeId: dataForm.officalId,
             fromOverdueDays: dataForm.fromOverdueDays,
             toOverdueDays: dataForm.toOverdueDays,
-            debitRate: dataForm.debitRate
+            debitRate: dataForm.debitRate,
+            partnerType:dataForm.partnerType
         };
+
 
         this._store.dispatch(SearchListAccountReceivable(body));
         this.onSearch.emit(body);
@@ -252,9 +264,10 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                             officalId: data.officeId ? data.officeId : null,
                             fromOverdueDays: data.fromOverdueDays ? data.fromOverdueDays : null,
                             toOverdueDays: data.toOverdueDays ? data.toOverdueDays : null,
-                            debitRate: data.debitRate ? data.debitRate : this.debitRates[0].id
+                            debitRate: data.debitRate ? data.debitRate : this.debitRates[0].id,
+                            partnerType: data.partnerType ? data.partnerType : this.partnerTypes[0].id
                         };
-
+                        console.log("subscriptionSearchParamState",data);
                         this.formSearch.patchValue(formData);
                     }
                 }
@@ -272,6 +285,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.resetFormControl(this.agreementExpiredDays)
         this.resetFormControl(this.salesManId)
         this.resetFormControl(this.officalId)
+        this.resetFormControl(this.partnerType)
     }
 
     expanded() {

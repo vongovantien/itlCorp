@@ -18,6 +18,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'list-trial-official-account-receivable',
     templateUrl: './list-trial-official-account-receivable.component.html',
+    styleUrls: ['./list-trial-official-account-receivable.component.scss'],
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
@@ -41,10 +42,10 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     ngOnInit() {
 
         this.headers = [
-            { title: 'Partner Id', field: 'partnerCode', sortable: true },
-            { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
-            { title: 'Rate (%)', field: 'debitRate', sortable: true },
-            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
+        //    { title: 'Partner Id', field: 'partnerCode', sortable: true },
+        //    { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
+        //     { title: 'Rate (%)', field: 'debitRate', sortable: true },
+        //     { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Paid a Part', field: 'paidAmount', sortable: true },
             { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
