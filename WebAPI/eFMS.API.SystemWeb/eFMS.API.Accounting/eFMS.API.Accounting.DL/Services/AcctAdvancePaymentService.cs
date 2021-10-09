@@ -546,6 +546,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             foreach (var item in datamap)
             {
+                string statusApproval = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault().StatusApproval;
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
                 if (!string.IsNullOrEmpty(requesterID))
                 {
@@ -555,7 +556,10 @@ namespace eFMS.API.Accounting.DL.Services
 
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
-
+                if(statusApproval== "New" || statusApproval == "Denied")
+                {
+                    item.ApproveDate = null;
+                }
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
                 if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
                 {
