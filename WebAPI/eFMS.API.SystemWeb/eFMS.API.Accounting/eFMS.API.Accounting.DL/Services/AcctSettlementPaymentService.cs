@@ -4767,7 +4767,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
 
             var infoSettlement = new InfoSettlementExport
             {
