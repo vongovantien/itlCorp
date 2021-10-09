@@ -571,7 +571,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        private string CreateSoaNo(string currentOffice)
+        public string CreateSoaNo(string currentOffice)
         {
             var prefix = (DateTime.Now.ToString("yy"));
             string stt;
@@ -588,7 +588,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var prefixCurrent = soaCurrent.Substring(0, 2);
                 if (soaOffice == "ITLHAN"|| soaOffice == "ITLDAD")
                 {
-                    prefixCurrent = soaCurrent.Substring(1, 3);
+                    prefixCurrent = soaCurrent.Substring(1, 2);
                 }
                 //Reset về 1 khi qua năm mới
                 if (prefixCurrent != prefix)
