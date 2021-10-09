@@ -571,7 +571,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        public string CreateSoaNo(string currentOffice)
+        private string CreateSoaNo(string currentOffice)
         {
             var prefix = (DateTime.Now.ToString("yy"));
             string stt;
