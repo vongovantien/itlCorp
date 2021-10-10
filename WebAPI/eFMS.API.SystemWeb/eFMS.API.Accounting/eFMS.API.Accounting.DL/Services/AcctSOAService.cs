@@ -192,12 +192,11 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargesSoa.Add(surcharge);
                     }
                 }
-                var currentOffice = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
                 soa.TotalShipment = _totalShipment;
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
-                soa.Soano = model.Soano = CreateSoaNo(currentOffice.Code);
+                soa.Soano = model.Soano = CreateSoaNo();
                 soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
@@ -607,9 +606,9 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        private string CreateSoaNo(string currentOffice)
+        private string CreateSoaNo()
         {
-            var prefix = (DateTime.Now.ToString("yy"));
+            var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra soa no mới nhất
             var rowLast = DataContext.Get().OrderByDescending(o => o.Soano).FirstOrDefault();
@@ -620,8 +619,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 var soaCurrent = rowLast.Soano;
-                var soaOffice = officeRepo.Get(x => x.Id == rowLast.OfficeId).FirstOrDefault().Code;
-                var prefixCurrent = soaCurrent.Substring(soaCurrent.Length - 7, 2);
+                var prefixCurrent = soaCurrent.Substring(0, 2);
                 //Reset về 1 khi qua năm mới
                 if (prefixCurrent != prefix)
                 {
@@ -629,20 +627,13 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    stt = (Convert.ToInt32(soaCurrent.Substring(soaCurrent.Length - 5, 5)) + 1).ToString();
+                    stt = (Convert.ToInt32(soaCurrent.Substring(2, 5)) + 1).ToString();
                     stt = stt.PadLeft(5, '0');
                 }
             }
-            if (currentOffice == "ITLHAN")
-            {
-                prefix = "H" + prefix;
-            }
-            if (currentOffice == "ITLDAD")
-            {
-                prefix = "D" + prefix;
-            }
             return prefix + stt;
         }
+
 
         /// <summary>
         /// Update Credit Management Data List
