@@ -387,12 +387,13 @@ namespace eFMS.API.Catalogue.DL.Services
             return ContractServicesName;
         }
 
-        public HandleState Update(CatContractModel model)
+        public HandleState Update(CatContractModel model, out bool isChangeAgrmentType)
         {
             var entity = mapper.Map<CatContract>(model);
             entity.UserModified = currentUser.UserID;
             entity.DatetimeModified = DateTime.Now;
             var currentContract = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
+            isChangeAgrmentType = model.PaymentTerm != currentContract.PaymentTerm;
             entity.DatetimeCreated = currentContract.DatetimeCreated;
             entity.UserCreated = currentContract.UserCreated;
             var hs = DataContext.Update(entity, x => x.Id == model.Id, false);
@@ -1732,9 +1733,9 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractNo = x.contract.ContractNo,
                             ExpiredDate = x.contract.ExpiredDate,
                             ContractType = x.contract.ContractType,
-                            CusAdvanceAmount = x.contract.CustomerAdvanceAmount ?? 0,
+                            CustomerAdvanceAmountVnd = x.contract.CustomerAdvanceAmountVnd ?? 0,
                             CreditCurrency = x.contract.CreditCurrency,
-                            CustomerAdvanceAmount = x.contract.CustomerAdvanceAmount,
+                            CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
                         }).OrderBy(x => x.ExpiredDate);
                     }
                 }

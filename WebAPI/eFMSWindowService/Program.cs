@@ -15,15 +15,15 @@ namespace eFMSWindowService
         /// </summary>
         static void Main()
         {
-            ////#if DEBUG
-            ////If the mode is in debugging
-            ////create a new service instance
-            //SendMailToARDepartmentService myService = new SendMailToARDepartmentService();
-            ////call the start method - this will start the Timer.
+            //#if DEBUG
+            //If the mode is in debugging
+            //create a new service instance
+            //SendMailExceededCreditLimitService myService = new SendMailExceededCreditLimitService();
+            //call the start method - this will start the Timer.
             //myService.Start();
-            ////Set the Thread to sleep
+            //Set the Thread to sleep
             //Thread.Sleep(60000);
-            ////Call the Stop method-this will stop the Timer.
+            //Call the Stop method-this will stop the Timer.
             //myService.Stop();
             ////#else
             //The following is the default code - You may fine tune
@@ -39,7 +39,8 @@ namespace eFMSWindowService
                             new SendMailToARDepartmentService(),
                             new AutoLockShipmentService(),
                             new SendMailOverduePaymentService(),
-                            //new SendMailExceededCreditLimitService()
+                            new SendMailExceededCreditLimitService(),
+                            new SendMailExpiredAgreementService()
             };
             ServiceBase.Run(ServicesToRun);
             //#endif

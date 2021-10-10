@@ -61,6 +61,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     partnerIds: AbstractControl;
     creditLimit: AbstractControl;
     trialCreditLimit: AbstractControl;
+    autoExtendDays: AbstractControl;
 
     minDateEffective: any = null;
     minDateExpired: any = null;
@@ -213,12 +214,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             billingAmount: [],
             paidAmount: [],
             unpaidAmount: [],
-            customerAmount: [],
+            customerAdvanceAmountVnd: [],
+            customerAdvanceAmountUsd: [],
             creditRate: [],
             description: [],
-            currencyId: [],
-            creditCurrency: [],
-            creditUnlimited: []
+            currencyId: [null, Validators.required],
+            creditCurrency: [null, Validators.required],
+            creditUnlimited: [],
+            autoExtendDays: []
         });
         this.salesmanId = this.formGroup.controls['salesmanId'];
         this.companyId = this.formGroup.controls['companyId'];
@@ -239,6 +242,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.creditCurrency = this.formGroup.controls['creditCurrency'];
         this.creditLimit = this.formGroup.controls['creditLimit'];
         this.trialCreditLimit = this.formGroup.controls['trialCreditLimit'];
+        this.autoExtendDays = this.formGroup.controls['autoExtendDays'];
     }
 
     initDataForm() {
@@ -601,7 +605,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             billingAmount: this.selectedContract.billingAmount,
             paidAmount: this.selectedContract.paidAmount,
             unpaidAmount: this.selectedContract.unpaidAmount,
-            customerAmount: this.selectedContract.customerAdvanceAmount,
+            customerAdvanceAmountVnd: this.selectedContract.customerAdvanceAmountVnd,
+            customerAdvanceAmountUsd: this.selectedContract.customerAdvanceAmountUsd,
             creditRate: this.selectedContract.creditRate,
             description: this.selectedContract.description,
             saleService: this.activeServices,
@@ -610,7 +615,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
             baseOn: !!this.selectedContract.baseOn ? this.basesOn.find(type => type === this.selectedContract.baseOn) : null,
             currencyId: !!this.selectedContract.currencyId ? { id: this.selectedContract.currencyId, text: this.selectedContract.currencyId } : null,
             creditUnlimited: this.selectedContract.creditUnlimited,
-            creditCurrency: this.selectedContract.creditCurrency
+            creditCurrency: this.selectedContract.creditCurrency,
+            autoExtendDays: this.selectedContract.autoExtendDays
         });
         this.contractTypeDetail = this.selectedContract.contractType;
         if (this.selectedContract.contractType === 'Trial') {
@@ -640,7 +646,8 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.officeId = offices;
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value : null;
         this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value : null;
-        this.selectedContract.trialCreditLimited = this.formGroup.controls['trialCreditLimit'].value;
+        this.selectedContract.trialCreditLimited = !!this.formGroup.controls['trialCreditLimit'].value ? this.formGroup.controls['trialCreditLimit'].value :
+            this.formGroup.controls['creditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
         if (this.officeId.value[0].id === 'All') {
             this.selectedContract.officeId = this.mapOfficeId();
@@ -680,19 +687,22 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         this.selectedContract.trialEffectDate = !!this.trialEffectDate.value && !!this.trialEffectDate.value.startDate ? formatDate(this.trialEffectDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.trialExpiredDate = !!this.trialExpiredDate.value && !!this.trialExpiredDate.value.startDate ? formatDate(this.trialExpiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
         this.selectedContract.paymentTerm = this.formGroup.controls['paymentTerm'].value;
-        this.selectedContract.creditLimit = this.formGroup.controls['creditLimit'].value;
+        this.selectedContract.creditLimit = !!this.formGroup.controls['creditLimit'].value ? this.formGroup.controls['creditLimit'].value :
+            this.formGroup.controls['trialCreditLimit'].value;
         this.selectedContract.creditLimitRate = this.formGroup.controls['creditLimitRate'].value;
         this.selectedContract.debitAmount = this.formGroup.controls['debitAmount'].value;
         this.selectedContract.billingAmount = this.formGroup.controls['billingAmount'].value;
         this.selectedContract.paidAmount = this.formGroup.controls['paidAmount'].value;
         this.selectedContract.unpaidAmount = this.formGroup.controls['unpaidAmount'].value;
-        this.selectedContract.customerAdvanceAmount = this.formGroup.controls['customerAmount'].value;
+        this.selectedContract.customerAdvanceAmountVnd = this.formGroup.controls['customerAdvanceAmountVnd'].value;
+        this.selectedContract.customerAdvanceAmountUsd = this.formGroup.controls['customerAdvanceAmountUsd'].value;
         this.selectedContract.creditRate = this.formGroup.controls['creditRate'].value;
         this.selectedContract.description = this.formGroup.controls['description'].value;
         this.selectedContract.creditUnlimited = this.formGroup.controls['creditUnlimited'].value;
         this.selectedContract.trialCreditDays = this.trialCreditDays.value;
         this.selectedContract.partnerId = this.partnerId;
-        this.selectedContract.creditCurrency = !!this.creditCurrency.value ? !!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value : null;
+        this.selectedContract.creditCurrency = !!this.creditCurrency.value ? (!!this.creditCurrency.value.id ? this.creditCurrency.value.id : this.creditCurrency.value) : this.selectedContract.currencyId;
+        this.selectedContract.autoExtendDays = this.autoExtendDays.value
     }
 
     onSubmitActiveContract() {
@@ -910,5 +920,14 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     close() {
         this.hide();
+    }
+
+    formatAutoExtendDays() {
+        var num = this.autoExtendDays.value;
+        if (num >= 0) {
+            this.autoExtendDays.setValue(Math.round(num * 10) / 10);
+        } else {
+            this.autoExtendDays.setValue(0);
+        }
     }
 }

@@ -21,6 +21,7 @@ export class PaymentModel {
     paymentMethod: string = null;
     exchangeRate: number = null;
     receiptId: string = null;
+    receiptNo: string = null;
     note: string = null;
     constructor(data?: any) {
         const self = this;

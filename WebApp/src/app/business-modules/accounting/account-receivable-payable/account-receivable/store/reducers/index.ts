@@ -2,7 +2,7 @@ import { createFeatureSelector, ActionReducerMap, createSelector } from '@ngrx/s
 import { accountReceivableReducer, IAccountReceivableReducerState } from './account-receivable.reducer';
 
 export interface IAccountReceivableState {
-    account:IAccountReceivableReducerState
+    account: IAccountReceivableReducerState
 }
 
 // // * SELECTOR
@@ -10,8 +10,9 @@ export const accountReceivableState = createFeatureSelector<IAccountReceivableSt
 export const getAccountReceivableSearchState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.dataSearch);
 export const getAccountReceivablePagingState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.pagingData);
 export const getAccountReceivableListState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.list);
+export const getAccountReceivableLoadingListState = createSelector(accountReceivableState, (state: IAccountReceivableState) => state.account?.isLoading);
 
 export const reducers: ActionReducerMap<IAccountReceivableState> = {
-    account:accountReceivableReducer,
+    account: accountReceivableReducer,
 };
 

@@ -232,6 +232,21 @@ export class UtilityHelper {
         ]).get(type)[0];
     }
 
+    mappingServiceType(type: string) {
+        return new Map([
+            [ChargeConstants.AE_DES, [ChargeConstants.AE_CODE]],
+            [ChargeConstants.AI_DES, [ChargeConstants.AI_CODE]],
+            [ChargeConstants.SFE_DES, [ChargeConstants.SFE_CODE]],
+            [ChargeConstants.SFI_DES, [ChargeConstants.SFI_CODE]],
+            [ChargeConstants.SLE_DES, [ChargeConstants.SLE_CODE]],
+            [ChargeConstants.SLI_DES, [ChargeConstants.SLI_CODE]],
+            [ChargeConstants.CL_DES, [ChargeConstants.CL_CODE]],
+            [ChargeConstants.IT_DES, [ChargeConstants.IT_CODE]],
+            [ChargeConstants.SCE_DES, [ChargeConstants.SCE_CODE]],
+            [ChargeConstants.SCI_DES, [ChargeConstants.SCI_CODE]],
+        ]).get(type)[0];
+    }
+
     getChargeType(type: string) {
         return new Map([
             ['BUY', [CommonEnum.CHARGE_TYPE.DEBIT]],

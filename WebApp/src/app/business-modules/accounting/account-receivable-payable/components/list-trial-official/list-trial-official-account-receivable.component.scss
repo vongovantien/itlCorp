@@ -1,0 +1,40 @@
+:host /deep/ {
+      .sticky-col {
+        position: -webkit-sticky;
+        position: sticky;
+        background-color: white;
+      }
+
+      .first-col {
+        width: 100px;
+        min-width: 100px;
+        max-width: 100px;
+        left: -1px;
+      }
+
+      .second-col {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+        left: 80px;
+      }
+      .three-col {
+        width: 260px;
+        min-width: 260px;
+        max-width: 260px;
+        left: 180px;
+      }
+      .four-col {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+        left: 370px;
+      }
+      .five-col {
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+        left: 470px;
+      }
+}
+

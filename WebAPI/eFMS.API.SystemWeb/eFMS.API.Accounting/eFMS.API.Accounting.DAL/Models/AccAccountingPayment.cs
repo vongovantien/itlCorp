@@ -49,5 +49,7 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? ExchangeRateBilling { get; set; }
         public string PartnerId { get; set; }
         public bool? NetOff { get; set; }
+        public decimal? NetOffVnd { get; set; }
+        public decimal? NetOffUsd { get; set; }
     }
 }

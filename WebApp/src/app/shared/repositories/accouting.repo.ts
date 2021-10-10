@@ -230,7 +230,7 @@ export class AccountingRepo {
 
 
     getExistingCharge(body: any = {}, settlementCode: string = null) {
-        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body, {settlementCode: settlementCode}).pipe(
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetExistsCharge`, body, { settlementCode: settlementCode }).pipe(
             map((data: any) => data)
         );
     }
@@ -555,12 +555,12 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
     getPaymentByrefNo(refNo: string, type: string) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refNo: refNo, type: type}).pipe(
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountingPayment/GetBy`, { refNo: refNo, type: type }).pipe(
             map((data: any) => data)
         );
     }
@@ -624,7 +624,7 @@ export class AccountingRepo {
         return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AccountReceivable/Paging`, body, {
             pageNumber: '' + page,
             pageSize: '' + size
-        }).pipe(
+        }, { "hideSpinner": "true" }).pipe(
             map((data: any) => data)
         );
     }
@@ -888,8 +888,8 @@ export class AccountingRepo {
         );
     }
 
-    getDataDebitDetail(agreementId: any,option : any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`,{ argeementId: agreementId,option :option }).pipe(
+    getDataDebitDetail(agreementId: any, option: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
