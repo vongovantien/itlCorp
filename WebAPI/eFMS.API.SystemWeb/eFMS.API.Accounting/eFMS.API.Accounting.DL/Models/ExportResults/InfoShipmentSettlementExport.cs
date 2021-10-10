@@ -18,5 +18,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public decimal? Cbm { get; set; }
         public List<InfoShipmentChargeSettlementExport> ShipmentCharges { get; set; }
         public List<InfoAdvanceExport> InfoAdvanceExports { get; set; }
+        public decimal? Credit { get; set; }
+        public decimal? OBH { get; set; }
     }
 }

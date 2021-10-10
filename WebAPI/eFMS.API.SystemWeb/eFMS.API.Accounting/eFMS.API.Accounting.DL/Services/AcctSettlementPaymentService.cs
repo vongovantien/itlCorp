@@ -4809,7 +4809,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo, s.Total, s.Type }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo, total=s.Key.Total, type=s.Key.Type });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4837,6 +4837,14 @@ namespace eFMS.API.Accounting.DL.Services
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;
+                    if (houseBillId.type == "OBH")
+                    {
+                        shipmentSettlement.OBH = houseBillId.total;
+                    }
+                    if (houseBillId.type == "BUY")
+                    {
+                        shipmentSettlement.Credit = houseBillId.total;
+                    }
 
                     listData.Add(shipmentSettlement);
                 }
