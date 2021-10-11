@@ -31,5 +31,6 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
         AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts);
+        bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd);
     }
 }

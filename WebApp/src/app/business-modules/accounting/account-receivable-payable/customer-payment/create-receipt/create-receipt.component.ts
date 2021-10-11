@@ -162,6 +162,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
             AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
             AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH].includes(this.listInvoice.paymentMethod.value)) {
+            this.listInvoice.paymentMethod.setErrors({ method_invalid: true });
             this._toastService.warning("Cus Advance Amount >0 <br> so Payment Method must be one of Clear-advance/Clear-Advance-Bank/Clear-Advance-Bank", 'Payment method is incorrect', { enableHtml: true });
             return;
         }
@@ -281,6 +282,10 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 (res: HttpErrorResponse) => {
                     if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
                         this.formCreate.paymentRefNo.setErrors({ existed: true });
+                        return;
+                    }
+                    if (res.error?.code == 408) {
+                        this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
                     }
                 }
             )

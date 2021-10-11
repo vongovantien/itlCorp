@@ -3571,5 +3571,20 @@ namespace eFMS.API.Accounting.DL.Services
 
             return totalAdv;
         }
+
+        public bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd)
+        {
+            bool valid = true;
+            CatContract contract = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault();
+            if (contract != null && (contract.CustomerAdvanceAmountUsd != null || contract.CustomerAdvanceAmountUsd != null))
+            {
+                if(cusVnd > contract.CustomerAdvanceAmountVnd || cusUsd > contract.CustomerAdvanceAmountUsd)
+                {
+                    valid = false;
+                }
+            }
+
+            return valid;
+        }
     }
 }

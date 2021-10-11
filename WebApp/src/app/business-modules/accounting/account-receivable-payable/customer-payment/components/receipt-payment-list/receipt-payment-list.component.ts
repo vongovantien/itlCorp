@@ -34,7 +34,7 @@ import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'customer-payment-list-receipt',
     templateUrl: './receipt-payment-list.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush
+    // changeDetection: ChangeDetectionStrategy.OnPush
 })
 
 export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implements OnInit {

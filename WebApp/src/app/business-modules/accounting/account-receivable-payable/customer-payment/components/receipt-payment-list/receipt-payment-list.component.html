@@ -13,7 +13,8 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group">
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger': (paymentMethod.errors | equalError: 'method_invalid')  }">
                 <label>Payment Method</label>
                 <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom" name="method"
                     [clearable]="false" [readonly]="isReadonly"
@@ -70,7 +71,9 @@
             </div>
         </div>
         <div class="col-lg-3">
-            <div class="form-group">
+            {{cusAdvanceAmountVnd.errors | json}}
+            <div class="form-group"
+                [ngClass]="{'m-form__group has-danger': (cusAdvanceAmountVnd.errors | equalError: 'validCus')  }">
                 <label>Cus ADV VND</label>
                 <input class="form-control text-success" type="number" formControlName="cusAdvanceAmountVnd" numeric
                     [decimals]="2" autoFormatCurrency [attr.readOnly]="isReadonly"

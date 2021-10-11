@@ -171,6 +171,18 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
+            if((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
+            {
+                bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
+                if (!isValidCusAgreement)
+                {
+                    string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again");
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
+                    return BadRequest(_result);
+
+                }
+            }
+
             if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
             {
                 bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);

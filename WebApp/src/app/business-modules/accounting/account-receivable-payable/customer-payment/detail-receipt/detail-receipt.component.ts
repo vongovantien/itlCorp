@@ -172,6 +172,10 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 (res: HttpErrorResponse) => {
                     if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
                         this.formCreate.paymentRefNo.setErrors({ existed: true });
+                        return;
+                    }
+                    if (res.error?.code == 408) {
+                        this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
                     }
                 }
             )
