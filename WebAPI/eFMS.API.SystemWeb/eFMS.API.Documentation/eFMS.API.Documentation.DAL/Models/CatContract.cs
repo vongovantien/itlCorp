@@ -32,7 +32,7 @@ namespace eFMS.API.Documentation.Service.Models
         public decimal? BillingAmount { get; set; }
         public decimal? PaidAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
-        public decimal? CustomerAdvanceAmount { get; set; }
+        public decimal? CustomerAdvanceAmountVnd { get; set; }
         public decimal? CreditRate { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
@@ -42,5 +42,7 @@ namespace eFMS.API.Documentation.Service.Models
         public bool? CreditUnlimited { get; set; }
         public string CreditCurrency { get; set; }
         public decimal? DebitAmount { get; set; }
+        public decimal? AutoExtendDays { get; set; }
+        public decimal? CustomerAdvanceAmountUsd { get; set; }
     }
 }

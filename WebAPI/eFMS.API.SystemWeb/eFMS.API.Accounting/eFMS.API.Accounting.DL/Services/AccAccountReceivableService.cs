@@ -408,7 +408,7 @@ namespace eFMS.API.Accounting.DL.Services
         private List<AccAccountReceivableModel> CalculatorObhAmount(List<AccAccountReceivableModel> models, IQueryable<CsShipmentSurcharge> charges)
         {
             //Get OBH charge by OBH Partner (PaymentObjectId)
-            var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH);
+            var surcharges = charges.Where(x => x.Type == AccountingConstants.TYPE_CHARGE_OBH && string.IsNullOrEmpty(x.ReferenceNo));
 
             models.ForEach(fe =>
             {
@@ -1011,11 +1011,11 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal? _creditRate = agreement.CreditRate;
                 if (agreement.ContractType == "Trial")
                 {
-                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
+                    _creditRate = agreement.TrialCreditLimited == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.TrialCreditLimited) * 100; //((DebitAmount + CusAdv)/TrialCreditLimit)*100
                 }
                 if (agreement.ContractType == "Official")
                 {
-                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CustomerAdvanceAmount ?? 0)) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
+                    _creditRate = agreement.CreditLimit == null ? 0 : (((agreement.DebitAmount ?? 0) + (agreement.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (agreement.CustomerAdvanceAmountVnd ?? 0) : (agreement.CustomerAdvanceAmountUsd ?? 0))) / agreement.CreditLimit) * 100; //((DebitAmount + CusAdv)/CreditLimit)*100
                 }
                 if (agreement.ContractType == "Parent Contract")
                 {
@@ -1194,7 +1194,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         // Lấy currency của contract & user created of contract gán cho Receivable
                         receivable.ContractId = contractPartner.Id;
-                        receivable.ContractCurrency = contractPartner.CurrencyId;
+                        receivable.ContractCurrency = contractPartner.CreditCurrency;
                         receivable.SaleMan = contractPartner.SaleManId;
                         receivable.UserCreated = contractPartner.UserCreated;
                         receivable.UserModified = contractPartner.UserCreated;
@@ -1436,14 +1436,15 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitRate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.TrialCreditLimited != 0 && s.First().contract.TrialCreditLimited != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.TrialCreditLimited)
-                                                                    : 0) * 100 ?? 0, 3) :
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) /(s.First().contract.TrialCreditLimited)
+                                                                    :0) * 100 ?? 0,3) :
                                 (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL ?
                                                                 Math.Round((
                                                                     s.First().contract.CreditLimit != 0 && s.First().contract.CreditLimit != null ?
-                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CustomerAdvanceAmount ?? 0)) / (s.First().contract.CreditLimit)
+                                                                    (s.Select(se => se.acctReceivable != null ? se.acctReceivable.DebitAmount : null).Sum() + (s.First().contract.CreditCurrency == AccountingConstants.CURRENCY_LOCAL ? (s.First().contract.CustomerAdvanceAmountVnd ?? 0) : (s.First().contract.CustomerAdvanceAmountUsd ?? 0))) / (s.First().contract.CreditLimit)
                                                                     : 0) * 100 ?? 0, 3):0),
-                    CusAdvance = s.First().contract.CustomerAdvanceAmount ?? 0,
+                    CusAdvanceVnd = s.First().contract.CustomerAdvanceAmountVnd ?? 0,
+                    CusAdvanceUsd = s.First().contract.CustomerAdvanceAmountUsd ?? 0,
                     BillingAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingAmount : 0).Sum(),
                     BillingUnpaid = s.Select(se => se.acctReceivable != null ? se.acctReceivable.BillingUnpaid : 0).Sum(),
                     PaidAmount = s.Select(se => se.acctReceivable != null ? se.acctReceivable.PaidAmount : 0).Sum(),
@@ -1499,7 +1500,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ObhPaidAmount = contract.ObhPaidAmount,
                            ObhUnPaidAmount = contract.ObhUnPaidAmount,
                            DebitRate = contract.DebitRate,
-                           CusAdvance = contract.CusAdvance,
+                           CusAdvanceUsd = contract.CusAdvanceUsd,
+                           CusAdvanceVnd = contract.CusAdvanceVnd,
                            BillingAmount = contract.BillingAmount,
                            BillingUnpaid = contract.BillingUnpaid,
                            PaidAmount = contract.PaidAmount,
@@ -1518,9 +1520,10 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AccountReceivableResult> GetARNoContract(IQueryable<AccAccountReceivable> acctReceivables, IQueryable<CatContract> partnerContracts, IQueryable<CatPartner> partners)
         {
             var selectQuery = from acctReceivable in acctReceivables
-                              join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
+                                  //join partnerContract in partnerContracts on acctReceivable.AcRef equals partnerContract.PartnerId into partnerContract2
+                              join partnerContract in partnerContracts on acctReceivable.PartnerId equals partnerContract.PartnerId into partnerContract2
                               from partnerContract in partnerContract2.DefaultIfEmpty()
-                              where acctReceivable.AcRef != partnerContract.PartnerId
+                              where acctReceivable.PartnerId != partnerContract.PartnerId
                               select acctReceivable;
             if (selectQuery == null || !selectQuery.Any()) return null;
             var groupByPartner = selectQuery.GroupBy(g => new { g.AcRef })
@@ -1685,13 +1688,18 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var queryAcctReceivable = ExpressionAcctReceivableQuery(criteria);
             var acctReceivables = DataContext.Get(queryAcctReceivable);
-            var partners = partnerRepo.Get();
+
+            var partners = QueryPartner(criteria);
+
             var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL 
-            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT);
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
+
             var partnerContracts = QueryContractPartner(contracts, criteria);
 
             IQueryable<AccountReceivableResult> arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
+
             if (arPartnerContracts == null || !arPartnerContracts.Any())
             {
                 return null;
@@ -1701,9 +1709,14 @@ namespace eFMS.API.Accounting.DL.Services
                 arPartnerContracts = GetArPartnerContractGroupByAgreementId(arPartnerContracts);
                 var queryAccountReceivable = ExpressionAccountReceivableQuery(criteria);
                 arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
+
+                IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
+                if (arPartnerNoContracts!=null)
+                    arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
         }
+
 
         private IQueryable<object> GetDataGuarantee(AccountReceivableCriteria criteria)
         {
@@ -1862,7 +1875,8 @@ namespace eFMS.API.Accounting.DL.Services
                         DebitAmount = s.Sum(sum => sum.DebitAmount),
                         ObhAmount = s.Sum(sum => sum.ObhAmount),
                         DebitRate = s.Sum(sum => sum.DebitRate),
-                        CusAdvance = s.First().CusAdvance,
+                        CusAdvanceUsd = s.First().CusAdvanceUsd,
+                        CusAdvanceVnd = s.First().CusAdvanceVnd,
                         BillingAmount = s.Sum(sum => sum.BillingAmount),
                         BillingUnpaid = s.Sum(sum => sum.BillingUnpaid),
                         PaidAmount = s.Sum(sum => sum.PaidAmount),
@@ -1930,6 +1944,16 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
+        private IQueryable<CatPartner> QueryPartner(AccountReceivableCriteria criteria)
+        {
+            Expression<Func<CatPartner, bool>> query = q => true;
+            if (criteria.ParterType == ParterTypeEnum.Customer)
+                query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Customer.ToString()));
+            if (criteria.ParterType == ParterTypeEnum.Agent)
+                query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Agent.ToString()));
+
+            return partnerRepo.Get();
+        }
         #endregion --- LIST & PAGING ---
 
         #region --- DETAIL ---  
@@ -2043,7 +2067,8 @@ namespace eFMS.API.Accounting.DL.Services
                 ObhPaidAmount = s.Sum(sum => sum.ObhPaidAmount),
                 ObhUnPaidAmount = s.Sum(sum => sum.ObhUnPaidAmount),
                 DebitRate = s.Sum(sum => sum.DebitRate),
-                CusAdvance = s.Select(se => se.CusAdvance).FirstOrDefault(),
+                CusAdvanceVnd = s.Select(se => se.CusAdvanceVnd).FirstOrDefault(),
+                CusAdvanceUsd = s.Select(se => se.CusAdvanceUsd).FirstOrDefault(),
                 BillingAmount = s.Sum(sum => sum.BillingAmount),
                 BillingUnpaid = s.Sum(sum => sum.BillingUnpaid),
                 PaidAmount = s.Sum(sum => sum.PaidAmount),

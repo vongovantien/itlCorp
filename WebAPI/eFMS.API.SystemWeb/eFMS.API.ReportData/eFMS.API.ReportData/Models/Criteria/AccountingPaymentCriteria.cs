@@ -15,10 +15,11 @@ namespace eFMS.API.ReportData.Models.Criteria
         public DateTime? ToIssuedDate { get; set; }
         public DateTime? FromUpdatedDate { get; set; }
         public DateTime? ToUpdatedDate { get; set; }
-        public DateTime? FromDueDate { get; set; }
-        public DateTime? ToDueDate { get; set; }
+        public DateTime? DueDate { get; set; }
         public OverDueDate OverDueDays { get; set; }
         public List<string> PaymentStatus { get; set; }
         public PaymentType PaymentType { get; set; }
+        public List<string> Office { get; set; }
+        public bool? IsPaging { get; set; }
     }
 }

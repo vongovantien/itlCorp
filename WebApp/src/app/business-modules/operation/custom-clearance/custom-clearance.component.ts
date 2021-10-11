@@ -169,6 +169,20 @@ export class CustomClearanceComponent extends AppList {
                 },
             );
     }
+    getDataOlaFromEcus() {
+        this._progressRef.start();
+        this._operationRepo.importCustomClearanceOlaFromEcus()
+            .pipe(catchError(this.catchError),
+                finalize(() => { this.isLoading = false; this._progressRef.complete(); }))
+            .subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (!!res.message) {
+                        this._toastrService.success(res.message, '');
+                    }
+                    this.getListCustomsDeclaration();
+                },
+            );
+    }
 
     confirmConvert() {
         this._toastrService.clear();

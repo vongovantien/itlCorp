@@ -16,6 +16,8 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string Serie { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? PaidAmount { get; set; }
+        public decimal? PaidAmountVnd { get; set; }
+        public decimal? PaidAmountUsd { get; set; }
         public DateTime? DueDate { get; set; }
         public int OverdueDays { get; set; }
         public string Status { get; set; }
@@ -30,8 +32,11 @@ namespace eFMS.API.Accounting.DL.Models.AccountingPayment
         public string ServiceType { get; set; }
         public DateTime? PaidDate { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
+        public decimal? UnpaidAmountUsd { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? TotalAmountVnd { get; set; }
         public decimal? TotalAmountUsd { get; set; }
+        public string AccountNo { get; set; }
+        public DateTime? DatetimeSorting { get; set; }
     }
 }

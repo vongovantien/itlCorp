@@ -1,29 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { AppList } from '@app';
 
 import { SortService } from '@services';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { AccountingRepo } from '@repositories';
-import { AccReceivableDetailModel, AccReceivableOfficesDetailModel } from '@models';
+import { AccReceivableDetailModel, AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel } from '@models';
 import { RoutingConstants } from '@constants';
 
-import { takeUntil, switchMap } from 'rxjs/operators';
+import { takeUntil, switchMap, switchMapTo, tap } from 'rxjs/operators';
+import { ConfirmPopupComponent } from '@common';
+import { InjectViewContainerRefDirective } from '@directives';
+import { of } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { IAppState, getMenuUserSpecialPermissionState } from '@store';
+import { Store } from '@ngrx/store';
 @Component({
     selector: 'detail-account-receivable',
     templateUrl: 'detail-account-receivable.component.html',
 })
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
+    @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
     subTab: string;
 
     accReceivableDetail: AccReceivableDetailModel = new AccReceivableDetailModel();
     accReceivableMoreDetail: AccReceivableOfficesDetailModel[] = [];
     subHeaders: any[];
+    agreementId: string;
 
     constructor(
-        private _sortService: SortService,
-        private _accoutingRepo: AccountingRepo,
-        private _activedRoute: ActivatedRoute,
-        private _router: Router,
+        private readonly _sortService: SortService,
+        private readonly _accoutingRepo: AccountingRepo,
+        private readonly _activedRoute: ActivatedRoute,
+        private readonly _router: Router,
+        private readonly _toastService: ToastrService,
+        private readonly _store: Store<IAppState>
     ) {
         super();
         this.requestSort = this.sortDetailList;
@@ -33,6 +43,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         this._activedRoute.queryParams
             .pipe(
                 takeUntil(this.ngUnsubscribe),
+                tap((p: Params) => {
+                    this.agreementId = p['agreementId'];
+                }),
                 switchMap((p: Params) => {
                     this.subTab = p.subTab;
                     if (!!p.agreementId) {
@@ -47,6 +60,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
                 }
             );
+
+        this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+
     }
 
     initHeaders() {
@@ -64,6 +80,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
 
         ];
         this.subHeaders = [
+            { title: '', field: '' },
             { title: 'Service', field: 'serviceName', sortable: true },
             { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Billing (Unpaid)', field: 'billingAmount', sortable: true },
@@ -87,5 +104,38 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     goBack() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary`],
             { queryParams: { subTab: this.subTab } });
+    }
+
+    onClickCalculateService(serviceData: AccReceivableServicesDetailModel, officeData: AccReceivableOfficesDetailModel) {
+        console.log({ serviceData, officeData });
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainerRef.viewContainerRef, {
+            title: 'Calculate Accounts Receivable Payable',
+            body: 'Are you sure to recalculate data',
+        }, () => {
+            const body: { partnerId: string, office: string, service: string } = {
+                partnerId: this.accReceivableDetail.partnerId,
+                office: officeData.officeId,
+                service: this.utility.mappingServiceType(serviceData.serviceName),
+            };
+
+            console.log({ body });
+            this._accoutingRepo.insertOrUpdateReceivable([body])
+                .pipe(
+                    switchMap((res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            return this._accoutingRepo.getDetailReceivableByArgeementId(this.agreementId);
+                        }
+                        return of(false);
+                    })
+                )
+                .subscribe((data: any) => {
+                    if (!!data) {
+                        this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
+                        this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
+                            .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
+                    }
+                });
+        })
     }
 }

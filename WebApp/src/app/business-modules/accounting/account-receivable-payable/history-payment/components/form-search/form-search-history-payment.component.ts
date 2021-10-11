@@ -2,8 +2,8 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { formatDate } from '@angular/common';
 
-import { CatalogueRepo } from '@repositories';
-import { Partner } from '@models';
+import { CatalogueRepo, SystemRepo } from '@repositories';
+import { Office, Partner } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 import { SearchListHistoryPayment } from '../../store/actions';
 import { getDataSearchHistoryPaymentState, IHistoryPaymentState } from '../../store/reducers';
 import { Store } from '@ngrx/store';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 
 enum OverDueDays {
     All,
@@ -41,8 +41,10 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
     overdueDate: AbstractControl;
     paymentStatus: AbstractControl;
     searchType: AbstractControl;
+    office: AbstractControl;
 
     partners: Observable<Partner[]>;
+    offices: any[] = [];
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'ID' },
@@ -73,10 +75,12 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
     ];
 
     showAdvanceSearch: boolean = false;
+    loginData: SystemInterface.IClaimUser;
     
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
+        private _systemRepo: SystemRepo,
         private _store: Store<IHistoryPaymentState>
     ) {
         super();
@@ -86,9 +90,11 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
     ngOnInit(): void {
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
+        this.loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
+        
         this.initForm();
         this.subscriptionSearchParamState();
+        this.getOffices();
     }
 
     initForm() {
@@ -100,7 +106,8 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             paidDate: [],
             dueDate: [],
             overdueDate: [this.overDueDays[0].id],
-            paymentStatus: [[this.payments[1], this.payments[2]]]
+            paymentStatus: [[this.payments[1], this.payments[2]]],
+            office: [[this.loginData.officeId]]
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
@@ -111,6 +118,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
         this.paymentStatus = this.formSearch.controls["paymentStatus"];
         this.searchType = this.formSearch.controls["searchType"];
         this.referenceNo = this.formSearch.controls["referenceNo"];
+        this.office = this.formSearch.controls["office"];
     }
 
     // tslint:disable-next-line:no-any
@@ -140,11 +148,13 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             fromUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.startDate) ? formatDate(dataForm.paidDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.endDate) ? formatDate(dataForm.paidDate.endDate, 'yyyy-MM-dd', 'en') : null,
             dueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
-            paymentType: PaymentType.Invoice
+            paymentType: PaymentType.Invoice,
+            office: !!dataForm.office ? this.getOfficeSearch(dataForm.office) : null
         };
         this._store.dispatch(SearchListHistoryPayment(body));
         this.onSearch.emit(body);
     }
+
     getSearchStatus(paymentStatus: []) {
         let strStatus = null;
         if (!!paymentStatus) {
@@ -159,13 +169,38 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             });
         }
         return strStatus;
+    }
 
+    getOfficeSearch(office: []){
+        let strOffice = [];
+        if (office.length > 0) {
+            office.forEach(element => {
+                strOffice.push(element);
+            });
+        }else{
+            this.offices.forEach((item: Office)=> strOffice.push(item.id));
+        }
+        return strOffice;
+    }
+
+    getOffices() {
+        this._systemRepo.getListOfficesByUserId(this.loginData.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: Office[]) => {
+                    this.offices = res;
+                },
+            );
     }
 
     resetSearch() {
         this.formSearch.reset();
         this.initForm();
-        this._store.dispatch(SearchListHistoryPayment({ searchType : this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All }));
+        this.getOffices();
+        this._store.dispatch(SearchListHistoryPayment({ searchType : this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value)
+            , paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All, office: this.getSearchStatus(this.office.value) }));
         this.submitSearch();
         // this.onSearch.emit({ paymentStatus: this.getSearchStatus(this.paymentStatus.value), paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All });
     }
@@ -199,9 +234,10 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
                             overdueDate: data.overDueDays ? data.overDueDays : this.overDueDays[0].id,
                             paidDate: (!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
                                 { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
-                                dueDate: !!data?.dueDate ? { startDate: new Date(data?.dueDate), endDate: new Date(data?.dueDate) } : null,
+                            dueDate: !!data?.dueDate ? { startDate: new Date(data?.dueDate), endDate: new Date(data?.dueDate) } : null,
                             issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
                                 { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
+                            office: data.office.length === 0 ? (!!this.loginData ? [this.loginData.officeId] : null) : data.office,
                         };
                         this.formSearch.patchValue(formData);
                     }
@@ -222,6 +258,7 @@ interface ISearchAccPayment {
     toUpdatedDate: string;
     dueDate: string;
     paymentType: number;
+    office: string[];
 }
 export enum PaymentType {
     Invoice = 0,

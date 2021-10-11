@@ -21,7 +21,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
     @ViewChild(InjectViewContainerRefDirective) confirmDeleteContainerRef: InjectViewContainerRefDirective;
 
     @Input() state: string = 'update';
-    @Input() statusApproval:string='';
+    @Input() statusApproval: string = '';
 
     headers: CommonInterface.IHeaderTable[];
 
@@ -58,7 +58,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
         this.getRequestAdvancePayment();
         console.log(this.listRequestAdvancePayment);
     }
-    
+
     getRequestAdvancePayment() {
         this.$listRequestAdvancePayment
             .pipe(
@@ -70,7 +70,7 @@ export class AdvancePaymentListRequestComponent extends AppList {
                     this.listRequestAdvancePayment.push(data);
                     this.totalAmount = this.updateTotalAmount(this.listRequestAdvancePayment);
                     this.updateCurrencyForRequest(data);
-                    
+
                 },
             );
     }

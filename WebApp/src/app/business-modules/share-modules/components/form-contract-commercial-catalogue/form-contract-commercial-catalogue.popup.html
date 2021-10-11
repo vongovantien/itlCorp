@@ -186,7 +186,7 @@
                         </div>
                         <div class="col-lg-2">
                             <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted  && !creditCurrency.value}">
-                                <label required>Credit Currency</label>
+                                <label required>AR Currency</label>
                                 <ng-select [items]="listCurrency | async" [clearable]="true" bindLabel="id"
                                     class="custom" formControlName="creditCurrency"
                                     placeholder="Select Credit Currency">
@@ -343,11 +343,23 @@
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <label>Customer Advance Amount</label>
-                                        <input formatDecimalFormControl disabled type="text" class="form-control"
-                                            formControlName="customerAmount">
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Advance Amount USD</label>
+                                                <input formatDecimalFormControl disabled type="text"
+                                                    class="form-control" formControlName="customerAdvanceAmountUsd">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Advance Amount VND</label>
+                                                <input formatDecimalFormControl disabled type="text"
+                                                    class="form-control" formControlName="customerAdvanceAmountVnd">
+                                            </div>
+                                        </div>
                                     </div>
+
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="row">

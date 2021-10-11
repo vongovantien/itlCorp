@@ -71,7 +71,7 @@ namespace eFMS.API.Catalogue.Service.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.6-servicing-10079");
 
             modelBuilder.Entity<CatArea>(entity =>
             {
@@ -526,7 +526,9 @@ namespace eFMS.API.Catalogue.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CustomerAdvanceAmount).HasColumnType("decimal(18, 4)");
+                entity.Property(e => e.CustomerAdvanceAmountUsd).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.CustomerAdvanceAmountVnd).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.DatetimeCreated)
                     .HasColumnType("datetime")

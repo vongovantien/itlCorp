@@ -13,6 +13,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string UserNameModified { get; set; }
         public string SubRejectReceipt { get; set; }
         public bool IsReceiptBankFee { get; set; } 
+        public string ReceiptInternalOfficeCode { get; set; }
     }
 
     public enum SaveAction

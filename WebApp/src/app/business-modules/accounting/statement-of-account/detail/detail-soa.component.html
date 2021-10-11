@@ -236,7 +236,7 @@
             <div class="table-horizontal" style="max-height:800px">
                 <table class="table table-striped table-brand dataTable">
                     <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)"></thead>
-                    <tbody class="tbody-group" [@listAnimation]="!isLoading">
+                    <tbody class="tbody-group">
                         <ng-container *ngIf="TYPE === 'GROUP'">
                             <ng-container
                                 *ngFor="let groupShipment of soa.groupShipments ; let i = index; trackBy: trackByFn">

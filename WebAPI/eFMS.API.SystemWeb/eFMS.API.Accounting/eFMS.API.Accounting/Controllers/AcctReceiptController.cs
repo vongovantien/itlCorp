@@ -18,6 +18,7 @@ using System.Linq;
 using eFMS.IdentityServer.DL.UserManager;
 using eFMS.API.Infrastructure.Extensions;
 using ITL.NetCore.Common;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -234,8 +235,7 @@ namespace eFMS.API.Accounting.Controllers
             
             if (!hs.Success)
             {
-                ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = receiptModel };
-                return BadRequest(_result);
+                return BadRequest(result);
             }
             else if(saveAction == SaveAction.SAVECANCEL || saveAction == SaveAction.SAVEDONE)
             {                
@@ -430,6 +430,17 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult GetDataIssueAgencyPayment(CustomerDebitCreditCriteria criteria)
         {
             var result = acctReceiptService.GetDataIssueAgencyPayment(criteria);
+            return Ok(result);
+        }
+
+        [HttpPost("GetDataExportReceiptAdvance")]
+        [Authorize]
+        public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
+        {
+            var resultQuery = acctReceiptService.Query(criteria);
+
+            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria, resultQuery);
+
             return Ok(result);
         }
     }

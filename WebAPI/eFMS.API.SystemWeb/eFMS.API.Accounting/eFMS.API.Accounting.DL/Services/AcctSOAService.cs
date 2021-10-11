@@ -192,7 +192,6 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargesSoa.Add(surcharge);
                     }
                 }
-
                 soa.TotalShipment = _totalShipment;
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
@@ -634,6 +633,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return prefix + stt;
         }
+
 
         /// <summary>
         /// Update Credit Management Data List

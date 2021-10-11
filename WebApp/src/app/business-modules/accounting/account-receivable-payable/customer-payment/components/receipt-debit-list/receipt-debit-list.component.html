@@ -24,7 +24,8 @@
                         <ng-container *ngIf="!!(debitList$ | async)?.length">
                             <tr *ngFor="let item of (this.debitList$ | async); let i = index; trackBy: trackByFn"
                                 [class.bg-warning]="item.paymentType === 'OTHER'"
-                                [ngClass]="{'bg-secondary font-italic': item.negative}">
+                                [ngClass]="{'bg-secondary font-italic': item.negative}"
+                                [ngClass]="{ 'invalid-row': item.isValid === false }">
                                 <td>
                                     <ng-container *ngIf="!isReadonly">
                                         <app-permission-button type="delete"
@@ -105,7 +106,8 @@
                                         (ngModelChange)="calculateTotalPaidAmount(item,'paidVnd')">
                                 </td>
                                 <td ALIGN="right">
-                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                    <ng-container
+                                        *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH' && (receiptType$ | async) !== 'CUSTOMER'">
                                         <input type="text" class="form-control text-right text-success font-15"
                                             [(ngModel)]="item.netOffUsd" name="paidAmountUsd" autoFormatCurrency
                                             [disabled]="isReadonly"
@@ -113,7 +115,8 @@
                                     </ng-container>
                                 </td>
                                 <td>
-                                    <ng-container *ngIf="item.paymentType !== 'OTHER' ">
+                                    <ng-container
+                                        *ngIf="item.paymentType !== 'OTHER' && item.type !== 'OBH' && (receiptType$ | async) !== 'CUSTOMER'">
                                         <input type="text" class="form-control text-right text-success font-15"
                                             [(ngModel)]="item.netOffVnd" name="paidAmountVnd" numeric autoFormatCurrency
                                             [disabled]="isReadonly"
@@ -131,33 +134,21 @@
                                         {{item.totalPaidVnd | number:'1.0-2'}}
                                     </ng-container>
                                 </td>
+                                <td class="text-center"
+                                    *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
+                                    <app-switch size="sm" class="danger"
+                                        (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
+                                        [disabled]="isReadonly">
+                                    </app-switch>
+                                </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.paymentType !== 'OTHER'">
-                                        <ng-container
-                                            *ngIf="item.unpaidAmountUsd - (item.totalPaidUsd | abs) >= 0 ; else negativeUsd">
-
-                                            <span> {{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | negativeNumber
-                                                |
-                                                number: '.2-2'}} </span>
-                                        </ng-container>
-                                        <ng-template #negativeUsd>
-                                            <span> ({{item.unpaidAmountUsd - (item.totalPaidUsd | abs) | abs | number:
-                                                '.2-2'}}) </span>
-                                        </ng-template>
+                                        {{(item.unpaidAmountUsd - item.totalPaidUsd) | negativeNumber: '.2-2'}}
                                     </div>
                                 </td>
                                 <td ALIGN="right">
                                     <div *ngIf="item.paymentType !== 'OTHER'">
-                                        <ng-container
-                                            *ngIf="item.unpaidAmountVnd - (item.totalPaidVnd | abs) >= 0 ; else negativeVnd">
-                                            <span> {{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | negativeNumber
-                                                |
-                                                number: '.2-2'}} </span>
-                                        </ng-container>
-                                        <ng-template #negativeVnd>
-                                            <span> ({{item.unpaidAmountVnd - (item.totalPaidVnd | abs) | abs | number:
-                                                '.2-2'}}) </span>
-                                        </ng-template>
+                                        {{(item.unpaidAmountVnd - item.totalPaidVnd) | negativeNumber: '1.0-2'}}
                                     </div>
                                 </td>
                                 <td>
@@ -166,15 +157,7 @@
                                 </td>
                                 <td class="text-success">{{item.departmentName}}</td>
                                 <td class="text-success">{{item.officeName}}</td>
-                                <td class="text-center">
-                                    <ng-container
-                                        *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
-                                        <app-switch size="sm" class="danger"
-                                            (toggleChange)="onToggleNetOfOnly($event, item)" [ngModel]="item.netOff"
-                                            [disabled]="isReadonly">
-                                        </app-switch>
-                                    </ng-container>
-                                </td>
+
 
                                 <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.jobNo}}</td>
                                 <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.mbl}}</td>

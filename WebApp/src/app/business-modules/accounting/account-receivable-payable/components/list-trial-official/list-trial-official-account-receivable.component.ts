@@ -8,7 +8,7 @@ import { NgProgress } from '@ngx-progressbar/core';
 
 import { TrialOfficialOtherModel } from '@models';
 import { RoutingConstants, SystemConstants } from '@constants';
-import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from '../../account-receivable/store/reducers';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableLoadingListState } from '../../account-receivable/store/reducers';
 import { Store } from '@ngrx/store';
 import { getMenuUserSpecialPermissionState } from '@store';
 import { AccReceivableDebitDetailPopUpComponent } from '../popup/account-receivable-debit-detail-popup.component';
@@ -18,6 +18,7 @@ import { ToastrService } from 'ngx-toastr';
 @Component({
     selector: 'list-trial-official-account-receivable',
     templateUrl: './list-trial-official-account-receivable.component.html',
+    styleUrls: ['./list-trial-official-account-receivable.component.scss'],
 })
 export class AccountReceivableListTrialOfficialComponent extends AppList implements OnInit {
     @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
@@ -29,7 +30,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         private _progressService: NgProgress,
         private _router: Router,
         private _accountingRepo: AccountingRepo,
-        private _store:Store<IAccountReceivableState>,
+        private _store: Store<IAccountReceivableState>,
         private _exportRepo: ExportRepo,
         private _toastService: ToastrService,
     ) {
@@ -41,10 +42,10 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     ngOnInit() {
 
         this.headers = [
-            { title: 'Partner Id', field: 'partnerCode', sortable: true },
-            { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
-            { title: 'Rate (%)', field: 'debitRate', sortable: true },
-            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
+        //    { title: 'Partner Id', field: 'partnerCode', sortable: true },
+        //    { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
+        //     { title: 'Rate (%)', field: 'debitRate', sortable: true },
+        //     { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Paid a Part', field: 'paidAmount', sortable: true },
             { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
@@ -64,18 +65,20 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
         this._store.select(getAccountReceivableSearchState)
-        .pipe(
-            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
-            takeUntil(this.ngUnsubscribe),
-            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-        )
-        .subscribe(
-            (data) => {
-                this.dataSearch = data.dataSearch;
-                this.page = data.page;
-                this.pageSize = data.pageSize;
-            }
-        );
+            .pipe(
+                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    this.dataSearch = data.dataSearch;
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+                }
+            );
+
+        this.isLoading = this._store.select(getAccountReceivableLoadingListState);
 
     }
 
@@ -86,15 +89,15 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     getPagingList() {
         this._store.dispatch(LoadListAccountReceivable({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
         this._store.select(getAccountReceivableListState)
-        .pipe(
-            catchError(this.catchError),
-            map((store: any) => {return store})
-        ).subscribe(
-            (res: any) => {
+            .pipe(
+                catchError(this.catchError),
+                map((store: any) => { return store })
+            ).subscribe(
+                (res: any) => {
                     this.trialOfficialList = res.data || [];
                     this.totalItems = res.totalItems;
-            },
-        );
+                },
+            );
     }
 
     //
@@ -107,34 +110,34 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
         });
     }
 
-    exportExcel(){
+    exportExcel() {
         if (!this.trialOfficialList.length) {
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
         } else {
             this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
-            .subscribe(
-                (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
-                }
-            );
+                .subscribe(
+                    (res: Blob) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
+                    }
+                );
         }
     }
 
-    showDebitDetail(agreementId,option){
-        this._accountingRepo.getDataDebitDetail(agreementId,option)
-        .pipe(
-            catchError(this.catchError),
-            finalize(() => this._progressRef.complete())
-        ).subscribe(
-            (res: any) => {
-                if (res) {
-                    this.debitDetailPopupComponent.dataDebitList = res || [];
-                    this.debitDetailPopupComponent.calculateTotal();
-                    this.debitDetailPopupComponent.show();
-                }
-            },
-        );
+    showDebitDetail(agreementId, option) {
+        this._accountingRepo.getDataDebitDetail(agreementId, option)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.debitDetailPopupComponent.dataDebitList = res || [];
+                        this.debitDetailPopupComponent.calculateTotal();
+                        this.debitDetailPopupComponent.show();
+                    }
+                },
+            );
     }
 }
 

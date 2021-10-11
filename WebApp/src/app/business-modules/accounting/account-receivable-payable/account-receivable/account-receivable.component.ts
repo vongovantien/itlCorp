@@ -144,7 +144,8 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                         officeId: null,
                         fromOverdueDays: null,
                         toOverdueDays: null,
-                        debitRate: 0
+                        debitRate: 0,
+                        partnerType:"All"
                     };
                     this.dataSearch = body;
                 }

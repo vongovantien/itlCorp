@@ -2,7 +2,7 @@
     <div class="m-portlet__body">
         <form [formGroup]="formSearch">
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-8">
                     <label>Partner</label>
                     <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'partner')"
                         (remove)="resetFormControl(partnerId)"
@@ -10,6 +10,12 @@
                         [selectedDisplayFields]="['shortName']" [dataSources]="partners | async"
                         [displayFields]="displayFieldsPartner" placeholder="Select Partner">
                     </app-combo-grid-virtual-scroll>
+                </div>
+                <div class="col-lg-4">
+                    <label>Partner Type</label>
+                    <ng-select [items]="partnerTypes" formControlName="partnerType" class="custom"
+                        bindLabel="text" bindValue="id" placeholder="All">
+                    </ng-select>
                 </div>
             </div>
 
