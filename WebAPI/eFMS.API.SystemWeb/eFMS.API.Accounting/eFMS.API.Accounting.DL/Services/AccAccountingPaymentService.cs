@@ -309,11 +309,12 @@ namespace eFMS.API.Accounting.DL.Services
                                     InvoiceNo = invoice.Type != "Invoice" ? string.Empty : invoice.InvoiceNoReal,
                                     Type = surcharge.Type == "OBH" ? "OBH" : "DEBIT",
                                     payment,
-                                    PaymentRefNo = rcpt == null ? null : rcpt.PaymentRefNo
+                                    PaymentRefNo = rcpt == null ? null : rcpt.PaymentRefNo,
+                                    PaymentDate = rcpt == null ? null : rcpt.PaymentDate,
                                 });
             if (criteria.FromUpdatedDate != null)
             {
-                resultsQuery = resultsQuery.Where(x => (x.payment == null || (x.payment.PaidDate != null && x.payment.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.payment.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date)));
+                resultsQuery = resultsQuery.Where(x => (x.payment == null || (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date)));
             }
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
@@ -1651,7 +1652,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 });
             if (criteria.FromUpdatedDate != null)
             {
-                resultsQuery = resultsQuery.Where(x => (x.payment == null || (x.payment.PaidDate != null && x.payment.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.payment.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date)));
+                resultsQuery = resultsQuery.Where(x => (x.payment == null || (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date)));
             }
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
@@ -1799,8 +1800,16 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             results = results?.OrderBy(x => x.PartnerId).ThenBy(x => x.PartnerName).ThenBy(x => x.BillingRefNo).ToList();
+
+            // Caculate advance amount
             var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
-            var paymentAdv = DataContext.Get(x => x.Type == "ADV");
+            var paymentAdv = from dataAdv in DataContext.Get(x => x.Type == "ADV" || x.Type == "COLL_OBH")
+                             join rcpt in receiptData on dataAdv.ReceiptId equals rcpt.Id
+                             select new {
+                                 dataAdv,
+                                 rcpt.CusAdvanceAmountUsd,
+                                 rcpt.CusAdvanceAmountVnd
+                             };
             if (criteria.DueDate != null)
             {
                 foreach (var item in grpPartner)
@@ -1811,7 +1820,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         receiptIds.AddRange(it.receiptDetail.Select(x => (Guid)x.ReceiptId));
                     }
-                    var pm = paymentAdv.Where(x => receiptIds.Any(r => r == x.ReceiptId)).OrderByDescending(x => x.PaidDate).FirstOrDefault();
+                    var pm = paymentAdv.Where(x => receiptIds.Any(r => r == x.dataAdv.ReceiptId)).OrderByDescending(x => x.dataAdv.PaidDate).FirstOrDefault();
+
                     if (pm != null)
                     {
 
@@ -1821,9 +1831,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.BranchName = officeData[(Guid)pm.OfficeId].FirstOrDefault()?.ShortName;
-                        payment.AdvanceAmountVnd = pm.PaymentAmountVnd ?? 0;
-                        payment.AdvanceAmountUsd = pm.PaymentAmountUsd ?? 0;
+                        payment.BranchName = officeData[(Guid)pm.dataAdv.OfficeId].FirstOrDefault()?.ShortName;
+                        payment.AdvanceAmountVnd = pm.dataAdv.PaymentAmountVnd ?? 0;
+                        payment.AdvanceAmountUsd = pm.dataAdv.PaymentAmountUsd ?? 0;
                         if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
@@ -1841,24 +1851,31 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         receiptList.AddRange(it.receiptDetail);
                     }
-                    receiptList = receiptList.GroupBy(x => x.ReceiptId).Select(x => x.FirstOrDefault()).ToList();
-
-                    if (receiptList.Count > 0)
+                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.FirstOrDefault().PartnerId && (x.dataAdv.PaidDate != null && x.dataAdv.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.dataAdv.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
+                    foreach(var dt in pm)
                     {
-                        var receiptIds = receiptList.Select(x => x.ReceiptId).ToList();
-                        var pm = paymentAdv.Where(x => receiptIds.Any(a => a == x.ReceiptId));
+                        var detail = new AccountingReceiptDetail();
+                        detail.ReceiptId = dt.dataAdv.ReceiptId;
+                        detail.CusAdvanceAmountVnd = dt.CusAdvanceAmountVnd;
+                        detail.CusAdvanceAmountUsd = dt.CusAdvanceAmountUsd;
+                        receiptList.Add(detail);
+                    }
+
+                    receiptList = receiptList.GroupBy(x => x.ReceiptId).Select(x => x.FirstOrDefault()).ToList();
+                    if (pm != null && pm.Count() > 0)
+                    {
                         var indexOfLastGrp = results.IndexOf(item.Last());
                         payment.PartnerId = item.FirstOrDefault().PartnerId;
                         payment.PartnerCode = item.FirstOrDefault().PartnerCode;
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.AdvanceAmountVnd = pm.Sum(x => x.PaymentAmountVnd ?? 0);
+                        payment.AdvanceAmountVnd = pm.Sum(x => x.dataAdv.PaymentAmountVnd ?? 0);
                         payment.AdvanceAmountVnd += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
 
-                        payment.AdvanceAmountUsd = pm.Sum(x => x.PaymentAmountUsd ?? 0);
+                        payment.AdvanceAmountUsd = pm.Sum(x => x.dataAdv.PaymentAmountUsd ?? 0);
                         payment.AdvanceAmountUsd += receiptList.Sum(x => x.CusAdvanceAmountUsd ?? 0);
-                        payment.BranchName = pm.FirstOrDefault() == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().OfficeId].FirstOrDefault()?.ShortName;
+                        payment.BranchName = pm.FirstOrDefault().dataAdv == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().dataAdv.OfficeId].FirstOrDefault()?.ShortName;
                         if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
