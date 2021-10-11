@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { eFMSPopup } from '../popup';
 
 @Component({

@@ -19,6 +19,7 @@ import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-e
 import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
 import { formatDate } from '@angular/common';
+import { of } from 'rxjs';
 
 
 
@@ -150,6 +151,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._spinner.hide();
         this.loadingPopupComponent.show();
         this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
+            .pipe(
+                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                finalize(() => this._progressRef.complete())
+            )
             .subscribe(
                 (res: Blob) => {
                     this.startDownloadReport(res, 'invoice-payment.xlsx');
@@ -165,6 +170,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._spinner.hide();
             this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
+                .pipe(
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    finalize(() => this._progressRef.complete())
+                )
                 .subscribe(
                     (res: Blob) => {
                         this.startDownloadReport(res, 'Statement of Receivable Customer - eFMS.xlsx');
@@ -189,6 +198,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._spinner.hide();
         this.loadingPopupComponent.show();
         this._exportRepo.exportAdvanceReceipt(body)
+            .pipe(
+                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                finalize(() => this._progressRef.complete())
+            )
             .subscribe(
                 (res: ArrayBuffer) => {
                     if (!res) {
@@ -343,6 +356,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._spinner.hide();
             this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
+                .pipe(
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    finalize(() => this._progressRef.complete())
+                )
                 .subscribe(
                     (res: Blob) => {
                         this.startDownloadReport(res, 'Statement of Receivable Agency - eFMS.xlsx');
