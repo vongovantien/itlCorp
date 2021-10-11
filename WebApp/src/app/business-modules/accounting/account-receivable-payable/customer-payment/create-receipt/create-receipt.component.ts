@@ -158,6 +158,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Paid amount is required");
             return;
         }
+        if ((this.listInvoice.cusAdvanceAmountVnd.value > 0 || this.listInvoice.cusAdvanceAmountUsd.value > 0)
+            && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH].includes(this.listInvoice.paymentMethod.value)) {
+            this._toastService.warning("Cus Advance Amount >0 <br> so Payment Method must be one of Clear-advance/Clear-Advance-Bank/Clear-Advance-Bank", 'Payment method is incorrect', { enableHtml: true });
+            return;
+        }
 
         const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
         const OBH_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH);
@@ -177,7 +184,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
 
         sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
-        sumTotalPaidVnd = +sumTotalPaidUsd.toFixed(0);
+        sumTotalPaidVnd = +sumTotalPaidVnd.toFixed(0);
 
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
             this._toastService.warning("Final paid amount < sum total paid amount");
