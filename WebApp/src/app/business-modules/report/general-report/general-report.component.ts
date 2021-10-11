@@ -8,6 +8,7 @@ import { catchError, finalize, map } from "rxjs/operators";
 import { LoadingPopupComponent } from "@common";
 import { NgxSpinnerService } from "ngx-spinner";
 import { SystemConstants } from "@constants";
+import { of } from "rxjs";
 
 @Component({
     selector: 'app-general-report',
@@ -74,7 +75,7 @@ export class GeneralReportComponent extends AppList {
         this._progressRef.start();
         this._documentRepo.getGeneralReport(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
-                catchError(this.catchError),
+                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                 finalize(() => {
                     this._progressRef.complete();
                 }),
@@ -98,7 +99,7 @@ export class GeneralReportComponent extends AppList {
 
     startDownloadReport(data: any, fileName: string){
         if(data.byteLength > 0){
-            this.downLoadFile(data, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+            this.downLoadFile(data, SystemConstants.FILE_EXCEL, fileName);
             this.loadingPopupComponent.downloadSuccess();
         }else{
             this.loadingPopupComponent.downloadFail();
@@ -115,7 +116,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverview(this.dataSearch)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
@@ -137,7 +138,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverviewWithType(this.dataSearch, reportType)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
@@ -159,7 +160,7 @@ export class GeneralReportComponent extends AppList {
             this.loadingPopupComponent.show();
             this._exportRepo.exportStandardGeneralReport(this.dataSearch)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
