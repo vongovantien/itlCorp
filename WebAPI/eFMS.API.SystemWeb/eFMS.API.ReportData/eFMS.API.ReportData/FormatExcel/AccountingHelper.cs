@@ -3136,6 +3136,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Bank code:", // 27
                 "By cash:", // 28
                 "Due date:", // 29
+                "Payment method:", //30
+
             };
 
             List<string> headers = Headers;
@@ -3465,28 +3467,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Total net amount
                 var _totalNetAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeNetAmount).Sum();
                 workSheet.Cells[j - 1, 6].Value = _totalNetAmount;
-                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 6].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 // Total VAT amount
                 var _totalVatAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeVatAmount).Sum();
                 workSheet.Cells[j - 1, 7].Value = _totalVatAmount;
-                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 7].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total amount
                 var _totalAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum();
                 workSheet.Cells[j - 1, 8].Value = _totalAmount;
-                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 8].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 8].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total advanced amount (số tiền đã tạm ứng)
                 var _advanceAmount = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
                 workSheet.Cells[j - 1, 11].Value = _advanceAmount;
-                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 11].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -3494,7 +3496,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //Value chênh lệch
                 workSheet.Cells[j - 1, 13].Value = _totalAmount - _advanceAmount;
-                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 13].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -3508,7 +3510,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 11, j - 2, 11].Merge = true;
                 workSheet.Cells[p, 11, j - 2, 11].Value = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount); //Value Số tiền đã tạm ứng
-                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 11, j - 2, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -3531,7 +3533,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 13, j - 2, 13].Merge = true;
                 workSheet.Cells[p, 13, j - 2, 13].Value = string.Empty; //Value Chênh lệch
-                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 13, j - 2, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -3578,7 +3580,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             //Bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["A" + p + ":M" + p].Style.Font.Bold = true;
-            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = decimalFormat2;
 
             //In đậm border dòng 14
             workSheet.Cells[14, 1, 14, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
@@ -3735,6 +3737,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Value = headers[22]; //Supplier
             workSheet.Cells["A7"].Style.Font.Bold = true;
             workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.SupplierName;
+
+            workSheet.Cells["A8"].Value = headers[7]; //Reson for request
+            workSheet.Cells["A8"].Style.Font.Bold = true;
+            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.ReasonForRequest;
+
+
+            workSheet.Cells["A11"].Value = headers[30]; //Reson for request
+            workSheet.Cells["A11"].Style.Font.Bold = true;
+            workSheet.Cells["B11"].Value = settlementExport.InfoSettlement.PaymentMethod;
 
             workSheet.Cells["F6"].Value = headers[5]; //Số SOA
             workSheet.Cells["F6"].Style.Font.Bold = true;

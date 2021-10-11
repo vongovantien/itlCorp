@@ -4823,6 +4823,14 @@ namespace eFMS.API.Accounting.DL.Services
 
                 string _personInCharge = string.Empty;
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
+                if (houseBillId.type == "OBH")
+                {
+                    shipmentSettlement.OBH = houseBillId.total;
+                }
+                if (houseBillId.type == "BUY")
+                {
+                    shipmentSettlement.Credit = houseBillId.total;
+                }
                 if (ops != null)
                 {
                     shipmentSettlement.JobNo = ops.JobNo;
@@ -4837,15 +4845,6 @@ namespace eFMS.API.Accounting.DL.Services
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;
-                    if (houseBillId.type == "OBH")
-                    {
-                        shipmentSettlement.OBH = houseBillId.total;
-                    }
-                    if (houseBillId.type == "BUY")
-                    {
-                        shipmentSettlement.Credit = houseBillId.total;
-                    }
-
                     listData.Add(shipmentSettlement);
                 }
                 else
