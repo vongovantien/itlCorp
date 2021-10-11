@@ -5305,13 +5305,15 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
-        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria)
+        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria, out string fileName)
         {
             try
             {
                 var folderOfFile = GetARExcelFolder();
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
                 var path = f.FullName;
+                fileName = "AdvanceReport_" + result.TaxCode+ ".xlsx";
+
                 if (!File.Exists(path))
                 {
                     return null;
@@ -5324,6 +5326,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 map.Add("taxCode", result.TaxCode);
                 map.Add("nameEn", result.PartnerNameEn);
                 map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
+
+
                 excel.SetData(map);
 
                 int startRow = 6;
@@ -5358,7 +5362,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch (Exception ex)
             {
-
+                fileName = "";
                 return null;
             }
         }
