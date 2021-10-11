@@ -3558,7 +3558,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal totalAdv = 0;
 
-            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE);
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && (x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE 
+            || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH));
             if(currency == AccountingConstants.CURRENCY_LOCAL)
             {
                 totalAdv = payments.Sum(x => x.PaymentAmountVnd) ?? 0;

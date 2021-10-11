@@ -92,18 +92,20 @@ export class ApiService {
             });
     }
 
-    downloadfile(url: string, data?: any, params?: any, headers?: any) {
+    downloadfile(url: string, data?: any, params?: any, headers?: any, observe: 'body' | 'response' | any = 'body') {
         if (data !== null && data !== undefined) {
             return this._http.post(this.setUrl(url), data, {
                 params,
                 headers: Object.assign({}, this._headers, headers),
-                responseType: 'arraybuffer'
+                responseType: 'arraybuffer',
+                observe: observe
             });
         } else {
             return this._http.get(this.setUrl(url), {
                 params,
                 headers: Object.assign({}, this._headers, headers),
-                responseType: 'arraybuffer'
+                responseType: 'arraybuffer',
+                observe: observe
             });
         }
     }
