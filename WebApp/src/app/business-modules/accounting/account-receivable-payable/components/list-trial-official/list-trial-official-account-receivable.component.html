@@ -30,9 +30,6 @@
                                  <th class="m--w-50 first table-actions-col sticky-col four-col">
                                     Rate (%)
                                  </th>
-                                 <th class="m--w-50 first table-actions-col sticky-col five-col">
-                                    Debit Amount
-                                 </th>
                             </thead>
                             <tbody>
                                 <ng-container>
@@ -59,9 +56,7 @@
                                                     {{ item.debitRate | number: '.2-2'}}%
                                                 </span>
                                             </td>
-                                            <td class="text-right sticky-col five-col">
-                                                 {{item.debitAmount | negativeNumber:'.0-3'}}
-                                            </td>
+
 
                                             <td class="text-right">
                                                 <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Unpaid')">
@@ -105,9 +100,10 @@
                                                     </a>
                                                 </span>
                                             </td>
-                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited) | negativeNumber:'.0-3' }}</td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
+                                            <td class="text-right"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
                                             <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}</td>
+                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited) | negativeNumber:'.0-3' }}</td>
                                             <td class="text-center text-success">{{ item.agreementSalesmanName}}</td>
                                             <td>
                                                 {{ item.agreementNo}}
