@@ -4496,6 +4496,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["F18:G18"].Merge = true;
             workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+            workSheet.Cells["F18:G18"].Style.Numberformat.Format = numberFormat2;
 
             workSheet.Cells["F19"].Merge = true;
             workSheet.Cells["F19"].Value = headers[14]; // OBH
@@ -4524,7 +4525,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
                 _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
-                //workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in OBHCharges)
                 {
                     workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
@@ -4537,7 +4538,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
                 _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
-                //workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
                 foreach (var no_invoice in CreditInvoiceCharges)
                 {
                     workSheet.Cells[k, 2].Value = no_invoice.InvoiceNo;
@@ -4613,9 +4614,9 @@ namespace eFMS.API.ReportData.FormatExcel
             #endregion--TOTAL--
             //bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["a" + (p-2) + ":g" + (p - 2)].Style.Font.Bold = true;
-            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat2;
             workSheet.Cells["a" + p + ":g" + p].Style.Font.Bold = true;
-            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat2;
 
             //In đậm border dòng 14
             workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
