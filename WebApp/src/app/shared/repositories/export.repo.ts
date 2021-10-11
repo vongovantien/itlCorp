@@ -459,7 +459,7 @@ export class ExportRepo {
     }
 
     exportAdvanceReceipt(criteria: any) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportReceiptAdvance`, criteria, null, null, 'response').pipe(
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportReceiptAdvance`, criteria, null, { "hideSpinner": "true" }, 'response').pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );

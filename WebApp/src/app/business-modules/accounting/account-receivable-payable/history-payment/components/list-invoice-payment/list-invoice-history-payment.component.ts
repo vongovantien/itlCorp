@@ -196,6 +196,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             // paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
         };
         this.loadingPopupComponent.show();
+
         this._exportRepo.exportAdvanceReceipt(body)
             .pipe(
                 catchError(() => of(this.loadingPopupComponent.downloadFail())),
