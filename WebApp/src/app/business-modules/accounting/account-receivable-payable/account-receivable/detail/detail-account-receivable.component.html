@@ -81,8 +81,16 @@
                                                 <tbody>
                                                     <tr
                                                         *ngFor="let element of item.accountReceivableGrpServices; let j = index; trackBy: trackByFn">
-
-
+                                                        <td>
+                                                            <ng-container
+                                                                *ngIf="menuSpecialPermission | async | specialPermission:'ReCalculateARSummary'">
+                                                                <button title="Calculate Accounts Receivable Payable"
+                                                                    (click)="onClickCalculateService(element,item)"
+                                                                    class="btn btn-primary btn-sm m-btn--pill m-btn--icon m-btn--icon-only">
+                                                                    <i class="la la-calculator"></i>
+                                                                </button>
+                                                            </ng-container>
+                                                        </td>
                                                         <td>{{ element.serviceName }}
                                                         </td>
                                                         <td class="text-right">{{ element.debitAmount |
@@ -138,3 +146,5 @@
         </div>
     </div>
 </div>
+
+<ng-template inject></ng-template>

@@ -150,8 +150,9 @@ namespace eFMS.API.ForPartner.DL.Service
         }
 
         #region --- CRUD INVOICE ---
-        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey)
+        public HandleState InsertInvoice(InvoiceCreateInfo model, string apiKey, out Guid Id)
         {
+            Id = Guid.Empty;
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
             currentUser.GroupId = _currentUser.GroupId;
@@ -160,15 +161,19 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "InsertInvoice";
 
-            var hsInsertInvoice = InsertInvoice(model, currentUser);
+            var hsInsertInvoice = InsertInvoice(model, currentUser, out AccAccountingManagement invoiceDebit);
+            if(invoiceDebit != null)
+            {
+                Id = invoiceDebit.Id;
+            }
             return hsInsertInvoice;
         }
 
-        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser)
+        private HandleState InsertInvoice(InvoiceCreateInfo model, ICurrentUser _currentUser, out AccAccountingManagement invoiceDebit)
         {
             var chargeInvoiceDebitUpdate = new List<ChargeInvoiceUpdateTable>();
             var chargeInvoiceObhUpdate = new List<ChargeInvoiceUpdateTable>();
-            var invoiceDebit = new AccAccountingManagement();
+            invoiceDebit = new AccAccountingManagement();
             var invoicesObh = new List<AccAccountingManagement>();
 
             decimal kickBackExcRate = companyRepository.Get(x => x.Id == _currentUser.CompanyID).FirstOrDefault()?.KbExchangeRate ?? 20000;
@@ -405,6 +410,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     WriteLogInsertInvoice(hsObh.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, hsObh.Message.ToString());
                     return hsObh;
                 }
+
                 WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
                 return hsDebit;                
             }
@@ -600,7 +606,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return new HandleState();
         }
 
-        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey)
+        public HandleState DeleteInvoice(InvoiceInfo model, string apiKey, out Guid Id)
         {
             ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
             currentUser.UserID = _currentUser.UserID;
@@ -610,26 +616,56 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.CompanyID = _currentUser.CompanyID;
             currentUser.Action = "DeleteInvoice";
 
-            var hsDeleteInvoice = DeleteInvoice(model, currentUser);
+            var hsDeleteInvoice = DeleteInvoice(model, currentUser, out AccAccountingManagement data);
+            Id = data.Id;
             return hsDeleteInvoice;
         }
 
-        HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser)
+        private HandleState DeleteInvoice(InvoiceInfo model, ICurrentUser _currentUser, out AccAccountingManagement data)
         {
+            string invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TYPE;
+            List<Guid?> IdsInvoiceTemps = new List<Guid?>();
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
                 {
-                    AccAccountingManagement data = null;
+                    data = new AccAccountingManagement();
                     HandleState hs = new HandleState();
 
                     if (model.SerieNo == ForPartnerConstants.TYPE_CHARGE_OBH)
                     {
-                        data = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE
-                                                && x.ReferenceNo == model.ReferenceNo && x.InvoiceNoReal == model.ReferenceNo).FirstOrDefault();
+                        invoiceType = ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE;
 
+                        CsShipmentSurcharge charge = surchargeRepo.First(x => x.ReferenceNo == model.ReferenceNo && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        if(charge == null || string.IsNullOrEmpty(charge.SyncedFrom))
+                        {
+                            return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
 
-                        hs = DataContext.Delete(x => data.Id == x.Id, false);
+                        // Find and Delete Inoice Temp with same debit/soa
+                        IQueryable<CsShipmentSurcharge> surchargeHadSynced = null;
+                        if (charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.DebitNo == charge.DebitNo 
+                            &&  x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_CDNOTE 
+                            && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        else if(charge.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA)
+                        {
+                            surchargeHadSynced = surchargeRepo.Get(x => x.Soano == charge.Soano
+                           && x.SyncedFrom == ForPartnerConstants.SYNCED_FROM_SOA
+                           && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+
+                        if (surchargeHadSynced != null && surchargeHadSynced.Count() > 0)
+                        {
+                            IdsInvoiceTemps = surchargeHadSynced.Select(x => x.AcctManagementId).Distinct().ToList();
+
+                            foreach (var Id in IdsInvoiceTemps)
+                            {
+                                DataContext.Delete(x => x.Id == Id, false);
+                            }
+                        }
                     }
                     else
                     {
@@ -644,35 +680,62 @@ namespace eFMS.API.ForPartner.DL.Service
                                                               && x.Serie == model.SerieNo
                                                               && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
                     }
-                   
-                    if (data == null) return new HandleState((object)"Không tìm thấy hóa đơn");
+
+                    if (data == null)
+                    {
+                        return new HandleState((object)"Không tìm thấy hóa đơn");
+                    }
 
                    
                     if (hs.Success)
                     {
-                        var charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
-                        foreach (var charge in charges)
+                        IQueryable<CsShipmentSurcharge> charges = null;
+                        if(invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
                         {
-                            charge.AcctManagementId = null;
-                            charge.ReferenceNo = null;
-                            charge.InvoiceNo = null;
-                            charge.InvoiceDate = null;
-                            charge.VoucherId = null;
-                            charge.VoucherIddate = null;
-                            charge.SeriesNo = null;
-                            //charge.FinalExchangeRate = null;
-                            //charge.AmountVnd = charge.VatAmountVnd = null;
-                            charge.DatetimeModified = DateTime.Now;
-                            charge.UserModified = _currentUser.UserID;
-                            charge.SyncedFrom = null;
-                            var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
-
-                            //Update Status Removed Inv For SOA (SOA synced)
-                            UpdateStatusRemovedInvForSOA(charge.Soano);
-                            //Update Status Removed Inv For Debit Note (Debit Note synced)
-                            UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
+                            charges = surchargeRepo.Get(x => x.ReferenceNo == model.ReferenceNo);
                         }
+                        else
+                        {
+                            charges = surchargeRepo.Get(x => IdsInvoiceTemps.Contains(x.AcctManagementId) && x.Type == ForPartnerConstants.TYPE_CHARGE_OBH);
+                        }
+                        
+                        if(charges != null)
+                        {
+                            foreach (var charge in charges)
+                            {
+                                charge.AcctManagementId = null;
+                                charge.ReferenceNo = null;
+                                charge.InvoiceNo = null;
+                                charge.InvoiceDate = null;
+                                charge.VoucherId = null;
+                                charge.VoucherIddate = null;
+                                charge.SeriesNo = null;
+                                //charge.FinalExchangeRate = null;
+                                //charge.AmountVnd = charge.VatAmountVnd = null;
+                                charge.DatetimeModified = DateTime.Now;
+                                charge.UserModified = _currentUser.UserID;
+                                charge.SyncedFrom = null;
 
+                                if(invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE)
+                                {
+                                    //Update Status Removed Inv For SOA (SOA synced)
+                                    UpdateStatusRemovedInvForSOA(charge.Soano);
+                                    //Update Status Removed Inv For Debit Note (Debit Note synced)
+                                    UpdateStatusRemovedInvForDebitNote(charge.DebitNo);
+                                }
+
+                                var updateSur = surchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                            }
+                            if (invoiceType == ForPartnerConstants.ACCOUNTING_INVOICE_TEMP_TYPE)
+                            {
+                                string soaNo = charges.First().Soano;
+                                string debitNo = charges.First().DebitNo;
+
+                                UpdateStatusRemovedInvForSOA(soaNo);
+                                UpdateStatusRemovedInvForDebitNote(debitNo);
+                            }
+                        }
+                       
 
                         var smSoa = acctSOARepository.SubmitChanges();
                         var smDebitNote = acctCdNoteRepo.SubmitChanges();
@@ -680,10 +743,10 @@ namespace eFMS.API.ForPartner.DL.Service
                         var sm = DataContext.SubmitChanges();
 
                         // Tính lại công nợ của hđ vừa hủy từ bravo.
-                        if(sm.Success)
-                        {
-                            CalculatorInvoiceReceivable(data);
-                        }
+                        //if(sm.Success)
+                        //{
+                        //    CalculatorInvoiceReceivable(data);
+                        //}
 
                         trans.Commit();
                     }
@@ -692,6 +755,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 catch (Exception ex)
                 {
                     trans.Rollback();
+                    data = new AccAccountingManagement();
                     return new HandleState((object)ex.Message);
                 }
                 finally
@@ -736,7 +800,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     // Lấy currency của contract & user created of contract gán cho Receivable
                     receivable.ContractId = contractPartner.Id;
-                    receivable.ContractCurrency = contractPartner.CurrencyId;
+                    receivable.ContractCurrency = contractPartner.CreditCurrency;
                     receivable.SaleMan = contractPartner.SaleManId;
                     receivable.UserCreated = contractPartner.UserCreated;
                     receivable.UserModified = contractPartner.UserCreated;
@@ -802,6 +866,10 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState UpdateStatusRemovedInvForSOA(string soaNo)
         {
             var hsUpdate = new HandleState();
+            if (string.IsNullOrEmpty(soaNo))
+            {
+                return hsUpdate;
+            }
             var soa = acctSOARepository.Get(x => x.Soano == soaNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (soa != null)
             {
@@ -816,6 +884,10 @@ namespace eFMS.API.ForPartner.DL.Service
         private HandleState UpdateStatusRemovedInvForDebitNote(string debitNo)
         {
             var hsUpdate = new HandleState();
+            if (string.IsNullOrEmpty(debitNo))
+            {
+                return hsUpdate;
+            }
             var debitNote = acctCdNoteRepo.Get(x => x.Code == debitNo && x.SyncStatus == ForPartnerConstants.STATUS_SYNCED).FirstOrDefault();
             if (debitNote != null)
             {
@@ -2115,32 +2187,54 @@ namespace eFMS.API.ForPartner.DL.Service
             var hs = new HandleState();
             try
             {
-                foreach (var expense in expenses)
+                //foreach (var expense in expenses)
+                //{
+                //    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
+                //    if (surcharge != null)
+                //    {
+                //        surcharge.UserModified = _currentUser.UserID;
+                //        surcharge.DatetimeModified = DateTime.Now;
+                //        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                //        {
+                //            surcharge.VoucherIdre = expense.VoucherNO;
+                //            surcharge.VoucherIdredate = expense.VoucherDate;
+                //        }
+                //        else
+                //        {
+                //            surcharge.VoucherId = expense.VoucherNO;
+                //            surcharge.VoucherIddate = expense.VoucherDate;
+                //        }
+                //        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
+                //    }
+                //}
+
+                StatusModel result = UpdateSurchargeVoucherExpense(expenses);
+                if(!result.Status)
                 {
-                    var surcharge = surchargeRepo.Get(x => x.Id == expense.RowID).FirstOrDefault();
-                    if (surcharge != null)
-                    {
-                        surcharge.UserModified = _currentUser.UserID;
-                        surcharge.DatetimeModified = DateTime.Now;
-                        if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
-                        {
-                            surcharge.VoucherIdre = expense.VoucherNO;
-                            surcharge.VoucherIdredate = expense.VoucherDate;
-                        }
-                        else
-                        {
-                            surcharge.VoucherId = expense.VoucherNO;
-                            surcharge.VoucherIddate = expense.VoucherDate;
-                        }
-                        hs = surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id);
-                    }
+                    return new HandleState((object)result.Message);
                 }
-                return hs;
+                return new HandleState(result.Status,"Success");
             }
             catch(Exception ex)
             {
                 return new HandleState((object)"Error");
             }
+        }
+
+        private StatusModel UpdateSurchargeVoucherExpense(List<VoucherExpenseCharge> listExpense)
+        {
+            var parameters = new[]{
+                new SqlParameter()
+                {
+                    Direction = ParameterDirection.Input,
+                    ParameterName = "@Charges",
+                    Value = DataHelper.ToDataTable(listExpense),
+                    SqlDbType = SqlDbType.Structured,
+                    TypeName = "[dbo].[VoucherExpense]"
+                }
+            };
+            var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateVoucherExpense>(parameters);
+            return result.FirstOrDefault();
         }
     }
 }

@@ -29,5 +29,6 @@ namespace eFMS.API.Operation.DL.IService
         CustomsDeclarationModel GetDetail(int id);
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
         bool CheckAllowUpdate(Guid? jobId);
+        HandleState ImportClearancesOlaFromEcus();
     }
 }

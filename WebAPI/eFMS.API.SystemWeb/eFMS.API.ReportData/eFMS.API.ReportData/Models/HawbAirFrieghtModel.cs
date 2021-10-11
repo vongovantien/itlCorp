@@ -27,5 +27,6 @@ namespace eFMS.API.ReportData.Models
         public decimal? NetAmount { get; set; }
         public decimal? ExchangeRate { get; set; }
         public decimal? TotalAmount { get; set; }
+        public string HBLNo { get; set; }
     }
 }

@@ -79,16 +79,35 @@
                                 </td>
                                 <td>{{request.customNo}}</td>
                                 <td>{{request.jobId}}</td>
+                                <!-- <td *ngIf="request.statusPayment==='Settled'")>{{request.statusPayment}}</td> -->
                                 <td>{{request.hbl}}</td>
                                 <td>{{request.amount | number : '.0-3'}}</td>
                                 <td>{{request.requestCurrency}}</td>
                                 <td>{{request.advanceType | titlecase}}</td>
+                                <td [ngSwitch]="request.statusPayment">
+                                    <ng-container *ngIf="this.statusApproval === '' else empty">
+                                        <div class="text-success" *ngSwitchCase="'Settled'">
+                                            {{request.statusPayment}}
+                                        </div>
+                                        <div class="text-danger" *ngSwitchCase="'NotSettled'">
+                                            Not Settled
+                                        </div>
+                                        <div class="text-danger" *ngSwitchCase="'PartialSettlement'">
+                                            Partial Settlement
+                                        </div>
+                                        <div *ngSwitchCase="''">
+                                            -
+                                        </div>
+                                    </ng-container>
+                                    <ng-template #empty>-</ng-template>
+                                </td>
                                 <td>{{request.requestNote}}</td>
                             </tr>
                         </ng-container>
 
                         <tr class="text-center text-black" *ngIf="!!listRequestAdvancePayment.length">
                             <td *ngIf="state === 'update'"></td>
+                            <td></td>
                             <td></td>
                             <td></td>
                             <td></td>

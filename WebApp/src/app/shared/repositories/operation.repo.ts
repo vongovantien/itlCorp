@@ -95,6 +95,13 @@ export class OperationRepo {
         );
     }
 
+    importCustomClearanceOlaFromEcus() {
+        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/ImportClearancesOlaFromEcus`, {}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
     deleteMultipleClearance(body: any[] = []) {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/en-US/CustomsDeclaration/DeleteMultiple`, body).pipe(
             catchError((error) => throwError(error)),

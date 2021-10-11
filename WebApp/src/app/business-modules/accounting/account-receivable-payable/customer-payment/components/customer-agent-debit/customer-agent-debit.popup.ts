@@ -5,7 +5,7 @@ import { AccountingRepo } from '@repositories';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
-import { GetInvoiceListSuccess, ResetInvoiceList } from '../../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList, AddDebitCreditToReceipt } from '../../store/actions';
 import { ToastrService } from 'ngx-toastr';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState, ReceiptPartnerCurrentState } from '../../store/reducers';
 import { SortService } from '@services';
@@ -14,7 +14,7 @@ import { combineLatest } from 'rxjs/internal/observable/combineLatest';
 
 @Component({
     selector: 'customer-agent-debit-popup',
-    templateUrl: 'customer-agent-debit.popup.html'
+    templateUrl: 'customer-agent-debit.popup.html',
 })
 
 export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase {
@@ -34,10 +34,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
         { title: 'JOB', field: 'jobNo', sortable: true, width: 150 },
         { title: 'HBL', field: 'hbl', sortable: true, width: 150 },
         { title: 'MBL', field: 'mbl', sortable: true, width: 150 },
-        { title: 'PartnerId', field: 'taxCode', sortable: true },
-        { title: 'Partner Name', field: 'partnerName', sortable: true },
         { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true, width: 150 },
         { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true, width: 150 },
+        { title: 'PartnerId', field: 'taxCode', sortable: true },
+        { title: 'Partner Name', field: 'partnerName', sortable: true },
         { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
         { title: 'Payment Term', field: 'paymentTerm', sortable: true },
         { title: 'Due Date', field: 'dueDate', sortable: true },
@@ -47,8 +47,7 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
 
     agencyDebitModel: AgencyReceiptModel = new AgencyReceiptModel();
     checkAllAgency = false;
-    checkAllGroup = false;
-    isCheckAllAgent
+    isCheckAllAgent: boolean = false;
     TYPELIST: string = 'LIST';
     partnerId: string;
 
@@ -90,10 +89,10 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             { title: 'VoucherId', field: 'voucherId', sortable: true },
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Invoice No', field: 'invoiceNo', sortable: true },
-            { title: 'Tax Code', field: 'taxCode', sortable: true },
-            { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Unpaid VND', field: 'unpaidAmountVnd', sortable: true, width: 150 },
             { title: 'Unpaid USD', field: 'unpaidAmountUsd', sortable: true, width: 150 },
+            { title: 'Tax Code', field: 'taxCode', sortable: true },
+            { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Invoice Date', field: 'invoiceDate', sortable: true },
             { title: 'Payment Term', field: 'paymentTerm', sortable: true },
             { title: 'Due Date', field: 'dueDate', sortable: true },
@@ -392,9 +391,11 @@ export class ARCustomerPaymentCustomerAgentDebitPopupComponent extends PopupBase
             element.totalPaidVnd = element.paidAmountVnd;
             element.totalPaidUsd = element.paidAmountUsd;
             element.creditNos = []
+            element.isValid = null;
         });
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: datatoReceipt }));
+        this._store.dispatch(AddDebitCreditToReceipt({ data: datatoReceipt }));
         this.onAddToReceipt.emit(this.partnerId);
         // this.hide();
     }

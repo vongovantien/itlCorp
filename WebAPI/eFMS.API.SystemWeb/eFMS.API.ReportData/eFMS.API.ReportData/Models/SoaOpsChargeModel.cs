@@ -64,6 +64,7 @@ namespace eFMS.API.ReportData.Models
         public decimal? VATAmount { get; set; }
 
         public decimal? NetAmount { get; set; }
+        public DateTime? InvoiceDate { get; set; }
 
     }
 }

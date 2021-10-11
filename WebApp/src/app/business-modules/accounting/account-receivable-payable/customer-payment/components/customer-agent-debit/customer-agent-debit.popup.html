@@ -68,13 +68,6 @@
                                                     </ng-container>
                                                 </span>
                                             </td>
-
-                                            <td>
-                                                <span>{{debit.taxCode}}</span>
-                                            </td>
-                                            <td>
-                                                <span>{{debit.partnerName}}</span>
-                                            </td>
                                             <td ALIGN="right">
                                                 <ng-container *ngIf="debit.paymentType === 'CREDIT';else notCredit1">
                                                     {{(-debit.unpaidAmountVnd) | number}}
@@ -90,6 +83,12 @@
                                                 <ng-template #notCredit2>
                                                     {{debit.unpaidAmountUsd | number: '1.2-2'}}
                                                 </ng-template>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.taxCode}}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{debit.partnerName}}</span>
                                             </td>
                                             <td>
                                                 <span>{{debit.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -112,7 +111,7 @@
                                 </tbody>
                                 <tfoot *ngIf="!!listDebit.length">
                                     <tr class="font-weight-bold bg-locked font-15">
-                                        <td rowspan="6" colspan="7" ALIGN="right">Total</td>
+                                        <td rowspan="6" colspan="5" ALIGN="right">Total</td>
                                         <td class="text-right" rowspan="6" ALIGN="center">
                                             <ng-container
                                                 *ngIf="sumTotalObj.totalBalanceVnd >= 0;else TplTotalObjectBalanceVndNegative">
@@ -125,7 +124,7 @@
                                                 {{sumTotalObj.totalBalanceUsd | number:'1.2-2'}} USD
                                             </ng-container>
                                         </td>
-                                        <td rowspan="6" colspan="5"></td>
+                                        <td rowspan="6" colspan="7"></td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -251,17 +250,17 @@
                                                 <td>
                                                     <span>{{invoice.mbl}}</span>
                                                 </td>
-                                                <td>
-                                                    <span>{{invoice.taxCode}}</span>
-                                                </td>
-                                                <td>
-                                                    <span>{{invoice.partnerName}}</span>
-                                                </td>
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmountVnd | number}} </span>
                                                 </td>
                                                 <td ALIGN="right">
                                                     <span>{{invoice.unpaidAmountUsd | number: '1.2-2'}} </span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.taxCode}}</span>
+                                                </td>
+                                                <td>
+                                                    <span>{{invoice.partnerName}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -339,17 +338,29 @@
                                                 <td>
                                                     <span>{{invoice.mbl}}</span>
                                                 </td>
+                                                <td ALIGN="right">
+                                                    <ng-container
+                                                        *ngIf="invoice.paymentType === 'CREDIT';else notCreditVndTpl">
+                                                        {{(-invoice.unpaidAmountVnd) | number}}
+                                                    </ng-container>
+                                                    <ng-template #notCreditVndTpl>
+                                                        {{invoice.unpaidAmountVnd | number}}
+                                                    </ng-template>
+                                                </td>
+                                                <td ALIGN="right">
+                                                    <ng-container
+                                                        *ngIf="invoice.paymentType === 'CREDIT';else notCreditUsdTpl">
+                                                        {{(-invoice.unpaidAmountUsd) | number: '1.2-2'}}
+                                                    </ng-container>
+                                                    <ng-template #notCreditUsdTpl>
+                                                        {{invoice.unpaidAmountUsd | number: '1.2-2'}}
+                                                    </ng-template>
+                                                </td>
                                                 <td>
                                                     <span>{{invoice.taxCode}}</span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.partnerName}}</span>
-                                                </td>
-                                                <td ALIGN="right">
-                                                    <span>{{invoice.unpaidAmountVnd | number: '1.0-2'}} </span>
-                                                </td>
-                                                <td ALIGN="right">
-                                                    <span>{{invoice.unpaidAmountUsd | number: '1.2-2'}} </span>
                                                 </td>
                                                 <td>
                                                     <span>{{invoice.invoiceDate | date :'dd/MM/yyyy'}} </span>
@@ -487,7 +498,7 @@
                     <span>
                         <i class="la la-ban"></i>
                         <span>
-                            Cancel
+                            Close
                         </span>
                     </span>
                 </button>

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { formatDate } from '@angular/common';
-import { ReceiptModel, ReceiptInvoiceModel } from '@models';
+import { ReceiptModel, ReceiptInvoiceModel, ReceiptCreditDebitModel, Partner } from '@models';
 import { AppForm } from '@app';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { RoutingConstants, SystemConstants, AccountingConstants } from '@constants';
@@ -67,7 +67,6 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 takeUntil(this.ngUnsubscribe)
             )
             .subscribe((type: string) => {
-                console.log(type);
                 this._store.dispatch(RegistTypeReceipt({ data: type.toUpperCase() }));
                 this.type = type.toUpperCase()
                 this.titleReceipt = `Create ${this.type} Receipt`;
@@ -155,20 +154,44 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd))) {
+        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd) && !x.netOff && x.type !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
             this._toastService.warning("Paid amount is required");
             return;
         }
 
+        const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
+        const OBH_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH);
+        const CREDIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT);
+
+        const paymentDebitObh = [...DEBIT_LIST, ...OBH_LIST];
+        let sumTotalPaidUsd: number = 0;
+        let sumTotalPaidVnd: number = 0;
+
+        for (let index = 0; index < paymentDebitObh.length; index++) {
+            const element = paymentDebitObh[index];
+
+            sumTotalPaidUsd += element.totalPaidUsd;
+            sumTotalPaidVnd += element.totalPaidVnd;
+
+            element.isValid = null;
+        }
+
+        sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
+        sumTotalPaidVnd = +sumTotalPaidUsd.toFixed(0);
+
+        if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
+            this._toastService.warning("Final paid amount < sum total paid amount");
+            return;
+        }
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
             this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
             return;
         }
-        if (this.paymentList.filter(x => x.paymentType == AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            const isCreditHaveInvoice = this.paymentList.filter(x => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT).some(x => !x.invoiceNo);
-            if (isCreditHaveInvoice) {
+        if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            const isCreditHaveInvoice = DEBIT_LIST.some(x => !!x.netOffVnd || !!x.netOffUsd);
+            if (!isCreditHaveInvoice) {
                 this._toastService.warning("Some credit do not have net off invoice");
                 return;
             }
@@ -178,7 +201,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning('Please you do Process Clear firstly!');
             return;
         }
-        if (this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && !x.creditNo && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd))) {
+        const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+        if (hasRowTotalInvalid) {
+            const rowInvalid: ReceiptInvoiceModel[] = this.paymentList.filter(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
+            rowInvalid.forEach(x => {
+                x.isValid = false;
+            })
             this._toastService.warning("Total Paid must <= Unpaid");
             return;
         }
@@ -329,21 +357,35 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         if (this.actionReceiptFromParams !== 'debit') {
             this.formCreate.isReadonly = true;
         }
-
-        if (this.actionReceiptFromParams === 'bank') {
-            const formMappingBank = {
-                paymentRefNo: res.paymentRefNo + '_BANK',
-            }
-            this.formCreate.formSearchInvoice.patchValue(formMappingBank);
-            this.formCreate.receiptReference = res.paymentRefNo + res.class;
-
-        } else if (this.actionReceiptFromParams === 'other') {
-            this.formCreate.formSearchInvoice.patchValue({ paymentRefNo: res.paymentRefNo + '_OTH001' });
-            this.formCreate.receiptReference = res.paymentRefNo + '_' + res.class;
+        let paymentRefNo: string = null;
+        switch (this.actionReceiptFromParams) {
+            case 'bank':
+                paymentRefNo = res.paymentRefNo + '_BANK';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'other':
+                paymentRefNo = res.paymentRefNo + '_OTH001';
+                this.formCreate.isUpdate = true;
+                break;
+            case 'debit':
+                this.formCreate.isUpdate = false; // allow generate receipt
+                break;
+            default:
+                break;
         }
+
+        this.formCreate.formSearchInvoice.patchValue({
+            paymentRefNo: paymentRefNo,
+            referenceNo: res.paymentRefNo + '_' + res.class
+        });
     }
 
     setPaymentListFormDefault(res: ReceiptModel) {
+        if (res.currencyId !== 'VND') {
+            this.listInvoice.paidAmountUsd.enable();
+            this.listInvoice.creditAmountUsd.enable();
+            this.listInvoice.cusAdvanceAmountUsd.enable();
+        }
         if (this.actionReceiptFromParams === 'debit') {
             this.setPaymentListFormForClearDebit(res);
             return;
@@ -358,7 +400,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
@@ -385,10 +428,23 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             cusAdvanceAmountVnd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountVnd : 0,
             cusAdvanceAmountUsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
 
-            paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER
+            paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER,
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+
+        if (res.class == AccountingConstants.RECEIPT_CLASS.COLLECT_OBH && !!res.receiptInternalOfficeCode) {
+            this.listInvoice.obhPartners
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((partners: Partner[]) => {
+                    if (!!partners.length) {
+                        const partner: Partner = partners.find(x => x.internalCode === res.receiptInternalOfficeCode);
+                        this.listInvoice.obhpartnerId.setValue(partner?.id);
+                    }
+                })
+        } else if (res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE) {
+            this.listInvoice.paymentMethod.setValue(AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE);
+        }
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: [] }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
@@ -398,7 +454,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const formMappingFormOther = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
-            cusAdvanceAmount: 0,
+            cusAdvanceAmountVnd: 0,
+            cusAdvanceAmountUsd: 0,
             creditAmountUsd: 0,
             creditAmountVnd: 0,
             paidAmountVnd: 0,
@@ -422,18 +479,23 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         listPaymentWithUnpaid.forEach((c: ReceiptInvoiceModel) => {
+
+            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.balanceVnd;
+            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.balanceUsd;
+
             if (c.currencyId === 'VND') {
-                c.unpaidAmount = c.unpaidAmountVnd - c.paidAmountVnd;
+                c.unpaidAmount = c.unpaidAmountVnd;
             } else {
-                c.unpaidAmount = c.unpaidAmountUsd - c.paidAmountUsd;
+                c.unpaidAmount = c.unpaidAmountUsd;
             }
-            c.unpaidAmountVnd = c.paidAmountVnd = c.totalPaidVnd = c.unpaidAmountVnd - c.paidAmountVnd;
-            c.unpaidAmountUsd = c.paidAmountUsd = c.totalPaidUsd = c.unpaidAmountUsd - c.paidAmountUsd;
         })
         listPaymentWithUnpaid.forEach((x: ReceiptInvoiceModel) => {
             x.paidAmountVnd = x.unpaidAmountVnd;
             x.paidAmountUsd = x.unpaidAmountUsd;
             x.notes = "Bank Fee/Other Receipt";
+            x.netOff = false;
+            x.netOffVnd = 0;
+            x.netOffUsd = 0;
             x.id = SystemConstants.EMPTY_GUID; // ? Reset ID Trường hợp phiếu ngân hàng.
         })
 

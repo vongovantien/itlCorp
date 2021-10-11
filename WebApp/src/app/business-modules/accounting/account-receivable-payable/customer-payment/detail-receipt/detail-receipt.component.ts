@@ -121,13 +121,19 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
         // * Mapping credit to credit[]
-        // this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;
             this.formCreate.isReadonly = true;
+        }
+
+        if (res.class === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT || res.class === AccountingConstants.RECEIPT_CLASS.NET_OFF) {
+            this.formCreate.isShowGetDebit = true;
+        } else {
+            this.formCreate.isShowGetDebit = false;
         }
     }
 

@@ -67,5 +67,8 @@ namespace eFMS.API.Catalogue.DL.Common
         public static readonly string PARTNER_TYPE_CUSTOMER = "Customer";
         public static readonly string PARTNER_TYPE_AGENT = "Agent";
         public static readonly string PARTNER_TYPE_SUPPLIER = "Supplier";
+
+        public static readonly string EMAIL_TYPE_ACTIVE_PARTNER = "Active Partner";
+        public static readonly string EMAIL_TYPE_ACTIVE_CONTRACT = "Active Agreement";
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace eFMS.API.ReportData.Models.Accounting
+﻿using System;
+
+namespace eFMS.API.ReportData.Models.Accounting
 {
     public class InfoShipmentAdvanceExport
     {
@@ -17,5 +19,7 @@
         public decimal? NormAmount { get; set; }
         public decimal? InvoiceAmount { get; set; }
         public decimal? OtherAmount { get; set; }
+        public DateTime? ServiceDate { get; set; }
+        public string RequestNote { get; set; }
     }
 }

@@ -10,14 +10,15 @@ import { catchError, finalize, concatMap, withLatestFrom, takeUntil, map } from 
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 
-import { ConfirmPopupComponent, InfoPopupComponent } from '@common';
+import { ConfirmPopupComponent, InfoPopupComponent, LoadingPopupComponent } from '@common';
 
 import { PaymentModel, AccountingPaymentModel } from '@models';
-import { RoutingConstants } from '@constants';
+import { RoutingConstants, AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
-import { getDataSearchHistoryPaymentState, getHistoryPaymentPagingState } from '../../store/reducers';
+import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
+import { formatDate } from '@angular/common';
 
 
 
@@ -31,6 +32,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
     @ViewChild(InfoPopupComponent) infoNotAllowDelete: InfoPopupComponent;
     @ViewChild('confirmInvoicePaymentPopup') confirmInvoicePaymentPopup: ConfirmPopupComponent;
+    @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
     @Output() onUpdateExtendDateOfInvoice: EventEmitter<any> = new EventEmitter<any>();
 
 
@@ -65,15 +67,21 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             { title: 'Type', field: 'type', sortable: true },
             { title: 'Invoice No', field: 'invoiceNoReal', sortable: true },
             { title: 'Partner Name', field: 'partnerName', sortable: true },
-            { title: 'Amount', field: 'amount', sortable: true },
-            { title: 'Paid Amount', field: 'paidAmount', sortable: true },
-            { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
+            { title: 'Amount VND', field: 'totalAmountVnd', sortable: true },
+            { title: 'Amount USD', field: 'totalAmountUsd', sortable: true },
+            { title: 'Paid Amount VND', field: 'paidAmountVnd', sortable: true },
+            { title: 'Paid Amount USD', field: 'paidAmountUsd', sortable: true },
+            { title: 'Unpaid Amount VND', field: 'unpaidAmountVnd', sortable: true },
+            { title: 'Unpaid Amount USD', field: 'unpaidAmountUsd', sortable: true },
             { title: 'Payment Status', field: 'status', sortable: true },
             { title: 'Due Date', field: 'dueDate', sortable: true },
             { title: 'Overdue Days', field: 'overdueDays', sortable: true },
             { title: 'Extends date', field: 'extendDays', sortable: true },
             { title: 'Invoice Date', field: 'issuedDate', sortable: true },
             { title: 'Serie No', field: 'serie', sortable: true },
+            { title: 'Amount', field: 'amount', sortable: true },
+            { title: 'Paid Amount', field: 'paidAmount', sortable: true },
+            { title: 'Unpaid Amount', field: 'unpaidAmount', sortable: true },
         ];
         this.paymentHeaders = [
             { title: 'No', field: '', sortable: true },
@@ -86,26 +94,42 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         ];
 
         this.menuSpecialPermission = this._store.select(getMenuUserSpecialPermissionState);
+        this._store.select(getDataSearchHistoryPaymentState)
+            .pipe(
+                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    this.dataSearch = data.dataSearch;
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+                }
+            );
+
+        this.isLoading = this._store.select(getHistoryPaymentLoadingListState);
     }
 
     ngAfterViewInit() {
     }
 
     getPagingData() {
-        this._store.select(getDataSearchHistoryPaymentState)
+        this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+        this._store.select(getHistoryPaymentListState)
             .pipe(
-                withLatestFrom(this._store.select(getHistoryPaymentPagingState)),
-                takeUntil(this.ngUnsubscribe),
-                map(([dataSearch]) => ({  dataSearch: dataSearch }))
-            )
-            .subscribe(
-                (data) => {
-                    if (!!data.dataSearch) {
-                        this.dataSearch = data.dataSearch;
-                    }
-
-                    this._store.dispatch(LoadListHistoryPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
-                }
+                catchError(this.catchError),
+                map((data: any) => {
+                    return {
+                        data: !!data.data ? data.data.map((item: any) => new AccountingPaymentModel(item)) : [],
+                        totalItems: data.totalItems,
+                    };
+                })
+            ).subscribe(
+                (res: any) => {
+                    this.refPayments = res.data || [];
+                    this.totalItems = res.totalItems;
+                },
             );
     }
 
@@ -113,11 +137,22 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/history-payment/import`]);
     }
 
+    startDownloadReport(data: any, fileName: string) {
+        if (data.byteLength > 0) {
+            this.downLoadFile(data, SystemConstants.FILE_EXCEL, fileName);
+            this.loadingPopupComponent.downloadSuccess();
+        } else {
+            this.loadingPopupComponent.downloadFail();
+        }
+    }
+
     exportExcel() {
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
         this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
             .subscribe(
                 (res: Blob) => {
-                    this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+                    this.startDownloadReport(res, 'invoice-payment.xlsx');
                 }
             );
     }
@@ -127,13 +162,42 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
         } else {
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
                 .subscribe(
                     (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Customer - eFMS.xlsx');
+                        this.startDownloadReport(res, 'Statement of Receivable Customer - eFMS.xlsx');
                     }
                 );
         }
+    }
+
+    exportAdvanceReceiptData() {
+        if (!this.dataSearch || !this.dataSearch.partnerId) {
+            this._toastService.warning('No Data To View, Please Select Partner and Apply');
+            return;
+        }
+        const body: ICriteriaReceiptAdvance = {
+            customerId: this.dataSearch.partnerId,
+            status: "Done",
+            dateFrom: this.dataSearch.fromUpdatedDate,
+            dateTo: this.dataSearch.toUpdatedDate,
+            dateType: "Paid Date",
+            // paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
+        };
+        this._spinner.hide();
+        this.loadingPopupComponent.show();
+        this._exportRepo.exportAdvanceReceipt(body)
+            .subscribe(
+                (res: ArrayBuffer) => {
+                    if (!res) {
+                        this._toastService.warning('No Data To View');
+                        return;
+                    }
+                    this.startDownloadReport(res, 'eFms Receipt_Advance.xlsx');
+                }
+            );
     }
 
     getPayments(refNo: string, type: string) {
@@ -205,7 +269,6 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     onDeletePayment() {
-        this.isLoading = true;
         this._accountingRepo.deletePayment(this.selectedPayment.id)
             .pipe(
                 catchError(this.catchError),
@@ -272,17 +335,28 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    exportStatementReceivableAgency(){
+    exportStatementReceivableAgency() {
         if (!this.refPayments.length) {
             this._toastService.warning('No Data To View, Please Re-Apply Filter');
             return;
         } else {
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
                 .subscribe(
                     (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Statement of Receivable Agency - eFMS.xlsx');
+                        this.startDownloadReport(res, 'Statement of Receivable Agency - eFMS.xlsx');
                     }
                 );
         }
     }
+}
+
+interface ICriteriaReceiptAdvance {
+    customerId: string;
+    status: string;
+    dateFrom: string;
+    dateTo: string;
+    dateType: string;
+    paymentMethod?: string;
 }

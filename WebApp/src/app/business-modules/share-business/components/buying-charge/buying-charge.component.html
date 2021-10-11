@@ -65,7 +65,7 @@
                                             title="Duplicate"><i class="la la-copy"></i>
                                         </button>
                                         <ng-container *ngIf="
-                                        !charge.paySoano 
+                                        !charge.paySoano
                                         && !charge.creditNo
                                         && !charge.settlementCode
                                         && !charge.voucherId
@@ -80,20 +80,20 @@
                                 </td>
                             </ng-container>
                             <td>
-                                <div class="form-group col-md-12 dropdown-partner" [ngClass]="{'m-form__group has-danger': isSubmitted && 
-                                    !charge.partnerShortName 
+                                <div class="form-group col-md-12 dropdown-partner" [ngClass]="{'m-form__group has-danger': isSubmitted &&
+                                    !charge.partnerShortName
                                     && !charge.paySoano
                                     && !charge.creditNo
                                     && !charge.settlementCode
                                     && !charge.voucherId
                                     && !charge.voucherIddate}"
                                     [tooltip]="!!charge.paymentObjectId ? charge.partnerName : null">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true ;else partnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.partnerShortName">
@@ -102,22 +102,22 @@
                                         <input type="text" class="dropdown-toggle form-control" readonly
                                             [(ngModel)]="charge.partnerShortName" placeholder="Please Select"
                                             (click)="loadDynamicComoGrid(charge,i)"
-                                            [disabled]="isShowLoadingPartner ? 'disabled': null" [attr.readonly]="!!charge.creditNo 
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null" [attr.readonly]="!!charge.creditNo
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
-                                                || !charge.isFromShipment 
+                                                || !charge.isFromShipment
                                                 || (isLocked | async) === true">
-                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null; 
+                                        <combo-grid-icon (onDelete)="charge.paymentObjectId = null;
                                                     charge.partnerShortName = null"
-                                            (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName 
-                                                && !charge.paySoano 
+                                            (onDropdown)="loadDynamicComoGrid(charge,i)" [showDelete]="!!charge.partnerShortName
+                                                && !charge.paySoano
                                                 && !charge.creditNo
                                                 && !charge.settlementCode
                                                 && !charge.voucherId
-                                                && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName 
-                                                && !charge.paySoano 
+                                                && !charge.voucherIddate" [showDropdown]="!!charge.partnerShortName
+                                                && !charge.paySoano
                                                 && !charge.creditNo
                                                 && !charge.settlementCode
                                                 && !charge.voucherId
@@ -137,12 +137,12 @@
                                 </div>
                             </td>
                             <td>
-                                <ng-container *ngIf="!!charge.creditNo 
+                                <ng-container *ngIf="!!charge.creditNo
                                     || !!charge.settlementCode
                                     || !!charge.paySoano
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate
-                                    || !charge.isFromShipment 
+                                    || !charge.isFromShipment
                                     || (isLocked | async) === true ;else chargeID">
                                     <div class="form-group">
                                         <input type="text" class="dropdown-toggle form-control" disabled
@@ -172,7 +172,7 @@
                                         <div class="col-md-6 p-r-none">
                                             <input type="number" class="form-control" [(ngModel)]="charge.quantity"
                                                 placeholder="Quantity" (ngModelChange)="onChangeDataUpdateTotal(charge)"
-                                                [disabled]="!!charge.creditNo 
+                                                [disabled]="!!charge.creditNo
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
@@ -181,12 +181,12 @@
                                                 [decimals]="digitDecimal" autoFormatCurrency>
                                         </div>
                                         <div class="col-md-6 p-l-none">
-                                            <ng-container *ngIf="!!charge.creditNo 
+                                            <ng-container *ngIf="!!charge.creditNo
                                                 || !!charge.settlementCode
                                                 || !!charge.voucherId
                                                 || !!charge.voucherIddate
                                                 || !!charge.paySoano
-                                                || !charge.isFromShipment 
+                                                || !charge.isFromShipment
                                                 || (isLocked | async) === true; else qtyHint">
                                                 <select class="form-control border" disabled>
                                                     <option [value]="charge.quantityType">
@@ -211,12 +211,12 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && charge.unitId === null }">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true; else unit">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.unitCode">
@@ -238,12 +238,12 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (((!(+charge.unitPrice)) && charge.isFromShipment) || charge.unitPrice === '')}">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true; else unitPrice">
                                         <input type="text" class="form-control" disabled [value]="charge.unitPrice"
                                             autoFormatCurrency>
@@ -258,12 +258,12 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.currencyId)}">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true; else currency">
                                         <select class="form-control" disabled>
                                             <option>{{charge.currencyId}}</option>
@@ -282,12 +282,12 @@
                             <td>
                                 <div class="form-group "
                                     [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true; else vatrate">
                                         <input type="text" class="form-control" disabled [value]="charge.vatrate">
                                     </ng-container>
@@ -307,7 +307,7 @@
                             <td>
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.notes"
-                                        placeholder="Note" [disabled]="!!charge.creditNo 
+                                        placeholder="Note" [disabled]="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
@@ -321,7 +321,7 @@
                                     <input type="text" class="form-control" [(ngModel)]="charge.invoiceNo"
                                         placeholder="Invoice No"
                                         (ngModelChange)="onChangeInvoiceNo(charge,$event); isDuplicateInvoice = false"
-                                        [disabled]="!!charge.creditNo 
+                                        [disabled]="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
@@ -332,7 +332,7 @@
                             <td>
                                 <div class="form-group ">
                                     <input type="text" class="form-control" [(ngModel)]="charge.seriesNo"
-                                        placeholder="Series No" [disabled]="!!charge.creditNo 
+                                        placeholder="Series No" [disabled]="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
@@ -342,12 +342,12 @@
                             </td>
                             <td>
                                 <div class="form-group table-date">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true;else invoiceDate">
                                         <input type="text" class="form-control" disabled
                                             [value]="!!charge.invoiceDate && charge.invoiceDate.startDate ? (charge.invoiceDate.startDate | date: 'dd/MM/yyyy') : null ">
@@ -366,12 +366,12 @@
                             </td>
                             <td>
                                 <div class="form-group ">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true ;else vatPartnerTemplate">
                                         <input type="text" class="dropdown-toggle form-control" disabled
                                             [(ngModel)]="charge.vatPartnerShortName">
@@ -403,12 +403,12 @@
                             </td>
                             <td>
                                 <div class="form-group table-date">
-                                    <ng-container *ngIf="!!charge.creditNo 
+                                    <ng-container *ngIf="!!charge.creditNo
                                         || !!charge.settlementCode
                                         || !!charge.voucherId
                                         || !!charge.voucherIddate
                                         || !!charge.paySoano
-                                        || !charge.isFromShipment 
+                                        || !charge.isFromShipment
                                         || (isLocked | async) === true;else exchangeDate">
                                         <input type="text" class="form-control" disabled
                                             [value]="!!charge.exchangeDate && charge.exchangeDate.startDate ? (charge.exchangeDate.startDate | date: 'dd/MM/yyyy') : null ">
@@ -432,7 +432,7 @@
                                 </div>
                             </td>
                             <td>
-                                <app-switch [(ngModel)]="charge.kickBack" [disabled]="!!charge.creditNo 
+                                <app-switch [(ngModel)]="charge.kickBack" [disabled]="!!charge.creditNo
                                     || !!charge.settlementCode
                                     || !!charge.voucherId
                                     || !!charge.voucherIddate

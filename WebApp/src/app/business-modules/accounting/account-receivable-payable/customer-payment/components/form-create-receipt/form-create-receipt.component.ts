@@ -33,6 +33,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     paymentRefNo: AbstractControl;
     agreementId: AbstractControl;
     class: AbstractControl;
+    referenceNo: AbstractControl;
 
     $customers: Observable<Partner[]>;
     customers: Partner[] = [];
@@ -59,7 +60,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     partnerTypeState: string;
     receiptReference: string = null;
     isShowGetDebit: boolean = true;
-
     constructor(
         private readonly _fb: FormBuilder,
         private readonly _store: Store<IAppState>,
@@ -73,10 +73,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     ngOnInit() {
         this.initForm();
         this.getCustomerAgent();
-
-        if (!this.isUpdate) {
-            this.generateReceiptNo();
-        }
+        this.generateReceiptNo();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -111,13 +108,15 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             date: [],
             paymentRefNo: new FormControl(null, Validators.required),
             agreementId: [null, Validators.required],
-            class: [this.classReceipt[0]]
+            class: [this.classReceipt[0]],
+            referenceNo: [{ value: null, disabled: true }]
         });
         this.customerId = this.formSearchInvoice.controls['customerId'];
         this.date = this.formSearchInvoice.controls['date'];
         this.paymentRefNo = this.formSearchInvoice.controls['paymentRefNo'];
         this.agreementId = this.formSearchInvoice.controls['agreementId'];
         this.class = this.formSearchInvoice.controls['class'];
+        this.referenceNo = this.formSearchInvoice.controls['referenceNo'];
 
     }
 
@@ -126,7 +125,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             (data: any) => {
                 if (!!data) {
                     const { receiptNo } = data;
-                    this.paymentRefNo.setValue(receiptNo);
+                    if (!this.isUpdate) {
+                        this.paymentRefNo.setValue(receiptNo);
+                    }
                 }
             }
         );
