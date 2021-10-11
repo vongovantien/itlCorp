@@ -140,7 +140,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
 
     startDownloadReport(data: any, fileName: string) {
         if (data.byteLength > 0) {
-            this.downLoadFile(data, SystemConstants.FILE_EXCEL, 'invoice-payment.xlsx');
+            this.downLoadFile(data, SystemConstants.FILE_EXCEL, fileName);
             this.loadingPopupComponent.downloadSuccess();
         } else {
             this.loadingPopupComponent.downloadFail();
