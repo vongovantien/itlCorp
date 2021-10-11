@@ -35,6 +35,9 @@
      </Reference>
    </ItemGroup>
    <ItemGroup>
+     <None Update="FormatExcel\TemplateExport\AccountReceivable\AR_SUMMARY_TEMPLATE.xlsx">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
      <None Update="FormatExcel\TemplateExport\AccountReceivable\Receipt_Advance_Report _Teamplate.xlsx">
        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
      </None>
