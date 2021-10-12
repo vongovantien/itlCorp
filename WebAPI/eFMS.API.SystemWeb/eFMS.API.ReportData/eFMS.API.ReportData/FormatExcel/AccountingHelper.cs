@@ -656,7 +656,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 for (int i = 0; i < customerPayment.Count; i++)
                 {
                     var item = customerPayment[i];
-                    if (i == 1)
+                    if (i == 1 && isExistDetail)
                     {
                         excel.SetDataTable();
                         excel.DeleteRow(7);
