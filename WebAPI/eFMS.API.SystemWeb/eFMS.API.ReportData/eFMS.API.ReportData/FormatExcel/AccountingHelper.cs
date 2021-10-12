@@ -653,8 +653,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 var sumRemainObhUsd = 0m;
                 var sumAdvanceAmountVnd = 0m;
                 var sumAdvanceAmountUsd = 0m;
-                foreach (var item in customerPayment)
+                for (int i = 0; i < customerPayment.Count; i++)
                 {
+                    var item = customerPayment[i];
+                    if (i == 1)
+                    {
+                        excel.SetDataTable();
+                        excel.DeleteRow(7);
+                        excel.StartDetailTable -= 1;
+                    }
                     var listKeyData = new Dictionary<string, object>();
                     if (item.BillingRefNo != "ADVANCE AMOUNT")
                     {
