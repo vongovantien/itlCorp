@@ -3519,9 +3519,39 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
 
-        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts)
+        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            if(receipts.Count() == 0)
+            List<string> methodsAdv = new List<string> {
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH,
+                AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL,
+            };
+            Expression<Func<AcctReceipt, bool>> query = (x =>
+               (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+               && x.Status == AccountingConstants.RECEIPT_STATUS_DONE
+              );
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid Date" && criteria.DateFrom.HasValue && criteria.DateTo.HasValue)
+            {
+                query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
+            }
+
+            IQueryable<AcctReceipt> receiptExpre = DataContext.Get(query);
+
+            IQueryable<AcctReceipt> receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
+            List<Guid> receiptWithoutPaymentMethodIds = receiptExpre.Where(x => !methodsAdv.Contains(x.PaymentMethod)).Select(x => x.Id).ToList();
+
+            List<Guid?> queryPayment = acctPaymentRepository.Get(x => receiptWithoutPaymentMethodIds.Contains(x.ReceiptId ?? Guid.Empty)
+            && (x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH))
+            .Select(x => x.ReceiptId)
+            .Distinct()
+            .ToList();
+
+            IQueryable<AcctReceipt> receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
+
+            IQueryable<AcctReceipt> receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
+
+            if (receipts.Count() == 0)
             {
                 return null;
             }

@@ -2,18 +2,18 @@ import { Component, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
+import { ConfirmPopupComponent, Permission403PopupComponent } from "@common";
 import { AccountingRepo } from "@repositories";
 import { AppList, IPermissionBase } from "@app";
 import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants } from "@constants";
 
-import { catchError, finalize, map, takeUntil, withLatestFrom } from "rxjs/operators";
+import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { LoadListCustomerPayment, RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
+import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
 

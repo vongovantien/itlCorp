@@ -11,6 +11,7 @@ import { debounceTime, distinctUntilChanged, switchMap, takeUntil, skip } from "
 import moment from "moment/moment";
 import { PermissionShipment } from "./shared/models/document/permissionShipment";
 import { PermissionHouseBill } from "./shared/models/document/permissionHouseBill";
+import { environment } from 'src/environments/environment';
 
 
 export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit {
@@ -43,6 +44,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     permissionHblDetail: Observable<PermissionHouseBill>;
     menuSpecialPermission: Observable<SystemInterface.ISpecialAction[]>;
 
+    isProduction: boolean = environment.production;
 
     _isShowAutoComplete = new BehaviorSubject<boolean>(false);
     $isShowAutoComplete: Observable<boolean> = this._isShowAutoComplete.asObservable();

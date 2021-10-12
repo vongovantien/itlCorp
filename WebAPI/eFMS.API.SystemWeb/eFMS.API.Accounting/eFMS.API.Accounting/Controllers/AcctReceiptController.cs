@@ -355,11 +355,11 @@ namespace eFMS.API.Accounting.Controllers
             bool valid = true;
             if (Id == Guid.Empty)
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
             else
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
 
             return valid;
@@ -460,9 +460,7 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            var resultQuery = acctReceiptService.Query(criteria);
-
-            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria, resultQuery);
+            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria);
 
             return Ok(result);
         }
