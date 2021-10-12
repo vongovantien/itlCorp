@@ -18,8 +18,10 @@
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item pointer"
                                             (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
-                                        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
-                                            Receipt</a>
+                                        <ng-container *ngIf="!isProduction">
+                                            <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
+                                                Receipt</a>
+                                        </ng-container>
                                     </div>
                                 </div>
 
@@ -44,6 +46,7 @@
                                                     </thead>
                                                     <tbody>
                                                         <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
+                                                            [attr.title]="cps.reasonReject"
                                                             [class.invalid-row]="cps.syncStatus === 'Rejected'">
                                                             <td class="table-actions-col" style="min-width:40px">
                                                                 <div class="table-actions">
