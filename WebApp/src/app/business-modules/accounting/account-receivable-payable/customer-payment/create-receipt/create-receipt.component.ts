@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { InjectViewContainerRefDirective } from '@directives';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
@@ -256,7 +256,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this.listInvoice.obhpartnerId.setErrors({ required: true });
                 valid = false;
             } else {
-                this.listInvoice.obhpartnerId.setErrors({ required: null });
+                this.removeValidators(this.listInvoice.obhpartnerId);
+
                 valid = true;
             }
         }
@@ -280,13 +281,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     this._toastService.error("Create data fail, Please check again!");
                 },
                 (res: HttpErrorResponse) => {
-                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
-                        this.formCreate.paymentRefNo.setErrors({ existed: true });
-                        return;
-                    }
-                    if (res.error?.code == 408) {
-                        this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
-                    }
+                    this.handleValidateReceiptResponse(res);
                 }
             )
     };
@@ -512,5 +507,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         })
 
         return listPaymentWithUnpaid;
+    }
+
+    handleValidateReceiptResponse(res: HttpErrorResponse) {
+        if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+            this.formCreate.paymentRefNo.setErrors({ existed: true });
+            return;
+        }
+        if (res.error?.code == 408) {
+            this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
+            return;
+        }
+        if (res.error?.code == 407) {
+            this.listInvoice.paidAmountVnd.setErrors({ validCus: true });
+            return;
+        }
     }
 }

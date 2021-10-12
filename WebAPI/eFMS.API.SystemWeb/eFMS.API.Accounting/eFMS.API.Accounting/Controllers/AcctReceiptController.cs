@@ -171,12 +171,23 @@ namespace eFMS.API.Accounting.Controllers
                 return BadRequest(_result);
             }
 
+            if(receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+            {
+                bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
+                if (!isValidCusAgreement)
+                {
+                    string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
+                    return BadRequest(_result);
+                }
+            }
+
             if((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
             {
                 bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
                 if (!isValidCusAgreement)
                 {
-                    string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again");
+                    string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
                     var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
                     return BadRequest(_result);
 

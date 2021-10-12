@@ -54,7 +54,7 @@
         </div>
         <div class="col-lg-3">
             <div class="form-group"
-                [ngClass]="{'m-form__group has-danger':isSubmitted && paidAmountVnd.value === null }">
+                [ngClass]="{'m-form__group has-danger':(isSubmitted && paidAmountVnd.value === null) || (paidAmountVnd.errors | equalError: 'validCus') }">
                 <label required>Collect Amount VND</label>
                 <input type="number" class="form-control m-input m-input--square text-success"
                     formControlName="paidAmountVnd" autoFormatCurrency [attr.readOnly]="isReadonly"
@@ -134,7 +134,7 @@
                         [ngClass]="{'m-form__group has-danger':isSubmitted && !obhpartnerId.value && (obhpartnerId.errors | equalError: 'required') }">
                         <label>OBH
                             Partner</label>
-                        <app-combo-grid-virtual-scroll (itemSelected)="obhpartnerId.setValue($event.id)"
+                        <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'obhPartner')"
                             (remove)="resetFormControl(obhpartnerId)"
                             [currentActiveItemId]="{field:'id', value: obhpartnerId.value}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners | async"

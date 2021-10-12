@@ -418,6 +418,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
                 break;
             case 'payment-method':
+                this.removeValidators(this.obhpartnerId);
+
                 if (data === AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) {
                     this.paidAmountVnd.setValue(0);
                     this.paidAmountUsd.setValue(0);
@@ -439,6 +441,11 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 } else {
                     this.bankAccountNo.setValue(null);
                 }
+                break;
+            case 'obhPartner':
+                this.obhpartnerId.setValue(data.id);
+                this.removeValidators(this.obhpartnerId);
+
                 break;
             default:
                 break;
@@ -497,9 +504,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
     processClear() {
         this.isSubmitted = true;
-        if (this.form.invalid) {
-            return;
-        }
+        // if (this.form.invalid) {
+        //     return;
+        // }
 
         let listInvoice = [];
         this.debitList
