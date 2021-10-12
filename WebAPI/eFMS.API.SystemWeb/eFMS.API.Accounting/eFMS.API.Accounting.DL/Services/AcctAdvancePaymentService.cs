@@ -202,6 +202,7 @@ namespace eFMS.API.Accounting.DL.Services
             var advancePayments = DataContext.Get().Where(queryDefault);
 
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
+            var advanceRequests = acctAdvanceRequestRepo.Get();
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
 
@@ -565,6 +566,8 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
+                item.StatusApproval = advancePayment.StatusApproval;
+                
 
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
                 if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
