@@ -656,12 +656,6 @@ namespace eFMS.API.ReportData.FormatExcel
                 for (int i = 0; i < customerPayment.Count; i++)
                 {
                     var item = customerPayment[i];
-                    if (i == 1 && isExistDetail)
-                    {
-                        excel.SetDataTable();
-                        excel.DeleteRow(7);
-                        excel.StartDetailTable -= 1;
-                    }
                     var listKeyData = new Dictionary<string, object>();
                     if (item.BillingRefNo != "ADVANCE AMOUNT")
                     {
@@ -729,6 +723,12 @@ namespace eFMS.API.ReportData.FormatExcel
                     startRow++;
                     if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate != null)
                     {
+                        if (i == 0 && item.receiptDetail.Count == 0 && isExistDetail)
+                        {
+                            excel.SetDataTable();
+                            excel.DeleteRow(7);
+                            excel.StartDetailTable -= 1;
+                        }
                         foreach (var detail in item.receiptDetail)
                         {
                             listKeyData = new Dictionary<string, object>();
