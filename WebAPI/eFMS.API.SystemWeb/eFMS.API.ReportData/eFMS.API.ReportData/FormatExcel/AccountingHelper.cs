@@ -5088,25 +5088,54 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 excel.StartDetailTable = 3;
 
+                excel.StartDetailTable = 3;
+                //Set format amount
+                var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
+                var formatAmountUSD = "_([$USD] * #,##0.00_);_([$USD] * (#,##0.00);_([$USD] * \"\"??_);_(@_)";
+
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
                     var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
                     excel.SetDataTable();
                     listKeyData.Add("No", i+1);
                     listKeyData.Add("PartnerId", item.PartnerCode);
-                    listKeyData.Add("PartnerName", item.ParentNameAbbr);
-                    listKeyData.Add("Rate", item.DebitRate);
-                    listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
-                    listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
-                    listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
-                    listKeyData.Add("Over1-15Days", item.Over1To15Day);
-                    listKeyData.Add("Over16-30Days", item.Over16To30Day);
-                    listKeyData.Add("Over30Days", item.Over30Day);
+                    listKeyData.Add("PartnerName", item.PartnerNameEn);
+                    var rate = item.DebitRate?.ToString("0.##");
+                    listKeyData.Add("Rate", rate + " %");
+
+                    if (item.AgreementCurrency == "VND")
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        listKeyData.Add("CreditLimited", item.CreditLimited);
+                        listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+                        excel.SetFormatCell(listKeyFormat, formatAmountVND);
+                    }
+                    else
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        listKeyData.Add("CreditLimited", item.CreditLimited);
+                        listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+                        excel.SetFormatCell(listKeyFormat, formatAmountUSD);
+                    }
+              
+
                     listKeyData.Add("Curr", item.AgreementCurrency);
-                    listKeyData.Add("DebitAmount", item.DebitAmount);
-                    listKeyData.Add("CreditLimited", item.CreditLimited);
-                    listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+              
+
                     listKeyData.Add("Salesman",item.AgreementSalesmanName);
                     listKeyData.Add("ContractType", item.AgreementType);
                     listKeyData.Add("Status", item.AgreementStatus);
