@@ -434,11 +434,11 @@ namespace eFMS.API.ForPartner.DL.Service
         private DateTime? GetDueDateIssueAcctMngt(string partnerId, decimal? paymentTerm, List<string> serviceTypes, DateTime? invoiceDate, DateTime? billingDate)
         {
             DateTime? dueDate = null;
-            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
+            var contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == partnerId && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
             if (contractPartner == null)
             {
                 var acRefPartner = partnerRepo.Get(x => x.Id == partnerId).FirstOrDefault()?.ParentId;
-                contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == acRefPartner && x.OfficeId.Contains(currentUser.OfficeID.ToString()) && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
+                contractPartner = catContractRepository.Get(x => x.Active == true && x.PartnerId == acRefPartner && serviceTypes.Any(a => x.SaleService.Contains(a))).FirstOrDefault();
             }
 
             if (contractPartner != null)
@@ -448,10 +448,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     dueDate = invoiceDate.HasValue ? invoiceDate.Value.AddDays((double)(paymentTerm ?? 0)) : invoiceDate;
                 }
-                //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
-                if (contractPartner.BaseOn == "Billing Date")
+                else if (contractPartner.BaseOn == "Billing Date")  //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                 {
                     dueDate = billingDate.HasValue ? billingDate.Value.AddDays((double)(paymentTerm ?? 0)) : billingDate;
+                }
+                else
+                {
+                    dueDate = invoiceDate.Value.AddDays((double)(paymentTerm ?? 0));
                 }
             }
             else
@@ -669,24 +672,20 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
                     else
                     {
-                        data = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
+                        var invoiceToDelete = DataContext.Get(x => x.ReferenceNo == model.ReferenceNo
                                                 && x.InvoiceNoReal == model.InvoiceNo
                                                 && x.Serie == model.SerieNo
                                                 && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault();
+                      
+                        if (invoiceToDelete == null)
+                        {
+                            return new HandleState((object)"Không tìm thấy hóa đơn");
+                        }
 
-
-                        hs = DataContext.Delete(x => x.ReferenceNo == model.ReferenceNo
-                                                              && x.InvoiceNoReal == model.InvoiceNo
-                                                              && x.Serie == model.SerieNo
-                                                              && x.Type == ForPartnerConstants.ACCOUNTING_INVOICE_TYPE, false);
+                        data = invoiceToDelete;
+                        hs = DataContext.Delete(x => x.Id == invoiceToDelete.Id, false);
                     }
 
-                    if (data == null)
-                    {
-                        return new HandleState((object)"Không tìm thấy hóa đơn");
-                    }
-
-                   
                     if (hs.Success)
                     {
                         IQueryable<CsShipmentSurcharge> charges = null;
@@ -756,6 +755,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     trans.Rollback();
                     data = new AccAccountingManagement();
+                    new LogHelper("CancellingInvoice", ex.ToString());
                     return new HandleState((object)ex.Message);
                 }
                 finally
