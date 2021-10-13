@@ -3811,6 +3811,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Bank code:", // 27
                 "By cash:", // 28
                 "Due date:", // 29
+                "Payment method:", //30
+
             };
 
             List<string> headers = Headers;
@@ -4147,28 +4149,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Total net amount
                 var _totalNetAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeNetAmount).Sum();
                 workSheet.Cells[j - 1, 6].Value = _totalNetAmount;
-                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 6].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 // Total VAT amount
                 var _totalVatAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeVatAmount).Sum();
                 workSheet.Cells[j - 1, 7].Value = _totalVatAmount;
-                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 7].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total amount
                 var _totalAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum();
                 workSheet.Cells[j - 1, 8].Value = _totalAmount;
-                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 8].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 8].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total advanced amount (số tiền đã tạm ứng)
                 var _advanceAmount = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
                 workSheet.Cells[j - 1, 11].Value = _advanceAmount;
-                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 11].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4176,7 +4178,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //Value chênh lệch
                 workSheet.Cells[j - 1, 13].Value = _totalAmount - _advanceAmount;
-                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 13].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4190,7 +4192,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 11, j - 2, 11].Merge = true;
                 workSheet.Cells[p, 11, j - 2, 11].Value = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount); //Value Số tiền đã tạm ứng
-                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 11, j - 2, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4213,7 +4215,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 13, j - 2, 13].Merge = true;
                 workSheet.Cells[p, 13, j - 2, 13].Value = string.Empty; //Value Chênh lệch
-                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 13, j - 2, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4260,7 +4262,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             //Bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["A" + p + ":M" + p].Style.Font.Bold = true;
-            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = decimalFormat2;
 
             //In đậm border dòng 15
             workSheet.Cells[15, 1, 15, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
@@ -4418,6 +4420,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Style.Font.Bold = true;
             workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.SupplierName;
 
+            workSheet.Cells["A8"].Value = headers[7]; //Reson for request
+            workSheet.Cells["A8"].Style.Font.Bold = true;
+            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.ReasonForRequest;
+
+
+            workSheet.Cells["A11"].Value = headers[30]; //Reson for request
+            workSheet.Cells["A11"].Style.Font.Bold = true;
+            workSheet.Cells["B11"].Value = settlementExport.InfoSettlement.PaymentMethod;
+
             workSheet.Cells["F6"].Value = headers[5]; //Số SOA
             workSheet.Cells["F6"].Style.Font.Bold = true;
             workSheet.Cells["G6"].Value = settlementExport.InfoSettlement.SOANo;
@@ -4430,7 +4441,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Beneficiary
             workSheet.Cells["F13"].Value = headers[24];
             workSheet.Cells["F13"].Style.Font.Bold = true;
-            workSheet.Cells["CG3"].Value = settlementExport.InfoSettlement.BankAccountName;
+            workSheet.Cells["G13"].Value = settlementExport.InfoSettlement.BankAccountName;
 
             // Acc No
             workSheet.Cells["F14"].Value = headers[25];
@@ -4492,6 +4503,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["F18:G18"].Merge = true;
             workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+            workSheet.Cells["F18:G18"].Style.Numberformat.Format = numberFormat2;
 
             workSheet.Cells["F19"].Merge = true;
             workSheet.Cells["F19"].Value = headers[14]; // OBH
@@ -4505,8 +4517,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[17, 1, 17, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             #endregion
 
-            decimal? _sumTotalOBH = 0;
-            decimal? _sumTotalCredit = 0;
+            decimal _sumTotalOBH = 0;
+            decimal _sumTotalCredit = 0;
             int p = 20;
             int j = 20;
             int k = 20;
@@ -4518,9 +4530,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
-                //workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in OBHCharges)
                 {
                     workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
@@ -4531,9 +4543,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
-                //workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
                 foreach (var no_invoice in CreditInvoiceCharges)
                 {
                     workSheet.Cells[k, 2].Value = no_invoice.InvoiceNo;
@@ -4609,9 +4621,9 @@ namespace eFMS.API.ReportData.FormatExcel
             #endregion--TOTAL--
             //bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["a" + (p-2) + ":g" + (p - 2)].Style.Font.Bold = true;
-            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat2;
             workSheet.Cells["a" + p + ":g" + p].Style.Font.Bold = true;
-            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat2;
 
             //In đậm border dòng 14
             workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
