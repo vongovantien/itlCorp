@@ -1924,7 +1924,7 @@ namespace eFMS.API.Accounting.DL.Services
                         receiptList.AddRange(it.receiptDetail);
                     }
                     var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.FirstOrDefault().PartnerId && (x.dataAdv.PaidDate != null && x.dataAdv.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.dataAdv.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
-                    foreach(var dt in pm)
+                    foreach (var dt in pm)
                     {
                         var detail = new AccountingReceiptDetail();
                         detail.ReceiptId = dt.dataAdv.ReceiptId;
@@ -1965,21 +1965,19 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         agreementIds.AddRange(it.receiptDetail.Select(x => (Guid)x.AgreementId));
                     }
-                    if (agreementIds.Count > 0)
+                    var contractInfo = catContractRepository.Get(x => x.PartnerId == item.Key);
+                    var indexOfLastGrp = results.IndexOf(item.Last());
+                    payment.PartnerId = item.FirstOrDefault().PartnerId;
+                    payment.PartnerCode = item.FirstOrDefault().PartnerCode;
+                    payment.PartnerName = item.FirstOrDefault().PartnerName;
+                    payment.ParentCode = item.FirstOrDefault().ParentCode;
+                    payment.BillingRefNo = "ADVANCE AMOUNT";
+                    contractInfo = agreementIds.Count > 0 ? catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)) : contractInfo;
+                    payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
+                    payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
+                    if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                     {
-                        var indexOfLastGrp = results.IndexOf(item.Last());
-                        payment.PartnerId = item.FirstOrDefault().PartnerId;
-                        payment.PartnerCode = item.FirstOrDefault().PartnerCode;
-                        payment.PartnerName = item.FirstOrDefault().PartnerName;
-                        payment.ParentCode = item.FirstOrDefault().ParentCode;
-                        payment.BillingRefNo = "ADVANCE AMOUNT";
-                        var contractInfo = catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id));
-                        payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
-                        payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
+                        results.Insert(indexOfLastGrp + 1, payment);
                     }
                 }
             }
