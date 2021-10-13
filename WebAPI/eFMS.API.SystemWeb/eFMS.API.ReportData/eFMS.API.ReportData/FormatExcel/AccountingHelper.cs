@@ -1153,6 +1153,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J12"].Value = headers[39];
             workSheet.Cells["J12"].Style.Font.Bold = true;
             workSheet.Cells["K12"].Value = advanceExport.InfoAdvance.BankName;
+            workSheet.Cells["K12"].Style.WrapText = true;
 
             workSheet.Cells["J13"].Value = headers[40];
             workSheet.Cells["J13"].Style.Font.Bold = true;
