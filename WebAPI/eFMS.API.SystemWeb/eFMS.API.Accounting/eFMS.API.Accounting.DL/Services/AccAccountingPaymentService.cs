@@ -1876,18 +1876,21 @@ namespace eFMS.API.Accounting.DL.Services
             var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
             var paymentAdv = from dataAdv in DataContext.Get(x => x.Type == "ADV" || x.Type == "COLL_OBH")
                              join rcpt in receiptData on dataAdv.ReceiptId equals rcpt.Id
-                             select new {
+                             select new
+                             {
                                  dataAdv,
-                                 rcpt.CusAdvanceAmountUsd,
-                                 rcpt.CusAdvanceAmountVnd,
-                                 rcpt.PaymentDate
+                                 CusAdvanceAmountUsd = rcpt.CusAdvanceAmountUsd ?? 0,
+                                 CusAdvanceAmountVnd = rcpt.CusAdvanceAmountVnd ?? 0,
+                                 rcpt.PaymentDate,
+                                 AgreementAdvanceAmountUsd = rcpt.AgreementAdvanceAmountUsd ?? 0,
+                                 AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
                              };
-            if (criteria.DueDate != null)
+            if(criteria.FromIssuedDate != null)
             {
                 foreach (var item in grpPartner)
                 {
                     var payment = new AccountingCustomerPaymentExport();
-                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date).OrderByDescending(x => x.dataAdv.PaidDate).ThenByDescending(x=>x.dataAdv.DatetimeCreated).FirstOrDefault();
+                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.ToIssuedDate.Value.Date && (x.AgreementAdvanceAmountVnd > 0 || x.AgreementAdvanceAmountUsd > 0)).OrderByDescending(x => x.dataAdv.PaidDate).ThenByDescending(x => x.dataAdv.DatetimeCreated).FirstOrDefault();
 
                     if (pm != null)
                     {
@@ -1899,8 +1902,34 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
                         payment.BranchName = officeData[(Guid)pm.dataAdv.OfficeId].FirstOrDefault()?.ShortName;
-                        payment.AdvanceAmountVnd = pm.CusAdvanceAmountVnd ?? 0;
-                        payment.AdvanceAmountUsd = pm.CusAdvanceAmountUsd ?? 0;
+                        payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
+                        payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
+                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+                        {
+                            results.Insert(indexOfLastGrp + 1, payment);
+                        }
+                    }
+                }
+            }
+            if (criteria.DueDate != null)
+            {
+                foreach (var item in grpPartner)
+                {
+                    var payment = new AccountingCustomerPaymentExport();
+                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date && (x.AgreementAdvanceAmountVnd > 0 || x.AgreementAdvanceAmountUsd > 0)).OrderByDescending(x => x.dataAdv.PaidDate).ThenByDescending(x=>x.dataAdv.DatetimeCreated).FirstOrDefault();
+
+                    if (pm != null)
+                    {
+
+                        var indexOfLastGrp = results.IndexOf(item.Last());
+                        payment.PartnerId = item.FirstOrDefault().PartnerId;
+                        payment.PartnerCode = item.FirstOrDefault().PartnerCode;
+                        payment.PartnerName = item.FirstOrDefault().PartnerName;
+                        payment.ParentCode = item.FirstOrDefault().ParentCode;
+                        payment.BillingRefNo = "ADVANCE AMOUNT";
+                        payment.BranchName = officeData[(Guid)pm.dataAdv.OfficeId].FirstOrDefault()?.ShortName;
+                        payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
+                        payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
                         if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
