@@ -761,13 +761,6 @@ namespace eFMS.API.Catalogue.DL.Services
                 }
             }
 
-            if (partner?.UserCreated == currentUser.UserID)
-            {
-                if (partner.Active == true)
-                {
-                    entity.Active = true;
-                }
-            }
             entity.DatetimeModified = DateTime.Now;
             entity.UserModified = currentUser.UserID;
             entity.GroupId = partner.GroupId;
