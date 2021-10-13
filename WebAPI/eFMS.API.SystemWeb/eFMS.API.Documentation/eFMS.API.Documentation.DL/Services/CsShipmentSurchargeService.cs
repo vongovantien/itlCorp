@@ -1451,11 +1451,16 @@ namespace eFMS.API.Documentation.DL.Services
                         if (string.IsNullOrEmpty(item.ChargeCodeError))
                         {
                             var trueType = chargeData[item.ChargeCode.Trim()].Any(x => x.Type == TypeCompare);
-                            if (!trueType)
+                            if (!trueType && string.IsNullOrEmpty(item.ChargeCodeError))
                             {
                                 item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_INVALID_TYPE], item.ChargeCode);
                                 item.IsValid = false;
                             }
+                        }
+                        if (TypeCompare == "OBH" && string.IsNullOrEmpty(item.ObhPartner))
+                        {
+                            item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
+                            item.IsValid = false;
                         }
                     }
                 }
