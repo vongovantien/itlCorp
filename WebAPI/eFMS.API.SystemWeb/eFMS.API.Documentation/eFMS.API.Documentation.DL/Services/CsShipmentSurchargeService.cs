@@ -1277,7 +1277,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             var listPartner = partnerRepository.Get(x => x.Active == true);
-            var chargeData = catChargeRepository.Get().ToLookup(x => x.Code);
+            var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
@@ -1359,14 +1359,19 @@ namespace eFMS.API.Documentation.DL.Services
                     else
                     {
                         // check valid obh partner
-                        if (chargeData[item.ChargeCode.Trim()].Where(x=>x.Type == "CREDIT").Any() && !string.IsNullOrEmpty(item.ObhPartner))
+                        if (chargeData[item.ChargeCode.Trim()].Any(x => x.Type == "CREDIT") && !string.IsNullOrEmpty(item.ObhPartner))
                         {
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_WRONG], item.ChargeCode);
                             item.IsValid = false;
                         }
-                        else if(chargeData[item.ChargeCode.Trim()].Where(x => x.Type == "OBH").Any() && string.IsNullOrEmpty(item.ObhPartner))
+                        else if (chargeData[item.ChargeCode.Trim()].Where(x => x.Type == "OBH").Any() && string.IsNullOrEmpty(item.ObhPartner))
                         {
                             item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        if (!chargeData[item.ChargeCode.Trim()].Any(x => x.ServiceTypeId.Contains("CL")))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
                             item.IsValid = false;
                         }
                     }

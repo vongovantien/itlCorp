@@ -95,5 +95,6 @@
   "MSG_OBH_PARTNER_CODE_EMPTY": "No OBH Partner",
   "MSG_CHARGE_CODE_INVALID_TYPE": "Charge Code {0} not valid with type",
   "MSG_PARTER_CODE_NOT_VALID_TYPE": "Partner code '{0}' have invalid partner type in selling charge",
-  "MSG_PARTNER_CODE_DUPLICATE": "Partner Code and OBH Partner can't duplicate"
+  "MSG_PARTNER_CODE_DUPLICATE": "Partner Code and OBH Partner can't duplicate",
+  "MSG_CHARGE_CODE_WRONG_SERVICE": "Charge Code '{0}' invalid in service"
 }
