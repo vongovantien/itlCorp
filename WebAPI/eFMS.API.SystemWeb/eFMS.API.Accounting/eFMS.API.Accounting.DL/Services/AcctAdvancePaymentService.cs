@@ -538,7 +538,7 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
-                    Description = se.FirstOrDefault().Description,
+                    Description = string.Join(";",se.Select(x=>x.Description)),
                     DatetimeModified = se.First().DatetimeModified
 
                 })
