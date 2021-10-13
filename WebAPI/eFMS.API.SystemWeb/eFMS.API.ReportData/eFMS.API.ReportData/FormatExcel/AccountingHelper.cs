@@ -607,16 +607,16 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <returns></returns>
         public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
         {
+            var folderOfFile = GetARExcelFolder();
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
             try
             {
-                var folderOfFile = GetARExcelFolder();
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName;
-                if (!File.Exists(path))
-                {
-                    return null;
-                }
-                var excel = new ExcelExport(path);
                 int startRow = 6;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 2;
@@ -774,6 +774,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch (Exception ex)
             {
+                excel.PackageExcel.Dispose();
                 return null;
             }
         }

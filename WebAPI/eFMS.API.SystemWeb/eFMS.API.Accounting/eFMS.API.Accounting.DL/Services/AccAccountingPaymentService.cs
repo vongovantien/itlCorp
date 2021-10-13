@@ -1911,7 +1911,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
-            if (criteria.DueDate != null)
+            else if (criteria.DueDate != null)
             {
                 foreach (var item in grpPartner)
                 {
@@ -1987,7 +1987,10 @@ namespace eFMS.API.Accounting.DL.Services
                     var agreementIds = new List<Guid>();
                     foreach (var it in item)
                     {
-                        agreementIds.AddRange(it.receiptDetail.Select(x => (Guid)x.AgreementId));
+                        if (it.receiptDetail != null)
+                        {
+                            agreementIds.AddRange(it.receiptDetail.Select(x => (Guid)x.AgreementId));
+                        }
                     }
                     var indexOfLastGrp = results.IndexOf(item.Last());
                     payment.PartnerId = item.FirstOrDefault().PartnerId;
