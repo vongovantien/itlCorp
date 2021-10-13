@@ -723,12 +723,12 @@ namespace eFMS.API.ReportData.FormatExcel
                     startRow++;
                     if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate != null)
                     {
-                        if (i == 0 && item.receiptDetail.Count == 0 && isExistDetail)
-                        {
-                            excel.SetDataTable();
-                            excel.DeleteRow(7);
-                            excel.StartDetailTable -= 1;
-                        }
+                        //if (i == 0 && item.receiptDetail.Count == 0 && isExistDetail)
+                        //{
+                        //    excel.SetDataTable();
+                        //    excel.DeleteRow(7);
+                        //    excel.StartDetailTable -= 1;
+                        //}
                         foreach (var detail in item.receiptDetail)
                         {
                             listKeyData = new Dictionary<string, object>();
