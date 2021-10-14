@@ -2,6 +2,7 @@
 
 export const environment = {
     production: false,
+    uat: false,
     local: false,
     HOST: {
         WEB_URL: "test.api-efms.itlvn.com",

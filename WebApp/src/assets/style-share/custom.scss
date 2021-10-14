@@ -1413,3 +1413,11 @@ button {
 .bg-locked {
     background: #b5f5ff61 !important;
 }
+
+.cdk-overlay-container {
+    z-index: 1044; // lon hon thang modal backdrop 1042 (cdk > modal > backdrop)
+}   
+
+.modal{
+    z-index: 1043;
+}

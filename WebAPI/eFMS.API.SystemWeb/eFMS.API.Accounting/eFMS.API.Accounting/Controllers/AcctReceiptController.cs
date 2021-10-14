@@ -131,20 +131,20 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
+          
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (hs.Success)
             {
-                //Tính công nợ sau khi Save Cancel thành công
-                // acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 });
             }
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
+
+            
         }
 
         /// <summary>
@@ -169,6 +169,29 @@ namespace eFMS.API.Accounting.Controllers
                 string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
                 var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
                 return BadRequest(_result);
+            }
+
+            if(receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+            {
+                bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
+                if (!isValidCusAgreement)
+                {
+                    string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
+                    return BadRequest(_result);
+                }
+            }
+
+            if((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
+            {
+                bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
+                if (!isValidCusAgreement)
+                {
+                    string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
+                    return BadRequest(_result);
+
+                }
             }
 
             if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
@@ -332,11 +355,11 @@ namespace eFMS.API.Accounting.Controllers
             bool valid = true;
             if (Id == Guid.Empty)
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
             else
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
 
             return valid;
@@ -437,10 +460,23 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            var resultQuery = acctReceiptService.Query(criteria);
+            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria);
 
-            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria, resultQuery);
+            return Ok(result);
+        }
 
+        [HttpPut("{Id}/QuickUpdate")]
+        [Authorize]
+        public async Task<IActionResult> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
+        {
+            HandleState hs = await acctReceiptService.QuickUpdate(Id, model);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            if(!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model });
+            }
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             return Ok(result);
         }
     }

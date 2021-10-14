@@ -20,6 +20,7 @@ import { ARCustomerPaymentReceiptCreditListComponent } from './components/receip
 import { ARCustomerPaymentReceiptDebitListComponent } from './components/receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent } from './components/form-search-agent-customer/form-search-customer-agent-cd-invoice.component';
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from './components/customer-agent-debit/customer-agent-debit.popup';
+import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from './components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup';
 
 const routing: Routes = [
     {
@@ -44,7 +45,8 @@ const routing: Routes = [
         ARCustomerPaymentReceiptCreditListComponent,
         ARCustomerPaymentReceiptDebitListComponent,
         ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent,
-        ARCustomerPaymentCustomerAgentDebitPopupComponent
+        ARCustomerPaymentCustomerAgentDebitPopupComponent,
+        ARCustomerPaymentFormQuickUpdateReceiptPopupComponent
     ],
     imports: [
         SharedModule,

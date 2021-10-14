@@ -549,10 +549,13 @@ namespace eFMS.API.ReportData.Controllers
             var dataObjects = responseFromApi.Content.ReadAsAsync<AcctReceiptAdvanceModelExport>();
             if (dataObjects.Result == null)  return Ok(null);
 
-            var stream = new AccountingHelper().GenerateReceiptAdvance(dataObjects.Result, criteria);
+            var stream = new AccountingHelper().GenerateReceiptAdvance(dataObjects.Result, criteria, out string fileName);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Receipt Advance - eFMS.xlsx");
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, fileName);
+
+            Response.Headers.Add("efms-file-name", fileName);
+            Response.Headers.Add("Access-Control-Expose-Headers", "efms-file-name");
 
             return fileContent;
         }

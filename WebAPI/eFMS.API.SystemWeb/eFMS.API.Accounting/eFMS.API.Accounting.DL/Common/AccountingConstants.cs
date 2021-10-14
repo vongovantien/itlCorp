@@ -64,6 +64,7 @@
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE = "Clear-Advance";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_CASH = "Clear-Advance-Cash";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_BANK = "Clear-Advance-Bank";
+        public static readonly string PAYMENT_METHOD_COLL_INTERNAL = "COLL - Internal";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -197,11 +198,11 @@
         public static readonly string PAYMENT_TYPE_CODE_PAY_OTHER = "PAY_OTH";
         public static readonly string PAYMENT_TYPE_CODE_ADVANCE = "ADV";
 
-        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT OBH";
-        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT OTHER";
-        public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY OBH";
-        public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
-        public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT-OBH";
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT-OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY-OBH";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY-OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NETOFF";
         public static readonly string PAYMENT_TYPE_NAME_ADVANCE = "ADV";
         #endregion
 
