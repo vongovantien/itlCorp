@@ -2,20 +2,21 @@ import { Component, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
-import { ConfirmPopupComponent, InfoPopupComponent, Permission403PopupComponent } from "@common";
+import { ConfirmPopupComponent, Permission403PopupComponent } from "@common";
 import { AccountingRepo } from "@repositories";
 import { AppList, IPermissionBase } from "@app";
 import { ReceiptModel } from "@models";
 import { SortService } from "@services";
 import { RoutingConstants } from "@constants";
 
-import { catchError, finalize, map, takeUntil, withLatestFrom } from "rxjs/operators";
+import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { LoadListCustomerPayment, RegistTypeReceipt, ResetInvoiceList } from "./store/actions";
+import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
+import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -33,7 +34,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
-
+    @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
 
     CPs: ReceiptModel[] = [];
 
@@ -62,15 +63,15 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
         this.headers = [
             { title: 'Receipt No', field: 'paymentRefNo', sortable: true },
-            { title: 'Customer Name', field: 'customerName', sortable: true },
-            { title: 'Payment Amount', field: 'paidAmount', sortable: true },
-            { title: 'Collect Amount', field: '', sortable: true },
-            { title: 'Currency', field: 'currencyId', sortable: true },
-            { title: 'Description', field: 'description', sortable: true },
-            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
-            { title: 'Receipt Type', field: '', sortable: true },
-            { title: 'Type', field: 'type', sortable: true },
             { title: 'Paid Date', field: 'paymentDate', sortable: true },
+            { title: 'Customer Name', field: 'customerName', sortable: true },
+            { title: 'Collect Amount', field: '', sortable: true },
+            { title: 'Description', field: 'description', sortable: true },
+            { title: 'Receipt Type', field: '', sortable: true },
+            { title: 'Payment Method', field: 'paymentMethod', sortable: true },
+            { title: 'Payment Amount', field: 'paidAmount', sortable: true },
+            { title: 'Currency', field: 'currencyId', sortable: true },
+            { title: 'Type', field: 'type', sortable: true },
             { title: 'Billing Date', field: 'billingDate', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
             { title: 'Creator', field: 'userNameCreated', sortable: true },
@@ -220,6 +221,21 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     requestLoadListCustomerPayment() {
         this._store.dispatch(LoadListCustomerPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    showQuickUpdatePopup(type: string) {
+        switch (type) {
+            case 'method':
+                break;
+            case 'refNo':
+                break;
+            case 'obhPartner':
+                break;
+            default:
+                break;
+        }
+        this.quickUpdatePopup.updateKey = type;
+        this.quickUpdatePopup.show();
     }
 
 }

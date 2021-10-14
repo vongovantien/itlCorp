@@ -19,10 +19,9 @@
                 </div>
             </div>
 
-            <app-permission-button title="Export" type="export" [dpToggle]="dropdownMenu" position="bottomCenter"
-                mode="dropdown">
+            <app-permission-button title="Export" type="export"(click)="export()">
             </app-permission-button>
-            <app-dropdown #dropdownMenu>
+            <!-- <app-dropdown #dropdownMenu>
                 <a class="dropdown-item pointer" (click)="export()">
                     <span>
                         Customer Info
@@ -33,7 +32,7 @@
                         Agreement Info
                     </span>
                 </a>
-            </app-dropdown>
+            </app-dropdown> -->
 
             <button (click)="onCustomerRequest()"
                 *ngIf="((menuSpecialPermission | async | specialPermission: 'CustomerRequest') === true )"

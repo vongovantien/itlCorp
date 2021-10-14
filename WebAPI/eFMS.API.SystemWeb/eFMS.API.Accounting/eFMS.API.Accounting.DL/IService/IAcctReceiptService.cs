@@ -30,6 +30,8 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
-        AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts);
+        AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria);
+        bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd);
+        Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model);
     }
 }

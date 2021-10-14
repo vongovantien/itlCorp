@@ -88,9 +88,6 @@ export class UserDetailsComponent extends AppPage {
     }
 
     ngOnInit() {
-        // this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
-        //     if (data) {this.dataUseRole = data["DropDownUserRole"]}
-        // })
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.userId = param.id;

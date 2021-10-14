@@ -93,7 +93,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
             this.customers = customersFromService.data;
             return;
         }
-        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT])
+        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER])
             .subscribe(
                 (data) => {
                     this._catalogueRepo.customersSource$.next({ data }); // * Update service.

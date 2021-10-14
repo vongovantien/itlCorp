@@ -13,13 +13,13 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { ConfirmPopupComponent, InfoPopupComponent, LoadingPopupComponent } from '@common';
 
 import { PaymentModel, AccountingPaymentModel } from '@models';
-import { RoutingConstants, AccountingConstants } from '@constants';
+import { RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ARHistoryPaymentUpdateExtendDayPopupComponent } from '../popup/update-extend-day/update-extend-day.popup';
 import { getDataSearchHistoryPaymentState, getHistoryPaymentListState, getHistoryPaymentPagingState, getHistoryPaymentLoadingListState } from '../../store/reducers';
 import { LoadListHistoryPayment } from '../../store/actions';
-import { formatDate } from '@angular/common';
 import { of } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 
 
@@ -152,7 +152,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
         this.loadingPopupComponent.show();
         this._exportRepo.exportAcountingPaymentShipment(this.dataSearch)
             .pipe(
-                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                catchError(() => of(this.loadingPopupComponent.downloadFail())),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
@@ -171,7 +171,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
                 .pipe(
-                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
@@ -195,20 +195,24 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             dateType: "Paid Date",
             // paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL
         };
-        this._spinner.hide();
         this.loadingPopupComponent.show();
+
         this._exportRepo.exportAdvanceReceipt(body)
             .pipe(
-                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                catchError(() => of(this.loadingPopupComponent.downloadFail())),
                 finalize(() => this._progressRef.complete())
             )
             .subscribe(
-                (res: ArrayBuffer) => {
-                    if (!res) {
-                        this._toastService.warning('No Data To View');
+                (res: HttpResponse<any>) => {
+                    if (res.body) {
+                        this.startDownloadReport(res.body, res.headers.get('efms-file-name'));
                         return;
                     }
-                    this.startDownloadReport(res, 'eFms Receipt_Advance.xlsx');
+                    this._toastService.warning('No Data To View');
+                },
+                () => { },
+                () => {
+                    this.loadingPopupComponent.hide();
                 }
             );
     }
@@ -357,7 +361,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableAgency(this.dataSearch)
                 .pipe(
-                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
+                    catchError(() => of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(

@@ -197,7 +197,13 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
     resetSearch() {
         this.formSearch.reset();
-        this.initForm();
+        this.searchType.setValue(this.referenceTypes[0].value);
+        this.referenceNo.setValue(null);
+        this.partnerId.setValue(null);
+        this.overdueDate.setValue(this.overDueDays[0].id);
+        this.paymentStatus.setValue([this.payments[1], this.payments[2]]);
+        this.office.setValue([this.loginData.officeId]);
+
         this.getOffices();
         this._store.dispatch(SearchListHistoryPayment({ searchType : this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value)
             , paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All, office: this.getSearchStatus(this.office.value) }));

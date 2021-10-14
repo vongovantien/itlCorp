@@ -33,7 +33,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         private readonly _activedRoute: ActivatedRoute,
         private readonly _router: Router,
         private readonly _toastService: ToastrService,
-        private readonly _store: Store<IAppState>
+        private readonly _store: Store<IAppState>,
     ) {
         super();
         this.requestSort = this.sortDetailList;
@@ -55,6 +55,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 }),
             ).subscribe(
                 (data: any) => {
+                    if(data.accountReceivable ===null){
+                        this._toastService.info("Chưa có data công nợ");
+                    }
                     this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
                     this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
