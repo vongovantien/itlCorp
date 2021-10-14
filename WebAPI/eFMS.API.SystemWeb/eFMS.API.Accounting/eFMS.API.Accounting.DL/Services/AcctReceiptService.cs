@@ -1513,8 +1513,17 @@ namespace eFMS.API.Accounting.DL.Services
                     decimal _cusAdvUsd = 0;
                     decimal _cusAdvVnd = 0;
 
-                    _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
-                    _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+                    // 16485
+                    if (receipt.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT && receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                    {
+                        _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.PaidAmountUsd ?? 0);
+                        _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.PaidAmountVnd ?? 0);
+                    }
+                    else
+                    {
+                        _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
+                        _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+                    }
 
                     agreement.CustomerAdvanceAmountUsd = _cusAdvUsd;
                     agreement.CustomerAdvanceAmountVnd = _cusAdvVnd;
@@ -1524,8 +1533,18 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (agreement != null)
                 {
-                    agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
-                    agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    // 16485
+                    if(receipt.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT && receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                    {
+                        agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.PaidAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
+                        agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.PaidAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    }
+                    else
+                    {
+                        agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
+                        agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    }
+                    
                 }
             }
 
@@ -1871,11 +1890,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 receiptCurrent.Status = AccountingConstants.RECEIPT_STATUS_CANCEL;
-                receiptCurrent.GroupId = currentUser.GroupId;
-                receiptCurrent.DepartmentId = currentUser.DepartmentId;
-                receiptCurrent.OfficeId = currentUser.OfficeID;
-                receiptCurrent.CompanyId = currentUser.CompanyID;
-
                 receiptCurrent.UserModified = currentUser.UserID;
                 receiptCurrent.DatetimeModified = DateTime.Now;
 
@@ -3615,6 +3629,25 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return valid;
+        }
+
+        public async Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
+        {
+            HandleState hs = new HandleState();
+
+            List<AcctReceipt> receiptListAsync = await DataContext.GetAsync(x => x.Id == Id);
+            if(receiptListAsync.Count == 0)
+            {
+                return hs;
+            }
+            AcctReceipt receiptCurrent = receiptListAsync.FirstOrDefault();
+            receiptCurrent.PaymentMethod = model.PaymentMethod;
+            receiptCurrent.PaymentRefNo = model.RecepiptNo;
+            receiptCurrent.ObhpartnerId = model.OBHPartnerId;
+
+            hs = await DataContext.UpdateAsync(receiptCurrent, x => x.Id == receiptCurrent.Id);
+
+            return hs;
         }
     }
 }

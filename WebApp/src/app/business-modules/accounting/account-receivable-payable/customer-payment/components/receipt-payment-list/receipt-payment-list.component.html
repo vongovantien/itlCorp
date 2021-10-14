@@ -197,7 +197,7 @@
                     </button>
 
                     <ng-container
-                        *ngIf="((class$ | async) === 'Clear Debit') ||((class$ | async) === 'Net Off');else advTpl">
+                        *ngIf="((class$ | async) === 'Clear Debit') || ((class$ | async) === 'Net Off');else advTpl">
                         <button class="btn btn-warning m-btn--icon m-btn--uppercase m--margin-right-10 dropdown-toggle"
                             type="button" [dpToggle]="dropdownMenu" position="bottomCenter">
                             <i class="la la-plus"></i>

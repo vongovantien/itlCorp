@@ -131,20 +131,20 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
+          
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (hs.Success)
             {
-                //Tính công nợ sau khi Save Cancel thành công
-                // acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 });
             }
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
+
+            
         }
 
         /// <summary>
@@ -462,6 +462,21 @@ namespace eFMS.API.Accounting.Controllers
         {
             var result = acctReceiptService.GetDataExportReceiptAdvance(criteria);
 
+            return Ok(result);
+        }
+
+        [HttpPut("{Id}/QuickUpdate")]
+        [Authorize]
+        public async Task<IActionResult> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
+        {
+            HandleState hs = await acctReceiptService.QuickUpdate(Id, model);
+            string message = HandleError.GetMessage(hs, Crud.Update
+            if(!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model });
+            }
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             return Ok(result);
         }
     }

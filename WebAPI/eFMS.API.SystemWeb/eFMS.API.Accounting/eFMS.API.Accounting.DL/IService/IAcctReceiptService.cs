@@ -32,5 +32,6 @@ namespace eFMS.API.Accounting.DL.IService
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
         AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria);
         bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd);
+        Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model);
     }
 }
