@@ -2180,22 +2180,26 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach (var invoice in invoiceData)
                         {
-                            invoice.PaymentTerm = contractModel.PaymentTerm;
                             //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
                             if (contractModel.BaseOn == "Invoice Date")
                             {
+                                invoice.PaymentTerm = contractModel.PaymentTerm;
                                 invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.Date;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
-                            if (contractModel.BaseOn == "Billing Date")
+                            if (contractModel.BaseOn == "Confirmed Billing")
                             {
+                                invoice.PaymentTerm = contractModel.PaymentTerm;
                                 invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.ConfirmBillingDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
                         }
                     }
-                    listInvoices = invoiceData;
-                    accountingManagementRepo.SubmitChanges();
+                    if (contractModel.BaseOn == "Invoice Date" || contractModel.BaseOn == "Confirmed Billing")
+                    {
+                        listInvoices = invoiceData;
+                        accountingManagementRepo.SubmitChanges();
+                    }
                     trans.Commit();
                     return hs;
                 }
