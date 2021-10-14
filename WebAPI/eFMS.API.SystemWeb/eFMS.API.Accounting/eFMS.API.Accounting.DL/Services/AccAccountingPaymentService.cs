@@ -287,10 +287,10 @@ namespace eFMS.API.Accounting.DL.Services
 
         private IQueryable<AccountingPaymentModel> GetReferencesInvoiceData(IQueryable<AccountingPaymentModel> data, PaymentCriteria criteria)
         {
-            var partners = partnerRepository.Get().Select(x => new { x.Id, x.ShortName });
+            var partners = partnerRepository.Get(x => x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
 
-            var surchargeData = surchargeRepository.Get(x => x.AcctManagementId != null).Select(x => new { x.AcctManagementId, x.Soano, x.PaySoano, x.Type, x.DebitNo });
+            var surchargeData = surchargeRepository.Get(x => x.AcctManagementId != null);
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
             var resultsQuery = (from invoice in data
                                 join surcharge in surchargeData on invoice.RefId.ToLower() equals surcharge.AcctManagementId.ToString()
@@ -1130,16 +1130,16 @@ namespace eFMS.API.Accounting.DL.Services
             switch (criteria.OverDueDays)
             {
                 case Common.OverDueDate.Between1_15:
-                    results = results.ToList().Where(x => x.OverdueDays < 16 && x.OverdueDays > 0).AsQueryable();
+                    results = results.Where(x => x.OverdueDays < 16 && x.OverdueDays > 0);
                     break;
                 case Common.OverDueDate.Between16_30:
-                    results = results.ToList().Where(x => x.OverdueDays < 31 && x.OverdueDays > 15).AsQueryable();
+                    results = results.Where(x => x.OverdueDays < 31 && x.OverdueDays > 15);
                     break;
                 case Common.OverDueDate.Between31_60:
-                    results = results.ToList().Where(x => x.OverdueDays < 61 && x.OverdueDays > 30).AsQueryable();
+                    results = results.Where(x => x.OverdueDays < 61 && x.OverdueDays > 30);
                     break;
                 case Common.OverDueDate.Between61_90:
-                    results = results.ToList().Where(x => x.OverdueDays < 91 && x.OverdueDays > 60).AsQueryable();
+                    results = results.Where(x => x.OverdueDays < 91 && x.OverdueDays > 60);
                     break;
             }
             return results;
@@ -1633,7 +1633,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             var data = Query(criteria);
             if (data == null) return null;
-            var partners = partnerRepository.Get(x => x.PartnerType == "Customer");
+            var partners = partnerRepository.Get(x => x.PartnerType == "Customer" && x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
             var surchargeData = surchargeRepository.Get(x => x.AcctManagementId != null);
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
