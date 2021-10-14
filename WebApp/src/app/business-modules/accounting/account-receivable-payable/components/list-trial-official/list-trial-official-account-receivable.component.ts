@@ -42,9 +42,9 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     ngOnInit() {
 
         this.headers = [
-        //    { title: 'Partner Id', field: 'partnerCode', sortable: true },
-        //    { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
-        //     { title: 'Rate (%)', field: 'debitRate', sortable: true },
+           { title: 'Partner Id', field: 'partnerCode', sortable: true },
+           { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
+            { title: 'Rate (%)', field: 'debitRate', sortable: true },
             { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Paid a Part', field: 'paidAmount', sortable: true },
             { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
@@ -101,13 +101,21 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     //
-    viewDetail(agreementId: string) {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
-            queryParams: {
-                agreementId: agreementId,
-
-            }
-        });
+    viewDetail(agreementId: string, partnerId: string) {
+        if (!!agreementId) {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
+                queryParams: {
+                    agreementId: agreementId,
+                }
+            });
+        } else {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
+                queryParams: {
+                    partnerId: partnerId,
+                    subTab: 'other',
+                }
+            });
+        }
     }
 
     exportExcel() {
