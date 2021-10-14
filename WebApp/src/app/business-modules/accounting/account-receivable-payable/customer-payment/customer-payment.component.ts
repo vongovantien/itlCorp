@@ -16,6 +16,7 @@ import { Store } from "@ngrx/store";
 import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
+import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -33,7 +34,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
-
+    @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
 
     CPs: ReceiptModel[] = [];
 
@@ -220,6 +221,21 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     requestLoadListCustomerPayment() {
         this._store.dispatch(LoadListCustomerPayment({ page: this.page, size: this.pageSize, dataSearch: this.dataSearch }));
+    }
+
+    showQuickUpdatePopup(type: string) {
+        switch (type) {
+            case 'method':
+                break;
+            case 'refNo':
+                break;
+            case 'obhPartner':
+                break;
+            default:
+                break;
+        }
+        this.quickUpdatePopup.updateKey = type;
+        this.quickUpdatePopup.show();
     }
 
 }

@@ -470,7 +470,7 @@ namespace eFMS.API.Accounting.Controllers
         public async Task<IActionResult> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
         {
             HandleState hs = await acctReceiptService.QuickUpdate(Id, model);
-            string message = HandleError.GetMessage(hs, Crud.Update
+            string message = HandleError.GetMessage(hs, Crud.Update);
             if(!hs.Success)
             {
                 return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model });
