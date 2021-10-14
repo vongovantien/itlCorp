@@ -1107,7 +1107,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IssuedDate = x.Date,
                 Serie = x.Serie,
                 DueDate = x.PaymentDueDate,
-                OverdueDays = (DateTime.Today > x.PaymentDueDate.Value.Date) ? (DateTime.Today - x.PaymentDueDate.Value.Date).Days : 0,
+                OverdueDays = x.PaymentDueDate != null && (DateTime.Today > x.PaymentDueDate.Value.Date) ? (DateTime.Today - x.PaymentDueDate.Value.Date).Days : 0,
                 Status = x.PaymentStatus ?? "Unpaid",
                 ExtendDays = x.PaymentExtendDays,
                 ExtendNote = x.PaymentNote,
