@@ -1,40 +1,39 @@
 :host /deep/ {
-      .sticky-col {
-        position: -webkit-sticky;
-        position: sticky;
-        background-color: white;
-      }
+  .table-summary{
+    .sticky-col {
+      position: -webkit-sticky;
+      position: sticky;
+    }
 
-      .first-col {
-        width: 100px;
-        min-width: 100px;
-        max-width: 100px;
-        left: -1px;
-      }
+    .first-col {
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      left: -1px;
+      z-index: 1;
+    }
+    .second-col {
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      left: 80px;
+      z-index: 1;
+    }
+    .three-col {
+      width: 380px;
+      min-width: 380px;
+      max-width: 380px;
+      left: 180px;
+      z-index: 1;
+    }
+    .four-col {
+      width: 120px;
+      min-width: 120px;
+      max-width: 120px;
+      left: 280px;
+      z-index: 1;
+    }
+  }
 
-      .second-col {
-        width: 200px;
-        min-width: 200px;
-        max-width: 200px;
-        left: 80px;
-      }
-      .three-col {
-        width: 260px;
-        min-width: 260px;
-        max-width: 260px;
-        left: 180px;
-      }
-      .four-col {
-        width: 200px;
-        min-width: 200px;
-        max-width: 200px;
-        left: 370px;
-      }
-      .five-col {
-        width: 200px;
-        min-width: 200px;
-        max-width: 200px;
-        left: 470px;
-      }
 }
 
