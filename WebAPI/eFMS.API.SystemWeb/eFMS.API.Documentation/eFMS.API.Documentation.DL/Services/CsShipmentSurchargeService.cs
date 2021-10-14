@@ -44,6 +44,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly ICsTransactionDetailService transactionDetailService;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
+        private readonly IContextBase<CatChargeGroup> catChargeGroupRepository;
 
         public CsShipmentSurchargeService(IContextBase<CsShipmentSurcharge> repository, IMapper mapper, IStringLocalizer<LanguageSub> localizer,
             IContextBase<CsTransactionDetail> tranDetailRepo,
@@ -63,7 +64,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrentUser currUser,
             ICsTransactionDetailService transDetailService,
             ICurrencyExchangeService currencyExchange,
-            IContextBase<CustomsDeclaration> customsDeclarationRepo
+            IContextBase<CustomsDeclaration> customsDeclarationRepo,
+            IContextBase<CatChargeGroup> catChargeGroupRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -85,6 +87,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAccountReceivableRepository = accAccountRepo;
             unitRepository = unitRepo;
             customsDeclarationRepository = customsDeclarationRepo;
+            catChargeGroupRepository = catChargeGroupRepo;
         }
 
         public HandleState DeleteCharge(Guid chargeId)
@@ -1274,6 +1277,8 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             var listPartner = partnerRepository.Get(x => x.Active == true);
+            var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
+            string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
                 if (string.IsNullOrEmpty(item.Hblno))
@@ -1315,6 +1320,29 @@ namespace eFMS.API.Documentation.DL.Services
                         item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST], item.PartnerCode);
                         item.IsValid = false;
                     }
+                    if (item.Type == "Selling")
+                    {
+                        var validCustomer = listPartner.Any(x => x.AccountNo.Trim() == item.PartnerCode.Replace("'", "").Trim() && (x.PartnerGroup.Contains("AGENT") || x.PartnerGroup.Contains("CUSTOMER")));
+                        if (!validCustomer)
+                        {
+                            item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_VALID_TYPE], item.PartnerCode);
+                            item.IsValid = false;
+                        }
+                    }
+
+                }
+                if (!string.IsNullOrEmpty(item.ObhPartner))
+                {
+                    if (!listPartner.Any(x => x.AccountNo.Trim() == item.ObhPartner.Replace("'", "").Trim()))
+                    {
+                        item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTER_CODE_NOT_EXIST], item.ObhPartner);
+                        item.IsValid = false;
+                    }
+                    else if (item.PartnerCode == item.ObhPartner)
+                    {
+                        item.ObhPartnerError = stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_DUPLICATE];
+                        item.IsValid = false;
+                    }
                 }
                 if (string.IsNullOrEmpty(item.ChargeCode))
                 {
@@ -1327,6 +1355,25 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_NOT_EXIST], item.ChargeCode);
                         item.IsValid = false;
+                    }
+                    else
+                    {
+                        // check valid obh partner
+                        if (chargeData[item.ChargeCode.Trim()].Any(x => x.Type == "CREDIT") && !string.IsNullOrEmpty(item.ObhPartner))
+                        {
+                            item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_WRONG], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        else if (chargeData[item.ChargeCode.Trim()].Where(x => x.Type == "OBH").Any() && string.IsNullOrEmpty(item.ObhPartner))
+                        {
+                            item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                        if (!chargeData[item.ChargeCode.Trim()].Any(x => x.ServiceTypeId.Contains("CL")))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_WRONG_SERVICE], item.ChargeCode);
+                            item.IsValid = false;
+                        }
                     }
                 }
 
@@ -1391,6 +1438,36 @@ namespace eFMS.API.Documentation.DL.Services
                         item.TypeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_TYPE_NOT_VALID], item.Type);
                         item.IsValid = false;
                     }
+                    else
+                    {
+                        TypeCompare = string.Empty;
+                        if (item.Type.ToLower() == "buying")
+                        {
+                            TypeCompare = "CREDIT";
+                        }
+                        else if (item.Type.ToLower() == "selling")
+                        {
+                            TypeCompare = "DEBIT";
+                        }
+                        else if (item.Type.ToLower() == "obh")
+                        {
+                            TypeCompare = "OBH";
+                        }
+                        if (string.IsNullOrEmpty(item.ChargeCodeError))
+                        {
+                            var trueType = chargeData[item.ChargeCode.Trim()].Any(x => x.Type == TypeCompare);
+                            if (!trueType && string.IsNullOrEmpty(item.ChargeCodeError))
+                            {
+                                item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_INVALID_TYPE], item.ChargeCode);
+                                item.IsValid = false;
+                            }
+                        }
+                        if (TypeCompare == "OBH" && string.IsNullOrEmpty(item.ObhPartner))
+                        {
+                            item.ObhPartnerError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_OBH_PARTNER_CODE_EMPTY], item.ChargeCode);
+                            item.IsValid = false;
+                        }
+                    }
                 }
                 if (!string.IsNullOrEmpty(item.Hblno))
                 {
@@ -1429,14 +1506,18 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.PayerId = PartnerId;
                     }
-                    string TypeCompare = string.Empty;
+                    
                     if (item.Type.ToLower() == "buying")
                     {
                         TypeCompare = "BUY";
                     }
-                    if (item.Type.ToLower() == "selling")
+                    else if (item.Type.ToLower() == "selling")
                     {
                         TypeCompare = "SELL";
+                    }
+                    else if (item.Type.ToLower() == "obh")
+                    {
+                        TypeCompare = "OBH";
                     }
 
                     if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
@@ -1476,48 +1557,54 @@ namespace eFMS.API.Documentation.DL.Services
 
         public HandleState Import(List<CsShipmentSurchargeImportModel> list)
         {
+            var chargeGroup = catChargeGroupRepository.Get();
             foreach (var item in list)
             {
-                switch (item.Type.ToLower())
-                {
-                    case "buying":
-                        item.Type = "BUY";
-                        break;
-                    case "obh":
-                        item.Type = item.Type.ToUpper();
-                        break;
-                    case "sell":
-                        item.Type = item.Type.ToUpper();
-                        break;
-                }
-                item.UserCreated = item.UserModified = currentUser.UserID;
-                item.Id = Guid.NewGuid();
-                item.ExchangeDate = DateTime.Now.Date;
-                item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
-                item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
-                item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
-
-                decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
-
-                #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-                var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
-                item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
-                item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
-                item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
-                item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
-                item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
-                item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
-                item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
-                if (item.Type.ToLower() == "buying")
+                if (hbl.OfficeId == currentUser.OfficeID)
                 {
-                    item.Type = "BUY";
-                }
-                if (item.Type.ToLower() == "selling")
-                {
-                    item.Type = "SELL";
+                    switch (item.Type.ToLower())
+                    {
+                        case "buying":
+                            item.Type = "BUY";
+                            break;
+                        case "obh":
+                            item.Type = "OBH";
+                            break;
+                        case "selling":
+                            item.Type = "SELL";
+                            break;
+                    }
+                    item.UserCreated = item.UserModified = currentUser.UserID;
+                    item.Id = Guid.NewGuid();
+                    item.ExchangeDate = DateTime.Now.Date;
+                    item.DatetimeCreated = item.DatetimeModified = DateTime.Now;
+                    item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
+                    item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                    var chargeGroupId = catChargeRepository.Get(x => x.Id == item.ChargeId).Select(x => x.ChargeGroup).FirstOrDefault();
+                    item.KickBack = chargeGroup.Where(x => x.Id == chargeGroupId && x.Name == "Com").Any();
+
+                    decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+
+                    #region --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(item, kickBackExcRate);
+                    item.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    item.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    item.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    item.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    item.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
+                    //if (item.Type.ToLower() == "buying")
+                    //{
+                    //    item.Type = "BUY";
+                    //}
+                    //if (item.Type.ToLower() == "selling")
+                    //{
+                    //    item.Type = "SELL";
+                    //}
                 }
             }
             var datas = mapper.Map<List<CsShipmentSurcharge>>(list);

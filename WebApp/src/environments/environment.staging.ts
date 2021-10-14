@@ -1,7 +1,8 @@
 
 
 export const environment = {
-    production: true,
+    production: false,
+    uat: true,
     local: false,
     HOST: {
         WEB_URL: "efms-demo-api.logtechub.com",

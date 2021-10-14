@@ -7,10 +7,9 @@
             <app-permission-button title="add new" (onClick)=addPartner()></app-permission-button>
             <app-permission-button title="Import" [routerLink]="['/home/catalogue/partner-data/import']" type="import">
             </app-permission-button>
-            <app-permission-button title="Export" type="export" [dpToggle]="dropdownMenu" position="bottomCenter"
-                mode="dropdown">
+            <app-permission-button title="Export" type="export" (click)="exportPartnerData()" >
             </app-permission-button>
-            <app-dropdown #dropdownMenu>
+            <!-- <app-dropdown #dropdownMenu>
                 <a class="dropdown-item pointer" (click)="exportPartnerData()">
                     <span>
                         Partner Info
@@ -21,7 +20,7 @@
                         Agreement Info
                     </span>
                 </a>
-            </app-dropdown>
+            </app-dropdown> -->
 
             <button (click)="onCustomerRequest()"
                 *ngIf="((menuSpecialPermission | async | specialPermission: 'CustomerRequest') === true )"

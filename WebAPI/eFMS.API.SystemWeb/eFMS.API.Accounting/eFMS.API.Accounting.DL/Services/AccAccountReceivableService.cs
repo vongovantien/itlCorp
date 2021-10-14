@@ -1711,7 +1711,7 @@ namespace eFMS.API.Accounting.DL.Services
                 arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
 
                 IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
-                if (arPartnerNoContracts!=null)
+                if (arPartnerNoContracts != null)
                     arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
@@ -1921,7 +1921,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
-            IEnumerable<object> data = GetDataARByCriteria(criteria);
+             IEnumerable<object> data = GetDataARByCriteria(criteria);
 
             if (data == null)
             {
@@ -1947,12 +1947,12 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<CatPartner> QueryPartner(AccountReceivableCriteria criteria)
         {
             Expression<Func<CatPartner, bool>> query = q => true;
-            if (criteria.ParterType == ParterTypeEnum.Customer)
+            if (criteria.PartnerType == ParterTypeEnum.Customer.ToString())
                 query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Customer.ToString()));
-            if (criteria.ParterType == ParterTypeEnum.Agent)
+            if (criteria.PartnerType == ParterTypeEnum.Agent.ToString())
                 query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Agent.ToString()));
 
-            return partnerRepo.Get();
+            return partnerRepo.Get(query);
         }
         #endregion --- LIST & PAGING ---
 
@@ -2032,6 +2032,7 @@ namespace eFMS.API.Accounting.DL.Services
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
 
             var detail = new AccountReceivableDetailResult();
+            if (arPartnerContracts == null) return new AccountReceivableDetailResult();
             var arPartners = arPartnerContracts.Where(x => x.AgreementId == argeementId);
             detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.AgreementId }).Select(s => new AccountReceivableResult
             {

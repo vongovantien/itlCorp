@@ -7,7 +7,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { finalize, catchError } from 'rxjs/operators';
 import { UserLevel } from 'src/app/shared/models/system/userlevel';
 import { SystemConstants } from '@constants';
-import { HttpClient } from "@angular/common/http";
 
 @Component({
     selector: 'app-form-add-user',
@@ -36,7 +35,7 @@ export class FormAddUserComponent extends AppList {
     //
     creditLimit: AbstractControl;
     creditRate: AbstractControl;
-    userRole:AbstractControl;
+    userRole: AbstractControl;
 
     status: CommonInterface.ICommonTitleValue[] = [
         { title: 'Active', value: true },
@@ -55,14 +54,38 @@ export class FormAddUserComponent extends AppList {
         { title: 'Off', value: 'Off' }
     ];
 
-    userRoles:CommonInterface.ICommonTitleValue[]=[];
+    userRoles: CommonInterface.ICommonTitleValue[] = [
+        {
+            "title": "CS Document",
+            "value": "CS"
+        },
+        {
+            "title": "Sale",
+            "value": "Sale"
+        },
+        {
+            "title": "Accountant",
+            "value": "FIN"
+        },
+        {
+            "title": "Internal Audit",
+            "value": "IA"
+        },
+        {
+            "title": "Account Receivable",
+            "value": "AR"
+        },
+        {
+            "title": "BOD",
+            "value": "BOD"
+        }
+    ];
 
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
         private _toastService: ToastrService,
         private _progressService: NgProgress,
-        private _httpClient: HttpClient,
 
     ) {
         super();
@@ -129,9 +152,6 @@ export class FormAddUserComponent extends AppList {
     }
 
     ngOnInit() {
-        this._httpClient.get("assets/data/dropdownData.json").subscribe(data =>{
-            if (data) {this.userRoles = data["DropDownUserRole"]}
-        })
         this.initForm();
         this.headersuslv = [
             { title: 'Group Name', field: 'groupName' },

@@ -102,6 +102,11 @@
                                 <span>Partner Code*</span>
                             </th>
                             <th class="sorting"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'obhPartner'), 'sorting_desc': (!isDesc && sortKey == 'obhPartner') }"
+                                (click)="sort('obhPartner')">
+                                <span>OBH Partner</span>
+                            </th>
+                            <th class="sorting"
                                 [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeCode'), 'sorting_desc': (!isDesc && sortKey == 'chargeCode') }"
                                 (click)="sort('chargeCode')">
                                 <span>Charge Code*</span>
@@ -187,6 +192,12 @@
                                     <span *ngIf="item.partnerCodeError === null">{{ item.partnerCode }}</span>
                                     <span class="m--font-danger"
                                         *ngIf="item.partnerCodeError !== null">{{item.partnerCodeError
+                                        }}</span>
+                                </td>
+                                <td>
+                                    <span *ngIf="item.obhPartnerError === null">{{ item.obhPartner }}</span>
+                                    <span class="m--font-danger"
+                                        *ngIf="item.obhPartnerError !== null">{{item.obhPartnerError
                                         }}</span>
                                 </td>
                                 <td>

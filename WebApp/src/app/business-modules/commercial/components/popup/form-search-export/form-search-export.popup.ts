@@ -94,7 +94,7 @@ export class FormSearchExportComponent extends PopupBase {
         }
     }
 
-    exportData() {
+    getDataSearch(){
         if ((this.salesmanActive.findIndex(x => x === 'All') === 0) || !this.salesmanActive.length) {
             this.dataSearch.saleman = this.salesmanList.filter(x => x.id !== 'All').map(x => x.username).join(";");
         } else {
@@ -106,6 +106,10 @@ export class FormSearchExportComponent extends PopupBase {
         this.dataSearch.active = (!!this.status.value && this.status.value !== this.statusList[0].id) ? (this.status.value === this.statusList[1].id ? true : false) : null;
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.dataSearch.author = userLogged.nameEn;
+    }
+
+    exportData() {
+        this.getDataSearch();
         if (!!this.dataSearch) {
             this._progressRef.start();
             this._exportRepo.exportPartner(this.dataSearch)
@@ -118,6 +122,19 @@ export class FormSearchExportComponent extends PopupBase {
                             this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'eFms-partner.xlsx');
                         }
                         this.close();
+                    }
+                );
+        }
+    }
+    exportAgreementInfo() {
+        this.getDataSearch();
+        if (!!this.dataSearch) {
+            this._progressRef.start();
+            this._exportRepo.exportAgreementInfo(this.dataSearch)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res) => {
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'efms_agent_agreement.xlsx')
                     }
                 );
         }

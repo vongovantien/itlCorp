@@ -1513,8 +1513,17 @@ namespace eFMS.API.Accounting.DL.Services
                     decimal _cusAdvUsd = 0;
                     decimal _cusAdvVnd = 0;
 
-                    _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
-                    _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+                    // 16485
+                    if (receipt.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT && receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                    {
+                        _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.PaidAmountUsd ?? 0);
+                        _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.PaidAmountVnd ?? 0);
+                    }
+                    else
+                    {
+                        _cusAdvUsd = (totalAdvPaymentUsd ?? 0) + (agreement.CustomerAdvanceAmountUsd ?? 0) - (receipt.CusAdvanceAmountUsd ?? 0);
+                        _cusAdvVnd = (totalAdvPaymentVnd ?? 0) + (agreement.CustomerAdvanceAmountVnd ?? 0) - (receipt.CusAdvanceAmountVnd ?? 0);
+                    }
 
                     agreement.CustomerAdvanceAmountUsd = _cusAdvUsd;
                     agreement.CustomerAdvanceAmountVnd = _cusAdvVnd;
@@ -1524,8 +1533,18 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 if (agreement != null)
                 {
-                    agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
-                    agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    // 16485
+                    if(receipt.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT && receipt.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                    {
+                        agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.PaidAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
+                        agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.PaidAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    }
+                    else
+                    {
+                        agreement.CustomerAdvanceAmountUsd = (agreement.CustomerAdvanceAmountUsd ?? 0) + (receipt.CusAdvanceAmountUsd ?? 0) - (totalAdvPaymentUsd ?? 0);
+                        agreement.CustomerAdvanceAmountVnd = (agreement.CustomerAdvanceAmountVnd ?? 0) + (receipt.CusAdvanceAmountVnd ?? 0) - (totalAdvPaymentVnd ?? 0);
+                    }
+                    
                 }
             }
 
@@ -1871,11 +1890,6 @@ namespace eFMS.API.Accounting.DL.Services
                 }
 
                 receiptCurrent.Status = AccountingConstants.RECEIPT_STATUS_CANCEL;
-                receiptCurrent.GroupId = currentUser.GroupId;
-                receiptCurrent.DepartmentId = currentUser.DepartmentId;
-                receiptCurrent.OfficeId = currentUser.OfficeID;
-                receiptCurrent.CompanyId = currentUser.CompanyID;
-
                 receiptCurrent.UserModified = currentUser.UserID;
                 receiptCurrent.DatetimeModified = DateTime.Now;
 
@@ -3519,9 +3533,39 @@ namespace eFMS.API.Accounting.DL.Services
             var sendMailResult = SendMail.Send(sb.ToString(), bd.ToString(), toEmails, null, null, null);
         }
 
-        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts)
+        public AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            if(receipts.Count() == 0)
+            List<string> methodsAdv = new List<string> {
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH,
+                AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL,
+            };
+            Expression<Func<AcctReceipt, bool>> query = (x =>
+               (x.CustomerId ?? "").IndexOf(criteria.CustomerID ?? "", StringComparison.OrdinalIgnoreCase) >= 0
+               && x.Status == AccountingConstants.RECEIPT_STATUS_DONE
+              );
+            if (!string.IsNullOrEmpty(criteria.DateType) && criteria.DateType == "Paid Date" && criteria.DateFrom.HasValue && criteria.DateTo.HasValue)
+            {
+                query = query.And(x => x.PaymentDate.Value.Date >= criteria.DateFrom.Value.Date && x.PaymentDate.Value.Date <= criteria.DateTo.Value.Date);
+            }
+
+            IQueryable<AcctReceipt> receiptExpre = DataContext.Get(query);
+
+            IQueryable<AcctReceipt> receiptWithPaymentMethod = receiptExpre.Where(x => methodsAdv.Contains(x.PaymentMethod));
+            List<Guid> receiptWithoutPaymentMethodIds = receiptExpre.Where(x => !methodsAdv.Contains(x.PaymentMethod)).Select(x => x.Id).ToList();
+
+            List<Guid?> queryPayment = acctPaymentRepository.Get(x => receiptWithoutPaymentMethodIds.Contains(x.ReceiptId ?? Guid.Empty)
+            && (x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH))
+            .Select(x => x.ReceiptId)
+            .Distinct()
+            .ToList();
+
+            IQueryable<AcctReceipt> receiptWithPayment = receiptExpre.Where(x => queryPayment.Contains(x.Id));
+
+            IQueryable<AcctReceipt> receipts = receiptWithPaymentMethod.Union(receiptWithPayment);
+
+            if (receipts.Count() == 0)
             {
                 return null;
             }
@@ -3558,7 +3602,8 @@ namespace eFMS.API.Accounting.DL.Services
         {
             decimal totalAdv = 0;
 
-            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE);
+            IQueryable<AccAccountingPayment> payments = acctPaymentRepository.Get(x => x.ReceiptId == receiptId && (x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE 
+            || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH));
             if(currency == AccountingConstants.CURRENCY_LOCAL)
             {
                 totalAdv = payments.Sum(x => x.PaymentAmountVnd) ?? 0;
@@ -3569,6 +3614,40 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return totalAdv;
+        }
+
+        public bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd)
+        {
+            bool valid = true;
+            CatContract contract = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault();
+            if (contract != null && (contract.CustomerAdvanceAmountUsd != null || contract.CustomerAdvanceAmountUsd != null))
+            {
+                if(cusVnd > contract.CustomerAdvanceAmountVnd || cusUsd > contract.CustomerAdvanceAmountUsd)
+                {
+                    valid = false;
+                }
+            }
+
+            return valid;
+        }
+
+        public async Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
+        {
+            HandleState hs = new HandleState();
+
+            List<AcctReceipt> receiptListAsync = await DataContext.GetAsync(x => x.Id == Id);
+            if(receiptListAsync.Count == 0)
+            {
+                return hs;
+            }
+            AcctReceipt receiptCurrent = receiptListAsync.FirstOrDefault();
+            receiptCurrent.PaymentMethod = model.PaymentMethod;
+            receiptCurrent.PaymentRefNo = model.RecepiptNo;
+            receiptCurrent.ObhpartnerId = model.OBHPartnerId;
+
+            hs = await DataContext.UpdateAsync(receiptCurrent, x => x.Id == receiptCurrent.Id);
+
+            return hs;
         }
     }
 }

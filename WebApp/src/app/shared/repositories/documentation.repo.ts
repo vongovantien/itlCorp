@@ -1121,7 +1121,7 @@ export class DocumentationRepo {
     }
 
     upLoadChargeFile(files: any) {
-        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/UploadFile`, files, "uploadedFile");
+        return this._api.postFile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsShipmentSurcharge/uploadFile`, files, "uploadedFile");
     }
 
     importCharge(body: any) {
