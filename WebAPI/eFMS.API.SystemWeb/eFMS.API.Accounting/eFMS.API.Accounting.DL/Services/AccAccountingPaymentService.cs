@@ -404,7 +404,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     payment.PaidAmount = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmount)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmount);
                     payment.PaidAmountVnd = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmountVnd)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmountVnd);
-                    payment.PaidAmount = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmountUsd)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmountUsd);
+                    payment.PaidAmountUsd = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmountUsd)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmountUsd);
                 }
                 results.Add(payment);
             }
