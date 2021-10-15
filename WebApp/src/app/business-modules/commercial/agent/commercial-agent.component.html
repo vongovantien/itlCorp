@@ -17,21 +17,9 @@
                         href="javascript:void(0)">Import Contract</a>
                 </div>
             </div>
-            <app-permission-button title="Export" type="export" [dpToggle]="dropdownMenu" position="bottomCenter"
-                mode="dropdown">
+            <app-permission-button title="Export" type="export" (click)="export()">
             </app-permission-button>
-            <app-dropdown #dropdownMenu>
-                <a class="dropdown-item pointer" (click)="export()">
-                    <span>
-                        Customer Info
-                    </span>
-                </a>
-                <a class="dropdown-item pointer" (click)="exportAgreementInfo()">
-                    <span>
-                        Agreement Info
-                    </span>
-                </a>
-            </app-dropdown>
+            <!-- Pform-search-popup -->
             <button (click)="onCustomerRequest()"
                 *ngIf="((menuSpecialPermission | async | specialPermission: 'CustomerRequest') === true )"
                 class="btn btn-success  m-btn--icon m-btn--uppercase m--margin-right-10">

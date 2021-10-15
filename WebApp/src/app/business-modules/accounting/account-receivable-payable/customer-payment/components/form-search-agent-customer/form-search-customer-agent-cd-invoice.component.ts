@@ -57,6 +57,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     offices: Office[];
 
     selectedDefaultOffice = { id: 'All', shortName: "All" };
+    currentUser;
 
     constructor(
         private readonly _fb: FormBuilder,
@@ -71,13 +72,14 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     ngOnInit(): void {
         this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
 
-        this.initForm();
 
         this.initSubmitClickSubscription(() => this.searchData());
+        this.initForm();
 
         this._store.select(getCurrentUserState)
             .pipe(
                 filter(c => !!c.userName),
+                tap((c) => this.currentUser = c),
                 switchMap((currentUser: SystemInterface.IClaimUser | any) => {
                     if (!!currentUser.userName) {
                         return this._systemRepo.getOfficePermission(currentUser.id, currentUser.companyId)
@@ -90,6 +92,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             .subscribe((offices: Office[]) => {
                 this.offices = offices;
             })
+
     }
 
     initForm() {
@@ -100,7 +103,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             date: [],
             dateType: [this.dateTypeList[0]],
             service: [[this.services[0].id]],
-            office: [[this.selectedDefaultOffice.id]]
+            office: []
         });
 
         this.typeSearch = this.formSearch.controls['typeSearch'];
@@ -143,6 +146,15 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                     }
                 }
             )
+
+        this._store.select(getCurrentUserState)
+            .pipe(
+                filter(c => !!c.userName),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((c) => {
+                this.office.setValue([c.officeId]);
+            })
     }
 
     onSelectDataFormInfo(data: any) {

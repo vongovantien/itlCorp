@@ -448,7 +448,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     dueDate = invoiceDate.HasValue ? invoiceDate.Value.AddDays((double)(paymentTerm ?? 0)) : invoiceDate;
                 }
-                else if (contractPartner.BaseOn == "Billing Date")  //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
+                else if (contractPartner.BaseOn == "Confirmed Billing")  //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                 {
                     dueDate = billingDate.HasValue ? billingDate.Value.AddDays((double)(paymentTerm ?? 0)) : billingDate;
                 }

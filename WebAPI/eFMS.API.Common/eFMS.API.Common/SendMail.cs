@@ -31,72 +31,71 @@ namespace eFMS.API.Common
             MailMessage message = new MailMessage();
 
             message.From = emailFrom;
-            if (toEmails != null && toEmails.Count() > 0)
-            {
-                foreach (string ToEmail in toEmails)
-                {
-                    MailAddress EmailTo = new MailAddress(ToEmail);
-                    receivers += ToEmail + ", ";
-                    message.To.Add(EmailTo);
-                }
-            }
-
-            message.IsBodyHtml = true;
-            message.Subject = subject;
-            message.Body = body;
-
-            // Add a carbon copy recipient.
-            if (emailCCs != null)
-            {
-                foreach (string EmailCC in emailCCs)
-                {
-                    MailAddress CC = new MailAddress(EmailCC);
-                    CCs += EmailCC + ", ";
-                    message.CC.Add(CC);
-                }
-            }
-
-            // Add a carbon copy recipient.
-            if (emailBCC != null)
-            {
-                foreach (string EmailBCC in emailBCC)
-                {
-                    MailAddress BCC = new MailAddress(EmailBCC);
-                    BCCs += emailBCC + ", ";
-                    message.Bcc.Add(BCC);
-                }
-            }
-
-            //now attached the file
-            if (attachments != null)
-            {
-                var webClient = new WebClient();
-                string fileName = string.Empty;
-                foreach (string attachment in attachments)
-                {
-                    fileName = Path.GetFileName(attachment);
-                    webClient.DownloadFile(attachment, fileName);
-
-                    Attachment attached = new Attachment(fileName, MediaTypeNames.Application.Octet);
-                    message.Attachments.Add(attached);
-                }
-            }
-
-            SmtpClient client = new SmtpClient();
-            client.UseDefaultCredentials = false;
-
-            client.Host = _smtpHost;
-            client.Port = 587;
-            client.EnableSsl = true;
-            client.DeliveryMethod = SmtpDeliveryMethod.Network;
-            client.Credentials =
-                new System.Net.NetworkCredential(_smptUser,
-                    _smtpPassword);
-            client.Timeout = 300000;
-
-            // send message
             try
             {
+                if (toEmails != null && toEmails.Count() > 0)
+                {
+                    foreach (string ToEmail in toEmails)
+                    {
+                        MailAddress EmailTo = new MailAddress(ToEmail);
+                        receivers += ToEmail + ", ";
+                        message.To.Add(EmailTo);
+                    }
+                }
+
+                message.IsBodyHtml = true;
+                message.Subject = subject;
+                message.Body = body;
+
+                // Add a carbon copy recipient.
+                if (emailCCs != null)
+                {
+                    foreach (string EmailCC in emailCCs)
+                    {
+                        MailAddress CC = new MailAddress(EmailCC);
+                        CCs += EmailCC + ", ";
+                        message.CC.Add(CC);
+                    }
+                }
+
+                // Add a carbon copy recipient.
+                if (emailBCC != null)
+                {
+                    foreach (string EmailBCC in emailBCC)
+                    {
+                        MailAddress BCC = new MailAddress(EmailBCC);
+                        BCCs += emailBCC + ", ";
+                        message.Bcc.Add(BCC);
+                    }
+                }
+
+                //now attached the file
+                if (attachments != null)
+                {
+                    var webClient = new WebClient();
+                    string fileName = string.Empty;
+                    foreach (string attachment in attachments)
+                    {
+                        fileName = Path.GetFileName(attachment);
+                        webClient.DownloadFile(attachment, fileName);
+
+                        Attachment attached = new Attachment(fileName, MediaTypeNames.Application.Octet);
+                        message.Attachments.Add(attached);
+                    }
+                }
+
+                SmtpClient client = new SmtpClient();
+                client.UseDefaultCredentials = false;
+
+                client.Host = _smtpHost;
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                client.Credentials =
+                    new System.Net.NetworkCredential(_smptUser,
+                        _smtpPassword);
+                client.Timeout = 300000;
+
                 ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors) { return true; };
                 client.Send(message);
                 message.Attachments.Dispose();
@@ -105,6 +104,7 @@ namespace eFMS.API.Common
             catch (Exception ex)
             {
                 result = false;
+                new LogHelper("LOG_SEND_MAIl", ex.ToString());
                 description = ex.Message;
             }
             finally

@@ -10,7 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
 import { InjectViewContainerRefDirective } from '@directives';
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
@@ -158,6 +158,14 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Paid amount is required");
             return;
         }
+        if ((this.listInvoice.cusAdvanceAmountVnd.value > 0 || this.listInvoice.cusAdvanceAmountUsd.value > 0)
+            && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+            AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH].includes(this.listInvoice.paymentMethod.value)) {
+            this.listInvoice.paymentMethod.setErrors({ method_invalid: true });
+            this._toastService.warning("Cus Advance Amount >0 <br> so Payment Method must be one of Clear-advance/Clear-Advance-Cash/Clear-Advance-Bank", 'Payment method is incorrect', { enableHtml: true });
+            return;
+        }
 
         const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
         const OBH_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH);
@@ -177,7 +185,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
 
         sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
-        sumTotalPaidVnd = +sumTotalPaidUsd.toFixed(0);
+        sumTotalPaidVnd = +sumTotalPaidVnd.toFixed(0);
 
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
             this._toastService.warning("Final paid amount < sum total paid amount");
@@ -248,7 +256,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                 this.listInvoice.obhpartnerId.setErrors({ required: true });
                 valid = false;
             } else {
-                this.listInvoice.obhpartnerId.setErrors({ required: null });
+                this.removeValidators(this.listInvoice.obhpartnerId);
+
                 valid = true;
             }
         }
@@ -272,9 +281,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     this._toastService.error("Create data fail, Please check again!");
                 },
                 (res: HttpErrorResponse) => {
-                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
-                        this.formCreate.paymentRefNo.setErrors({ existed: true });
-                    }
+                    this.handleValidateReceiptResponse(res);
                 }
             )
     };
@@ -500,5 +507,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         })
 
         return listPaymentWithUnpaid;
+    }
+
+    handleValidateReceiptResponse(res: HttpErrorResponse) {
+        if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
+            this.formCreate.paymentRefNo.setErrors({ existed: true });
+            return;
+        }
+        if (res.error?.code == 408) {
+            this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
+            return;
+        }
+        if (res.error?.code == 407) {
+            this.listInvoice.paidAmountVnd.setErrors({ validCus: true });
+            return;
+        }
     }
 }

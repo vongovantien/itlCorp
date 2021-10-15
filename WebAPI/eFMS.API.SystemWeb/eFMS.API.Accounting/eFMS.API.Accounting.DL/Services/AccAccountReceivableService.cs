@@ -1711,7 +1711,7 @@ namespace eFMS.API.Accounting.DL.Services
                 arPartnerContracts = arPartnerContracts.Where(queryAccountReceivable).OrderByDescending(x => x.DatetimeModified);
 
                 IQueryable<AccountReceivableResult> arPartnerNoContracts = GetARNoContract(acctReceivables, partnerContracts, partners);
-                if (arPartnerNoContracts!=null)
+                if (arPartnerNoContracts != null)
                     arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
             return arPartnerContracts;
@@ -1921,7 +1921,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
 
-            IEnumerable<object> data = GetDataARByCriteria(criteria);
+             IEnumerable<object> data = GetDataARByCriteria(criteria);
 
             if (data == null)
             {
@@ -1947,12 +1947,12 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<CatPartner> QueryPartner(AccountReceivableCriteria criteria)
         {
             Expression<Func<CatPartner, bool>> query = q => true;
-            if (criteria.ParterType == ParterTypeEnum.Customer)
+            if (criteria.PartnerType == ParterTypeEnum.Customer.ToString())
                 query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Customer.ToString()));
-            if (criteria.ParterType == ParterTypeEnum.Agent)
+            if (criteria.PartnerType == ParterTypeEnum.Agent.ToString())
                 query = query.And(x => x.PartnerType.Contains(ParterTypeEnum.Agent.ToString()));
 
-            return partnerRepo.Get();
+            return partnerRepo.Get(query);
         }
         #endregion --- LIST & PAGING ---
 
@@ -2032,6 +2032,7 @@ namespace eFMS.API.Accounting.DL.Services
             var arPartnerContracts = GetARHasContract(acctReceivables, partnerContracts, partners);
 
             var detail = new AccountReceivableDetailResult();
+            if (arPartnerContracts == null) return new AccountReceivableDetailResult();
             var arPartners = arPartnerContracts.Where(x => x.AgreementId == argeementId);
             detail.AccountReceivable = arPartners.ToList().GroupBy(g => new { g.AgreementId }).Select(s => new AccountReceivableResult
             {
@@ -2179,22 +2180,26 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         foreach (var invoice in invoiceData)
                         {
-                            invoice.PaymentTerm = contractModel.PaymentTerm;
                             //Nếu Base On là Invoice Date: Due Date = Invoice Date + Payment Term
                             if (contractModel.BaseOn == "Invoice Date")
                             {
+                                invoice.PaymentTerm = contractModel.PaymentTerm;
                                 invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.Date;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
-                            if (contractModel.BaseOn == "Billing Date")
+                            if (contractModel.BaseOn == "Confirmed Billing")
                             {
+                                invoice.PaymentTerm = contractModel.PaymentTerm;
                                 invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.ConfirmBillingDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
                         }
                     }
-                    listInvoices = invoiceData;
-                    accountingManagementRepo.SubmitChanges();
+                    if (contractModel.BaseOn == "Invoice Date" || contractModel.BaseOn == "Confirmed Billing")
+                    {
+                        listInvoices = invoiceData;
+                        accountingManagementRepo.SubmitChanges();
+                    }
                     trans.Commit();
                     return hs;
                 }
