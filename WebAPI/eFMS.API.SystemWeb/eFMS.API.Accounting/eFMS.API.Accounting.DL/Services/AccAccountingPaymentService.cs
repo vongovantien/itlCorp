@@ -383,7 +383,7 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.Status = item.Key.Type != "OBH" ? invoice.FirstOrDefault()?.Status : statusOBH;
                 payment.ExtendDays = invoice.FirstOrDefault()?.ExtendDays;
                 payment.PaidAmount = payment.PaidAmountVnd = payment.PaidAmountUsd = 0;
-                var invoiceObh = invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).Select(x => new { x.UnpaidAmount, x.UnpaidAmountVnd, x.UnpaidAmountUsd });
+                var invoiceObh = invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).Select(x => new { x.UnpaidAmount, x.UnpaidAmountVnd, x.UnpaidAmountUsd, x.SourceModified, x.PaidAmount, x.PaidAmountVnd, x.PaidAmountUsd, x.Status });
                 payment.UnpaidAmount = item.Key.Type == "OBH" ? invoiceObh.Sum(x => x?.UnpaidAmount ?? 0) :
                         invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE).FirstOrDefault()?.UnpaidAmount ?? 0;
                 payment.UnpaidAmountVnd = item.Key.Type == "OBH" ? invoiceObh.Sum(x => x?.UnpaidAmountVnd ?? 0) :
@@ -398,6 +398,14 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaidAmountUsd = item.Key.Type == "OBH" ? paymentUniq.Sum(x => x.p.Sum(z => z.PaymentAmountUsd ?? 0)) : paymentUniq.Sum(x => x.p.FirstOrDefault()?.PaymentAmountUsd ?? 0);
                 }
 
+                var invoiceDe = invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE && x.SourceModified != null && x.SourceModified == "1" && x.Status == "Paid");
+                invoiceObh = invoiceObh == null ? null : invoiceObh.Where(x => x.SourceModified != null && x.SourceModified == "1" && x.Status == "Paid");
+                if ((invoiceDe != null && invoiceDe.Count() > 0) || (invoiceObh != null && invoiceObh.Count() > 0))
+                {
+                    payment.PaidAmount = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmount)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmount);
+                    payment.PaidAmountVnd = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmountVnd)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmountVnd);
+                    payment.PaidAmount = item.Key.Type == "OBH" ? (invoiceObh == null ? 0 : invoiceObh.Sum(x => x.PaidAmountUsd)) : (invoiceDe == null ? 0 : invoiceDe.FirstOrDefault().PaidAmountUsd);
+                }
                 results.Add(payment);
             }
             if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
