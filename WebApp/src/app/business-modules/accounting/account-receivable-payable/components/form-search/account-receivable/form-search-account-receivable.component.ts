@@ -10,7 +10,8 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { SearchListAccountReceivable } from '../../../account-receivable/store/actions';
 import { getAccountReceivableSearchState, IAccountReceivableState } from '../../../account-receivable/store/reducers';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
+import { SystemConstants } from '@constants';
 
 const OverDueDaysValues = [
     { from: null, to: null },
@@ -63,8 +64,10 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     partners: Observable<Partner[]>;
     salemans: Observable<User[]>;
-    offices: Observable<Office[]>;
+    offices: any[] = [];
     partnerType: AbstractControl;
+    officeIds: AbstractControl;
+
 
     displayFieldsPartner: CommonInterface.IComboGridDisplayField[] = [
         { field: 'accountNo', label: 'Partner ID' },
@@ -115,6 +118,11 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         { id: 'Customer', text: 'Customer' },
         { id: 'Agent', text: 'Agent' },
     ];
+    loginData: SystemInterface.IClaimUser;
+    staffList: any[] = [];
+    staffsInit: any[] = [];
+    staff: AbstractControl;
+
     constructor(
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
@@ -127,11 +135,13 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     ngOnInit(): void {
-        this.initForm();
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.salemans = this._systemRepo.getListSystemUser();
-        this.offices = this._systemRepo.getAllOffice();
+        this.initForm();
+        this.getOffices();
         this.submitSearch();
+        this.getAllStaff();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -148,6 +158,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             salesManId: [],
             officalId: [],
             partnerType: [this.partnerTypes[0].id],
+            officeIds: [[this.loginData.officeId]],
+            staff:[]
         });
 
         this.partnerId = this.formSearch.controls["partnerId"];
@@ -162,6 +174,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.salesManId = this.formSearch.controls["salesManId"];
         this.officalId = this.formSearch.controls["officalId"];
         this.partnerType = this.formSearch.controls["partnerType"];
+        this.officeIds = this.formSearch.controls["officeIds"];
+        this.staff = this.formSearch.controls["staff"];
 
         this.partnerType.setValue("All");
 
@@ -237,7 +251,9 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             fromOverdueDays: dataForm.fromOverdueDays,
             toOverdueDays: dataForm.toOverdueDays,
             debitRate: dataForm.debitRate,
-            partnerType:dataForm.partnerType
+            partnerType:dataForm.partnerType,
+            officeIds: !!dataForm.officeIds ? this.getOfficeSearch(dataForm.officeIds) : null,
+            staffs:!!dataForm.staffs ? dataForm.staffs: null
         };
 
 
@@ -271,6 +287,45 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                         this.formSearch.patchValue(formData);
                     }
                 }
+            );
+    }
+    getAllStaff() {
+        this._systemRepo.getUserLevelByType({ type: 'All' })
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { }),
+            ).subscribe(
+                (staff: any) => {
+                    this.staffsInit = staff;
+                    this.getStaff(staff);
+                },
+            );
+    }
+    getStaff(data: any) {
+        this.staffList = data
+            .map(item => ({ text: item.userName, id: item.userId }))
+            .filter((g, i, arr) => arr.findIndex(t => t.id === g.id) === i); // Distinct user
+    }
+    getOfficeSearch(office: []){
+        let strOffice = [];
+        if (office.length > 0) {
+            office.forEach(element => {
+                strOffice.push(element);
+            });
+        }else{
+            this.offices.forEach((item: Office)=> strOffice.push(item.id));
+        }
+        return strOffice;
+    }
+    getOffices() {
+        this._systemRepo.getListOfficesByUserId(this.loginData.id)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: Office[]) => {
+                    this.offices = res;
+                },
             );
     }
 
