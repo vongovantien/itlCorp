@@ -1278,6 +1278,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
+            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled");
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {
@@ -1288,12 +1289,12 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransRepository.Any(x => x.Hwbno == item.Hblno.Trim()))
+                    if (!opsTransaction.Any(x => (string.IsNullOrEmpty(item.Mblno) || x.Mblno == item.Mblno) && x.Hwbno == item.Hblno))
                     {
                         item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
                         item.IsValid = false;
-                    }
 
+                    }
                 }
                 if (string.IsNullOrEmpty(item.Mblno))
                 {
@@ -1302,12 +1303,22 @@ namespace eFMS.API.Documentation.DL.Services
                 }
                 else
                 {
-                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno.Trim()))
+                    if (!opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && (string.IsNullOrEmpty(item.Hblno) || x.Hwbno == item.Hblno)))
                     {
                         item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
                         item.IsValid = false;
                     }
+                    else if (!string.IsNullOrEmpty(item.Hblno) && !string.IsNullOrEmpty(item.Mblno))
+                    {
+                        if (opsTransaction.Any(x => x.Mblno == item.Mblno.Trim() && x.Hwbno == item.Hblno && x.OfficeId != currentUser.OfficeID))
+                        {
+                            item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
+                            item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
+                            item.IsValid = false;
+                        }
+                    }
                 }
+
                 if (string.IsNullOrEmpty(item.PartnerCode))
                 {
                     item.PartnerCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_PARTNER_CODE_EMPTY]);
@@ -1469,26 +1480,11 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
-                if (!string.IsNullOrEmpty(item.Hblno))
-                {
-
-                    if (!opsTransRepository.Any(x => x.Mblno == item.Mblno && x.Hwbno == item.Hblno))
-                    {
-                        item.HBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_HBLNO_NOT_EXIST], item.Hblno);
-                        item.IsValid = false;
-
-                    }
-                }
-                if (!string.IsNullOrEmpty(item.Mblno))
-                {
-                    if (!opsTransRepository.Any(x => x.Mblno.Trim() == item.Mblno.Trim()))
-                    {
-                        item.MBLNoError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_MBLNO_NOT_EXIST], item.Mblno);
-                        item.IsValid = false;
-                    }
-                }
+                
                 if (item.IsValid)
                 {
+                    OpsTransaction currentOpsJob = opsTransaction.Where(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).FirstOrDefault();
+
                     string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
                     string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
                     Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
@@ -1498,13 +1494,13 @@ namespace eFMS.API.Documentation.DL.Services
                     item.PaymentObjectId = PartnerId;
                     item.Quantity = (decimal)item.Qty;
 
-                    OpsTransaction currentOpsJob = opsTransRepository.Get(x => x.Hwbno == item.Hblno.Trim() && x.Mblno == item.Mblno.Trim()).FirstOrDefault();
                     item.Hblid = currentOpsJob.Hblid;
                     item.JobNo = currentOpsJob.JobNo;
                     item.TransactionType = "CL";
                     string jobNo = currentOpsJob.JobNo;
                     if (item.Type.ToLower() == "obh")
                     {
+                        item.PaymentObjectId = obhPartnerId;
                         item.PayerId = PartnerId;
                     }
                     
