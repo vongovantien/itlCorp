@@ -99,24 +99,19 @@
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Salesman</label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'salesMan')"
-                                    (remove)="resetFormControl(salesManId)"
-                                    [currentActiveItemId]="{field:'id', value: salesManId.value}"
-                                    [selectedDisplayFields]="['username', 'employeeNameEn']"
-                                    [dataSources]="salemans | async" [displayFields]="displayFieldsSalesMan">
-                                </app-combo-grid-virtual-scroll>
+                                <ng-select [multiple]='true' formControlName="staff" class="custom"
+                                    (change)="onSelectDataFormInfo($event, 'staff')" [items]="staffList"
+                                    [(ngModel)]="staffActive"
+                                    bindLabel="text" bindValue="id">
+                                </ng-select>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label>Office</label>
-                                <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'offical')"
-                                    (remove)="resetFormControl(officalId)"
-                                    [currentActiveItemId]="{field:'id', value: officalId.value}"
-                                    [selectedDisplayFields]="['shortName']" [dataSources]="offices | async"
-                                    [displayFields]="displayFieldsOffice">
-                                    >
-                                </app-combo-grid-virtual-scroll>
+                                <ng-select [items]="offices" formControlName="officeIds" class="custom"
+                                [multiple]="true" bindLabel="shortName" bindValue="id">
+                           </ng-select>
                             </div>
                         </div>
                     </div>
