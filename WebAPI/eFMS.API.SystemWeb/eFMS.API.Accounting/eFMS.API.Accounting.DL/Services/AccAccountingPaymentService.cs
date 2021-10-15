@@ -1710,7 +1710,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var invoiceDe = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TYPE);
                 var invoiceObh = invoice.Where(x => x.invc.FirstOrDefault().Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE);
                 var statusOBH = string.Empty;
-                if (criteria.PaymentStatus.Count > 0 && invoiceObh.Count() > 0)
+                if (invoiceObh.Count() > 0)
                 {
                     // Check if obh payment have valid status on search
                     var unpaidOBH = invoiceObh.Sum(x => x?.invc.FirstOrDefault().UnpaidAmountVnd ?? 0);
@@ -1727,7 +1727,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         statusOBH = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
                     }
-                    if (!criteria.PaymentStatus.Contains(statusOBH))
+                    if (criteria.PaymentStatus.Count > 0 && !criteria.PaymentStatus.Contains(statusOBH))
                     {
                         isValidObh = false;
                     }
