@@ -37,3 +37,10 @@ StlAscDpManagerName	String	100
 StlAscDpManagerSignDate	String	50	
 StlBODSignDate	String	50	
 StlRequesterSignDate	String	50	
+PaymentMethod	String	50	
+Beneficiary	String	50	
+AccNo	String	50	
+Bank	String	50	
+BankCode	String	50	
+ServiceDate	DateTime	
+DueDate	DateTime	
