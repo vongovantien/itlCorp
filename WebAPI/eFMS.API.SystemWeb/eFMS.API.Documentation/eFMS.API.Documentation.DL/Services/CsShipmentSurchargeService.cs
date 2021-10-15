@@ -1490,6 +1490,7 @@ namespace eFMS.API.Documentation.DL.Services
                 if (item.IsValid)
                 {
                     string PartnerId = listPartner.Where(x => x.AccountNo.Trim() == item.PartnerCode.Trim()).Select(t => t.Id).FirstOrDefault();
+                    string obhPartnerId = string.IsNullOrEmpty(item.ObhPartner) ? string.Empty : listPartner.Where(x => x.AccountNo.Trim() == item.ObhPartner).Select(t => t.Id).FirstOrDefault();
                     Guid ChargeId = catChargeRepository.Get(x => x.Code == item.ChargeCode).Select(t => t.Id).FirstOrDefault();
                     item.ChargeId = ChargeId;
                     short UnitId = unitRepository.Get(x => x.UnitNameEn == item.Unit.Trim()).Select(t => t.Id).FirstOrDefault();
@@ -1520,10 +1521,21 @@ namespace eFMS.API.Documentation.DL.Services
                         TypeCompare = "OBH";
                     }
 
-                    if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                    if (string.IsNullOrEmpty(item.ObhPartner))
                     {
-                        item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
-                        item.IsValid = false;
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
+                    }
+                    else
+                    {
+                        if (listChargeOps.Any(x => x.Mblno.Trim() == item.Mblno.Trim() && x.Hblno.Trim() == item.Hblno.Trim() && x.PaymentObjectId == obhPartnerId && x.PayerId == PartnerId && x.ChargeId == ChargeId && x.Type == TypeCompare))
+                        {
+                            item.ChargeCodeError = string.Format(stringLocalizer[DocumentationLanguageSub.MSG_CHARGE_CODE_DUPLICATE], item.ChargeCode, jobNo);
+                            item.IsValid = false;
+                        }
                     }
                     if (!string.IsNullOrEmpty(item.SeriesNo))
                     {
@@ -1558,6 +1570,7 @@ namespace eFMS.API.Documentation.DL.Services
         public HandleState Import(List<CsShipmentSurchargeImportModel> list)
         {
             var chargeGroup = catChargeGroupRepository.Get();
+            var listImport = new List<CsShipmentSurchargeImportModel>();
             foreach (var item in list)
             {
                 OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
@@ -1596,7 +1609,7 @@ namespace eFMS.API.Documentation.DL.Services
                     item.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                     item.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
                     #endregion --Tính giá trị các field: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
-
+                    listImport.Add(item);
                     //if (item.Type.ToLower() == "buying")
                     //{
                     //    item.Type = "BUY";
@@ -1607,7 +1620,11 @@ namespace eFMS.API.Documentation.DL.Services
                     //}
                 }
             }
-            var datas = mapper.Map<List<CsShipmentSurcharge>>(list);
+            var datas = mapper.Map<List<CsShipmentSurcharge>>(listImport);
+            if(datas.Count == 0)
+            {
+                return new HandleState(true, "");
+            }
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
                 try
