@@ -4335,6 +4335,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _requester = userBaseService.GetEmployeeByEmployeeId(requesterId);
             var requesterName = _requester?.EmployeeNameEn;
             var emailRequester = _requester?.Email;
+            var partnerName = catPartnerRepo.Get(x => x.Id == settlement.Payee).FirstOrDefault().PartnerNameVn;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
@@ -4369,6 +4370,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
                                                 "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
                                                 "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+                                                "<li>Payee/ <i>Đối tượng thanh toán</i> : <b>[Payee]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
                                                 "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div>" +
@@ -4389,6 +4391,8 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[UrlFunc]", "#/home/accounting/settlement-payment");
             body = body.Replace("[SettlementId]", settlement.Id.ToString());
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[Payee]", partnerName);
             List<string> toEmails = new List<string> {
                 emailRequester
             };
