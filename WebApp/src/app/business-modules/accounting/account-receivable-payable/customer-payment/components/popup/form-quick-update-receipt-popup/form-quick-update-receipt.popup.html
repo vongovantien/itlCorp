@@ -8,26 +8,51 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label for="">Payment RefNo</label>
-                            <input type="text" class="form-control">
+                <form [formGroup]="form" class="row m-form m-form--state">
+                    <ng-container *ngIf="updateKey === 'paymentRefNo'">
+                        <div class="col-lg-12">
+                            <div class="form-group"
+                                [ngClass]="{'m-form__group has-danger':(isSubmitted || paymentRefNo.dirty) && !paymentRefNo.valid }">
+                                <label required>Payment RefNo:</label>
+                                <div class="input-group m-input m-input--square-group m-input-icon">
+                                    <input type="text" placeholder="Please input receipt no"
+                                        class="form-control m-input m-input--square text-primary"
+                                        formControlName="paymentRefNo">
+                                    <div class="input-group-append">
+                                        <button title="Clear" class="btn btn-success" title="Auto generate receipt no"
+                                            (click)="autoGenerateReceiptNo()">
+                                            <i class="la la-refresh"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label for="">Payment Method</label>
-                            <input type="text" class="form-control">
+                    </ng-container>
+                    <ng-container *ngIf="updateKey === 'paymentMethod'">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label required>Payment Method:</label>
+                                <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom"
+                                    name="method">
+                                </ng-select>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-lg-12">
-                        <div class="form-group">
-                            <label for="">OBH Partner</label>
-                            <input type="text" class="form-control">
+                    </ng-container>
+
+                    <ng-container *ngIf="updateKey === 'obhpartnerId'">
+                        <div class="col-lg-12">
+                            <div class="form-group">
+                                <label for="">OBH Partner:</label>
+                                <app-combo-grid-virtual-scroll (itemSelected)="obhpartnerId.setValue($event.id)"
+                                    (remove)="obhpartnerId.setValue(null)"
+                                    [currentActiveItemId]="{field:'id', value: obhpartnerId.value}"
+                                    [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners | async"
+                                    [displayFields]="displayFieldsPartner" placeholder="Select OBH Partner">
+                                </app-combo-grid-virtual-scroll>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    </ng-container>
+                </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <button type="button" class="btn btn-primary  m-btn--icon m-btn--uppercase" (click)="onConfirmSave()">

@@ -469,6 +469,14 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public async Task<IActionResult> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
         {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!ValidateReceiptNo(Id, model.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", model.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = model, Code = 409 };
+                return BadRequest(_result);
+            }
             HandleState hs = await acctReceiptService.QuickUpdate(Id, model);
             string message = HandleError.GetMessage(hs, Crud.Update);
             if(!hs.Success)
