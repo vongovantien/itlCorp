@@ -1,6 +1,6 @@
 <div class="m-portlet">
     <div class="m-portlet__body">
-        <form [formGroup]="formSearch">
+        <form [formGroup]="formSearch"  class="m-form m-form--state">
             <div class="row">
                 <div class="col-lg-8">
                     <label>Partner</label>
@@ -13,8 +13,7 @@
                 </div>
                 <div class="col-lg-4">
                     <label>Partner Type</label>
-                    <ng-select [items]="partnerTypes" formControlName="partnerType" class="custom"
-                        bindLabel="text" bindValue="id" placeholder="All">
+                    <ng-select [items]="partnerTypes" formControlName="partnerType" class="custom" placeholder="All" bindLabel="text" bindValue="id">
                     </ng-select>
                 </div>
             </div>
@@ -54,25 +53,18 @@
                             <div class="row">
                                 <div class="col-lg-6">
                                     <label></label>
-                                    <div class="form-group"
-                                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                    <div class="form-group">
                                         <input type="number" min="0" class="form-control"
                                             formControlName="fromDebitRate">
                                     </div>
 
-
                                 </div>
                                 <div class="col-lg-6">
                                     <label></label>
-                                    <div class="form-group"
-                                        [ngClass]="{ 'm-form__group has-danger': isSubmitted && (fromDebitRate.value > toDebitRate.value) }">
+                                    <div class="form-group">
                                         <input type="number" min="0" class="form-control" formControlName="toDebitRate">
                                     </div>
                                 </div>
-                            </div>
-                            <div class="form-control-feedback text-danger"
-                                *ngIf="isSubmitted && (fromDebitRate.value > toDebitRate.value)">
-                                The value of fromDebitRate must be smaller than toDebitRate
                             </div>
                         </div>
 
@@ -101,7 +93,6 @@
                                 <label>Salesman</label>
                                 <ng-select [multiple]='true' formControlName="staff" class="custom"
                                     (change)="onSelectDataFormInfo($event, 'staff')" [items]="staffList"
-                                    [(ngModel)]="staffActive"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>

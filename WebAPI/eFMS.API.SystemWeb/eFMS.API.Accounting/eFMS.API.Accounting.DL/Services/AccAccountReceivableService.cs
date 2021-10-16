@@ -1400,7 +1400,7 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitAmount = s.acctReceivable.DebitAmount
                 }).ToList();
             // Group by Contract ID, Service AR, Office AR
-            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office })
+            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office ,g.contract.OfficeId })
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
@@ -1416,7 +1416,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AgreementStatus = s.First().contract.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                     AgreementSalesmanId = s.First().contract.SaleManId,
                     AgreementCurrency = s.First().contract.CurrencyId,
-                    OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
+                    //OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
+                    OfficeId = s.Key.OfficeId.ToString(), //Office AR chứa trong Office Argeement
                     ArServiceCode = s.Key.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
                     EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
@@ -1719,42 +1720,45 @@ namespace eFMS.API.Accounting.DL.Services
             res = arPartnerContracts.ToList();
 
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
-                res = arPartnerContracts.Where(x => x.DebitRate >= criteria.DebitRateTo && x.DebitRate <= criteria.DebitRateFrom).ToList();
+                res = res.Where(x => x.DebitRate >= criteria.DebitRateTo && x.DebitRate <= criteria.DebitRateFrom).ToList();
             if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
-                res = arPartnerContracts.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
+                res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
             if (criteria.AgreementExpiredDay !=null && criteria.AgreementExpiredDay!="All")
             {
                 switch (criteria.AgreementExpiredDay)
                 {
                     case "Normal":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay > 30).ToList();
+                        res = res.Where(x => x.ExpriedDay > 30).ToList();
                         break;
                     case "30Day":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay == 30).ToList();
+                        res = res.Where(x => x.ExpriedDay == 30).ToList();
                         break;
                     case "15Day":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 15).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 15).ToList();
                         break;
                     case "Expired":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 0).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 0).ToList();
                         break;
                 }
             }
             if (criteria.Staffs != null)
-                res = arPartnerContracts.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
+                res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
             if (criteria.OfficeIds != null)
-                res = arPartnerContracts.Where(x => criteria.OfficeIds.Contains(x.OfficeId)).ToList();
+            {
+                var str = String.Join(",", criteria.OfficeIds);
+                res = res.Where(x => x.OfficeId.Contains(str)).ToList();
+            }
 
             switch (criteria.OverDueDay)
             {
                 case OverDueDayEnum.Over1_15:
-                    res = arPartnerContracts.Where(x => x.Over1To15Day > 0).ToList();
+                    res = res.Where(x => x.Over1To15Day > 0).ToList();
                     break;
                 case OverDueDayEnum.Over16_30:
-                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over16To30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.Over30:
-                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over16To30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.All:
                     break;
