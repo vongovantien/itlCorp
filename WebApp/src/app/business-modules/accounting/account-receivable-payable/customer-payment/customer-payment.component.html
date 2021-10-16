@@ -47,7 +47,9 @@
                                                     <tbody>
                                                         <tr *ngFor="let cps of CPs; let i = index; trackBy: trackByFn"
                                                             [attr.title]="cps.reasonReject"
-                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'">
+                                                            [class.invalid-row]="cps.syncStatus === 'Rejected'"
+                                                            [contextMenu]="receiptContextMenu"
+                                                            (onTouch)="onSelectReceipt(cps)">
                                                             <td class="table-actions-col" style="min-width:40px">
                                                                 <div class="table-actions">
 
@@ -73,7 +75,6 @@
                                                                 <div *ngIf="cps.status != 'Cancel'; else CancelNo">
                                                                     <span>
                                                                         <a class="pointer"
-                                                                            [contextMenu]="quickUpdateReceiptNoContextMenu"
                                                                             (click)="checkAllowDetail(cps)">
                                                                             {{cps.paymentRefNo}}
                                                                         </a>
@@ -128,9 +129,7 @@
                                                                 {{cps.class}}
                                                             </td>
                                                             <td>
-                                                                <span [contextMenu]="quickUpdateMethodContextMenu">
-                                                                    {{cps.paymentMethod}}
-                                                                </span>
+                                                                {{cps.paymentMethod}}
                                                             </td>
                                                             <td class="text-right">
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
@@ -217,20 +216,47 @@
 
 <ng-template inject></ng-template>
 
-<app-context-menu #quickUpdateMethodContextMenu>
-    <div class="menu-context__item" (click)="showQuickUpdatePopup('method')">
-        <span><i class="la la-edit text-success"></i><span>Update Payment Method</span></span>
+
+<app-context-menu #receiptContextMenu>
+    <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !== 'Synced'">
+        <div class="menu-context__item" (click)="confirmSyncReceipt()">
+            <span><i class="la la-cloud-upload text-info"></i><span> Sync to accountant system</span></span>
+        </div>
+    </ng-container>
+    <div class="menu-context__item">
+        <span><i class="la la-print text-muted"></i><span>Print...</span></span>
     </div>
-</app-context-menu>
-<app-context-menu #quickUpdateReceiptNoContextMenu>
-    <div class="menu-context__item" (click)="showQuickUpdatePopup('refNo')">
-        <span><i class="la la-edit text-success"></i><span> Update Receipt No </span></span>
-    </div>
-</app-context-menu>
-<app-context-menu #quickUpdateObhPartnerContextMenu>
-    <div class="menu-context__item" (click)="showQuickUpdatePopup('obhPartner')">
-        <span><i class="la la-edit text-success"></i><span>Update OBH Partner</span></span>
-    </div>
+
+    <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
+        <hr />
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentRefNo')">
+            <span><i class="la la-edit"></i><span> Update receipt no </span></span>
+        </div>
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentMethod')">
+            <span><i class="la la-edit"></i><span>Update payment method</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('obhpartnerId')">
+            <span><i class="la la-edit"></i><span>Update OBH partner</span></span>
+        </div>
+    </ng-container>
+
+    <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
+        <hr />
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('obhPartner')">
+            <span><i class="la la-times-circle"></i><span>Cancel receipt</span></span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="selectedReceipt?.status === 'Draft'">
+        <div class="menu-context__item">
+            <app-permission-button type="delete" (onClick)="checkAllowDelete(selectedReceipt)"
+                [user]="selectedReceipt.userCreated" class="icon" icon="la la-trash text-danger" mode="context-menu"
+                title="Delete receipt">
+            </app-permission-button>
+        </div>
+    </ng-container>
+
 </app-context-menu>
 
-<form-quick-update-receipt></form-quick-update-receipt>
+<form-quick-update-receipt [updateKey]="selectedUpdateKey" [receiptId]="selectedReceipt?.id"
+    (onSuccess)="onUpdateReceiptSuccess($event)">
+</form-quick-update-receipt>
