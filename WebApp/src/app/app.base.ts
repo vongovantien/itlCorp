@@ -146,6 +146,8 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         language: 'vi',
     };
 
+    currentUser: any;
+
     ngOnInit(): void { }
 
     ngOnDestroy(): void {
