@@ -275,7 +275,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     subscriptionSearchParamState() {
-        debugger
         this._store.select(getAccountReceivableSearchState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
