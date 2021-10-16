@@ -13,8 +13,8 @@
                 </div>
                 <div class="col-lg-4">
                     <label>Partner Type</label>
-                    <ng-select [items]="partnerTypes" formControlName="partnerType" class="custom"
-                        bindLabel="text" bindValue="id" placeholder="All">
+                    <ng-select [items]="partnerTypes" formControlName="partnerType" class="custom" bindLabel="text"
+                        bindValue="id" placeholder="All">
                     </ng-select>
                 </div>
             </div>
@@ -101,7 +101,6 @@
                                 <label>Salesman</label>
                                 <ng-select [multiple]='true' formControlName="staff" class="custom"
                                     (change)="onSelectDataFormInfo($event, 'staff')" [items]="staffList"
-                                    [(ngModel)]="staffActive"
                                     bindLabel="text" bindValue="id">
                                 </ng-select>
                             </div>
@@ -110,8 +109,8 @@
                             <div class="form-group">
                                 <label>Office</label>
                                 <ng-select [items]="offices" formControlName="officeIds" class="custom"
-                                [multiple]="true" bindLabel="shortName" bindValue="id">
-                           </ng-select>
+                                    [multiple]="true" bindLabel="shortName" bindValue="id">
+                                </ng-select>
                             </div>
                         </div>
                     </div>
