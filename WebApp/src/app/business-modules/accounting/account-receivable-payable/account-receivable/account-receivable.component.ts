@@ -12,6 +12,7 @@ import { RoutingConstants } from '@constants';
 import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
 import { Store } from '@ngrx/store';
 import { LoadListAccountReceivable, SearchListAccountReceivable } from './store/actions';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-account-receivable',
@@ -35,13 +36,13 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         private _router: Router,
         private _activeRouter: ActivatedRoute,
         private _cd: ChangeDetectorRef,
-        private _store:Store<IAccountReceivableState>
+        private _store: Store<IAccountReceivableState>
     ) {
         super();
     }
 
     ngOnInit() {
-
+        this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
 
     }
     ngAfterViewInit() {
@@ -151,11 +152,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                     };
                     this.dataSearch = body;
                 }
-
-                this.page = data.page;
-                this.pageSize = data.pageSize;
-            }
-        );
+            );
         tabComponent.dataSearch = this.dataSearch;
         tabComponent.getPagingList();
     }

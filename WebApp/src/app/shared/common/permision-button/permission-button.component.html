@@ -64,12 +64,14 @@
     </ng-container>
     <ng-container *ngSwitchCase="'delete'">
         <ng-container *ngIf="(menuPermission | async)?.delete !== 'None'">
-            <ng-container *ngIf="!!user && (menuPermission | async)?.delete=== 'Owner';else deleteTpl">
-                <button type="button" NoDbClick
-                    class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
-                    (click)="onClicked($event)" *hasOwnerPermission="user">
-                    <i className="la la-trash {{icon}}"></i>
-                </button>
+            <ng-container *ngIf="mode === 'context-menu'; else defaultDeleteTpl">
+                <ng-container
+                    *ngIf="!!user && (menuPermission | async)?.delete=== 'Owner';else deleteNotOwnerContextMenuTpl">
+                    <span NoDbClick (click)="onClicked($event)" *hasOwnerPermission="user">
+                        <i class="la la-trash {{icon}}"></i>
+                        <span>{{title}}</span>
+                    </span>
+                </ng-container>
             </ng-container>
         </ng-container>
     </ng-container>
@@ -95,7 +97,7 @@
 </ng-container>
 
 
-<ng-template #deleteTpl>
+<ng-template #deleteNotOwnerTpl>
     <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
         (click)="onClicked($event)">
         <i className="la la-trash {{ icon}}"></i>
@@ -104,14 +106,30 @@
 
 <ng-template #detailTpl>
     <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--icon-only"
-        *ngIf="(menuPermission | async)?.detail !== 'None'" (click)="onClicked($event)">
+        (click)="onClicked($event)">
         <i class="la la-edit"></i>
     </button>
 </ng-template>
 
 <ng-template #copyTpl>
     <button type="button" NoDbClick class="btn btn-{{class ? class : 'success'}}  m-btn--icon m-btn--icon-only"
-        *ngIf="(menuPermission | async)?.detail !== 'None'" (click)="onClicked($event)">
+        (click)="onClicked($event)">
         <i class="la la-copy"></i>
     </button>
+</ng-template>
+
+<ng-template #defaultDeleteTpl>
+    <ng-container *ngIf="!!user && (menuPermission | async)?.delete=== 'Owner';else deleteNotOwnerTpl">
+        <button type="button" NoDbClick class="btn btn-{{class ? class : 'danger'}}  m-btn--icon m-btn--icon-only"
+            (click)="onClicked($event)" *hasOwnerPermission="user">
+            <i className="la la-trash {{icon}}"></i>
+        </button>
+    </ng-container>
+</ng-template>
+
+<ng-template #deleteNotOwnerContextMenuTpl>
+    <span NoDbClick (click)="onClicked($event)">
+        <i class="la la-trash {{icon}}"></i>
+        <span>{{title}}</span>
+    </span>
 </ng-template>

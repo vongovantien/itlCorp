@@ -5,7 +5,7 @@ import { IDropdownPanel } from '../dropdown/dropdown.component';
     selector: 'app-context-menu',
     template: `
     <ng-template>
-        <div class="context-menu-wrapper" (click)="closed.emit()">
+        <div class="context-menu-wrapper" (click)="closed.emit()" (clickOutside)="clickOutside.emit()">
             <ng-content></ng-content>
         </div>
     </ng-template>
@@ -18,6 +18,7 @@ import { IDropdownPanel } from '../dropdown/dropdown.component';
 export class AppContextMenuComponent implements OnInit, IDropdownPanel {
     @ViewChild(TemplateRef) templateRef: TemplateRef<any>;
     @Output() closed: EventEmitter<void> = new EventEmitter<any>();
+    @Output() clickOutside: EventEmitter<void> = new EventEmitter<any>();
     constructor() { }
 
     ngOnInit(): void {

@@ -3641,11 +3641,17 @@ namespace eFMS.API.Accounting.DL.Services
                 return hs;
             }
             AcctReceipt receiptCurrent = receiptListAsync.FirstOrDefault();
-            receiptCurrent.PaymentMethod = model.PaymentMethod;
-            receiptCurrent.PaymentRefNo = model.RecepiptNo;
+            if (!string.IsNullOrEmpty(model.PaymentMethod))
+            {
+                receiptCurrent.PaymentMethod = model.PaymentMethod;
+            }
+            if (!string.IsNullOrEmpty(model.PaymentRefNo))
+            {
+                receiptCurrent.PaymentRefNo = model.PaymentRefNo;
+            }
             receiptCurrent.ObhpartnerId = model.OBHPartnerId;
 
-            hs = await DataContext.UpdateAsync(receiptCurrent, x => x.Id == receiptCurrent.Id);
+            hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
 
             return hs;
         }

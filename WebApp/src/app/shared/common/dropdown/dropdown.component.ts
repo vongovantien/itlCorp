@@ -42,4 +42,5 @@ export class AppDropdownComponent implements OnInit, IDropdownPanel {
 export interface IDropdownPanel {
     templateRef: TemplateRef<any>;
     readonly closed: EventEmitter<void>;
+    readonly clickOutside?: EventEmitter<void>;
 }

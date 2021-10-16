@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
@@ -7,16 +7,16 @@ import { AccountingRepo } from "@repositories";
 import { AppList, IPermissionBase } from "@app";
 import { ReceiptModel } from "@models";
 import { SortService } from "@services";
-import { RoutingConstants } from "@constants";
+import { RoutingConstants, AccountingConstants } from "@constants";
 
 import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
 import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
-import { InjectViewContainerRefDirective } from "@directives";
+import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
-import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
+import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent, IModelQuickUpdateReceipt } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -35,7 +35,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
-
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     CPs: ReceiptModel[] = [];
 
     selectedCPs: ReceiptModel = null;
@@ -47,6 +47,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
         dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')
     }
 
+    selectedReceipt: ReceiptModel;
+    selectedUpdateKey: string;
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
@@ -128,7 +130,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                         body: this.messageDelete,
                         labelConfirm: 'Yes',
                         classConfirmButton: 'btn-danger',
-                        iconConfirm: 'la la-trash'
+                        iconConfirm: 'la la-trash',
+                        center: true
                     }, () => this.onConfirmDeleteCP())
                 } else {
                     this.permissionPopup.show();
@@ -225,17 +228,80 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
 
     showQuickUpdatePopup(type: string) {
         switch (type) {
-            case 'method':
+            case 'paymentMethod':
                 break;
-            case 'refNo':
+            case 'paymentRefNo':
                 break;
-            case 'obhPartner':
+            case 'obhpartnerId':
                 break;
             default:
                 break;
         }
-        this.quickUpdatePopup.updateKey = type;
-        this.quickUpdatePopup.show();
+        this.selectedUpdateKey = type;
+        if (!!this.selectedReceipt) {
+            this.quickUpdatePopup.setValueForm('paymentRefNo', this.selectedReceipt['paymentRefNo']);
+            this.quickUpdatePopup.setValueForm('paymentMethod', this.selectedReceipt['paymentMethod']);
+            this.quickUpdatePopup.setValueForm('obhpartnerId', this.selectedReceipt['obhpartnerId']);
+            this.quickUpdatePopup.show();
+
+        }
+    }
+
+    onSelectReceipt(receipt: ReceiptModel) {
+        this.selectedReceipt = receipt;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    onUpdateReceiptSuccess(data: { id: string, type: string, data: IModelQuickUpdateReceipt }) {
+        if (data.id) {
+            const receiptItem: ReceiptModel = this.CPs.find(x => x.id == data.id);
+            if (!!receiptItem) {
+                receiptItem[data.type] = data.data[data.type];
+            }
+        }
+    }
+
+    confirmSyncReceipt() {
+        const confirmMessage = `Are you sure you want to send ${this.selectedReceipt.paymentRefNo} to accountant system?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Sync To Accountant System',
+            body: confirmMessage,
+            iconConfirm: 'la la-cloud-upload',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            this.sendReceiptToAccountant(this.selectedReceipt);
+        });
+    }
+
+    sendReceiptToAccountant(receipt: ReceiptModel) {
+        const receiptSyncIds: AccountingInterface.IRequestString[] = [];
+        const receiptSyncId: AccountingInterface.IRequestString = {
+            id: receipt.id,
+            action: receipt.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+        };
+        receiptSyncIds.push(receiptSyncId);
+
+        this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
+            .pipe(
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
+                        this.requestLoadListCustomerPayment();
+
+                    } else {
+                        this._toastService.error("Send Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
     }
 
 }
