@@ -5069,10 +5069,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 BalanceTotalAmount = s.Key.Currency == "VND" ? Math.Round((decimal)(advTotalAmount - s.Sum(d => d.SettlementAmount)),0): Math.Round((decimal)(advTotalAmount - s.Sum(d => d.SettlementAmount)), 2),
                                 AdvanceTotalAmountVND =advTotalAmount*currencyExchangeService.CurrencyExchangeRateConvert(null,null, s.Key.Currency,"VND"),
                                 AdvanceTotalAmountUSD = advTotalAmount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "USD"),
-                                SettlementTotalAmountVND = (s.Key.Currency == "VND" ? Math.Round((decimal)s.Sum(d => d.SettlementAmount), 0) :
-                                Math.Round((decimal)s.Sum(d => d.SettlementAmount), 2)) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "VND"),
-                                SettlementTotalAmountUSD = (s.Key.Currency == "VND" ? Math.Round((decimal)s.Sum(d => d.SettlementAmount), 0) :
-                                Math.Round((decimal)s.Sum(d => d.SettlementAmount), 2)) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "USD"),
+                                SettlementTotalAmountVND = s.Sum(d => d.SettlementAmount) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "VND"),
+                                SettlementTotalAmountUSD = s.Sum(d => d.SettlementAmount) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "USD"),
                             });;
 
                         // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
