@@ -878,7 +878,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Tiền mặt",//41
                 "Ngày đến hạn",//42
                 //END
-                "Note", //43
+                "Ghi chú", //43
             };
 
             List<string> engHeaders = new List<string>()
