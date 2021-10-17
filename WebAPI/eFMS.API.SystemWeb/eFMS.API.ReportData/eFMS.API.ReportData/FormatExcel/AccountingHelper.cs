@@ -366,20 +366,33 @@ namespace eFMS.API.ReportData.FormatExcel
 
 
                     // Total
+
+                    worksheet.Cells[addressStartContent + 3, 2].Value = "VND";
+                    worksheet.Cells[addressStartContent + 3, 2].Style.Font.Bold = true;
+                    worksheet.Cells[addressStartContent + 3, 2].Style.Font.Bold = true;
+
+                    worksheet.Cells[addressStartContent + 3, 3].Value = "USD";
+                    worksheet.Cells[addressStartContent + 3, 3].Style.Font.Bold = true;
+                    worksheet.Cells[addressStartContent + 3, 3].Style.Font.Bold = true;
+
                     worksheet.Cells[addressStartContent + 4, 1].Value = "Total Settlement";
                     worksheet.Cells[addressStartContent + 4, 1].Style.Font.Bold = true;
                     worksheet.Cells[addressStartContent + 4, 1].Style.Font.Bold = true;
 
-                    worksheet.Cells[addressStartContent + 4, 2].Value = listObj.Sum(s => s.SettlementTotalAmount);
+                    worksheet.Cells[addressStartContent + 4, 2].Value = listObj.Sum(s => s.SettlementTotalAmountVND);
 
                     worksheet.Cells[addressStartContent + 5, 1].Value = "Total Advance";
                     worksheet.Cells[addressStartContent + 5, 1].Style.Font.Bold = true;
-                    worksheet.Cells[addressStartContent + 5, 2].Value = listObj.Sum(d => d.AdvanceTotalAmount);
+                    worksheet.Cells[addressStartContent + 5, 2].Value = listObj.Sum(d => d.AdvanceTotalAmountVND);
+
+                    worksheet.Cells[addressStartContent + 4, 3].Value = listObj.Sum(s => s.SettlementTotalAmountUSD);
+
+                    worksheet.Cells[addressStartContent + 5, 3].Value = listObj.Sum(d => d.AdvanceTotalAmountUSD);
 
                     worksheet.Cells[addressStartContent + 6, 1].Value = "Total Balance";
                     worksheet.Cells[addressStartContent + 6, 1].Style.Font.Bold = true;
-                    worksheet.Cells[addressStartContent + 6, 2].Value = listObj.Sum(b => b.BalanceTotalAmount);
-
+                    worksheet.Cells[addressStartContent + 6, 2].Value = listObj.Sum(d => d.AdvanceTotalAmountVND)- listObj.Sum(s => s.SettlementTotalAmountVND);
+                    worksheet.Cells[addressStartContent + 6, 3].Value = listObj.Sum(d => d.AdvanceTotalAmountUSD) - listObj.Sum(s => s.SettlementTotalAmountUSD);
 
                     excelPackage.Save();
                     return excelPackage.Stream;

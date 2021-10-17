@@ -14,6 +14,10 @@ namespace eFMS.API.ReportData.Models.Accounting
         public decimal? SettlementTotalAmount { get; set; }
         public decimal? AdvanceTotalAmount { get; set; }
         public decimal? BalanceTotalAmount { get; set; }
+        public decimal? SettlementTotalAmountVND { get; set; }
+        public decimal? AdvanceTotalAmountVND { get; set; }
+        public decimal? SettlementTotalAmountUSD { get; set; }
+        public decimal? AdvanceTotalAmountUSD { get; set; }
 
         public List<SettlementExportDefault> requestList { get; set; }
     }

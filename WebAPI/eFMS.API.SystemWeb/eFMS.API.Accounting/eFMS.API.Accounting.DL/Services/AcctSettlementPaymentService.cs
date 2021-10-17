@@ -5021,7 +5021,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 RequestDate = currentSettlement.RequestDate,
                                                 ApproveDate = approveDate,
                                                 Description = sur.Notes,
-                                                SettlementAmount = sur.Total,
+                                                SettlementAmount = sur.Total*currencyExchangeService.CurrencyExchangeRateConvert(null,null,sur.CurrencyId,currentSettlement.SettlementCurrency),
                                             };
 
                         // Get Document
@@ -5041,7 +5041,7 @@ namespace eFMS.API.Accounting.DL.Services
                                               JobID = cst.JobNo,
                                               HBL = cstd.Hwbno,
                                               MBL = cst.Mawb,
-                                              SettlementAmount = sur.Total,
+                                              SettlementAmount = sur.Total*currencyExchangeService.CurrencyExchangeRateConvert(null,null,sur.CurrencyId,currentSettlement.SettlementCurrency),
                                               CustomNo = string.Empty,
                                               SettleNo = currentSettlement.SettlementNo,
                                               Currency = currentSettlement.SettlementCurrency,
@@ -5055,18 +5055,25 @@ namespace eFMS.API.Accounting.DL.Services
                         var data = dataOperation.Union(dataService).ToList();
 
                         decimal? advTotalAmount;
-                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
+                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo, d.Currency })
                             .Select(s => new SettlementExportGroupDefault
                             {
                                 JobID = s.Key.JobID,
                                 MBL = s.Key.MBL,
                                 HBL = s.Key.HBL,
                                 CustomNo = s.Key.CustomNo,
-                                SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
+                                SettlementTotalAmount = s.Key.Currency=="VND"? Math.Round((decimal)s.Sum(d => d.SettlementAmount),0) : 
+                                Math.Round((decimal)s.Sum(d => d.SettlementAmount), 2),
                                 requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, out advTotalAmount),
-                                AdvanceTotalAmount = advTotalAmount,
-                                BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
-                            });
+                                AdvanceTotalAmount = s.Key.Currency == "VND" ? Math.Round((decimal)advTotalAmount,0): Math.Round((decimal)advTotalAmount,2),
+                                BalanceTotalAmount = s.Key.Currency == "VND" ? Math.Round((decimal)(advTotalAmount - s.Sum(d => d.SettlementAmount)),0): Math.Round((decimal)(advTotalAmount - s.Sum(d => d.SettlementAmount)), 2),
+                                AdvanceTotalAmountVND =advTotalAmount*currencyExchangeService.CurrencyExchangeRateConvert(null,null, s.Key.Currency,"VND"),
+                                AdvanceTotalAmountUSD = advTotalAmount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "USD"),
+                                SettlementTotalAmountVND = (s.Key.Currency == "VND" ? Math.Round((decimal)s.Sum(d => d.SettlementAmount), 0) :
+                                Math.Round((decimal)s.Sum(d => d.SettlementAmount), 2)) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "VND"),
+                                SettlementTotalAmountUSD = (s.Key.Currency == "VND" ? Math.Round((decimal)s.Sum(d => d.SettlementAmount), 0) :
+                                Math.Round((decimal)s.Sum(d => d.SettlementAmount), 2)) * currencyExchangeService.CurrencyExchangeRateConvert(null, null, s.Key.Currency, "USD"),
+                            });;
 
                         // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
                         foreach (var item in group)
@@ -5131,14 +5138,14 @@ namespace eFMS.API.Accounting.DL.Services
                     MBL = y.Key.MBL,
                     SettleNo = y.Key.SettleNo,
                     AdvanceNo = y.Key.AdvanceNo,
-                    SettlementAmount = y.Sum(z => z.SettlementAmount),
+                    SettlementAmount = y.Key.Currency=="VND"? Math.Round(y.Sum(z => (decimal)z.SettlementAmount),0):Math.Round(y.Sum(z => (decimal)z.SettlementAmount),2),
                     ApproveDate = y.Key.ApproveDate,
                     Currency = y.Key.Currency,
                     CustomNo = y.Key.CustomNo,
                     Description = settleDesc,
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
-                });
+                });;
             var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
             groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
