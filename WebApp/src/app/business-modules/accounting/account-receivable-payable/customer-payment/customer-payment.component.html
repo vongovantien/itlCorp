@@ -104,21 +104,32 @@
                                                                     </a>
                                                                 </ng-template>
                                                             </td>
-
                                                             <td>
                                                                 <span class="text-info">{{cps.customerName}}</span>
                                                             </td>
-                                                            <td>
-                                                                <span>{{cps.type}}</span>
-                                                            </td>
+
                                                             <td class="text-right">
                                                                 <span>{{cps.finalPaidAmount | number :'.0-3'}}</span>
+                                                            </td>
+                                                            <td class="text-right">
+                                                                <span>{{(cps.currencyId ===
+                                                                    'VND'?cps.paidAmountVnd:cps.paidAmountUsd) | number
+                                                                    :'.0-3'}}</span>
                                                             </td>
                                                             <td>
                                                                 <span>{{cps.currencyId}}</span>
                                                             </td>
                                                             <td>
+                                                                <span>{{cps.description}}</span>
+                                                            </td>
+                                                            <td>
                                                                 {{cps.paymentMethod}}
+                                                            </td>
+                                                            <td>
+                                                                {{cps.class}}
+                                                            </td>
+                                                            <td>
+                                                                <span>{{cps.type}}</span>
                                                             </td>
                                                             <td>
                                                                 <span>
@@ -138,9 +149,6 @@
                                                             <td>
                                                                 <span>{{cps.lastSyncDate | date :'dd/MM/yyyy' }}
                                                                 </span>
-                                                            </td>
-                                                            <td>
-                                                                <span>{{cps.description}}</span>
                                                             </td>
                                                             <td>
                                                                 <span
@@ -173,9 +181,6 @@
                                             </app-pagination>
                                         </div>
                                     </div>
-                                </tab>
-                                <tab heading="Summary">
-                                    summary
                                 </tab>
                             </tabset>
                         </div>

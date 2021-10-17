@@ -56,5 +56,28 @@ namespace eFMS.API.Common.Helpers
             }
             return null;
         }
+
+        public async static Task<HttpResponseMessage> DeleteApi(string url, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split()[1]; // remove bearer
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+
+                HttpResponseMessage response = await client.DeleteAsync(url);
+                return response;
+            }
+            catch (Exception e)
+            {
+                new LogHelper("eFMS_HttpService_Log", e.ToString());
+            }
+            return null;
+        }
     }
 }

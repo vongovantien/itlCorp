@@ -1,3 +1,5 @@
+import { getCurrentUserState } from './../../../../store/reducers/index';
+import { takeUntil } from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -9,7 +11,6 @@ import { SortService } from 'src/app/shared/services';
 import { NgProgress } from '@ngx-progressbar/core';
 import { RoutingConstants } from '@constants';
 import { ReportPreviewComponent, ConfirmPopupComponent, InfoPopupComponent } from '@common';
-import { listAnimation } from '@animations';
 import { AccountingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { StatementOfAccountPaymentMethodComponent } from '../components/poup/payment-method/soa-payment-method.popup';
@@ -19,7 +20,6 @@ import { ShareModulesReasonRejectPopupComponent } from 'src/app/business-modules
 @Component({
     selector: 'app-statement-of-account-detail',
     templateUrl: './detail-soa.component.html',
-     animations: [listAnimation]
 })
 export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild(ReportPreviewComponent) previewPopup: ReportPreviewComponent;
@@ -29,7 +29,7 @@ export class StatementOfAccountDetailComponent extends AppList {
     @ViewChild('validateSyncedSOAPopup') validateSyncedPopup: InfoPopupComponent;
     soaNO: string = '';
     currencyLocal: string = 'VND';
-    folderModuleName:string='SOA';
+    folderModuleName: string = 'SOA';
 
     soa: SOA = new SOA();
     headers: CommonInterface.IHeaderTable[] = [];
@@ -46,7 +46,9 @@ export class StatementOfAccountDetailComponent extends AppList {
     reasonReject: string = '';
     messageValidate: string = '';
     attachFiles: SysImage[] = [];
-    
+
+    userLogged: Partial<SystemInterface.IClaimUser>;
+
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -91,6 +93,13 @@ export class StatementOfAccountDetailComponent extends AppList {
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
             }
         });
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((u) => {
+                if (!!u) {
+                    this.userLogged = u;
+                }
+            })
     }
 
     getDetailSOA(soaNO: string, currency: string) {
@@ -149,6 +158,24 @@ export class StatementOfAccountDetailComponent extends AppList {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
+    exportSOAAFWithHBL() {
+        this._progressRef.start();
+        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO, this.userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight With HBL.xlsx');
                     } else {
                         this._toastService.warning('No data found');
                     }

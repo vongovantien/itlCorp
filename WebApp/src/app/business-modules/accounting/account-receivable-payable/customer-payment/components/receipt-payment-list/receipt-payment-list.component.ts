@@ -4,7 +4,7 @@ import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
 import { formatDate, formatCurrency } from '@angular/common';
 import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { IAppState, getCatalogueCurrencyState, GetCatalogueCurrencyAction, getCurrentUserState } from '@store';
-import { Store } from '@ngrx/store';
+import { Store, ActionsSubject } from '@ngrx/store';
 import { ToastrService } from 'ngx-toastr';
 import { AppForm } from '@app';
 import { JobConstants, AccountingConstants } from '@constants';
@@ -22,13 +22,14 @@ import {
     ProcessClearSuccess,
     ToggleAutoConvertPaid,
     SelectReceiptCurrency,
-    UpdateReceiptExchangeRate
+    UpdateReceiptExchangeRate,
+    ReceiptActionTypes
 } from '../../store/actions';
 import { ARCustomerPaymentReceiptDebitListComponent } from '../receipt-debit-list/receipt-debit-list.component';
 import { ARCustomerPaymentReceiptCreditListComponent } from '../receipt-credit-list/receipt-credit-list.component';
 
-import { takeUntil } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { takeUntil, withLatestFrom, switchMap, switchMapTo, take, filter } from 'rxjs/operators';
+import { Observable, pipe } from 'rxjs';
 import cloneDeep from 'lodash/cloneDeep';
 @Component({
     selector: 'customer-payment-list-receipt',
@@ -71,6 +72,9 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     paymentMethods: string[] = [
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
@@ -103,14 +107,14 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     departments: Observable<any>;
     class$: Observable<string>;
 
-
     constructor(
         private readonly _accountingRepo: AccountingRepo,
         private readonly _store: Store<IAppState>,
         private readonly _fb: FormBuilder,
         private readonly _catalogueRepo: CatalogueRepo,
         private readonly _toastService: ToastrService,
-        private readonly _systemRepo: SystemRepo
+        private readonly _systemRepo: SystemRepo,
+        private readonly _actionStoreSubject: ActionsSubject,
     ) {
         super();
     }
@@ -119,9 +123,23 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this._store.dispatch(new GetCatalogueCurrencyAction());
         this.$currencyList = this._store.select(getCatalogueCurrencyState);
 
-        this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal' });
-        this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
         this.userLogged$ = this._store.select(getCurrentUserState);
+
+
+        this.obhPartners = this.userLogged$
+            .pipe(
+                filter(c => !!c.userName),
+                switchMap((currentUser: SystemInterface.IClaimUser | any) => {
+                    if (!!currentUser.userName) {
+                        return this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal', notEqualInternalCode: currentUser.internalCode });
+                    }
+                }),
+                takeUntil(this.ngUnsubscribe),
+            )
+
+
+        // this.obhPartners = this._catalogueRepo.getListPartner(null, null, { active: true, partnerMode: 'Internal', notEqualInternalCode: this.currentUser });
+        this.departments = this._systemRepo.getDepartment(null, null, { active: true, deptTypes: ['AR', 'ACCOUNTANT'] });
 
         this.initForm();
         this.listenCustomerInfoData();
@@ -140,10 +158,44 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 }
             );
 
-        this.class$ = this._store.select(ReceiptClassState)
+        this.class$ = this._store.select(ReceiptClassState);
 
+
+        this._actionStoreSubject
+            .pipe(
+                filter(x => x.type === ReceiptActionTypes.ADD_DEBIT_CREDIT_TO_RECEIPT),
+                switchMapTo(
+                    this._store.select(ReceiptCreditListState)
+                        .pipe(take(1))
+                ),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe(
+                (data: any) => {
+                    this.calculateCreditAmount(data);
+                }
+            )
+    }
+
+    calculateCreditAmount(credits: ReceiptInvoiceModel[]) {
+        let totalCreditAmountVnd: number = 0;
+        let totalCreditAmountUsd: number = 0;
+
+        if (!!credits.length) {
+            for (let index = 0; index < credits.length; index++) {
+                const credit = credits[index];
+                totalCreditAmountVnd += Number(credit.paidAmountVnd);
+                totalCreditAmountUsd += Number(credit.paidAmountUsd);
+            }
+        }
+
+        this.creditAmountVnd.setValue(totalCreditAmountVnd);
+        this.creditAmountUsd.setValue(+totalCreditAmountUsd.toFixed(2));
+
+        this.calculateFinalPaidAmount();
 
     }
+
 
     listenCustomerInfoData() {
         this._store.select(ReceiptPartnerCurrentState)
@@ -222,25 +274,6 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         }
     }
 
-    getBankAccountNo(event: any) {
-        if (event === this.paymentMethods[1]) {
-            this.userLogged$
-                .pipe(takeUntil(this.ngUnsubscribe))
-                .subscribe((u) => {
-                    if (!!u) {
-                        if (this.currencyId.value === 'VND') {
-                            this.bankAccountNo.setValue(u.bankOfficeAccountNoVnd)
-                        } else {
-                            this.bankAccountNo.setValue(u.bankOfficeAccountNoUsd)
-                        }
-                    }
-                });
-
-        } else {
-            this.bankAccountNo.setValue(null);
-        }
-    }
-
     onSelectDataFormInfo(data, type: string) {
         switch (type) {
             case 'paid-amountVnd':
@@ -248,7 +281,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.paidAmountUsd.setValue(0);
                     } else {
-                        this.paidAmountUsd.setValue(formatCurrency(+((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const paidAmountUsd = Number((this.paidAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.paidAmountUsd.setValue(paidAmountUsd);
                     }
                 }
 
@@ -300,7 +334,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     if (this.exchangeRateValue === 0) {
                         this.creditAmountUsd.setValue(0);
                     } else {
-                        this.creditAmountUsd.setValue(formatCurrency(+((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2)), 'en', ''));
+                        const creditAmountUsd = Number((this.creditAmountVnd.value / this.exchangeRateValue).toFixed(2));
+                        this.creditAmountUsd.setValue(creditAmountUsd);
                     }
                 }
                 this.calculateFinalPaidAmount();
@@ -322,12 +357,24 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     this.cusAdvanceAmountVnd.setValue(0);
                 }
                 if (!!this.isAutoConvert.value) {
-                    const valueUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                    this.cusAdvanceAmountUsd.setValue(formatCurrency(valueUsd, 'en', ''));
+                    const cusAdvanceAmountUsd: number = Number(((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2));
+                    this.cusAdvanceAmountUsd.setValue(cusAdvanceAmountUsd);
                 }
-                this.calculateFinalPaidAmount();
+                let isCleaAdvVnd = null;
+
+                if (this.paymentMethod.value == AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) {
+                    isCleaAdvVnd = true;
+                    if (!!this.isAutoConvert.value) {
+                        this.paidAmountVnd.setValue(0);
+                        this.paidAmountUsd.setValue(0);
+                    } else {
+                        this.paidAmountVnd.setValue(0);
+                    }
+                }
+                this.calculateFinalPaidAmount(isCleaAdvVnd);
                 break;
             case 'cusAdvanceAmountUsd':
+                debugger
                 if (!data.target.value.length) {
                     this.cusAdvanceAmountUsd.setValue(0);
                 }
@@ -335,7 +382,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     const valueVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                     this.cusAdvanceAmountVnd.setValue(valueVnd);
                 }
-                this.calculateFinalPaidAmount();
+                let isCleaAdv = null;
+                if (this.paymentMethod.value == AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) {
+                    isCleaAdv = true;
+                    if (!!this.isAutoConvert.value) {
+                        this.paidAmountVnd.setValue(0);
+                        this.paidAmountUsd.setValue(0);
+                    } else {
+                        this.paidAmountUsd.setValue(0);
+                    }
+                }
+                this.calculateFinalPaidAmount(isCleaAdv);
 
                 break;
             case 'payment-date':
@@ -359,6 +416,29 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                     }
                 );
 
+                break;
+            case 'payment-method':
+                if (data === AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE) {
+                    this.paidAmountVnd.setValue(0);
+                    this.paidAmountUsd.setValue(0);
+                    this.calculateFinalPaidAmount(true);
+
+                } else if (data === this.paymentMethods[1]) {  // ? BANK
+                    this.userLogged$
+                        .pipe(takeUntil(this.ngUnsubscribe))
+                        .subscribe((u) => {
+                            if (!!u) {
+                                if (this.currencyId.value === 'VND') {
+                                    this.bankAccountNo.setValue(u.bankOfficeAccountNoVnd)
+                                } else {
+                                    this.bankAccountNo.setValue(u.bankOfficeAccountNoUsd)
+                                }
+                            }
+                        });
+
+                } else {
+                    this.bankAccountNo.setValue(null);
+                }
                 break;
             default:
                 break;
@@ -423,19 +503,29 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
 
         let listInvoice = [];
         this.debitList
+            .pipe(takeUntil(this.ngUnsubscribe))
             .subscribe((x: ReceiptInvoiceModel[]) => {
                 listInvoice = cloneDeep<ReceiptInvoiceModel[]>(x);
             });
         const body: IProcessClearInvoiceModel = {
             currency: this.currencyId.value,
             finalExchangeRate: this.exchangeRate.value,
-            paidAmountVnd: this.finalPaidAmountVnd.value,
-            paidAmountUsd: this.finalPaidAmountUsd.value,
-            list: listInvoice.filter(x => x.type !== AccountingConstants.RECEIPT_ADVANCE_TYPE),
+            paidAmountVnd: +this.finalPaidAmountVnd.value,
+            paidAmountUsd: +this.finalPaidAmountUsd.value,
+            list: listInvoice.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT
+                || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH
+                || x.type === AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE),
         };
         if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
             this._toastService.warning('Missing data to process', 'Warning');
             return;
+        }
+        if (!!this.creditAmountVnd.value || !!this.creditAmountUsd.value) {
+            const isHavenetOff = body.list.filter(x => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT).some(x => (!!x.netOffVnd || !!x.netOffUsd));
+            if (!isHavenetOff) {
+                this._toastService.warning('Please you check Net Off Amount Detail on Debit List', 'Warning');
+                return;
+            }
         }
 
         this._accountingRepo.processInvoiceReceipt(body)
@@ -462,7 +552,13 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 this.creditAmountVnd.enable();
 
                 const _advanceUsd: number = +((this.cusAdvanceAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
-                this.cusAdvanceAmountUsd.setValue(formatCurrency(_advanceUsd, 'en', ''));
+                this.cusAdvanceAmountUsd.setValue(+formatCurrency(_advanceUsd, 'en', ''));
+
+                const paidAmountUsd: number = +((+this.paidAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                this.paidAmountUsd.setValue(+formatCurrency(paidAmountUsd, 'en', ''))
+
+                const creditAmountUsd: number = +((+this.creditAmountVnd.value ?? 0) / this.exchangeRateValue).toFixed(2);
+                this.creditAmountUsd.setValue(+formatCurrency(creditAmountUsd, 'en', ''))
 
                 this.cusAdvanceAmountUsd.disable();
                 this.creditAmountUsd.disable();
@@ -477,6 +573,12 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 const _advanceVnd: number = +((this.cusAdvanceAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
                 this.cusAdvanceAmountVnd.setValue(_advanceVnd);
 
+                const paidAmountVnd: number = +((this.paidAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                this.paidAmountVnd.setValue(paidAmountVnd);
+
+                const creditAmountVnd: number = +((this.creditAmountUsd.value ?? 0) * this.exchangeRateValue).toFixed(0);
+                this.creditAmountVnd.setValue(creditAmountVnd);
+
                 this.cusAdvanceAmountVnd.disable();
                 this.paidAmountVnd.disable();
                 this.creditAmountVnd.disable();
@@ -488,10 +590,34 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             this.cusAdvanceAmountUsd.enable();
             this.creditAmountUsd.enable();
             this.creditAmountVnd.enable();
+
+
+            this.debitList
+                .pipe(takeUntil(this.ngUnsubscribe))
+                .subscribe((data: ReceiptInvoiceModel[]) => {
+                    if (!!data.length) {
+                        let totalPaidAmountVnd: number = 0;
+                        let totalPaidAmountUsd: number = 0;
+                        for (let index = 0; index < data.length; index++) {
+                            const element = data[index];
+                            totalPaidAmountVnd += element.paidAmountVnd;
+                            totalPaidAmountUsd += element.paidAmountUsd;
+                        }
+                        if (!this.paidAmountVnd.value) {
+                            this.paidAmountVnd.setValue(totalPaidAmountVnd);
+                        }
+                        if (!this.paidAmountUsd.value) {
+                            this.paidAmountUsd.setValue(totalPaidAmountUsd);
+                        }
+                    }
+                });
+
         }
 
         this.paidAmountVnd.updateValueAndValidity();
         this.paidAmountUsd.updateValueAndValidity();
+
+        this.calculateFinalPaidAmount();
 
     }
 
@@ -512,15 +638,22 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     private calculateFinalPaidAmountWithAsPaid(isAsPaid: boolean) {
+        let totalFinalPaidVnd: number = 0;
+        let totalFinalPaidusd: number = 0;
+
         if (!!isAsPaid) {
-            const totaValueVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
-            const totaValueUsd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
-            this.finalPaidAmountVnd.setValue(totaValueVnd);
-            this.finalPaidAmountUsd.setValue(totaValueUsd);
+            totalFinalPaidVnd = (this.paidAmountVnd.value ?? 0) + (this.cusAdvanceAmountVnd.value ?? 0) + (this.creditAmountVnd.value ?? 0);
+            totalFinalPaidusd = (this.paidAmountUsd.value ?? 0) + (this.cusAdvanceAmountUsd.value ?? 0) + (this.creditAmountUsd.value ?? 0);
+
+            this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd);
+            this.finalPaidAmountUsd.setValue(+totalFinalPaidusd);
             return;
         }
-        this.finalPaidAmountVnd.setValue(this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0));
-        this.finalPaidAmountUsd.setValue(this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0));
+        totalFinalPaidVnd = this.paidAmountVnd.value + (this.creditAmountVnd.value ?? 0);
+        totalFinalPaidusd = this.paidAmountUsd.value + (this.creditAmountUsd.value ?? 0);
+
+        this.finalPaidAmountVnd.setValue(+totalFinalPaidVnd.toFixed(0));
+        this.finalPaidAmountUsd.setValue(+totalFinalPaidusd.toFixed(2));
     }
 }
 

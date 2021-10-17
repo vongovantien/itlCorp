@@ -147,5 +147,8 @@
 
         public static readonly string API_KEY_INVALID = "API Key invalid";
         public static readonly string HASH_INVALID = "Hashed string invalid";
+
+        public static readonly string SYNCED_FROM_CDNOTE = "CDNOTE";
+        public static readonly string SYNCED_FROM_SOA = "SOA";
     }
 }

@@ -24,6 +24,7 @@ export class AdvancePaymentFormCreateComponent extends AppForm {
     methods: CommonInterface.ICommonTitleValue[] = [
         { title: 'Cash', value: 'Cash' },
         { title: 'Bank Transfer', value: 'Bank' },
+        { title: 'Other', value: 'Other' },
     ];
     currencyList: Currency[] = [];
     userLogged: Partial<SystemInterface.IClaimUser>;

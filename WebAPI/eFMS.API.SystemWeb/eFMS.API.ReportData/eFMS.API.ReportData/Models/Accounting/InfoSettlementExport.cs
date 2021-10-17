@@ -26,5 +26,9 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string Note { get; set; }
         public string BankCode { get; set; }
         public DateTime? DueDate { get; set; }
+        public string SupplierName { get; set; }
+        public DateTime? SOADate { get; set; }
+        public string SOANo { get; set; }
+        public string ReasonForRequest { get; set; }
     }
 }

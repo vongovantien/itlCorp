@@ -1,5 +1,11 @@
 //combogrid
 .e--combogrid {
+    input.dropdown-toggle {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 35px;
+    }
     .e--combogrid_icon {
         position: absolute;
         right: 10px;

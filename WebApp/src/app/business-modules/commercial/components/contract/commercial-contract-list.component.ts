@@ -117,9 +117,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.formGroup.controls['creditLimitRate'].setValue(120);
 
 
-
+        this.formContractPopup.autoExtendDays.setValue(0);
         this.formContractPopup.contractType.setValue('Trial');
-        this.formContractPopup.currencyId.setValue('VND');
         this.formContractPopup.baseOn.setValue('Invoice Date');
 
         if (this.type === 'Agent') {
@@ -136,11 +135,19 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         this.formContractPopup.effectiveDate.setValue(null);
         this.formContractPopup.partnerLocation = this.partnerLocation;
         console.log(this.formContractPopup.partnerLocation);
-        if (this.partnerLocation === "Domestic") {
-            this.formContractPopup.creditCurrency.setValue('VND');
-        }
-        if (this.partnerLocation === "Oversea") {
+        this.formContractPopup.autoExtendDays.setValue(0);
+        if (this.type === 'Agent') {
+            this.formContractPopup.currencyId.setValue('USD');
             this.formContractPopup.creditCurrency.setValue('USD');
+        } else {
+            if (this.partnerLocation === "Domestic") {
+                this.formContractPopup.currencyId.setValue('VND');
+                this.formContractPopup.creditCurrency.setValue('VND');
+            }
+            if (this.partnerLocation === "Oversea") {
+                this.formContractPopup.currencyId.setValue('USD');
+                this.formContractPopup.creditCurrency.setValue('USD');
+            }
         }
         this.formContractPopup.show();
 

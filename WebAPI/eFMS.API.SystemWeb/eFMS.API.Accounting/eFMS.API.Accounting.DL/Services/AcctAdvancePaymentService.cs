@@ -540,19 +540,27 @@ namespace eFMS.API.Accounting.DL.Services
                     Mbl = se.First().Mbl,
                     Description = se.FirstOrDefault().Description,
                     DatetimeModified = se.First().DatetimeModified
-                }).ToList().OrderByDescending(o => o.DatetimeModified);
+
+                })
+                .ToList().OrderByDescending(o => o.DatetimeModified);
             var datamap = mapper.Map<List<AcctAdvanceRequestModel>>(list);
             var surcharge = csShipmentSurchargeRepo.Get(); // lấy ds surcharge đã có advanceNo.
 
             foreach (var item in datamap)
             {
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
+                var advancePayment = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
                 if (!string.IsNullOrEmpty(requesterID))
                 {
                     string employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
                     item.Requester = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
                 }
 
+                item.PaymentMethod = advancePayment.PaymentMethod;
+                item.DeadlinePayment = advancePayment.DeadlinePayment;
+                item.BankAccountName = advancePayment.BankAccountName;
+                item.BankAccountNo = advancePayment.BankAccountNo;
+                item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
 
@@ -645,6 +653,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Lấy ra danh sách Advance Request dựa vào Advance No và sắp xếp giảm dần theo DatetimeModified Advance Request
             var request = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).OrderByDescending(x => x.DatetimeModified).ToList();
+
             //Không tìm thấy Advance Request thì trả về null
             if (request == null) return null;
 
@@ -652,12 +661,13 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel = mapper.Map<AcctAdvancePaymentModel>(advance);
             //Mapper List<AcctAdvanceRequest> thành List<AcctAdvanceRequestModel>
             advanceModel.AdvanceRequests = mapper.Map<List<AcctAdvanceRequestModel>>(request);
+
             advanceModel.NumberOfRequests = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
             advanceModel.UserNameCreated = sysUserRepo.Get(x => x.Id == advance.UserCreated).FirstOrDefault()?.Username;
             advanceModel.UserNameModified = sysUserRepo.Get(x => x.Id == advance.UserModified).FirstOrDefault()?.Username;
             advanceModel.RequesterName = sysUserRepo.Get(x => x.Id == advance.Requester).FirstOrDefault()?.Username;
             advanceModel.PayeeName = catPartnerRepo.Get(x => x.Id == advance.Payee).FirstOrDefault()?.ShortName;
-
+            
             var advanceApprove = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo && x.IsDeny == false).FirstOrDefault();
 
             advanceModel.IsRequester = (currentUser.UserID == advance.Requester
@@ -668,6 +678,7 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel.IsManager = CheckUserIsManager(currentUser, advance, advanceApprove);
             advanceModel.IsApproved = CheckUserIsApproved(currentUser, advance, advanceApprove);
             advanceModel.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, advance, advanceApprove);
+
             return advanceModel;
         }
         #endregion --- DETAIL ---
@@ -3646,6 +3657,7 @@ namespace eFMS.API.Accounting.DL.Services
                 decimal? _cw = 0;
                 decimal? _pcs = 0;
                 decimal? _cbm = 0;
+                DateTime? serviceDate;
                 if (request.JobId.Contains("LOG"))
                 {
                     var ops = opsTransactionRepo.Get(x => x.JobNo == request.JobId).FirstOrDefault();
@@ -3659,6 +3671,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                         _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
+                    serviceDate = ops.ServiceDate;
                 }
                 else
                 {
@@ -3679,6 +3692,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
                         _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     }
+                    serviceDate = trans.ServiceDate;
                 }
                 var shipmentAdvance = new InfoShipmentAdvanceExport
                 {
@@ -3694,7 +3708,8 @@ namespace eFMS.API.Accounting.DL.Services
                     Cw = _cw,
                     Pcs = _pcs,
                     Cbm = _cbm,
-                    RequestNote=request.RequestNote,
+                    ServiceDate = serviceDate,
+                    RequestNote= request.RequestNote,
                     NormAmount = advancePayment.AdvanceRequests
                                             .Where(x => x.JobId == request.JobId
                                                     && x.Hbl == request.Hbl

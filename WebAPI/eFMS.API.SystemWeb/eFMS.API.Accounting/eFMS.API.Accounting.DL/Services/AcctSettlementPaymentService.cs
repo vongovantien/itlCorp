@@ -551,16 +551,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             foreach (var item in surchargeShipment)
                             {
-                                //Cập nhật status payment of Advance Request = NotSettled (Nếu có)
-                                var advanceRequest = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).FirstOrDefault();
-                                if (advanceRequest != null)
+                                var advanceRequests = acctAdvanceRequestRepo.Get(x => x.Hblid == item.Hblid && x.AdvanceNo == item.AdvanceNo && x.StatusPayment != AccountingConstants.STATUS_PAYMENT_NOTSETTLED).ToList();
+                                foreach(var advanceRequest in advanceRequests)
                                 {
-                                    advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
-                                    advanceRequest.DatetimeModified = DateTime.Now;
-                                    advanceRequest.UserModified = userCurrenct;
-                                    var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    if (advanceRequest != null)
+                                    {
+                                        advanceRequest.StatusPayment = AccountingConstants.STATUS_PAYMENT_NOTSETTLED;
+                                        advanceRequest.DatetimeModified = DateTime.Now;
+                                        advanceRequest.UserModified = userCurrenct;
+                                        var hsUpdateAdvRequest = acctAdvanceRequestRepo.Update(advanceRequest, x => x.Id == advanceRequest.Id);
+                                    }
                                 }
-
                                 item.SettlementCode = null;
                                 item.AdvanceNo = null;
                                 item.UserModified = userCurrenct;
@@ -2358,6 +2359,7 @@ namespace eFMS.API.Accounting.DL.Services
         public AscSettlementPaymentRequestReportParams GetFirstShipmentOfSettlement(string settlementNo)
         {
             //Order giảm dần theo JobNo
+            var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo).OrderByDescending(x => x.JobNo);
             var firstCharge = surcharges.FirstOrDefault(); //Get charge đầu tiên
 
@@ -2369,11 +2371,19 @@ namespace eFMS.API.Accounting.DL.Services
             string _consigneeName = string.Empty;
             string _consignerName = string.Empty;
             string _advDate = string.Empty;
+            //string _paymentMethod = settlement.PaymentMethod;
+            //string _beneficiary = settlement.BankAccountName;
+            //string _accNo = settlement.BankAccountNo;
+            //string _bank = settlement.BankName;
+            //string _bankCode = settlement.BankCode;
+            DateTime? _serviceDate = null;
+            //DateTime? _dueDate = settlement.DueDate;
+
             decimal? _gw = 0;
             decimal? _nw = 0;
             int? _psc = 0;
             decimal? _cbm = 0;
-
+            
             var opsTran = opsTransactionRepo.Get(x => x.Hblid == firstCharge.Hblid).FirstOrDefault();
             if (opsTran != null)
             {
@@ -2382,6 +2392,7 @@ namespace eFMS.API.Accounting.DL.Services
                 _hbl = opsTran?.Hwbno;
                 _containerQty = opsTran.SumContainers != null ? opsTran.SumContainers.Value.ToString() + "/" : string.Empty;
                 _customerName = catPartnerRepo.Get(x => x.Id == opsTran.CustomerId).FirstOrDefault()?.PartnerNameVn;
+                _serviceDate = opsTran?.ServiceDate;
             }
             else
             {
@@ -2392,6 +2403,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _jobId = csTran?.JobNo;
                     _mbl = csTran?.Mawb;
                     _hbl = csTranDetail?.Hwbno;
+                    _serviceDate = csTran?.ServiceDate;
                 }
                 _customerName = catPartnerRepo.Get(x => x.Id == csTranDetail.CustomerId).FirstOrDefault()?.PartnerNameVn;
                 _consigneeName = catPartnerRepo.Get(x => x.Id == csTranDetail.ConsigneeId).FirstOrDefault()?.PartnerNameVn;
@@ -2419,6 +2431,13 @@ namespace eFMS.API.Accounting.DL.Services
             result.HBL = _hbl;
             result.MBL = _mbl;
             result.StlCSName = string.Empty;
+            result.PaymentMethod = settlement.PaymentMethod;
+            result.Beneficiary = settlement.BankAccountName;
+            result.AccNo = settlement.BankAccountNo;
+            result.Bank = settlement.BankName;
+            result.BankCode = settlement.BankCode;
+            result.ServiceDate = _serviceDate;
+            result .DueDate = settlement.DueDate;
 
             //CR: Sum _gw, _nw, _psc, _cbm theo Masterbill [28/12/2020 - Alex]
             //Settlement có nhiều Job thì sum all các job đó
@@ -2490,6 +2509,14 @@ namespace eFMS.API.Accounting.DL.Services
                 fe.HBL = firstShipment.HBL;
                 fe.MBL = firstShipment.MBL;
                 fe.StlCSName = firstShipment.StlCSName;
+                fe.DueDate = firstShipment.DueDate;
+                fe.ServiceDate = firstShipment.ServiceDate;
+                fe.PaymentMethod = firstShipment.PaymentMethod;
+                fe.Bank = firstShipment.Bank;
+                fe.BankCode = firstShipment.BankCode;
+                fe.AccNo = firstShipment.AccNo;
+                fe.Beneficiary = firstShipment.Beneficiary;
+                
 
                 fe.SettleRequester = (settlement != null && !string.IsNullOrEmpty(settlement.Requester)) ? userBaseService.GetEmployeeByUserId(settlement.Requester)?.EmployeeNameVn : string.Empty;
                 fe.SettleRequestDate = settlement.RequestDate != null ? settlement.RequestDate.Value.ToString("dd/MM/yyyy") : string.Empty;
@@ -4765,6 +4792,10 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4783,8 +4814,11 @@ namespace eFMS.API.Accounting.DL.Services
                 BankAccountNo = settlementPayment.BankAccountNo,
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
-                DueDate = settlementPayment.DueDate
-            };
+                DueDate = settlementPayment.DueDate,
+                SOADate = soa?.SoaformDate,
+                SOANo = soa?.Soano,
+                ReasonForRequest = soa?.Note
+    };
             return infoSettlement;
         }
 
@@ -4827,6 +4861,7 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Cw = ops.SumChargeWeight;
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
+                    shipmentSettlement.ServiceDate = ops.ServiceDate;
 
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
@@ -4857,6 +4892,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var employeeId = sysUserRepo.Get(x => x.Id == trans.PersonIncharge).FirstOrDefault()?.EmployeeId;
                             _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                             shipmentSettlement.PersonInCharge = _personInCharge;
+                            shipmentSettlement.ServiceDate = trans.ServiceDate;
                         }
                         listData.Add(shipmentSettlement);
                     }

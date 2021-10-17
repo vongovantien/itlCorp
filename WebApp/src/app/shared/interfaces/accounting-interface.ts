@@ -21,6 +21,7 @@ namespace AccountingInterface {
         fromOverdueDays:number;
         toOverdueDays:number;
         debitRate:number;
+        partnerType: string;
     }
 
     export interface IDefaultSearchAcctMngt {

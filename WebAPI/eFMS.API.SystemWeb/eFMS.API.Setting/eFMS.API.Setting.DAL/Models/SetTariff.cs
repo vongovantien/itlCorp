@@ -10,8 +10,8 @@ namespace eFMS.API.Setting.Service.Models
         public string TariffType { get; set; }
         public DateTime EffectiveDate { get; set; }
         public DateTime ExpiredDate { get; set; }
-        public string ProductService { get; set; }
         public Guid ApplyOfficeId { get; set; }
+        public string ProductService { get; set; }
         public string CargoType { get; set; }
         public string ServiceMode { get; set; }
         public string CustomerId { get; set; }

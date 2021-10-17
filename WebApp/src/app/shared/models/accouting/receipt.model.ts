@@ -27,8 +27,9 @@ export class ReceiptCreditDebitModel {
     notes: string;
     paidAmountUsd: number;
     paidAmountVnd: number;
-    balanceAmountUsd: number;
-    balanceAmountVnd: number;
+    balance: number;
+    balanceUsd: number;
+    balanceVnd: number;
     totalPaidVnd: number;
     totalPaidUsd: number;
     negative: boolean;
@@ -40,6 +41,8 @@ export class ReceiptCreditDebitModel {
     voucherIdre: string = null;
     paymentType: string = null;
     netOff: boolean = null;
+    netOffVnd: number;
+    netOffUsd: number;
 }
 
 export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
@@ -63,6 +66,7 @@ export class ReceiptInvoiceModel extends ReceiptCreditDebitModel {
 
     isChangeValue: boolean = false;
     creditNos: string[] = [];
+    isValid: boolean = true;
 
     constructor(object?: any) {
         super();
@@ -114,6 +118,8 @@ export class Receipt {
     cusAdvanceAmount: number = 0;
     paidAmountUsd: number = 0;
     paidAmountVnd: number = 0;
+    referenceNo: string = null;
+
     constructor(object?: any) {
         const self = this;
         for (const key in object) {
@@ -131,7 +137,7 @@ export class ReceiptModel extends Receipt {
     userNameModified: string = null;
     subRejectReceipt: string = null;
     isReceiptBankFee: boolean = false;
-    referenceNo: string = null;
+    receiptInternalOfficeCode: string = null;
 
     constructor(object?: any) {
         super();

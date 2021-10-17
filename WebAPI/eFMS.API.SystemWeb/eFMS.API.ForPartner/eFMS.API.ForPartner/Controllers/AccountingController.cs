@@ -16,9 +16,9 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
-using eFMS.API.ForPartner.DL.Infrastructure.Http;
 using System.Threading.Tasks;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using eFMS.API.Common.Helpers;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -210,7 +210,7 @@ namespace eFMS.API.ForPartner.Controllers
                 return Ok(_result);
             }
 
-            var hs = accountingManagementService.InsertInvoice(model, apiKey);
+            var hs = accountingManagementService.InsertInvoice(model, apiKey, out Guid Id);
             string _message = hs.Success ? "Tạo mới hóa đơn thành công" : string.Format("{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
@@ -240,6 +240,7 @@ namespace eFMS.API.ForPartner.Controllers
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
                         var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
                         await CalculatorReceivable(modelReceivable);
+                        await InsertDebitInvoiceAr(Id);
                     });
                 }
             }
@@ -293,7 +294,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 ReferenceNo = model.PreReferenceNo
             };
-            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey);
+            var hsDeleteInvoice = accountingManagementService.DeleteInvoice(invoiceToDelete, apiKey, out Guid IdDelete);
             if (!hsDeleteInvoice.Success)
             {
                 ResultHandle _result = new ResultHandle { Status = hsDeleteInvoice.Success, Message = string.Format("{0}. Xóa hóa đơn cũ thất bại", hsDeleteInvoice.Message.ToString()), Data = model };
@@ -317,7 +318,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 fe.ReferenceNo = model.ReferenceNo;
             });
-            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey);
+            var hsInsertInvoice = accountingManagementService.InsertInvoice(invoiceToCreate, apiKey, out Guid Id);
             #endregion --- Create New Invoice by ReferenceNo ---
 
             string _message = hsInsertInvoice.Success ? "Thay thế hóa đơn thành công" : string.Format("{0}. Thay thế hóa đơn thất bại", hsInsertInvoice.Message.ToString());
@@ -349,6 +350,14 @@ namespace eFMS.API.ForPartner.Controllers
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
                         var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "ReplaceInvoiceData_FromBravo");
                         await CalculatorReceivable(modelReceivable);
+                        if (IdDelete != Guid.Empty)
+                        {
+                            await DeleteDebitInvoiceAr(IdDelete);
+                        }
+                        if (Id != Guid.Empty)
+                        {
+                            await InsertDebitInvoiceAr(Id);
+                        }
                     });
                 }
             }
@@ -376,7 +385,7 @@ namespace eFMS.API.ForPartner.Controllers
             }
             if (!ModelState.IsValid) return BadRequest();
 
-            var hs = accountingManagementService.DeleteInvoice(model, apiKey);
+            var hs = accountingManagementService.DeleteInvoice(model, apiKey, out Guid Id);
             string _message = hs.Success ? "Hủy hóa đơn thành công" : string.Format("{0}. Hủy hóa đơn thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
@@ -389,29 +398,31 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion -- Ghi Log --
 
-            if (!hs.Success)
+            try
+            {
+                if (!hs.Success)
+                    return Ok(result);
                 return Ok(result);
-            return Ok(result);
-            //try
-            //{
-            //    if (!hs.Success)
-            //        return Ok(result);
-            //    return Ok(result);
-            //}
-            //finally
-            //{
-            //    if (hs.Success)
-            //    {
-            //        //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
-            //        Response.OnCompleted(async () =>
-            //        {
-            //            //Tính công nợ sau khi cancel invoice thành công
-            //            var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
-            //            var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
-            //            await CalculatorReceivable(modelReceivable);
-            //        });
-            //    }
-            //}
+            }
+            finally
+            {
+                if (hs.Success)
+                {
+                    //The key is the "Response.OnCompleted" part, which allows your code to execute even after reporting HttpStatus 200 OK to the client.
+                    Response.OnCompleted(async () =>
+                    {
+                        //Tính công nợ sau khi cancel invoice thành công
+                        var surchargeIds = accountingManagementService.GetSurchargeIdsByRefNoInvoice(model.ReferenceNo);
+                        var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CancellingInvoice_FromBravo");
+                        await CalculatorReceivable(modelReceivable);
+                        if(Id != Guid.Empty)
+                        {
+                            await DeleteDebitInvoiceAr(Id);
+                        }
+                    });
+
+                }
+            }
         }
 
         /// <summary>
@@ -618,11 +629,30 @@ namespace eFMS.API.ForPartner.Controllers
         private async Task<HandleState> CalculatorReceivable(CalculatorReceivableNotAuthorizeModel model)
         {
             var urlApiAcct = apiUrl.Value.Url + "/Accounting";//"http://localhost:44368";//
-            HttpResponseMessage resquest = await HttpService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountReceivable/CalculatorReceivableNotAuthorize", model, null);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
             return response;
         }
-        
+
+        private async Task<HandleState> InsertDebitInvoiceAr(Guid Id)
+        {
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
+            // var urlApiAcct = "http://localhost:44368";
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AcctDebitManagementAr?Id=" + Id, null, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
+        }
+
+        private async Task<HandleState> DeleteDebitInvoiceAr(Guid Id)
+        {
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
+            // var urlApiAcct = "http://localhost:44368";
+
+            HttpResponseMessage resquest = await HttpClientService.DeleteApi(urlApiAcct + "/api/v1/e/AcctDebitManagementAr?Id=" + Id, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
+        }
+
         /// <summary>
         /// Cập nhật thông tin phiếu chi và số HT
         /// </summary>

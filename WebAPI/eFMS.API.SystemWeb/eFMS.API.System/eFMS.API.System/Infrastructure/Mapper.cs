@@ -39,6 +39,8 @@ namespace eFMS.API.Catalogue.Infrastructure
             CreateMap<SysEmailSetting, SysEmailSettingModel>();
 
             //map view model to entity model
+            CreateMap<SysCompanyModel, SysCompany>();
+            CreateMap<SysOfficeModel, SysOffice>();
             CreateMap<SysOfficeEditModel, SysOfficeModel>();
             CreateMap<SysGroupModel, SysGroup>();
             CreateMap<SysEmployeeModel, SysEmployee>();
