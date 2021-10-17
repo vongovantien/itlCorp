@@ -31,8 +31,7 @@
                     <div class="form-group">
                         <label for="form-control-label">Currency</label>
                         <ng-select formControlName="currency" class="custom" [items]="Currencys | async" bindLabel="id"
-                            bindValue="id" (change)="onSelectDataFormInfo($event,'currency')"
-                            placeholder="All">
+                            bindValue="id" (change)="onSelectDataFormInfo($event,'currency')" placeholder="All">
                         </ng-select>
 
                     </div>
@@ -69,7 +68,19 @@
                     <div class="form-group">
                         <label for="form-control-label">Status</label>
                         <ng-select [items]="statusRecepit" formControlName="status" class="custom" placeholder="All">
-
+                            <ng-template ng-label-tmp let-item="item">
+                                <ng-container [ngSwitch]="item">
+                                    <ng-container *ngSwitchCase="'Done'">
+                                        <span class="text-success"> {{item}} </span>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Draft'">
+                                        <span class="text-danger"> {{item}}</span>
+                                    </ng-container>
+                                    <ng-container *ngSwitchCase="'Cancel'">
+                                        <span class="text-dark"> {{item}}</span>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-template>
                         </ng-select>
                     </div>
                 </div>

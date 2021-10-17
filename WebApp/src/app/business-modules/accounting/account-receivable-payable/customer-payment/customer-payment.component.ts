@@ -139,15 +139,19 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             });
     }
 
-    cancelReceipt(id: string) {
+    cancelReceipt(receipt: ReceiptModel) {
+        if (!receipt) {
+            return;
+        }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
             title: 'Cancel Receipt',
-            body: 'This Receipt will be canceled. Are you sure you want to continue?',
+            body: `This Receipt ${receipt.paymentRefNo} will be canceled. Are you sure you want to continue?`,
             labelConfirm: 'Yes',
             classConfirmButton: 'btn-danger',
-            iconConfirm: 'la la-times'
+            iconConfirm: 'la la-times',
+            center: true
         }, () => {
-            this._accountingRepo.cancelReceipt(id)
+            this._accountingRepo.cancelReceipt(receipt.id)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {

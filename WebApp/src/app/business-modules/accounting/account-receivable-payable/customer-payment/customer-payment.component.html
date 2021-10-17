@@ -49,7 +49,8 @@
                                                             [attr.title]="cps.reasonReject"
                                                             [class.invalid-row]="cps.syncStatus === 'Rejected'"
                                                             [contextMenu]="receiptContextMenu"
-                                                            (onTouch)="onSelectReceipt(cps)">
+                                                            (onTouch)="onSelectReceipt(cps)"
+                                                            [class.touch-row]="selectedReceipt?.id === cps.id">
                                                             <td class="table-actions-col" style="min-width:40px">
                                                                 <div class="table-actions">
 
@@ -60,8 +61,7 @@
                                                                         icon="la la-trash text-danger">
                                                                     </app-permission-button>
 
-                                                                    <button type="button"
-                                                                        (click)="cancelReceipt(cps.id)"
+                                                                    <button type="button" (click)="cancelReceipt(cps)"
                                                                         class="btn btn-icon m-btn--icon m-btn--icon-only"
                                                                         title="Cancel"
                                                                         *ngIf="(cps.status === 'Done' && cps.syncStatus !=='Synced')">
@@ -217,7 +217,7 @@
 <ng-template inject></ng-template>
 
 
-<app-context-menu #receiptContextMenu>
+<app-context-menu #receiptContextMenu (clickOutside)="selectedReceipt = null">
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !== 'Synced'">
         <div class="menu-context__item" (click)="confirmSyncReceipt()">
             <span><i class="la la-cloud-upload text-info"></i><span> Sync to accountant system</span></span>
@@ -242,7 +242,7 @@
 
     <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
         <hr />
-        <div class="menu-context__item" (click)="showQuickUpdatePopup('obhPartner')">
+        <div class="menu-context__item" (click)="cancelReceipt(selectedReceipt)">
             <span><i class="la la-times-circle"></i><span>Cancel receipt</span></span>
         </div>
     </ng-container>
