@@ -154,10 +154,18 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this._toastService.warning("Receipt don't have any invoice in this period, Please check it again!");
             return;
         }
-        if (this.paymentList.some(x => (!x.paidAmountVnd || !x.paidAmountUsd) && !x.netOff && x.type !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
-            this._toastService.warning("Paid amount is required");
-            return;
+        if (this.listInvoice.currencyId.value === 'VND') {
+            if (this.paymentList.some(x => (!x.paidAmountVnd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
+                this._toastService.warning("Paid amount vnd is required");
+                return;
+            }
+        } else {
+            if (this.paymentList.some(x => (!x.paidAmountUsd && !x.netOff) && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF)) {
+                this._toastService.warning("Paid amount usd is required");
+                return;
+            }
         }
+
         if ((this.listInvoice.cusAdvanceAmountVnd.value > 0 || this.listInvoice.cusAdvanceAmountUsd.value > 0)
             && ![AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE,
             AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
