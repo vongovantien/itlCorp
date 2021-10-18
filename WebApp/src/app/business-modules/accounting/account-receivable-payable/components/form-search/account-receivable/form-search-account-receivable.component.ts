@@ -138,21 +138,12 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     ngOnInit(): void {
-        this._store.select(getCurrentUserState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe(
-            (user: any) => {
-                if (user) {
-                    this.currentUser = user;
-                }
-            }
-        )
+        this.currentUser = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
         this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
         this.salemans = this._systemRepo.getListSystemUser();
-        this.initForm();
         this.getOffices();
         this.getAllStaff();
+        this.initForm();
         this.subscriptionSearchParamState();
         this.submitSearch();
     }
