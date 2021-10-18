@@ -540,8 +540,7 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
-
-                    Description = se.Select(x => x.Description.Concat(";")).ToString(),
+                    Description = string.Join(";", se.Select(x => x.Description)),
                     DatetimeModified = se.First().DatetimeModified
 
                 })
@@ -565,7 +564,7 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankAccountNo = advancePayment.BankAccountNo;
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
-                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
+                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
                 item.StatusApproval = advancePayment.StatusApproval;
                 
 
