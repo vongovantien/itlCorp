@@ -565,7 +565,6 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
-                item.StatusApproval = advancePayment.StatusApproval;
                 
 
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
