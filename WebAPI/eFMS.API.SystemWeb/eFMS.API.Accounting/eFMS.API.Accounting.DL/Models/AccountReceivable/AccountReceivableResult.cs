@@ -50,5 +50,6 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
         public decimal? ObhUnPaidAmount { get; set; }
         public DateTime? DatetimeModified { get; set; }
 
+        public string OfficeContract { get; set; }
     }
 }
