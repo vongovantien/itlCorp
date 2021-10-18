@@ -4794,7 +4794,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
 
             var infoSettlement = new InfoSettlementExport
             {
@@ -4836,7 +4836,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surChargeBySettleCode = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo);
 
-            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo, s.Total, s.Type }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo, total=s.Key.Total, type=s.Key.Type });
+            var houseBillIds = surChargeBySettleCode.GroupBy(s => new { s.Hblid, s.AdvanceNo, s.ClearanceNo }).Select(s => new { hblId = s.Key.Hblid, customNo = s.Key.ClearanceNo, s.Key.AdvanceNo });
             foreach (var houseBillId in houseBillIds)
             {
                 var shipmentSettlement = new InfoShipmentSettlementExport();
@@ -4850,14 +4850,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 string _personInCharge = string.Empty;
                 var ops = opsTransactionRepo.Get(x => x.Hblid == houseBillId.hblId).FirstOrDefault();
-                if (houseBillId.type == "OBH")
-                {
-                    shipmentSettlement.OBH = houseBillId.total;
-                }
-                if (houseBillId.type == "BUY")
-                {
-                    shipmentSettlement.Credit = houseBillId.total;
-                }
                 if (ops != null)
                 {
                     shipmentSettlement.JobNo = ops.JobNo;
