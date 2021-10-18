@@ -936,6 +936,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(9).Width = 20; //Cột I
             workSheet.Column(10).Width = 18; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
         }
 
         private List<string> GetHeaderExcelDetailAdvancePayment(string language)
@@ -996,7 +997,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Hình thức thanh toán:",//44
                 "Đối tượng thanh toán:",//45
                 //END
-                "Note", //46
+                "Ghi chú", //46
             };
 
             List<string> engHeaders = new List<string>()
