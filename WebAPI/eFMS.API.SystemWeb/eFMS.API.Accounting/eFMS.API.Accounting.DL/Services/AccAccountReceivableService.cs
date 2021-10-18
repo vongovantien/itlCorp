@@ -1721,7 +1721,7 @@ namespace eFMS.API.Accounting.DL.Services
             res = arPartnerContracts.ToList();
 
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
-                res = res.Where(x => x.DebitRate >= criteria.DebitRateTo && x.DebitRate <= criteria.DebitRateFrom).ToList();
+                res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo).ToList();
             if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
                 res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
             if (criteria.AgreementExpiredDay !=null && criteria.AgreementExpiredDay!="All")
@@ -1765,7 +1765,7 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
             }
 
-            return res.AsQueryable();
+            return res.AsQueryable().OrderByDescending(x=>x.DebitRate);
         }
 
 

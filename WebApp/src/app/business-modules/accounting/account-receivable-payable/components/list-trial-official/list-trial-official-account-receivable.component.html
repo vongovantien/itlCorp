@@ -19,30 +19,22 @@
                         <table class="table table-hover table-brand table-editable dataTable table-summary ">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <!-- <thead> -->
-                                <th class="m--w-50 first table-actions-col sticky-col first-col">
+                                <th class="first table-actions-col sticky-col first-col">
                                     Action
                                 </th>
-                                <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col second-col"
+                                <th class="sortable ng-star-inserted first sticky-col second-col"
                                     [class]="sortClass('partnerCode')" (click)="sortBy('partnerCode')">
-                                    Partner Id
-                                    <span class="sort-indicator"></span>
+                                    <span class="sort-indicator">Partner Id</span>
                                 </th>
-                                <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col three-col"
-                                    [class]="sortClass('partnerNameAbbr')" (click)="sortBy('partnerNameAbbr')">
-                                    Partner Name
-                                    <span class="sort-indicator"></span>
+                                <th class="sortable ng-star-inserted first sticky-col three-col"
+                                    [class]="sortClass('partnerNameAbbr')" (click)="sortBy('partnerNameAbbr')"
+                                    style="min-width: 200px; white-space:initial">
+                                    <span class="sort-indicator">Partner Name</span>
                                 </th>
-                                <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col four-col"
+                                <th class="sortable ng-star-inserted first sticky-col four-col "
                                     [class]="sortClass('debitRate')" (click)="sortBy('debitRate')">
-                                    Rate (%)
-                                    <span class="sort-indicator"></span>
+                                    <span class="sort-indicator"> Rate (%)</span>
                                 </th>
-                                <!-- <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                 [class]="sortClass(header.sortable ? header.field : '')"
-                                 (click)="sortBy(header.sortable ? header.field : '')">
-                                 <span>{{header.title}}</span>
-                                 <span class="sort-indicator"></span>
-                                </th> -->
                             </thead>
                             <tbody>
                                 <ng-container>
@@ -66,7 +58,7 @@
                                                 style="background-color: #fff;min-width: 200px; white-space:initial">{{
                                                 item.partnerNameAbbr }}
                                             </td>
-                                            <td class="sticky-col four-col" style="background-color: #fff;">
+                                            <td class="sticky-col four-col text-right" style="background-color: #fff;">
                                                 <span
                                                     [ngClass]="item.debitRate < 70 ? 'text-success' : item.debitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ item.debitRate | number: '.2-2'}}%
