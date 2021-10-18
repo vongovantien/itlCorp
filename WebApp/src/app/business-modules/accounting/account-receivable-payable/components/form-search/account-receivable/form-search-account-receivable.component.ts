@@ -142,19 +142,19 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(
             (user: any) => {
-                if (user) {
+                if (user && JSON.stringify(user) !== '{}') {
                     this.currentUser = user;
+                    this.officeIds.setValue([this.currentUser.officeId]);
+                    this.getOffices();
+                    this.getAllStaff();
+                    this.subscriptionSearchParamState();
+                    this.submitSearch();
                 }
             }
         )
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
-        this.salemans = this._systemRepo.getListSystemUser();
         this.initForm();
-        this.getOffices();
-        this.getAllStaff();
-        this.subscriptionSearchParamState();
-        this.submitSearch();
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.salemans = this._systemRepo.getListSystemUser();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -171,7 +171,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             salesManId: [],
             officalId: [],
             partnerType: [this.partnerTypes[0].id],
-            officeIds: [[this.currentUser.officeId]],
+            officeIds: [],
             staff:[]
         });
 

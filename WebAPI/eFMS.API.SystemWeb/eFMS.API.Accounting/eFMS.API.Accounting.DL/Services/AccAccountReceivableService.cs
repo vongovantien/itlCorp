@@ -1416,8 +1416,8 @@ namespace eFMS.API.Accounting.DL.Services
                     AgreementStatus = s.First().contract.Active == true ? AccountingConstants.STATUS_ACTIVE : AccountingConstants.STATUS_INACTIVE,
                     AgreementSalesmanId = s.First().contract.SaleManId,
                     AgreementCurrency = s.First().contract.CurrencyId,
-                    //OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
-                    OfficeId = s.Key.OfficeId.ToString(), //Office AR chứa trong Office Argeement
+                    OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
+                    OfficeContract = s.Key.OfficeId.ToString(), //Office AR chứa trong Office Argeement
                     ArServiceCode = s.Key.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
                     EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
@@ -1513,7 +1513,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ArCurrency = contract.ArCurrency,
                            CreditCurrency = contract.CreditCurrency,
                            ParentNameAbbr = parent.ShortName,
-                           DatetimeModified = contract.DatetimeModified
+                           DatetimeModified = contract.DatetimeModified,
+                           OfficeContract = contract.OfficeContract,
                        };
             return data;
         }
@@ -1746,7 +1747,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.OfficeIds != null)
             {
                 var str = String.Join(",", criteria.OfficeIds);
-                res = res.Where(x => x.OfficeId.Contains(str)).ToList();
+                res = res.Where(x => x.OfficeContract != null && x.OfficeContract.Contains(str)).ToList();
             }
 
             switch (criteria.OverDueDay)
@@ -1939,7 +1940,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
                         ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
-                        DatetimeModified = s.First().DatetimeModified
+                        DatetimeModified = s.First().DatetimeModified,
+                        OfficeContract = s.First().OfficeContract,
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
