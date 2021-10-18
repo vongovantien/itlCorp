@@ -139,6 +139,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
 
     ngOnInit(): void {
         this._store.select(getCurrentUserState)
+        .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(
             (user: any) => {
                 if (user && JSON.stringify(user) !== '{}') {
