@@ -1,5 +1,6 @@
 ﻿using eFMS.API.Accounting.DL.Common;
 using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models.Criteria
 {
@@ -15,5 +16,7 @@ namespace eFMS.API.Accounting.DL.Models.Criteria
         public string SalesmanId { get; set; }
         public Guid? OfficeId { get; set; }
         public string PartnerType { get; set; }
+        public List<string> OfficeIds{ get; set; }
+        public List<string> Staffs{ get; set; }
     }
 }

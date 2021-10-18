@@ -17,11 +17,13 @@ namespace AccountingInterface {
         agreementStatus: string;
         agreementExpiredDay: string;
         salesmanId: string;
-        officeId: string;
+        officeId: string[];
         fromOverdueDays:number;
         toOverdueDays:number;
         debitRate:number;
         partnerType: string;
+        officeIds: string[];
+        staffs: string[];
     }
 
     export interface IDefaultSearchAcctMngt {
