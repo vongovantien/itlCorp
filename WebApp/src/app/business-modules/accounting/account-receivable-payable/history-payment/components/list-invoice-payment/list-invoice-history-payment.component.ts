@@ -373,7 +373,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 }
 
-interface ICriteriaReceiptAdvance {
+export interface ICriteriaReceiptAdvance {
     customerId: string;
     status: string;
     dateFrom: string;

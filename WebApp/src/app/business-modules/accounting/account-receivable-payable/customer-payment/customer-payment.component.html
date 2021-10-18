@@ -10,20 +10,10 @@
                     <div class="m-portlet">
                         <div class="m-portlet__body">
                             <div class="m--align-right">
-                                <div class="dropdown m-dropdown m-dropdown--inline">
-                                    <button class="btn btn-success dropdown-toggle" type="button"
-                                        data-toggle="dropdown">
-                                        <i class="la la-plus"></i>Create Receipt<span class="caret"></span>
-                                    </button>
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item pointer"
-                                            (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
-                                        <ng-container *ngIf="!isProduction">
-                                            <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
-                                                Receipt</a>
-                                        </ng-container>
-                                    </div>
-                                </div>
+                                <button class="btn btn-success dropdown-toggle" type="button"
+                                    [dpToggle]="createReceitTypeTpl" position="rightTop" position="bottomCenter">
+                                    <i class="la la-plus"></i>Create Receipt<span class="caret"></span>
+                                </button>
 
                             </div>
                             <tabset class="custom-class-tab">
@@ -210,10 +200,7 @@
     </div>
 </div>
 
-<confirm-popup (onSubmit)="onConfirmDeleteCP()" [body]="messageDelete" [iconConfirm]="'la la-trash'"></confirm-popup>
-
-<permission-403-popup></permission-403-popup>
-
+<!-- Popup -->
 <ng-template inject></ng-template>
 
 
@@ -224,9 +211,20 @@
         </div>
     </ng-container>
     <div class="menu-context__item">
-        <span><i class="la la-print text-muted"></i><span>Print...</span></span>
+        <span><i class="la la-print"></i><span>Print...</span></span>
     </div>
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover">
+        <div class="d-flex justify-content-between">
+            <div>
+                <i class="la la-download"></i>
+                <span>Export...</span>
+            </div>
+            <div>
+                <span><i class="la la-caret-right"></i></span>
+            </div>
+        </div>
 
+    </div>
     <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
         <hr />
         <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentRefNo')">
@@ -260,3 +258,26 @@
 <form-quick-update-receipt [updateKey]="selectedUpdateKey" [receiptId]="selectedReceipt?.id"
     (onSuccess)="onUpdateReceiptSuccess($event)">
 </form-quick-update-receipt>
+
+<app-dropdown #exportTpl>
+    <span class="dropdown-item pointer" (click)="exportAdvanceReceipt()">
+        <span>
+            <i class="la la-file-excel-o"></i>
+            Advance receipt
+        </span>
+    </span>
+    <span class="dropdown-item pointer" (click)="exportPaymentCustomer()">
+        <span>
+            <i class="la la-file-excel-o"></i>
+            Statement of receivable customer
+        </span>
+    </span>
+</app-dropdown>
+
+<app-dropdown #createReceitTypeTpl>
+    <a class="dropdown-item pointer" (click)="gotoCreateReceipt('CUSTOMER')">Customer Receipt</a>
+    <ng-container *ngIf="!isProduction">
+        <a class="dropdown-item pointer" (click)="gotoCreateReceipt('AGENT')">Agency
+            Receipt</a>
+    </ng-container>
+</app-dropdown>

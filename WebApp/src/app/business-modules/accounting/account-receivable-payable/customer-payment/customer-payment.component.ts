@@ -2,12 +2,12 @@ import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
-import { ConfirmPopupComponent, Permission403PopupComponent } from "@common";
-import { AccountingRepo } from "@repositories";
+import { ConfirmPopupComponent, Permission403PopupComponent, LoadingPopupComponent } from "@common";
+import { AccountingRepo, ExportRepo } from "@repositories";
 import { AppList, IPermissionBase } from "@app";
 import { ReceiptModel } from "@models";
 import { SortService } from "@services";
-import { RoutingConstants, AccountingConstants } from "@constants";
+import { RoutingConstants, AccountingConstants, SystemConstants } from "@constants";
 
 import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
@@ -17,6 +17,9 @@ import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
 import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
 import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent, IModelQuickUpdateReceipt } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
+import { ICriteriaReceiptAdvance } from "../history-payment/components/list-invoice-payment/list-invoice-history-payment.component";
+import { HttpResponse } from "@angular/common/http";
+import { NgxSpinnerService } from "ngx-spinner";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -31,8 +34,6 @@ enum PAYMENT_TAB {
 })
 export class ARCustomerPaymentComponent extends AppList implements IPermissionBase {
 
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
     @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
@@ -42,19 +43,22 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     messageDelete: string = "";
     selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
-    dataSearch = {
+    dataSearch: any = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
         dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')
     }
 
     selectedReceipt: ReceiptModel;
     selectedUpdateKey: string;
+
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
         private readonly _router: Router,
         private readonly _accountingRepo: AccountingRepo,
-        private readonly _store: Store<IAppState>
+        private readonly _store: Store<IAppState>,
+        private readonly _exportRepo: ExportRepo,
+        private readonly _spinner: NgxSpinnerService
     ) {
         super();
         this.requestList = this.requestLoadListCustomerPayment;
@@ -113,7 +117,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                     this._store.dispatch(ResetInvoiceList());
                     this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
                 }
             });
     }
@@ -134,7 +138,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                         center: true
                     }, () => this.onConfirmDeleteCP())
                 } else {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
                 }
             });
     }
@@ -306,6 +310,42 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                     console.log(error);
                 }
             );
+    }
+
+    exportAdvanceReceipt() {
+        if (!this.dataSearch || !this.selectedReceipt) {
+            this._toastService.warning('No Data To View, Please Select Partner and Apply');
+            return;
+        }
+        const body: ICriteriaReceiptAdvance = {
+            customerId: this.selectedReceipt.customerId,
+            status: "Done",
+            dateFrom: this.dataSearch.dateFrom,
+            dateTo: this.dataSearch.dateTo,
+            dateType: this.dataSearch.dateType,
+
+        };
+        this._spinner.show();
+        this._exportRepo.exportAdvanceReceipt(body)
+            .subscribe(
+                (res: HttpResponse<any>) => {
+                    if (res.body) {
+                        const fileName = res.headers.get('efms-file-name');
+                        console.log(fileName);
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, fileName);
+                        return;
+                    }
+                    this._toastService.warning('No Data To View');
+                },
+                () => { },
+                () => {
+                    this._spinner.hide();
+                }
+            );
+    }
+
+    exportPaymentCustomer() {
+
     }
 
 }
