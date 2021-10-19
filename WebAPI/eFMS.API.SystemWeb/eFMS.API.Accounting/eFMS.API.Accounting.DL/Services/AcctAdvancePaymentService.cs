@@ -3645,7 +3645,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo,
-                    RequestNote=s.First().RequestNote,
+                    RequestNote= string.Join(";", s.Select(x => x.Description)),
                 });
             foreach (var request in groupJobByHbl)
             {
