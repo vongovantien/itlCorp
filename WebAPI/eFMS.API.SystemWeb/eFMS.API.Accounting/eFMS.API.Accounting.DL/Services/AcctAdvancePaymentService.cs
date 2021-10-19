@@ -317,7 +317,6 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
-                advanceRequests = acctAdvanceRequestRepo.Get(x => x.StatusPayment == criteria.StatusPayment);
                 IQueryable<AcctAdvanceRequest> advanceRQSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 IQueryable<AcctAdvanceRequest> advanceRQNotSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 IQueryable<AcctAdvanceRequest> advanceRQPartial = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
