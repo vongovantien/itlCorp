@@ -54,11 +54,15 @@
         public static readonly string COMPANY_ADDRESS2 = "";
         public static readonly string COMPANY_WEBSITE = "www‎.‎itlvn‎.‎com‎";
         public static readonly string COMPANY_CONTACT = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+        public static readonly string OFFICE_CODE_HCM = "ITLHCM";
+        public static readonly string OFFICE_CODE_DAD = "ITLDAD";
+        public static readonly string OFFICE_CODE_HAN = "ITLHAN";
         #endregion -- INFO COMPANY --
 
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_BANK_TRANSFER = "Bank Transfer";
         public static readonly string PAYMENT_METHOD_OTHER = "Other";
         public static readonly string PAYMENT_METHOD_NETOFF_SHPT = "NETOFF_SHPT";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE = "Clear-Advance";

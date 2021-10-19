@@ -270,6 +270,14 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             }
         }
 
+        if (this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH && !this.formCreate.paymentRefNo.value) {
+            this.formCreate.paymentRefNo.setErrors({ required: true });
+            valid = false;
+        } else {
+            this.removeValidators(this.formCreate.paymentRefNo);
+            valid = true;
+        }
+
         return valid;
     }
 
