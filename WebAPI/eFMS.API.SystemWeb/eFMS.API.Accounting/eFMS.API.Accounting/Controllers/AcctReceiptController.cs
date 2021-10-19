@@ -71,6 +71,16 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(new { receiptNo });
         }
 
+        [HttpGet("GenerateReceiptNoV2")]
+        [Authorize]
+        public IActionResult GenerateReceiptNoV2(string officeCode, string paymentMethod, string currency, DateTime paymentDate)
+        {
+            AcctReceiptModel receipt = new AcctReceiptModel { PaymentMethod = paymentMethod, CurrencyId = currency, PaymentDate = paymentDate };
+            string receiptNo = acctReceiptService.GenerateReceiptNoV2(receipt);
+
+            return Ok(new { receiptNo });
+        }
+
         [HttpPost("GetInvoiceForReceipt")]
         [Authorize]
         public IActionResult GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria)
@@ -228,6 +238,13 @@ namespace eFMS.API.Accounting.Controllers
                 {
                     return BadRequest(new ResultHandle { Status = false, Message = msgCheckPaidPayment });
                 }
+            }
+
+            // Generate Receipt no If PaymentRefNo is null
+            if(string.IsNullOrEmpty(receiptModel.PaymentRefNo))
+            {
+                string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel);
+                receiptModel.PaymentRefNo = receiptNo;
             }
 
             HandleState hs = acctReceiptService.SaveReceipt(receiptModel, saveAction);

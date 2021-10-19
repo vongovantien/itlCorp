@@ -106,7 +106,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this.formSearchInvoice = this._fb.group({
             customerId: new FormControl(null, Validators.required),
             date: [],
-            paymentRefNo: new FormControl(null, Validators.required),
+            paymentRefNo: new FormControl(null),
             agreementId: [null, Validators.required],
             class: [this.classReceipt[0]],
             referenceNo: [{ value: null, disabled: true }]
