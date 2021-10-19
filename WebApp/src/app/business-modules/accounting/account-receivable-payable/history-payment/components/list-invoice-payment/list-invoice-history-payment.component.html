@@ -61,8 +61,8 @@
                                                     <button type="button"
                                                         class="btn btn-sm  m-btn--icon m-btn--icon-only collapsed"
                                                         data-toggle="collapse"
-                                                        [attr.data-target]="'#id-00' + item.refNo + item.type"
-                                                        title="Collapse" (click)="getPayments(item.refNo, item.type)">
+                                                        [attr.data-target]="'#id-00' + item.refNo + item.type + item.invoiceNoReal"
+                                                        title="Collapse" (click)="getPayments(item.refNo, item.type, item.invoiceNoReal)">
                                                         <i class="la la-angle-up"></i>
                                                     </button>
                                                     <!-- <button type="button"
@@ -118,7 +118,7 @@
                                                 {{item.currency}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row
-                                            [id]="'id-00' + item.refNo + item.type" [parentId]="'#payment-table'">
+                                            [id]="'id-00' + item.refNo + item.type + item.invoiceNoReal" [parentId]="'#payment-table'">
                                             <table class="table table-secondary dataTable">
                                                 <thead app-table-header [headers]="paymentHeaders"
                                                     (onClick)="sortPayment($event.sortField, $event.order)">
