@@ -617,7 +617,28 @@ namespace eFMS.API.ReportData.FormatExcel
             var excel = new ExcelExport(path);
             try
             {
-                int startRow = 6;
+                int startRow = 2;
+                var listKeyData = new Dictionary<string, object>();
+                if (paymentCriteria.IssuedDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", paymentCriteria.IssuedDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else if (paymentCriteria.FromUpdatedDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {1}", paymentCriteria.FromUpdatedDate.Value.ToString("dd/MM/yyyy")
+                        , paymentCriteria.ToUpdatedDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else if (paymentCriteria.DueDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", paymentCriteria.DueDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", DateTime.Now.ToString("dd/MM/yyyy")));
+                }
+                excel.SetData(listKeyData);
+
+                startRow = 6;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 2;
                 if (customerPayment.Count == 0)
@@ -656,7 +677,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 for (int i = 0; i < customerPayment.Count; i++)
                 {
                     var item = customerPayment[i];
-                    var listKeyData = new Dictionary<string, object>();
+                    listKeyData = new Dictionary<string, object>();
                     if (item.BillingRefNo != "ADVANCE AMOUNT")
                     {
                         excel.IndexOfGroup = 1;
@@ -723,12 +744,6 @@ namespace eFMS.API.ReportData.FormatExcel
                     startRow++;
                     if (item.receiptDetail != null && paymentCriteria.DueDate == null && paymentCriteria.FromUpdatedDate != null)
                     {
-                        //if (i == 0 && item.receiptDetail.Count == 0 && isExistDetail)
-                        //{
-                        //    excel.SetDataTable();
-                        //    excel.DeleteRow(7);
-                        //    excel.StartDetailTable -= 1;
-                        //}
                         foreach (var detail in item.receiptDetail)
                         {
                             listKeyData = new Dictionary<string, object>();
