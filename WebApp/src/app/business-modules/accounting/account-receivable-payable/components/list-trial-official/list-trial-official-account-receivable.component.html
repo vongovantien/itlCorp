@@ -37,6 +37,9 @@
                                 </th>
                             </thead>
                             <tbody>
+                                <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
+                                </tr>
+                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                                 <ng-container>
                                     <ng-container
                                         *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
@@ -147,9 +150,7 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
-                                </tr>
-                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+
                             </tbody>
                         </table>
                     </div>
