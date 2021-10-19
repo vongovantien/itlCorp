@@ -1,10 +1,11 @@
 import { Component, OnInit, TemplateRef, EventEmitter, ViewChild, Output, ChangeDetectionStrategy } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-dropdown',
     template: `
     <ng-template>
-        <div (click)="closed.emit()" class="dropdown-menu-wrapper">
+        <div (click)="closed.emit()" class="dropdown-menu-wrapper"  (mouseenter)="visible$.next(true)" (mouseleave)="visible$.next(false)">
             <ng-content></ng-content>
         </div>
     </ng-template>
@@ -30,11 +31,11 @@ import { Component, OnInit, TemplateRef, EventEmitter, ViewChild, Output, Change
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppDropdownComponent implements OnInit, IDropdownPanel {
-
     @ViewChild(TemplateRef) templateRef: TemplateRef<any>;
     @Output() closed: EventEmitter<void> = new EventEmitter<any>();
 
     constructor() { }
+    visible$: Subject<boolean> = new Subject<boolean>();
 
     ngOnInit(): void { }
 }
@@ -43,4 +44,5 @@ export interface IDropdownPanel {
     templateRef: TemplateRef<any>;
     readonly closed: EventEmitter<void>;
     readonly clickOutside?: EventEmitter<void>;
+    readonly visible$?: Subject<boolean>;
 }

@@ -144,11 +144,15 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             (user: any) => {
                 if (user && JSON.stringify(user) !== '{}') {
                     this.currentUser = user;
-                    this.officeIds.setValue([this.currentUser.officeId]);
+                    if(this.officeIds)
+                        this.officeIds.setValue([this.currentUser.officeId]);
                     this.getOffices();
                     this.getAllStaff();
-                    this.subscriptionSearchParamState();
-                    this.submitSearch();
+
+                    if(this.formSearch){
+                        this.subscriptionSearchParamState();
+                        this.submitSearch();
+                    }
                 }
             }
         )
@@ -213,7 +217,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
     // tslint:disable-next-line:no-any
     onSelectBindingInput(item: any, fieldName: string) {
-        debugger
             switch (fieldName) {
                 case 'OverDueDays':
                     if(item){

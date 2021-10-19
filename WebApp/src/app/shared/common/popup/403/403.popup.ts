@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
 import { eFMSPopup } from '../popup';
 
 @Component({
@@ -8,6 +8,7 @@ import { eFMSPopup } from '../popup';
 })
 
 export class Permission403PopupComponent extends eFMSPopup {
+    @Input() center: boolean = false;
     constructor() {
         super();
     }

@@ -202,6 +202,7 @@ namespace eFMS.API.Accounting.DL.Services
             var advancePayments = DataContext.Get().Where(queryDefault);
 
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
+            var advanceRequests = acctAdvanceRequestRepo.Get();
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
 
@@ -530,6 +531,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl, g.AdvanceNo })
                 .Select(se => new AcctAdvanceRequest
                 {
+
                     JobId = se.First().JobId,
                     Hbl = se.First().Hbl,
                     CustomNo = se.First().CustomNo,
@@ -538,7 +540,7 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
-                    Description = string.Join(";",se.Select(x=>x.Description)),
+                    Description = string.Join(";", se.Select(x => x.Description)),
                     DatetimeModified = se.First().DatetimeModified
 
                 })
@@ -563,11 +565,9 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankAccountNo = advancePayment.BankAccountNo;
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
-                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
-                if(statusApproval== "New" || statusApproval == "Denied")
-                {
-                    item.ApproveDate = null;
-                }
+                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
+                
+
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
                 if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
                 {
@@ -3649,7 +3649,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo,
-                    RequestNote=s.First().RequestNote,
+                    RequestNote= string.Join(";", s.Select(x => x.Description)),
                 });
             foreach (var request in groupJobByHbl)
             {
