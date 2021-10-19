@@ -12,6 +12,7 @@ import { RoutingConstants } from '@constants';
 import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
 import { Store } from '@ngrx/store';
 import { LoadListAccountReceivable, SearchListAccountReceivable } from './store/actions';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-account-receivable',
@@ -35,13 +36,13 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         private _router: Router,
         private _activeRouter: ActivatedRoute,
         private _cd: ChangeDetectorRef,
-        private _store:Store<IAccountReceivableState>
+        private _store: Store<IAccountReceivableState>
     ) {
         super();
     }
 
     ngOnInit() {
-
+        this._store.select(getCurrentUserState).subscribe((c) => this.currentUser = c);
 
     }
     ngAfterViewInit() {
@@ -121,41 +122,41 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         this.accountReceivableFormComponent.arType = tab;
 
         this._store.select(getAccountReceivableSearchState)
-        .pipe(
-            withLatestFrom(this._store.select(getAccountReceivablePagingState)),
-            takeUntil(this.ngUnsubscribe),
-            map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
-        )
-        .subscribe(
-            (data) => {
-                if (data.dataSearch) {
-                    this.dataSearch = data.dataSearch;
-                    this.dataSearch.arType = tab;
-                } else {
-                    let body: AccountingInterface.IAccReceivableSearch = {
-                        arType: tab,
-                        acRefId: null,
-                        overDueDay: 0,
-                        debitRateFrom: null,
-                        debitRateTo: null,
-                        agreementStatus: "All",
-                        agreementExpiredDay: 'All',
-                        salesmanId: null,
-                        officeId: null,
-                        fromOverdueDays: null,
-                        toOverdueDays: null,
-                        debitRate: 0,
-                        partnerType:"All",
-                        staffs:null,
-                        officeIds:null
-                    };
-                    this.dataSearch = body;
-                }
+            .pipe(
+                withLatestFrom(this._store.select(getAccountReceivablePagingState)),
+                takeUntil(this.ngUnsubscribe),
+                map(([dataSearch, pagingData]) => ({ page: pagingData.page, pageSize: pagingData.pageSize, dataSearch: dataSearch }))
+            )
+            .subscribe(
+                (data) => {
+                    if (data.dataSearch) {
+                        this.dataSearch = data.dataSearch;
+                        this.dataSearch.arType = tab;
+                    } else {
+                        let body: AccountingInterface.IAccReceivableSearch = {
+                            arType: tab,
+                            acRefId: null,
+                            overDueDay: 0,
+                            debitRateFrom: null,
+                            debitRateTo: null,
+                            agreementStatus: "All",
+                            agreementExpiredDay: 'All',
+                            salesmanId: null,
+                            officeId: null,
+                            fromOverdueDays: null,
+                            toOverdueDays: null,
+                            debitRate: 0,
+                            partnerType: "All",
+                            officeIds: [this.currentUser?.officeId],
+                            staffs: []
+                        };
+                        this.dataSearch = body;
+                    }
 
-                this.page = data.page;
-                this.pageSize = data.pageSize;
-            }
-        );
+                    this.page = data.page;
+                    this.pageSize = data.pageSize;
+                }
+            );
         tabComponent.dataSearch = this.dataSearch;
         tabComponent.getPagingList();
     }
