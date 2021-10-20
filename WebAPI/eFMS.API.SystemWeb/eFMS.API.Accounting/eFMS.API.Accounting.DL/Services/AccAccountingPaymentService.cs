@@ -1831,17 +1831,17 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    invoiceObhGroup = invoiceObhGroup == null ? null : invoiceObhGroup.Where(x => x.invc.FirstOrDefault().SourceModified != null && x.invc.FirstOrDefault().SourceModified == "1" && x.invc.FirstOrDefault().Status == "Paid");
-                    if (invoiceObhGroup != null && invoiceObhGroup.Count() > 0)
+                    var invoiceObhPaid = invoiceObhGroup == null ? null : invoiceObhGroup.Where(x => x.invc.FirstOrDefault().SourceModified != null && x.invc.FirstOrDefault().SourceModified == "1" && x.invc.FirstOrDefault().Status == "Paid");
+                    if (invoiceObhPaid != null && invoiceObhPaid.Count() > 0)
                     {
                         var detail = new AccountingReceiptDetail();
                         detail.ReceiptId = Guid.Empty;
                         detail.PaymentRefNo = "";
                         detail.PaymentDate = null;
                         detail.PaidAmount = 0;
-                        detail.PaidAmountOBH = isValidObh ? invoiceObhGroup.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) : 0;
+                        detail.PaidAmountOBH = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) : 0;
                         detail.PaidAmountUsd = 0;
-                        detail.PaidAmountOBHUsd = isValidObh ? invoiceObhGroup.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) : 0;
+                        detail.PaidAmountOBHUsd = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) : 0;
 
                         payment.PaidAmount += (detail.PaidAmount ?? 0);
                         payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
@@ -2038,17 +2038,17 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     var invoiceDebitPaid = invoiceDe == null ? null : invoiceDe.invc.Where(x => x.SourceModified != null && x.SourceModified == "1" && x.Status == "Paid");
-                    invoiceObhGroup = invoiceObhGroup == null ? null : invoiceObhGroup.Where(x => x.invc.FirstOrDefault().SourceModified != null && x.invc.FirstOrDefault().SourceModified == "1" && x.invc.FirstOrDefault().Status == "Paid");
-                    if ((invoiceDebitPaid != null && invoiceDebitPaid.Count() > 0) || (invoiceObhGroup != null && invoiceObhGroup.Count() > 0))
+                    var invoiceObhPaid = invoiceObhGroup == null ? null : invoiceObhGroup.Where(x => x.invc.FirstOrDefault().SourceModified != null && x.invc.FirstOrDefault().SourceModified == "1" && x.invc.FirstOrDefault().Status == "Paid");
+                    if ((invoiceDebitPaid != null && invoiceDebitPaid.Count() > 0) || (invoiceObhPaid != null && invoiceObhPaid.Count() > 0))
                     {
                         var detail = new AccountingReceiptDetail();
                         detail.ReceiptId = Guid.Empty;
                         detail.PaymentRefNo = "";
                         detail.PaymentDate = null;
                         detail.PaidAmount = invoiceDebitPaid.FirstOrDefault()?.PaidAmountVnd ?? 0;
-                        detail.PaidAmountOBH = isValidObh ? invoiceObhGroup.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) : 0;
+                        detail.PaidAmountOBH = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) : 0;
                         detail.PaidAmountUsd = invoiceDebitPaid.FirstOrDefault()?.PaidAmountUsd ?? 0;
-                        detail.PaidAmountOBHUsd = isValidObh ? invoiceObhGroup.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) : 0;
+                        detail.PaidAmountOBHUsd = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) : 0;
 
                         payment.PaidAmount += (detail.PaidAmount ?? 0);
                         payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
@@ -2057,13 +2057,13 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.receiptDetail.Add(detail);
                     }
 
-
+                    invoiceDebitPaid = invoiceDe.invc;
                     if (criteria.FromUpdatedDate != null && item.payment != null)
                     {
                         var receiptRemain = receiptData.Where(x => !payment.receiptDetail.Any(p => p.ReceiptId == x.Id));
                         if (receiptRemain != null && receiptRemain.Count() > 0)
                         {
-                            var pmType = invoiceDebitPaid.Count() > 0 ? "DEBIT" : string.Empty;
+                            var pmType = invoiceDebitPaid?.Count() > 0 ? "DEBIT" : string.Empty;
                             pmType += invoiceObhGroup?.Count() > 0 ? (string.IsNullOrEmpty(pmType) ? "OBH" : ";OBH") : string.Empty;
                             var pmDetail = from pm in paymentData.Where(x => x.BillingRefNo == payment.BillingRefNo && pmType.Contains(x.PaymentType))
                                            join rcp in receiptRemain on pm.ReceiptId equals rcp.Id
