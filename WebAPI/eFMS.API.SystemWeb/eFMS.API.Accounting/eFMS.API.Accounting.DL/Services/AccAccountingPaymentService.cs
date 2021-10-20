@@ -1699,7 +1699,7 @@ namespace eFMS.API.Accounting.DL.Services
                 x.ParentCode,
                 x.BillingRefNo,
                 x.BillingRefNoType
-            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, z.PaymentDate, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.Type }) });
+            }).Select(x => new { grp = x.Key, invoice = x.Select(z => z.invoice), surcharge = x.Select(z => new { z.JobNo, z.Mblno, z.Hblno }), payment = x.Select(z => new { z.payment?.Id, z.payment?.ReceiptId, z.payment?.PaymentType, z.PaymentRefNo, invoicePayment = z.payment?.InvoiceNo, z.PaymentDate, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.payment?.PaymentAmountVnd, z.payment?.PaymentAmountUsd, z.payment?.UnpaidPaymentAmountVnd, z.Type }) });
             var results = new List<AccountingCustomerPaymentExport>();
             var soaLst = soaRepository.Get().Select(x => new { x.Soano, x.UserCreated }).ToLookup(x => x.Soano);
             var cdNoteLst = cdNoteRepository.Get().ToLookup(x => x.Code);
@@ -1714,8 +1714,9 @@ namespace eFMS.API.Accounting.DL.Services
                 var invoiceObhGroup = item.invoice.Where(x => x.Type == AccountingConstants.ACCOUNTING_INVOICE_TEMP_TYPE).GroupBy(x => new { x.RefId }).Select(x => new { x.Key, invc = x.Select(z => new { z.Type, z.UnpaidAmountVnd, z.TotalAmountVnd, z.TotalAmountUsd, z.InvoiceNoReal, z.IssuedDate, z.ConfirmBillingDate, z.DueDate, z.PaymentTerm, z.OverdueDays, z.AccountNo, z.OfficeId, z.SourceModified, z.PaidAmountVnd, z.PaidAmountUsd, z.Status }) });
 
                 // CR: TH 1 billing with multi invoice
-                if (invoiceObhGroup.FirstOrDefault() != null && ( numOfDebitInvoice == null || (numOfDebitInvoice != null && numOfDebitInvoice > 1)))
+                if (invoiceObhGroup.FirstOrDefault() != null && (numOfDebitInvoice == null || numOfDebitInvoice == 0 || (numOfDebitInvoice != null && numOfDebitInvoice > 1)))
                 {
+                    #region OBH Detail
                     var payment = new AccountingCustomerPaymentExport();
                     var statusOBH = string.Empty;
                     if (invoiceObhGroup != null && invoiceObhGroup.Count() > 0)
@@ -1896,6 +1897,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
                     results.Add(payment);
+                    #endregion
                 }
 
                 if (numOfDebitInvoice != null && numOfDebitInvoice > 1)
@@ -2008,7 +2010,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     payment.receiptDetail = new List<AccountingReceiptDetail>();
-                    var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo)).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd }) });
+                    var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) && (numOfDebitInvoice == 1 || (numOfDebitInvoice > 1 && x.invoicePayment == invoiceDe.Key.InvoiceNoReal))).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd }) });
                     if (receiptGroup != null && receiptGroup.Count() > 0)
                     {
                         foreach (var rcp in receiptGroup)
