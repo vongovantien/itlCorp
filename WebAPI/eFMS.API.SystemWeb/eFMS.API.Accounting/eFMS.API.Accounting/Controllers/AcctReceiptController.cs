@@ -62,20 +62,19 @@ namespace eFMS.API.Accounting.Controllers
         }
 
 
-        [HttpGet("GenerateReceiptNo")]
-        [Authorize]
-        public IActionResult GenerateReceiptNo()
-        {
-            string receiptNo = acctReceiptService.GenerateReceiptNo();
+        //[HttpGet("GenerateReceiptNo")]
+        //[Authorize]
+        //public IActionResult GenerateReceiptNo()
+        //{
+        //    string receiptNo = acctReceiptService.GenerateReceiptNo();
 
-            return Ok(new { receiptNo });
-        }
+        //    return Ok(new { receiptNo });
+        //}
 
-        [HttpGet("GenerateReceiptNoV2")]
+        [HttpPost("GenerateReceiptNo")]
         [Authorize]
-        public IActionResult GenerateReceiptNoV2(string officeCode, string paymentMethod, string currency, DateTime paymentDate)
+        public IActionResult GenerateReceiptNo(AcctReceiptModel receipt)
         {
-            AcctReceiptModel receipt = new AcctReceiptModel { PaymentMethod = paymentMethod, CurrencyId = currency, PaymentDate = paymentDate };
             string receiptNo = acctReceiptService.GenerateReceiptNoV2(receipt);
 
             return Ok(new { receiptNo });

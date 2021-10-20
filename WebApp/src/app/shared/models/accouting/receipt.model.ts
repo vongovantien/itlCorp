@@ -90,7 +90,7 @@ export class Receipt {
     paymentRefNo: string = null;
     paidAmount: string = null;
     finalPaidAmount: number = 0;
-    paymentDate: string = null;
+    paymentDate: Date = null;
     status: string = null;
     type: string = null;
     currencyId: string = null;

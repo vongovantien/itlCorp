@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/fo
 import { AccountingRepo, CatalogueRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { Observable } from 'rxjs';
-import { Partner } from '@models';
+import { Partner, ReceiptModel } from '@models';
 import { filter, switchMap, takeUntil } from 'rxjs/operators';
 import { IAppState, getCurrentUserState } from '@store';
 import { Store } from '@ngrx/store';
@@ -17,8 +17,8 @@ import { Store } from '@ngrx/store';
 })
 export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends PopupBase implements OnInit {
     @Input() updateKey: string = '';
-    @Input() receiptId: string = '';
     @Output() onSuccess: EventEmitter<any> = new EventEmitter<any>();
+    @Input() receipt: ReceiptModel;
 
     form: FormGroup;
     paymentMethod: AbstractControl;
@@ -91,13 +91,13 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
         };
         console.log(body);
 
-        if (this.receiptId) {
-            this._accountingRepo.quickUpdateReceipt(this.receiptId, body)
+        if (this.receipt) {
+            this._accountingRepo.quickUpdateReceipt(this.receipt.id, body)
                 .pipe()
                 .subscribe((res: CommonInterface.IResult) => {
                     if (res.status) {
                         this._toastService.success(res.message);
-                        this.onSuccess.emit({ id: this.receiptId, type: this.updateKey, data: body });
+                        this.onSuccess.emit({ id: this.receipt.id, type: this.updateKey, data: body });
                         this.hide();
                         return;
                     }
@@ -107,7 +107,15 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
     }
 
     autoGenerateReceiptNo() {
-        this._accountingRepo.generateReceiptNo().subscribe(
+        if (!this.receipt) {
+            return;
+        }
+        const modelReceipt: IGenerateReceiptV2 = {
+            paymentMethod: this.receipt.paymentMethod,
+            currency: this.receipt.currencyId,
+            paymentDate: this.receipt.paymentDate
+        }
+        this._accountingRepo.generateReceiptNo(modelReceipt).subscribe(
             (data: any) => {
                 if (!!data) {
                     const { receiptNo } = data;
@@ -124,4 +132,10 @@ export interface IModelQuickUpdateReceipt {
     paymentMethod: string;
     paymentRefNo: string;
     obhpartnerId: string;
+}
+
+interface IGenerateReceiptV2 {
+    paymentMethod: string;
+    currency: string;
+    paymentDate: Date;
 }

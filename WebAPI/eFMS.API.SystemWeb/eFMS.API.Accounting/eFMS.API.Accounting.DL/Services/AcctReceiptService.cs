@@ -338,7 +338,6 @@ namespace eFMS.API.Accounting.DL.Services
 
         public string GenerateReceiptNo()
         {
-            string receiptNo = string.Empty;
             string prefix = "PT";
             var userCurrentOffice = officeRepository.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
             if (userCurrentOffice != null)
@@ -385,7 +384,7 @@ namespace eFMS.API.Accounting.DL.Services
                 ReceiptNo += "00001";
             }
 
-            return receiptNo;
+            return ReceiptNo;
         }
 
         public string GenerateReceiptNoV2(AcctReceiptModel receipt)

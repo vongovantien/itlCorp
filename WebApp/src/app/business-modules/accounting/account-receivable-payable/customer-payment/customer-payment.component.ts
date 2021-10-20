@@ -250,6 +250,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             this.quickUpdatePopup.setValueForm('paymentRefNo', this.selectedReceipt['paymentRefNo']);
             this.quickUpdatePopup.setValueForm('paymentMethod', this.selectedReceipt['paymentMethod']);
             this.quickUpdatePopup.setValueForm('obhpartnerId', this.selectedReceipt['obhpartnerId']);
+            this.quickUpdatePopup.receipt = Object.assign({}, this.selectedReceipt);
             this.quickUpdatePopup.show();
 
         }

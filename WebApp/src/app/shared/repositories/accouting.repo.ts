@@ -788,8 +788,8 @@ export class AccountingRepo {
         );
     }
 
-    generateReceiptNo() {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`);
+    generateReceiptNo(body) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`, body);
     }
 
     getInvoiceForReceipt(body) {

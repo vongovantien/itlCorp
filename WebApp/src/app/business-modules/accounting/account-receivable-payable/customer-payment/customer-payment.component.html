@@ -104,7 +104,7 @@
                                                                     {{cps.paymentDate | date :'dd/MM/yyyy'}}
                                                                 </span>
                                                             </td>
-                                                            <td>
+                                                            <td style="min-width: 200px; white-space:initial">
                                                                 <span class="text-info">{{cps.customerName}}</span>
                                                             </td>
                                                             <td class="text-right">
@@ -213,7 +213,7 @@
     <div class="menu-context__item">
         <span><i class="la la-print"></i><span>Print...</span></span>
     </div>
-    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover">
+    <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
         <div class="d-flex justify-content-between">
             <div>
                 <i class="la la-download"></i>
@@ -255,8 +255,7 @@
 
 </app-context-menu>
 
-<form-quick-update-receipt [updateKey]="selectedUpdateKey" [receiptId]="selectedReceipt?.id"
-    (onSuccess)="onUpdateReceiptSuccess($event)">
+<form-quick-update-receipt [updateKey]="selectedUpdateKey" (onSuccess)="onUpdateReceiptSuccess($event)">
 </form-quick-update-receipt>
 
 <app-dropdown #exportTpl>

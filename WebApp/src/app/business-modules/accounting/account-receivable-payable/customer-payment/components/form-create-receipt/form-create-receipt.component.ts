@@ -73,7 +73,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     ngOnInit() {
         this.initForm();
         this.getCustomerAgent();
-        this.generateReceiptNo();
+        // this.generateReceiptNo();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -120,18 +120,18 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     }
 
-    generateReceiptNo() {
-        this._accountingRepo.generateReceiptNo().subscribe(
-            (data: any) => {
-                if (!!data) {
-                    const { receiptNo } = data;
-                    if (!this.isUpdate) {
-                        this.paymentRefNo.setValue(receiptNo);
-                    }
-                }
-            }
-        );
-    }
+    // generateReceiptNo() {
+    //     this._accountingRepo.generateReceiptNo().subscribe(
+    //         (data: any) => {
+    //             if (!!data) {
+    //                 const { receiptNo } = data;
+    //                 if (!this.isUpdate) {
+    //                     this.paymentRefNo.setValue(receiptNo);
+    //                 }
+    //             }
+    //         }
+    //     );
+    // }
 
     getContract() {
         this._catalogueRepo.getAgreement(

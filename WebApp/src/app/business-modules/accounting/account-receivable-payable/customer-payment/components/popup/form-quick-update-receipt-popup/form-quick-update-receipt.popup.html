@@ -1,4 +1,5 @@
-<div class="quick-update-receipt-popup modal fade" role="dialog" bsModal #popup="bs-modal">
+<div class="quick-update-receipt-popup modal fade" role="dialog" bsModal #popup="bs-modal"
+    (onHide)="isSubmitted = false;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -12,7 +13,7 @@
                     <ng-container *ngIf="updateKey === 'paymentRefNo'">
                         <div class="col-lg-12">
                             <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':(isSubmitted || paymentRefNo.dirty) && !paymentRefNo.valid }">
+                                [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
                                 <label required>Payment RefNo:</label>
                                 <div class="input-group m-input m-input--square-group m-input-icon">
                                     <input type="text" placeholder="Please input receipt no"
@@ -33,7 +34,7 @@
                             <div class="form-group">
                                 <label required>Payment Method:</label>
                                 <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom"
-                                    name="method">
+                                    name="method" [clearable]="false">
                                 </ng-select>
                             </div>
                         </div>
