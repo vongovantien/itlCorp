@@ -86,12 +86,13 @@ namespace eFMS.API.Accounting.Controllers
         /// get list payment by refNo
         /// </summary>
         /// <param name="refNo">Payment RefNo</param>
-        /// <param name="type">payment type</param>s
+        /// <param name="type">payment type</param>
+        /// <param name="invoiceNo"></param>s
         /// <returns></returns>
         [HttpGet("GetBy")]
-        public IActionResult GetBy(string refNo, string type)
+        public IActionResult GetBy(string refNo, string type, string invoiceNo)
         {
-            var results = accountingPaymentService.GetBy(refNo, type);
+            var results = accountingPaymentService.GetBy(refNo, type, invoiceNo);
             return Ok(results);
         }
         /// <summary>

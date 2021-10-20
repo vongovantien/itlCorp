@@ -13,7 +13,7 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IAccAccountingPaymentService : IRepositoryBase<AccAccountingPayment, AccAccountingPaymentModel>
     {
-        IQueryable<AccAccountingPaymentModel> GetBy(string refId, string refNo);
+        IQueryable<AccAccountingPaymentModel> GetBy(string refId, string refNo, string invoiceNo);
         IQueryable<AccountingPaymentModel> Paging(PaymentCriteria criteria, int page, int size, out int rowsCount);
         HandleState UpdateExtendDate(ExtendDateUpdatedModel model);
         HandleState Delete(Guid id);
