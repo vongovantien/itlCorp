@@ -20,6 +20,7 @@ namespace eFMS.API.ReportData.HttpServices
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -40,6 +41,7 @@ namespace eFMS.API.ReportData.HttpServices
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -66,6 +68,7 @@ namespace eFMS.API.ReportData.HttpServices
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -91,6 +94,7 @@ namespace eFMS.API.ReportData.HttpServices
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -108,6 +112,7 @@ namespace eFMS.API.ReportData.HttpServices
             try
             {
                 HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
