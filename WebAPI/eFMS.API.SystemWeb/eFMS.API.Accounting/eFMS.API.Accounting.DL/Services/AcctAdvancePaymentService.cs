@@ -303,17 +303,6 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
             IQueryable<AcctAdvanceRequest> advanceRequests = null;
-            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
-            {
-                advanceRequests = acctAdvanceRequestRepo.Get(x =>
-                                        criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
-                                     || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
-                                     || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
-                                     || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
-                                     || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
-                                     );
-
-            }
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
@@ -350,8 +339,33 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    advanceRequests = advanceRQNotSettled;
+                    advanceRequests = advanceRQNotSettled ;
                 }
+            }
+
+            if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
+            {
+                if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
+                {
+                    advanceRequests = advanceRequests.Where(x =>
+                                          criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
+                                     );
+                }
+                else
+                {
+                    advanceRequests = acctAdvanceRequestRepo.Get(x =>
+                                        criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
+                                     || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
+                                     );
+                }
+
             }
 
             if (advanceRequests != null)
