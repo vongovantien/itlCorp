@@ -26,7 +26,11 @@ namespace eFMS.API.Shipment
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseKestrel(o => {
+                    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
+                    o.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5);
+                });
         //public static void Main(string[] args)
         //{
         //    var host = new WebHostBuilder()
