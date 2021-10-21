@@ -447,11 +447,10 @@
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-5">
-                        <h6 class="font-weight-bold">Credit Amount:</h6>
+                        <h6 class="font-weight-bold">Over Amount:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div><span class="text-primary">{{ accReceivableDetail.creditAmount
-                                | number: '.0-3'}}</span>
+                        <div><span class="text-primary">{{(accReceivableDetail.debitAmount - accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
                             <span *ngIf="accReceivableDetail.creditAmount">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>
