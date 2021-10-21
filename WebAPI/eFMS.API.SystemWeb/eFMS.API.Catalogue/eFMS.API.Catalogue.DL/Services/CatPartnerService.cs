@@ -922,6 +922,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria)
         {
             IQueryable<CatPartner> data = null;
+            criteria.Active = null;
             var cachedData = cache.Get();
             if(cachedData == null)
             {
@@ -938,13 +939,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if(data != null)
             {
-                return MappingQueryAgreementInfo(data);
+                if (criteria.AgreeActive != null)
+                {
+                    return MappingQueryAgreementInfo(data, criteria.AgreeActive);
+                }
+                return MappingQueryAgreementInfo(data,null);
             }
 
             return null;
         }
 
-        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner)
+        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive)
         {
             var contract = contractRepository.Get();
             var sysUSer = sysUserRepository.Get();
@@ -956,7 +961,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         from g1 in grpUs1.DefaultIfEmpty()
                         join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
                         from g2 in grpUs2.DefaultIfEmpty()
-                        where (p.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER || p.PartnerType == DataEnums.PARTNER_TYPE_AGENT)
+                        where ((p.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER || p.PartnerType == DataEnums.PARTNER_TYPE_AGENT) && c.SaleManId == p.SalePersonId)
                         select new QueryExportAgreementInfo
                         {
                             Active = c.Active,
@@ -976,8 +981,11 @@ namespace eFMS.API.Catalogue.DL.Services
                             Service = GetContractServicesName(c.SaleService),
                             Office = GetContractOfficeName(c.OfficeId),
                         };
-
-           return query;
+            if (AgreeActive != null)
+            {
+                return query.Where(x => x.Active == AgreeActive);
+            }
+            return query;
         }
 
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
