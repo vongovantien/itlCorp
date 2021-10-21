@@ -922,6 +922,7 @@ namespace eFMS.API.Catalogue.DL.Services
         public IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria)
         {
             IQueryable<CatPartner> data = null;
+            criteria.Active = null;
             var cachedData = cache.Get();
             if(cachedData == null)
             {
@@ -938,13 +939,17 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if(data != null)
             {
-                return MappingQueryAgreementInfo(data);
+                if (criteria.AgreeActive != null)
+                {
+                    return MappingQueryAgreementInfo(data, criteria.AgreeActive);
+                }
+                return MappingQueryAgreementInfo(data,null);
             }
 
             return null;
         }
 
-        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner)
+        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive)
         {
             var contract = contractRepository.Get();
             var sysUSer = sysUserRepository.Get();
@@ -976,8 +981,11 @@ namespace eFMS.API.Catalogue.DL.Services
                             Service = GetContractServicesName(c.SaleService),
                             Office = GetContractOfficeName(c.OfficeId),
                         };
-
-           return query;
+            if (AgreeActive != null)
+            {
+                return query.Where(x => x.Active == AgreeActive);
+            }
+            return query;
         }
 
         public IQueryable<CatPartnerViewModel> Paging(CatPartnerCriteria criteria, int page, int size, out int rowsCount)
@@ -1239,7 +1247,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (SalemanId.Count() > 0)
                 {
-                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)) || SalemanId.Any(sm => sm == x.partner.UserCreated));
+                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId) || SalemanId.Any(sm => sm == x.partner.UserCreated)));
                 }
                 //else if (!string.IsNullOrEmpty(criteria.Saleman))
                 //{
