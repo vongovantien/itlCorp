@@ -215,13 +215,6 @@ namespace eFMS.API.Accounting.Controllers
                 }
             }
 
-            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
-            {
-                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
-                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
-                return BadRequest(_result);
-            }
-
             string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
             if (!string.IsNullOrWhiteSpace(ListPaymentMessageInvalid))
             {
