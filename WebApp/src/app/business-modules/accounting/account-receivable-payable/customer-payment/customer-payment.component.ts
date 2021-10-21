@@ -235,21 +235,12 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     showQuickUpdatePopup(type: string) {
-        switch (type) {
-            case 'paymentMethod':
-                break;
-            case 'paymentRefNo':
-                break;
-            case 'obhpartnerId':
-                break;
-            default:
-                break;
-        }
         this.selectedUpdateKey = type;
         if (!!this.selectedReceipt) {
             this.quickUpdatePopup.setValueForm('paymentRefNo', this.selectedReceipt['paymentRefNo']);
             this.quickUpdatePopup.setValueForm('paymentMethod', this.selectedReceipt['paymentMethod']);
             this.quickUpdatePopup.setValueForm('obhpartnerId', this.selectedReceipt['obhpartnerId']);
+            this.quickUpdatePopup.setValueForm('paymentDate', !!this.selectedReceipt.paymentDate ? { startDate: new Date(this.selectedReceipt.paymentDate), endDate: new Date(this.selectedReceipt.paymentDate) } : null);
             this.quickUpdatePopup.receipt = Object.assign({}, this.selectedReceipt);
             this.quickUpdatePopup.show();
 
@@ -345,8 +336,17 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             );
     }
 
-    exportPaymentCustomer() {
-
+    confirmCopyReceipt() {
+        const confirmMessage = `Are you sure you want to copy ${this.selectedReceipt.paymentRefNo} turn into new receipt?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Copy receipt',
+            body: confirmMessage,
+            iconConfirm: 'la la-copy',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/customer/new`]);
+        });
     }
 
 }

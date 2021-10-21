@@ -10,8 +10,9 @@
             </div>
             <div class="modal-body">
                 <form [formGroup]="form" class="row m-form m-form--state">
-                    <ng-container *ngIf="updateKey === 'paymentRefNo'">
-                        <div class="col-lg-12">
+                    <div class="col-lg-12">
+
+                        <ng-container *ngIf="updateKey === 'paymentRefNo'">
                             <div class="form-group"
                                 [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
                                 <label required>Payment RefNo:</label>
@@ -27,21 +28,18 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </ng-container>
-                    <ng-container *ngIf="updateKey === 'paymentMethod'">
-                        <div class="col-lg-12">
+                        </ng-container>
+
+                        <ng-container *ngIf="updateKey === 'paymentMethod'">
                             <div class="form-group">
                                 <label required>Payment Method:</label>
                                 <ng-select [items]="paymentMethods" formControlName="paymentMethod" class="custom"
                                     name="method" [clearable]="false">
                                 </ng-select>
                             </div>
-                        </div>
-                    </ng-container>
+                        </ng-container>
 
-                    <ng-container *ngIf="updateKey === 'obhpartnerId'">
-                        <div class="col-lg-12">
+                        <ng-container *ngIf="updateKey === 'obhpartnerId'">
                             <div class="form-group">
                                 <label for="">OBH Partner:</label>
                                 <app-combo-grid-virtual-scroll (itemSelected)="obhpartnerId.setValue($event.id)"
@@ -51,8 +49,23 @@
                                     [displayFields]="displayFieldsPartner" placeholder="Select OBH Partner">
                                 </app-combo-grid-virtual-scroll>
                             </div>
-                        </div>
-                    </ng-container>
+                        </ng-container>
+
+                        <ng-container *ngIf="updateKey === 'paymentDate'">
+                            <div class="form-group">
+                                <label>Payment Date</label>
+                                <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                    <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                        [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}" [singleDatePicker]="true"
+                                        name="daterange" placeholder="Select request date" [autoApply]="true"
+                                        formControlName="paymentDate" readonly calendar />
+                                </div>
+                            </div>
+
+                        </ng-container>
+                    </div>
+
+
                 </form>
             </div>
             <div class="modal-footer m--align-center c-button-actions">

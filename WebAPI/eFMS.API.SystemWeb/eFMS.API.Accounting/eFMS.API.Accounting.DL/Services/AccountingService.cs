@@ -3002,7 +3002,8 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return "Công Nợ Cấn Trừ";
             }
-            if(type == "COLL_ADV")
+           
+            if (type == "COLL_ADV")
             {
                 if (string.IsNullOrEmpty(receipt.Description))
                 {
@@ -3012,6 +3013,10 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     return receipt.Description;
                 }
+            }
+            if(!string.IsNullOrEmpty(receipt.Description))
+            {
+                return receipt.Description;
             }
             return _des;
         }

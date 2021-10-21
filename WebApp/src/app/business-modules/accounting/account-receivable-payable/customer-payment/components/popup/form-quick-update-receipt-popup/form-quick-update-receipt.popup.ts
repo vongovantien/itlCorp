@@ -9,6 +9,7 @@ import { Partner, ReceiptModel } from '@models';
 import { filter, switchMap, takeUntil } from 'rxjs/operators';
 import { IAppState, getCurrentUserState } from '@store';
 import { Store } from '@ngrx/store';
+import { formatDate } from '@angular/common';
 
 @Component({
     selector: 'form-quick-update-receipt',
@@ -24,6 +25,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
     paymentMethod: AbstractControl;
     paymentRefNo: AbstractControl;
     obhpartnerId: AbstractControl;
+    paymentDate: AbstractControl;
 
     paymentMethods: string[] = [
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
@@ -32,6 +34,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,
@@ -56,12 +59,14 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
         this.form = this._fb.group({
             'paymentRefNo': [null, Validators.required],
             'paymentMethod': [],
-            'obhpartnerId': []
+            'obhpartnerId': [],
+            'paymentDate': []
         });
 
         this.paymentMethod = this.form.controls['paymentMethod'];
         this.paymentRefNo = this.form.controls['paymentRefNo'];
         this.obhpartnerId = this.form.controls['obhpartnerId'];
+        this.paymentDate = this.form.controls['paymentDate'];
 
         this.obhPartners = this._store.select(getCurrentUserState)
             .pipe(
@@ -88,6 +93,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
             paymentMethod: valueForm.paymentMethod,
             paymentRefNo: valueForm.paymentRefNo,
             obhpartnerId: valueForm.obhpartnerId,
+            paymentDate: !!valueForm.paymentDate.startDate ? formatDate(valueForm.paymentDate.startDate, 'yyyy-MM-dd', 'en') : null,
         };
         console.log(body);
 
@@ -132,6 +138,8 @@ export interface IModelQuickUpdateReceipt {
     paymentMethod: string;
     paymentRefNo: string;
     obhpartnerId: string;
+    paymentDate: string;
+
 }
 
 interface IGenerateReceiptV2 {

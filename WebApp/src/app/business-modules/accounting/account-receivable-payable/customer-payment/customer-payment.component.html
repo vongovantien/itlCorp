@@ -207,7 +207,12 @@
 <app-context-menu #receiptContextMenu (clickOutside)="selectedReceipt = null">
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !== 'Synced'">
         <div class="menu-context__item" (click)="confirmSyncReceipt()">
-            <span><i class="la la-cloud-upload text-info"></i><span> Sync to accountant system</span></span>
+            <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="selectedReceipt?.status === 'Cancel'">
+        <div class="menu-context__item" (click)="confirmCopyReceipt()">
+            <span><i class="la la-copy"></i><span> Copy receipt {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
     <div class="menu-context__item">
@@ -229,6 +234,9 @@
         <hr />
         <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentRefNo')">
             <span><i class="la la-edit"></i><span> Update receipt no </span></span>
+        </div>
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentDate')">
+            <span><i class="la la-calendar"></i><span>Update Payment Date</span></span>
         </div>
         <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentMethod')">
             <span><i class="la la-edit"></i><span>Update payment method</span></span>
@@ -263,12 +271,6 @@
         <span>
             <i class="la la-file-excel-o"></i>
             Advance receipt
-        </span>
-    </span>
-    <span class="dropdown-item pointer" (click)="exportPaymentCustomer()">
-        <span>
-            <i class="la la-file-excel-o"></i>
-            Statement of receivable customer
         </span>
     </span>
 </app-dropdown>

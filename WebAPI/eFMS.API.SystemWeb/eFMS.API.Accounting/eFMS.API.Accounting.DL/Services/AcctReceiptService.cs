@@ -438,7 +438,7 @@ namespace eFMS.API.Accounting.DL.Services
                     break;
                 case "Clear-Advance":
                 case "Clear-Advance-Bank":
-                case "Clear-Advance-Case":
+                case "Clear-Advance-Cash":
                 case "Other":
                     string prefix2 = string.Empty;
 
@@ -459,6 +459,7 @@ namespace eFMS.API.Accounting.DL.Services
                     receiptNo = GenerateReceiptNoWithPrefix(prefix2, receipt);
 
                     break;
+                case "Internal":
                 case "COLL - Internal":
                 case "Management Fee":
                 case "Other Fee":
@@ -3788,6 +3789,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receiptCurrent.PaymentRefNo = model.PaymentRefNo;
             }
             receiptCurrent.ObhpartnerId = model.OBHPartnerId;
+            receiptCurrent.PaymentDate = model.PaymentDate;
 
             hs = DataContext.Update(receiptCurrent, x => x.Id == receiptCurrent.Id);
 
