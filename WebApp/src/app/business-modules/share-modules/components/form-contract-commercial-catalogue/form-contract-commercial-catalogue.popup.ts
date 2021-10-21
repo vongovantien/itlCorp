@@ -645,7 +645,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
         const offices = this.officeId.value ? (this.officeId.value.length > 0 ? this.officeId.value.map((item: any) => item.id).toString().replace(/(?:,)/g, ';') : '') : '';
         this.selectedContract.officeId = offices;
         this.selectedContract.paymentMethod = !!this.paymentMethod.value ? this.paymentMethod.value : null;
-        this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value : null;
+        this.selectedContract.baseOn = !!this.baseOn.value ? this.baseOn.value : "Invoice Date";
         this.selectedContract.trialCreditLimited = !!this.formGroup.controls['trialCreditLimit'].value ? this.formGroup.controls['trialCreditLimit'].value :
             this.formGroup.controls['creditLimit'].value;
         this.selectedContract.trialCreditDays = this.formGroup.controls['trialCreditDays'].value;
