@@ -1771,9 +1771,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.BranchName = officeData[(Guid)item.invoice.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
                         payment.UnpaidAmountInv = 0;
-                        payment.UnpaidAmountOBH = isValidObh ? invoiceObhGroup?.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0) ?? 0 : 0;
+                        payment.UnpaidAmountOBH = isValidObh ? (invoiceObhGroup?.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountVnd ?? 0) ?? 0) : 0;
                         payment.UnpaidAmountInvUsd = 0;
-                        payment.UnpaidAmountOBHUsd = isValidObh ? invoiceObhGroup?.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0) ?? 0 : 0;
+                        payment.UnpaidAmountOBHUsd = isValidObh ? (invoiceObhGroup?.Sum(x => x?.invc.FirstOrDefault()?.TotalAmountUsd ?? 0) ?? 0) : 0;
 
                         payment.PaidAmount = payment.PaidAmountUsd = 0;
                         payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
@@ -1877,9 +1877,9 @@ namespace eFMS.API.Accounting.DL.Services
                                     detail.PaymentDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
                                     var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
                                     detail.PaidAmount = 0;
-                                    detail.PaidAmountOBH = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                                    detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
                                     detail.PaidAmountUsd = 0;
-                                    detail.PaidAmountOBHUsd = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0;
+                                    detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
                                     detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
                                     detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
                                     detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
@@ -2019,9 +2019,9 @@ namespace eFMS.API.Accounting.DL.Services
                             var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
                             var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
                             detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
-                            detail.PaidAmountOBH = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                            detail.PaidAmountOBH = isValidObh ? (paymentOBH != null ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0) : 0;
                             detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
-                            detail.PaidAmountOBHUsd = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0;
+                            detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH != null ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0) : 0;
                             detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
                             detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
                             detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
@@ -2043,9 +2043,9 @@ namespace eFMS.API.Accounting.DL.Services
                         detail.PaymentRefNo = "";
                         detail.PaymentDate = null;
                         detail.PaidAmount = invoiceDebitPaid.FirstOrDefault()?.PaidAmountVnd ?? 0;
-                        detail.PaidAmountOBH = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) : 0;
+                        detail.PaidAmountOBH = isValidObh ? (invoiceObhPaid?.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) ?? 0) : 0;
                         detail.PaidAmountUsd = invoiceDebitPaid.FirstOrDefault()?.PaidAmountUsd ?? 0;
-                        detail.PaidAmountOBHUsd = isValidObh ? invoiceObhPaid.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) : 0;
+                        detail.PaidAmountOBHUsd = isValidObh ? (invoiceObhPaid?.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) ?? 0) : 0;
 
                         payment.PaidAmount += (detail.PaidAmount ?? 0);
                         payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
@@ -2087,9 +2087,9 @@ namespace eFMS.API.Accounting.DL.Services
                                 var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
                                 var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
                                 detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
-                                detail.PaidAmountOBH = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountVnd ?? 0) : 0;
+                                detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
                                 detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
-                                detail.PaidAmountOBHUsd = isValidObh ? paymentOBH.Sum(x => x.PaymentAmountUsd ?? 0) : 0;
+                                detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
                                 detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
                                 detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
                                 detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
