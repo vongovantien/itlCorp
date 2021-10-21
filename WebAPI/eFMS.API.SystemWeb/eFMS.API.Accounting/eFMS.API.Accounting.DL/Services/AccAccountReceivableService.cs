@@ -2034,6 +2034,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
                         ServiceName = sel.ArServiceName,
+                        ServiceCode = sel.ArServiceCode,
                         DebitAmount = sel.DebitAmount,
                         BillingAmount = sel.BillingAmount,
                         BillingUnpaid = sel.BillingUnpaid,
@@ -2055,6 +2056,7 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            OfficeId = ar.OfficeId,
                            OfficeName = office.BranchNameEn,
+                           OfficeNameAbbr = office.ShortName,
                            TotalDebitAmount = ar.TotalDebitAmount,
                            TotalBillingAmount = ar.TotalBillingAmount,
                            TotalBillingUnpaid = ar.TotalBillingUnpaid,
@@ -2178,13 +2180,15 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option)
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode)
         {
             if (argeementId == null || argeementId == Guid.Empty) return null;
             DbParameter[] parameters =
             {
                 SqlParam.GetParameter("argid", argeementId),
-                SqlParam.GetParameter("option", option)
+                SqlParam.GetParameter("option", option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:"")
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;

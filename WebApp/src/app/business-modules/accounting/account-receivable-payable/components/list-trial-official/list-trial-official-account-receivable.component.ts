@@ -130,7 +130,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     showDebitDetail(agreementId, option) {
-        this._accountingRepo.getDataDebitDetail(agreementId, option)
+        this._accountingRepo.getDataDebitDetail(agreementId, option,'','')
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
