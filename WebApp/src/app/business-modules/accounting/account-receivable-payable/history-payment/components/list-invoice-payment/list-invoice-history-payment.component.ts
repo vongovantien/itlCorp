@@ -217,8 +217,8 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    getPayments(refNo: string, type: string) {
-        this._accountingRepo.getPaymentByrefNo(refNo, type)
+    getPayments(refNo: string, type: string, invoiceNo: string) {
+        this._accountingRepo.getPaymentByrefNo(refNo, type, invoiceNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(
@@ -305,10 +305,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
             );
     }
 
-    confirmSync(refId: string, refNo: string, action: string) {
+    confirmSync(refId: string, refNo: string, invoiceNo: string, action: string) {
         this.refId = refId;
         this.action = action;
-        this._accountingRepo.getPaymentByrefNo(refId, refNo)
+        this._accountingRepo.getPaymentByrefNo(refId, refNo, invoiceNo)
             .pipe(
                 catchError(this.catchError)
             ).subscribe(

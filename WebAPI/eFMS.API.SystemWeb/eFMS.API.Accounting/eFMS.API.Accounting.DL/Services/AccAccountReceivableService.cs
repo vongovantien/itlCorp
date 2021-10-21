@@ -1219,7 +1219,7 @@ namespace eFMS.API.Accounting.DL.Services
                 receivables = CalculatorPaidAmount(receivables, surcharges, invoices); //Paid Amount
                 receivables = CalculatorObhUnpaid(receivables, surcharges, invoices); //Obh Unpaid
                 receivables = CalculatorObhPaid(receivables, surcharges, invoices); //Obh Paid
-                receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)               
+                receivables = CalculatorObhAmount(receivables, surcharges); //Obh Amount: Cộng thêm OBH Unpaid (đã cộng bên trong)
                 receivables = CalculatorObhBilling(receivables, surcharges, invoices); //Obh Billing
                 receivables = CalculatorAdvanceAmount(receivables); //Advance Amount
                 receivables = CalculatorCreditAmount(receivables, surcharges); //Credit Amount
@@ -1692,7 +1692,7 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = QueryPartner(criteria);
 
             var contracts = contractPartnerRepo.Get(x => x.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL
-            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL 
+            || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_PARENT
             || x.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH);
 
@@ -1714,7 +1714,53 @@ namespace eFMS.API.Accounting.DL.Services
                 if (arPartnerNoContracts != null)
                     arPartnerContracts = arPartnerContracts.Concat(arPartnerNoContracts).OrderByDescending(x => x.DatetimeModified);
             }
-            return arPartnerContracts;
+
+            var res = new List<AccountReceivableResult>();
+            res = arPartnerContracts.ToList();
+
+            if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
+                res = arPartnerContracts.Where(x => x.DebitRate >= criteria.DebitRateTo && x.DebitRate <= criteria.DebitRateFrom).ToList();
+            if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
+                res = arPartnerContracts.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
+            if (criteria.AgreementExpiredDay !=null && criteria.AgreementExpiredDay!="All")
+            {
+                switch (criteria.AgreementExpiredDay)
+                {
+                    case "Normal":
+                        res = arPartnerContracts.Where(x => x.ExpriedDay > 30).ToList();
+                        break;
+                    case "30Day":
+                        res = arPartnerContracts.Where(x => x.ExpriedDay == 30).ToList();
+                        break;
+                    case "15Day":
+                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 15).ToList();
+                        break;
+                    case "Expired":
+                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 0).ToList();
+                        break;
+                }
+            }
+            if (criteria.Staffs != null)
+                res = arPartnerContracts.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
+            if (criteria.OfficeIds != null)
+                res = arPartnerContracts.Where(x => criteria.OfficeIds.Contains(x.OfficeId)).ToList();
+
+            switch (criteria.OverDueDay)
+            {
+                case OverDueDayEnum.Over1_15:
+                    res = arPartnerContracts.Where(x => x.Over1To15Day > 0).ToList();
+                    break;
+                case OverDueDayEnum.Over16_30:
+                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    break;
+                case OverDueDayEnum.Over30:
+                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    break;
+                case OverDueDayEnum.All:
+                    break;
+            }
+
+            return res.AsQueryable();
         }
 
 
@@ -1956,7 +2002,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- LIST & PAGING ---
 
-        #region --- DETAIL ---  
+        #region --- DETAIL ---
         private List<AccountReceivableGroupOfficeResult> GetARGroupOffice(IQueryable<AccountReceivableResult> arPartner)
         {
             //Group by Office of Argeement or Account Receivable
