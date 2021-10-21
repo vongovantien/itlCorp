@@ -40,6 +40,7 @@ namespace eFMS.API.Accounting.Infrastructure
             services.AddTransient<IActionFuncLogService, ActionFuncLogService>();
             services.AddTransient<IAcctReceiptService, AcctReceiptService>();
             services.AddTransient<ISysImageService, SysImageService>();
+            services.AddTransient<IAcctDebitManagementARService, AcctDebitManagementArService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {

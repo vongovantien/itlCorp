@@ -39,4 +39,35 @@ namespace eFMSWindowService.Models
         public decimal Over16To30Day { get; set; }
         public decimal Over30Day { get; set; }
     }
+
+
+    public partial class sp_GetOverDuePaymentCredit_Result
+    {
+        public System.Guid ID { get; set; }
+        public string BranchName_EN { get; set; }
+        public string PartnerName_EN { get; set; }
+        public string Email { get; set; }
+        public string UserName { get; set; }
+        public decimal CreditRate { get; set; }
+        public decimal? CreditLimit { get; set; }
+        public decimal DebitAmount { get; set; }
+    }
+    
+    public partial class sp_GetExpiredContract_Result
+    {
+        public string SaleManId { get; set; }
+        public string SaleManName { get; set; }
+        public string PartnerName { get; set; }
+        public string ContractNo { get; set; }
+        public DateTime? EffectiveDate { get; set; }
+        public DateTime? ExpiredDate { get; set; }
+        public string SaleManEmail { get; set; }
+        public string AccountantEmail { get; set; }
+        public string AREmail { get; set; }
+    }
+
+    public partial class sp_GetContractExpiredWithin15And30Days_Result: sp_GetExpiredContract_Result
+    {
+        public int? ExpiredIn { get; set; }
+    }
 }

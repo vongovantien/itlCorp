@@ -1,16 +1,21 @@
 import { AppList } from "src/app/app.list";
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { SortService } from "@services";
 import { NgProgress } from "@ngx-progressbar/core";
 import { ToastrService } from "ngx-toastr";
 import { DocumentationRepo, ExportRepo } from "@repositories";
 import { catchError, finalize, map } from "rxjs/operators";
+import { LoadingPopupComponent } from "@common";
+import { NgxSpinnerService } from "ngx-spinner";
+import { SystemConstants } from "@constants";
+import { of } from "rxjs";
 
 @Component({
     selector: 'app-general-report',
     templateUrl: './general-report.component.html',
 })
 export class GeneralReportComponent extends AppList {
+    @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
     headers: CommonInterface.IHeaderTable[];
     dataList: any[] = [];
     isClickSubMenu: boolean = false;
@@ -22,6 +27,7 @@ export class GeneralReportComponent extends AppList {
         private _toastService: ToastrService,
         private _documentRepo: DocumentationRepo,
         private _exportRepo: ExportRepo,
+        private _spinner: NgxSpinnerService
 
     ) {
         super();
@@ -69,7 +75,7 @@ export class GeneralReportComponent extends AppList {
         this._progressRef.start();
         this._documentRepo.getGeneralReport(this.page, this.pageSize, Object.assign({}, this.dataSearch))
             .pipe(
-                catchError(this.catchError),
+                catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                 finalize(() => {
                     this._progressRef.complete();
                 }),
@@ -91,22 +97,32 @@ export class GeneralReportComponent extends AppList {
         this.dataList = this._sortService.sort(this.dataList, sort, this.order);
     }
 
+    startDownloadReport(data: any, fileName: string){
+        if(data.byteLength > 0){
+            this.downLoadFile(data, SystemConstants.FILE_EXCEL, fileName);
+            this.loadingPopupComponent.downloadSuccess();
+        }else{
+            this.loadingPopupComponent.downloadFail();
+        }
+    }
+    
     exportShipmentOverview() {
         if (this.dataList.length === 0) {
             this._toastService.warning('No Data To View, Please Re-Apply Report');
             return;
         } else {
             this.isClickSubMenu = false;
-            this._progressRef.start();
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverview(this.dataSearch)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
                     (response: ArrayBuffer) => {
                         const fileName = "Export ShipmentOverview.xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
+                        this.startDownloadReport(response, fileName);
                     },
                 );
         }
@@ -118,16 +134,17 @@ export class GeneralReportComponent extends AppList {
             return;
         } else {
             this.isClickSubMenu = false;
-            this._progressRef.start();
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportShipmentOverviewWithType(this.dataSearch, reportType)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
                     (response: ArrayBuffer) => {
                         const fileName = reportType == 'FCL' ? "Export ShipmentOverview FCL.xlsx" : "Shipment Overview-LCL.xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
+                        this.startDownloadReport(response, fileName);
                     },
                 );
         }
@@ -139,16 +156,17 @@ export class GeneralReportComponent extends AppList {
             return;
         } else {
             this.isClickSubMenu = false;
-            this._progressRef.start();
+            this._spinner.hide();
+            this.loadingPopupComponent.show();
             this._exportRepo.exportStandardGeneralReport(this.dataSearch)
                 .pipe(
-                    catchError(this.catchError),
+                    catchError(()=> of(this.loadingPopupComponent.downloadFail())),
                     finalize(() => this._progressRef.complete())
                 )
                 .subscribe(
                     (response: ArrayBuffer) => {
                         const fileName = "Standard Report (" + this.dataSearch.currency + ").xlsx";
-                        this.downLoadFile(response, "application/ms-excel", fileName);
+                        this.startDownloadReport(response, fileName);
                     },
                 );
         }

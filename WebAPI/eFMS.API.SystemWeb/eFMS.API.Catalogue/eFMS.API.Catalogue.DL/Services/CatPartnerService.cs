@@ -2211,9 +2211,9 @@ namespace eFMS.API.Catalogue.DL.Services
                 RoundUpMethod = x.RoundUpMethod,
                 ApplyDim = x.ApplyDim,
                 AccountNo = x.AccountNo,
-                PartnerType = x.PartnerType
+                PartnerType = x.PartnerType,
+                TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName
             }).ToList();
-            results.ForEach(item => item.TaxCodeAbbrName = item.TaxCode + " - " + item.ShortName);
             return results.AsQueryable();
         }
 
@@ -2256,6 +2256,15 @@ namespace eFMS.API.Catalogue.DL.Services
                 query = query.And(x => x.PartnerMode == criteria.PartnerMode);
             }
 
+            if (!string.IsNullOrEmpty(criteria.NotEqualInternalCode))
+            {
+                query = query.And(x => x.InternalCode != criteria.NotEqualInternalCode);
+            }
+            if (!string.IsNullOrEmpty(criteria.InternalCode))
+            {
+                query = query.And(x => x.InternalCode == criteria.InternalCode);
+            }
+
             var dataQuery = DataContext.Get(query);
 
             IQueryable<CatPartnerViewModel> results = dataQuery.Select(x => new CatPartnerViewModel
@@ -2279,7 +2288,8 @@ namespace eFMS.API.Catalogue.DL.Services
                 TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName,
                 BankName = x.BankName,
                 BankCode = x.BankCode,
-                PartnerType = x.PartnerType
+                PartnerType = x.PartnerType,
+                InternalCode = x.InternalCode
             });
 
             return results;

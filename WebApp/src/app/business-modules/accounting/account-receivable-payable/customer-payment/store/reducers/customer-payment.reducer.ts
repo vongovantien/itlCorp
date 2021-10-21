@@ -105,7 +105,7 @@ export const receiptManagementReducer = createReducer(
                     }]
                 };
             }
-        } else if (payload.data.cusAdvanceAmountVnd > 0) {
+        } else if (payload.data.cusAdvanceAmountUsd > 0) {
             return {
                 ...state, debitList: [...payload.data.invoices, {
                     type: 'ADV',
@@ -133,13 +133,16 @@ export const receiptManagementReducer = createReducer(
         ...state, agreement: { ...payload }
     })),
     on(ReceiptActions.SearchListCustomerPayment, (state: IReceiptState, payload: any) => ({
-        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 15 }
+        ...state, dataSearch: payload, pagingData: { page: 1, pageSize: 30 }
     })),
     on(ReceiptActions.LoadListCustomerPayment, (state: IReceiptState, payload: CommonInterface.IParamPaging) => ({
         ...state, isLoading: true, pagingData: { page: payload.page, pageSize: payload.size }
     })),
     on(ReceiptActions.LoadListCustomerPaymentSuccess, (state: IReceiptState, payload: CommonInterface.IResponsePaging) => ({
         ...state, list: payload, isLoading: false, isLoaded: true
+    })),
+    on(ReceiptActions.LoadListCustomerPaymentFail, (state: IReceiptState) => ({
+        ...state, isLoading: false, isLoaded: true
     })),
     on(ReceiptActions.ToggleAutoConvertPaid, (state: IReceiptState, payload: { isAutoConvert: boolean }) => ({
         ...state, isAutoConvertPaid: payload.isAutoConvert

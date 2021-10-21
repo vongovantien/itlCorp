@@ -91,6 +91,14 @@
             <param name="language">VN (Việt Nam) or ENG (English)</param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportDetailSettlementPaymentTemplate(System.Guid,System.String)">
+            <summary>
+            Export detail settlement template payment
+            </summary>
+            <param name="settlementId">Id of settlement payment</param>
+            <param name="language">VN (Việt Nam) or ENG (English)</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportGeneralSettlementPayment(System.Guid)">
             <summary>
             Export General Preview in Settlement detail
@@ -99,6 +107,7 @@
             <returns></returns>
         </member>
         <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreight(System.String,System.String)" -->
+        <!-- Badly formed XML comment ignored for member "M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOAAirfreightWithHBL(System.String,System.String)" -->
         <member name="M:eFMS.API.ReportData.Controllers.AccountingReportController.ExportSOASupplierAirfreight(System.String,System.String)">
             <summary>
             Export detail SOA Supplier
@@ -494,7 +503,7 @@
             <param name="fileName"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},System.String)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateExportCustomerHistoryPayment(System.Collections.Generic.List{FMS.API.ReportData.Models.Accounting.AccountingCustomerPaymentExport},eFMS.API.ReportData.Models.Criteria.AccountingPaymentCriteria,System.String)">
             <summary>
             GenerateExportCutomerHistoryPayment
             </summary>
@@ -519,10 +528,10 @@
             <param name="stream"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSOAAirfreightExcel(eFMS.API.ReportData.Models.ExportSOAAirfreightModel,System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateSOAAirfreightExcel(eFMS.API.ReportData.Models.ExportSOAAirfreightModel,System.String,System.IO.Stream)">
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.IO.Stream)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.AccountingHelper.GenerateDetailSettlementPaymentExcel(eFMS.API.ReportData.Models.Accounting.SettlementExport,System.String,System.String,System.IO.Stream)">
             <summary>
             Generate detail settlement payment excel
             </summary>

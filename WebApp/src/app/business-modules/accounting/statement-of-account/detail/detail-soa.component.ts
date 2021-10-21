@@ -1,3 +1,5 @@
+import { getCurrentUserState } from './../../../../store/reducers/index';
+import { takeUntil } from 'rxjs/operators';
 import { Component, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccountingRepo, ExportRepo } from 'src/app/shared/repositories';
@@ -45,6 +47,8 @@ export class StatementOfAccountDetailComponent extends AppList {
     messageValidate: string = '';
     attachFiles: SysImage[] = [];
 
+    userLogged: Partial<SystemInterface.IClaimUser>;
+
     constructor(
         private _activedRoute: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -89,6 +93,13 @@ export class StatementOfAccountDetailComponent extends AppList {
                 this.getDetailSOA(this.soaNO, this.currencyLocal)
             }
         });
+        this._store.select(getCurrentUserState)
+            .pipe(takeUntil(this.ngUnsubscribe))
+            .subscribe((u) => {
+                if (!!u) {
+                    this.userLogged = u;
+                }
+            })
     }
 
     getDetailSOA(soaNO: string, currency: string) {
@@ -147,6 +158,24 @@ export class StatementOfAccountDetailComponent extends AppList {
                 (response: ArrayBuffer) => {
                     if (response.byteLength > 0) {
                         this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight.xlsx');
+                    } else {
+                        this._toastService.warning('No data found');
+                    }
+                },
+            );
+    }
+
+    exportSOAAFWithHBL() {
+        this._progressRef.start();
+        this._exportRepo.exportSOAAirFreightWithHBL(this.soaNO, this.userLogged.officeId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            )
+            .subscribe(
+                (response: ArrayBuffer) => {
+                    if (response.byteLength > 0) {
+                        this.downLoadFile(response, "application/ms-excel", 'SOA AirFreight With HBL.xlsx');
                     } else {
                         this._toastService.warning('No data found');
                     }
