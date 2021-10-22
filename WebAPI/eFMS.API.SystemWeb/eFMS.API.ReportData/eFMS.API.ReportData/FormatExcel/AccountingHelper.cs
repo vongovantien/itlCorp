@@ -5260,6 +5260,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 var folderOfFile = GetARExcelFolder();
+                var deleteDetailRow = false;
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
                 var path = f.FullName;
                 if (!File.Exists(path))
@@ -5271,8 +5272,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (paymentCriteria.DueDate == null)
+                if (paymentCriteria.DueDate != null || paymentCriteria.FromIssuedDate !=null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
+                {
                     excel.DeleteRow(7);
+                    deleteDetailRow = true;
+                }
 
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5330,7 +5334,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0 && paymentCriteria.DueDate != null)
+                    if ( item.details.Count > 0 && deleteDetailRow == false && (paymentCriteria.DueDate == null || paymentCriteria.FromIssuedDate == null))
                     {
                         foreach (var detail in item.details)
                         {
