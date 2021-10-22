@@ -5272,7 +5272,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (paymentCriteria.DueDate != null || paymentCriteria.FromIssuedDate !=null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
+                if (paymentCriteria.DueDate != null  || paymentCriteria.FromIssuedDate != null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
                 {
                     excel.DeleteRow(7);
                     deleteDetailRow = true;
