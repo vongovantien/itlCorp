@@ -14,7 +14,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { ARCustomerPaymentReceiptPaymentListComponent } from '../components/receipt-payment-list/receipt-payment-list.component';
-import { ResetInvoiceList, RegistTypeReceipt, GetInvoiceListSuccess } from '../store/actions';
+import { ResetInvoiceList, RegistTypeReceipt, GetInvoiceListSuccess, SelectReceiptClass } from '../store/actions';
 import { ReceiptCreditListState, ReceiptDebitListState, ReceiptTypeState } from '../store/reducers';
 
 import { takeUntil, pluck, tap, switchMap } from 'rxjs/operators';
@@ -90,7 +90,20 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             .subscribe(
                 (res: any) => {
                     if (!!res) {
-                        this.titleReceipt = this.actionReceiptFromParams === 'debit' ? 'Create Clear Debit' : "Create Bank Fee/Other";
+                        switch (this.actionReceiptFromParams) {
+                            case 'debit':
+                                this.titleReceipt = 'Create Clear Debit';
+                                break;
+                            case 'bank':
+                            case 'other':
+                                this.titleReceipt = "Create Bank Fee/Other";
+                                break;
+                            case 'copy':
+                                this.titleReceipt = "Copy Receipt";
+                                break;
+                            default:
+                                break;
+                        }
                         this.setFormReceiptDefault(res);
                     }
                 },
@@ -284,6 +297,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
         model.referenceId = this.receiptRefId; // * Set Id cho phiếu ngân hàng.
+        if (this.actionReceiptFromParams === 'copy') {
+            model.referenceId = null;
+        }
         this._accountingRepo.saveReceipt(model, action)
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -377,30 +393,30 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
 
-        if (this.actionReceiptFromParams !== 'debit') {
+        if (this.actionReceiptFromParams !== 'debit' && this.actionReceiptFromParams !== 'copy') {
             this.formCreate.isReadonly = true;
         }
-        let paymentRefNo: string = null;
-        switch (this.actionReceiptFromParams) {
-            case 'bank':
-                paymentRefNo = res.paymentRefNo + '_BANK';
-                this.formCreate.isUpdate = true;
-                break;
-            case 'other':
-                paymentRefNo = res.paymentRefNo + '_OTH001';
-                this.formCreate.isUpdate = true;
-                break;
-            case 'debit':
-                this.formCreate.isUpdate = false; // allow generate receipt
-                break;
-            default:
-                break;
-        }
+        // let paymentRefNo: string = null;
+        // switch (this.actionReceiptFromParams) {
+        //     case 'bank':
+        //         paymentRefNo = res.paymentRefNo + '_BANK';
+        //         this.formCreate.isUpdate = true;
+        //         break;
+        //     case 'other':
+        //         paymentRefNo = res.paymentRefNo + '_OTH001';
+        //         this.formCreate.isUpdate = true;
+        //         break;
+        //     case 'debit':
+        //         this.formCreate.isUpdate = false; // allow generate receipt
+        //         break;
+        //     default:
+        //         break;
+        // }
 
-        this.formCreate.formSearchInvoice.patchValue({
-            paymentRefNo: paymentRefNo,
-            referenceNo: res.paymentRefNo + '_' + res.class
-        });
+        // this.formCreate.formSearchInvoice.patchValue({
+        //     paymentRefNo: paymentRefNo,
+        //     referenceNo: res.paymentRefNo + '_' + res.class
+        // });
     }
 
     setPaymentListFormDefault(res: ReceiptModel) {
@@ -409,14 +425,22 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             this.listInvoice.creditAmountUsd.enable();
             this.listInvoice.cusAdvanceAmountUsd.enable();
         }
-        if (this.actionReceiptFromParams === 'debit') {
-            this.setPaymentListFormForClearDebit(res);
-            return;
-        } else if (this.actionReceiptFromParams === 'bank') {
-            this.setPaymentListDefaultForBankFee(res);
-            return;
+
+        switch (this.actionReceiptFromParams) {
+            case 'debit':
+                this.setPaymentListFormForClearDebit(res);
+                break;
+            case 'bank':
+                this.setPaymentListDefaultForBankFee(res);
+                break;
+            case 'copy':
+                this.setPaymentListFormForCopy(res);
+                break;
+            default:
+                this.setListInvoiceDefaultForOther(res);
+                break;
         }
-        this.setListInvoiceDefaultForOther(res);
+
     }
 
     setPaymentListDefaultForBankFee(res: ReceiptModel) {
@@ -432,9 +456,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             finalPaidAmountVnd: 0,
             finalPaidAmountUsd: 0,
             paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
+            notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : [],
+
         };
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
 
+        this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(SelectReceiptClass({ class: res.class }));
         this._store.dispatch(GetInvoiceListSuccess({ invoices: this.generateDefaultDebitList(res) }));
 
         (this.listInvoice.partnerId as any) = { id: res.customerId };
@@ -450,7 +478,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             paidAmountUsd: res.finalPaidAmountUsd,
             cusAdvanceAmountVnd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountVnd : 0,
             cusAdvanceAmountUsd: res.class === AccountingConstants.RECEIPT_CLASS.ADVANCE ? res.finalPaidAmountUsd : 0,
-
+            notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : [],
             paymentMethod: res.class?.includes('OBH') ? AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL : AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER,
         };
 
@@ -485,13 +513,29 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             paidAmountUsd: 0,
             finalPaidAmountVnd: 0,
             finalPaidAmountUsd: 0,
-            paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE
+            paymentMethod: AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
+            notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : [],
         };
 
         this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMappingFormOther));
 
         this._store.dispatch(GetInvoiceListSuccess({ invoices: this.generateDefaultDebitList(res) }));
 
+        (this.listInvoice.partnerId as any) = { id: res.customerId };
+    }
+
+    setPaymentListFormForCopy(res: ReceiptModel) {
+        const formMapping = {
+            type: res.type?.split(","),
+            paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
+            notifyDepartment: !!res.notifyDepartment ? (res.notifyDepartment.split(',') || []).map(c => +c) : []
+        };
+
+        this.listInvoice.form.patchValue(this.utility.mergeObject({ ...res }, formMapping));
+
+        this._store.dispatch(ResetInvoiceList());
+        this._store.dispatch(SelectReceiptClass({ class: res.class }));
+        this._store.dispatch(GetInvoiceListSuccess({ invoices: [...res.payments.filter((x: ReceiptInvoiceModel) => !x.negative)] }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
     }
 
@@ -531,7 +575,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             return;
         }
         if (res.error?.code == 408) {
-            this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true });
+            this.listInvoice.cusAdvanceAmountVnd.setErrors({ validCus: true }); //? Adv vượt quá số tiền trên agreement.
             return;
         }
         if (res.error?.code == 407) {

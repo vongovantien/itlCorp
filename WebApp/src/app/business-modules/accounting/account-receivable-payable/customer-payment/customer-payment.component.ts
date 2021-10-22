@@ -337,6 +337,11 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     confirmCopyReceipt() {
+        if (!this.selectedReceipt) {
+            return;
+        }
+        const currentReceipt = Object.assign({}, this.selectedReceipt);
+
         const confirmMessage = `Are you sure you want to copy ${this.selectedReceipt.paymentRefNo} turn into new receipt?`;
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
             title: 'Copy receipt',
@@ -345,7 +350,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             labelConfirm: 'Yes',
             center: true
         }, () => {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/customer/new`]);
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'copy' } });
         });
     }
 

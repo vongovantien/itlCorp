@@ -205,7 +205,9 @@ namespace eFMS.API.Accounting.Controllers
 
             if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
             {
-                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
+                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId 
+                && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL 
+                && x.PaymentMethod == AccountingConstants.PAYMENT_METHOD_MANAGEMENT_FEE);
                 if(isExisted == true)
                 {
                     string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;

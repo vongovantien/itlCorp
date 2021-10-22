@@ -69,6 +69,9 @@
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_CASH = "Clear-Advance-Cash";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_BANK = "Clear-Advance-Bank";
         public static readonly string PAYMENT_METHOD_COLL_INTERNAL = "COLL - Internal";
+        public static readonly string PAYMENT_METHOD_MANAGEMENT_FEE = "Management Fee";
+        public static readonly string PAYMENT_METHOD_OTHER_FEE = "Other Fee";
+
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
