@@ -4335,7 +4335,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _requester = userBaseService.GetEmployeeByEmployeeId(requesterId);
             var requesterName = _requester?.EmployeeNameEn;
             var emailRequester = _requester?.Email;
-            var partnerName = catPartnerRepo.Get(x => x.Id == settlement.Payee).FirstOrDefault().PartnerNameVn;
+            var partnerName = catPartnerRepo.Get(x => x.Id == settlement.Payee).FirstOrDefault()?.PartnerNameVn;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
@@ -4365,12 +4365,12 @@ namespace eFMS.API.Accounting.DL.Services
                                             "</p>" +
                                             "<ul>" +
                                                 "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+                                                "<li>Payee/ <i>Đối tượng thanh toán</i> : <b>[Payee]</b></li>" +
                                                 "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
                                                 "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
                                                 "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
                                                 "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
                                                 "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
-                                                "<li>Payee/ <i>Đối tượng thanh toán</i> : <b>[Payee]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
                                                 "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]' target='_blank'>Detail Payment Request</a> </span></div>" +
