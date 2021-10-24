@@ -572,7 +572,7 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     string _settleCode = surchargeAdvanceNo.SettlementCode;
                     var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
-                    if (data != null)
+                    if (data != null && data.IsDeny==false)
                     {
                         item.SettleDate = data.RequesterAprDate;
                     }
