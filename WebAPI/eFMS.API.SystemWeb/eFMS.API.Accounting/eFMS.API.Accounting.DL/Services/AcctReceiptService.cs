@@ -828,6 +828,15 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 result.SubRejectReceipt = receipt.SyncStatus != "Rejected" ? " - Rejected(" + totalRejectReceiptSync + ")" : string.Empty;
             }
+
+            if(result.ReferenceId != null)
+            {
+                AcctReceipt receiptRef = DataContext.Get(x => x.Id == result.ReferenceId)?.FirstOrDefault();
+                if(receiptRef != null)
+                {
+                    result.ReferenceNo = receiptRef.PaymentRefNo + "_" + receiptRef.Class;
+                }
+            }
             return result;
         }
 
