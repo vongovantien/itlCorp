@@ -141,49 +141,95 @@
                 <div class="div-inside bg-secondary">
                     <div class="m-form m-form--state">
                         <div class="row">
+                            <div class="col-lg-5">
+                                <div class="form-group">
+                                    <label>Total USD</label>
+                                    <span style="color:rgb(0, 140, 255);">{{total.totalUSDStr}}</span>
+                                </div>
+                            </div>
                             <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label>Total VND</label>
+                                    <span type="text" style="color:green">{{totalAmountVnd}}</span>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Total Shipment/Charge:</label>
+                                    <span type="text" style="color:rgb(23, 94, 122)">{{total.totalShipment}}/{{total.totalCharges}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-5">
                                 <div class="form-group">
                                     <label>Exchange Update</label>
                                     <div class="row">
                                         <!-- <div class="col-lg-5"> -->
                                         <div class="col-lg-7" style="padding-right: 0;">
-                                            <input type="text" class="form-control m-input m-input--square" autocomplete="nope" placeholder="Search text"
-                                                [(ngModel)]="exchangeRateInput" autoFormatCurrency (change)="exchangeRateInput = exchangeRateInput <= 0 ? 1 : exchangeRateInput">
+                                            <input type="text" class="form-control m-input m-input--square" autocomplete="nope"
+                                                placeholder="Search text" [(ngModel)]="exchangeRateInput" autoFormatCurrency
+                                                (change)="exchangeRateInput = exchangeRateInput <= 0 ? 1 : exchangeRateInput">
                                         </div>
                                         <div class="col-lg-5">
-                                            <button
-                                                class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
+                                            <button class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only m--margin-left-10"
                                                 title="Update exchange rate to charges" (click)="updateExchangeRateForCharges()">
                                                 <i class="la la-calculator"></i>
                                             </button>
-                                            <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--icon-only" (click)="resetUpdateExchangeRateForCharges()" 
-                                                title=" Reset update exchange rate">
+                                            <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--icon-only"
+                                                (click)="resetUpdateExchangeRateForCharges()" title=" Reset update exchange rate">
                                                 <i class="la la-refresh" style="color: green; font-weight: 900;"></i>
-                                        </button>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Total amount USD</label><br />
-                                    <p style="color:rgb(0, 140, 255);">{{total.totalUSDStr}}</p>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Total amount VND</label><br />
-                                    <span type="text" style="color:green">{{totalAmountVnd}}</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-2">
-                                <div class="form-group">
-                                    <label>Total Shipment/Charge:</label><br />
-                                    <span type="text" style="color:rgb(23, 94, 122)">{{total.totalShipment}}/{{total.totalCharges}}</span>
+                            <div class="col-lg-7">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div class="form-group"
+                                        [ngClass]="{'m-form__group has-danger': confirmInvoice && !this.invoiceNoAll}">
+                                            <label>Invoice No</label>
+                                            <input type="text" class="form-control m-input m-input--square" autocomplete="nope" placeholder="Inv No"
+                                                [(ngModel)]="invoiceNoAll">
+                                        </div>
+                                    </div>
+                            
+                                    <div class="col-lg-5" [formGroup]="formSearch">
+                                        <div class="form-group" [ngClass]="{'m-form__group has-danger': confirmInvoice && (!this.invoiceDateAll.value || !this.invoiceDateAll.value.startDate)}">
+                                            <label>Invoice Date</label>
+                                            <div class="row">
+                                                <div class="col-lg-8"
+                                                >
+                                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                                        <input type="text" class="form-control m-input m-input--square" ngxDaterangepickerMd
+                                                            [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true" [singleDatePicker]="true"
+                                                            [alwaysShowCalendars]="true" name="daterange" placeholder="Select Service Date" readonly
+                                                            formControlName="invoiceDateAll" (remove)="resetInvoiceDateAll()" calendar
+                                                            [allowRemove]="!!invoiceDateAll.value && !!invoiceDateAll.value.startDate" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-4">
+                                                    <button class="btn btn-success btn-sm m-btn--pill m-btn--icon m-btn--icon-only"
+                                                        title="Apply inoice no/date" (click)="onChangeAllInvoice()">
+                                                        <i class="la la-arrow-circle-down"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-default m-btn--pill m-btn--icon m-btn--icon-only"
+                                                        (click)="onResetInvoice()" title="Clear invoice">
+                                                        <i class="la la-close"></i>
+                                                    </button>
+                                                </div>
+                            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
                 <!-- session 2 -->
