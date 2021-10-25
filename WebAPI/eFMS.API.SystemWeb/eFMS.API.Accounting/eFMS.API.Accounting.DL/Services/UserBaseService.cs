@@ -315,5 +315,18 @@ namespace eFMS.API.Accounting.DL.Services
             }
             return result;
         }
+
+        /// <summary>
+        /// Get Department of user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<int?> GetDepartmentUser(Guid? companyId, Guid? officeId, string userId)
+        {
+            var deptAccountants = catDepartmentRepo.Get(s => s.DeptType == AccountingConstants.DeptTypeAccountant).Select(s => s.Id).ToList();
+            var result = sysUserLevelRepo.Get(x => x.UserId == userId && x.CompanyId == companyId && x.OfficeId == officeId && deptAccountants.Any(z => z == x.DepartmentId))
+                                                    .Select(s => s.DepartmentId).ToList();
+            return result;
+        }
     }
 }

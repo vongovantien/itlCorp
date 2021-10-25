@@ -33,6 +33,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
     personInCharge: AbstractControl;
     exchangeRateInput: number = 0;
     totalAmountVnd: string = '';
+    invoiceNoAll: string = null;
+    invoiceDateAll: AbstractControl;
+    confirmInvoice = false;
 
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
@@ -227,12 +230,14 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
             referenceNo: [this.referenceNos[0].value, Validators.required],
             serviceDate: [],
             personInCharge: [],
+            invoiceDateAll: []
         });
 
         this.referenceInput = this.formSearch.controls['referenceInput'];
         this.referenceNo = this.formSearch.controls['referenceNo'];
         this.serviceDate = this.formSearch.controls['serviceDate'];
         this.personInCharge = this.formSearch.controls['personInCharge'];
+        this.invoiceDateAll = this.formSearch.controls['invoiceDateAll'];
         this.selectedPartnerData = null;
     }
 
@@ -460,6 +465,31 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         }else{
             chargeItem.vatPartnerId = null;
             chargeItem.vatPartnerShortName = null;
+        }
+    }
+
+    onChangeAllInvoice() {
+        this.confirmInvoice = true;
+        let validInvNo = false, validInvDate = false;
+        if (!!this.invoiceNoAll) {
+            validInvNo = true;
+        }
+        if (!!this.invoiceDateAll.value && !!this.invoiceDateAll.value.startDate) {
+            validInvDate = true;
+        }
+        if (validInvNo && validInvDate) {
+            this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+                shipment.chargeSettlements.forEach((charge: Surcharge) => {
+                    if (charge.isSelected) {
+                        charge.invoiceNo = !validInvNo ? charge.invoiceNo : this.invoiceNoAll;
+                        charge.invoiceDate = validInvDate ? formatDate(new Date(this.invoiceDateAll.value.startDate), 'dd/MM/yyyy', 'en') : charge.invoiceDate;
+                        if (validInvNo) {
+                            this.onChangeInvoiceNo(charge, charge.invoiceNo);
+                        }
+                    }
+                })
+            });
+            this.confirmInvoice = false;
         }
     }
 
@@ -739,6 +769,9 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.serviceDate.setValue(null);
         this.personInCharge.setValue(null);
         this.resetFormShipmentInput();
+        this.confirmInvoice = false;
+        this.invoiceNoAll = null;
+        this.resetInvoiceDateAll();
     }
 
     resetPartner() {
@@ -756,6 +789,25 @@ export class SettlementExistingChargePopupComponent extends PopupBase {
         this.referenceNo.setValue(this.referenceNos[0].value);
         this.referenceInput.setValue(null);
         this.selectedServices = (this.initService || []).map((item: CommonInterface.IValueDisplay) => ({ id: item.value, text: item.displayName }));
+    }
+
+    resetInvoiceDateAll(){
+        this.invoiceDateAll.setValue(null);
+    }
+
+    onResetInvoice(){
+        this.confirmInvoice = false;
+        this.invoiceNoAll = null;
+        this.resetInvoiceDateAll();
+        this.shipments.forEach((shipment: ShipmentChargeSettlement) => {
+            shipment.chargeSettlements.forEach((charge: Surcharge) => {
+                if (charge.isSelected) {
+                    charge.invoiceNo =  this.invoiceNoAll;
+                    charge.invoiceDate = null;
+                    this.onChangeInvoiceNo(charge, charge.invoiceNo);
+                }
+            })
+        });
     }
 }
 export interface ISearchExistsChargeSettlePayment {

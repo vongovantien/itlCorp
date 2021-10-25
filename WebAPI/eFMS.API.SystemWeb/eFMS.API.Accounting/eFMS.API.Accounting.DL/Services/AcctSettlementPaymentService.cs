@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -62,6 +63,8 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<SysNotifications> sysNotificationRepository;
         private readonly IContextBase<SysUserNotification> sysUserNotificationRepository;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
+        private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
         private string typeApproval = "Settlement";
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -97,6 +100,8 @@ namespace eFMS.API.Accounting.DL.Services
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysNotifications> sysNotificationRepo,
             IContextBase<SysUserNotification> sysUserNotificationRepo,
+            IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
+            IContextBase<SysEmailSetting> sysEmailSettingRepo,
             IUserBaseService userBase) : base(repository, mapper)
         {
             currentUser = user;
@@ -130,6 +135,8 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             sysNotificationRepository = sysNotificationRepo;
             sysUserNotificationRepository = sysUserNotificationRepo;
+            sysEmailTemplateRepository = sysEmailTemplateRepo;
+            sysEmailSettingRepository = sysEmailSettingRepo;
         }
 
         #region --- LIST & PAGING SETTLEMENT PAYMENT ---
@@ -2905,21 +2912,6 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        var sendMailApproved = true;
-                        var sendMailSuggest = true;
-                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                        {
-                            //Send Mail Approved
-                            sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
-                            //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
-                            acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
-                        }
-                        else
-                        {
-                            //Send Mail Suggest
-                            sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
-                        }
-
                         var checkExistsApproveBySettlementNo = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementApprove.SettlementNo && x.IsDeny == false).FirstOrDefault();
                         if (checkExistsApproveBySettlementNo == null) //Insert ApproveSettlement
                         {
@@ -2940,18 +2932,35 @@ namespace eFMS.API.Accounting.DL.Services
                             var hsUpdateApprove = acctApproveSettlementRepo.Update(checkExistsApproveBySettlementNo, x => x.Id == checkExistsApproveBySettlementNo.Id, false);
                         }
 
-                        acctApproveSettlementRepo.SubmitChanges();
+                        var hs = acctApproveSettlementRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
 
-                        // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
-                        if (!sendMailSuggest)
+                        var sendMailApproved = true;
+                        var sendMailSuggest = true;
+                        if (hs.Success) // Send mail when success update
                         {
-                            return new HandleState("Send mail suggest approval failed");
-                        }
-                        if (!sendMailApproved)
-                        {
-                            return new HandleState("Send mail approved approval failed");
+                            if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            {
+                                //Send Mail Approved
+                                sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
+                                //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
+                                acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
+                            }
+                            else
+                            {
+                                //Send Mail Suggest
+                                sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
+                            }
+
+                            if (!sendMailSuggest)
+                            {
+                                return new HandleState("Send mail suggest approval failed");
+                            }
+                            if (!sendMailApproved)
+                            {
+                                return new HandleState("Send mail approved approval failed");
+                            }
                         }
                         return new HandleState();
                     }
@@ -3263,21 +3272,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    var sendMailApproved = true;
-                    var sendMailSuggest = true;
-
-                    if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                    {
-                        //Send Mail Approved
-                        sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
-                        //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
-                        acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
-                    }
-                    else
-                    {
-                        //Send Mail Suggest
-                        sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
-                    }
+                    
 
                     settlementPayment.UserModified = approve.UserModified = userCurrent;
                     settlementPayment.DatetimeModified = approve.DateModified = DateTime.Now;
@@ -3285,18 +3280,35 @@ namespace eFMS.API.Accounting.DL.Services
                     var hsUpdateSettlementPayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id, false);
                     var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
 
-                    acctApproveSettlementRepo.SubmitChanges();
+                    var hs = acctApproveSettlementRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
 
-                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
-                    if (!sendMailSuggest)
+                    var sendMailApproved = true;
+                    var sendMailSuggest = true;
+                    if (hs.Success) // Send mail when success update
                     {
-                        return new HandleState("Send mail suggest approval failed");
-                    }
-                    if (!sendMailApproved)
-                    {
-                        return new HandleState("Send mail approved approval failed");
+                        if (settlementPayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            //Send Mail Approved
+                            sendMailApproved = SendMailApproved(settlementPayment.SettlementNo, DateTime.Now);
+                            //Update Status Payment of Advance Request by Settlement Code [17-11-2020]
+                            acctAdvancePaymentService.UpdateStatusPaymentOfAdvanceRequest(settlementPayment.SettlementNo);
+                        }
+                        else
+                        {
+                            //Send Mail Suggest
+                            sendMailSuggest = SendMailSuggestApproval(settlementPayment.SettlementNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
+                        }
+                        // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail approved approval failed");
+                        }
                     }
                     return new HandleState();
                 }
@@ -3459,15 +3471,17 @@ namespace eFMS.API.Accounting.DL.Services
                     var hsUpdateSettlementPayment = DataContext.Update(settlementPayment, x => x.Id == settlementPayment.Id, false);
                     var hsUpdateApprove = acctApproveSettlementRepo.Update(approve, x => x.Id == approve.Id, false);
 
-                    acctApproveSettlementRepo.SubmitChanges();
+                    var hs = acctApproveSettlementRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
 
-                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
-                    var sendMailDeny = SendMailDeniedApproval(settlementPayment.SettlementNo, comment, DateTime.Now);
-                    if (!sendMailDeny)
+                    if (hs.Success) // Send mail when success update
                     {
-                        return new HandleState("Send mail denied failed");
+                        var sendMailDeny = SendMailDeniedApproval(settlementPayment.SettlementNo, comment, DateTime.Now);
+                        if (!sendMailDeny)
+                        {
+                            return new HandleState("Send mail denied failed");
+                        }
                     }
                     return new HandleState();
                 }
@@ -3637,12 +3651,25 @@ namespace eFMS.API.Accounting.DL.Services
             var employeeIdOfAccountant = userBaseService.GetEmployeeIdOfUser(userAccountant);
 
             var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
-            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            //var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
 
             result.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
             result.Role = roleAccountant;
             result.UserId = userAccountant;
             result.UserDeputies = userDeputies;
+
+            // Get email setting accountant
+            var deptAccountants = userBaseService.GetDepartmentUser(companyId, officeId, userAccountant).FirstOrDefault();
+            var emailSetting = deptAccountants == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == "Approve Settlement" && deptAccountants == x.DeptId).FirstOrDefault()?.EmailInfo;
+            var emailDeputies = new List<string>();
+            if (emailSetting != null)
+            {
+                emailDeputies = emailSetting.Split(";").ToList();
+            }
+            else
+            {
+                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault().Email?.Split(";").ToList();
+            }
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
             result.EmailDeputies = emailDeputies;
 
@@ -4192,19 +4219,9 @@ namespace eFMS.API.Accounting.DL.Services
         //Send Mail đề nghị Approve
         private bool SendMailSuggestApproval(string settlementNo, string userReciver, string emailUserReciver, List<string> emailUsersDeputy)
         {
-            //var surcharges = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
-
             //Lấy ra SettlementPayment dựa vào SettlementNo
             var settlement = DataContext.Get(x => x.SettlementNo == settlementNo).FirstOrDefault();
             if (settlement == null) return false;
-
-            //Quy đổi tỉ giá theo ngày Request Date
-            /*var currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == settlement.RequestDate.Value.Date).ToList();
-            if (currencyExchange.Count == 0)
-            {
-                DateTime? maxDateCreated = catCurrencyExchangeRepo.Get().Max(s => s.DatetimeCreated);
-                currencyExchange = catCurrencyExchangeRepo.Get(x => x.DatetimeCreated.Value.Date == maxDateCreated.Value.Date).ToList();
-            }*/
 
             //Lấy ra tên & email của user Requester
             var requesterId = userBaseService.GetEmployeeIdOfUser(settlement.Requester);
@@ -4216,11 +4233,6 @@ namespace eFMS.API.Accounting.DL.Services
             var listJobId = GetJobIdBySettlementNo(settlementNo);
             string jobIds = string.Empty;
             jobIds = String.Join("; ", listJobId.ToList());
-
-            /*var totalAmount = surcharges
-                .Where(x => x.SettlementCode == settlementNo)
-                .Sum(x => x.Total * currencyExchangeService.GetRateCurrencyExchange(currencyExchange, x.CurrencyId, settlement.SettlementCurrency));
-            totalAmount = NumberHelper.RoundNumber(totalAmount, 2);*/
 
             decimal totalAmount = settlement.Amount ?? 0; //19-04-2021 - Andy
 
@@ -4235,42 +4247,66 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             var numberOfRequest = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlement.SettlementNo).Select(s => s.Id).Count();
             numberOfRequest = numberOfRequest == 0 ? 1 : (numberOfRequest + 1);
-            string subject = "eFMS - Settlement Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
-            subject = subject.Replace("[RequesterName]", requesterName);
-            subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
-                                            "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
-                                            "<p>" +
-                                                "<div>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
-                                                "<div><i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
-                                            "</p>" +
-                                            "<ul>" +
-                                                "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
-                                                "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
-                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
-                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
-                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
-                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
-                                            "</ul>" +
-                                            "<p>" +
-                                                "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></div>" +
-                                                "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></div>" +
-                                            "</p>" +
-                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
-                                         "</div>");
-            body = body.Replace("[UserName]", userReciverName);
-            body = body.Replace("[RequesterName]", requesterName);
-            body = body.Replace("[SettlementNo]", settlementNo);
-            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
-            body = body.Replace("[CurrencySettlement]", settlement.SettlementCurrency);
-            body = body.Replace("[AdvanceNos]", advanceNos);
-            body = body.Replace("[JobIds]", jobIds);
-            body = body.Replace("[RequestDate]", settlement.RequestDate.Value.ToString("dd/MM/yyyy"));
-            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
-            body = body.Replace("[lang]", "en");
-            body = body.Replace("[UrlFunc]", "#/home/accounting/settlement-payment");
-            body = body.Replace("[SettlementId]", settlement.Id.ToString());
-            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #region Old Template
+            //string subject = "eFMS - Settlement Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
+            //subject = subject.Replace("[RequesterName]", requesterName);
+            //subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
+            //string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+            //                                "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
+            //                                "<p>" +
+            //                                    "<div>You have new Settlement Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
+            //                                    "<div><i>Anh/ Chị có một yêu cầu duyệt thanh toán từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
+            //                                "</p>" +
+            //                                "<ul>" +
+            //                                    "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+            //                                    "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
+            //                                    "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
+            //                                    "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+            //                                    "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+            //                                    "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+            //                                "</ul>" +
+            //                                "<p>" +
+            //                                    "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Detail Payment Request</a> </span></div>" +
+            //                                    "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[SettlementId]/approve' target='_blank'>Chi tiết phiếu đề nghị thanh toán</a> </span> </i></div>" +
+            //                                "</p>" +
+            //                                "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+            //                             "</div>");
+            //body = body.Replace("[UserName]", userReciverName);
+            //body = body.Replace("[RequesterName]", requesterName);
+            //body = body.Replace("[SettlementNo]", settlementNo);
+            //body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
+            //body = body.Replace("[CurrencySettlement]", settlement.SettlementCurrency);
+            //body = body.Replace("[AdvanceNos]", advanceNos);
+            //body = body.Replace("[JobIds]", jobIds);
+            //body = body.Replace("[RequestDate]", settlement.RequestDate.Value.ToString("dd/MM/yyyy"));
+            //body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            //body = body.Replace("[lang]", "en");
+            //body = body.Replace("[UrlFunc]", "#/home/accounting/settlement-payment");
+            //body = body.Replace("[SettlementId]", settlement.Id.ToString());
+            //body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #endregion
+
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "SETTLE-SUGGEST-APPROVE")?.FirstOrDefault();
+            // Subject
+            var subject = new StringBuilder(emailTemplate.Subject);
+            subject.Replace("{{RequesterName}}", requesterName);
+            subject.Replace("{{NumberOfRequest}}", numberOfRequest.ToString() + (numberOfRequest > 1 ? " times" : " time"));
+
+            // Body
+            var body = new StringBuilder(emailTemplate.Body);
+            body = body.Replace("{{UserName}}", userReciverName);
+            body = body.Replace("{{RequesterName}}", requesterName);
+            body = body.Replace("{{SettlementNo}}", settlementNo);
+            body = body.Replace("{{TotalAmount}}", string.Format("{0:n}", totalAmount));
+            body = body.Replace("{{CurrencySettlement}}", settlement.SettlementCurrency);
+            body = body.Replace("{{AdvanceNos}}", advanceNos);
+            body = body.Replace("{{JobIds}}", jobIds);
+            body = body.Replace("{{RequestDate}}", settlement.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/settlement-payment/" + settlement.Id.ToString() + "/approve");
+            body = body.Replace("{{LogoEFMS}}", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
+
             List<string> toEmails = new List<string> {
                 emailUserReciver
             };
@@ -4293,7 +4329,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            var sendMailResult = SendMail.Send(subject.ToString(), body.ToString(), toEmails, attachments, emailCCs);
 
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
@@ -4301,10 +4337,10 @@ namespace eFMS.API.Accounting.DL.Services
                 SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
-                Subject = subject,
+                Subject = subject.ToString(),
                 Sent = sendMailResult,
                 SentDateTime = DateTime.Now,
-                Body = body
+                Body = body.ToString()
             };
             var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
             var hsSm = sentEmailHistoryRepo.SubmitChanges();
@@ -5559,13 +5595,17 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null, string settlementNo = null)
         {
-            var advanceNo = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => x.AdvanceNo).Distinct().ToList();
+            var advanceNoLst = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => new { x.JobId, x.AdvanceNo }).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
+            var advanceNo = new List<string>();
             // Check if adv existed in another settlement
-            var advanceExp = csShipmentSurchargeRepo.Get(x => advanceNo.Any(ad => ad == x.AdvanceNo) && !string.IsNullOrEmpty(x.SettlementCode) && (x.SettlementCode != settlementNo || string.IsNullOrEmpty(settlementNo))).Select(x => x.AdvanceNo).ToList();
-            if (advanceExp?.Count() != 0)
+            foreach (var item in advanceNoLst)
             {
-                advanceNo = advanceNo.Where(x => !advanceExp.Contains(x)).ToList();
+                var advanceExp = csShipmentSurchargeRepo.Any(x => item.AdvanceNo == x.AdvanceNo && item.JobId == x.JobNo && !string.IsNullOrEmpty(x.SettlementCode) && (x.SettlementCode != settlementNo || string.IsNullOrEmpty(settlementNo)));
+                if (!advanceExp)
+                {
+                    advanceNo.Add(item.AdvanceNo);
+                }
             }
 
             if (string.IsNullOrEmpty(payeeId))
