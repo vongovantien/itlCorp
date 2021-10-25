@@ -4335,6 +4335,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _requester = userBaseService.GetEmployeeByEmployeeId(requesterId);
             var requesterName = _requester?.EmployeeNameEn;
             var emailRequester = _requester?.Email;
+            var partnerName = catPartnerRepo.Get(x => x.Id == settlement.Payee).FirstOrDefault()?.PartnerNameVn;
 
             //Lấy ra thông tin JobId dựa vào SettlementNo
             var listJobId = GetJobIdBySettlementNo(settlementNo);
@@ -4364,6 +4365,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             "</p>" +
                                             "<ul>" +
                                                 "<li>Settlement No / <i>Mã đề nghị thanh toán</i> : <b>[SettlementNo]</b></li>" +
+                                                "<li>Payee/ <i>Đối tượng thanh toán</i> : <b>[Payee]</b></li>" +
                                                 "<li>Settlement Amount/ <i>Số tiền thanh toán</i> : <b>[TotalAmount] [CurrencySettlement]</b></li>" +
                                                 "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNos]</b></li>" +
                                                 "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
@@ -4389,6 +4391,8 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[UrlFunc]", "#/home/accounting/settlement-payment");
             body = body.Replace("[SettlementId]", settlement.Id.ToString());
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            body = body.Replace("[RequesterName]", requesterName);
+            body = body.Replace("[Payee]", partnerName);
             List<string> toEmails = new List<string> {
                 emailRequester
             };
@@ -4794,7 +4798,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.Soano).FirstOrDefault();
+            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
 
             var infoSettlement = new InfoSettlementExport
             {
