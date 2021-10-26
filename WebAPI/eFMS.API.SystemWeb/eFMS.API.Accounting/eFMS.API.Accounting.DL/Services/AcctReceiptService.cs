@@ -496,29 +496,34 @@ namespace eFMS.API.Accounting.DL.Services
                 return "PT" + DateTime.Now.ToString("YY") + "00001";
             }
             string receiptNo = prefix; // default
+
             string pattern = @"^(" + prefix + ")";
             pattern += @"\d{3}\/\d{2}$";
             Regex regex = new Regex(pattern);
+
             IQueryable<AcctReceipt> acctReceipts = DataContext.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) && regex.IsMatch(x.PaymentRefNo)).OrderByDescending(x => x.DatetimeCreated);
             if (acctReceipts.Count() > 0)
             {
-                AcctReceipt receiptNewest = acctReceipts.First();
-                string subStringToSlash = receiptNewest.PaymentRefNo.Substring(0, receiptNewest.PaymentRefNo.Length - 3); // remove /MM
+                var receiptRefNoOrder = acctReceipts.Select(x => new { x.PaymentDate, Order = int.Parse(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - 3)
+                    .Substring(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - 3).Length - 3, 3))
+                }); // remove /MM
+                int listRefNoOrderedMax = receiptRefNoOrder.Select(a => a.Order).Max();
+                var orderReceiptNewest = receiptRefNoOrder.First(x => x.Order == listRefNoOrderedMax);
+            
 
-                int orderReceiptNewest = int.Parse(subStringToSlash.Substring(subStringToSlash.Length - 3, 3));
-
-                if (receiptNewest.PaymentDate?.ToString("MM") == receipt.PaymentDate?.ToString("MM"))
+                if (orderReceiptNewest.PaymentDate?.ToString("MM") == receipt.PaymentDate?.ToString("MM") 
+                    || orderReceiptNewest.PaymentDate?.ToString("MM") == DateTime.Now.ToString("MM"))
                 {
-                    receiptNo = string.Format(@"{0}{1}/{2}", prefix, (orderReceiptNewest + 1).ToString("000"), receipt.PaymentDate?.ToString("MM"));
+                    receiptNo = string.Format(@"{0}{1}/{2}", prefix, (listRefNoOrderedMax + 1).ToString("000"), receipt.PaymentDate?.ToString("MM"));
                 }
-                else // qua tháng
+                else // next tháng
                 {
-                    receiptNo = string.Format(@"{0}{1}/{2}", prefix, "001", receipt.PaymentDate?.ToString("MM"));
+                    receiptNo = string.Format(@"{0}{1}/{2}", prefix, "001", receipt.PaymentDate.HasValue ? receipt.PaymentDate?.ToString("MM") : DateTime.Now.ToString("MM"));
                 }
             }
-            else
+            else 
             {
-                receiptNo = string.Format(@"{0}{1}/{2}", prefix, "001", receipt.PaymentDate?.ToString("MM"));
+                receiptNo = string.Format(@"{0}{1}/{2}", prefix, "001", receipt.PaymentDate.HasValue ? receipt.PaymentDate?.ToString("MM") : DateTime.Now.ToString("MM"));
             }
 
             return receiptNo;
