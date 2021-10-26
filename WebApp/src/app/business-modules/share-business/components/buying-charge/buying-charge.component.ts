@@ -534,7 +534,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         chargeItem.quantity = this.shipment.grossWeight;
                     } else {
-                        chargeItem.quantity = this.hbl.gw;
+                        chargeItem.quantity = this.hbl.gw | this.hbl.grossWeight;
                     }
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.grossWeight;
@@ -586,7 +586,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     if (this.TYPE === CommonEnum.SurchargeTypeEnum.BUYING_RATE) {
                         chargeItem.quantity = this.shipment.chargeWeight;
                     } else {
-                        chargeItem.quantity = this.hbl.cw;
+                        chargeItem.quantity = this.hbl.cw | this.hbl.chargeWeight;
                     }
                 } else if (this.service === 'logistic') {
                     chargeItem.quantity = this.shipment.chargeWeight;
