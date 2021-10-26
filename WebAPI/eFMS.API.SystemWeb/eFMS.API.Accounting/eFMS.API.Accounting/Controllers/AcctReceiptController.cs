@@ -173,7 +173,7 @@ namespace eFMS.API.Accounting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            if (receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_CASH && !ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            if (!string.IsNullOrEmpty(receiptModel.PaymentRefNo) && !ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
             {
                 string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
                 var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
