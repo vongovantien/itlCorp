@@ -267,28 +267,31 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         ) {
             valid = false;
-        }
-        if (this.formCreate.class.value?.includes('OBH') ||
-            (
-                this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
-                && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL
-            )) {
-            if (!this.listInvoice.obhpartnerId.value) {
-                this.listInvoice.obhpartnerId.setErrors({ required: true });
-                valid = false;
-            } else {
-                this.removeValidators(this.listInvoice.obhpartnerId);
-
-                valid = true;
-            }
-        }
-
-        if (this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH && !this.formCreate.paymentRefNo.value) {
-            this.formCreate.paymentRefNo.setErrors({ required: true });
-            valid = false;
         } else {
-            this.removeValidators(this.formCreate.paymentRefNo);
-            valid = true;
+            if (this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH) {
+                if (!this.formCreate.paymentRefNo.value) {
+                    this.formCreate.paymentRefNo.setErrors({ required: true });
+                    valid = false;
+                } else {
+                    this.removeValidators(this.formCreate.paymentRefNo);
+                    valid = true;
+                }
+            }
+            if (this.formCreate.class.value?.includes('OBH') ||
+                (
+                    this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
+                    && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL
+                )) {
+                if (!this.listInvoice.obhpartnerId.value) {
+                    this.listInvoice.obhpartnerId.setErrors({ required: true });
+                    valid = false;
+                } else {
+                    this.removeValidators(this.listInvoice.obhpartnerId);
+
+                    valid = true;
+                }
+            }
+
         }
 
         return valid;
