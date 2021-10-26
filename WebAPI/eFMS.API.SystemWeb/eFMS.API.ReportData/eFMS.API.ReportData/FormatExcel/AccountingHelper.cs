@@ -126,13 +126,14 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Width = 20; //Cột E
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 14; //Cột G
-            workSheet.Column(8).Width = 18; //Cột H
+            workSheet.Column(8).Width = 23; //Cột H
             workSheet.Column(9).Width = 19; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(10).Width = 25; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
-            workSheet.Column(12).Width = 13; //Cột L
-            workSheet.Column(13).Width = 12; //Cột M
-            workSheet.Column(14).Width = 20; //Cột N
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 15; //Cột M
+            workSheet.Column(14).Width = 25; //Cột N
+            workSheet.Column(14).Width = 15; //Cột P
             workSheet.Column(16).Width = 30; //Cột P
         }
 
@@ -194,6 +195,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 9].Value = item.BankAccountNo;
                         worksheet.Cells[i + addressStartContent, 10].Value = item.BankAccountName;
+                        worksheet.Cells[i + addressStartContent, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 11].Value = item.BankName;
                         //
                         worksheet.Cells[i + addressStartContent, 12].Value = item.JobId;
@@ -201,7 +203,8 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
-                        worksheet.Cells[i + addressStartContent, 17].Value = item.ApproveDate;
+                        worksheet.Cells[i + addressStartContent, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                        worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
                         worksheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = "dd/MM/yyyy";
@@ -1157,6 +1160,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J10"].Style.Font.Bold = true;
             //workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
             workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.BankAccountName;
+            workSheet.Cells["K10"].Style.WrapText = true;
 
             workSheet.Cells["A8:B8"].Merge = true;
             workSheet.Cells["A8:B8"].Value = headers[42];
