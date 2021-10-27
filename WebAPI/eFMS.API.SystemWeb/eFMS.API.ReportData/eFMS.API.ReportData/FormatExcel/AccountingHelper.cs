@@ -5134,9 +5134,11 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 excel.StartDetailTable = 3;
                 //Set format amount
-                var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
-                var formatAmountUSD = "_([$USD] * #,##0.00_);_([$USD] * (#,##0.00);_([$USD] * \"\"??_);_(@_)";
-
+                var formatAmountVND = "_(#,##0_);";
+                var formatAmountUSD = "_(#,##0.00_);";
+                //var formatAmountVND = "#,##0";
+                //var formatAmountUSD = "#,##0.00";
+                var rowStart = 3;
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
@@ -5152,28 +5154,44 @@ namespace eFMS.API.ReportData.FormatExcel
                     if (item.AgreementCurrency == "VND")
                     {
                         listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
-                        excel.SetFormatCell(listKeyFormat, formatAmountVND);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountVND;
                     }
                     else
                     {
                         listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
-                        excel.SetFormatCell(listKeyFormat, formatAmountUSD);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountUSD;
                     }
               
 
@@ -5189,6 +5207,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("ParentPartner", item.ParentNameAbbr);
 
                     excel.SetData(listKeyData);
+                    rowStart++;
                 }
                 return excel.ExcelStream();
             }
