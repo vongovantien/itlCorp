@@ -1747,7 +1747,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.OfficeIds != null)
             {
                 var str = String.Join(",", criteria.OfficeIds);
-                res = res.Where(x => x.OfficeContract != null && x.OfficeContract.Contains(str)).ToList();
+                res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId)).ToList();
             }
 
             switch (criteria.OverDueDay)
