@@ -26,6 +26,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
     paymentRefNo: AbstractControl;
     obhpartnerId: AbstractControl;
     paymentDate: AbstractControl;
+    bankAccountNo: AbstractControl;
 
     paymentMethods: string[] = [
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CASH,
@@ -60,13 +61,15 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
             'paymentRefNo': [null, Validators.required],
             'paymentMethod': [],
             'obhpartnerId': [],
-            'paymentDate': []
+            'paymentDate': [],
+            bankAccountNo: []
         });
 
         this.paymentMethod = this.form.controls['paymentMethod'];
         this.paymentRefNo = this.form.controls['paymentRefNo'];
         this.obhpartnerId = this.form.controls['obhpartnerId'];
         this.paymentDate = this.form.controls['paymentDate'];
+        this.bankAccountNo = this.form.controls['bankAccountNo'];
 
         this.obhPartners = this._store.select(getCurrentUserState)
             .pipe(
@@ -94,6 +97,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
             paymentRefNo: valueForm.paymentRefNo,
             obhpartnerId: valueForm.obhpartnerId,
             paymentDate: !!valueForm.paymentDate.startDate ? formatDate(valueForm.paymentDate.startDate, 'yyyy-MM-dd', 'en') : null,
+            bankAccountNo: valueForm.bankAccountNo
         };
         console.log(body);
 
@@ -139,7 +143,7 @@ export interface IModelQuickUpdateReceipt {
     paymentRefNo: string;
     obhpartnerId: string;
     paymentDate: string;
-
+    bankAccountNo: string;
 }
 
 interface IGenerateReceiptV2 {

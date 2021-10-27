@@ -41,7 +41,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
 
-    @Input() syncInfoTemplate: TemplateRef<any>
+    @Input() syncInfoTemplate?: TemplateRef<any>
 
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
@@ -107,6 +107,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     obhPartners: Observable<Partner[]>;
     departments: Observable<any>;
     class$: Observable<string>;
+    obhPartnerName: string;
 
     constructor(
         private readonly _accountingRepo: AccountingRepo,

@@ -136,7 +136,7 @@
                             Partner</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'obhPartner')"
                             (remove)="resetFormControl(obhpartnerId)"
-                            [currentActiveItemId]="{field:'id', value: obhpartnerId.value}"
+                            [currentActiveItemId]="{field:'id', value: obhpartnerId.value, hardValue: obhPartnerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners | async"
                             [displayFields]="displayFieldsPartner" placeholder="Select OBH Partner"
                             [disabled]="isReadonly">

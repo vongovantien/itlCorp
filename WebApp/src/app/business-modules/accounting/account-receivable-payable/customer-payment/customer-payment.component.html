@@ -215,6 +215,11 @@
             <span><i class="la la-copy"></i><span> Copy receipt {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
+    <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt.class !== 'Clear Debit'">
+        <div class="menu-context__item" (click)="confirmCreateClearDebit()">
+            <span><i class="la la-copy"></i><span> Clear debit receipt {{selectedReceipt?.paymentRefNo}}</span></span>
+        </div>
+    </ng-container>
     <div class="menu-context__item">
         <span><i class="la la-print"></i><span>Print...</span></span>
     </div>
@@ -236,10 +241,13 @@
             <span><i class="la la-edit"></i><span> Update receipt no </span></span>
         </div>
         <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentDate')">
-            <span><i class="la la-calendar"></i><span>Update Payment Date</span></span>
+            <span><i class="la la-edit"></i><span>Update payment date</span></span>
         </div>
         <div class="menu-context__item" (click)="showQuickUpdatePopup('paymentMethod')">
             <span><i class="la la-edit"></i><span>Update payment method</span></span>
+        </div>
+        <div class="menu-context__item" (click)="showQuickUpdatePopup('bankAccountNo')">
+            <span><i class="la la-edit"></i><span>Update account no</span></span>
         </div>
         <div class="menu-context__item" (click)="showQuickUpdatePopup('obhpartnerId')">
             <span><i class="la la-edit"></i><span>Update OBH partner</span></span>

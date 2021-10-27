@@ -34,7 +34,7 @@
                 <label class="form-control-label">
                     Receipt Reference
                 </label>
-                <input type="text" formControlName="referenceNo" class="form-control">
+                <input type="text" formControlName="referenceNo" class="form-control text-primary">
             </div>
         </div>
         <div class="col-lg-3">
@@ -42,8 +42,8 @@
                 <label class="form-control-label">
                     Receipt No
                 </label>
-                <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
-                    [attr.disabled]="isReadonly">
+                <input type="text" class="form-control m-input m-input--square text-primary"
+                    formControlName="paymentRefNo" [attr.disabled]="isReadonly">
             </div>
         </div>
         <div class="col-lg-3">

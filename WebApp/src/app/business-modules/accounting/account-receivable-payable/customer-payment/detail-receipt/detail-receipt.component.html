@@ -12,11 +12,10 @@
                         </span>
                         {{receiptDetail?.type === 'Customer' ? 'Customer' : receiptDetail?.type}} Receipt Edit Detail
                         <span
-                            class="m-badge m-badge--{{(receiptDetail?.status === 'Draft' || receiptDetail?.status === 'Cancel') 
-                            && (!receiptDetail?.syncStatus || receiptDetail?.syncStatus !== 'Synced') ? (receiptDetail?.status === 'Cancel' ? 'dark': 'danger') : 'success'}} m-badge--wide">
-                            {{!receiptDetail?.syncStatus ? receiptDetail?.status : receiptDetail?.syncStatus}}
-                            {{receiptDetail?.subRejectReceipt}}
+                            class="m-badge m-badge--wide m-badge--{{receiptDetail?.status === 'Done' ? 'success' : (receiptDetail?.status ===  'cancel' ? 'muted' :'danger')}}">
+                            {{receiptDetail?.status}}
                         </span>
+
                     </h3>
                     <div>
                         <div class="c-button-actions">
@@ -98,7 +97,7 @@
             <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center"
                 *ngIf="!!receiptDetail.reasonReject">
                 <b>Reason reject:</b>
-                <span>{{receiptDetail?.reasonReject}}</span>
+                <span class="text-danger font-weight-bold">{{receiptDetail?.reasonReject}}</span>
             </li>
             <li class="border-0 pl-0 pr-0 list-group-item d-flex justify-content-between align-items-center">
                 <b>Last Sync:</b>

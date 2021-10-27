@@ -138,6 +138,7 @@ export class ReceiptModel extends Receipt {
     subRejectReceipt: string = null;
     isReceiptBankFee: boolean = false;
     receiptInternalOfficeCode: string = null;
+    obhPartnerName: string = null;
 
     constructor(object?: any) {
         super();

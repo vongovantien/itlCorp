@@ -14,6 +14,7 @@ namespace eFMS.API.Accounting.DL.Models
         public string SubRejectReceipt { get; set; }
         public bool IsReceiptBankFee { get; set; } 
         public string ReceiptInternalOfficeCode { get; set; }
+        public string ObhPartnerName { get; set; }
     }
 
     public enum SaveAction

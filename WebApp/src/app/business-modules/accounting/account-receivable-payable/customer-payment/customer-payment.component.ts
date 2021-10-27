@@ -13,7 +13,7 @@ import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
+import { LoadListCustomerPayment, ResetInvoiceList, RegistTypeReceipt } from "./store/actions";
 import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
 import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent, IModelQuickUpdateReceipt } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
@@ -240,6 +240,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             this.quickUpdatePopup.setValueForm('paymentRefNo', this.selectedReceipt['paymentRefNo']);
             this.quickUpdatePopup.setValueForm('paymentMethod', this.selectedReceipt['paymentMethod']);
             this.quickUpdatePopup.setValueForm('obhpartnerId', this.selectedReceipt['obhpartnerId']);
+            this.quickUpdatePopup.setValueForm('bankAccountNo', this.selectedReceipt['bankAccountNo']);
             this.quickUpdatePopup.setValueForm('paymentDate', !!this.selectedReceipt.paymentDate ? { startDate: new Date(this.selectedReceipt.paymentDate), endDate: new Date(this.selectedReceipt.paymentDate) } : null);
             this.quickUpdatePopup.receipt = Object.assign({}, this.selectedReceipt);
             this.quickUpdatePopup.show();
@@ -351,6 +352,26 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             center: true
         }, () => {
             this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'copy' } });
+        });
+    }
+
+    confirmCreateClearDebit() {
+        if (!this.selectedReceipt) {
+            return;
+        }
+        const currentReceipt = Object.assign({}, this.selectedReceipt);
+
+        const confirmMessage = `Are you sure you want to create Receipt Clear Debit for <span class="text-primary font-weight-bold">${this.selectedReceipt.customerName} </span>?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Create Receipt Clear Debit',
+            body: confirmMessage,
+            iconConfirm: 'la la-save',
+            labelConfirm: 'Yes',
+        }, () => {
+            this._store.dispatch(ResetInvoiceList());
+            this._store.dispatch(RegistTypeReceipt({ data: currentReceipt.type.toUpperCase() }));
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'debit' } });
+
         });
     }
 

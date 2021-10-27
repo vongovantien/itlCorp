@@ -38,6 +38,13 @@
                                 </ng-select>
                             </div>
                         </ng-container>
+                        <ng-container *ngIf="updateKey === 'bankAccountNo'">
+                            <div class="form-group">
+                                <label for="">Bank Account No</label>
+                                <input type="text" class="form-control" placeholder="123xxxx (VND)"
+                                    formControlName="bankAccountNo">
+                            </div>
+                        </ng-container>
 
                         <ng-container *ngIf="updateKey === 'obhpartnerId'">
                             <div class="form-group">

@@ -842,6 +842,13 @@ namespace eFMS.API.Accounting.DL.Services
                     result.ReferenceNo = receiptRef.PaymentRefNo + "_" + receiptRef.Class;
                 }
             }
+
+            if (result.ObhpartnerId != null)
+            {
+                CatPartner obhP = catPartnerRepository.Get(x => x.Id == result.ObhpartnerId.ToString())?.FirstOrDefault();
+
+                result.ObhPartnerName = obhP?.ShortName;
+            }
             return result;
         }
 
@@ -3801,6 +3808,10 @@ namespace eFMS.API.Accounting.DL.Services
             if (!string.IsNullOrEmpty(model.PaymentRefNo))
             {
                 receiptCurrent.PaymentRefNo = model.PaymentRefNo;
+            }
+            if (!string.IsNullOrEmpty(model.BankAccountNo))
+            {
+                receiptCurrent.BankAccountNo = model.BankAccountNo;
             }
             receiptCurrent.ObhpartnerId = model.OBHPartnerId;
             receiptCurrent.PaymentDate = model.PaymentDate;
