@@ -941,15 +941,22 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 if (criteria.AgreeActive != null)
                 {
-                    return MappingQueryAgreementInfo(data, criteria.AgreeActive);
+                    if(criteria.PartnerType== DataEnums.PARTNER_TYPE_CUSTOMER)
+                    {
+                        return MappingQueryAgreementInfo(data, criteria.AgreeActive, DataEnums.PARTNER_TYPE_CUSTOMER);
+                    }
+                    else
+                    {
+                        return MappingQueryAgreementInfo(data, criteria.AgreeActive, DataEnums.PARTNER_TYPE_AGENT);
+                    }
                 }
-                return MappingQueryAgreementInfo(data,null);
+                return MappingQueryAgreementInfo(data,null,null);
             }
 
             return null;
         }
 
-        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive)
+        public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive, string partnerType)
         {
             var contract = contractRepository.Get();
             var sysUSer = sysUserRepository.Get();
@@ -961,7 +968,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         from g1 in grpUs1.DefaultIfEmpty()
                         join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
                         from g2 in grpUs2.DefaultIfEmpty()
-                        where ((p.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER || p.PartnerType == DataEnums.PARTNER_TYPE_AGENT) && c.SaleManId == p.SalePersonId)
+                        where ((p.PartnerType == partnerType) && c.SaleManId == p.SalePersonId)
                         select new QueryExportAgreementInfo
                         {
                             Active = c.Active,
