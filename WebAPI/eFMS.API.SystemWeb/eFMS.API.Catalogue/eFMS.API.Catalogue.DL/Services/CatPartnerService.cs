@@ -1294,7 +1294,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (SalemanId.Count() > 0)
                 {
-                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)) || SalemanId.Any(sm => sm == x.partner.UserCreated));
+                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)));
                 }
                 //else if (!string.IsNullOrEmpty(criteria.Saleman))
                 //{
