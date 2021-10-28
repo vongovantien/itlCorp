@@ -3002,7 +3002,6 @@ namespace eFMS.API.Accounting.DL.Services
                 case "NETOFF":
                     return receipt.PaymentRefNo + "CR";
                 case "COLL_ADV":
-                case "CLEAR_ADV":
                     return receipt.PaymentRefNo + "_AD"; 
                 default:
                     return receipt.PaymentRefNo;

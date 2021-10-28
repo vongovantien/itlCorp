@@ -3742,16 +3742,16 @@ namespace eFMS.API.Accounting.DL.Services
             result.PartnerNameEn = partner.PartnerNameEn;
             result.UserExport = currentUser.UserName;
 
-            result.Details = receipts.OrderBy(x => x.PaymentDate).ThenBy(x => x.PaymentRefNo).Select(receipt => new AcctReceiptAdvanceRowModel
+            result.Details = receipts.OrderBy(x => x.PaymentDate).ThenBy(x => x.DatetimeCreated).Select(receipt => new AcctReceiptAdvanceRowModel
             {
                 Description = receipt.Description,
                 ReceiptNo = receipt.PaymentRefNo,
                 PaidDate = receipt.PaymentDate,
-                CusAdvanceAmountVnd = receipt.CusAdvanceAmountVnd ?? 0,
-                CusAdvanceAmountUsd = receipt.CusAdvanceAmountUsd ?? 0,
-                AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0,
+                CusAdvanceAmountVnd = receipt.Class == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountVnd ?? 0) : (receipt.CusAdvanceAmountVnd ?? 0), // Trừ ứng trước
+                CusAdvanceAmountUsd = receipt.Class == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL ? (receipt.PaidAmountUsd ?? 0) : (receipt.CusAdvanceAmountUsd ?? 0),
+                AgreementCusAdvanceUsd = receipt.AgreementAdvanceAmountUsd ?? 0, // Số dư ứng trước
                 AgreementCusAdvanceVnd = receipt.AgreementAdvanceAmountVnd ?? 0,
-                TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD),
+                TotalAdvancePaymentUsd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_USD), // tổng tiền ứng trước
                 TotalAdvancePaymentVnd = GetTotalAdvancePayment(receipt.Id, AccountingConstants.CURRENCY_LOCAL),
             });
 
