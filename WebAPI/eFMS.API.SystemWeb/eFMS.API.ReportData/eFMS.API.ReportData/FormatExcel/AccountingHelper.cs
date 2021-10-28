@@ -5134,10 +5134,9 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 excel.StartDetailTable = 3;
                 //Set format amount
-                var formatAmountVND = "_(#,##0_);";
-                var formatAmountUSD = "_(#,##0.00_);";
-                //var formatAmountVND = "#,##0";
-                //var formatAmountUSD = "#,##0.00";
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+
                 var rowStart = 3;
                 for (int i = 0; i < result.Count; i++)
                 {
