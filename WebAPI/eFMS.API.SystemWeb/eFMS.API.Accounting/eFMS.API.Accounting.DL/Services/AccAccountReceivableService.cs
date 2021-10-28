@@ -1387,7 +1387,8 @@ namespace eFMS.API.Accounting.DL.Services
             var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
-                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
+                              //join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
+                              join acctReceivable in acctReceivables on contract.Id equals acctReceivable.ContractId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
                               where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
