@@ -2914,7 +2914,9 @@ namespace eFMS.API.Documentation.DL.Services
             }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
 
             var charges = from charge in chargeData
-                          join am in accMangData on charge.AcctManagementId equals am.Id select new CsShipmentSurchargeModel { 
+                          join am in accMangData on charge.AcctManagementId equals am.Id into amGrp
+                          from am in amGrp.DefaultIfEmpty()
+                          select new CsShipmentSurchargeModel { 
                               Id = charge.Id,
                               CurrencyId = charge.CurrencyId,
                               Total =charge.Total,
