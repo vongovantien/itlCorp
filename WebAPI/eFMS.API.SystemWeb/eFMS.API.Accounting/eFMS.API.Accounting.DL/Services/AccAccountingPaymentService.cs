@@ -1806,7 +1806,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             dateTo = criteria.IssuedDate != null ? criteria.IssuedDate.Value.Date : criteria.DueDate.Value.Date;
                         }
-                        var receiptGroup = item.payment.Where(x => x.PaymentType == "OBH" && !string.IsNullOrEmpty(x.PaymentRefNo) && (dateTo == null || x.PaymentDatetimeCreated.Value.Date <= dateTo.Value.Date)).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) });
+                        var receiptGroup = item.payment.Where(x => x.PaymentType == "OBH" && !string.IsNullOrEmpty(x.PaymentRefNo) && (dateTo == null || x.PaymentDatetimeCreated.Value.Date <= dateTo.Value.Date)).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) }).OrderBy(x => x.Payment.FirstOrDefault().PaymentDatetimeCreated);
                         if (receiptGroup != null && receiptGroup.Count() > 0)
                         {
                             if (statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
@@ -1878,10 +1878,10 @@ namespace eFMS.API.Accounting.DL.Services
                                                rcp.CusAdvanceAmountUsd,
                                                rcp.CusAdvanceAmountVnd
                                            };
-                            receiptGroup = pmDetail.Where(x=> (dateTo == null || x.PaymentDatetimeCreated.Value.Date > dateTo.Value.Date)).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) });
-                            if (receiptGroup?.Count() > 0)
+                            var receiptRMGroup = pmDetail.Where(x => dateTo == null || x.PaymentDatetimeCreated.Value.Date > dateTo.Value.Date).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) }).OrderBy(x => x.Payment.FirstOrDefault().PaymentDatetimeCreated);
+                            if (receiptRMGroup?.Count() > 0)
                             {
-                                var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
+                                var obhGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
 
                                 if (obhGrp != null)
                                 {
@@ -1890,7 +1890,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
                                         payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                                     }
-                                    foreach (var rcp in receiptGroup)
+                                    foreach (var rcp in receiptRMGroup)
                                     {
                                         var detail = new AccountingReceiptDetail();
                                         detail.ReceiptId = rcp.grp.ReceiptId;
@@ -2035,7 +2035,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         dateTo = criteria.IssuedDate != null ? criteria.IssuedDate.Value.Date : criteria.DueDate.Value.Date;
                     }
-                    var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) && (numOfDebitInvoice == 1 || (numOfDebitInvoice > 1 && x.invoicePayment == invoiceDe.Key.InvoiceNoReal)) && (dateTo == null || x.PaymentDatetimeCreated.Value.Date <= dateTo.Value.Date)).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) });
+                    var receiptGroup = item.payment.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) && (numOfDebitInvoice == 1 || (numOfDebitInvoice > 1 && x.invoicePayment == invoiceDe.Key.InvoiceNoReal)) && (dateTo == null || x.PaymentDatetimeCreated.Value.Date <= dateTo.Value.Date)).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) }).OrderBy(x => x.Payment.FirstOrDefault().PaymentDatetimeCreated);
                     if (receiptGroup != null && receiptGroup.Count() > 0)
                     {
                         var debitGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
@@ -2119,11 +2119,11 @@ namespace eFMS.API.Accounting.DL.Services
                                            rcp.CusAdvanceAmountUsd,
                                            rcp.CusAdvanceAmountVnd
                                        };
-                        receiptGroup = pmDetail.Where(x => x.PaymentDatetimeCreated.Value.Date > dateTo.Value.Date).OrderBy(x => x.PaymentDatetimeCreated).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) });
-                        if (receiptGroup?.Count() > 0)
+                        var receiptRMGroup = pmDetail.Where(x => x.PaymentDatetimeCreated.Value.Date > dateTo.Value.Date).GroupBy(x => new { x.ReceiptId, x.PaymentRefNo }).Select(x => new { grp = x.Key, Payment = x.Select(z => new { z.PaymentType, z.PaymentDate, z.PaymentDatetimeCreated, z.AgreementId, z.CusAdvanceAmountVnd, z.CusAdvanceAmountUsd, z.PaymentAmountVnd, z.PaymentAmountUsd, z.UnpaidPaymentAmountVnd, z.UnpaidPaymentAmountUsd }) }).OrderBy(x => x.Payment.FirstOrDefault().PaymentDatetimeCreated);
+                        if (receiptRMGroup?.Count() > 0)
                         {
-                            var debitGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
-                            var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
+                            var debitGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
+                            var obhGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
                             if (debitGrp != null || obhGrp != null)
                             {
                                 if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
@@ -2139,7 +2139,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 }
                                 if (debitGrp != null || isValidObh)
                                 {
-                                    foreach (var rcp in receiptGroup)
+                                    foreach (var rcp in receiptRMGroup)
                                     {
                                         var detail = new AccountingReceiptDetail();
                                         detail.ReceiptId = rcp.grp.ReceiptId;
