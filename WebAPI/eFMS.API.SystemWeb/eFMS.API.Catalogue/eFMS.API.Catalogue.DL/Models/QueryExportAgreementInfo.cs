@@ -21,5 +21,6 @@ namespace eFMS.API.Catalogue.DL.Models
         public string Service { get; set; }
         public string Office { get; set; }
         public string UserCreatedName { get; set; }
+        public string PartnerType { get; set; }
     }
 }
