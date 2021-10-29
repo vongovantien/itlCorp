@@ -638,7 +638,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Type = "OBH",
                     InvoiceNo = null,
                     Amount = s.FirstOrDefault().RefAmount,
-                    UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.Sum(x => x.UnpaidPaymentAmountVnd) : s.Sum(x => x.UnpaidPaymentAmountUsd),
+                    UnpaidAmount = s.Key.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? s.FirstOrDefault().UnpaidPaymentAmountVnd :  s.FirstOrDefault().UnpaidPaymentAmountUsd,
                     UnpaidAmountVnd = s.FirstOrDefault().UnpaidPaymentAmountVnd,
                     UnpaidAmountUsd = s.FirstOrDefault().UnpaidPaymentAmountUsd,
                     PaidAmountVnd = s.Sum(x => x.PaymentAmountVnd),
@@ -849,6 +849,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 result.ObhPartnerName = obhP?.ShortName;
             }
+
             return result;
         }
 

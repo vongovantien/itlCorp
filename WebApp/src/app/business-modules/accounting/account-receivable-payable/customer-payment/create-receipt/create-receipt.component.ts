@@ -191,10 +191,13 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         const DEBIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT);
         const OBH_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH);
         const CREDIT_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.CREDIT);
+        const OTHER_LIST = this.paymentList.filter((x: ReceiptInvoiceModel) => x.paymentType === AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER);
 
-        const paymentDebitObh = [...DEBIT_LIST, ...OBH_LIST];
+        const paymentDebitObh = [...DEBIT_LIST, ...OBH_LIST, ...OTHER_LIST];
         let sumTotalPaidUsd: number = 0;
         let sumTotalPaidVnd: number = 0;
+        let sumPaidAmountUsd: number = 0;
+        let sumPaidAmountVnd: number = 0;
 
         for (let index = 0; index < paymentDebitObh.length; index++) {
             const element = paymentDebitObh[index];
@@ -202,20 +205,30 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             sumTotalPaidUsd += element.totalPaidUsd;
             sumTotalPaidVnd += element.totalPaidVnd;
 
+            sumPaidAmountUsd += element.paidAmountUsd;
+            sumPaidAmountVnd += element.paidAmountVnd;
+
             element.isValid = null;
         }
 
         sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
         sumTotalPaidVnd = +sumTotalPaidVnd.toFixed(0);
 
+        sumPaidAmountUsd = +sumPaidAmountUsd.toFixed(2);
+        sumPaidAmountVnd = +sumPaidAmountVnd.toFixed(0);
+
+        if (receiptModel.paidAmountVnd > sumPaidAmountVnd || receiptModel.paidAmountUsd > sumPaidAmountUsd) {
+            this._toastService.warning("Collect amount > Sum paid amount, please process clear");
+            return;
+        }
         if (sumTotalPaidVnd > receiptModel.finalPaidAmountVnd || sumTotalPaidUsd > receiptModel.finalPaidAmountUsd) {
-            this._toastService.warning("Final paid amount < sum total paid amount");
+            this._toastService.warning("Final paid amount < Sum total paid amount");
             return;
         }
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
-            this._toastService.warning("Receipt Type is Wrong, Please You correct it!");
+            this._toastService.warning("Receipt type is wrong, please You correct it!");
             return;
         }
         if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
@@ -227,7 +240,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         }
 
         if (this.paymentList.some(x => x.paymentType !== AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER && x.isChangeValue == true)) {
-            this._toastService.warning('Please you do Process Clear firstly!');
+            this._toastService.warning('Please you do process clear firstly!');
             return;
         }
         const hasRowTotalInvalid: boolean = this.paymentList.some(x => x.totalPaidVnd > 0 && x.type == AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT && (x.totalPaidVnd > x.unpaidAmountVnd || x.totalPaidUsd > x.unpaidAmountUsd));
@@ -236,7 +249,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             rowInvalid.forEach(x => {
                 x.isValid = false;
             })
-            this._toastService.warning("Total Paid must <= Unpaid");
+            this._toastService.warning("Total paid must <= Unpaid");
             return;
         }
         receiptModel.payments = this.paymentList;
@@ -276,8 +289,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                     this.removeValidators(this.formCreate.paymentRefNo);
                     valid = true;
                 }
-            }
-            if (this.formCreate.class.value?.includes('OBH') ||
+            } else if (this.formCreate.class.value?.includes('OBH') ||
                 (
                     this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
                     && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL

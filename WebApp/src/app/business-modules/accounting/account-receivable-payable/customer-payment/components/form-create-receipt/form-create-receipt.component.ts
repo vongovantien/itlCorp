@@ -125,12 +125,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 (d: IAgreementReceipt[]) => {
                     if (!!d) {
                         this.agreements = d || [];
-                        if (!!this.agreements.length) {
-                            this.agreementId.setValue(d[0].id);
-                        } else {
-                            this.combogrid.displaySelectedStr = '';
-                            this.agreementId.setValue(null);
-                        }
+                        // if (!!this.agreements.length) {
+                        //     this.agreementId.setValue(d[0].id);
+                        // } else {
+                        //     this.combogrid.displaySelectedStr = '';
+                        //     this.agreementId.setValue(null);
+                        // }
                     }
                 }
             );
@@ -180,6 +180,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 this.agreementId.setValue((data as IAgreementReceipt).id);
                 // this._store.dispatch(SelectReceiptAgreement({ cusAdvanceAmount: null })) // ! Dispatch action to Trigger new state to call caculateAmountFromDebitList 
                 this._store.dispatch(SelectReceiptAgreement({ ...data }));
+                this.contractNo = (data as IAgreementReceipt).contractType + ' - ' + data.saleManName + ' - ' + data?.contractNo;
                 break;
             default:
                 break;

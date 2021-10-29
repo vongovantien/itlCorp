@@ -450,7 +450,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                                 }
                             }
                         });
-
+                    // this.removeValidators(this.paymentRefNo);
                 } else {
                     this.bankAccountNo.setValue(null);
                 }
@@ -458,7 +458,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             case 'obhPartner':
                 this.obhpartnerId.setValue(data.id);
                 this.removeValidators(this.obhpartnerId);
-
+                this.obhPartnerName = (data as Partner).shortName;
                 break;
             default:
                 break;

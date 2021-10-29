@@ -103,6 +103,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(this.utility.mergeObject({ ...res }, formMapping));
         this.formCreate.customerName = res.customerName;
         this.formCreate.receiptReference = res.referenceNo;
+        // this.formCreate.contractNo = res.contractNo;
         this.formCreate.getContract();
     }
 

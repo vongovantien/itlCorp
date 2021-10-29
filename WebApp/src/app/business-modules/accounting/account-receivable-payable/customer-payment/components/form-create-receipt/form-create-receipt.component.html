@@ -60,7 +60,7 @@
                 </label>
                 <app-combo-grid-virtual-scroll #combogridAgreement
                     (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreementId)"
-                    [currentActiveItemId]="{field:'id', value: agreementId.value, hardValue:contractNo}"
+                    [currentActiveItemId]="{field:'id', value: agreementId.value}"
                     [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
                     [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
                     [disabled]="isReadonly">

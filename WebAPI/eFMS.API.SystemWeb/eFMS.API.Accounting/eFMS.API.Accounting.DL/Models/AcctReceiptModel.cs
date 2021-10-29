@@ -15,6 +15,7 @@ namespace eFMS.API.Accounting.DL.Models
         public bool IsReceiptBankFee { get; set; } 
         public string ReceiptInternalOfficeCode { get; set; }
         public string ObhPartnerName { get; set; }
+        public string ContractNo { get; set; }
     }
 
     public enum SaveAction
