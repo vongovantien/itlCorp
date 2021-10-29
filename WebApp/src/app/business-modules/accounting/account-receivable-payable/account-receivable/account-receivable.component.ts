@@ -139,7 +139,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                             overDueDay: 0,
                             debitRateFrom: null,
                             debitRateTo: null,
-                            agreementStatus: "All",
+                            agreementStatus: "Active",
                             agreementExpiredDay: 'All',
                             salesmanId: null,
                             officeId: null,

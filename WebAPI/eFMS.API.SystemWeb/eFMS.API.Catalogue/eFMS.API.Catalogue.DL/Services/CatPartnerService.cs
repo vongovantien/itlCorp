@@ -914,51 +914,54 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<QueryExportAgreementInfo> QueryExportAgreement(CatPartnerCriteria criteria)
         {
-            IQueryable<CatPartner> data = null;
-            criteria.Active = null;
-            var cachedData = cache.Get();
-            if(cachedData == null)
+
+            Expression<Func<CatContract, bool>> q = query => true;
+
+            if (criteria.Active != null)
             {
-                IQueryable<CatPartnerViewModel> dataQuery =  QueryExport(criteria);
-                if(dataQuery != null)
-                {
-                    data = dataQuery.ProjectTo<CatPartner>(mapper.ConfigurationProvider);
-                }
+                q = q.And(x => x.Active == criteria.Active);
             }
-            else
+            if (!string.IsNullOrEmpty(criteria.Saleman))
             {
-                data = cachedData.AsQueryable();
+                var s = criteria.Saleman.Split(";").ToList();
+                q = q.And(x => s.Contains(x.SaleManId));
             }
 
-            if(data != null)
-            {
-                if (criteria.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER)
-                {
-                    if (criteria.AgreeActive != null)
-                    {
-                        return MappingQueryAgreementInfo(data, criteria.AgreeActive, DataEnums.PARTNER_TYPE_CUSTOMER);
-                    }
-                    return MappingQueryAgreementInfo(data, null, DataEnums.PARTNER_TYPE_CUSTOMER);
-                }
-                else if (criteria.PartnerType == DataEnums.PARTNER_TYPE_AGENT)
-                {
-                    if (criteria.AgreeActive != null)
-                    {
-                        return MappingQueryAgreementInfo(data, criteria.AgreeActive, DataEnums.PARTNER_TYPE_AGENT);
-                    }
-                    return MappingQueryAgreementInfo(data, null, DataEnums.PARTNER_TYPE_AGENT);
-                }
-                else
-                {
-                    if (criteria.AgreeActive != null)
-                    {
-                        return MappingQueryAgreementInfo(data, criteria.AgreeActive, null);
-                    }
-                    return MappingQueryAgreementInfo(data, null, null);
-                }
-            }
+            var contracts = contractRepository.Get(q);
+            var sysUSer = sysUserRepository.Get();
+            var result =from c in contracts
+                  join p in DataContext.Get() on c.PartnerId equals p.Id
+                  join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
+                  from g1 in grpUs1.DefaultIfEmpty()
+                  join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
+                  from g2 in grpUs2.DefaultIfEmpty()
+                  where p.PartnerType == criteria.PartnerType
+                  select new QueryExportAgreementInfo
+                  {
+                      Active = c.Active,
+                      AgreementNo = c.ContractNo,
+                      AgreementType = c.ContractType,
+                      ARComfirm = c.Arconfirmed,
+                      CreditLimit = c.ContractType == DataEnums.CONTRACT_TRIAL ? c.TrialCreditLimited : c.CreditLimit,
+                      Currency = c.CurrencyId,
+                      EffectiveDate = c.EffectiveDate,
+                      ExpiredDate = c.ExpiredDate,
+                      PartnerCode = p.TaxCode,
+                      PartnerNameEn = p.PartnerNameEn,
+                      PartnerNameVn = p.PartnerNameVn,
+                      PaymentTerm = c.PaymentTerm,
+                      SaleManName = g1.Username,
+                      UserCreatedName = g2.Username,
+                      Service = GetContractServicesName(c.SaleService),
+                      Office = GetContractOfficeName(c.OfficeId),
+                      PartnerType = p.PartnerType
+                  };
 
-            return null;
+            if (!string.IsNullOrEmpty(criteria.PartnerType))
+            {
+                result.Where(x => x.PartnerType == criteria.PartnerType);
+            }
+            return result;
         }
 
         public  IQueryable<QueryExportAgreementInfo> MappingQueryAgreementInfo(IQueryable<CatPartner> queryPartner, bool? AgreeActive, string partnerType)
@@ -972,7 +975,7 @@ namespace eFMS.API.Catalogue.DL.Services
                         from g1 in grpUs1.DefaultIfEmpty()
                         join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
                         from g2 in grpUs2.DefaultIfEmpty()
-                        where (p.PartnerType==partnerType && c.SaleManId == p.SalePersonId)
+                        where ((p.PartnerType == partnerType) && c.SaleManId == p.SalePersonId)
                         select new QueryExportAgreementInfo
                         {
                             Active = c.Active,
@@ -992,35 +995,6 @@ namespace eFMS.API.Catalogue.DL.Services
                             Service = GetContractServicesName(c.SaleService),
                             Office = GetContractOfficeName(c.OfficeId),
                         };
-            if (partnerType == null)
-            {
-                query = from c in contract
-                            join p in queryPartner on c.PartnerId equals p.Id
-                            join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
-                            from g1 in grpUs1.DefaultIfEmpty()
-                            join user2 in sysUSer on c.UserCreated equals user2.Id into grpUs2
-                            from g2 in grpUs2.DefaultIfEmpty()
-                            where ((p.PartnerType == DataEnums.PARTNER_TYPE_CUSTOMER || p.PartnerType == DataEnums.PARTNER_TYPE_AGENT) && c.SaleManId == p.SalePersonId)
-                            select new QueryExportAgreementInfo
-                            {
-                                Active = c.Active,
-                                AgreementNo = c.ContractNo,
-                                AgreementType = c.ContractType,
-                                ARComfirm = c.Arconfirmed,
-                                CreditLimit = c.ContractType == DataEnums.CONTRACT_TRIAL ? c.TrialCreditLimited : c.CreditLimit,
-                                Currency = c.CurrencyId,
-                                EffectiveDate = c.EffectiveDate,
-                                ExpiredDate = c.ExpiredDate,
-                                PartnerCode = p.TaxCode,
-                                PartnerNameEn = p.PartnerNameEn,
-                                PartnerNameVn = p.PartnerNameVn,
-                                PaymentTerm = c.PaymentTerm,
-                                SaleManName = g1.Username,
-                                UserCreatedName = g2.Username,
-                                Service = GetContractServicesName(c.SaleService),
-                                Office = GetContractOfficeName(c.OfficeId),
-                            };
-            }
             if (AgreeActive != null)
             {
                 return query.Where(x => x.Active == AgreeActive);
@@ -1287,7 +1261,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (SalemanId.Count() > 0)
                 {
-                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)) || SalemanId.Any(sm => sm == x.partner.UserCreated));
+                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)));
                 }
                 //else if (!string.IsNullOrEmpty(criteria.Saleman))
                 //{
