@@ -976,7 +976,6 @@ namespace eFMS.API.Catalogue.DL.Services
             var contract = contractRepository.Get();
             var sysUSer = sysUserRepository.Get();
             var office = officeRepository.Get();
-
             var query = from c in contract
                         join p in queryPartner on c.PartnerId equals p.Id
                         join user1 in sysUSer on c.SaleManId equals user1.Id into grpUs1
@@ -1269,7 +1268,7 @@ namespace eFMS.API.Catalogue.DL.Services
                            ));
                 if (SalemanId.Count() > 0)
                 {
-                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)) || SalemanId.Any(sm => sm == x.partner.UserCreated));
+                    query = query.Where(x => x.agreements.Any(y => SalemanId.Any(sm => sm == y.SaleManId)));
                 }
                 //else if (!string.IsNullOrEmpty(criteria.Saleman))
                 //{
