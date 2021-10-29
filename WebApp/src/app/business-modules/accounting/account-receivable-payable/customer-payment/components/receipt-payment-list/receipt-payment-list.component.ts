@@ -330,6 +330,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 }
                 this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.calculateFinalPaidAmount();
+                this.userLogged$
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe((u) => {
+                        if (!!u) {
+                            if (this.currencyId.value === 'VND') {
+                                this.bankAccountNo.setValue(u.bankOfficeAccountNoVnd)
+                            } else {
+                                this.bankAccountNo.setValue(u.bankOfficeAccountNoUsd)
+                            }
+                        }
+                    });
                 break;
             case 'creditAmountVnd':
                 if (this.isAutoConvert.value) {
