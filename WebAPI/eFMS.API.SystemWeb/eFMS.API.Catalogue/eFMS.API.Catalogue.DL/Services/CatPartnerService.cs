@@ -930,8 +930,12 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (!string.IsNullOrEmpty(criteria.Saleman))
             {
-                var s = criteria.Saleman.Split(";").ToList();
+                var s = sysUserRepository.Get().Where(x => criteria.Saleman.Contains(x.Username)).Select(t => t.Id).ToList();
                 q = q.And(x => s.Contains(x.SaleManId));
+            }
+            if (criteria.DatetimeCreatedFrom != null && criteria.DatetimeCreatedTo != null)
+            {
+                q.And(x => x.DatetimeCreated <= criteria.DatetimeCreatedTo && x.DatetimeCreated >= criteria.DatetimeCreatedFrom);
             }
 
             var contracts = contractRepository.Get(q);
