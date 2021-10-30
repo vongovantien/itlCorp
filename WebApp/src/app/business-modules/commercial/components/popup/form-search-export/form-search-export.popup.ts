@@ -94,11 +94,19 @@ export class FormSearchExportComponent extends PopupBase {
         }
     }
 
-    getDataSearch(){
+    getDataSearch(type: string = 'partner') {
         if ((this.salesmanActive.findIndex(x => x === 'All') === 0) || !this.salesmanActive.length) {
-            this.dataSearch.saleman = this.salesmanList.filter(x => x.id !== 'All').map(x => x.username).join(";");
+            if (type === 'partner') {
+                this.dataSearch.saleman = this.salesmanList.filter(x => x.id !== 'All').map(x => x.username).join(";");
+            } else {
+                this.dataSearch.saleman = this.salesmanList.filter(x => x.id !== 'All').map(x => x.id).join(";");
+            }
         } else {
-            this.dataSearch.saleman = this.salesmanList.filter(x => this.salesmanActive.findIndex(item => item === x.id) >= 0).map(x => x.username).join(";");
+            if (type === 'partner') {
+                this.dataSearch.saleman = this.salesmanList.filter(x => this.salesmanActive.findIndex(item => item === x.id) >= 0).map(x => x.username).join(";");
+            } else {
+                this.dataSearch.saleman = this.salesmanList.filter(x => this.salesmanActive.findIndex(item => item === x.id) >= 0).map(x => x.id).join(";");
+            }
         }
         this.dataSearch.partnerType = this.partnerType;
         this.dataSearch.datetimeCreatedFrom = (!!this.createdDate.value && !!this.createdDate.value.startDate) ? formatDate(this.createdDate.value.startDate, 'yyyy-MM-dd', 'en') : null;
@@ -128,7 +136,7 @@ export class FormSearchExportComponent extends PopupBase {
         }
     }
     exportAgreementInfo() {
-        this.getDataSearch();
+        this.getDataSearch('agreement');
         if (!!this.dataSearch) {
             this._progressRef.start();
             this._exportRepo.exportAgreementInfo(this.dataSearch)

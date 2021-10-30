@@ -215,6 +215,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("AcctSOA", ex.ToString());
                 var hs = new HandleState((object)ex.Message);
                 return hs;
             }
@@ -357,6 +358,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("AcctSOA", ex.ToString());
                 var hs = new HandleState((object)ex.Message);
                 return hs;
             }
@@ -496,13 +498,14 @@ namespace eFMS.API.Accounting.DL.Services
             if (soaCharges.Count > 0)
             {
                 var updateSoaCharge = UpdateSurchargeForSoa(soaCharges);
-                string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
-                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
-                    JsonConvert.SerializeObject(soaCharges),
-                    JsonConvert.SerializeObject(updateSoaCharge));
-                new LogHelper(logName, logMessage);
+
                 if (!updateSoaCharge.Status)
                 {
+                    string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                        JsonConvert.SerializeObject(soaCharges),
+                        JsonConvert.SerializeObject(updateSoaCharge));
+                    new LogHelper(logName, logMessage);
                     hs = new HandleState((object)updateSoaCharge.Message);
                 }
             }
@@ -540,13 +543,14 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soaCharges.Count > 0)
                 {
                     var clearSoaCharge = ClearSurchargeForSoa(soaCharges);
-                    string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
-                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
-                        JsonConvert.SerializeObject(soaCharges),
-                        JsonConvert.SerializeObject(clearSoaCharge));
-                    new LogHelper(logName, logMessage);
+                   
                     if (!clearSoaCharge.Status)
                     {
+                        string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                        string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                            JsonConvert.SerializeObject(soaCharges),
+                            JsonConvert.SerializeObject(clearSoaCharge));
+                        new LogHelper(logName, logMessage);
                         hs = new HandleState((object)clearSoaCharge.Message);
                     }
                 }

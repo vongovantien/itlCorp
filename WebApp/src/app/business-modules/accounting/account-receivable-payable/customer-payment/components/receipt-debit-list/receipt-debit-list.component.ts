@@ -6,7 +6,7 @@ import { ConfirmPopupComponent } from "@common";
 import { InjectViewContainerRefDirective } from "@directives";
 
 import { IReceiptState } from "../../store/reducers/customer-payment.reducer";
-import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState, ReceiptExchangeRate } from "../../store/reducers";
+import { ReceiptDebitListState, ReceiptTypeState, ReceiptCreditListState, ReceiptIsAutoConvertPaidState, ReceiptExchangeRate, customerPaymentReceipLoadingState } from "../../store/reducers";
 import { RemoveInvoice, ChangeADVType, InsertCreditToDebit, UpdateCreditItemValue, DeleteCreditInDebit } from "../../store/actions";
 
 import { takeUntil, withLatestFrom, map } from "rxjs/operators";
@@ -25,7 +25,6 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
 
     debitList$ = this._store.select(ReceiptDebitListState);
     creditList$: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
-
 
     agencyHeaders: CommonInterface.IHeaderTable[] = [
         { title: 'RefNo', field: '', sortable: true },
@@ -123,7 +122,7 @@ export class ARCustomerPaymentReceiptDebitListComponent extends AppList implemen
                 }
             )
 
-
+        this.isLoading = this._store.select(customerPaymentReceipLoadingState);
     }
 
     confirmDeleteInvoiceItem(item: ReceiptInvoiceModel, index: number) {

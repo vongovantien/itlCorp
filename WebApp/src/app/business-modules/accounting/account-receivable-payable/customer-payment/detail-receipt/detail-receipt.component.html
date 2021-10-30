@@ -1,5 +1,4 @@
 <div class="customer-payment-wrapper m-animate-fade-in">
-
     <app-sub-header> </app-sub-header>
 
     <div class="m-content">
@@ -57,7 +56,7 @@
                 <div class="c-button-actions text-center">
                     <ng-container
                         *ngIf="receiptDetail?.status !== 'Done' && receiptDetail?.status !== 'Cancel' && receiptDetail?.syncStatus !== 'Synced'">
-                        <app-permission-button title="Save Draft" class="cancel" [icon]="'la la-sticky-note'"
+                        <app-permission-button title="Save Draft" class="outline-primary" [icon]="'la la-sticky-note'"
                             (onClick)="submitClick('update')">
                         </app-permission-button>
                     </ng-container>

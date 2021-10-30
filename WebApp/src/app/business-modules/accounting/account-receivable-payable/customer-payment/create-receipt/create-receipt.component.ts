@@ -214,8 +214,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         sumTotalPaidUsd = +sumTotalPaidUsd.toFixed(2);
         sumTotalPaidVnd = +sumTotalPaidVnd.toFixed(0);
 
-        sumPaidAmountUsd = +sumPaidAmountUsd.toFixed(2);
-        sumPaidAmountVnd = +sumPaidAmountVnd.toFixed(0);
+        sumPaidAmountUsd = +((+sumPaidAmountUsd).toFixed(2));
+        sumPaidAmountVnd = +((+sumPaidAmountVnd).toFixed(0));
 
         if (receiptModel.paidAmountVnd > sumPaidAmountVnd || receiptModel.paidAmountUsd > sumPaidAmountUsd) {
             this._toastService.warning("Collect amount > Sum paid amount, please process clear");
@@ -228,7 +228,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         if (this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT &&
             this.paymentList.filter((x: ReceiptInvoiceModel) => x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.DEBIT || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH).length === 0
         ) {
-            this._toastService.warning("Receipt type is wrong, please You correct it!");
+            this._toastService.warning("Receipt type is wrong, please you correct it!");
             return;
         }
         if (CREDIT_LIST.length && this.formCreate.class.value !== AccountingConstants.RECEIPT_CLASS.NET_OFF) {
