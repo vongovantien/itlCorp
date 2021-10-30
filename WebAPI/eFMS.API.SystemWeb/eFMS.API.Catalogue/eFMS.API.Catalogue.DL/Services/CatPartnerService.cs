@@ -924,21 +924,21 @@ namespace eFMS.API.Catalogue.DL.Services
 
             Expression<Func<CatContract, bool>> q = query => true;
 
-            if (criteria.Active != null)
+            if (criteria.AgreeActive != null)
             {
-                q = q.And(x => x.Active == criteria.Active);
+                q = q.And(x => x.Active == criteria.AgreeActive);
             }
             if (!string.IsNullOrEmpty(criteria.Saleman))
             {
                 var s = sysUserRepository.Get().Where(x => criteria.Saleman.Contains(x.Username)).Select(t => t.Id).ToList();
                 q = q.And(x => s.Contains(x.SaleManId));
             }
-            if (criteria.DatetimeCreatedFrom != null && criteria.DatetimeCreatedTo != null)
-            {
-                q.And(x => x.DatetimeCreated <= criteria.DatetimeCreatedTo && x.DatetimeCreated >= criteria.DatetimeCreatedFrom);
-            }
 
             var contracts = contractRepository.Get(q);
+            if (criteria.DatetimeCreatedFrom != null && criteria.DatetimeCreatedTo != null)
+            {
+                contracts = contracts.Where(x => x.DatetimeCreated <= criteria.DatetimeCreatedTo && x.DatetimeCreated >= criteria.DatetimeCreatedFrom);
+            }
             var sysUSer = sysUserRepository.Get();
             var result =from c in contracts
                   join p in DataContext.Get() on c.PartnerId equals p.Id
