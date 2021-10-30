@@ -106,7 +106,6 @@ export class FormSearchExportComponent extends PopupBase {
         this.dataSearch.active = (!!this.status.value && this.status.value !== this.statusList[0].id) ? (this.status.value === this.statusList[1].id ? true : false) : null;
         const userLogged = JSON.parse(localStorage.getItem('id_token_claims_obj'));
         this.dataSearch.author = userLogged.nameEn;
-        this.dataSearch.agreeActive = (!!this.status.value && this.status.value !== this.statusList[0].id) ? (this.status.value === this.statusList[1].id ? true : false) : null;
     }
 
     exportData() {
