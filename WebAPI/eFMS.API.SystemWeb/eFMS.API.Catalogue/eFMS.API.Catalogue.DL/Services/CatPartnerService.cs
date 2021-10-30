@@ -924,9 +924,9 @@ namespace eFMS.API.Catalogue.DL.Services
 
             Expression<Func<CatContract, bool>> q = query => true;
 
-            if (criteria.AgreeActive != null)
+            if (criteria.Active != null)
             {
-                q = q.And(x => x.Active == criteria.AgreeActive);
+                q = q.And(x => x.Active == criteria.Active);
             }
             if (!string.IsNullOrEmpty(criteria.Saleman))
             {
