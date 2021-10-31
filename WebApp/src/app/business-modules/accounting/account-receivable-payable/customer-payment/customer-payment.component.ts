@@ -1,22 +1,25 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
 import { Router } from "@angular/router";
 import { ToastrService } from "ngx-toastr";
 
-import { ConfirmPopupComponent, Permission403PopupComponent } from "@common";
-import { AccountingRepo } from "@repositories";
+import { ConfirmPopupComponent, Permission403PopupComponent, LoadingPopupComponent } from "@common";
+import { AccountingRepo, ExportRepo } from "@repositories";
 import { AppList, IPermissionBase } from "@app";
 import { ReceiptModel } from "@models";
 import { SortService } from "@services";
-import { RoutingConstants } from "@constants";
+import { RoutingConstants, AccountingConstants, SystemConstants } from "@constants";
 
 import { catchError, map, takeUntil, withLatestFrom } from "rxjs/operators";
 import { formatDate } from "@angular/common";
 import { IAppState } from "@store";
 import { Store } from "@ngrx/store";
-import { LoadListCustomerPayment, ResetInvoiceList } from "./store/actions";
-import { InjectViewContainerRefDirective } from "@directives";
+import { LoadListCustomerPayment, ResetInvoiceList, RegistTypeReceipt } from "./store/actions";
+import { InjectViewContainerRefDirective, ContextMenuDirective } from "@directives";
 import { customerPaymentReceipListState, customerPaymentReceipPagingState, customerPaymentReceipSearchState, customerPaymentReceipLoadingState } from "./store/reducers";
-import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
+import { ARCustomerPaymentFormQuickUpdateReceiptPopupComponent, IModelQuickUpdateReceipt } from "./components/popup/form-quick-update-receipt-popup/form-quick-update-receipt.popup";
+import { ICriteriaReceiptAdvance } from "../history-payment/components/list-invoice-payment/list-invoice-history-payment.component";
+import { HttpResponse } from "@angular/common/http";
+import { NgxSpinnerService } from "ngx-spinner";
 
 enum PAYMENT_TAB {
     CUSTOMER = 'CUSTOMER',
@@ -31,28 +34,31 @@ enum PAYMENT_TAB {
 })
 export class ARCustomerPaymentComponent extends AppList implements IPermissionBase {
 
-    @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
-    @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @ViewChild(ARCustomerPaymentFormQuickUpdateReceiptPopupComponent) quickUpdatePopup: ARCustomerPaymentFormQuickUpdateReceiptPopupComponent;
-
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
     CPs: ReceiptModel[] = [];
 
     selectedCPs: ReceiptModel = null;
     messageDelete: string = "";
     selectedTab: string = PAYMENT_TAB.CUSTOMER;
 
-    dataSearch = {
+    dataSearch: any = {
         dateFrom: formatDate(new Date(new Date().setDate(new Date().getDate() - 29)), 'yyyy-MM-dd', 'en'),
         dateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')
     }
+
+    selectedReceipt: ReceiptModel;
+    selectedUpdateKey: string;
 
     constructor(
         private readonly _sortService: SortService,
         private readonly _toastService: ToastrService,
         private readonly _router: Router,
         private readonly _accountingRepo: AccountingRepo,
-        private readonly _store: Store<IAppState>
+        private readonly _store: Store<IAppState>,
+        private readonly _exportRepo: ExportRepo,
+        private readonly _spinner: NgxSpinnerService
     ) {
         super();
         this.requestList = this.requestLoadListCustomerPayment;
@@ -111,7 +117,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                     this._store.dispatch(ResetInvoiceList());
                     this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${data.id}`]);
                 } else {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
                 }
             });
     }
@@ -128,23 +134,28 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
                         body: this.messageDelete,
                         labelConfirm: 'Yes',
                         classConfirmButton: 'btn-danger',
-                        iconConfirm: 'la la-trash'
+                        iconConfirm: 'la la-trash',
+                        center: true
                     }, () => this.onConfirmDeleteCP())
                 } else {
-                    this.permissionPopup.show();
+                    this.showPopupDynamicRender(Permission403PopupComponent, this.viewContainer.viewContainerRef, { center: true });
                 }
             });
     }
 
-    cancelReceipt(id: string) {
+    cancelReceipt(receipt: ReceiptModel) {
+        if (!receipt) {
+            return;
+        }
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
             title: 'Cancel Receipt',
-            body: 'This Receipt will be canceled. Are you sure you want to continue?',
+            body: `This Receipt ${receipt.paymentRefNo} will be canceled. Are you sure you want to continue?`,
             labelConfirm: 'Yes',
             classConfirmButton: 'btn-danger',
-            iconConfirm: 'la la-times'
+            iconConfirm: 'la la-times',
+            center: true
         }, () => {
-            this._accountingRepo.cancelReceipt(id)
+            this._accountingRepo.cancelReceipt(receipt.id)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -224,18 +235,144 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     showQuickUpdatePopup(type: string) {
-        switch (type) {
-            case 'method':
-                break;
-            case 'refNo':
-                break;
-            case 'obhPartner':
-                break;
-            default:
-                break;
+        this.selectedUpdateKey = type;
+        if (!!this.selectedReceipt) {
+            this.quickUpdatePopup.setValueForm('paymentRefNo', this.selectedReceipt['paymentRefNo']);
+            this.quickUpdatePopup.setValueForm('paymentMethod', this.selectedReceipt['paymentMethod']);
+            this.quickUpdatePopup.setValueForm('obhpartnerId', this.selectedReceipt['obhpartnerId']);
+            this.quickUpdatePopup.setValueForm('bankAccountNo', this.selectedReceipt['bankAccountNo']);
+            this.quickUpdatePopup.setValueForm('paymentDate', !!this.selectedReceipt.paymentDate ? { startDate: new Date(this.selectedReceipt.paymentDate), endDate: new Date(this.selectedReceipt.paymentDate) } : null);
+            this.quickUpdatePopup.receipt = Object.assign({}, this.selectedReceipt);
+            this.quickUpdatePopup.show();
+
         }
-        this.quickUpdatePopup.updateKey = type;
-        this.quickUpdatePopup.show();
+    }
+
+    onSelectReceipt(receipt: ReceiptModel) {
+        this.selectedReceipt = receipt;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    onUpdateReceiptSuccess(data: { id: string, type: string, data: IModelQuickUpdateReceipt }) {
+        if (data.id) {
+            const receiptItem: ReceiptModel = this.CPs.find(x => x.id == data.id);
+            if (!!receiptItem) {
+                receiptItem[data.type] = data.data[data.type];
+            }
+        }
+    }
+
+    confirmSyncReceipt() {
+        const confirmMessage = `Are you sure you want to send ${this.selectedReceipt.paymentRefNo} to accountant system?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Sync To Accountant System',
+            body: confirmMessage,
+            iconConfirm: 'la la-cloud-upload',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            this.sendReceiptToAccountant(this.selectedReceipt);
+        });
+    }
+
+    sendReceiptToAccountant(receipt: ReceiptModel) {
+        const receiptSyncIds: AccountingInterface.IRequestString[] = [];
+        const receiptSyncId: AccountingInterface.IRequestString = {
+            id: receipt.id,
+            action: receipt.syncStatus === AccountingConstants.SYNC_STATUS.REJECTED ? 'UPDATE' : 'ADD',
+        };
+        receiptSyncIds.push(receiptSyncId);
+
+        this._accountingRepo.syncReceiptToAccountant(receiptSyncIds)
+            .pipe(
+            ).subscribe(
+                (res: CommonInterface.IResult) => {
+                    if (((res as CommonInterface.IResult).status)) {
+                        this._toastService.success(`Send ${receipt.paymentRefNo} to Accountant System Successful`);
+                        this.requestLoadListCustomerPayment();
+
+                    } else {
+                        this._toastService.error("Send Data Fail");
+                    }
+                },
+                (error) => {
+                    console.log(error);
+                }
+            );
+    }
+
+    exportAdvanceReceipt() {
+        if (!this.dataSearch || !this.selectedReceipt) {
+            this._toastService.warning('No Data To View, Please Select Partner and Apply');
+            return;
+        }
+        const body: ICriteriaReceiptAdvance = {
+            customerId: this.selectedReceipt.customerId,
+            status: "Done",
+            dateFrom: this.dataSearch.dateFrom,
+            dateTo: this.dataSearch.dateTo,
+            dateType: this.dataSearch.dateType,
+
+        };
+        this._spinner.show();
+        this._exportRepo.exportAdvanceReceipt(body)
+            .subscribe(
+                (res: HttpResponse<any>) => {
+                    if (res.body) {
+                        const fileName = res.headers.get('efms-file-name');
+                        console.log(fileName);
+                        this.downLoadFile(res.body, SystemConstants.FILE_EXCEL, fileName);
+                        return;
+                    }
+                    this._toastService.warning('No Data To View');
+                },
+                () => { },
+                () => {
+                    this._spinner.hide();
+                }
+            );
+    }
+
+    confirmCopyReceipt() {
+        if (!this.selectedReceipt) {
+            return;
+        }
+        const currentReceipt = Object.assign({}, this.selectedReceipt);
+
+        const confirmMessage = `Are you sure you want to copy ${this.selectedReceipt.paymentRefNo} turn into new receipt?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Copy receipt',
+            body: confirmMessage,
+            iconConfirm: 'la la-copy',
+            labelConfirm: 'Yes',
+            center: true
+        }, () => {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'copy' } });
+        });
+    }
+
+    confirmCreateClearDebit() {
+        if (!this.selectedReceipt) {
+            return;
+        }
+        const currentReceipt = Object.assign({}, this.selectedReceipt);
+
+        const confirmMessage = `Are you sure you want to create Receipt Clear Debit for <span class="text-primary font-weight-bold">${this.selectedReceipt.customerName} </span>?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
+            title: 'Create Receipt Clear Debit',
+            body: confirmMessage,
+            iconConfirm: 'la la-save',
+            labelConfirm: 'Yes',
+        }, () => {
+            this._store.dispatch(ResetInvoiceList());
+            this._store.dispatch(RegistTypeReceipt({ data: currentReceipt.type.toUpperCase() }));
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'debit' } });
+
+        });
     }
 
 }

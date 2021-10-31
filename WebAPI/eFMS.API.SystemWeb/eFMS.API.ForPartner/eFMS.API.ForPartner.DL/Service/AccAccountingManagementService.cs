@@ -162,7 +162,7 @@ namespace eFMS.API.ForPartner.DL.Service
             currentUser.Action = "InsertInvoice";
 
             var hsInsertInvoice = InsertInvoice(model, currentUser, out AccAccountingManagement invoiceDebit);
-            if(invoiceDebit != null)
+            if(invoiceDebit != null && invoiceDebit.Id != Guid.Empty)
             {
                 Id = invoiceDebit.Id;
             }
@@ -215,12 +215,12 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
 
                 if (debitCharges.Count > 0)
-                {
+                 {
                     var invoiceDebitByRefNo = DataContext.Get(x => x.ReferenceNo == debitCharges[0].ReferenceNo).FirstOrDefault();
                     if (invoiceDebitByRefNo != null)
                     {
                         string message = string.Format("Số Reference No {0} đã tồn tại trong hóa đơn {1}. Vui lòng kiểm tra lại", debitCharges[0].ReferenceNo, invoiceDebitByRefNo.InvoiceNoReal);
-                        return new HandleState((object)message);
+                        return new HandleState(409, message); // 166607
                     }
                 }
 
@@ -411,7 +411,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     return hsObh;
                 }
 
-                WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
+                // WriteLogInsertInvoice(hsDebit.Success, model.InvoiceNo, invoiceDebit, invoicesObh, chargeInvoiceDebitUpdate, chargeInvoiceObhUpdate, "Create Invoice Successful");
                 return hsDebit;                
             }
             catch (Exception ex)
@@ -1585,13 +1585,14 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
 
                 var updateRejectCharge = UpdateRejectCharge(rejectCharges);
-                string logName = string.Format("Reject_SOA_{0}_UpdateCharge", soa.Soano);
-                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
-                    JsonConvert.SerializeObject(rejectCharges),
-                    JsonConvert.SerializeObject(updateRejectCharge));
-                new LogHelper(logName, logMessage);
+              
                 if (!updateRejectCharge.Status)
                 {
+                    string logName = string.Format("Reject_SOA_{0}_UpdateCharge", soa.Soano);
+                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                        JsonConvert.SerializeObject(rejectCharges),
+                        JsonConvert.SerializeObject(updateRejectCharge));
+                    new LogHelper(logName, logMessage);
                     return new HandleState((object)updateRejectCharge.Message);
                 }
             }

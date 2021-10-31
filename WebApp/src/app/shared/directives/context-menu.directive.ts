@@ -1,9 +1,10 @@
-import { Directive, ViewContainerRef, ElementRef, Input, OnDestroy } from '@angular/core';
+import { Directive, ViewContainerRef, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { Overlay, OverlayRef, ConnectionPositionPair, OverlayConfig } from '@angular/cdk/overlay';
-import { Subscription, merge } from 'rxjs';
+import { Subscription, merge, fromEvent } from 'rxjs';
 import { OVERLAY_POSITION_MAP } from '@constants';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { IDropdownPanel } from '../common/dropdown/dropdown.component';
+import { filter, take } from 'rxjs/operators';
 
 @Directive({
     selector: '[contextMenu]',
@@ -12,7 +13,7 @@ import { IDropdownPanel } from '../common/dropdown/dropdown.component';
     },
 })
 export class ContextMenuDirective implements OnDestroy {
-
+    @Output() onTouch: EventEmitter<any> = new EventEmitter<any>();
     @Input('contextMenu') public menuTemplate: IDropdownPanel;
     @Input() set position(key: any) {
         if (!!key) {
@@ -24,14 +25,17 @@ export class ContextMenuDirective implements OnDestroy {
         return this._position;
     }
 
+    private mouseX: number;
+    private mouseY: number;
+
     private get overlayConfig(): OverlayConfig {
         return new OverlayConfig({
-            hasBackdrop: true,
+            //hasBackdrop: true,
             backdropClass: 'cdk-overlay-context-menu',
             scrollStrategy: this._overlay.scrollStrategies.close(),
             positionStrategy: this._overlay
                 .position()
-                .flexibleConnectedTo(this._elementRef)
+                .flexibleConnectedTo({ x: this.mouseX, y: this.mouseY })
                 .withPositions([
                     this.position
                 ])
@@ -41,20 +45,22 @@ export class ContextMenuDirective implements OnDestroy {
     private overlayRef: OverlayRef;
     private dropdownClosingActions$: Subscription = Subscription.EMPTY;
     private _position: ConnectionPositionPair = OVERLAY_POSITION_MAP.rightTop;
+
     constructor(
         private readonly _overlay: Overlay,
-        private readonly _elementRef: ElementRef<HTMLElement>,
         private readonly viewContainerRef: ViewContainerRef) {
     }
 
     public open(e: MouseEvent) {
         e.preventDefault();
-        this.openContextMenu();
-
+        this.onTouch.emit();
+        this.openContextMenu(e);
     }
 
-    private openContextMenu() {
+    private openContextMenu({ x, y }: MouseEvent) {
         this.close();
+        this.mouseX = x;
+        this.mouseY = y;
         this.overlayRef = this._overlay.create(this.overlayConfig);
 
         this.overlayRef.attach(new TemplatePortal(
@@ -69,14 +75,24 @@ export class ContextMenuDirective implements OnDestroy {
     }
 
     private onClosingDropdown() {
-        const backdropClick$ = this.overlayRef.backdropClick(); // ? clickoutside 
+        // const backdropClick$ = this.overlayRef.backdropClick(); // ? clickoutside 
         const detachment$ = this.overlayRef.detachments();
         const dropdownClosed$ = this.menuTemplate.closed;   // ? dropdown emit close
+        // const dropdownClickOutSide$ = this.menuTemplate.clickOutside;   // ? dropdown emit close
 
-        return merge(backdropClick$, detachment$, dropdownClosed$);
+        const dropdownClickOutSide$ = fromEvent<MouseEvent>(document, 'click')
+            .pipe(
+                filter(event => {
+                    const clickTarget = event.target as HTMLElement;
+                    return !!this.overlayRef && !this.overlayRef.overlayElement.contains(clickTarget);
+                }),
+                take(1)
+            );
+
+        return merge(detachment$, dropdownClosed$, dropdownClickOutSide$);
     }
 
-    private close() {
+    public close() {
         this.dropdownClosingActions$ && this.dropdownClosingActions$.unsubscribe();
         if (this.overlayRef) {
             this.overlayRef.dispose();

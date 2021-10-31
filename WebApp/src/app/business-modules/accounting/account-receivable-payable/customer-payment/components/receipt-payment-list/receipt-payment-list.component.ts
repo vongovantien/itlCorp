@@ -41,7 +41,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     @ViewChild(ARCustomerPaymentReceiptDebitListComponent) receiptDebitList: ARCustomerPaymentReceiptDebitListComponent;
     @ViewChild(ARCustomerPaymentReceiptCreditListComponent) receiptCreditList: ARCustomerPaymentReceiptCreditListComponent;
 
-    @Input() syncInfoTemplate: TemplateRef<any>
+    @Input() syncInfoTemplate?: TemplateRef<any>
 
     creditList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptCreditListState);
     debitList: Observable<ReceiptInvoiceModel[]> = this._store.select(ReceiptDebitListState);
@@ -76,6 +76,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_BANK,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,
@@ -106,6 +107,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     obhPartners: Observable<Partner[]>;
     departments: Observable<any>;
     class$: Observable<string>;
+    obhPartnerName: string;
 
     constructor(
         private readonly _accountingRepo: AccountingRepo,
@@ -328,6 +330,17 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 }
                 this._store.dispatch(SelectReceiptCurrency({ currency: data.id }));
                 this.calculateFinalPaidAmount();
+                this.userLogged$
+                    .pipe(takeUntil(this.ngUnsubscribe))
+                    .subscribe((u) => {
+                        if (!!u) {
+                            if (this.currencyId.value === 'VND') {
+                                this.bankAccountNo.setValue(u.bankOfficeAccountNoVnd)
+                            } else {
+                                this.bankAccountNo.setValue(u.bankOfficeAccountNoUsd)
+                            }
+                        }
+                    });
                 break;
             case 'creditAmountVnd':
                 if (this.isAutoConvert.value) {
@@ -437,7 +450,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                                 }
                             }
                         });
-
+                    // this.removeValidators(this.paymentRefNo);
                 } else {
                     this.bankAccountNo.setValue(null);
                 }
@@ -445,7 +458,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
             case 'obhPartner':
                 this.obhpartnerId.setValue(data.id);
                 this.removeValidators(this.obhpartnerId);
-
+                this.obhPartnerName = (data as Partner).shortName;
                 break;
             default:
                 break;
@@ -523,7 +536,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
                 || x.type === AccountingConstants.RECEIPT_PAYMENT_TYPE.OBH
                 || x.type === AccountingConstants.RECEIPT_ADVANCE_TYPE.ADVANCE),
         };
-        if (!body.list.length || !body.paidAmountVnd || !body.paidAmountUsd) {
+        if (!body.list.length || (body.currency === 'VND' && !body.paidAmountVnd) || (body.currency === 'USD' && !body.paidAmountUsd)) {
             this._toastService.warning('Missing data to process', 'Warning');
             return;
         }

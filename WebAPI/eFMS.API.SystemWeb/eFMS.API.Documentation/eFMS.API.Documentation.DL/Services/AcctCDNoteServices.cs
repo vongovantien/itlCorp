@@ -2895,6 +2895,9 @@ namespace eFMS.API.Documentation.DL.Services
 
         public List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
         {
+            var accMangData = accountingManagementRepository.Get();
+            var chargeData =  surchargeRepository.Get();
+
             var cdNotes = Query(criteria).Select(s => new AcctCdnote
             {
                Id = s.Id,
@@ -2910,27 +2913,29 @@ namespace eFMS.API.Documentation.DL.Services
                DepartmentId = s.DepartmentId
             }).ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
 
-            var charges = surchargeRepository.Get().Select(s => new CsShipmentSurcharge
-            {
-               Id =s.Id,
-               CurrencyId = s.CurrencyId,
-               Total = s.Total,
-               JobNo = s.JobNo,
-               InvoiceNo = s.InvoiceNo,
-               VoucherId = s.VoucherId,
-               VoucherIddate = s.VoucherIddate,
-               AcctManagementId = s.AcctManagementId,
-               Hblno = s.Hblno,
-               Mblno=s.Mblno,
-               CreditNo = s.CreditNo,
-               DebitNo = s.DebitNo,
-               Type = s.Type,
-               PayerId = s.PayerId,
-
-            });
+            var charges = from charge in chargeData
+                          join am in accMangData on charge.AcctManagementId equals am.Id into amGrp
+                          from am in amGrp.DefaultIfEmpty()
+                          select new CsShipmentSurchargeModel { 
+                              Id = charge.Id,
+                              CurrencyId = charge.CurrencyId,
+                              Total =charge.Total,
+                              JobNo =charge.JobNo,
+                              InvoiceNo =charge.InvoiceNo,
+                              VoucherId =charge.VoucherId,
+                              VoucherIddate =charge.VoucherIddate,
+                              AcctManagementId =charge.AcctManagementId,
+                              Hblno =charge.Hblno,
+                              Mblno =charge.Mblno,
+                              CreditNo =charge.CreditNo,
+                              DebitNo =charge.DebitNo,
+                              Type =charge.Type,
+                              PayerId =charge.PayerId,
+                              AccountNo = am.AccountNo
+                          };
 
             var query = from cdnote in cdNotes
-                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
+                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo) 
                        select new { cdnote, charge };
 
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
@@ -2943,7 +2948,7 @@ namespace eFMS.API.Documentation.DL.Services
                ReferenceNo = se.Key.ReferenceNo,
                Currency = se.Key.Currency,
                CdNote = se.Select(s => s.cdnote),
-               Charge = se.Select(s => s.charge)
+               Charge = se.Select(s => s.charge),
             });
 
             var selectData = grpQuery.Select(se => new CDNoteModel
@@ -2973,7 +2978,8 @@ namespace eFMS.API.Documentation.DL.Services
                PayerId = se.Charge.FirstOrDefault().PayerId,
                DepartmentId = se.CdNote.FirstOrDefault().DepartmentId,
                IssueDate= se.CdNote.FirstOrDefault().DatetimeCreated,
-               VoucherIddate = se.Charge.FirstOrDefault().VoucherIddate
+               VoucherIddate = se.Charge.FirstOrDefault().VoucherIddate,
+               AccountNo = se.Charge.FirstOrDefault().AccountNo
             });
 
             var _resultDatas = GetByStatus(criteria.Status, selectData).ToArray();
@@ -3012,7 +3018,8 @@ namespace eFMS.API.Documentation.DL.Services
                               Bu= departs != null? departs.DeptNameEn:"",
                               ServiceDate=trans != null ?trans.ServiceDate:null,
                               VoucherIddate = cd.VoucherIddate,
-                              IssueDate = cd.IssueDate
+                              IssueDate = cd.IssueDate,
+                              AccountNo = cd.AccountNo,
                           };
 
             var dataOps = from cd in _resultDatas
@@ -3042,7 +3049,8 @@ namespace eFMS.API.Documentation.DL.Services
                               Bu = departs!=null?departs.DeptNameEn:"",
                               ServiceDate = trans != null ? trans.ServiceDate : null,
                               VoucherIddate = cd.VoucherIddate,
-                              IssueDate = cd.IssueDate
+                              IssueDate = cd.IssueDate,
+                              AccountNo = cd.AccountNo,
                           };
 
             var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();

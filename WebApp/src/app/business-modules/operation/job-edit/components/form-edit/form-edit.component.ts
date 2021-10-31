@@ -189,7 +189,7 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             customerId: [null, Validators.required],
             pol: [],
             pod: [],
-            supplierId: [],
+            supplierId: [null, Validators.required],
             agentId: [],
             salemansId: [null, Validators.required],
             warehouseId: [],

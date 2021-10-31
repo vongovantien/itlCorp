@@ -209,10 +209,21 @@ namespace eFMS.API.ForPartner.Controllers
                 ResultHandle _result = new ResultHandle { Status = false, Message = "Không có phí để tạo hóa đơn. Vui lòng kiểm tra lại!", Data = model };
                 return Ok(_result);
             }
-
-            var hs = accountingManagementService.InsertInvoice(model, apiKey, out Guid Id);
-            string _message = hs.Success ? "Tạo mới hóa đơn thành công" : string.Format("{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString());
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+            string _message = string.Empty;
+            bool _code = false;
+            HandleState hs = accountingManagementService.InsertInvoice(model, apiKey, out Guid Id);
+            if(hs.Code == 409)
+            {
+                _message = "Hóa Đơn đã tồn tại, eFMS đồng bộ lại trạng thái";
+                _code = true;
+            }
+            else
+            {
+                _message = hs.Success ? "Tạo mới hóa đơn thành công" : string.Format("{0}. Tạo mới hóa đơn thất bại", hs.Message.ToString());
+                _code = hs.Success;
+            }
+           
+            ResultHandle result = new ResultHandle { Status = _code, Message = _message, Data = model };
 
             var _endDateProgress = DateTime.Now;
 
@@ -240,7 +251,10 @@ namespace eFMS.API.ForPartner.Controllers
                         var surchargeIds = model.Charges.Select(s => s.ChargeId).ToList();
                         var modelReceivable = accountingManagementService.GetCalculatorReceivableNotAuthorizeModelBySurchargeIds(surchargeIds, apiKey, "CreateInvoiceData_FromBravo");
                         await CalculatorReceivable(modelReceivable);
-                        await InsertDebitInvoiceAr(Id);
+                        if (Id != Guid.Empty)
+                        {
+                            await InsertDebitInvoiceAr(Id);
+                        }
                     });
                 }
             }

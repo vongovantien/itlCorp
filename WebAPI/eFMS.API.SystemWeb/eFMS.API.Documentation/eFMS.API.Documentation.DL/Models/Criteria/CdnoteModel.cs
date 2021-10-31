@@ -33,5 +33,6 @@ namespace eFMS.API.Documentation.DL.Models.Criteria
         public int? DepartmentId { get;  set; }
         public DateTime? VoucherIddate { get; set; }
         public DateTime? IssueDate { get;  set; }
+        public string AccountNo { get; set; }
     }
 }
