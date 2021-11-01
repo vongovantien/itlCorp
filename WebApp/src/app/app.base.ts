@@ -272,10 +272,10 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         };
     }
 
-    showPopupDynamicRender<T = any>(component: T | ConfirmPopupComponent | InfoPopupComponent | any, containerRef: ViewContainerRef, config: ConfirmPopupConfig, callBack?: Function) {
+    showPopupDynamicRender<T = any>(component: T | ConfirmPopupComponent | InfoPopupComponent | any, containerRef: ViewContainerRef, config?: ConfirmPopupConfig, callBack?: Function) {
         this.componentRef = this.renderDynamicComponent(component, containerRef);
 
-        const configKeys = Object.keys(config);
+        const configKeys = config && Object.keys(config) || [];
         if (configKeys.length) {
             configKeys.forEach((k: string) => {
                 this.componentRef.instance[k] = config[k];
@@ -287,7 +287,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
         });
 
         if (this.componentRef.instance instanceof ConfirmPopupComponent) {
-            const cancelSubscription = this.componentRef.instance.onCancel.subscribe(
+            const cancelSubscription = this.componentRef.instance?.onCancel?.subscribe(
                 () => {
                     cancelSubscription.unsubscribe();
                     containerRef.clear();
@@ -295,7 +295,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
                 });
         }
 
-        const submitSubscription = this.componentRef.instance.onSubmit.subscribe(
+        const submitSubscription = this.componentRef.instance?.onSubmit?.subscribe(
             (v: boolean) => {
                 submitSubscription.unsubscribe();
                 containerRef.clear();
@@ -312,7 +312,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
 
 export interface ConfirmPopupConfig {
     title?: string;
-    body: string;
+    body?: string;
     labelConfirm?: string;
     labelCancel?: string;
     iconConfirm?: string;

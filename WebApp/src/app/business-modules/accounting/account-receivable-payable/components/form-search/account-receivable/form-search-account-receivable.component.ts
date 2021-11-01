@@ -12,6 +12,7 @@ import { SearchListAccountReceivable } from '../../../account-receivable/store/a
 import { getAccountReceivableSearchState, IAccountReceivableState } from '../../../account-receivable/store/reducers';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { SystemConstants } from '@constants';
+import { getCurrentUserState } from '@store';
 
 const OverDueDaysValues = [
     { from: null, to: null },
@@ -115,10 +116,12 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     ];
     partnerTypes: CommonInterface.INg2Select[] = [
         { id: 'All', text: 'All' },
-        { id: 'Customer', text: 'Customer' },
         { id: 'Agent', text: 'Agent' },
+        { id: 'Customer', text: 'Customer' },
     ];
-    loginData: SystemInterface.IClaimUser;
+
+    //partnerTypes:string[]=["All","Customer","Agent"]
+    currentUser: SystemInterface.IClaimUser;
     staffList: any[] = [];
     staffsInit: any[] = [];
     staff: AbstractControl;
@@ -135,13 +138,27 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     ngOnInit(): void {
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-        this.loginData = JSON.parse(localStorage.getItem(SystemConstants.USER_CLAIMS));
-        this.salemans = this._systemRepo.getListSystemUser();
+        this._store.select(getCurrentUserState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe(
+            (user: any) => {
+                if (user && JSON.stringify(user) !== '{}') {
+                    this.currentUser = user;
+                    if(this.officeIds)
+                        this.officeIds.setValue([this.currentUser.officeId]);
+                    this.getOffices();
+                    this.getAllStaff();
+
+                    if(this.formSearch){
+                        this.subscriptionSearchParamState();
+                        this.submitSearch();
+                    }
+                }
+            }
+        )
         this.initForm();
-        this.getOffices();
-        this.submitSearch();
-        this.getAllStaff();
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.salemans = this._systemRepo.getListSystemUser();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -153,12 +170,12 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             debitRate: [this.debitRates[0].id],
             fromDebitRate: [],
             toDebitRate: [],
-            agreementStatus: [this.agreementStatusList[0].id],
+            agreementStatus: [this.agreementStatusList[1].id],
             agreementExpiredDays: [this.agreementExpiredDayList[0].id],
             salesManId: [],
             officalId: [],
             partnerType: [this.partnerTypes[0].id],
-            officeIds: [[this.loginData.officeId]],
+            officeIds: [],
             staff:[]
         });
 
@@ -177,9 +194,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         this.officeIds = this.formSearch.controls["officeIds"];
         this.staff = this.formSearch.controls["staff"];
 
-        this.partnerType.setValue("All");
-
-        this.subscriptionSearchParamState();
     }
 
     // tslint:disable-next-line:no-any
@@ -193,6 +207,9 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                 break;
             case 'offical':
                 this.officalId.setValue(data.id);
+                break;
+            case 'partnerType':
+                this.partnerType.setValue(data.id);
                 break;
             default:
                 break;
@@ -253,9 +270,8 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             debitRate: dataForm.debitRate,
             partnerType:dataForm.partnerType,
             officeIds: !!dataForm.officeIds ? this.getOfficeSearch(dataForm.officeIds) : null,
-            staffs:!!dataForm.staffs ? dataForm.staffs: null
+            staffs:!!dataForm.staff ? dataForm.staff: null
         };
-
 
         this._store.dispatch(SearchListAccountReceivable(body));
         this.onSearch.emit(body);
@@ -274,16 +290,17 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                             overdueDays: data.overDueDay ? data.overDueDay : this.overDueDays[0].id,
                             fromDebitRate: data.debitRateFrom ? data.debitRateFrom : null,
                             toDebitRate: data.debitRateTo ? data.debitRateTo : null,
-                            agreementStatus: data.agreementStatus ? data.agreementStatus : this.agreementStatusList[0].id,
+                            agreementStatus: data.agreementStatus ? data.agreementStatus : this.agreementStatusList[1].id,
                             agreementExpiredDays: data.agreementExpiredDay ? data.agreementExpiredDay : this.agreementExpiredDayList[0].id,
                             salesManId: data.salesmanId ? data.salesmanId : null,
                             officalId: data.officeId ? data.officeId : null,
                             fromOverdueDays: data.fromOverdueDays ? data.fromOverdueDays : null,
                             toOverdueDays: data.toOverdueDays ? data.toOverdueDays : null,
                             debitRate: data.debitRate ? data.debitRate : this.debitRates[0].id,
-                            partnerType: data.partnerType ? data.partnerType : this.partnerTypes[0].id
+                            partnerType: data.partnerType ? data.partnerType : this.partnerTypes[0].id,
+                            officeIds:data.officeIds?data.officeIds:null,
+                            staff:data.staffs?data.staffs:null
                         };
-                        console.log("subscriptionSearchParamState",data);
                         this.formSearch.patchValue(formData);
                     }
                 }
@@ -318,7 +335,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         return strOffice;
     }
     getOffices() {
-        this._systemRepo.getListOfficesByUserId(this.loginData.id)
+        this._systemRepo.getListOfficesByUserId(this.currentUser.id)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this.isLoading = false; }),

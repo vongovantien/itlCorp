@@ -37,40 +37,47 @@
                                                 </div>
                                             </td>
 
-                                            <td>{{ item.officeName}}</td>
-                                            <td>{{ item.currency}}</td>
-                                            <td class="text-right">{{ item.totalDebitAmount | number: '.0-3'
-                                                }}
+                                            <td class="text-right">{{ item.officeName}}</td>
+                                            <td class="text-right">{{ item.officeNameAbbr}}</td>
+                                            <td class="text-right">{{ item.totalDebitAmount | number: '.0-3'}}</td>
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail('Unpaid',item.officeId,'')">
+                                                    {{ (item.totalBillingAmount + item.totalObhBillingAmount) | number:'.0-3'}}
+                                                </a>
                                             </td>
-
-                                            <td class="text-right">{{ (item.totalBillingAmount +
-                                                item.totalObhBillingAmount) | number:
-                                                '.0-3'}}
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail('Paid',item.officeId,'')">
+                                                {{ (item.totalPaidAmount + item.totalObhPaidAmount) | number:'.0-3'}}
+                                                </a>
                                             </td>
-                                            <td class="text-right">{{ (item.totalPaidAmount +
-                                                item.totalObhPaidAmount) | number:
-                                                '.0-3'}}
-                                            </td>
-                                            <td class="text-right">{{ (item.totalBillingUnpaid +
-                                                item.totalObhUnPaidAmount) | number:
-                                                '.0-3'}}
+                                            <td class="text-right">
+                                                <a href="javascript:void(0)" (click)="showDebitDetail('OutStanding',item.officeId,'')">
+                                                    {{ (item.totalBillingUnpaid + item.totalObhUnPaidAmount) | number:'.0-3'}}
+                                                </a>
                                             </td>
 
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over1To15Day',item.officeId,'')">
                                                     {{ item.totalOver1To15Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over16To30Day',item.officeId,'')">
                                                     {{ item.totalOver15To30Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
                                             <td class="text-right">
                                                 <span [ngClass]="'text-danger'">
-                                                    {{ item.totalOver30Day | number: '.0-3' }}
+                                                    <a href="javascript:void(0)" (click)="showDebitDetail('Over30Day',item.officeId,'')">
+                                                        {{ item.totalOver30Day | number: '.0-3' }}
+                                                    </a>
                                                 </span>
                                             </td>
+                                            <td class="text-right">{{ item.currency}}</td>
                                         </tr>
                                         <tr class="collapse-panel-row" app-table-collapse-row [id]="'id-00' + (i + 1)"
                                             [parentId]="'#service-table'">
@@ -97,33 +104,40 @@
                                                             number: '.0-3'}}
                                                         </td>
 
-                                                        <td class="text-right">{{ (element.billingAmount
-                                                            + element.obhBillingAmount)
-                                                            | number: '.0-3'}}
+                                                        <td class="text-right">
+                                                            <a href="javascript:void(0)" (click)="showDebitDetail('Unpaid',element.officeId,element.serviceCode)">
+                                                            {{ (element.billingAmount+ element.obhBillingAmount)| number: '.0-3'}}
+                                                            </a>
                                                         </td>
-                                                        <td class="text-right">{{ (element.paidAmount +
-                                                            element.obhPaidAmount) |
-                                                            number: '.0-3' }}
+                                                        <td class="text-right">
+                                                            <a href="javascript:void(0)" (click)="showDebitDetail('Paid',element.officeId,element.serviceCode)">
+                                                            {{ (element.paidAmount + element.obhPaidAmount) | number: '.0-3' }}
+                                                            </a>
                                                         </td>
-                                                        <td class="text-right">{{ (element.billingUnpaid
-                                                            + element.obhUnPaidAmount)
-                                                            | number: '.0-3'}}
+                                                        <td class="text-right">
+                                                            <a href="javascript:void(0)" (click)="showDebitDetail('OutStanding',element.officeId,element.serviceCode)">
+                                                            {{ (element.billingUnpaid + element.obhUnPaidAmount) | number: '.0-3'}}
+                                                            </a>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ element.over1To15Day | number: '.0-3'
-                                                                }}
+                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over1To15Day',element.officeId,element.serviceCode)">
+                                                                {{ element.over1To15Day | number: '.0-3'}}
+                                                                </a>
                                                             </span>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ element.over16To30Day | number:
-                                                                '.0-3' }}
+                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over16To30Day',element.officeId,element.serviceCode)">
+                                                                {{ element.over16To30Day | number:'.0-3' }}
+                                                                </a>
                                                             </span>
                                                         </td>
                                                         <td class="text-right">
                                                             <span [ngClass]="'text-danger'">
-                                                                {{ element.over30Day | number: '.0-3' }}
+                                                                <a href="javascript:void(0)" (click)="showDebitDetail('Over30Day',element.officeId,element.serviceCode)">
+                                                                    {{ element.over30Day | number: '.0-3' }}
+                                                                </a>
                                                             </span>
                                                         </td>
 
@@ -146,5 +160,5 @@
         </div>
     </div>
 </div>
-
+<account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>
 <ng-template inject></ng-template>

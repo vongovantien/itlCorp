@@ -136,7 +136,7 @@
                             Partner</label>
                         <app-combo-grid-virtual-scroll (itemSelected)="onSelectDataFormInfo($event, 'obhPartner')"
                             (remove)="resetFormControl(obhpartnerId)"
-                            [currentActiveItemId]="{field:'id', value: obhpartnerId.value}"
+                            [currentActiveItemId]="{field:'id', value: obhpartnerId.value, hardValue: obhPartnerName}"
                             [selectedDisplayFields]="['shortName']" [dataSources]="obhPartners | async"
                             [displayFields]="displayFieldsPartner" placeholder="Select OBH Partner"
                             [disabled]="isReadonly">
@@ -164,14 +164,14 @@
         </div>
         <div class="col-lg-6">
             <div class="row">
-                <div class="col-lg-{{!!syncInfoTemplate ? 8 : 12}}">
+                <div class="col-lg-{{!!syncInfoTemplate ? 6 : 12}}">
                     <div class="form-group">
                         <label>Description</label>
                         <textarea cols="30" rows="5" class="form-control" formControlName="description"
                             [attr.readOnly]="isReadonly"></textarea>
                     </div>
                 </div>
-                <div class="col-lg-4">
+                <div class="col-lg-6">
                     <div class="form-group">
                         <label></label>
                         <ng-container *ngTemplateOutlet="syncInfoTemplate"></ng-container>

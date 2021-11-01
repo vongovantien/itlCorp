@@ -126,6 +126,7 @@ export class AccReceivableOfficesDetailModel {
     accountReceivableGrpServices: AccReceivableServicesDetailModel[] = [];
     officeId: string = null;
     officeName: string = null;
+    officeNameAbbr: string = null;
     totalBillingAmount: number = 0;
     totalBillingUnpaid: number = 0;
     totalDebitAmount: number = 0;
@@ -158,6 +159,7 @@ export class AccReceivableServicesDetailModel {
     over30Day: number = 0;
     paidAmount: number = 0;
     serviceName: string = null;
+    serviceCode: string = null;
     obhBillingAmount: number = 0;
     obhPaidAmount: number = 0;
     obhUnPaidAmount: number = 0;

@@ -1387,7 +1387,8 @@ namespace eFMS.API.Accounting.DL.Services
             var acRefPartner = partnerRepo.Get();
 
             var selectQuery = from contract in partnerContracts
-                              join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
+                              //join acctReceivable in acctReceivables on contract.PartnerId equals acctReceivable.PartnerId into acctReceivables2
+                              join acctReceivable in acctReceivables on contract.Id equals acctReceivable.ContractId into acctReceivables2
                               from acctReceivable in acctReceivables2.DefaultIfEmpty()
                               where contract.SaleService.Contains(acctReceivable.Service) && contract.OfficeId.Contains(acctReceivable.Office.ToString(), StringComparison.OrdinalIgnoreCase)
                               select new { acctReceivable, contract };
@@ -1400,7 +1401,7 @@ namespace eFMS.API.Accounting.DL.Services
                     DebitAmount = s.acctReceivable.DebitAmount
                 }).ToList();
             // Group by Contract ID, Service AR, Office AR
-            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office })
+            var groupByContract = selectQuery.GroupBy(g => new { g.contract.Id, g.acctReceivable.Service, g.acctReceivable.Office ,g.contract.OfficeId })
                 .Select(s => new AccountReceivableResult
                 {
                     AgreementId = s.Key.Id,
@@ -1417,6 +1418,7 @@ namespace eFMS.API.Accounting.DL.Services
                     AgreementSalesmanId = s.First().contract.SaleManId,
                     AgreementCurrency = s.First().contract.CurrencyId,
                     OfficeId = s.Key.Office.ToString(), //Office AR chứa trong Office Argeement
+                    OfficeContract = s.Key.OfficeId.ToString(), //Office AR chứa trong Office Argeement
                     ArServiceCode = s.Key.Service,
                     ArServiceName = string.Empty, //Get data bên dưới
                     EffectiveDate = s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_TRIAL ? s.First().contract.TrialEffectDate : (s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL || s.First().contract.ContractType == AccountingConstants.ARGEEMENT_TYPE_CASH ? s.First().contract.EffectiveDate : null),
@@ -1512,7 +1514,8 @@ namespace eFMS.API.Accounting.DL.Services
                            ArCurrency = contract.ArCurrency,
                            CreditCurrency = contract.CreditCurrency,
                            ParentNameAbbr = parent.ShortName,
-                           DatetimeModified = contract.DatetimeModified
+                           DatetimeModified = contract.DatetimeModified,
+                           OfficeContract = contract.OfficeContract,
                        };
             return data;
         }
@@ -1719,48 +1722,51 @@ namespace eFMS.API.Accounting.DL.Services
             res = arPartnerContracts.ToList();
 
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
-                res = arPartnerContracts.Where(x => x.DebitRate >= criteria.DebitRateTo && x.DebitRate <= criteria.DebitRateFrom).ToList();
+                res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo).ToList();
             if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
-                res = arPartnerContracts.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
+                res = res.Where(x => x.AgreementStatus == criteria.AgreementStatus).ToList();
             if (criteria.AgreementExpiredDay !=null && criteria.AgreementExpiredDay!="All")
             {
                 switch (criteria.AgreementExpiredDay)
                 {
                     case "Normal":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay > 30).ToList();
+                        res = res.Where(x => x.ExpriedDay > 30).ToList();
                         break;
                     case "30Day":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay == 30).ToList();
+                        res = res.Where(x => x.ExpriedDay == 30).ToList();
                         break;
                     case "15Day":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 15).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 15).ToList();
                         break;
                     case "Expired":
-                        res = arPartnerContracts.Where(x => x.ExpriedDay <= 0).ToList();
+                        res = res.Where(x => x.ExpriedDay <= 0).ToList();
                         break;
                 }
             }
             if (criteria.Staffs != null)
-                res = arPartnerContracts.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
+                res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
             if (criteria.OfficeIds != null)
-                res = arPartnerContracts.Where(x => criteria.OfficeIds.Contains(x.OfficeId)).ToList();
+            {
+                var str = String.Join(",", criteria.OfficeIds);
+                res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId)).ToList();
+            }
 
             switch (criteria.OverDueDay)
             {
                 case OverDueDayEnum.Over1_15:
-                    res = arPartnerContracts.Where(x => x.Over1To15Day > 0).ToList();
+                    res = res.Where(x => x.Over1To15Day > 0).ToList();
                     break;
                 case OverDueDayEnum.Over16_30:
-                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over16To30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.Over30:
-                    res = arPartnerContracts.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over16To30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.All:
                     break;
             }
 
-            return res.AsQueryable();
+            return res.AsQueryable().OrderByDescending(x=>x.DebitRate);
         }
 
 
@@ -1935,7 +1941,8 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhBillingAmount = s.Sum(sum=>sum.ObhBillingAmount),
                         ObhPaidAmount=s.Sum(sum=>sum.ObhPaidAmount),
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
-                        DatetimeModified = s.First().DatetimeModified
+                        DatetimeModified = s.First().DatetimeModified,
+                        OfficeContract = s.First().OfficeContract,
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -2028,6 +2035,7 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         OfficeId = Guid.Parse(sel.OfficeId),
                         ServiceName = sel.ArServiceName,
+                        ServiceCode = sel.ArServiceCode,
                         DebitAmount = sel.DebitAmount,
                         BillingAmount = sel.BillingAmount,
                         BillingUnpaid = sel.BillingUnpaid,
@@ -2049,6 +2057,7 @@ namespace eFMS.API.Accounting.DL.Services
                        {
                            OfficeId = ar.OfficeId,
                            OfficeName = office.BranchNameEn,
+                           OfficeNameAbbr = office.ShortName,
                            TotalDebitAmount = ar.TotalDebitAmount,
                            TotalBillingAmount = ar.TotalBillingAmount,
                            TotalBillingUnpaid = ar.TotalBillingUnpaid,
@@ -2172,13 +2181,15 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option)
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode)
         {
             if (argeementId == null || argeementId == Guid.Empty) return null;
             DbParameter[] parameters =
             {
                 SqlParam.GetParameter("argid", argeementId),
-                SqlParam.GetParameter("option", option)
+                SqlParam.GetParameter("option", option),
+                SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:"")
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;
@@ -2230,13 +2241,13 @@ namespace eFMS.API.Accounting.DL.Services
                             if (contractModel.BaseOn == "Invoice Date")
                             {
                                 invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.Date;
+                                invoice.PaymentDueDate = invoice.Date.HasValue ? invoice.Date.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             //Nếu Base On là Billing Date : Due Date = Billing date + Payment Term
                             if (contractModel.BaseOn == "Confirmed Billing")
                             {
                                 invoice.PaymentTerm = contractModel.PaymentTerm;
-                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.ConfirmBillingDate;
+                                invoice.PaymentDueDate = invoice.ConfirmBillingDate.HasValue ? invoice.ConfirmBillingDate.Value.AddDays((double)(contractModel.PaymentTerm ?? 0)) : invoice.PaymentDueDate;
                             }
                             var hsPaymentMgn = accountingManagementRepo.Update(invoice, x => x.Id == invoice.Id, false);
                         }

@@ -1505,7 +1505,7 @@ namespace eFMS.API.ReportData
                         worksheet.Cells[addressStartContent, 9].Value = item.ExpiredDate != null ? item.ExpiredDate.Value.ToShortDateString() : null;
                         worksheet.Cells[addressStartContent, 10].Value = item.Currency;
                         worksheet.Cells[addressStartContent, 11].Value = item.SaleManName;
-                        worksheet.Cells[addressStartContent, 12].Value = item.ARComfirm != null ? "Yes"  : "No";
+                        worksheet.Cells[addressStartContent, 12].Value = item.ARComfirm != null ? item.ARComfirm == true ? "Yes" : "No" : "No";
                         worksheet.Cells[addressStartContent, 13].Value = item.Active.Value ? "Active" : "Inactive";
                         worksheet.Cells[addressStartContent, 14].Value = item.Service;
                         worksheet.Cells[addressStartContent, 15].Value = item.Office;

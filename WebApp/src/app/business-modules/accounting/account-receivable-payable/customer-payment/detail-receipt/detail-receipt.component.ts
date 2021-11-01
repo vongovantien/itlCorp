@@ -59,7 +59,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 (res: ReceiptModel) => {
                     if (!!res) {
                         if (res.id === SystemConstants.EMPTY_GUID) {
-                            //this.gotoList();
                             return;
                         }
                         this.updateDetailForm(res);
@@ -104,6 +103,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(this.utility.mergeObject({ ...res }, formMapping));
         this.formCreate.customerName = res.customerName;
         this.formCreate.receiptReference = res.referenceNo;
+        // this.formCreate.contractNo = res.contractNo;
         this.formCreate.getContract();
     }
 
@@ -125,6 +125,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
         this._store.dispatch(SelectReceiptClass({ class: res.class }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
+        this.listInvoice.obhPartnerName = res.obhPartnerName;
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;

@@ -788,8 +788,8 @@ export class AccountingRepo {
         );
     }
 
-    generateReceiptNo() {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`);
+    generateReceiptNo(body) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/GenerateReceiptNo`, body);
     }
 
     getInvoiceForReceipt(body) {
@@ -873,7 +873,7 @@ export class AccountingRepo {
     }
 
     syncReceiptToAccountant(list: any[]) {
-        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list)
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/SyncListReceiptToAccountant`, list);
     }
 
     checkVoucherIdDuplicate(voucherId: string, acctId: string) {
@@ -888,11 +888,16 @@ export class AccountingRepo {
         );
     }
 
-    getDataDebitDetail(agreementId: any, option: any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option }).pipe(
+    getDataDebitDetail(agreementId: any, option: any, officeId:any,serviceCode:any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId:officeId,serviceCode:serviceCode }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
+    }
+
+    quickUpdateReceipt(receiptId: string, body: any) {
+        return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/${receiptId}/QuickUpdate`, body);
+
     }
 }
 

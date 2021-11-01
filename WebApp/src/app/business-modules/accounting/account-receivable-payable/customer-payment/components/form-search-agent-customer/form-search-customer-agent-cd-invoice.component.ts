@@ -12,10 +12,12 @@ import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
-import { Observable, of } from 'rxjs';
-import { takeUntil, pluck, switchMap, tap, mergeMap, withLatestFrom, switchAll, takeLast, last, take, filter, startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { takeUntil, switchMap, tap, filter, startWith, map } from 'rxjs/operators';
 import { SelectPartnerReceipt } from '../../store/actions';
 import { getCurrentUserState } from '@store';
+import { CommonEnum } from '@enums';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'form-search-customer-agent-cd-invoice',
@@ -70,8 +72,11 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     ) { super(); }
 
     ngOnInit(): void {
-        this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
-
+        if (environment.production) {
+            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
+        } else {
+            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
+        }
 
         this.initSubmitClickSubscription(() => this.searchData());
         this.initForm();

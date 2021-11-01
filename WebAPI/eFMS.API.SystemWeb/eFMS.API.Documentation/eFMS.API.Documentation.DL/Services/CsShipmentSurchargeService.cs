@@ -1278,7 +1278,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
-            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled");
+            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {

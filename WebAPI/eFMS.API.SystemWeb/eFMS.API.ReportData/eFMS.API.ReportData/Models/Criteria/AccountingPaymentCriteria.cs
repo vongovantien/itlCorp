@@ -12,6 +12,7 @@ namespace eFMS.API.ReportData.Models.Criteria
         public List<string> ReferenceNos { get; set; }
         public string PartnerId { get; set; }
         public DateTime? IssuedDate { get; set; }
+        public DateTime? FromIssuedDate { get; set; }
         public DateTime? FromUpdatedDate { get; set; }
         public DateTime? ToUpdatedDate { get; set; }
         public DateTime? DueDate { get; set; }
