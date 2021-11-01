@@ -122,7 +122,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
         }
         const modelReceipt: IGenerateReceiptV2 = {
             paymentMethod: this.receipt.paymentMethod,
-            currency: this.receipt.currencyId,
+            currencyId: this.receipt.currencyId,
             paymentDate: this.receipt.paymentDate
         }
         this._accountingRepo.generateReceiptNo(modelReceipt).subscribe(
@@ -148,6 +148,6 @@ export interface IModelQuickUpdateReceipt {
 
 interface IGenerateReceiptV2 {
     paymentMethod: string;
-    currency: string;
+    currencyId: string;
     paymentDate: Date;
 }
