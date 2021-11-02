@@ -217,7 +217,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         sumPaidAmountUsd = +((+sumPaidAmountUsd).toFixed(2));
         sumPaidAmountVnd = +((+sumPaidAmountVnd).toFixed(0));
 
-        if (receiptModel.paidAmountVnd > sumPaidAmountVnd || receiptModel.paidAmountUsd > sumPaidAmountUsd) {
+        if ((receiptModel.currencyId === 'VND' && receiptModel.paidAmountVnd > sumPaidAmountVnd) || (receiptModel.currencyId !== 'VND' && receiptModel.paidAmountUsd > sumPaidAmountUsd)) {
             this._toastService.warning("Collect amount > Sum paid amount, please process clear");
             return;
         }

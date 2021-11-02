@@ -263,6 +263,8 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         this.obhpartnerId = this.form.controls['obhpartnerId'];
         this.notifyDepartment = this.form.controls['notifyDepartment'];
         this.cusAdvanceAmountUsd = this.form.controls['cusAdvanceAmountUsd'];
+
+        this._store.dispatch(ToggleAutoConvertPaid({ isAutoConvert: true }));
     }
 
     async generateExchangeRate(date: string, curreny: string = 'USD') {
