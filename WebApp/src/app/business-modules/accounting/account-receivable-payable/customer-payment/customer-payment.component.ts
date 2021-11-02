@@ -267,6 +267,8 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     confirmSyncReceipt() {
+        const currentReceipt = Object.assign({}, this.selectedReceipt);
+
         const confirmMessage = `Are you sure you want to send ${this.selectedReceipt.paymentRefNo} to accountant system?`;
         this.showPopupDynamicRender(ConfirmPopupComponent, this.viewContainer.viewContainerRef, {
             title: 'Sync To Accountant System',
@@ -275,7 +277,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             labelConfirm: 'Yes',
             center: true
         }, () => {
-            this.sendReceiptToAccountant(this.selectedReceipt);
+            this.sendReceiptToAccountant(currentReceipt);
         });
     }
 

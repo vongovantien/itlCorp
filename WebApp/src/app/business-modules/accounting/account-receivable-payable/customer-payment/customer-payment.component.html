@@ -203,7 +203,7 @@
 
 <app-context-menu #receiptContextMenu (clickOutside)="selectedReceipt = null">
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !== 'Synced'">
-        <div class="menu-context__item" (click)="confirmSyncReceipt()">
+        <div class="menu-context__item" (click)="confirmSyncReceipt(selectedReceipt)">
             <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
         </div>
     </ng-container>
