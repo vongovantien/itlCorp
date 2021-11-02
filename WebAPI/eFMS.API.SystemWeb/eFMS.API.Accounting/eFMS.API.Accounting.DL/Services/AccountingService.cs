@@ -3010,7 +3010,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         private string GeneratePaymentReceiptDescription(AcctReceipt receipt, string type)
         {
-            string _des = "Công Nợ Phải Thu";
+            string _des = "Thu công nợ khách hàng";
             if (type == "NETOFF")
             {
                 return "Công Nợ Cấn Trừ";
@@ -3027,10 +3027,10 @@ namespace eFMS.API.Accounting.DL.Services
                     return receipt.Description;
                 }
             }
-            if(!string.IsNullOrEmpty(receipt.Description))
-            {
-                return receipt.Description;
-            }
+            //if(!string.IsNullOrEmpty(receipt.Description))
+            //{
+            //    return receipt.Description;
+            //}
             return _des;
         }
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)
