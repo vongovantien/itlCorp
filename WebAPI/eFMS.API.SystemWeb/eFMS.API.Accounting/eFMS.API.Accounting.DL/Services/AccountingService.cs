@@ -3027,10 +3027,10 @@ namespace eFMS.API.Accounting.DL.Services
                     return receipt.Description;
                 }
             }
-            if(!string.IsNullOrEmpty(receipt.Description))
-            {
-                return receipt.Description;
-            }
+            //if(!string.IsNullOrEmpty(receipt.Description))
+            //{
+            //    return receipt.Description;
+            //}
             return _des;
         }
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)

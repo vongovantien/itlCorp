@@ -1917,7 +1917,25 @@ namespace eFMS.API.Accounting.DL.Services
                         else
                         {
                             isAddNew = false;
-                            AcctReceipt receiptCurrent = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
+                            
+                            AcctReceipt receipt = DataContext.Get(x => x.Id == receiptModel.Id).FirstOrDefault();
+
+                            receiptModel.UserCreated = receipt.UserCreated;
+                            receiptModel.DatetimeCreated = receipt.DatetimeCreated;
+                            receiptModel.GroupId = receipt.GroupId;
+                            receiptModel.DepartmentId = receipt.DepartmentId;
+                            receiptModel.OfficeId = receipt.OfficeId;
+                            receiptModel.CompanyId = receipt.CompanyId;
+
+                            receiptModel.UserModified = currentUser.UserID;
+                            receiptModel.DatetimeModified = DateTime.Now;
+                          
+                            receiptModel.Status = AccountingConstants.RECEIPT_STATUS_DONE;
+                            receiptModel.DatetimeModified = DateTime.Now;
+                            receiptModel.PaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.PaidAmountVnd : receiptModel.PaidAmountUsd;
+                            receiptModel.FinalPaidAmount = receiptModel.CurrencyId == AccountingConstants.CURRENCY_LOCAL ? receiptModel.FinalPaidAmountVnd : receiptModel.FinalPaidAmountUsd;
+
+                            AcctReceipt receiptCurrent = mapper.Map<AcctReceipt>(receiptModel);
 
                             // Xóa các payment hiện tại, add các payment mới khi update
                             List<Guid> paymentsDelete = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.Id).ToList();
