@@ -50,6 +50,7 @@ export const receiptManagementReducer = createReducer(
     on(ReceiptActions.GetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true })),
     on(ReceiptActions.GetInvoiceListSuccess, (state: IReceiptState, payload: any) => ({
         ...state,
+        isLoading: false,
         creditList: [...payload.invoices.filter(x => x.paymentType === 'CREDIT'), ...state.creditList],
         debitList: [...payload.invoices.filter(x => x.paymentType === 'DEBIT' || x.paymentType === 'OBH' || x.paymentType === 'OTHER'), ...state.debitList]
     })),
@@ -58,7 +59,7 @@ export const receiptManagementReducer = createReducer(
         type: payload.data,
         partnerId: !!payload.partnerId ? payload.partnerId : null
     })),
-    on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, creditList: [], debitList: [], agreement: {} })),
+    on(ReceiptActions.ResetInvoiceList, (state: IReceiptState) => ({ ...state, isLoading: true, creditList: [], debitList: [], agreement: {} })),
     on(ReceiptActions.InsertAdvance, (state: IReceiptState, payload: any) => ({
         ...state,
         debitList: [...state.debitList, payload.data]

@@ -42,10 +42,6 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     ngOnInit() {
 
         this.headers = [
-        //    { title: 'Partner Id', field: 'partnerCode', sortable: true },
-        //    { title: 'Partner Name', field: 'partnerNameAbbr', sortable: true },
-        //     { title: 'Rate (%)', field: 'debitRate', sortable: true },
-        //     { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Billing', field: 'billingAmount', sortable: true },
             { title: 'Paid a Part', field: 'paidAmount', sortable: true },
             { title: 'OutStanding Balance', field: 'billingUnpaid', sortable: true },
@@ -53,9 +49,10 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             { title: 'Over 1-15 days', field: 'over1To15Day', sortable: true },
             { title: 'Over 16-30 days', field: 'over16To30Day', sortable: true },
             { title: 'Over 30 days', field: 'over30Day', sortable: true },
-            { title: 'Over Amount', field: 'overAmount', sortable: true },
             { title: 'Currency', field: 'agreementCurrency', sortable: true },
+            { title: 'Debit Amount', field: 'debitAmount', sortable: true },
             { title: 'Credit Limited', field: 'creditLimited', sortable: true },
+            { title: 'Over Credit Amount', field: 'overAmount', sortable: true },
             { title: 'Salesman', field: 'agreementSalesmanName', sortable: true },
             { title: 'Contract No', field: 'agreementNo', sortable: true },
             { title: 'Expired Date', field: 'expriedDate', sortable: true },
@@ -101,13 +98,21 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
     }
 
     //
-    viewDetail(agreementId: string) {
-        this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
-            queryParams: {
-                agreementId: agreementId,
-
-            }
-        });
+    viewDetail(agreementId: string, partnerId: string) {
+        if (!!agreementId) {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
+                queryParams: {
+                    agreementId: agreementId,
+                }
+            });
+        } else {
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/summary/detail`], {
+                queryParams: {
+                    partnerId: partnerId,
+                    subTab: 'other',
+                }
+            });
+        }
     }
 
     exportExcel() {
@@ -118,14 +123,14 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
             this._exportRepo.exportAccountingReceivableArSumary(this.dataSearch)
                 .subscribe(
                     (res: Blob) => {
-                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'List-Trial.xlsx');
+                        this.downLoadFile(res, SystemConstants.FILE_EXCEL, 'Ar-Summary.xlsx');
                     }
                 );
         }
     }
 
     showDebitDetail(agreementId, option) {
-        this._accountingRepo.getDataDebitDetail(agreementId, option)
+        this._accountingRepo.getDataDebitDetail(agreementId, option,'','')
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())

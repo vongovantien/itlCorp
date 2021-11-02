@@ -54,16 +54,24 @@
         public static readonly string COMPANY_ADDRESS2 = "";
         public static readonly string COMPANY_WEBSITE = "www‎.‎itlvn‎.‎com‎";
         public static readonly string COMPANY_CONTACT = "Tel‎: (‎84‎-‎8‎) ‎3948 6888  Fax‎: +‎84 8 38488 570‎";
+        public static readonly string OFFICE_CODE_HCM = "ITLHCM";
+        public static readonly string OFFICE_CODE_DAD = "ITLDAD";
+        public static readonly string OFFICE_CODE_HAN = "ITLHAN";
         #endregion -- INFO COMPANY --
 
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_BANK_TRANSFER = "Bank Transfer";
         public static readonly string PAYMENT_METHOD_OTHER = "Other";
         public static readonly string PAYMENT_METHOD_NETOFF_SHPT = "NETOFF_SHPT";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE = "Clear-Advance";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_CASH = "Clear-Advance-Cash";
         public static readonly string PAYMENT_METHOD_CLEAR_ADVANCE_BANK = "Clear-Advance-Bank";
+        public static readonly string PAYMENT_METHOD_COLL_INTERNAL = "COLL - Internal";
+        public static readonly string PAYMENT_METHOD_MANAGEMENT_FEE = "Management Fee";
+        public static readonly string PAYMENT_METHOD_OTHER_FEE = "Other Fee";
+
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -197,11 +205,11 @@
         public static readonly string PAYMENT_TYPE_CODE_PAY_OTHER = "PAY_OTH";
         public static readonly string PAYMENT_TYPE_CODE_ADVANCE = "ADV";
 
-        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT OBH";
-        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT OTHER";
-        public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY OBH";
-        public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY OTHER";
-        public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NET OFF";
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OBH = "COLLECT-OBH";
+        public static readonly string PAYMENT_TYPE_NAME_COLLECT_OTHER = "COLLECT-OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OBH = "PAY-OBH";
+        public static readonly string PAYMENT_TYPE_NAME_PAY_OTHER = "PAY-OTHER";
+        public static readonly string PAYMENT_TYPE_NAME_NET_OFF = "NETOFF";
         public static readonly string PAYMENT_TYPE_NAME_ADVANCE = "ADV";
         #endregion
 

@@ -53,7 +53,23 @@
             </div>
             <div class="modal-footer m--align-center">
                 <app-default-button [buttonSetting]="resetButtonSetting" (click)="resetSearch()"></app-default-button>
-                <app-permission-button title="Export" (onClick)="exportData()" type="export"></app-permission-button>
+                <!-- <app-permission-button title="Export" (onClick)="exportData()" type="export"></app-permission-button> -->
+                <app-permission-button title="Export" type="export" [dpToggle]="dropdownMenu" position="bottomCenter"
+                mode="dropdown">
+                </app-permission-button>
+                <app-dropdown #dropdownMenu>
+                    <a class="dropdown-item pointer" (click)="exportData()">
+                        <span>
+                            Partner Info
+                        </span>
+                    </a>
+                    <a class="dropdown-item pointer" (click)="exportAgreementInfo()">
+                        <span>
+                            Agreement Info
+                        </span>
+                    </a>
+                </app-dropdown>
+
                 <app-default-button [buttonSetting]="cancelButtonSetting" (click)="close()"></app-default-button>
             </div>
         </div>

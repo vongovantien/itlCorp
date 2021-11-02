@@ -1,6 +1,7 @@
 
 export const environment = {
     production: false,
+    uat: false,
     local: true,
     HOST: {
         WEB_URL: "localhost:",

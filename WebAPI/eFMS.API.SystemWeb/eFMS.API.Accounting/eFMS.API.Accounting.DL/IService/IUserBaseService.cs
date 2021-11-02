@@ -29,5 +29,6 @@ namespace eFMS.API.Accounting.DL.IService
         bool CheckIsUserDeputy(string type, string commissioner, string userId, int? groupId, int? departmentId, Guid? officeId, Guid? companyId);
         bool CheckIsAccountantByOfficeDept(Guid? officeId, int? deptId);
         bool CheckIsUserAdmin(string currUserId, Guid currOfficeId, Guid currCompanyId, Guid? objOfficeId, Guid? objCompanyId);
+        List<int?> GetDepartmentUser(Guid? companyId, Guid? officeId, string userId);
     }
 }

@@ -8,6 +8,7 @@ namespace eFMS.API.Accounting.DL.Models.AccountReceivable
     {
         public Guid? OfficeId { get; set; }
         public string ServiceName { get; set; }
+        public string ServiceCode { get; set; }
         public decimal? DebitAmount { get; set; }
         public decimal? BillingAmount { get; set; }
         public decimal? BillingUnpaid { get; set; }

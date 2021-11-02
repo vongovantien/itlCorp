@@ -143,8 +143,7 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
             partnerId: dataForm.partnerId,
             paymentStatus: status,
             overDueDays: !!dataForm.overdueDate ? +dataForm.overdueDate : OverDueDays.All,
-            fromIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.startDate) ? formatDate(this.issuedDate.value.startDate, 'yyyy-MM-dd', 'en') : null,
-            toIssuedDate: (!!this.issuedDate.value && !!this.issuedDate.value.endDate) ? formatDate(this.issuedDate.value.endDate, 'yyyy-MM-dd', 'en') : null,
+            issuedDate: (!!dataForm.issuedDate && !!dataForm.issuedDate.startDate) ? formatDate(dataForm.issuedDate.startDate, 'yyyy-MM-dd', 'en') : null,
             fromUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.startDate) ? formatDate(dataForm.paidDate.startDate, 'yyyy-MM-dd', 'en') : null,
             toUpdatedDate: (!!dataForm.paidDate && !!dataForm.paidDate.endDate) ? formatDate(dataForm.paidDate.endDate, 'yyyy-MM-dd', 'en') : null,
             dueDate: (!!dataForm.dueDate && !!dataForm.dueDate.startDate) ? formatDate(dataForm.dueDate.startDate, 'yyyy-MM-dd', 'en') : null,
@@ -197,7 +196,13 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
 
     resetSearch() {
         this.formSearch.reset();
-        this.initForm();
+        this.searchType.setValue(this.referenceTypes[0].value);
+        this.referenceNo.setValue(null);
+        this.partnerId.setValue(null);
+        this.overdueDate.setValue(this.overDueDays[0].id);
+        this.paymentStatus.setValue([this.payments[1], this.payments[2]]);
+        this.office.setValue([this.loginData.officeId]);
+
         this.getOffices();
         this._store.dispatch(SearchListHistoryPayment({ searchType : this.referenceTypes[0].value, paymentStatus: this.getSearchStatus(this.paymentStatus.value)
             , paymentType: PaymentType.Invoice, overDueDays: OverDueDays.All, office: this.getSearchStatus(this.office.value) }));
@@ -235,8 +240,8 @@ export class ARHistoryPaymentFormSearchComponent extends AppForm implements OnIn
                             paidDate: (!!data?.fromUpdatedDate && !!data?.toUpdatedDate) ?
                                 { startDate: new Date(data?.fromUpdatedDate), endDate: new Date(data?.toUpdatedDate) } : null,
                             dueDate: !!data?.dueDate ? { startDate: new Date(data?.dueDate), endDate: new Date(data?.dueDate) } : null,
-                            issuedDate: (!!data?.fromIssuedDate && !!data?.toIssuedDate) ?
-                                { startDate: new Date(data?.fromIssuedDate), endDate: new Date(data?.toIssuedDate) } : null,
+                            issuedDate: (!!data?.issuedDate) ?
+                                { startDate: new Date(data?.issuedDate), endDate: new Date(data?.issuedDate) } : null,
                             office: data.office.length === 0 ? (!!this.loginData ? [this.loginData.officeId] : null) : data.office,
                         };
                         this.formSearch.patchValue(formData);
@@ -252,8 +257,7 @@ interface ISearchAccPayment {
     partnerId: string;
     paymentStatus: string[];
     overDueDays: number;
-    fromIssuedDate: string;
-    toIssuedDate: string;
+    issuedDate: string;
     fromUpdatedDate: string;
     toUpdatedDate: string;
     dueDate: string;

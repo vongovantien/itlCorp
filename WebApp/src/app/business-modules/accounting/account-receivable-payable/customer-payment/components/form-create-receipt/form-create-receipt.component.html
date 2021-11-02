@@ -34,16 +34,16 @@
                 <label class="form-control-label">
                     Receipt Reference
                 </label>
-                <input type="text" formControlName="referenceNo" class="form-control">
+                <input type="text" formControlName="referenceNo" class="form-control text-primary">
             </div>
         </div>
         <div class="col-lg-3">
             <div class="form-group" [ngClass]="{'m-form__group has-danger':isSubmitted && !paymentRefNo.valid }">
-                <label class="form-control-label" required>
+                <label class="form-control-label">
                     Receipt No
                 </label>
-                <input type="text" class="form-control m-input m-input--square" formControlName="paymentRefNo"
-                    [attr.disabled]="isReadonly">
+                <input type="text" class="form-control m-input m-input--square text-primary"
+                    formControlName="paymentRefNo" [attr.disabled]="isReadonly">
             </div>
         </div>
         <div class="col-lg-3">
@@ -60,7 +60,7 @@
                 </label>
                 <app-combo-grid-virtual-scroll #combogridAgreement
                     (itemSelected)="onSelectDataFormInfo($event, 'agreement')" (remove)="resetFormControl(agreementId)"
-                    [currentActiveItemId]="{field:'id', value: agreementId.value, hardValue:contractNo}"
+                    [currentActiveItemId]="{field:'id', value: agreementId.value}"
                     [selectedDisplayFields]="['contractType','saleManName','contractNo']" [dataSources]="agreements"
                     [displayFields]="displayFieldAgreement" placeholder="Select Agreement" [clearable]="false"
                     [disabled]="isReadonly">

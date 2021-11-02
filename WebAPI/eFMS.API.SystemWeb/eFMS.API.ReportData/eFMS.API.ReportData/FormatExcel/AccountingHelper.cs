@@ -126,13 +126,14 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Width = 20; //Cột E
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 14; //Cột G
-            workSheet.Column(8).Width = 18; //Cột H
+            workSheet.Column(8).Width = 23; //Cột H
             workSheet.Column(9).Width = 19; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(10).Width = 25; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
-            workSheet.Column(12).Width = 13; //Cột L
-            workSheet.Column(13).Width = 12; //Cột M
-            workSheet.Column(14).Width = 20; //Cột N
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 15; //Cột M
+            workSheet.Column(14).Width = 25; //Cột N
+            workSheet.Column(14).Width = 15; //Cột P
             workSheet.Column(16).Width = 30; //Cột P
         }
 
@@ -194,6 +195,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 9].Value = item.BankAccountNo;
                         worksheet.Cells[i + addressStartContent, 10].Value = item.BankAccountName;
+                        worksheet.Cells[i + addressStartContent, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 11].Value = item.BankName;
                         //
                         worksheet.Cells[i + addressStartContent, 12].Value = item.JobId;
@@ -201,6 +203,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
+                        worksheet.Cells[i + addressStartContent, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
@@ -607,17 +610,38 @@ namespace eFMS.API.ReportData.FormatExcel
         /// <returns></returns>
         public Stream GenerateExportCustomerHistoryPayment(List<AccountingCustomerPaymentExport> customerPayment, AccountingPaymentCriteria paymentCriteria, string fileName)
         {
+            var folderOfFile = GetARExcelFolder();
+            FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
+            var path = f.FullName;
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+            var excel = new ExcelExport(path);
             try
             {
-                var folderOfFile = GetARExcelFolder();
-                FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
-                var path = f.FullName;
-                if (!File.Exists(path))
+                int startRow = 2;
+                var listKeyData = new Dictionary<string, object>();
+                if (paymentCriteria.IssuedDate != null)
                 {
-                    return null;
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", paymentCriteria.IssuedDate.Value.ToString("dd/MM/yyyy")));
                 }
-                var excel = new ExcelExport(path);
-                int startRow = 6;
+                else if (paymentCriteria.FromUpdatedDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {1}", paymentCriteria.FromUpdatedDate.Value.ToString("dd/MM/yyyy")
+                        , paymentCriteria.ToUpdatedDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else if (paymentCriteria.DueDate != null)
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", paymentCriteria.DueDate.Value.ToString("dd/MM/yyyy")));
+                }
+                else
+                {
+                    listKeyData.Add("RangeDate", string.Format("Từ ngày {0} đến ngày {0}", DateTime.Now.ToString("dd/MM/yyyy")));
+                }
+                excel.SetData(listKeyData);
+
+                startRow = 6;
                 excel.StartDetailTable = startRow;
                 excel.NumberOfGroup = 2;
                 if (customerPayment.Count == 0)
@@ -653,9 +677,10 @@ namespace eFMS.API.ReportData.FormatExcel
                 var sumRemainObhUsd = 0m;
                 var sumAdvanceAmountVnd = 0m;
                 var sumAdvanceAmountUsd = 0m;
-                foreach (var item in customerPayment)
+                for (int i = 0; i < customerPayment.Count; i++)
                 {
-                    var listKeyData = new Dictionary<string, object>();
+                    var item = customerPayment[i];
+                    listKeyData = new Dictionary<string, object>();
                     if (item.BillingRefNo != "ADVANCE AMOUNT")
                     {
                         excel.IndexOfGroup = 1;
@@ -767,6 +792,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch (Exception ex)
             {
+                excel.PackageExcel.Dispose();
                 return null;
             }
         }
@@ -928,6 +954,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(9).Width = 20; //Cột I
             workSheet.Column(10).Width = 18; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
         }
 
         private List<string> GetHeaderExcelDetailAdvancePayment(string language)
@@ -988,7 +1015,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Hình thức thanh toán:",//44
                 "Đối tượng thanh toán:",//45
                 //END
-                "Note", //46
+                "Ghi chú", //46
             };
 
             List<string> engHeaders = new List<string>()
@@ -1133,6 +1160,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J10"].Style.Font.Bold = true;
             //workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
             workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.BankAccountName;
+            workSheet.Cells["K10"].Style.WrapText = true;
 
             workSheet.Cells["A8:B8"].Merge = true;
             workSheet.Cells["A8:B8"].Value = headers[42];
@@ -1153,6 +1181,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J12"].Value = headers[39];
             workSheet.Cells["J12"].Style.Font.Bold = true;
             workSheet.Cells["K12"].Value = advanceExport.InfoAdvance.BankName;
+            workSheet.Cells["K12"].Style.WrapText = true;
 
             workSheet.Cells["J13"].Value = headers[40];
             workSheet.Cells["J13"].Style.Font.Bold = true;
@@ -3804,6 +3833,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Bank code:", // 27
                 "By cash:", // 28
                 "Due date:", // 29
+                "Payment method:", //30
+
             };
 
             List<string> headers = Headers;
@@ -4140,28 +4171,28 @@ namespace eFMS.API.ReportData.FormatExcel
                 // Total net amount
                 var _totalNetAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeNetAmount).Sum();
                 workSheet.Cells[j - 1, 6].Value = _totalNetAmount;
-                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 6].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 6].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 // Total VAT amount
                 var _totalVatAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeVatAmount).Sum();
                 workSheet.Cells[j - 1, 7].Value = _totalVatAmount;
-                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 7].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 7].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total amount
                 var _totalAmount = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Select(s => s.ChargeAmount).Sum();
                 workSheet.Cells[j - 1, 8].Value = _totalAmount;
-                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 8].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 8].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 8].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
                 //Value total advanced amount (số tiền đã tạm ứng)
                 var _advanceAmount = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount);//settlementExport.ShipmentsSettlement[i].AdvanceAmount ?? 0;
                 workSheet.Cells[j - 1, 11].Value = _advanceAmount;
-                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 11].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4169,7 +4200,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 //Value chênh lệch
                 workSheet.Cells[j - 1, 13].Value = _totalAmount - _advanceAmount;
-                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[j - 1, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[j - 1, 13].Style.Font.Bold = true;
                 workSheet.Cells[j - 1, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
 
@@ -4183,7 +4214,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 11, j - 2, 11].Merge = true;
                 workSheet.Cells[p, 11, j - 2, 11].Value = settlementExport.ShipmentsSettlement[i].InfoAdvanceExports.Sum(sum => sum.AdvanceAmount); //Value Số tiền đã tạm ứng
-                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 11, j - 2, 11].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 11, j - 2, 11].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 11, j - 2, 11].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4206,7 +4237,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[p, 13, j - 2, 13].Merge = true;
                 workSheet.Cells[p, 13, j - 2, 13].Value = string.Empty; //Value Chênh lệch
-                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[p, 13, j - 2, 13].Style.Numberformat.Format = decimalFormat2;
                 workSheet.Cells[p, 13, j - 2, 13].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
                 workSheet.Cells[p, 13, j - 2, 13].Style.Border.Right.Style = ExcelBorderStyle.Thin;
@@ -4253,7 +4284,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             //Bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["A" + p + ":M" + p].Style.Font.Bold = true;
-            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["A" + p + ":M" + p].Style.Numberformat.Format = decimalFormat2;
 
             //In đậm border dòng 15
             workSheet.Cells[15, 1, 15, 13].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
@@ -4411,6 +4442,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Style.Font.Bold = true;
             workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.SupplierName;
 
+            workSheet.Cells["A8"].Value = headers[7]; //Reson for request
+            workSheet.Cells["A8"].Style.Font.Bold = true;
+            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.ReasonForRequest;
+
+
+            workSheet.Cells["A11"].Value = headers[30]; //Reson for request
+            workSheet.Cells["A11"].Style.Font.Bold = true;
+            workSheet.Cells["B11"].Value = settlementExport.InfoSettlement.PaymentMethod;
+
             workSheet.Cells["F6"].Value = headers[5]; //Số SOA
             workSheet.Cells["F6"].Style.Font.Bold = true;
             workSheet.Cells["G6"].Value = settlementExport.InfoSettlement.SOANo;
@@ -4423,7 +4463,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Beneficiary
             workSheet.Cells["F13"].Value = headers[24];
             workSheet.Cells["F13"].Style.Font.Bold = true;
-            workSheet.Cells["CG3"].Value = settlementExport.InfoSettlement.BankAccountName;
+            workSheet.Cells["G13"].Value = settlementExport.InfoSettlement.BankAccountName;
 
             // Acc No
             workSheet.Cells["F14"].Value = headers[25];
@@ -4485,6 +4525,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["F18:G18"].Merge = true;
             workSheet.Cells["F18:G18"].Value = headers[13]; // Amount
+            workSheet.Cells["F18:G18"].Style.Numberformat.Format = numberFormat2;
 
             workSheet.Cells["F19"].Merge = true;
             workSheet.Cells["F19"].Value = headers[14]; // OBH
@@ -4498,8 +4539,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[17, 1, 17, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
             #endregion
 
-            decimal? _sumTotalOBH = 0;
-            decimal? _sumTotalCredit = 0;
+            decimal _sumTotalOBH = 0;
+            decimal _sumTotalCredit = 0;
             int p = 20;
             int j = 20;
             int k = 20;
@@ -4511,9 +4552,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
-                //workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in OBHCharges)
                 {
                     workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
@@ -4524,9 +4565,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
+                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
-                //workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat;
+                workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
                 foreach (var no_invoice in CreditInvoiceCharges)
                 {
                     workSheet.Cells[k, 2].Value = no_invoice.InvoiceNo;
@@ -4602,9 +4643,9 @@ namespace eFMS.API.ReportData.FormatExcel
             #endregion--TOTAL--
             //bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["a" + (p-2) + ":g" + (p - 2)].Style.Font.Bold = true;
-            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat2;
             workSheet.Cells["a" + p + ":g" + p].Style.Font.Bold = true;
-            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat;
+            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat2;
 
             //In đậm border dòng 14
             workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
@@ -5000,7 +5041,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Issued_by",//14
                 "BU",//15
                 "Service Date",//16
-                "Issue Date"//17
+                "Issue Date",//17
+                "Account No"//18
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -5040,13 +5082,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[rowStart, 18].Value = item.IssueDate;
                 workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[rowStart, 19].Value = item.AccountNo;
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
@@ -5088,25 +5132,71 @@ namespace eFMS.API.ReportData.FormatExcel
                 var excel = new ExcelExport(path);
                 excel.StartDetailTable = 3;
 
+                excel.StartDetailTable = 3;
+                //Set format amount
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
+
+                var rowStart = 3;
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
                     var listKeyData = new Dictionary<string, object>();
+                    var listKeyFormat = new List<string>();
                     excel.SetDataTable();
                     listKeyData.Add("No", i+1);
                     listKeyData.Add("PartnerId", item.PartnerCode);
-                    listKeyData.Add("PartnerName", item.ParentNameAbbr);
-                    listKeyData.Add("Rate", item.DebitRate);
-                    listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
-                    listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
-                    listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
-                    listKeyData.Add("Over1-15Days", item.Over1To15Day);
-                    listKeyData.Add("Over16-30Days", item.Over16To30Day);
-                    listKeyData.Add("Over30Days", item.Over30Day);
+                    listKeyData.Add("PartnerName", item.PartnerNameEn);
+                    var rate = item.DebitRate?.ToString("0.##");
+                    listKeyData.Add("Rate", rate + " %");
+
+                    if (item.AgreementCurrency == "VND")
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountVND;
+                        listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountVND;
+                    }
+                    else
+                    {
+                        listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
+                        listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountUSD;
+                    }
+              
+
                     listKeyData.Add("Curr", item.AgreementCurrency);
-                    listKeyData.Add("DebitAmount", item.DebitAmount);
-                    listKeyData.Add("CreditLimited", item.CreditLimited);
-                    listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
+              
+
                     listKeyData.Add("Salesman",item.AgreementSalesmanName);
                     listKeyData.Add("ContractType", item.AgreementType);
                     listKeyData.Add("Status", item.AgreementStatus);
@@ -5116,6 +5206,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("ParentPartner", item.ParentNameAbbr);
 
                     excel.SetData(listKeyData);
+                    rowStart++;
                 }
                 return excel.ExcelStream();
             }
@@ -5194,6 +5285,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 var folderOfFile = GetARExcelFolder();
+                var deleteDetailRow = false;
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
                 var path = f.FullName;
                 if (!File.Exists(path))
@@ -5205,8 +5297,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (paymentCriteria.DueDate == null)
+                if (paymentCriteria.DueDate != null  || paymentCriteria.FromIssuedDate != null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
+                {
                     excel.DeleteRow(7);
+                    deleteDetailRow = true;
+                }
 
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5264,7 +5359,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0 && paymentCriteria.DueDate != null)
+                    if ( item.details.Count > 0 && deleteDetailRow == false && (paymentCriteria.DueDate == null || paymentCriteria.FromIssuedDate == null))
                     {
                         foreach (var detail in item.details)
                         {
@@ -5305,13 +5400,15 @@ namespace eFMS.API.ReportData.FormatExcel
 
         }
 
-        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria)
+        public Stream GenerateReceiptAdvance(AcctReceiptAdvanceModelExport result, AcctReceiptCriteria criteria, out string fileName)
         {
             try
             {
                 var folderOfFile = GetARExcelFolder();
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, "Receipt_Advance_Report _Teamplate.xlsx"));
                 var path = f.FullName;
+                fileName = "AdvanceReport_" + result.TaxCode+ ".xlsx";
+
                 if (!File.Exists(path))
                 {
                     return null;
@@ -5324,6 +5421,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 map.Add("taxCode", result.TaxCode);
                 map.Add("nameEn", result.PartnerNameEn);
                 map.Add("info",  string.Format("{0} at {1}", result.UserExport, DateTime.Now.ToString("dd/MM/yyyy")) );
+
+
                 excel.SetData(map);
 
                 int startRow = 6;
@@ -5358,7 +5457,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
             catch (Exception ex)
             {
-
+                fileName = "";
                 return null;
             }
         }

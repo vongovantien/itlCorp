@@ -11,6 +11,8 @@ namespace eFMS.API.Documentation.DL.Models
         public string MBLNoError { get; set; }
         public string PartnerCode { get; set; }
         public string PartnerCodeError { get; set; }
+        public string ObhPartner { get; set; }
+        public string ObhPartnerError { get; set; }
         public string ChargeCode { get; set; }
         public string ChargeCodeError { get; set; }
         public string Unit { get; set; }

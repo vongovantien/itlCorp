@@ -12,10 +12,12 @@ import { ReceiptPartnerCurrentState, ReceiptDateState, ReceiptTypeState } from '
 import { ARCustomerPaymentCustomerAgentDebitPopupComponent } from '../customer-agent-debit/customer-agent-debit.popup';
 import { IReceiptState } from '../../store/reducers/customer-payment.reducer';
 
-import { Observable, of } from 'rxjs';
-import { takeUntil, pluck, switchMap, tap, mergeMap, withLatestFrom, switchAll, takeLast, last, take, filter, startWith, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { takeUntil, switchMap, tap, filter, startWith, map } from 'rxjs/operators';
 import { SelectPartnerReceipt } from '../../store/actions';
 import { getCurrentUserState } from '@store';
+import { CommonEnum } from '@enums';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'form-search-customer-agent-cd-invoice',
@@ -57,6 +59,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     offices: Office[];
 
     selectedDefaultOffice = { id: 'All', shortName: "All" };
+    currentUser;
 
     constructor(
         private readonly _fb: FormBuilder,
@@ -69,15 +72,19 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
     ) { super(); }
 
     ngOnInit(): void {
-        this.customers = (this._catalogueRepo.customers$ as Observable<any>).pipe(pluck('data'));
-
-        this.initForm();
+        if (environment.production) {
+            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER]);
+        } else {
+            this.customers = this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER, CommonEnum.PartnerGroupEnum.AGENT]);
+        }
 
         this.initSubmitClickSubscription(() => this.searchData());
+        this.initForm();
 
         this._store.select(getCurrentUserState)
             .pipe(
                 filter(c => !!c.userName),
+                tap((c) => this.currentUser = c),
                 switchMap((currentUser: SystemInterface.IClaimUser | any) => {
                     if (!!currentUser.userName) {
                         return this._systemRepo.getOfficePermission(currentUser.id, currentUser.companyId)
@@ -90,6 +97,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             .subscribe((offices: Office[]) => {
                 this.offices = offices;
             })
+
     }
 
     initForm() {
@@ -100,7 +108,7 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
             date: [],
             dateType: [this.dateTypeList[0]],
             service: [[this.services[0].id]],
-            office: [[this.selectedDefaultOffice.id]]
+            office: []
         });
 
         this.typeSearch = this.formSearch.controls['typeSearch'];
@@ -143,6 +151,15 @@ export class ARCustomerPaymentFormSearchCustomerAgentCDInvoiceComponent extends 
                     }
                 }
             )
+
+        this._store.select(getCurrentUserState)
+            .pipe(
+                filter(c => !!c.userName),
+                takeUntil(this.ngUnsubscribe)
+            )
+            .subscribe((c) => {
+                this.office.setValue([c.officeId]);
+            })
     }
 
     onSelectDataFormInfo(data: any) {

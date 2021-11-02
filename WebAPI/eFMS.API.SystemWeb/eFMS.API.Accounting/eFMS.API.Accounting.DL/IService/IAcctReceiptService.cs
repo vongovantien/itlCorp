@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.DL.IService
         IQueryable<AcctReceiptModel> Paging(AcctReceiptCriteria criteria, int page, int size, out int rowsCount);
         IQueryable<AcctReceipt> Query(AcctReceiptCriteria criteria);
         HandleState Delete(Guid id);
+        string GenerateReceiptNoV2(AcctReceiptModel receipt);
         string GenerateReceiptNo();
         List<ReceiptInvoiceModel> GetInvoiceForReceipt(ReceiptInvoiceCriteria criteria);
         AcctReceiptModel GetById(Guid id);
@@ -30,6 +31,8 @@ namespace eFMS.API.Accounting.DL.IService
         Task<HandleState> CalculatorReceivableForReceipt(Guid receiptId);
         bool CheckPaymentPaid(List<ReceiptInvoiceModel> Payments);
         void AlertReceiptToDeppartment(List<int> Ids, AcctReceiptModel receiptModel);
-        AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria, IQueryable<AcctReceipt> receipts);
+        AcctReceiptAdvanceModelExport GetDataExportReceiptAdvance(AcctReceiptCriteria criteria);
+        bool ValidateCusAgreement(Guid agreementId, decimal cusVnd, decimal cusUsd);
+        Task<HandleState> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model);
     }
 }

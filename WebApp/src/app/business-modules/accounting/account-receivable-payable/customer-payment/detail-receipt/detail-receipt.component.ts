@@ -12,7 +12,7 @@ import { of } from 'rxjs';
 import { pluck, switchMap, tap, concatMap, takeUntil, filter } from 'rxjs/operators';
 import { IAppState } from '@store';
 import { Store } from '@ngrx/store';
-import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt } from '../store/actions';
+import { GetInvoiceListSuccess, ResetInvoiceList, RegistTypeReceipt, SelectReceiptClass } from '../store/actions';
 import { ARCustomerPaymentFormCreateReceiptComponent } from '../components/form-create-receipt/form-create-receipt.component';
 import { InjectViewContainerRefDirective } from '@directives';
 import { ConfirmPopupComponent } from '@common';
@@ -59,7 +59,6 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                 (res: ReceiptModel) => {
                     if (!!res) {
                         if (res.id === SystemConstants.EMPTY_GUID) {
-                            //this.gotoList();
                             return;
                         }
                         this.updateDetailForm(res);
@@ -104,6 +103,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         this.formCreate.formSearchInvoice.patchValue(this.utility.mergeObject({ ...res }, formMapping));
         this.formCreate.customerName = res.customerName;
         this.formCreate.receiptReference = res.referenceNo;
+        // this.formCreate.contractNo = res.contractNo;
         this.formCreate.getContract();
     }
 
@@ -123,7 +123,9 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
         // * Mapping credit to credit[]
         this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(GetInvoiceListSuccess({ invoices: res.payments }));
+        this._store.dispatch(SelectReceiptClass({ class: res.class }));
         (this.listInvoice.partnerId as any) = { id: res.customerId };
+        this.listInvoice.obhPartnerName = res.obhPartnerName;
 
         if (res.status === AccountingConstants.RECEIPT_STATUS.DONE || res.status === AccountingConstants.RECEIPT_STATUS.CANCEL) {
             this.listInvoice.isReadonly = true;
@@ -170,9 +172,7 @@ export class ARCustomerPaymentDetailReceiptComponent extends ARCustomerPaymentCr
                     this.updateDetailForm(res);
                 },
                 (res: HttpErrorResponse) => {
-                    if (res.error.code === SystemConstants.HTTP_CODE.EXISTED) {
-                        this.formCreate.paymentRefNo.setErrors({ existed: true });
-                    }
+                    this.handleValidateReceiptResponse(res);
                 }
             )
     };

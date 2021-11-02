@@ -192,11 +192,12 @@ namespace eFMS.API.Accounting.DL.Services
                         surchargesSoa.Add(surcharge);
                     }
                 }
+                var currentOffice = officeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault().Code;
                 soa.TotalShipment = _totalShipment;
                 soa.DebitAmount = _debitAmount;
                 soa.CreditAmount = _creditAmount;
                 soa.TotalCharge = _totalCharge;
-                soa.Soano = model.Soano = CreateSoaNo();
+                soa.Soano = model.Soano = CreateSoaNo(currentOffice);
                 soa.NetOff = false;
                 var hs = DataContext.Add(soa);
 
@@ -215,6 +216,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("AcctSOA", ex.ToString());
                 var hs = new HandleState((object)ex.Message);
                 return hs;
             }
@@ -357,6 +359,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             catch (Exception ex)
             {
+                new LogHelper("AcctSOA", ex.ToString());
                 var hs = new HandleState((object)ex.Message);
                 return hs;
             }
@@ -496,13 +499,14 @@ namespace eFMS.API.Accounting.DL.Services
             if (soaCharges.Count > 0)
             {
                 var updateSoaCharge = UpdateSurchargeForSoa(soaCharges);
-                string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
-                string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
-                    JsonConvert.SerializeObject(soaCharges),
-                    JsonConvert.SerializeObject(updateSoaCharge));
-                new LogHelper(logName, logMessage);
+
                 if (!updateSoaCharge.Status)
                 {
+                    string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                        JsonConvert.SerializeObject(soaCharges),
+                        JsonConvert.SerializeObject(updateSoaCharge));
+                    new LogHelper(logName, logMessage);
                     hs = new HandleState((object)updateSoaCharge.Message);
                 }
             }
@@ -540,13 +544,14 @@ namespace eFMS.API.Accounting.DL.Services
                 if (soaCharges.Count > 0)
                 {
                     var clearSoaCharge = ClearSurchargeForSoa(soaCharges);
-                    string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
-                    string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
-                        JsonConvert.SerializeObject(soaCharges),
-                        JsonConvert.SerializeObject(clearSoaCharge));
-                    new LogHelper(logName, logMessage);
+                   
                     if (!clearSoaCharge.Status)
                     {
+                        string logName = string.Format("SOA_{0}_UpdateCharge_{1}", soaNo, action);
+                        string logMessage = string.Format(" * DataCharge: {0} \n * Result: {1}",
+                            JsonConvert.SerializeObject(soaCharges),
+                            JsonConvert.SerializeObject(clearSoaCharge));
+                        new LogHelper(logName, logMessage);
                         hs = new HandleState((object)clearSoaCharge.Message);
                     }
                 }
@@ -606,12 +611,12 @@ namespace eFMS.API.Accounting.DL.Services
             }
         }*/
 
-        private string CreateSoaNo()
+        private string CreateSoaNo(string currOffice)
         {
             var prefix = (DateTime.Now.Year.ToString()).Substring(2, 2);
             string stt;
             //Lấy ra soa no mới nhất
-            var rowLast = DataContext.Get().OrderByDescending(o => o.Soano).FirstOrDefault();
+            var rowLast = DataContext.Get().OrderByDescending(o => o.DatetimeCreated).FirstOrDefault();
             if (rowLast == null)
             {
                 stt = "00001";
@@ -619,7 +624,7 @@ namespace eFMS.API.Accounting.DL.Services
             else
             {
                 var soaCurrent = rowLast.Soano;
-                var prefixCurrent = soaCurrent.Substring(0, 2);
+                var prefixCurrent = soaCurrent.Substring(soaCurrent.Length-7, 2);
                 //Reset về 1 khi qua năm mới
                 if (prefixCurrent != prefix)
                 {
@@ -627,10 +632,20 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else
                 {
-                    stt = (Convert.ToInt32(soaCurrent.Substring(2, 5)) + 1).ToString();
+                    stt = (Convert.ToInt32(soaCurrent.Substring(soaCurrent.Length-5, 5)) + 1).ToString();
                     stt = stt.PadLeft(5, '0');
                 }
             }
+
+            if(currOffice== "ITLHAN")
+            {
+                prefix = "H" + prefix;
+            }
+            if (currOffice == "ITLDAD")
+            {
+                prefix = "D" + prefix;
+            }
+
             return prefix + stt;
         }
 

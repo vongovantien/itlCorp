@@ -21,6 +21,7 @@ using eFMS.API.Accounting.DL.Models.ExportResults;
 using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
 using eFMS.API.Common.Helpers;
+using System.Text;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -56,6 +57,9 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IStringLocalizer stringLocalizer;
         private string typeApproval = "Advance";
         private readonly IAccAccountReceivableService accAccountReceivableService;
+        private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
+        private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
             IMapper mapper,
@@ -87,7 +91,9 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<AccAccountReceivable> accAccountRepo,
             IContextBase<SysUserLevel> userLevelRepo,
             IUserBaseService userBase,
-            IAccAccountReceivableService accAccountReceivable) : base(repository, mapper)
+            IAccAccountReceivableService accAccountReceivable,
+            IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
+            IContextBase<SysEmailSetting> sysEmailSettingRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -118,6 +124,8 @@ namespace eFMS.API.Accounting.DL.Services
             sysOfficeRepo = sysOffice;
             authourizedApprovalRepo = authourizedApproval;
             accAccountReceivableService = accAccountReceivable;
+            sysEmailTemplateRepository = sysEmailTemplateRepo;
+            sysEmailSettingRepository = sysEmailSettingRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -202,6 +210,7 @@ namespace eFMS.API.Accounting.DL.Services
             var advancePayments = DataContext.Get().Where(queryDefault);
 
             var advancePaymentAprs = acctApproveAdvanceRepo.Get(x => x.IsDeny == false);
+            var advanceRequests = acctAdvanceRequestRepo.Get();
             var authorizedApvList = authourizedApprovalRepo.Get(x => x.Type == typeApproval && x.Active == true && (x.ExpirationDate ?? DateTime.Now.Date) >= DateTime.Now.Date).ToList();
             var isAccountantDept = userBaseService.CheckIsAccountantByOfficeDept(currentUser.OfficeID, currentUser.DepartmentId);
 
@@ -303,21 +312,69 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
             IQueryable<AcctAdvanceRequest> advanceRequests = null;
+
+            if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
+            {
+                IQueryable<AcctAdvanceRequest> advanceRQSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                IQueryable<AcctAdvanceRequest> advanceRQNotSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                IQueryable<AcctAdvanceRequest> advanceRQPartial = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                var ListAdvanceNo = acctAdvanceRequestRepo.Get().ToList().Select(x => x.AdvanceNo).Distinct();
+                var ListAvanceRQ = acctAdvanceRequestRepo.Get().ToList();
+                foreach (var advNo in ListAdvanceNo)
+                {
+                    int AdvanceCount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advNo).Count();
+                    int SettledCount = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_SETTLED && x.AdvanceNo == advNo).Count();
+                    int NotSettledCount = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.AdvanceNo == advNo).Count();
+                    if (NotSettledCount == AdvanceCount)
+                    {
+                        advanceRQNotSettled = advanceRQNotSettled.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
+                    }
+                    else if (SettledCount == AdvanceCount)
+                    {
+                        advanceRQSettled = advanceRQSettled.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
+                    }
+                    else
+                    {
+                        advanceRQPartial = advanceRQPartial.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
+                    }
+                }
+                if (criteria.StatusPayment == "PartialSettlement")
+                {
+                    advanceRequests = advanceRQPartial;
+                }
+                else if(criteria.StatusPayment == "Settled")
+                {
+                    advanceRequests = advanceRQSettled;
+                }
+                else
+                {
+                    advanceRequests = advanceRQNotSettled ;
+                }
+            }
+
             if (criteria.ReferenceNos != null && criteria.ReferenceNos.Count > 0)
             {
-                advanceRequests = acctAdvanceRequestRepo.Get(x =>
+                if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
+                {
+                    advanceRequests = advanceRequests.Where(x =>
+                                          criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
+                                       || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
+                                     );
+                }
+                else
+                {
+                    advanceRequests = acctAdvanceRequestRepo.Get(x =>
                                         criteria.ReferenceNos.Contains(x.AdvanceNo, StringComparer.OrdinalIgnoreCase)
                                      || criteria.ReferenceNos.Contains(x.Hbl, StringComparer.OrdinalIgnoreCase)
                                      || criteria.ReferenceNos.Contains(x.Mbl, StringComparer.OrdinalIgnoreCase)
                                      || criteria.ReferenceNos.Contains(x.CustomNo, StringComparer.OrdinalIgnoreCase)
                                      || criteria.ReferenceNos.Contains(x.JobId, StringComparer.OrdinalIgnoreCase)
                                      );
+                }
 
-            }
-
-            if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
-            {
-                advanceRequests = acctAdvanceRequestRepo.Get(x => x.StatusPayment == criteria.StatusPayment);
             }
 
             if (advanceRequests != null)
@@ -327,6 +384,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             return advancePayments;
         }
+
 
         /// <summary>
         /// Nếu không có điều kiện search (ngoại trừ param requester) thì load list Advance 3 tháng kể từ ngày modified mới nhất trở về trước
@@ -530,6 +588,7 @@ namespace eFMS.API.Accounting.DL.Services
                 .GroupBy(g => new { g.JobId, g.Hbl, g.CustomNo, g.Mbl, g.AdvanceNo })
                 .Select(se => new AcctAdvanceRequest
                 {
+
                     JobId = se.First().JobId,
                     Hbl = se.First().Hbl,
                     CustomNo = se.First().CustomNo,
@@ -538,7 +597,7 @@ namespace eFMS.API.Accounting.DL.Services
                     StatusPayment = se.First().StatusPayment,
                     AdvanceNo = se.FirstOrDefault().AdvanceNo,
                     Mbl = se.First().Mbl,
-                    Description = se.FirstOrDefault().Description,
+                    Description = string.Join(";", se.Select(x => x.Description)),
                     DatetimeModified = se.First().DatetimeModified
 
                 })
@@ -548,6 +607,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             foreach (var item in datamap)
             {
+                string statusApproval = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault().StatusApproval;
                 string requesterID = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).Requester;
                 var advancePayment = DataContext.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault();
                 if (!string.IsNullOrEmpty(requesterID))
@@ -562,14 +622,15 @@ namespace eFMS.API.Accounting.DL.Services
                 item.BankAccountNo = advancePayment.BankAccountNo;
                 item.BankName = advancePayment.BankName;
                 item.RequestDate = DataContext.First(x => x.AdvanceNo == item.AdvanceNo).RequestDate;
-                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo).FirstOrDefault()?.BuheadAprDate;
+                item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
+                
 
                 var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
                 if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
                 {
                     string _settleCode = surchargeAdvanceNo.SettlementCode;
                     var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
-                    if (data != null)
+                    if (data != null && data.IsDeny==false)
                     {
                         item.SettleDate = data.RequesterAprDate;
                     }
@@ -1671,22 +1732,6 @@ namespace eFMS.API.Accounting.DL.Services
                             }
                         }
 
-                        var sendMailApproved = true;
-                        var sendMailSuggest = true;
-                        if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                        {
-                            //Send Mail Approved
-                            sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
-                            //// to do send notification
-                            //var dataToSendNotification = GetAgreementDatasByAdvanceNo(advancePayment.AdvanceNo);
-                            //SendNotificationAccountReceivable(dataToSendNotification);
-                        }
-                        else
-                        {
-                            //Send Mail Suggest
-                            sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
-                        }
-
                         var checkExistsApproveByAdvanceNo = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advanceApprove.AdvanceNo && x.IsDeny == false).FirstOrDefault();
                         if (checkExistsApproveByAdvanceNo == null) //Insert ApproveAdvance
                         {
@@ -1707,19 +1752,37 @@ namespace eFMS.API.Accounting.DL.Services
                             var hsUpdateApprove = acctApproveAdvanceRepo.Update(checkExistsApproveByAdvanceNo, x => x.Id == checkExistsApproveByAdvanceNo.Id, false);
                         }
 
-                        acctApproveAdvanceRepo.SubmitChanges();
+                        var hs = acctApproveAdvanceRepo.SubmitChanges();
                         DataContext.SubmitChanges();
                         trans.Commit();
 
-                        // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
-                        if (!sendMailSuggest)
+                        if (hs.Success) // Send mail when success update
                         {
-                            return new HandleState("Send mail suggest approval failed");
+                            var sendMailApproved = true;
+                            var sendMailSuggest = true;
+                            if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                            {
+                                //Send Mail Approved
+                                sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
+                                //// to do send notification
+                                //var dataToSendNotification = GetAgreementDatasByAdvanceNo(advancePayment.AdvanceNo);
+                                //SendNotificationAccountReceivable(dataToSendNotification);
+                            }
+                            else
+                            {
+                                //Send Mail Suggest
+                                sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userLeaderOrManager, mailLeaderOrManager, mailUsersDeputy);
+                            }
+                            if (!sendMailSuggest)
+                            {
+                                return new HandleState("Send mail suggest approval failed");
+                            }
+                            if (!sendMailApproved)
+                            {
+                                return new HandleState("Send mail approved approval failed");
+                            }
                         }
-                        if (!sendMailApproved)
-                        {
-                            return new HandleState("Send mail approved approval failed");
-                        }
+
                         return new HandleState();
                     }
                     catch (Exception ex)
@@ -2024,19 +2087,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    var sendMailApproved = true;
-                    var sendMailSuggest = true;
-
-                    if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
-                    {
-                        //Send Mail Approved
-                        sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
-                    }
-                    else
-                    {
-                        //Send Mail Suggest
-                        sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
-                    }
+                    
 
                     advancePayment.UserModified = approve.UserModified = userCurrent;
                     advancePayment.DatetimeModified = approve.DateModified = DateTime.Now;
@@ -2044,19 +2095,35 @@ namespace eFMS.API.Accounting.DL.Services
                     var hsUpdateadvancePayment = DataContext.Update(advancePayment, x => x.Id == advancePayment.Id, false);
                     var hsUpdateApprove = acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id, false);
 
-                    acctApproveAdvanceRepo.SubmitChanges();
+                    var hs = acctApproveAdvanceRepo.SubmitChanges();
                     DataContext.SubmitChanges();
                     trans.Commit();
 
-                    // Send mail là Option nên send mail có thất bại vẫn cập nhật data Approve Settlement [23/12/2020]
-                    if (!sendMailSuggest)
+                    if (hs.Success) // Send mail when success update
                     {
-                        return new HandleState("Send mail suggest approval failed");
+                        var sendMailApproved = true;
+                        var sendMailSuggest = true;
+
+                        if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
+                        {
+                            //Send Mail Approved
+                            sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
+                        }
+                        else
+                        {
+                            //Send Mail Suggest
+                            sendMailSuggest = SendMailSuggestApproval(advancePayment.AdvanceNo, userApproveNext, mailUserApproveNext, mailUsersDeputy);
+                        }
+                        if (!sendMailSuggest)
+                        {
+                            return new HandleState("Send mail suggest approval failed");
+                        }
+                        if (!sendMailApproved)
+                        {
+                            return new HandleState("Send mail approved approval failed");
+                        }
                     }
-                    if (!sendMailApproved)
-                    {
-                        return new HandleState("Send mail approved approval failed");
-                    }
+
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -2329,40 +2396,62 @@ namespace eFMS.API.Accounting.DL.Services
             //Mail Info
             var numberOfRequest = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == advance.AdvanceNo).Select(s => s.Id).Count();
             numberOfRequest = numberOfRequest == 0 ? 1 : (numberOfRequest + 1);
-            string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
-            subject = subject.Replace("[RequesterName]", requesterName);
-            subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
-            string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
-                                            "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
-                                            "<p>" +
-                                                "<div>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
-                                                "<div> <i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
-                                            "</p>" +
-                                            "<ul>" +
-                                                "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li>" +
-                                                "<li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b></li>" +
-                                                "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
-                                                "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
-                                                "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
-                                            "</ul>" +
-                                            "<p>" +
-                                                "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></div>" +
-                                                "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a> </span></i></div>" +
-                                            "</p>" +
-                                            "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
-                                         "</div>");
-            body = body.Replace("[UserName]", userReciverName);
-            body = body.Replace("[RequesterName]", requesterName);
-            body = body.Replace("[AdvanceNo]", advanceNo);
-            body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
-            body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
-            body = body.Replace("[JobIds]", jobIds);
-            body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
-            body = body.Replace("[Url]", webUrl.Value.Url.ToString());
-            body = body.Replace("[lang]", "en");
-            body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
-            body = body.Replace("[AdvanceId]", advance.Id.ToString());
-            body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #region Template old
+            //string subject = "eFMS - Advance Payment Approval Request from [RequesterName] - [NumberOfRequest] " + (numberOfRequest > 1 ? "times" : "time");
+            //subject = subject.Replace("[RequesterName]", requesterName);
+            //subject = subject.Replace("[NumberOfRequest]", numberOfRequest.ToString());
+            //string body = string.Format(@"<div style='font-family: Calibri; font-size: 12pt; color: #004080'>" +
+            //                                "<p><i><b>Dear Mr/Mrs [UserName],</b> </i></p>" +
+            //                                "<p>" +
+            //                                    "<div>You have new Advance Payment Approval Request from <b>[RequesterName]</b> as below info:</div>" +
+            //                                    "<div> <i>Anh/ Chị có một yêu cầu duyệt tạm ứng từ <b>[RequesterName]</b> với thông tin như sau: </i></div>" +
+            //                                "</p>" +
+            //                                "<ul>" +
+            //                                    "<li>Advance No / <i>Mã tạm ứng</i> : <b>[AdvanceNo]</b></li>" +
+            //                                    "<li>Advance Amount/ <i>Số tiền tạm ứng</i> : <b>[TotalAmount] [CurrencyAdvance]</b></li>" +
+            //                                    "<li>Shipments/ <i>Lô hàng</i> : <b>[JobIds]</b></li>" +
+            //                                    "<li>Requester/ <i>Người đề nghị</i> : <b>[RequesterName]</b></li>" +
+            //                                    "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
+            //                                "</ul>" +
+            //                                "<p>" +
+            //                                    "<div>You click here to check more detail and approve: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Detail Advance Request</a></span></div>" +
+            //                                    "<div><i>Anh/ Chị chọn vào đây để biết thêm thông tin chi tiết và phê duyệt: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]/approve' target='_blank'>Chi tiết phiếu tạm ứng</a> </span></i></div>" +
+            //                                "</p>" +
+            //                                "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
+            //                             "</div>");
+            //body = body.Replace("[UserName]", userReciverName);
+            //body = body.Replace("[RequesterName]", requesterName);
+            //body = body.Replace("[AdvanceNo]", advanceNo);
+            //body = body.Replace("[TotalAmount]", string.Format("{0:n}", totalAmount));
+            //body = body.Replace("[CurrencyAdvance]", advance.AdvanceCurrency);
+            //body = body.Replace("[JobIds]", jobIds);
+            //body = body.Replace("[RequestDate]", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            //body = body.Replace("[Url]", webUrl.Value.Url.ToString());
+            //body = body.Replace("[lang]", "en");
+            //body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
+            //body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            //body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+            #endregion
+
+            // Filling email with template
+            var emailTemplate = sysEmailTemplateRepository.Get(x => x.Code == "ADV-SUGGEST-APPROVE")?.FirstOrDefault();
+            // Subject
+            var subject = new StringBuilder(emailTemplate.Subject);
+            subject.Replace("{{RequesterName}}", requesterName);
+            subject.Replace("{{NumberOfRequest}}", numberOfRequest.ToString() + (numberOfRequest > 1 ? " times" : " time"));
+
+            // Body
+            var body = new StringBuilder(emailTemplate.Body);
+            body = body.Replace("{{UserName}}", userReciverName);
+            body = body.Replace("{{RequesterName}}", requesterName);
+            body = body.Replace("{{AdvanceNo}}", advanceNo);
+            body = body.Replace("{{TotalAmount}}", string.Format("{0:n}", totalAmount));
+            body = body.Replace("{{CurrencyAdvance}}", advance.AdvanceCurrency);
+            body = body.Replace("{{JobIds}}", jobIds);
+            body = body.Replace("{{RequestDate}}", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
+            body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve");
+            body = body.Replace("{{LogoEFMS}}", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
+
             List<string> toEmails = new List<string> {
                 emailUserReciver
             };
@@ -2385,7 +2474,7 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            var sendMailResult = SendMail.Send(subject, body, toEmails, attachments, emailCCs);
+            var sendMailResult = SendMail.Send(subject.ToString(), body.ToString(), toEmails, attachments, emailCCs);
 
             #region --- Ghi Log Send Mail ---
             var logSendMail = new SysSentEmailHistory
@@ -2393,10 +2482,10 @@ namespace eFMS.API.Accounting.DL.Services
                 SentUser = SendMail._emailFrom,
                 Receivers = string.Join("; ", toEmails),
                 Ccs = string.Join("; ", emailCCs),
-                Subject = subject,
+                Subject = subject.ToString(),
                 Sent = sendMailResult,
                 SentDateTime = DateTime.Now,
-                Body = body
+                Body = body.ToString()
             };
             var hsLogSendMail = sentEmailHistoryRepo.Add(logSendMail);
             var hsSm = sentEmailHistoryRepo.SubmitChanges();
@@ -2958,7 +3047,20 @@ namespace eFMS.API.Accounting.DL.Services
             var employeeIdOfAccountant = userBaseService.GetEmployeeIdOfUser(userAccountant);
 
             var userDeputies = userBaseService.GetUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
-            var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+            //var emailDeputies = userBaseService.GetEmailUsersDeputyByCondition(type, userAccountant, null, null, officeId, companyId);
+
+            // Get email setting accountant
+            var deptAccountants = userBaseService.GetDepartmentUser(companyId, officeId, userAccountant).FirstOrDefault();
+            var emailSetting = deptAccountants == null ? null : sysEmailSettingRepository.Get(x => x.EmailType == "Approve Advance" && deptAccountants == x.DeptId).FirstOrDefault()?.EmailInfo;
+            var emailDeputies = new List<string>();
+            if (emailSetting != null)
+            {
+                emailDeputies = emailSetting.Split(";").ToList();
+            }
+            else
+            {
+                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault().Email?.Split(";").ToList();
+            }
 
             result.LevelApprove = AccountingConstants.LEVEL_ACCOUNTANT;
             result.Role = roleAccountant;
@@ -3645,7 +3747,7 @@ namespace eFMS.API.Accounting.DL.Services
                     Hbl = s.First().Hbl,
                     Mbl = s.First().Mbl,
                     CustomNo = s.First().CustomNo,
-                    RequestNote=s.First().RequestNote,
+                    RequestNote= string.Join(";", s.Select(x => x.RequestNote)),
                 });
             foreach (var request in groupJobByHbl)
             {

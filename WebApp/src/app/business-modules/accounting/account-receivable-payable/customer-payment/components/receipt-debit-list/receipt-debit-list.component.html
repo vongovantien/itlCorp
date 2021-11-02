@@ -61,27 +61,6 @@
                                         </ng-container>
                                     </ng-container>
                                 </td>
-                                <!-- <td>
-                                    <ng-container class="form-group "
-                                        *ngIf="item.paymentType === 'DEBIT' && (receiptType$ | async) !=='CUSTOMER'">
-                                        <ng-container *ngIf="!!(creditList$ | async)?.length && !isReadonly">
-                                            <div class="pos-rel credit-wrapper" [dpToggle]="dropdownMenuCreditList"
-                                                position=bottomCenter (click)="selectPaymentItem(i, item)">
-                                                <div class="credit-container">
-                                                    <ng-container *ngFor="let credit of item.creditNos; let j = index">
-                                                        <div class="credit-item-wrapper">
-                                                            <span class="credit-item__icon"
-                                                                (click)="deleteCreditItem(credit, i, item, $event)">x</span>
-                                                            <span class="credit-item__label">{{credit}}</span>
-                                                        </div>
-                                                    </ng-container>
-                                                </div>
-                                            </div>
-                                        </ng-container>
-
-                                    </ng-container>
-                                </td> -->
-
                                 <td ALIGN="right">
                                     <ng-container *ngIf="item.paymentType !== 'OTHER' ">
                                         {{item.unpaidAmountUsd | number:'1.2-2'}}
@@ -166,6 +145,8 @@
                         </ng-container>
                         <tr app-table-none-record *ngIf="!(debitList$ | async)?.length">
                         </tr>
+                        <!-- <tr class="loading-wrapper" *ngIf="(isLoading | async) " app-table-row-loading>
+                        </tr> -->
                     </tbody>
                     <tfoot *ngIf="!!(debitList$ | async)?.length">
                         <tr class="font-weight-bold font-15 bg-locked">
@@ -194,7 +175,7 @@
                             <td rowspan="4" ALIGN="center" class="text-right">
                                 {{sumTotalObj.totalPaidVnd | number: '1.0-2'}} VND
                             </td>
-
+                            <td *ngIf="(receiptType$ | async) !=='CUSTOMER'"></td>
                             <td ALIGN="right">
                                 <ng-container *ngIf="sumTotalObj.totalRemainUsd > 0; else TplnegativeRemainUsd">
                                     {{sumTotalObj.totalRemainUsd | number:'.2-2'}} USD

@@ -7,19 +7,22 @@ import { AccountingRepo } from '@repositories';
 import { AccReceivableDetailModel, AccReceivableOfficesDetailModel, AccReceivableServicesDetailModel } from '@models';
 import { RoutingConstants } from '@constants';
 
-import { takeUntil, switchMap, switchMapTo, tap } from 'rxjs/operators';
+import { takeUntil, switchMap, switchMapTo, tap, catchError, finalize } from 'rxjs/operators';
 import { ConfirmPopupComponent } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 import { of } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { IAppState, getMenuUserSpecialPermissionState } from '@store';
 import { Store } from '@ngrx/store';
+import { AccReceivableDebitDetailPopUpComponent } from '../../components/popup/account-receivable-debit-detail-popup.component';
+import { NgProgress } from '@ngx-progressbar/core';
 @Component({
     selector: 'detail-account-receivable',
     templateUrl: 'detail-account-receivable.component.html',
 })
 export class AccountReceivableDetailComponent extends AppList implements OnInit {
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChild(AccReceivableDebitDetailPopUpComponent) debitDetailPopupComponent: AccReceivableDebitDetailPopUpComponent;
     subTab: string;
 
     accReceivableDetail: AccReceivableDetailModel = new AccReceivableDetailModel();
@@ -33,10 +36,13 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
         private readonly _activedRoute: ActivatedRoute,
         private readonly _router: Router,
         private readonly _toastService: ToastrService,
-        private readonly _store: Store<IAppState>
+        private readonly _store: Store<IAppState>,
+        private _progressService: NgProgress,
+
     ) {
         super();
         this.requestSort = this.sortDetailList;
+        this._progressRef = this._progressService.ref();
     }
     ngOnInit() {
         this.initHeaders();
@@ -55,6 +61,9 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                 }),
             ).subscribe(
                 (data: any) => {
+                    if(data.accountReceivable ===null){
+                        this._toastService.info("Chưa có data công nợ");
+                    }
                     this.accReceivableDetail = new AccReceivableDetailModel(data.accountReceivable);
                     this.accReceivableMoreDetail = (data.accountReceivableGrpOffices || [])
                         .map((item: AccReceivableOfficesDetailModel) => new AccReceivableOfficesDetailModel(item));
@@ -68,7 +77,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
     initHeaders() {
         this.headers = [
             { title: 'Office (Branch)', field: 'officeName', sortable: true },
-            { title: 'Currency', field: 'currency', sortable: true },
+            { title: 'Office (ABBR)', field: 'officeNameAbbr', sortable: true },
             { title: 'Debit Amount', field: 'totalDebitAmount', sortable: true },
             { title: 'Billing (Unpaid)', field: 'totalBillingAmount', sortable: true },
             { title: 'Paid', field: 'totalPaidAmount', sortable: true },
@@ -77,6 +86,7 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
             { title: 'Over 1-15 days', field: 'totalOver1To15Day', sortable: true },
             { title: 'Over 16-30 days', field: 'totalOver15To30Day', sortable: true },
             { title: 'Over 30 Days', field: 'totalOver30Day', sortable: true },
+            { title: 'Currency', field: 'currency', sortable: true },
 
         ];
         this.subHeaders = [
@@ -137,5 +147,22 @@ export class AccountReceivableDetailComponent extends AppList implements OnInit 
                     }
                 });
         })
+    }
+
+    showDebitDetail(option,officeId,serviceCode) {
+        var agreId = this.accReceivableDetail.agreementId;
+        this._accoutingRepo.getDataDebitDetail(agreId, option,officeId,serviceCode)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => this._progressRef.complete())
+            ).subscribe(
+                (res: any) => {
+                    if (res) {
+                        this.debitDetailPopupComponent.dataDebitList = res || [];
+                        this.debitDetailPopupComponent.calculateTotal();
+                        this.debitDetailPopupComponent.show();
+                    }
+                },
+            );
     }
 }

@@ -62,11 +62,20 @@ namespace eFMS.API.Accounting.Controllers
         }
 
 
-        [HttpGet("GenerateReceiptNo")]
+        //[HttpGet("GenerateReceiptNo")]
+        //[Authorize]
+        //public IActionResult GenerateReceiptNo()
+        //{
+        //    string receiptNo = acctReceiptService.GenerateReceiptNo();
+
+        //    return Ok(new { receiptNo });
+        //}
+
+        [HttpPost("GenerateReceiptNo")]
         [Authorize]
-        public IActionResult GenerateReceiptNo()
+        public IActionResult GenerateReceiptNo(AcctReceiptModel receipt)
         {
-            string receiptNo = acctReceiptService.GenerateReceiptNo();
+            string receiptNo = acctReceiptService.GenerateReceiptNoV2(receipt);
 
             return Ok(new { receiptNo });
         }
@@ -131,20 +140,20 @@ namespace eFMS.API.Accounting.Controllers
                 ResultHandle _result = new ResultHandle { Status = hs.Success, Message = hs.Message.ToString(), Data = id };
                 return BadRequest(_result);
             }
+          
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
             if (hs.Success)
             {
-                //Tính công nợ sau khi Save Cancel thành công
-                // acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 Response.OnCompleted(async () =>
                 {
                     await acctReceiptService.CalculatorReceivableForReceipt(id);
-
                 });
             }
-            var message = HandleError.GetMessage(hs, Crud.Update);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             return Ok(result);
+
+            
         }
 
         /// <summary>
@@ -162,19 +171,29 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult SaveReceipt(AcctReceiptModel receiptModel, SaveAction saveAction)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            if (!string.IsNullOrEmpty(receiptModel.PaymentRefNo) )
             {
-                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
-                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
-                return BadRequest(_result);
+                if(!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+                {
+                    string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
+                    var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
+                    return BadRequest(_result);
+                }
+            }
+            else
+            {
+                string receiptNo = acctReceiptService.GenerateReceiptNoV2(receiptModel);
+                receiptModel.PaymentRefNo = receiptNo;
             }
 
-            if(receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
+            if (receiptModel.Id == Guid.Empty && receiptModel.ReferenceId != null)
             {
-                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
-                if(isExisted == true)
+                bool isExisted = acctReceiptService.Any(x => x.ReferenceId == receiptModel.ReferenceId
+                && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL
+                && x.PaymentMethod == AccountingConstants.PAYMENT_METHOD_MANAGEMENT_FEE);
+                if (isExisted == true)
                 {
                     string receiptNo = acctReceiptService.First(x => x.ReferenceId == receiptModel.ReferenceId).ReferenceNo;
                     string mess = String.Format("This Receipt already had Bank Fee/ Other fee Receipt {0}", receiptNo);
@@ -183,11 +202,28 @@ namespace eFMS.API.Accounting.Controllers
                 }
             }
 
-            if (!ValidateReceiptNo(receiptModel.Id, receiptModel.PaymentRefNo))
+            if (saveAction == SaveAction.SAVEDONE)
             {
-                string mess = String.Format("Receipt {0} have existed", receiptModel.PaymentRefNo);
-                var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 409 };
-                return BadRequest(_result);
+                if(receiptModel.PaymentMethod == AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL)
+                {
+                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.PaidAmountVnd ?? 0, receiptModel.PaidAmountUsd ?? 0);
+                    if (!isValidCusAgreement)
+                    {
+                        string mess = String.Format("Your Clear Amount > The Current advance of Partner, Pls check it again!");
+                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 407 };
+                        return BadRequest(_result);
+                    }                    
+                }
+                if ((receiptModel.CusAdvanceAmountVnd ?? 0) > 0 || (receiptModel.CusAdvanceAmountUsd ?? 0) > 0)
+                {
+                    bool isValidCusAgreement = acctReceiptService.ValidateCusAgreement(receiptModel.AgreementId ?? new Guid(), receiptModel.CusAdvanceAmountVnd ?? 0, receiptModel.CusAdvanceAmountUsd ?? 0);
+                    if (!isValidCusAgreement)
+                    {
+                        string mess = String.Format("Cus Advance Amount in Receipt > The current Advance of Partner , Please check it again!");
+                        var _result = new { Status = false, Message = mess, Data = receiptModel, Code = 408 };
+                        return BadRequest(_result);
+                    }
+                }
             }
 
             string ListPaymentMessageInvalid = ValidatePaymentList(receiptModel, receiptModel.Payments);
@@ -332,11 +368,11 @@ namespace eFMS.API.Accounting.Controllers
             bool valid = true;
             if (Id == Guid.Empty)
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
             else
             {
-                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id);
+                valid = !acctReceiptService.Any(x => x.PaymentRefNo == receiptNo && x.Id != Id && x.Status != AccountingConstants.RECEIPT_STATUS_CANCEL);
             }
 
             return valid;
@@ -437,10 +473,31 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult GetDataExportReceiptAdvance(AcctReceiptCriteria criteria)
         {
-            var resultQuery = acctReceiptService.Query(criteria);
+            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria);
 
-            var result = acctReceiptService.GetDataExportReceiptAdvance(criteria, resultQuery);
+            return Ok(result);
+        }
 
+        [HttpPut("{Id}/QuickUpdate")]
+        [Authorize]
+        public async Task<IActionResult> QuickUpdate(Guid Id, ReceiptQuickUpdateModel model)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            if (!ValidateReceiptNo(Id, model.PaymentRefNo))
+            {
+                string mess = String.Format("Receipt {0} have existed", model.PaymentRefNo);
+                var _result = new { Status = false, Message = mess, Data = model, Code = 409 };
+                return BadRequest(_result);
+            }
+            HandleState hs = await acctReceiptService.QuickUpdate(Id, model);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+            if(!hs.Success)
+            {
+                return BadRequest(new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model });
+            }
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
             return Ok(result);
         }
     }
