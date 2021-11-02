@@ -2280,7 +2280,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
             if (!string.IsNullOrEmpty(criteria.NotEqualInternalCode))
             {
-                query = query.And(x => x.InternalCode != criteria.NotEqualInternalCode);
+                query = query.And(x => !string.IsNullOrEmpty(x.InternalCode) && x.InternalCode != criteria.NotEqualInternalCode);
             }
             if (!string.IsNullOrEmpty(criteria.InternalCode))
             {
