@@ -930,7 +930,7 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (!string.IsNullOrEmpty(criteria.Saleman))
             {
-                var s = sysUserRepository.Get().Where(x => criteria.Saleman.Contains(x.Username)).Select(t => t.Id).ToList();
+                var s = sysUserRepository.Get().Where(x => criteria.Saleman.Contains(x.Id)).Select(t => t.Id).ToList();
                 q = q.And(x => s.Contains(x.SaleManId));
             }
 
