@@ -143,10 +143,10 @@
                                 <td *ngIf="(receiptType$ | async) !=='CUSTOMER'" ALIGN="center">{{item.hbl}}</td>
                             </tr>
                         </ng-container>
-                        <tr app-table-none-record *ngIf="!(debitList$ | async)?.length && !(isLoading | async)">
+                        <tr app-table-none-record *ngIf="!(debitList$ | async)?.length">
                         </tr>
-                        <tr class="loading-wrapper" *ngIf="(isLoading | async) " app-table-row-loading>
-                        </tr>
+                        <!-- <tr class="loading-wrapper" *ngIf="(isLoading | async) " app-table-row-loading>
+                        </tr> -->
                     </tbody>
                     <tfoot *ngIf="!!(debitList$ | async)?.length">
                         <tr class="font-weight-bold font-15 bg-locked">

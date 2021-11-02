@@ -440,7 +440,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                         break;
                     case "DebitInvoice":
-                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase)).Select(se => se.PaySoano).Distinct().ToList();
+                        soaNo = surchargeRepository.Get(x => criteria.ReferenceNos.Contains(x.CreditNo, StringComparer.OrdinalIgnoreCase) && string.IsNullOrEmpty(x.Soano)).Select(se => se.PaySoano).Distinct().ToList();
                         if (soaNo.Count == 0)
                         {
                             query = query.And(x => false);
@@ -2137,31 +2137,31 @@ namespace eFMS.API.Accounting.DL.Services
                                     payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
 
                                 }
-                                if (debitGrp != null || isValidObh)
-                                {
-                                    foreach (var rcp in receiptRMGroup)
-                                    {
-                                        var detail = new AccountingReceiptDetail();
-                                        detail.ReceiptId = rcp.grp.ReceiptId;
-                                        detail.PaymentRefNo = rcp.grp.PaymentRefNo;
-                                        detail.PaymentDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
-                                        var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
-                                        var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
-                                        detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
-                                        detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
-                                        detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
-                                        detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
-                                        detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
-                                        detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
-                                        detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
+                                //if (debitGrp != null || isValidObh)
+                                //{
+                                //    foreach (var rcp in receiptRMGroup)
+                                //    {
+                                //        var detail = new AccountingReceiptDetail();
+                                //        detail.ReceiptId = rcp.grp.ReceiptId;
+                                //        detail.PaymentRefNo = rcp.grp.PaymentRefNo;
+                                //        detail.PaymentDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
+                                //        var paymentDebit = rcp.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
+                                //        var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
+                                //        detail.PaidAmount = paymentDebit?.PaymentAmountVnd ?? 0;
+                                //        detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
+                                //        detail.PaidAmountUsd = paymentDebit?.PaymentAmountUsd ?? 0;
+                                //        detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
+                                //        detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
+                                //        detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
+                                //        detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
 
-                                        payment.PaidAmount += (detail.PaidAmount ?? 0);
-                                        payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
-                                        payment.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
-                                        payment.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
-                                        payment.receiptDetail.Add(detail);
-                                    }
-                                }
+                                //        payment.PaidAmount += (detail.PaidAmount ?? 0);
+                                //        payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
+                                //        payment.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
+                                //        payment.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
+                                //        payment.receiptDetail.Add(detail);
+                                //    }
+                                //}
                             }
                         }
                     }

@@ -498,14 +498,23 @@ namespace eFMS.API.Accounting.DL.Services
             string receiptNo = prefix; // default
 
             string pattern = @"^(" + prefix + ")";
-            pattern += @"\d{3}\/\d{2}$";
+            pattern += @"\d{3}\/\d{2}";
+            // pattern += @"\d{3}\/\(" + receipt.PaymentDate?.ToString("MM") + ")$";
+
             Regex regex = new Regex(pattern);
 
-            IQueryable<AcctReceipt> acctReceipts = DataContext.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) && regex.IsMatch(x.PaymentRefNo)).OrderByDescending(x => x.DatetimeCreated);
+            IQueryable<AcctReceipt> acctReceipts = DataContext.Where(x => !string.IsNullOrEmpty(x.PaymentRefNo) 
+            && regex.IsMatch(x.PaymentRefNo) && x.PaymentDate.Value.Month == receipt.PaymentDate.Value.Month).OrderByDescending(x => x.DatetimeCreated);
             if (acctReceipts.Count() > 0)
             {
-                var receiptRefNoOrder = acctReceipts.Select(x => new { x.PaymentDate, Order = int.Parse(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - 3)
-                    .Substring(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - 3).Length - 3, 3))
+                // remove /MM
+                //var receiptRefNoOrder = acctReceipts.Select(x => new { x.PaymentRefNo, x.PaymentDate, Order = int.Parse(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - (x.PaymentRefNo.IndexOf("/") - 1))
+                //    .Substring(x.PaymentRefNo.Substring(0, x.PaymentRefNo.Length - (x.PaymentRefNo.IndexOf("/") - 1)).Length - 3, 3))
+                //}); 
+                var receiptRefNoOrder = acctReceipts.Select(x => new {
+                    x.PaymentRefNo,
+                    x.PaymentDate,
+                    Order = int.Parse(x.PaymentRefNo.Substring(prefix.Length, 3))
                 }); // remove /MM
                 int listRefNoOrderedMax = receiptRefNoOrder.Select(a => a.Order).Max();
                 var orderReceiptNewest = receiptRefNoOrder.First(x => x.Order == listRefNoOrderedMax);
