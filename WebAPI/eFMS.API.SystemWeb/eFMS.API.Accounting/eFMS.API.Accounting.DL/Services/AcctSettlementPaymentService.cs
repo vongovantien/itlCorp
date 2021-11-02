@@ -2509,8 +2509,8 @@ namespace eFMS.API.Accounting.DL.Services
                 fe.HBL = firstShipment.HBL;
                 fe.MBL = firstShipment.MBL;
                 fe.StlCSName = firstShipment.StlCSName;
-                fe.DueDate = firstShipment.DueDate != null ? firstShipment.DueDate.Value.ToString("dd/MM/yyyy") : string.Empty;
-                fe.ServiceDate = firstShipment.ServiceDate != null ? firstShipment.ServiceDate.Value.ToString("dd/MM/yyyy") : string.Empty;
+                fe.DueDate = firstShipment.DueDate;
+                fe.ServiceDate = firstShipment.ServiceDate;
                 fe.PaymentMethod = firstShipment.PaymentMethod;
                 fe.Bank = firstShipment.Bank;
                 fe.BankCode = firstShipment.BankCode;

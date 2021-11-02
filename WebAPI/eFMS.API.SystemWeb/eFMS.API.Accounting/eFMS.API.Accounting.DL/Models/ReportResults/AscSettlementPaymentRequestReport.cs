@@ -43,13 +43,13 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string StlAscDpManagerSignDate { get; set; }
         public string StlBODSignDate { get; set; }
         public string StlRequesterSignDate { get; set; }
-        public string ServiceDate { get; set; }
+        public DateTime? ServiceDate { get; set; }
         public string PaymentMethod { get; set; }
         public string Beneficiary { get; set; }
         public string AccNo { get; set; }
         public string Bank { get; set; }
         public string BankCode { get; set; }
-        public string DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
 
     }
 

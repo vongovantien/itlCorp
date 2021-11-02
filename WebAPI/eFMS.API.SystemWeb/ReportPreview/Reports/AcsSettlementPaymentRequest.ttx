@@ -42,5 +42,5 @@ Beneficiary	String	50
 AccNo	String	50	
 Bank	String	50	
 BankCode	String	50	
-ServiceDate	String	50		
-DueDate	String	50	
+ServiceDate	DateTime	
+DueDate	DateTime	
