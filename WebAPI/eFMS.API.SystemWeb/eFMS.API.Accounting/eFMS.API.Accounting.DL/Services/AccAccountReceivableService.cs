@@ -1720,6 +1720,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             var res = new List<AccountReceivableResult>();
             res = arPartnerContracts.ToList();
+            
+            res = res.Where(x => x.DebitAmount > 0).ToList();
+
             if (criteria.DebitRateTo != null && criteria.DebitRateFrom != null)
                 res = res.Where(x => x.DebitRate >= criteria.DebitRateFrom && x.DebitRate <= criteria.DebitRateTo).ToList();
             if (criteria.AgreementStatus!= null && criteria.AgreementStatus != "All")
