@@ -308,47 +308,30 @@ namespace eFMS.API.Accounting.DL.Services
             ).Select(s => s.advancePayment);
             return result;
         }
+        public bool checkType(IQueryable<AcctAdvanceRequest> adv)
+        {
+            int settled = adv.Where(x => x.StatusPayment == "Settled").Count();
+            int notsettled = adv.Where(x => x.StatusPayment == "NotSettled").Count();
+            if (settled == notsettled)
+            {
+                return true;
+            }
+            return false;
+        }
 
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
-            IQueryable<AcctAdvanceRequest> advanceRequests = null;
+            IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
-                IQueryable<AcctAdvanceRequest> advanceRQSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
-                IQueryable<AcctAdvanceRequest> advanceRQNotSettled = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
-                IQueryable<AcctAdvanceRequest> advanceRQPartial = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
-                var ListAdvanceNo = acctAdvanceRequestRepo.Get().ToList().Select(x => x.AdvanceNo).Distinct();
-                var ListAvanceRQ = acctAdvanceRequestRepo.Get().ToList();
-                foreach (var advNo in ListAdvanceNo)
+                if (criteria.StatusPayment != "PartialSettlement")
                 {
-                    int AdvanceCount = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advNo).Count();
-                    int SettledCount = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_SETTLED && x.AdvanceNo == advNo).Count();
-                    int NotSettledCount = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.AdvanceNo == advNo).Count();
-                    if (NotSettledCount == AdvanceCount)
-                    {
-                        advanceRQNotSettled = advanceRQNotSettled.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
-                    }
-                    else if (SettledCount == AdvanceCount)
-                    {
-                        advanceRQSettled = advanceRQSettled.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
-                    }
-                    else
-                    {
-                        advanceRQPartial = advanceRQPartial.Concat((ListAvanceRQ.Where(x => x.AdvanceNo == advNo)));
-                    }
-                }
-                if (criteria.StatusPayment == "PartialSettlement")
-                {
-                    advanceRequests = advanceRQPartial;
-                }
-                else if(criteria.StatusPayment == "Settled")
-                {
-                    advanceRequests = advanceRQSettled;
+                    advanceRequests = advanceRequests.Where(x => x.StatusPayment == criteria.StatusPayment);
                 }
                 else
                 {
-                    advanceRequests = advanceRQNotSettled ;
+                    
                 }
             }
 
