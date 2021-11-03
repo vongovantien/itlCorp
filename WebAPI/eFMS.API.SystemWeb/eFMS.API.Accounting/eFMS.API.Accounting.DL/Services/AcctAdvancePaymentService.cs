@@ -308,30 +308,47 @@ namespace eFMS.API.Accounting.DL.Services
             ).Select(s => s.advancePayment);
             return result;
         }
-        public bool checkType(IQueryable<AcctAdvanceRequest> adv)
+        public bool checkType(List<AcctAdvanceRequest> adv)
         {
             int settled = adv.Where(x => x.StatusPayment == "Settled").Count();
             int notsettled = adv.Where(x => x.StatusPayment == "NotSettled").Count();
             if (settled == notsettled)
             {
-                return true;
+                return false;
             }
-            return false;
+            return true;
         }
 
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
-            IQueryable<AcctAdvanceRequest> advanceRequests = acctAdvanceRequestRepo.Get();
+            IQueryable<AcctAdvanceRequest> totalAdvanceRequests = acctAdvanceRequestRepo.Get();
+            IQueryable<AcctAdvanceRequest> advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
+                
                 if (criteria.StatusPayment != "PartialSettlement")
                 {
-                    advanceRequests = advanceRequests.Where(x => x.StatusPayment == criteria.StatusPayment);
+                    
+                    var result = totalAdvanceRequests.Where(x => x.StatusPayment == criteria.StatusPayment).GroupBy(x => x.AdvanceNo);
+                    foreach(var item in result)
+                    {
+                        if (checkType(item.ToList()))
+                        {
+                            advanceRequests = advanceRequests.Concat(item);
+                        }
+                    }
                 }
                 else
                 {
-                    
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
+                    foreach (var item in result)
+                    {
+                        if (!checkType(item.ToList()))
+                        {
+                            advanceRequests = advanceRequests.Concat(item);
+                        }
+                    }
                 }
             }
 
