@@ -7,5 +7,7 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
     {
         public List<CatPartnerGroupEnum> PartnerGroups { get; set; }
         public bool? Active { get; set; }
+        public string Service { get; set; }
+        public string Office { get; set; }
     }
 }
