@@ -928,9 +928,9 @@ namespace eFMS.API.Catalogue.DL.Services
             }
 
             var contracts = contractRepository.Get(q);
-            if (criteria.DatetimeCreatedFrom != null && criteria.DatetimeCreatedTo != null)
+            if (criteria.DatetimeCreatedFrom.HasValue && criteria.DatetimeCreatedTo.HasValue)
             {
-                contracts = contracts.Where(x => x.DatetimeCreated <= criteria.DatetimeCreatedTo && x.DatetimeCreated >= criteria.DatetimeCreatedFrom);
+                contracts = contracts.Where(x => x.DatetimeCreated.Value.Date <= criteria.DatetimeCreatedTo.Value.Date && x.DatetimeCreated.Value.Date >= criteria.DatetimeCreatedFrom.Value.Date);
             }
             var sysUSer = sysUserRepository.Get();
             var result =from c in contracts
