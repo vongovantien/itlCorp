@@ -63,6 +63,7 @@ export class AccountingConstants {
         CLEAR_ADVANCE_CASH: 'Clear-Advance-Cash',
         INTERNAL: 'Internal',
         COLL_INTERNAL: 'COLL - Internal',
+        OBH_INTERNAL: 'OBH - Internal',
         MANAGEMENT_FEE: 'Management Fee',
         OTHER_FEE: 'Other Fee',
         EXTRA: 'COLL - Extra',

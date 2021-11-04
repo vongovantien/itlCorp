@@ -464,6 +464,7 @@ namespace eFMS.API.Accounting.DL.Services
                 case "Management Fee":
                 case "Other Fee":
                 case "COLL - Extra":
+                case "OBH - Internal":
                     string prefix3 = string.Empty;
 
                     switch (userCurrentOffice.Code)

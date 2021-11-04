@@ -292,7 +292,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             } else if (this.formCreate.class.value?.includes('OBH') ||
                 (
                     this.formCreate.class.value === AccountingConstants.RECEIPT_CLASS.CLEAR_DEBIT
-                    && this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL
+                    && (this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL
+                        || this.listInvoice.paymentMethod.value === AccountingConstants.RECEIPT_PAYMENT_METHOD.OBH_INTERNAL)
                 )) {
                 if (!this.listInvoice.obhpartnerId.value) {
                     this.listInvoice.obhpartnerId.setErrors({ required: true });
