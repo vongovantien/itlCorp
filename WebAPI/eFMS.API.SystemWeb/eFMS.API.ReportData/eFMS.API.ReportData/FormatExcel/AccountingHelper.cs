@@ -134,7 +134,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(13).Width = 15; //Cột M
             workSheet.Column(14).Width = 25; //Cột N
             workSheet.Column(14).Width = 15; //Cột P
-            workSheet.Column(16).Width = 30; //Cột P
+            workSheet.Column(16).Width = 50; //Cột P
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
@@ -203,7 +203,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
-                        worksheet.Cells[i + addressStartContent, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
+                        //worksheet.Cells[i + addressStartContent, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
