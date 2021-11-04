@@ -923,11 +923,15 @@ namespace eFMS.API.Catalogue.DL.Services
             }
             if (!string.IsNullOrEmpty(criteria.Saleman))
             {
-                var s = criteria.Saleman.Split(";").ToList();
+                var s = sysUserRepository.Get().Where(x => criteria.Saleman.Contains(x.Id)).Select(t => t.Id).ToList();
                 q = q.And(x => s.Contains(x.SaleManId));
             }
 
             var contracts = contractRepository.Get(q);
+            if (criteria.DatetimeCreatedFrom != null && criteria.DatetimeCreatedTo != null)
+            {
+                contracts = contracts.Where(x => x.DatetimeCreated <= criteria.DatetimeCreatedTo && x.DatetimeCreated >= criteria.DatetimeCreatedFrom);
+            }
             var sysUSer = sysUserRepository.Get();
             var result =from c in contracts
                   join p in DataContext.Get() on c.PartnerId equals p.Id
