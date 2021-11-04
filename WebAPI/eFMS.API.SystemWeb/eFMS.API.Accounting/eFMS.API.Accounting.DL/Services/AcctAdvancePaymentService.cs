@@ -308,43 +308,59 @@ namespace eFMS.API.Accounting.DL.Services
             ).Select(s => s.advancePayment);
             return result;
         }
-        public bool checkType(List<AcctAdvanceRequest> adv)
+        private string checkType(List<AcctAdvanceRequest> adv)
         {
             int settled = adv.Where(x => x.StatusPayment == "Settled").Count();
             int notsettled = adv.Where(x => x.StatusPayment == "NotSettled").Count();
-            if (settled == notsettled)
+            if (settled > 0 && notsettled > 0)
             {
-                return false;
+                return "partial";
             }
-            return true;
+            else if (settled > 0 && notsettled == 0)
+            {
+                return "settled";
+            }
+
+            return "notsettled";
         }
 
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
             IQueryable<AcctAdvanceRequest> totalAdvanceRequests = acctAdvanceRequestRepo.Get();
-            IQueryable<AcctAdvanceRequest> advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+            IQueryable<AcctAdvanceRequest> advanceRequests = null;
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
-                
-                if (criteria.StatusPayment != "PartialSettlement")
+                advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+                if (criteria.StatusPayment == "Settled")
                 {
                     
-                    var result = totalAdvanceRequests.Where(x => x.StatusPayment == criteria.StatusPayment).GroupBy(x => x.AdvanceNo);
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
                     foreach(var item in result)
                     {
-                        if (checkType(item.ToList()))
+                        if (checkType(item.ToList())== "settled")
                         {
                             advanceRequests = advanceRequests.Concat(item);
                         }
                     }
                 }
-                else
+                if (criteria.StatusPayment == "NotSettled")
                 {
                     var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
                     foreach (var item in result)
                     {
-                        if (!checkType(item.ToList()))
+                        if (checkType(item.ToList())== "notsettled")
+                        {
+                            advanceRequests = advanceRequests.Concat(item);
+                        }
+                    }
+                }
+                if (criteria.StatusPayment == "PartialSettlement")
+                {
+                    var result = totalAdvanceRequests.GroupBy(x => x.AdvanceNo);
+                    foreach (var item in result)
+                    {
+                        if (checkType(item.ToList()) == "partial")
                         {
                             advanceRequests = advanceRequests.Concat(item);
                         }
