@@ -252,16 +252,16 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         // tslint:disable-next-line:no-any
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         this.isSubmitted = true;
-        if (dataForm.toDebitRate < dataForm.fromDebitRate) {
-            return;
-        }
+        // if (dataForm.toDebitRate < dataForm.fromDebitRate) {
+        //     return;
+        // }
         const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,
             overDueDay: dataForm.overdueDays? dataForm.overdueDays : 0,
             debitRateFrom: dataForm.fromDebitRate,
             debitRateTo: dataForm.toDebitRate,
-            agreementStatus: dataForm.agreementStatus,
+            agreementStatus: dataForm.agreementStatus?dataForm.agreementStatus:this.agreementStatusList[1].id,
             agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
