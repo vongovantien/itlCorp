@@ -308,11 +308,11 @@ namespace eFMS.API.Accounting.DL.Services
             ).Select(s => s.advancePayment);
             return result;
         }
-        public bool checkType(List<AcctAdvanceRequest> adv)
+        private bool checkType(List<AcctAdvanceRequest> adv)
         {
             int settled = adv.Where(x => x.StatusPayment == "Settled").Count();
             int notsettled = adv.Where(x => x.StatusPayment == "NotSettled").Count();
-            if (settled == notsettled)
+            if (settled>0&&notsettled>0)
             {
                 return false;
             }
@@ -322,11 +322,11 @@ namespace eFMS.API.Accounting.DL.Services
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
         {
             IQueryable<AcctAdvanceRequest> totalAdvanceRequests = acctAdvanceRequestRepo.Get();
-            IQueryable<AcctAdvanceRequest> advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
+            IQueryable<AcctAdvanceRequest> advanceRequests = null;
 
             if (!string.IsNullOrEmpty(criteria.StatusPayment) && !criteria.StatusPayment.Equals("All"))
             {
-                
+                advanceRequests = Enumerable.Empty<AcctAdvanceRequest>().AsQueryable();
                 if (criteria.StatusPayment != "PartialSettlement")
                 {
                     
