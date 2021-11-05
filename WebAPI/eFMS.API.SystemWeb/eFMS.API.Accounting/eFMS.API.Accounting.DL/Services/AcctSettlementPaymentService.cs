@@ -2554,8 +2554,14 @@ namespace eFMS.API.Accounting.DL.Services
                                (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                             :
                             settlement.SettlementCurrency;
-
-                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                    if (_currency == "USD")
+                    {
+                        _inword = InWordCurrency.ConvertNumberCurrencyToStringUSD(_amount, _currency);
+                    }
+                    if (_currency == "VND")
+                    {
+                        _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                    }
                 }
                 fe.Inword = _inword;
             });
