@@ -8,7 +8,7 @@ import { CatalogueRepo, DocumentationRepo, AccountingRepo } from '@repositories'
 import { SortService } from '@services';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, switchMap } from 'rxjs/operators';
 import { CsShipmentSurcharge, Partner, Charge, Unit } from '@models';
 
 import * as fromStore from './../../store';
@@ -60,16 +60,30 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
     }
 
     getPartner() {
-        this.isShowLoadingPartner = true;
         this._spinner.show(this.spinnerpartner);
 
-        this._catalogueRepo.getListPartner(null, null, { active: true })
+        this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(
-                catchError(this.catchError), finalize(() => {
-                    this._spinner.hide(this.spinnerpartner);
-                    this.isShowLoadingPartner = false;
-                }))
-            .subscribe(
+                switchMap(
+                    (data) => {
+                        if (!!data?.officeId) {
+                            return this._catalogueRepo.getPartnerByGroups(
+                                [CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER],
+                                true,
+                                this.serviceTypeId,
+                                data?.officeId
+                            ).pipe(
+                                finalize(() => {
+                                    this._spinner.hide(this.spinnerpartner);
+                                    this.isShowLoadingPartner = false;
+                                }),
+                            );
+                        }
+                    }
+                ),
+                catchError(this.catchError),
+                takeUntil(this.ngUnsubscribe),
+            ).subscribe(
                 (partners: any[]) => {
                     this.listPartner = partners;
                 }
