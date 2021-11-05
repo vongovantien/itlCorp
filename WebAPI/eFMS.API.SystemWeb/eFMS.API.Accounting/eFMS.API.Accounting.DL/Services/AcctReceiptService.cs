@@ -2769,7 +2769,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (criteria.Service != null && criteria.Service.Count > 0)
             {
-                query = query.And(x => criteria.Service.Contains(x.ServiceType));
+                query = query.And(x => IsMatchService(x.ServiceType, criteria.Service));
             }
 
             if (criteria.Office != null && criteria.Office.Count > 0)
@@ -2883,6 +2883,31 @@ namespace eFMS.API.Accounting.DL.Services
             //}
 
             return query;
+        }
+
+        private bool IsMatchService(string invoiceService, List<string> serviceTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(invoiceService))
+            {
+                var serviceList = invoiceService.Split(";").ToList();
+                if (serviceList.Count > 0)
+                {
+                    foreach (string item in serviceList)
+                    {
+                        if(serviceTerm.Contains(item))
+                        {
+                            return true;
+                        }
+                        isMatch = serviceTerm.Contains(item);
+                    }
+                    
+                }
+            }
+
+            return isMatch;
+
         }
 
         private Expression<Func<AcctCreditManagementAr, bool>> CreditARExpressionQuery(CustomerDebitCreditCriteria criteria)
