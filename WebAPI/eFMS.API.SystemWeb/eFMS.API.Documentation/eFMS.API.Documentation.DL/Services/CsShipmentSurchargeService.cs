@@ -483,6 +483,13 @@ namespace eFMS.API.Documentation.DL.Services
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
                             // lưu cứng HBL Tránh bug.
                             item.Hblno = hbl?.Hwbno;
+                            if (hbl != null)
+                            {
+                                var masterBill = csTransactionRepository.Get(x => x.Id == hbl.JobId).FirstOrDefault();
+                                item.JobNo = masterBill?.JobNo;
+                                //Ưu tiên lấy MBL của MasterBill >> HouseBill
+                                item.Mblno = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : hbl.Mawb;
+                            }
                         }
                         else
                         {
