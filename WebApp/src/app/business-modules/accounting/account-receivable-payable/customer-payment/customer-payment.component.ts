@@ -353,7 +353,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             labelConfirm: 'Yes',
             center: true
         }, () => {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'copy' } });
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: `copy-${currentReceipt.status}` } });
         });
     }
 
