@@ -481,6 +481,8 @@ namespace eFMS.API.Documentation.DL.Services
                             CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            // lưu cứng HBL Tránh bug.
+                            item.Hblno = hbl?.Hwbno;
                         }
                         else
                         {
