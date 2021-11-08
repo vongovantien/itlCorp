@@ -2185,18 +2185,6 @@ namespace eFMS.API.ReportData.FormatExcel
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
-                        if (itemCharge.VATAmount < 0)
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
-                            workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
-                        }
-                        else
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
-                        }
-
-
                         if (itemCharge.Type.Contains("OBH"))
                         {
                             workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.NetAmount;
@@ -2205,7 +2193,15 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
-
+                            if (itemCharge.VATAmount < 0)
+                            {
+                                workSheet.Cells[i + addressStartContent, 17].Value = Math.Abs(itemCharge.VATAmount ?? 0);
+                            }
+                            else
+                            {
+                                workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
+                                workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
+                            }
 
                         }
                         else
@@ -2216,6 +2212,16 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                             workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
+
+                            if (itemCharge.VATAmount < 0)
+                            {
+                                workSheet.Cells[i + addressStartContent, 14].Value = Math.Abs(itemCharge.VATAmount ?? 0);
+                            }
+                            else
+                            {
+                                workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                                workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
+                            }
                         }
 
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);
