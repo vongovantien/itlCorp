@@ -2767,10 +2767,10 @@ namespace eFMS.API.Accounting.DL.Services
                 }
             }
 
-            if (criteria.Service != null && criteria.Service.Count > 0)
-            {
-                query = query.And(x => IsMatchService(x.ServiceType, criteria.Service));
-            }
+            //if (criteria.Service != null && criteria.Service.Count > 0)
+            //{
+            //     query = query.And(x => IsMatchService(x.ServiceType, criteria.Service));
+            //}
 
             if (criteria.Office != null && criteria.Office.Count > 0)
             {
@@ -2889,6 +2889,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             bool isMatch = true;
 
+            isMatch = invoiceService.Split(';').Intersect(serviceTerm).Any();
             if (!string.IsNullOrEmpty(invoiceService))
             {
                 var serviceList = invoiceService.Split(";").ToList();
@@ -2905,7 +2906,7 @@ namespace eFMS.API.Accounting.DL.Services
                     
                 }
             }
-
+            
             return isMatch;
 
         }
