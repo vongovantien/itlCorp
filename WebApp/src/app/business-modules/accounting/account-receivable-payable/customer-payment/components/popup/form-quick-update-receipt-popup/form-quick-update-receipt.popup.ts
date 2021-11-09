@@ -36,6 +36,7 @@ export class ARCustomerPaymentFormQuickUpdateReceiptPopupComponent extends Popup
         AccountingConstants.RECEIPT_PAYMENT_METHOD.CLEAR_ADVANCE_CASH,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.COLL_INTERNAL,
+        AccountingConstants.RECEIPT_PAYMENT_METHOD.OBH_INTERNAL,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.MANAGEMENT_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.OTHER_FEE,
         AccountingConstants.RECEIPT_PAYMENT_METHOD.EXTRA,

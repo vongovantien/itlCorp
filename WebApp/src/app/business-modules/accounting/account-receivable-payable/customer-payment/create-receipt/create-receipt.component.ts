@@ -98,7 +98,8 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
                             case 'other':
                                 this.titleReceipt = "Create Bank Fee/Other";
                                 break;
-                            case 'copy':
+                            case 'copy-cancel':
+                            case 'copy-done':
                                 this.titleReceipt = "Copy Receipt";
                                 break;
                             default:
@@ -313,7 +314,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
         model.referenceId = this.receiptRefId; // * Set Id cho phiếu ngân hàng.
-        if (this.actionReceiptFromParams === 'copy') {
+        if (this.actionReceiptFromParams.includes('copy')) {
             model.referenceId = null;
         }
         this._accountingRepo.saveReceipt(model, action)
@@ -409,7 +410,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         this.formCreate.customerName = res.customerName;
         this.formCreate.getContract();
 
-        if (this.actionReceiptFromParams !== 'debit' && this.actionReceiptFromParams !== 'copy') {
+        if (this.actionReceiptFromParams !== 'debit' && !this.actionReceiptFromParams.includes('copy')) {
             this.formCreate.isReadonly = true;
         }
         // let paymentRefNo: string = null;
@@ -449,8 +450,9 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
             case 'bank':
                 this.setPaymentListDefaultForBankFee(res);
                 break;
-            case 'copy':
-                this.setPaymentListFormForCopy(res);
+            case 'copy-cancel':
+            case 'copy-done':
+                this.setPaymentListFormForCopy(res, this.actionReceiptFromParams);
                 break;
             default:
                 this.setListInvoiceDefaultForOther(res);
@@ -540,7 +542,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
         (this.listInvoice.partnerId as any) = { id: res.customerId };
     }
 
-    setPaymentListFormForCopy(res: ReceiptModel) {
+    setPaymentListFormForCopy(res: ReceiptModel, typeCopy: string) {
         const formMapping = {
             type: res.type?.split(","),
             paymentDate: !!res.paymentDate ? { startDate: new Date(res.paymentDate), endDate: new Date(res.paymentDate) } : null,
@@ -551,7 +553,12 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
 
         this._store.dispatch(ResetInvoiceList());
         this._store.dispatch(SelectReceiptClass({ class: res.class }));
-        this._store.dispatch(GetInvoiceListSuccess({ invoices: [...res.payments.filter((x: ReceiptInvoiceModel) => !x.negative)] }));
+
+        if (typeCopy === "copy-done") {
+            this._store.dispatch(GetInvoiceListSuccess({ invoices: [...this.generateDefaultDebitList(res)] }));
+        } else {
+            this._store.dispatch(GetInvoiceListSuccess({ invoices: [...res.payments.filter((x: ReceiptInvoiceModel) => !x.negative)] }));
+        }
         (this.listInvoice.partnerId as any) = { id: res.customerId };
     }
 

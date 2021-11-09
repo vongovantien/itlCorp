@@ -207,19 +207,19 @@
             <span><i class="la la-cloud-upload "></i><span> Sync to accountant system</span></span>
         </div>
     </ng-container>
-    <ng-container *ngIf="selectedReceipt?.status === 'Cancel'">
+    <ng-container *ngIf="selectedReceipt?.status !== 'Draft'">
         <div class="menu-context__item" (click)="confirmCopyReceipt()">
             <span><i class="la la-copy"></i><span> Copy receipt {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
     <ng-container *ngIf="selectedReceipt?.status === 'Done' && selectedReceipt.class !== 'Clear Debit'">
         <div class="menu-context__item" (click)="confirmCreateClearDebit()">
-            <span><i class="la la-copy"></i><span> Clear debit receipt {{selectedReceipt?.paymentRefNo}}</span></span>
+            <span><i class="la la-plus"></i><span> Clear debit receipt {{selectedReceipt?.paymentRefNo}}</span></span>
         </div>
     </ng-container>
-    <div class="menu-context__item">
+    <!-- <div class="menu-context__item">
         <span><i class="la la-print"></i><span>Print...</span></span>
-    </div>
+    </div> -->
     <div class="menu-context__item" [dpToggle]="exportTpl" position="rightTop" trigger="hover" ClickStopPropagation>
         <div class="d-flex justify-content-between">
             <div>
@@ -251,12 +251,12 @@
         </div>
     </ng-container>
 
-    <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
+    <!-- <ng-container *ngIf="(selectedReceipt?.status === 'Done' && selectedReceipt?.syncStatus !=='Synced')">
         <hr />
         <div class="menu-context__item" (click)="cancelReceipt(selectedReceipt)">
             <span><i class="la la-times-circle"></i><span>Cancel receipt</span></span>
         </div>
-    </ng-container>
+    </ng-container> -->
     <ng-container *ngIf="selectedReceipt?.status === 'Draft'">
         <div class="menu-context__item">
             <app-permission-button type="delete" (onClick)="checkAllowDelete(selectedReceipt)"
