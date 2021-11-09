@@ -182,10 +182,10 @@
                                         <span>{{item.vatrate}}</span>
                                     </td>
                                     <td class='m--align-right'>
-                                        <span>{{item.credit | number:'1.3-3'}}</span>
+                                        <span>{{ item.currencyId ==='USD'? (item.credit | number:'1.2-2'):(item.credit | number:'1.0-0')}}</span>
                                     </td>
                                     <td class='m--align-right'>
-                                        <span>{{item.debit | number:'1.3-3'}}</span>
+                                        <span>{{ item.currencyId ==='USD'? (item.debit | number:'1.2-2'):(item.debit | number:'1.0-0')}}</span>
                                     </td>
                                     <td>
                                         <span>{{item.notes}}</span>

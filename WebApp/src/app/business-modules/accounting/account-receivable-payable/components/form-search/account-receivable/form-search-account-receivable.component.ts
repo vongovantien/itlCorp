@@ -261,7 +261,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             overDueDay: dataForm.overdueDays? dataForm.overdueDays : 0,
             debitRateFrom: dataForm.fromDebitRate,
             debitRateTo: dataForm.toDebitRate,
-            agreementStatus: dataForm.agreementStatus,
+            agreementStatus: dataForm.agreementStatus?dataForm.agreementStatus:this.agreementStatusList[1].id,
             agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
