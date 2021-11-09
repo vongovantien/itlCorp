@@ -4547,7 +4547,7 @@ namespace eFMS.API.ReportData.FormatExcel
             for (int i = 0; i < settlementExport.ShipmentsSettlement.Count; i++)
             {
 
-                var OBHCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "OBH");
+                var OBHCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.SurType == "OBH");
 
                 workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
@@ -4560,7 +4560,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
                 }
 
-                var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.ChargeType == "BUY");
+                var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.SurType == "BUY");
 
                 workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
@@ -4637,7 +4637,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[p, 1, p, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            workSheet.Cells[p, 7].Value = _sumTotalOBH- _sumTotalCredit; //Value sum total Balance
+            workSheet.Cells[p, 7].Value =Math.Abs(_sumTotalOBH - _sumTotalCredit); //Value sum total Balance
             //workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             #endregion--TOTAL--
