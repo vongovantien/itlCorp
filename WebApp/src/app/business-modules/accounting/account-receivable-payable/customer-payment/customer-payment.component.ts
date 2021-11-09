@@ -340,7 +340,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
     }
 
     confirmCopyReceipt() {
-        if (!this.selectedReceipt) {
+        if (!this.selectedReceipt || this.selectedReceipt?.status === 'Draft') {
             return;
         }
         const currentReceipt = Object.assign({}, this.selectedReceipt);
@@ -353,7 +353,7 @@ export class ARCustomerPaymentComponent extends AppList implements IPermissionBa
             labelConfirm: 'Yes',
             center: true
         }, () => {
-            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: 'copy' } });
+            this._router.navigate([`${RoutingConstants.ACCOUNTING.ACCOUNT_RECEIVABLE_PAYABLE}/receipt/${currentReceipt?.type.toLowerCase()}/new`], { queryParams: { id: currentReceipt.id, action: `copy-${currentReceipt.status.toLowerCase()}` } });
         });
     }
 
