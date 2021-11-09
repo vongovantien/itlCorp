@@ -4622,11 +4622,12 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 5].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[p, 1, p, 7].Style.Border.BorderAround(ExcelBorderStyle.Medium);
 
-            workSheet.Cells[p, 6].Value = _sumTotalOBH; //Value sum total OBH
+            workSheet.Cells[p, 6].Value = "-"; //Value sum total OBH
             //workSheet.Cells[p, 6].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells[p, 1, p, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Right;
 
-            workSheet.Cells[p, 7].Value = _sumTotalCredit; //Value sum total Credit
+            workSheet.Cells[p, 7].Value = _sumTotalCredit+_sumTotalOBH; //Value sum total Credit
             //workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             p=p+2;
