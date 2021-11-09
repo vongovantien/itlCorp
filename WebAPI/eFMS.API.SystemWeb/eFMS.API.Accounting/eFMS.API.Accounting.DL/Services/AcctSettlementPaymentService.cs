@@ -4985,7 +4985,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeType = "NO_INVOICE";
                 }
                 infoShipmentCharge.ChargeType = _chargeType;
-
+                infoShipmentCharge.SurType = sur.Type;
                 listCharge.Add(infoShipmentCharge);
             }
             return listCharge;

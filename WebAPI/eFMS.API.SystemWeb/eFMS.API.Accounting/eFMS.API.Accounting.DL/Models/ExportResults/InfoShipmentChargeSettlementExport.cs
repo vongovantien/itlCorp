@@ -9,5 +9,6 @@
         public string InvoiceNo { get; set; }
         public string ChargeNote { get; set; }
         public string ChargeType { get; set; }
+        public string SurType { get; set; }
     }
 }
