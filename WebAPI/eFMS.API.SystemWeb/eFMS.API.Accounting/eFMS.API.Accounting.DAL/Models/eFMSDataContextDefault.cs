@@ -727,6 +727,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.CombineBillingNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.CurrencyId)
@@ -1241,6 +1245,10 @@ namespace eFMS.API.Accounting.Service.Models
                     .IsUnicode(false)
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.CombineBillingNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CommodityGroupId).HasColumnName("CommodityGroupID");
 
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
@@ -1301,7 +1309,7 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.Soano)
                     .HasColumnName("SOANo")
-                    .HasMaxLength(7)
+                    .HasMaxLength(10)
                     .IsUnicode(false);
 
                 entity.Property(e => e.SoatoDate)
@@ -1598,6 +1606,12 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.IsExpired).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsOverDue).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsOverLimit).HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
@@ -2263,6 +2277,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ClearanceNo).HasMaxLength(100);
 
+                entity.Property(e => e.CombineBillingNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.ContNo).HasMaxLength(200);
@@ -2326,6 +2344,11 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.NetAmount).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.Notes).HasMaxLength(500);
+
+                entity.Property(e => e.ObhcombineBillingNo)
+                    .HasColumnName("OBHCombineBillingNo")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.ObjectBePaid)
                     .HasMaxLength(50)
