@@ -35,5 +35,10 @@ namespace eFMS.API.Accounting.DL.Common
             }
             return serviceName;
         }
+
+        public static bool IsNullOrValue(decimal? value, decimal valueToCheck)
+        {
+            return (value ?? valueToCheck) == valueToCheck;
+        }
     }
 }

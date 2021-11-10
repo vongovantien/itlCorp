@@ -1030,11 +1030,20 @@ namespace eFMS.API.Accounting.DL.Services
                 agreement.CreditRate = _creditRate;
                 agreement.DatetimeModified = DateTime.Now;
                 agreement.UserModified = currentUser.UserID;
+
+                if (agreement.CreditRate > AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
+                {
+                    agreement.IsOverLimit = true; // vượt hạn mức
+                }
+                else
+                {
+                    agreement.IsOverLimit = false;
+                }
             }
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds)
+        private HandleState UpdateAgreementPartners(List<string> partnerIds, bool isOverDue = false)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1048,6 +1057,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
+                        agreementPartner.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
                         hs = contractPartnerRepo.Update(agreementPartner, x => x.Id == agreementPartner.Id);
                     }
                     else
@@ -1058,6 +1068,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+                            agreementParent.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
+
                             hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1066,7 +1078,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds)
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, bool isOverDue = false)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1080,6 +1092,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
+                        agreementPartner.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
                         hs = await contractPartnerRepo.UpdateAsync(agreementPartner, x => x.Id == agreementPartner.Id);
                     }
                     else
@@ -1090,6 +1103,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+                            agreementParent.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
+
                             hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1140,7 +1155,18 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                await UpdateAgreementPartnersAsync(partnerIds);
+
+                if (receivables.Any(x => DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                 || DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                 || DataTypeEx.IsNullOrValue(x.Over30Day, 0)))
+                {
+                    await UpdateAgreementPartnersAsync(partnerIds, true);
+                }
+                else
+                {
+                    await UpdateAgreementPartnersAsync(partnerIds);
+                }
+                
 
                 return hs;
             }
@@ -1257,7 +1283,16 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                UpdateAgreementPartners(partnerIds);
+
+                if(receivables.Any(x => DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
+                || DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) 
+                || DataTypeEx.IsNullOrValue(x.Over30Day, 0))) {
+                    UpdateAgreementPartners(partnerIds, true);
+                }
+                else
+                {
+                    UpdateAgreementPartners(partnerIds);
+                }
 
                 return hs;
             }
