@@ -759,7 +759,7 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportAccountingManagementDebCreInvoice")]
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> ExportAccountingManagementDebCreInvoice(AccAccountingManagementCriteria criteria)
+        public async Task<IActionResult> ExportAccountingManagementDebCreInvoice(AccAccountingManagementCriteriaDebCreInvoice criteria)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
             var responseFromApi = await HttpServiceExtension.GetDataFromApi(criteria, aPis.HostStaging + Urls.Documentation.GetDataExporDebCretInvUrl,accessToken);
