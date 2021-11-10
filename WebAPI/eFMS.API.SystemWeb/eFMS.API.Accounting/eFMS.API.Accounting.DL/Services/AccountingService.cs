@@ -3064,6 +3064,9 @@ namespace eFMS.API.Accounting.DL.Services
                 case "COLL_OTH":
                     _description = string.Format("{0} {1}", "Công Nợ Thu Khác", payment.InvoiceNo);
                     break;
+                case "COLL_OBH":
+                    _description = "Thu Hộ";
+                    break;
                 default:
                     break;
             }
