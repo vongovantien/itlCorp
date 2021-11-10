@@ -14,7 +14,7 @@
                     <form-search-account-receivable (onSearch)="onSearchReceivable($event)">
                     </form-search-account-receivable>
                     <tabset class="custom-class-tab">
-                        <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'" heading="Summary"
+                        <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'" heading={{heading}}
                             (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
                             <list-trial-official-account-receivable></list-trial-official-account-receivable>
                         </tab>
