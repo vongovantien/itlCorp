@@ -314,7 +314,7 @@ export class ARCustomerPaymentCreateReciptComponent extends AppForm implements O
     onSaveDataReceipt(model: ReceiptModel, action: number) {
         model.id = SystemConstants.EMPTY_GUID;
         model.referenceId = this.receiptRefId; // * Set Id cho phiếu ngân hàng.
-        if (this.actionReceiptFromParams.includes('copy')) {
+        if (this.actionReceiptFromParams?.includes('copy')) {
             model.referenceId = null;
         }
         this._accountingRepo.saveReceipt(model, action)
