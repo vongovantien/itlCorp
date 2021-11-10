@@ -19,44 +19,33 @@
                         <table class="table table-hover table-brand table-editable dataTable table-summary ">
                             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField)">
                                 <!-- <thead> -->
-                                    <th class="m--w-50 first table-actions-col sticky-col first-col">
-                                        Action
-                                    </th>
-                                <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col second-col"
-                                    [class]="sortClass('partnerCode')"
-                                    (click)="sortBy('partnerCode')"
-                                >
-                                   Partner Id
-                                   <span class="sort-indicator"></span>
+                                <th class="first table-actions-col sticky-col first-col">
+                                    Action
                                 </th>
-                                <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col three-col"
-                                    [class]="sortClass('partnerNameAbbr')"
-                                    (click)="sortBy('partnerNameAbbr')"
-                                >
-                                    Partner Name
-                                    <span class="sort-indicator"></span>
-                                 </th>
-                                 <th class="sortable ng-star-inserted m--w-90 first table-actions-col sticky-col four-col"
-                                    [class]="sortClass('debitRate')"
-                                    (click)="sortBy('debitRate')"
-
-                                 >
-                                    Rate (%)
-                                    <span class="sort-indicator"></span>
-                                 </th>
-                                 <!-- <th *ngFor="let header of headers; let i = index; trackBy: trackByFn"
-                                 [class]="sortClass(header.sortable ? header.field : '')"
-                                 (click)="sortBy(header.sortable ? header.field : '')">
-                                 <span>{{header.title}}</span>
-                                 <span class="sort-indicator"></span>
-                                </th> -->
+                                <th class="sortable ng-star-inserted first sticky-col second-col"
+                                    [class]="sortClass('partnerCode')" (click)="sortBy('partnerCode')">
+                                    <span class="sort-indicator">Partner Id</span>
+                                </th>
+                                <th class="sortable ng-star-inserted first sticky-col three-col"
+                                    [class]="sortClass('partnerNameAbbr')" (click)="sortBy('partnerNameAbbr')"
+                                    style="min-width: 200px;max-width: 200px; white-space:initial">
+                                    <span class="sort-indicator">Partner Name</span>
+                                </th>
+                                <th class="sortable ng-star-inserted first sticky-col four-col "
+                                    [class]="sortClass('debitRate')" (click)="sortBy('debitRate')">
+                                    <span class="sort-indicator"> Rate (%)</span>
+                                </th>
                             </thead>
                             <tbody>
+                                <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
+                                </tr>
+                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
                                 <ng-container>
                                     <ng-container
                                         *ngFor="let item of trialOfficialList; let i = index; trackBy: trackByFn">
                                         <tr class="">
-                                            <td class="table-actions-col sticky-col first-col" style="background-color: #fff;">
+                                            <td class="table-actions-col sticky-col first-col"
+                                                style="background-color: #fff;">
                                                 <div class="table-actions" style="width: 70px">
                                                     <app-permission-button type="detail"
                                                         (click)="viewDetail(item.agreementId)">
@@ -68,9 +57,11 @@
                                                     [queryParams]="{agreementId: item.agreementId}">{{
                                                     item.partnerCode }}</a>
                                             </td>
-                                            <td class="sticky-col three-col" style="background-color: #fff;min-width: 200px; white-space:initial">{{ item.partnerNameAbbr }}
+                                            <td class="sticky-col three-col"
+                                                style="background-color: #fff;min-width: 200px; white-space:initial">{{
+                                                item.partnerNameAbbr }}
                                             </td>
-                                            <td class="sticky-col four-col" style="background-color: #fff;" >
+                                            <td class="sticky-col four-col text-right" style="background-color: #fff;">
                                                 <span
                                                     [ngClass]="item.debitRate < 70 ? 'text-success' : item.debitRate < 100 ? 'text-warning':'text-danger'">
                                                     {{ item.debitRate | number: '.2-2'}}%
@@ -79,20 +70,26 @@
 
 
                                             <td class="text-right">
-                                                <a href="javascript:void(0)" (click)="showDebitDetail(item.agreementId,'Unpaid')">
-                                                    {{ (item.billingAmount + (item.obhBillingAmount!=null?item.obhBillingAmount:0)) | negativeNumber :'.0-3' }}
+                                                <a href="javascript:void(0)"
+                                                    (click)="showDebitDetail(item.agreementId,'Unpaid')">
+                                                    {{ (item.billingAmount +
+                                                    (item.obhBillingAmount!=null?item.obhBillingAmount:0)) |
+                                                    negativeNumber :'.0-3' }}
                                                 </a>
                                             </td>
                                             <td class="text-right">
                                                 <a href="javascript:void(0)"
                                                     (click)="showDebitDetail(item.agreementId,'Paid A Part')">
-                                                    {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0) | negativeNumber:'.0-3'}}
+                                                    {{ item.paidAmount + (item.obhPaidAmount!=null?item.obhPaidAmount:0)
+                                                    | negativeNumber:'.0-3'}}
                                                 </a>
                                             </td>
                                             <td class="text-right">
                                                 <a href="javascript:void(0)"
                                                     (click)="showDebitDetail(item.agreementId,'OutStanding')">
-                                                    {{ item.billingUnpaid + (item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0)  | negativeNumber:'.0-3'}}
+                                                    {{ item.billingUnpaid +
+                                                    (item.obhUnPaidAmount!=null?item.obhUnPaidAmount:0) |
+                                                    negativeNumber:'.0-3'}}
                                                 </a>
                                             </td>
                                             <!-- <td>{{ item.obhAmount | negativeNumber: '.0-3'}}</td> -->
@@ -122,8 +119,10 @@
                                             </td>
                                             <td class="text-center">{{ item.agreementCurrency }}</td>
                                             <td class="text-right"> {{item.debitAmount | negativeNumber:'.0-3'}}</td>
-                                            <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}</td>
-                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited) | negativeNumber:'.0-3' }}</td>
+                                            <td class="text-right">{{ item.creditLimited | negativeNumber: '.0-3' }}
+                                            </td>
+                                            <td class="text-right">{{ (item.debitAmount-item.creditLimited) |
+                                                negativeNumber:'.0-3' }}</td>
                                             <td class="text-center text-success">{{ item.agreementSalesmanName}}</td>
                                             <td>
                                                 {{ item.agreementNo}}
@@ -151,9 +150,7 @@
 
                                     </ng-container>
                                 </ng-container>
-                                <tr app-table-none-record *ngIf="!(isLoading | async) && !trialOfficialList.length">
-                                </tr>
-                                <tr app-table-row-loading *ngIf="isLoading | async"></tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -167,11 +164,3 @@
 </div>
 
 <account-receivable-debit-detail-popup></account-receivable-debit-detail-popup>
-
-<ng-template #debitAmountNegative>
-    {{item.debitAmount | negativeNumber }}
-</ng-template>
-<ng-template #TplTotalObjectBalanceVndNegative>
-    {{item.debitAmount | negativeNumber }}
-</ng-template>
-

@@ -37,6 +37,19 @@
                                 <label for="">Status Payment</label>
                                 <ng-select formControlName="statusPayment" [items]="statusPayments" class="custom"
                                     bindLabel="title" bindValue="value" placeholder="All">
+                                    <ng-template ng-label-tmp let-item="item">
+                                        <ng-container [ngSwitch]="item.value">
+                                            <ng-container *ngSwitchCase="'Settled'">
+                                                <span class="text-success"> Settled </span>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'NotSettled'">
+                                                <span class="text-danger"> Not Settle </span>
+                                            </ng-container>
+                                            <ng-container *ngSwitchCase="'PartialSettlement'">
+                                                <span class="text-warning"> Partial Settlement </span>
+                                            </ng-container>
+                                        </ng-container>
+                                    </ng-template>
                                 </ng-select>
                             </div>
                         </div>

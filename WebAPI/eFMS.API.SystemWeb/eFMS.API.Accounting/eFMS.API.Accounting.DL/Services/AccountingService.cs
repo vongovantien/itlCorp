@@ -2696,7 +2696,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                  BranchCode = office.Code,
                                                  OfficeCode = office.Code,
                                                  DocDate = receipt.PaymentDate.HasValue ? receipt.PaymentDate.Value.Date : receipt.PaymentDate, //Payment Date (Chỉ lấy Date, không lấy time)
-                                                 ReferenceNo = type == "NETOFF" ? receipt.PaymentRefNo + "CR" : receipt.PaymentRefNo,
+                                                 ReferenceNo = GetReferenceNoReceipt(receipt, type),
                                                  CurrencyCode = receipt.CurrencyId,
                                                  ExchangeRate = receipt.ExchangeRate,
                                                  CustomerCode = partner.AccountNo,
@@ -2995,14 +2995,28 @@ namespace eFMS.API.Accounting.DL.Services
 
             return account;
         }
+        private string GetReferenceNoReceipt(AcctReceipt receipt, string type)
+        {
+            switch (type)
+            {
+                case "NETOFF":
+                    return receipt.PaymentRefNo + "CR";
+                case "COLL_ADV":
+                    return receipt.PaymentRefNo + "_AD"; 
+                default:
+                    return receipt.PaymentRefNo;
+            }
+        }
+
         private string GeneratePaymentReceiptDescription(AcctReceipt receipt, string type)
         {
-            string _des = "Công Nợ Phải Thu";
+            string _des = "Thu công nợ khách hàng";
             if (type == "NETOFF")
             {
                 return "Công Nợ Cấn Trừ";
             }
-            if(type == "COLL_ADV")
+           
+            if (type == "COLL_ADV")
             {
                 if (string.IsNullOrEmpty(receipt.Description))
                 {
@@ -3013,6 +3027,10 @@ namespace eFMS.API.Accounting.DL.Services
                     return receipt.Description;
                 }
             }
+            //if(!string.IsNullOrEmpty(receipt.Description))
+            //{
+            //    return receipt.Description;
+            //}
             return _des;
         }
         private string GeneratePaymentReceiptDescription(AccAccountingPayment payment, string type)

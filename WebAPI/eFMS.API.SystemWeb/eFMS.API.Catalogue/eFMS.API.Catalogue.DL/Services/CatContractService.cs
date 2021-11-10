@@ -270,31 +270,32 @@ namespace eFMS.API.Catalogue.DL.Services
             string messageDuplicate = string.Empty;
             int LengthService = model.SaleService.Split(";").ToArray().Length;
             int LengthOffice = model.OfficeId.Split(";").ToArray().Length;
+            var contractPartner = DataContext.Get(x => x.PartnerId == model.PartnerId && x.Active == true);
             if (model.Id == Guid.Empty)
             {
                 if (!string.IsNullOrEmpty(model.ContractNo))
                 {
                     if (model.ContractType == "Official")
                     {
-                        if (DataContext.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId))
+                        if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim()))
                         {
                             messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                             return messageDuplicate;
                         }
                     }
                 }
-                var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
-                if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
+                //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+                if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
                 {
-                    if (DataCheck.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    var data = DataCheck.Where(x => x.Active == false || x.Active == null);
-                    if (data.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
+                    //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
+                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any())))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
@@ -306,24 +307,24 @@ namespace eFMS.API.Catalogue.DL.Services
                 {
                     if (model.ContractType == "Official")
                     {
-                        if (DataContext.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.PartnerId == model.PartnerId && x.Id != model.Id))
+                        if (contractPartner.Any(x => !string.IsNullOrEmpty(x.ContractNo) && x.ContractNo.Trim() == model.ContractNo.Trim() && x.Id != model.Id && model.Active == true))
                         {
                             return messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_CONTRACT_NO_EXISTED], model.ContractNo);
                         }
                     }
                 }
-                var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
-                if (!DataCheck.Any(x => x.SaleManId == model.SaleManId))
+                //var DataCheck = DataContext.Get(x => x.PartnerId == model.PartnerId);
+                if (!contractPartner.Any(x => x.SaleManId == model.SaleManId))
                 {
-                    if (DataCheck.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
+                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }
                 }
                 else
                 {
-                    var data = DataCheck.Where(x => x.Active == false || x.Active == null);
-                    if (data.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id))
+                    //var data = contractPartner.Where(x => x.Active == false || x.Active == null);
+                    if (contractPartner.Any(x => (LengthService == 1 ? x.SaleService.Contains(model.SaleService) : x.SaleService.Intersect(model.SaleService).Any()) && x.ContractType == model.ContractType && (LengthOffice == 1 ? x.OfficeId.Contains(model.OfficeId) : x.OfficeId.Intersect(model.OfficeId).Any()) && x.Id != model.Id && model.Active == true))
                     {
                         messageDuplicate = string.Format(stringLocalizer[CatalogueLanguageSub.MSG_CONTRACT_DUPLICATE_SERVICE]);
                     }

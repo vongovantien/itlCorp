@@ -4,5 +4,6 @@ namespace eFMS.API.Documentation.DL.Models
 {
     public class CsShipmentSurchargeModel:CsShipmentSurcharge
     {
+        public string AccountNo { get; set; }
     }
 }

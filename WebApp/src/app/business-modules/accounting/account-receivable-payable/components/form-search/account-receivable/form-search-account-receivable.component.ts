@@ -142,19 +142,23 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         .pipe(takeUntil(this.ngUnsubscribe))
         .subscribe(
             (user: any) => {
-                if (user) {
+                if (user && JSON.stringify(user) !== '{}') {
                     this.currentUser = user;
+                    if(this.officeIds)
+                        this.officeIds.setValue([this.currentUser.officeId]);
+                    this.getOffices();
+                    this.getAllStaff();
+
+                    if(this.formSearch){
+                        this.subscriptionSearchParamState();
+                        this.submitSearch();
+                    }
                 }
             }
         )
-        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
-
-        this.salemans = this._systemRepo.getListSystemUser();
         this.initForm();
-        this.getOffices();
-        this.getAllStaff();
-        this.subscriptionSearchParamState();
-        this.submitSearch();
+        this.partners = this._catalogueRepo.getPartnersByType(CommonEnum.PartnerGroupEnum.ALL);
+        this.salemans = this._systemRepo.getListSystemUser();
     }
     initForm() {
         this.formSearch = this._fb.group({
@@ -166,12 +170,12 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
             debitRate: [this.debitRates[0].id],
             fromDebitRate: [],
             toDebitRate: [],
-            agreementStatus: [this.agreementStatusList[0].id],
+            agreementStatus: [this.agreementStatusList[1].id],
             agreementExpiredDays: [this.agreementExpiredDayList[0].id],
             salesManId: [],
             officalId: [],
             partnerType: [this.partnerTypes[0].id],
-            officeIds: [[this.currentUser.officeId]],
+            officeIds: [],
             staff:[]
         });
 
@@ -213,7 +217,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
     // tslint:disable-next-line:no-any
     onSelectBindingInput(item: any, fieldName: string) {
-        debugger
             switch (fieldName) {
                 case 'OverDueDays':
                     if(item){
@@ -249,16 +252,16 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
         // tslint:disable-next-line:no-any
         const dataForm: { [key: string]: any } = this.formSearch.getRawValue();
         this.isSubmitted = true;
-        if (dataForm.toDebitRate < dataForm.fromDebitRate) {
-            return;
-        }
+        // if (dataForm.toDebitRate < dataForm.fromDebitRate) {
+        //     return;
+        // }
         const body: AccountingInterface.IAccReceivableSearch = {
             arType: this.arType,
             acRefId: dataForm.partnerId,
             overDueDay: dataForm.overdueDays? dataForm.overdueDays : 0,
             debitRateFrom: dataForm.fromDebitRate,
             debitRateTo: dataForm.toDebitRate,
-            agreementStatus: dataForm.agreementStatus,
+            agreementStatus: dataForm.agreementStatus?dataForm.agreementStatus:this.agreementStatusList[1].id,
             agreementExpiredDay: dataForm.agreementExpiredDays,
             salesmanId: dataForm.salesManId,
             officeId: dataForm.officalId,
@@ -275,7 +278,6 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
     }
 
     subscriptionSearchParamState() {
-        debugger
         this._store.select(getAccountReceivableSearchState)
             .pipe(
                 takeUntil(this.ngUnsubscribe)
@@ -288,7 +290,7 @@ export class AccountReceivableFormSearchComponent extends AppForm implements OnI
                             overdueDays: data.overDueDay ? data.overDueDay : this.overDueDays[0].id,
                             fromDebitRate: data.debitRateFrom ? data.debitRateFrom : null,
                             toDebitRate: data.debitRateTo ? data.debitRateTo : null,
-                            agreementStatus: data.agreementStatus ? data.agreementStatus : this.agreementStatusList[0].id,
+                            agreementStatus: data.agreementStatus ? data.agreementStatus : this.agreementStatusList[1].id,
                             agreementExpiredDays: data.agreementExpiredDay ? data.agreementExpiredDay : this.agreementExpiredDayList[0].id,
                             salesManId: data.salesmanId ? data.salesmanId : null,
                             officalId: data.officeId ? data.officeId : null,

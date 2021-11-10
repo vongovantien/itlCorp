@@ -126,14 +126,15 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(5).Width = 20; //Cột E
             workSheet.Column(6).Width = 10; //Cột F
             workSheet.Column(7).Width = 14; //Cột G
-            workSheet.Column(8).Width = 18; //Cột H
+            workSheet.Column(8).Width = 23; //Cột H
             workSheet.Column(9).Width = 19; //Cột I
-            workSheet.Column(10).Width = 15; //Cột J
+            workSheet.Column(10).Width = 25; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
-            workSheet.Column(12).Width = 13; //Cột L
-            workSheet.Column(13).Width = 12; //Cột M
-            workSheet.Column(14).Width = 20; //Cột N
-            workSheet.Column(16).Width = 30; //Cột P
+            workSheet.Column(12).Width = 15; //Cột L
+            workSheet.Column(13).Width = 15; //Cột M
+            workSheet.Column(14).Width = 25; //Cột N
+            workSheet.Column(14).Width = 15; //Cột P
+            workSheet.Column(16).Width = 50; //Cột P
         }
 
         public Stream GenerateAdvancePaymentShipmentExcel(List<AdvancePaymentRequestModel> listObj, Stream stream = null)
@@ -194,6 +195,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 8].Style.Numberformat.Format = "dd/MM/yyyy";
                         worksheet.Cells[i + addressStartContent, 9].Value = item.BankAccountNo;
                         worksheet.Cells[i + addressStartContent, 10].Value = item.BankAccountName;
+                        worksheet.Cells[i + addressStartContent, 10].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 11].Value = item.BankName;
                         //
                         worksheet.Cells[i + addressStartContent, 12].Value = item.JobId;
@@ -201,6 +203,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         worksheet.Cells[i + addressStartContent, 14].Value = item.Hbl;
                         worksheet.Cells[i + addressStartContent, 15].Value = item.CustomNo;
                         worksheet.Cells[i + addressStartContent, 16].Value = item.Description;
+                        //worksheet.Cells[i + addressStartContent, 16].Style.HorizontalAlignment = ExcelHorizontalAlignment.Fill;
                         worksheet.Cells[i + addressStartContent, 17].Value = item.StatusPayment == "New" || item.StatusPayment == "Denied" ? null : item.ApproveDate;
                         worksheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = "dd/MM/yyyy"; //"dd/MM/yyyy  HH:mm:ss AM/PM";
                         worksheet.Cells[i + addressStartContent, 18].Value = item.SettleDate;
@@ -951,6 +954,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Column(9).Width = 20; //Cột I
             workSheet.Column(10).Width = 18; //Cột J
             workSheet.Column(11).Width = 20; //Cột K
+            workSheet.Column(12).Width = 20; //Cột L
         }
 
         private List<string> GetHeaderExcelDetailAdvancePayment(string language)
@@ -1011,7 +1015,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Hình thức thanh toán:",//44
                 "Đối tượng thanh toán:",//45
                 //END
-                "Note", //46
+                "Ghi chú", //46
             };
 
             List<string> engHeaders = new List<string>()
@@ -1156,6 +1160,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["J10"].Style.Font.Bold = true;
             //workSheet.Cells["C10"].Value = advanceExport.InfoAdvance.BankAccountName;
             workSheet.Cells["K10"].Value = advanceExport.InfoAdvance.BankAccountName;
+            workSheet.Cells["K10"].Style.WrapText = true;
 
             workSheet.Cells["A8:B8"].Merge = true;
             workSheet.Cells["A8:B8"].Value = headers[42];
@@ -2167,18 +2172,6 @@ namespace eFMS.API.ReportData.FormatExcel
                         string vatAmount = "( " + itemCharge.VATAmount + " )";
 
 
-                        if (itemCharge.VATAmount < 0)
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = vatAmount;
-                            workSheet.Cells[i + addressStartContent, 17].Value = vatAmount;
-                        }
-                        else
-                        {
-                            workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
-                            workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
-                        }
-
-
                         if (itemCharge.Type.Contains("OBH"))
                         {
                             workSheet.Cells[i + addressStartContent, 16].Value = itemCharge.NetAmount;
@@ -2187,7 +2180,15 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 18].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
                             workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
-
+                            if (itemCharge.VATAmount < 0)
+                            {
+                                workSheet.Cells[i + addressStartContent, 17].Value = Math.Abs(itemCharge.VATAmount ?? 0);
+                            }
+                            else
+                            {
+                                workSheet.Cells[i + addressStartContent, 17].Value = itemCharge.VATAmount;
+                                workSheet.Cells[i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
+                            }
 
                         }
                         else
@@ -2198,6 +2199,16 @@ namespace eFMS.API.ReportData.FormatExcel
                             workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
                             workSheet.Cells[i + addressStartContent, 15].Value = Math.Abs(itemCharge.VATAmount ?? 0) + itemCharge.NetAmount.GetValueOrDefault(0M);
                             workSheet.Cells[i + addressStartContent, 15].Style.Numberformat.Format = numberFormat2;
+
+                            if (itemCharge.VATAmount < 0)
+                            {
+                                workSheet.Cells[i + addressStartContent, 14].Value = Math.Abs(itemCharge.VATAmount ?? 0);
+                            }
+                            else
+                            {
+                                workSheet.Cells[i + addressStartContent, 14].Value = itemCharge.VATAmount;
+                                workSheet.Cells[i + addressStartContent, 14].Style.Numberformat.Format = numberFormat2;
+                            }
                         }
 
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 15].Value);
@@ -5036,7 +5047,8 @@ namespace eFMS.API.ReportData.FormatExcel
                 "Issued_by",//14
                 "BU",//15
                 "Service Date",//16
-                "Issue Date"//17
+                "Issue Date",//17
+                "Account No"//18
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -5076,13 +5088,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 17].Style.Numberformat.Format = "dd/MM/yyyy";
                 workSheet.Cells[rowStart, 18].Value = item.IssueDate;
                 workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
+
+                workSheet.Cells[rowStart, 19].Value = item.AccountNo;
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:R" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
@@ -5126,9 +5140,10 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 excel.StartDetailTable = 3;
                 //Set format amount
-                var formatAmountVND = "_([$VND] * #,##0_);_([$VND] * (#,##0);_([$VND] * \"\"??_);_(@_)";
-                var formatAmountUSD = "_([$USD] * #,##0.00_);_([$USD] * (#,##0.00);_([$USD] * \"\"??_);_(@_)";
+                var formatAmountVND = "_(* #,##0_);_(* (#,##0);_(* \"-\"??_);_(@_)";
+                var formatAmountUSD = "_(* #,##0.00_);_(* (#,##0.00);_(* \"-\"??_);_(@_)";
 
+                var rowStart = 3;
                 for (int i = 0; i < result.Count; i++)
                 {
                     var item = result[i];
@@ -5144,28 +5159,44 @@ namespace eFMS.API.ReportData.FormatExcel
                     if (item.AgreementCurrency == "VND")
                     {
                         listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountVND;
                         listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
-                        excel.SetFormatCell(listKeyFormat, formatAmountVND);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountVND;
                     }
                     else
                     {
                         listKeyData.Add("Billing", item.BillingAmount + item.ObhBillingAmount);
+                        excel.Worksheet.Cells[rowStart, 5].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("PaidAPart", item.PaidAmount + item.ObhPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 6].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("OutStanding", item.BillingUnpaid + item.ObhUnPaidAmount);
+                        excel.Worksheet.Cells[rowStart, 7].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over1-15Days", item.Over1To15Day);
+                        excel.Worksheet.Cells[rowStart, 8].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over16-30Days", item.Over16To30Day);
+                        excel.Worksheet.Cells[rowStart, 9].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("Over30Days", item.Over30Day);
+                        excel.Worksheet.Cells[rowStart, 10].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("DebitAmount", item.DebitAmount);
+                        excel.Worksheet.Cells[rowStart, 12].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("CreditLimited", item.CreditLimited);
+                        excel.Worksheet.Cells[rowStart, 13].Style.Numberformat.Format = formatAmountUSD;
                         listKeyData.Add("OverCreditAmount", item.DebitAmount - item.CreditLimited);
-                        excel.SetFormatCell(listKeyFormat, formatAmountUSD);
+                        excel.Worksheet.Cells[rowStart, 14].Style.Numberformat.Format = formatAmountUSD;
                     }
               
 
@@ -5181,6 +5212,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("ParentPartner", item.ParentNameAbbr);
 
                     excel.SetData(listKeyData);
+                    rowStart++;
                 }
                 return excel.ExcelStream();
             }
@@ -5259,6 +5291,7 @@ namespace eFMS.API.ReportData.FormatExcel
             try
             {
                 var folderOfFile = GetARExcelFolder();
+                var deleteDetailRow = false;
                 FileInfo f = new FileInfo(Path.Combine(folderOfFile, fileName));
                 var path = f.FullName;
                 if (!File.Exists(path))
@@ -5270,8 +5303,11 @@ namespace eFMS.API.ReportData.FormatExcel
                 excel.StartDetailTable = startRow;
                 if (result.Count == 0)
                     result.Add(new AccountingAgencyPaymentExport());
-                if (paymentCriteria.DueDate == null)
+                if (paymentCriteria.DueDate != null  || paymentCriteria.FromIssuedDate != null || result.FirstOrDefault().details == null || result.Count(x => x.details != null && x.details.Count() > 0) == 0)
+                {
                     excel.DeleteRow(7);
+                    deleteDetailRow = true;
+                }
 
                 for (int i = 0; i < result.Count; i++)
                 {
@@ -5329,7 +5365,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     listKeyData.Add("Creator", item.Creator);
                     excel.SetData(listKeyData);
                     startRow++;
-                    if (item.details.Count > 0 && paymentCriteria.DueDate != null)
+                    if ( item.details.Count > 0 && deleteDetailRow == false && (paymentCriteria.DueDate == null || paymentCriteria.FromIssuedDate == null))
                     {
                         foreach (var detail in item.details)
                         {

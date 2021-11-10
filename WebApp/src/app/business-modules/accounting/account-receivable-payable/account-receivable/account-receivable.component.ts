@@ -139,7 +139,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                             overDueDay: 0,
                             debitRateFrom: null,
                             debitRateTo: null,
-                            agreementStatus: "All",
+                            agreementStatus: "Active",
                             agreementExpiredDay: 'All',
                             salesmanId: null,
                             officeId: null,
@@ -147,16 +147,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                             toOverdueDays: null,
                             debitRate: 0,
                             partnerType: "All",
-                            officeIds: [this.currentUser?.officeId],
-                            staffs: []
+                            staffs: null,
+                            officeIds: null
                         };
                         this.dataSearch = body;
                     }
-
-                    this.page = data.page;
-                    this.pageSize = data.pageSize;
-                }
-            );
+                });
         tabComponent.dataSearch = this.dataSearch;
         tabComponent.getPagingList();
     }

@@ -481,6 +481,15 @@ namespace eFMS.API.Documentation.DL.Services
                             CsTransactionDetail hbl = tranDetailRepository.Get(x => x.Id == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            // lưu cứng HBL Tránh bug.
+                            item.Hblno = hbl?.Hwbno;
+                            if (hbl != null)
+                            {
+                                var masterBill = csTransactionRepository.Get(x => x.Id == hbl.JobId).FirstOrDefault();
+                                item.JobNo = masterBill?.JobNo;
+                                //Ưu tiên lấy MBL của MasterBill >> HouseBill
+                                item.Mblno = !string.IsNullOrEmpty(masterBill?.Mawb) ? masterBill?.Mawb : hbl.Mawb;
+                            }
                         }
                         else
                         {
@@ -1278,7 +1287,7 @@ namespace eFMS.API.Documentation.DL.Services
             var listChargeOps = DataContext.Get(x => x.TransactionType == "CL");
             var listPartner = partnerRepository.Get(x => x.Active == true);
             var chargeData = catChargeRepository.Get(x => x.Active == true).ToLookup(x => x.Code);
-            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled");
+            var opsTransaction = opsTransRepository.Get(x => x.CurrentStatus != "Canceled" && x.IsLocked == false);
             string TypeCompare = string.Empty;
             list.ForEach(item =>
             {

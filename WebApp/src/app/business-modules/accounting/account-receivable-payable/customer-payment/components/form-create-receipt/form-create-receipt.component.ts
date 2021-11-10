@@ -5,8 +5,8 @@ import { ToastrService } from 'ngx-toastr';
 
 import { JobConstants, AccountingConstants } from '@constants';
 import { CommonEnum } from '@enums';
-import { Partner, ReceiptInvoiceModel, } from '@models';
-import { CatalogueRepo, AccountingRepo } from '@repositories';
+import { Partner, } from '@models';
+import { CatalogueRepo } from '@repositories';
 import { IAppState } from '@store';
 import { AppForm } from '@app';
 import { ComboGridVirtualScrollComponent } from '@common';
@@ -64,7 +64,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         private readonly _fb: FormBuilder,
         private readonly _store: Store<IAppState>,
         private readonly _catalogueRepo: CatalogueRepo,
-        private readonly _accountingRepo: AccountingRepo,
         private readonly _toastService: ToastrService,
 
     ) {
@@ -73,7 +72,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
     ngOnInit() {
         this.initForm();
         this.getCustomerAgent();
-        this.generateReceiptNo();
 
         this._store.select(ReceiptTypeState)
             .pipe(takeUntil(this.ngUnsubscribe))
@@ -96,7 +94,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
         this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.CUSTOMER])
             .subscribe(
                 (data) => {
-                    this._catalogueRepo.customersSource$.next({ data }); // * Update service.
                     this.customers = data;
                 }
             );
@@ -104,9 +101,9 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     initForm() {
         this.formSearchInvoice = this._fb.group({
-            customerId: new FormControl(null, Validators.required),
+            customerId: [null, Validators.required],
             date: [],
-            paymentRefNo: new FormControl(null, Validators.required),
+            paymentRefNo: [null],
             agreementId: [null, Validators.required],
             class: [this.classReceipt[0]],
             referenceNo: [{ value: null, disabled: true }]
@@ -120,19 +117,6 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
 
     }
 
-    generateReceiptNo() {
-        this._accountingRepo.generateReceiptNo().subscribe(
-            (data: any) => {
-                if (!!data) {
-                    const { receiptNo } = data;
-                    if (!this.isUpdate) {
-                        this.paymentRefNo.setValue(receiptNo);
-                    }
-                }
-            }
-        );
-    }
-
     getContract() {
         this._catalogueRepo.getAgreement(
             <IQueryAgreementCriteria>{
@@ -141,12 +125,12 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 (d: IAgreementReceipt[]) => {
                     if (!!d) {
                         this.agreements = d || [];
-                        if (!!this.agreements.length) {
-                            this.agreementId.setValue(d[0].id);
-                        } else {
-                            this.combogrid.displaySelectedStr = '';
-                            this.agreementId.setValue(null);
-                        }
+                        // if (!!this.agreements.length) {
+                        //     this.agreementId.setValue(d[0].id);
+                        // } else {
+                        //     this.combogrid.displaySelectedStr = '';
+                        //     this.agreementId.setValue(null);
+                        // }
                     }
                 }
             );
@@ -196,6 +180,7 @@ export class ARCustomerPaymentFormCreateReceiptComponent extends AppForm impleme
                 this.agreementId.setValue((data as IAgreementReceipt).id);
                 // this._store.dispatch(SelectReceiptAgreement({ cusAdvanceAmount: null })) // ! Dispatch action to Trigger new state to call caculateAmountFromDebitList 
                 this._store.dispatch(SelectReceiptAgreement({ ...data }));
+                this.contractNo = (data as IAgreementReceipt).contractType + ' - ' + data.saleManName + ' - ' + data?.contractNo;
                 break;
             default:
                 break;

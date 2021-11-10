@@ -195,7 +195,7 @@
 				</div>
 			</div>
 			<div class="col-md-4">
-				<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !supplierId.value}">
+				<div class="form-group" [ngClass]="{'m-form__group has-danger':  isSubmitted && !supplierId.valid}">
 					<label class="form-control-label" required>
 						Supplier/Carrier
 					</label>
@@ -203,9 +203,9 @@
 						[currentActiveItemId]="{ field: 'id', value: supplierId.value}"
 						[selectedDisplayFields]="['shortName']" [dataSources]="carries | async"
 						[displayFields]="displayFieldsCustomer" placeholder="Select supplier"
-						(remove)="resetFormControl(supplierId)">
+						(remove)="resetFormControl(supplierId)" [clearable]="false">
 					</app-combo-grid-virtual-scroll>
-					<div class="form-control-feedback" *ngIf="isSubmitted && !supplierId.value">
+					<div class="form-control-feedback" *ngIf="isSubmitted && !supplierId.valid">
 						Supplier/Carrier is required!
 					</div>
 				</div>
