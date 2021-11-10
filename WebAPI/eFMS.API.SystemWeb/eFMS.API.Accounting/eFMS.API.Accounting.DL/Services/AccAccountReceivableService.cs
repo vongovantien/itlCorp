@@ -1584,6 +1584,24 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 query = query.And(x => x.PartnerId == criteria.AcRefId);
             }
+            if (criteria.OverDueDay != 0)
+            {
+                if (criteria.OverDueDay == OverDueDayEnum.Over1_15)
+                {
+                    query = query.And(x => x.Over1To15Day > 0);
+                }
+                if (criteria.OverDueDay == OverDueDayEnum.Over16_30)
+                {
+                    query = query.And(x => x.Over16To30Day > 0);
+                }
+                if (criteria.OverDueDay == OverDueDayEnum.Over30)
+                {
+                    query = query.And(x => x.Over30Day > 0);
+                }
+            }
+            if (criteria.OfficeIds != null)
+                query = query.And(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId.ToString()));
+
             return query;
         }
 
@@ -1748,10 +1766,7 @@ namespace eFMS.API.Accounting.DL.Services
             if (criteria.Staffs != null)
                 res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
             if (criteria.OfficeIds != null)
-            {
-                var str = String.Join(",", criteria.OfficeIds);
                 res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId)).ToList();
-            }
 
             switch (criteria.OverDueDay)
             {
@@ -1897,7 +1912,7 @@ namespace eFMS.API.Accounting.DL.Services
         {
             if (arPartnerContracts == null) return null;
             var groupbyAgreementId = arPartnerContracts.ToList()
-                    .GroupBy(g => new { g.AgreementId })
+                    .GroupBy(g => new { g.AgreementId})
                     .Select(s => new AccountReceivableResult
                     {
                         AgreementId = s.Key.AgreementId,
