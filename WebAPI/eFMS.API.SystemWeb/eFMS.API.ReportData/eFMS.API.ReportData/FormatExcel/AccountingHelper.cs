@@ -4459,11 +4459,11 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7:B7"].Merge = true;
             workSheet.Cells["A7"].Value = headers[22]; //Supplier
             workSheet.Cells["A7"].Style.Font.Bold = true;
-            workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.SupplierName;
+            workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.Supplier;
 
             workSheet.Cells["A8"].Value = headers[7]; //Reson for request
             workSheet.Cells["A8"].Style.Font.Bold = true;
-            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.ReasonForRequest;
+            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.Note;
 
 
             workSheet.Cells["A11"].Value = headers[30]; //Reson for request

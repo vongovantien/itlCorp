@@ -4842,6 +4842,9 @@ namespace eFMS.API.Accounting.DL.Services
 
             var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
 
+            var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo).FirstOrDefault();
+            var partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4863,7 +4866,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DueDate = settlementPayment.DueDate,
                 SOADate = soa?.SoaformDate,
                 SOANo = soa?.Soano,
-                ReasonForRequest = soa?.Note
+                Supplier = partner.ShortName,
     };
             return infoSettlement;
         }
