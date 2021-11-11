@@ -31,7 +31,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
     activeOther: boolean = false;
-    heading:any ="Summary" ;
+    totalAr:any =0 ;
 
     constructor(
         private _router: Router,
@@ -95,7 +95,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
         tabComponent.getPagingList();
         this._store.select(getAccountReceivableListState).subscribe((lst) => {
             if(lst && lst.totalItems > 0){
-                this.heading = this.heading+" ("+lst.totalItems+")";
+                this.totalAr = lst.totalItems;
             }
         });
     }
