@@ -4576,7 +4576,13 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in OBHCharges)
                 {
-                    workSheet.Cells[k, 2].Value = invoice.InvoiceNo;
+                    if (workSheet.Cells[k, 2].Value == null)
+                    {
+                        workSheet.Cells[k, 2].Value += invoice.InvoiceNo;
+                    }
+                    else {
+                        workSheet.Cells[k, 2].Value +=";" + invoice.InvoiceNo;
+                    }
                 }
 
                 var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.SurType == "BUY");
@@ -4587,9 +4593,16 @@ namespace eFMS.API.ReportData.FormatExcel
                 _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
-                foreach (var no_invoice in CreditInvoiceCharges)
+                foreach (var invoice in CreditInvoiceCharges)
                 {
-                    workSheet.Cells[k, 2].Value = no_invoice.InvoiceNo;
+                    if (workSheet.Cells[k, 2].Value == null)
+                    {
+                        workSheet.Cells[k, 2].Value += invoice.InvoiceNo;
+                    }
+                    else
+                    {
+                        workSheet.Cells[k, 2].Value += ";" + invoice.InvoiceNo;
+                    }
                 }
                 #endregion
 
