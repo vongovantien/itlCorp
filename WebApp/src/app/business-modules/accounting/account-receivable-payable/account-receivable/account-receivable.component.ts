@@ -93,7 +93,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
-        this._store.select(getAccountReceivableListState).subscribe((lst) => {
+        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
             if(lst && lst.totalItems > 0){
                 this.totalAr = lst.totalItems;
             }
