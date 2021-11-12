@@ -4838,11 +4838,11 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
+            var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
+            var soa = acctSoaRepo.Get(x => soapayNo.Contains(x.Soano)).ToList();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
-
-            var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.JobNo).FirstOrDefault();
+            var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.FirstOrDefault().JobNo).FirstOrDefault();
             var partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
 
             var infoSettlement = new InfoSettlementExport
@@ -4864,10 +4864,10 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
                 DueDate = settlementPayment.DueDate,
-                SOADate = soa?.SoaformDate,
-                SOANo = soa?.Soano,
+                SOADate = soa.FirstOrDefault()?.SoaformDate,
+                SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
                 Supplier = partner.ShortName,
-    };
+            };
             return infoSettlement;
         }
 

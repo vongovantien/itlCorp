@@ -4670,7 +4670,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 1, p, 6].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             workSheet.Cells[p, 1, p, 5].Style.Border.BorderAround(ExcelBorderStyle.Thin);
 
-            workSheet.Cells[p, 7].Value =Math.Abs(_sumTotalOBH - _sumTotalCredit); //Value sum total Balance
+            workSheet.Cells[p, 7].Value =_sumTotalOBH + _sumTotalCredit; //Value sum total Balance
             //workSheet.Cells[p, 7].Style.Numberformat.Format = numberFormat;
             workSheet.Cells[p, 7].Style.Border.Right.Style = ExcelBorderStyle.Thin;
             #endregion--TOTAL--
