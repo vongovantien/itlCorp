@@ -20,5 +20,7 @@ namespace eFMS.API.System.Service.Models
         public bool? CreditLimit { get; set; }
         public bool? OverPaymentTerm { get; set; }
         public bool? ExpiredAgreement { get; set; }
+        public string ApplyType { get; set; }
+        public string ApplyPartner { get; set; }
     }
 }
