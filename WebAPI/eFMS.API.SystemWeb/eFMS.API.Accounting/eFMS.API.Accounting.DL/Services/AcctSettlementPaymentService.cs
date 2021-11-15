@@ -4867,6 +4867,7 @@ namespace eFMS.API.Accounting.DL.Services
                 SOADate = soa.FirstOrDefault()?.SoaformDate,
                 SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
                 Supplier = partner.ShortName,
+                Note=settlementPayment.Note
             };
             return infoSettlement;
         }

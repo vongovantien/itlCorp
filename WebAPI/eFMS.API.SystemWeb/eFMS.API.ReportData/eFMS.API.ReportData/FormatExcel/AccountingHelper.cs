@@ -4463,7 +4463,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["A8"].Value = headers[7]; //Reson for request
             workSheet.Cells["A8"].Style.Font.Bold = true;
-            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.Note;
+            workSheet.Cells["C8"].Value = settlementExport.InfoSettlement.Note;
 
 
             workSheet.Cells["A11"].Value = headers[30]; //Reson for request
