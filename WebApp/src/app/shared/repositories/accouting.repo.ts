@@ -46,6 +46,12 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+    getDetaiLSOAUpdateExUsd(soaNO: string, currency: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNoUpdateExUsd/${soaNO}&${currency}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 
     updateSOA(body: any = {}) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/update`, body)
@@ -888,8 +894,8 @@ export class AccountingRepo {
         );
     }
 
-    getDataDebitDetail(agreementId: any, option: any, officeId:any,serviceCode:any) {
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId:officeId,serviceCode:serviceCode }).pipe(
+    getDataDebitDetail(agreementId: any, option: any, officeId: any, serviceCode: any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode }).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -897,7 +903,75 @@ export class AccountingRepo {
 
     quickUpdateReceipt(receiptId: string, body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/${receiptId}/QuickUpdate`, body);
+    }
 
+    getListCombineBilling(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }, { "hideSpinner": "true" }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    generateCombineBillingNo() {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/GenerateCombineBillingNo`).pipe(
+            catchError((error) => throwError(error)),
+            map((data: { billingNo: string }) => data.billingNo)
+        );
+    }
+
+    checkDocumentNoExisted(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/CheckDocumentNoExisted`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getListShipmentInfo(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/GetListShipmentInfo`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    saveCombineBilling(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateCombineBilling(body: any = {}) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailByCombineId(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/GetDetailByCombineId/${id}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    checkExistingCombine(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/CheckExisting/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteCombineBilling(id: string) {
+        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/Delete`, { id: id })
+            .pipe(
+                map((data: any) => data)
+            );
+    }
+
+    previewCombineDebitTemplate(data: any) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/PreviewCombineDebitTemplate`, data).pipe(
+            catchError((error) => throwError(error)),
+            map((res: any) => {
+                return res;
+            })
+        );
     }
 }
 
