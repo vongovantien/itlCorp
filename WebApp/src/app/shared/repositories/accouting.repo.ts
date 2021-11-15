@@ -46,6 +46,12 @@ export class AccountingRepo {
                 map((data: any) => data)
             );
     }
+    getDetaiLSOAUpdateExUsd(soaNO: string, currency: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/GetBySoaNoUpdateExUsd/${soaNO}&${currency}`)
+            .pipe(
+                map((data: any) => data)
+            );
+    }
 
     updateSOA(body: any = {}) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/update`, body)

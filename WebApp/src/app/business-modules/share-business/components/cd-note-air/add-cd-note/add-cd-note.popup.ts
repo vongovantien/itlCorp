@@ -51,6 +51,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
 
     flexId: AbstractControl;
     note: AbstractControl;
+    excRateUsdToLocal:AbstractControl;
     configPartner: CommonInterface.IComboGirdConfig = {
         placeholder: 'Please select',
         displayFields: [],
@@ -80,10 +81,13 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     ngOnInit() {
         this.formCreate = this._fb.group({
             flexId: [],
-            note: []
+            note: [],
+            excRateUsdToLocal:[]
         });
         this.flexId = this.formCreate.controls["flexId"];
         this.note = this.formCreate.controls["note"];
+        this.excRateUsdToLocal = this.formCreate.controls["excRateUsdToLocal"];
+        debugger
     }
 
     setHeader() {
@@ -303,6 +307,19 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
     saveCDNote() {
         // Lấy danh sách group charge chưa delete
         this.listChargePartner = this.getGroupChargeNotDelete(this.listChargePartner);
+
+        if (this.action !== "create"){
+            if (this.excRateUsdToLocal.value) {
+                if (Number(this.excRateUsdToLocal.value) <=0) {
+                    this._toastService.warning(`Required to enter Excel USD greater than 0`);
+                    return;
+                }
+            }else {
+                this._toastService.warning(`Required to enter Excel USD`);
+                return;
+            }
+        }
+
         if (this.validateChargeOfCdNote(this.listChargePartner)) {
             return;
         }
@@ -318,6 +335,8 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
             this.CDNote.flexId = this.flexId.value;
             this.CDNote.transactionTypeEnum = this.transactionType;
             this.CDNote.note = this.note.value;
+            this.CDNote.excRateUsdToLocal = this.excRateUsdToLocal.value;
+
             const arrayCharges = [];
             for (const charges of this.listChargePartner) {
                 for (const charge of charges.listCharges) {
@@ -357,6 +376,10 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
+                                    let checkSoa = this.listCharges.find(x=>x.soano !== "");
+                                    if(checkSoa){
+                                        this._toastService.warning("Vui lòng cập nhật SOA");
+                                    }
                                     this.onUpdate.emit();
                                     this.closePopup();
                                 } else {
@@ -381,7 +404,7 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                 listCharge.push(charge);
             }
         }
-        // List currency unique      
+        // List currency unique
         const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';

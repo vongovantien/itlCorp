@@ -20,6 +20,7 @@ export class StatementOfAccountEditComponent extends AppList {
 
     currencyList: any[];
     selectedCurrency: any = null;
+    excRateUsdToLocal: any = null;
 
     selectedRange: any;
 
@@ -92,7 +93,7 @@ export class StatementOfAccountEditComponent extends AppList {
     getDetailSOA(soaNO: string, currency: string) {
         this._progressRef.start();
         this.isLoading = true;
-        this._accoutingRepo.getDetaiLSOA(soaNO, currency)
+        this._accoutingRepo.getDetaiLSOAUpdateExUsd(soaNO, currency)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => { this._progressRef.complete(); this.isLoading = false; })
@@ -110,6 +111,8 @@ export class StatementOfAccountEditComponent extends AppList {
 
                     // * update range Date
                     this.selectedRange = { startDate: new Date(this.soa.soaformDate), endDate: new Date(this.soa.soatoDate) };
+
+                    this.excRateUsdToLocal = !!this.soa.excRateUsdToLocal?this.formatNumberDecimal(this.soa.excRateUsdToLocal):0;
 
                     // * Update dataSearch for Add More Charge.
                     const datSearchMoreCharge: SOASearchCharge = {
@@ -132,7 +135,7 @@ export class StatementOfAccountEditComponent extends AppList {
                         jobIds: [],
                         hbls: [],
                         mbls: [],
-                        staffType: this.soa.staffType
+                        staffType: this.soa.staffType,
                     };
                     this.dataSearch = new SOASearchCharge(datSearchMoreCharge);
                 },
@@ -213,9 +216,18 @@ export class StatementOfAccountEditComponent extends AppList {
     updateSOA() {
         /*
         * endDate must >= soaToDate
-                    * and 
+                    * and
         * startDate must <= soaFromDate
         */
+        if (!this.excRateUsdToLocal) {
+            if (this.excRateUsdToLocal <=0) {
+                this._toastService.warning(`Required to enter Excel USD greater than 0`);
+                return;
+            } else {
+                this._toastService.warning(`Required to enter Excel USD`);
+                return;
+            }
+        }
         if ((new Date(this.selectedRange.startDate).getDate() > new Date(this.soa.soaformDate).getDate()) || new Date(this.selectedRange.endDate).getDate() < new Date(this.soa.soatoDate).getDate()) {
             this._toastService.warning(`Range date invalid `);
             return;
@@ -247,7 +259,8 @@ export class StatementOfAccountEditComponent extends AppList {
                 creatorShipment: this.soa.creatorShipment,
                 customer: this.soa.customer,
                 commodityGroupId: this.soa.commodityGroupId,
-                staffType: this.soa.staffType
+                staffType: this.soa.staffType,
+                excRateUsdToLocal:this.excRateUsdToLocal
             };
             this._progressRef.start();
             this._accoutingRepo.updateSOA(body)
@@ -304,5 +317,12 @@ export class StatementOfAccountEditComponent extends AppList {
             }
         })
         this.isCheckAllCharge = this.soa.chargeShipments.every((item: any) => item.isSelected);
+    }
+
+    formatNumberDecimal(input: number) {
+        return input.toLocaleString(
+            'en-US', // leave undefined to use the browser's locale, or use a string like 'en-US' to override it.
+            { minimumFractionDigits: 0 }
+        );
     }
 }

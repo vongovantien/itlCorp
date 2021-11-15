@@ -265,6 +265,25 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(results);
         }
 
+        [HttpGet("GetBySoaNoUpdateExUsd/{soaNo}&{currencyLocal}")]
+        [Authorize]
+        public IActionResult GetBySoaNoAndCurrencyLocalUpdateExUsd(string soaNo, string currencyLocal)
+        {
+            var id = acctSOAService.Get(x => x.Soano == soaNo).FirstOrDefault()?.Id;
+            var isAllowViewDetail = acctSOAService.CheckDetailPermission(id);
+            if (isAllowViewDetail == false)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+            }
+
+            if (string.IsNullOrEmpty(currencyLocal))
+                currencyLocal = AccountingConstants.CURRENCY_LOCAL;
+            var results = acctSOAService.GetDetailBySoaNoAndCurrencyLocal(soaNo, currencyLocal);
+            if (results != null) { results = acctSOAService.GetUpdateExcUsd(results); }
+            return Ok(results);
+        }
+
+
         /// <summary>
         /// get list status of soa
         /// </summary>
