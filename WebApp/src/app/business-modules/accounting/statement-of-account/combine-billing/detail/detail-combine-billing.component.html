@@ -7,13 +7,12 @@
                     <h3>Edit Combine Billing</h3>
                     <div class="c-button-actions">
                         <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                            <app-default-button [dpToggle]="dropdownMenu"
-                                [buttonSetting]="previewButtonSetting">
+                            <app-default-button [dpToggle]="dropdownMenu" [buttonSetting]="previewButtonSetting">
                             </app-default-button>
 
                             <app-dropdown #dropdownMenu>
-                                <a class="dropdown-item pointer" (click)="print()">OPS Template</a>
-                                <a class="dropdown-item pointer" (click)="print()">General Template</a>
+                                <a class="dropdown-item pointer">OPS Template</a>
+                                <a class="dropdown-item pointer">General Template</a>
                                 <a class="dropdown-item pointer" (click)="previewDebitTemplate()">As Debit Template</a>
                             </app-dropdown>
                         </div>
