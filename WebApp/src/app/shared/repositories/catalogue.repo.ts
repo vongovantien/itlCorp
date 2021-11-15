@@ -161,12 +161,18 @@ export class CatalogueRepo {
         );
     }
 
-    getPartnerByGroups(groups: number[], active: boolean = true) {
-        return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }, null, { "hideSpinner": "true" }).pipe(
-            map((res: any) => {
-                return res;
-            })
-        );
+    getPartnerByGroups(groups: number[], active: boolean = true, service: string = null, office: string = null): any {
+        if (!!service && !!office) {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`,
+                {
+                    partnerGroups: groups,
+                    active: active,
+                    service: service,
+                    office: office
+                }, null, { "hideSpinner": "true" });
+        } else {
+            return this._api.post(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/en-US/CatPartner/GetMultiplePartnerGroup`, { partnerGroups: groups, active: active }, null, { "hideSpinner": "true" })
+        }
     }
 
     getSalemanIdByPartnerId(partnerId: string, jobId: string = null) {
@@ -1343,14 +1349,14 @@ export class CatalogueRepo {
             })
         );
     }
-    
+
     deleteBank(id: string) {
         return this._api.delete(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/${id}`).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
     }
-    
+
     downloadBankExcel() {
         return this._api.downloadfile(`${environment.HOST.CATALOGUE}/api/${this.VERSION}/vi/CatBank/downloadExcel`, null).pipe(
             catchError((error) => throwError(error)),

@@ -2221,7 +2221,7 @@ namespace eFMS.API.Catalogue.DL.Services
 
         public IQueryable<CatPartnerViewModel> GetMultiplePartnerGroup(PartnerMultiCriteria criteria)
         {
-            IQueryable<CatPartnerModel> data = Get();
+            IQueryable<CatPartner> data;
             List<string> grpCodes = new List<string>();
             if (criteria.PartnerGroups != null)
             {
@@ -2230,7 +2230,7 @@ namespace eFMS.API.Catalogue.DL.Services
                     string group = PlaceTypeEx.GetPartnerGroup(grp);
                     grpCodes.Add(group);
                 }
-                Expression<Func<CatPartnerModel, bool>> query = null;
+                Expression<Func<CatPartner, bool>> query = null;
                 foreach (var group in grpCodes.Distinct())
                 {
                     if (query == null)
@@ -2243,11 +2243,21 @@ namespace eFMS.API.Catalogue.DL.Services
                     }
                 }
                 query = criteria.Active != null ? query.And(x => x.Active == criteria.Active) : query;
-                data = data.Where(query);
+
+
+                data = DataContext.Get(query);
+                if(!string.IsNullOrEmpty(criteria.Service) && !string.IsNullOrEmpty(criteria.Office))
+                {
+                    var contract = contractRepository.Get(x => x.Active == true && IsMatchService(x.SaleService, criteria.Service) && IsMatchOffice(x.OfficeId, criteria.Office));
+                    data = from p in data
+                                    join c in contract on p.Id equals c.PartnerId
+                                    select p;
+                }
+               
             }
             else
             {
-                data = data.Where(x => x.Active == criteria.Active || criteria.Active == null);
+                data = DataContext.Where(x => x.Active == criteria.Active || criteria.Active == null);
             }
             if (data == null) return null;
             var results = data.Select(x => new CatPartnerViewModel
@@ -2270,6 +2280,38 @@ namespace eFMS.API.Catalogue.DL.Services
                 TaxCodeAbbrName = x.TaxCode + " - " + x.ShortName
             }).ToList();
             return results.AsQueryable();
+        }
+
+        private bool IsMatchService(string saleService, string serviceTerm)
+        {
+            bool isMatch = true;
+
+            if(!string.IsNullOrEmpty(saleService))
+            {
+                var serviceList = saleService.Split(";").ToList();
+                if(serviceList.Count > 0)
+                {
+                    isMatch = serviceList.Contains(serviceTerm);
+                }
+            }
+
+            return isMatch;
+        }
+
+        private bool IsMatchOffice(string saleOffice, string officeTerm)
+        {
+            bool isMatch = true;
+
+            if (!string.IsNullOrEmpty(saleOffice))
+            {
+                var officeList = saleOffice.Split(";").ToList();
+                if (officeList.Count > 0)
+                {
+                    isMatch = officeList.Contains(officeTerm);
+                }
+            }
+
+            return isMatch;
         }
 
         public IQueryable<CatPartnerViewModel> Query(CatPartnerCriteria criteria)

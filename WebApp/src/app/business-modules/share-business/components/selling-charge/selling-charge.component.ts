@@ -10,7 +10,7 @@ import { CsShipmentSurcharge, Charge, Unit } from '@models';
 import { SystemConstants } from '@constants';
 import { CommonEnum } from '@enums';
 
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, switchMap } from 'rxjs/operators';
 
 import * as fromStore from './../../store';
 import cloneDeep from 'lodash/cloneDeep';
@@ -66,21 +66,32 @@ export class ShareBussinessSellingChargeComponent extends ShareBussinessBuyingCh
     }
 
     getPartner() {
-        this.isShowLoadingPartner = true;
         this._spinner.show(this.spinnerpartner);
-
-        this._catalogueRepo.getPartnerByGroups([CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER])
+        this._store.select(fromStore.getTransactionDetailCsTransactionState)
             .pipe(
-                catchError(this.catchError), finalize(() => {
-                    this._spinner.hide(this.spinnerpartner);
-                    this.isShowLoadingPartner = false;
-                }))
-            .subscribe(
+                switchMap(
+                    (data) => {
+                        if (!!data?.officeId) {
+                            return this._catalogueRepo.getPartnerByGroups(
+                                [CommonEnum.PartnerGroupEnum.AGENT, CommonEnum.PartnerGroupEnum.CUSTOMER],
+                                true,
+                                this.serviceTypeId,
+                                data?.officeId
+                            ).pipe(
+                                finalize(() => {
+                                    this._spinner.hide(this.spinnerpartner);
+                                    this.isShowLoadingPartner = false;
+                                }),
+                            );;
+                        }
+                    }
+                ),
+                takeUntil(this.ngUnsubscribe),
+            ).subscribe(
                 (partners: any[]) => {
                     this.listPartner = partners;
                 }
             );
-
     }
 
     getCurrency() {
