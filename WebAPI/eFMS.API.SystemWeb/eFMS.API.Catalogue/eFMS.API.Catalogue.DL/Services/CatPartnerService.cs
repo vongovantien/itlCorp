@@ -2340,7 +2340,7 @@ namespace eFMS.API.Catalogue.DL.Services
             {
                 query = query.And(x => (x.PartnerGroup ?? "").Contains(partnerGroup ?? "", StringComparison.OrdinalIgnoreCase));
             }
-            if (!string.IsNullOrEmpty(partnerGroup))
+            if (!string.IsNullOrEmpty(criteria.CoLoaderCode))
             {
                 query = query.And(x => (x.CoLoaderCode ?? "").Contains(criteria.CoLoaderCode ?? "", StringComparison.OrdinalIgnoreCase));
             }

@@ -60,6 +60,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
         private readonly IContextBase<AcctSoa> acctSoaRepo;
+        private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -92,7 +93,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AccAccountingManagement> accountingManagementRepo,
             IContextBase<CatDepartment> catDepManagementRepo,
             IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
-            IContextBase<AcctSoa> acctSoa
+            IContextBase<AcctSoa> acctSoa,
+            IContextBase<AcctCombineBilling> acctCombineBillingRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -125,6 +127,7 @@ namespace eFMS.API.Documentation.DL.Services
             departmentRepository = catDepManagementRepo;
             acctCreditManagementArRepository = acctCreditManagementArRepo;
             acctSoaRepo = acctSoa;
+            acctCombineBillingRepository = acctCombineBillingRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -515,6 +518,17 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.DebitNo = null;
                     }
+                    if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                    {
+                        if (cdNote.CombineBillingNo == item.CombineBillingNo)
+                        {
+                            item.CombineBillingNo = null;
+                        }
+                        if (cdNote.CombineBillingNo == item.ObhcombineBillingNo)
+                        {
+                            item.ObhcombineBillingNo = null;
+                        }
+                    }
                     surchargeUpdate.Add(item);
                     var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                 }
@@ -527,20 +541,36 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             charge.CreditNo = model.Code;
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                            }
                         }
                         else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             charge.DebitNo = model.Code;
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                            }
                         }
                         else
                         {
                             if (model.PartnerId == charge.PaymentObjectId)
                             {
                                 charge.DebitNo = model.Code;
+                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    charge.CombineBillingNo = cdNote.CombineBillingNo;
+                                }
                             }
                             if (model.PartnerId == charge.PayerId)
                             {
                                 charge.CreditNo = model.Code;
+                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    charge.ObhcombineBillingNo = cdNote.CombineBillingNo;
+                                }
                             }
                         }
 
@@ -620,6 +650,13 @@ namespace eFMS.API.Documentation.DL.Services
                     finally
                     {
                         trans.Dispose();
+                    }
+                }
+                if (hsSurSc.Success)
+                {
+                    if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                    {
+                        UpdateCombineBilling(cdNote.CombineBillingNo);
                     }
                 }
                 if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
@@ -1136,6 +1173,18 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             foreach (var item in charges)
                             {
+                                // Remove combine no
+                                if(!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    if(cdNote.CombineBillingNo == item.CombineBillingNo)
+                                    {
+                                        item.CombineBillingNo = null;
+                                    }
+                                    if(cdNote.CombineBillingNo == item.ObhcombineBillingNo)
+                                    {
+                                        item.ObhcombineBillingNo = null;
+                                    }
+                                }
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
@@ -1175,11 +1224,28 @@ namespace eFMS.API.Documentation.DL.Services
                                 jobCSTrans.DatetimeModified = DateTime.Now;
                                 cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
                             }
+                            // Delete combine if exist
+                            var existingCombine = surchargeRepository.Any(x => !(x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code) && (x.CombineBillingNo == cdNote.CombineBillingNo || x.ObhcombineBillingNo == cdNote.CombineBillingNo));
+                            if (!existingCombine)
+                            {
+                                if (acctCombineBillingRepository.Any(x => x.CombineBillingNo == cdNote.CombineBillingNo))
+                                {
+                                    var hsCm = acctCombineBillingRepository.Delete(x => x.CombineBillingNo == cdNote.CombineBillingNo);
+                                }
+                            }
                         }
                         DataContext.SubmitChanges();
                         var hsSur = surchargeRepository.SubmitChanges();
                         opstransRepository.SubmitChanges();
                         cstransRepository.SubmitChanges();
+                        acctCombineBillingRepository.SubmitChanges();
+                        if (hsSur.Success)
+                        {
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                UpdateCombineBilling(cdNote.CombineBillingNo);
+                            }
+                        }
                         // Delete credit AR
                         if (cdNote.Type == "CREDIT" && hsSur.Success)
                         {
@@ -3105,5 +3171,29 @@ namespace eFMS.API.Documentation.DL.Services
             return result.FirstOrDefault();
         }
         #endregion
+
+        /// <summary>
+        /// Update Combine Billing Data
+        /// </summary>
+        /// <param name="combineNoUpd">combine no in cd note</param>
+        private void UpdateCombineBilling(string combineNoUpd)
+        {
+            var surchargeCmb = surchargeRepository.Get(x => x.CombineBillingNo == combineNoUpd || x.ObhcombineBillingNo == combineNoUpd);
+            var existCmb = surchargeCmb?.Count() ?? 0;
+            if (existCmb > 0)
+            {
+                var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
+                if (combineCurrent != null)
+                {
+                    combineCurrent.TotalAmountVnd = surchargeCmb.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd));
+                    combineCurrent.TotalAmountUsd = surchargeCmb.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd));
+                    acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo);
+                }
+            }
+            else
+            {
+                acctCombineBillingRepository.Delete(x => x.CombineBillingNo == combineNoUpd);
+            }
+        }
     }
 }

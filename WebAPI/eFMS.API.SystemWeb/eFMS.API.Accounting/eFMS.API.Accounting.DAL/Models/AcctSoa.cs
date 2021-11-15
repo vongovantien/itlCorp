@@ -42,5 +42,6 @@ namespace eFMS.API.Accounting.Service.Models
         public int? TotalCharge { get; set; }
         public decimal? ExcRateUsdToLocal { get; set; }
         public bool? NetOff { get; set; }
+        public string CombineBillingNo { get; set; }
     }
 }
