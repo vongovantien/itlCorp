@@ -7,6 +7,8 @@ namespace eFMS.API.Accounting.DL.ViewModel
         public Guid? Id { get; set; }
         public string Soano { get; set; }
         public string PaySoano { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
         public decimal? NetAmount { get; set; }

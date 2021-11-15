@@ -159,6 +159,10 @@ export class StatementOfAccountComponent extends AppList {
                 this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}`]);
                 break;
             }
+            case 'combine-billing': {
+                this._router.navigate([`${RoutingConstants.ACCOUNTING.COMBINE_BILLING}`]);
+                break;
+            }
         }
     }
 }

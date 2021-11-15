@@ -65,7 +65,10 @@ const routing: Routes = [
                     }
                 ]
             },
-
+            {
+                path: 'combine-billing', loadChildren: () => import('./combine-billing/combine-billing.module').then(m => m.CombineBillingModule),
+                data: { name: 'Combine Billing', title: 'eFMS Combine Billing' }
+            },
         ]
     },
 

@@ -25,6 +25,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<AccAccountingManagement, AccAccountingManagementModel>();
             CreateMap<ChargeOfAccountingManagementModel, AccountingManagementExport>();
             CreateMap<CatContract, CatContractModel>();
+            CreateMap<AcctCombineBilling, AcctCombineBillingModel>();
+            CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
 
 
             // Map to entity model
@@ -42,6 +44,7 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<SysImage, SysImageModel>().ReverseMap();
             CreateMap<AccAccountReceivable, ReceivableTable>();
             CreateMap<AcctReceiptSyncModel, AcctReceiptSync>();
+            CreateMap<AcctCombineBillingModel, AcctCombineBilling>();
         }
     }
 }
