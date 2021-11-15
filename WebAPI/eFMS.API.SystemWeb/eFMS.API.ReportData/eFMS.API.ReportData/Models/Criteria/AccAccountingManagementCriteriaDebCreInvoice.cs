@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace eFMS.API.ReportData.Models.Criteria
 {
-    public class AccAccountingManagementCriteria
+    public class AccAccountingManagementCriteriaDebCreInvoice
     {
-        public List<string> ReferenceNos { get; set; }
+        public string ReferenceNos { get; set; }
         public string PartnerId { get; set; }
         public string CreatorId { get; set; }
         public string InvoiceStatus { get; set; }
