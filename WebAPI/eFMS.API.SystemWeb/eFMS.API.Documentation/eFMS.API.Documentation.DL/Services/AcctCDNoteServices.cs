@@ -59,6 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<AccAccountingManagement> accountingManagementRepository;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
+        private readonly IContextBase<AcctSoa> acctSoaRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -90,7 +91,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodityGroup> catCommodityGroupRepo,
             IContextBase<AccAccountingManagement> accountingManagementRepo,
             IContextBase<CatDepartment> catDepManagementRepo,
-            IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo
+            IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
+            IContextBase<AcctSoa> acctSoa
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -122,6 +124,7 @@ namespace eFMS.API.Documentation.DL.Services
             accountingManagementRepository = accountingManagementRepo;
             departmentRepository = catDepManagementRepo;
             acctCreditManagementArRepository = acctCreditManagementArRepo;
+            acctSoaRepo = acctSoa;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -441,6 +444,11 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
+
+                //[ADD][1/11/2021][16602-Update lại tỷ giá]
+                cdNote.ExcRateUsdToLocal = model.ExcRateUsdToLocal== null?cdNote.ExcRateUsdToLocal:model.ExcRateUsdToLocal;
+                //[END]
+
                 var entity = mapper.Map<AcctCdnote>(model);
                 entity.GroupId = cdNote.GroupId;
                 entity.DepartmentId = cdNote.DepartmentId;
@@ -536,8 +544,9 @@ namespace eFMS.API.Documentation.DL.Services
                             }
                         }
 
-                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
-                        {
+                        //[9/11/2021][Cho update phí cập nhật lại tỷ giá]
+                        //if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        //{
                             //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
                             charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
 
@@ -562,7 +571,10 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                             charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                             charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                        }
+                        //}
+
+
+                 
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -596,7 +608,7 @@ namespace eFMS.API.Documentation.DL.Services
                         hsSurSc = surchargeRepository.SubmitChanges();
                         var hsOtSc = opstransRepository.SubmitChanges();
                         var hsCtSc = cstransRepository.SubmitChanges();
-                        
+                        acctSoaRepo.SubmitChanges();
 
                         trans.Commit();
                     }
@@ -760,7 +772,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                    && (string.IsNullOrEmpty(x.PaySoano) || existCredit.SurchargeId.Split(';').Any(z => z == x.Id.ToString())) && action != "Delete");
                 }
 
-                // Update for credit note  
+                // Update for credit note
                 if (surchargeLst.Count() > 0)
                 {
                     // Get detail to update Credit AR
@@ -789,6 +801,7 @@ namespace eFMS.API.Documentation.DL.Services
                     acctCreditLst.Add(acctCredit);
                 }
             }
+        
             if (acctCreditLst.Count() > 0 || acctCreditDelete.Count() > 0)
             {
                 // Update database
@@ -897,6 +910,8 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.UnitCode = unit?.Code;
                 charge.ChargeCode = catCharge?.Code;
                 charge.NameEn = catCharge?.ChargeNameEn;
+                charge.Soano = item.Soano;
+                charge.PaySoano = item.PaySoano;
 
                 string _syncedFromBy = null;
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && charge.CreditNo == cdNote.Code)
@@ -2916,7 +2931,7 @@ namespace eFMS.API.Documentation.DL.Services
             var charges = from charge in chargeData
                           join am in accMangData on charge.AcctManagementId equals am.Id into amGrp
                           from am in amGrp.DefaultIfEmpty()
-                          select new CsShipmentSurchargeModel { 
+                          select new CsShipmentSurchargeModel {
                               Id = charge.Id,
                               CurrencyId = charge.CurrencyId,
                               Total =charge.Total,
@@ -2935,7 +2950,7 @@ namespace eFMS.API.Documentation.DL.Services
                           };
 
             var query = from cdnote in cdNotes
-                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo) 
+                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
                        select new { cdnote, charge };
 
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)

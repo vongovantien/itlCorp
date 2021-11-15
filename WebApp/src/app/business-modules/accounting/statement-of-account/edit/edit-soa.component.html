@@ -45,7 +45,7 @@
                 </div>
                 <hr />
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Currency
@@ -57,7 +57,7 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <label class="form-control-label" for="">
                                 Date
@@ -75,7 +75,15 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Exc USD
+                            </label>
+                            <input type="text" class="form-control text-right" [(ngModel)]="excRateUsdToLocal" name="excRateUsdToLocal"
+                            min="0" numeric [decimals]="digitDecimal" autoFormatCurrency>
+                        </div>
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label class="form-control-label" for="">

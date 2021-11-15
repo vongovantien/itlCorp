@@ -136,7 +136,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         for (const charge of this.CdNoteDetail.listSurcharges) {
             listCharge.push(charge);
         }
-        // List currency unique      
+        // List currency unique
         const uniqueCurrency = [...new Set(listCurrency)]; // Remove duplicate
         this.totalCredit = '';
         this.totalDebit = '';
@@ -211,6 +211,7 @@ export class ShareBussinessCdNoteDetailPopupComponent extends PopupBase {
         this.cdNoteEditPopupComponent.CDNote = this.CdNoteDetail.cdNote;
         this.cdNoteEditPopupComponent.currentMBLId = this.CdNoteDetail.jobId;
         this.cdNoteEditPopupComponent.note.setValue(this.CdNoteDetail.note);
+        this.cdNoteEditPopupComponent.excRateUsdToLocal.setValue(this.CdNoteDetail.excRateUsdToLocal);
         this.cdNoteEditPopupComponent.setHeader();
         this.cdNoteEditPopupComponent.getListCharges(this.CdNoteDetail.jobId, this.CdNoteDetail.partnerId, this.isHouseBillID, this.CdNoteDetail.cdNote.code);
         this.cdNoteEditPopupComponent.show();

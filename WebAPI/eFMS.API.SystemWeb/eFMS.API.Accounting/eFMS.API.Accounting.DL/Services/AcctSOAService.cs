@@ -248,7 +248,7 @@ namespace eFMS.API.Accounting.DL.Services
                 soa.SyncStatus = soaCurrent.SyncStatus;
                 soa.LastSyncDate = soaCurrent.LastSyncDate;
                 soa.ReasonReject = soaCurrent.ReasonReject;
-                soa.ExcRateUsdToLocal = soaCurrent.ExcRateUsdToLocal;
+                soa.ExcRateUsdToLocal = soa.ExcRateUsdToLocal != null? soa.ExcRateUsdToLocal:soaCurrent.ExcRateUsdToLocal;
                 soa.NetOff = soaCurrent.NetOff;
 
                 //Check exists OBH Debit Charge
@@ -295,7 +295,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                             if (surcharge.CurrencyId == AccountingConstants.CURRENCY_USD)
                             {
-                                surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
+                                //surcharge.FinalExchangeRate = soaCurrent.ExcRateUsdToLocal;
+                                surcharge.FinalExchangeRate = soa.ExcRateUsdToLocal;
                             }
                             else if (surcharge.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                             {
@@ -2140,6 +2141,7 @@ namespace eFMS.API.Accounting.DL.Services
                 return data;
             }
             var chargeShipments = GetChargesForDetailSoa(soaNo);
+
             var _groupShipments = new List<GroupShipmentModel>();
             _groupShipments = chargeShipments.GroupBy(g => new { g.JobId, g.HBL, g.MBL, g.PIC })
             .Select(s => new GroupShipmentModel
@@ -2759,7 +2761,7 @@ namespace eFMS.API.Accounting.DL.Services
                     AmountUSD = sur.AmountUsd,
                     SeriesNo = sur.SeriesNo,
                     InvoiceDate = sur.InvoiceDate,
-                    TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? catPartnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty
+                    TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? catPartnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
                 };
                 result.Add(chg);
             }
@@ -2779,6 +2781,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 charge = charge.Where(x => x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_DEBIT.ToLower() || x.TypeCharge.ToLower() == AccountingConstants.TYPE_SOA_OBH.ToLower());
             }
+
+
+            var surCharges = csShipmentSurchargeRepo.Get(x => soa.Type == "Debit" ? x.Soano == soa.Soano : x.PaySoano == soa.Soano);
+
+
             List<ExportSOAOPS> lstSOAOPS = new List<ExportSOAOPS>();
             var results = charge.GroupBy(x => new { x.JobId, x.HBLID }).AsQueryable();
             foreach (var group in results)
@@ -3292,6 +3299,21 @@ namespace eFMS.API.Accounting.DL.Services
             // var hs = accAccountReceivableService.InsertOrUpdateReceivable(objectReceivablesModel);
             return objectReceivablesModel;
         }
+
         #endregion --- Calculator Receivable SOA ---
+
+        public AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results)
+        {
+            if (results.GroupShipments.Count > 0)
+            {
+                var cd = results.GroupShipments.FirstOrDefault()?.ChargeShipments.Where(x => !string.IsNullOrEmpty(x.CDNote)).FirstOrDefault();
+                if (cd != null)
+                {
+                    var acctCdnote = acctCdnoteRepo.Get(x => x.Code == cd.CDNote).FirstOrDefault();
+                    if (acctCdnote != null) { results.ExcRateUsdToLocal = acctCdnote.ExcRateUsdToLocal;}
+                }
+            }
+            return results;
+        }
     }
 }
