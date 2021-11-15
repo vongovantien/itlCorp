@@ -14,8 +14,14 @@
                     <form-search-account-receivable (onSearch)="onSearchReceivable($event)">
                     </form-search-account-receivable>
                     <tabset class="custom-class-tab">
-                        <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'" heading="Summary"
+                        <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'"
                             (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
+                            <ng-template tabHeading>
+                                <span class="m--margin-right-10">Summary</span>
+                                <ng-container *ngIf="!!totalAr">
+                                    <span class="badge badge-info">{{totalAr}}</span>
+                                </ng-container>
+                            </ng-template>
                             <list-trial-official-account-receivable></list-trial-official-account-receivable>
                         </tab>
                         <!-- <tab [active]="selectedSubTab === 'GUARANTEED'" heading="Guaranteed"
@@ -27,6 +33,8 @@
                             <list-other-account-receivable></list-other-account-receivable>
                         </tab> -->
                     </tabset>
+
+
                 </tab>
                 <tab (selectTab)="changeTabAccount('HISTORY')">
                     <ng-template tabHeading>

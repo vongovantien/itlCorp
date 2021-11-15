@@ -9,7 +9,7 @@ import { AccountReceivableListGuaranteedComponent } from '../components/list-gua
 import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { RoutingConstants } from '@constants';
-import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
+import { getAccountReceivableListState, getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
 import { Store } from '@ngrx/store';
 import { LoadListAccountReceivable, SearchListAccountReceivable } from './store/actions';
 import { getCurrentUserState } from '@store';
@@ -31,6 +31,7 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     activeTrialOffice: boolean = false;
     activeGuaranteed: boolean = false;
     activeOther: boolean = false;
+    totalAr:any =0 ;
 
     constructor(
         private _router: Router,
@@ -92,6 +93,11 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
+        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
+            if(lst && lst.totalItems > 0){
+                this.totalAr = lst.totalItems;
+            }
+        });
     }
 
     onSelectTabAccountReceivable(tabname: string) {
