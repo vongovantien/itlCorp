@@ -1492,7 +1492,11 @@ namespace eFMS.API.Accounting.DL.Services
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                     CreditCurrency = s.First().contract.CreditCurrency,
                     ParentNameAbbr = string.Empty, //Get data bên dưới,
-                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified
+                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified,
+                    IsOverDue = s.FirstOrDefault().contract.IsOverDue,
+                    IsOverLimit = s.FirstOrDefault().contract.IsOverLimit,
+                    IsExpired = s.FirstOrDefault().contract.IsExpired,
+                    
                 });
 
             var data = from contract in groupByContract
@@ -1551,6 +1555,9 @@ namespace eFMS.API.Accounting.DL.Services
                            ParentNameAbbr = parent.ShortName,
                            DatetimeModified = contract.DatetimeModified,
                            OfficeContract = contract.OfficeContract,
+                           IsOverDue = contract.IsOverDue,
+                           IsExpired = contract.IsExpired,
+                           IsOverLimit = contract.IsOverLimit
                        };
             return data;
         }
@@ -1995,6 +2002,9 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
                         DatetimeModified = s.First().DatetimeModified,
                         OfficeContract = s.First().OfficeContract,
+                        IsExpired = s.First().IsExpired,
+                        IsOverLimit = s.First().IsOverLimit,
+                        IsOverDue = s.First().IsOverDue,
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -2184,7 +2194,10 @@ namespace eFMS.API.Accounting.DL.Services
                 Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                 Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                 Over30Day = s.Sum(sum => sum.Over30Day),
-                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault()
+                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
+                IsExpired = s.FirstOrDefault().IsExpired,
+                IsOverLimit = s.FirstOrDefault().IsOverLimit,
+                IsOverDue = s.FirstOrDefault().IsOverDue,
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;
