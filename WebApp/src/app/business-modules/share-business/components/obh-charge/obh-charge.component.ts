@@ -31,6 +31,8 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
 
     @Input() allowSaving: boolean = true; // * not allow to save or add Charges without saving the job
 
+    listPartnerPayee: any[] = [];
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -86,6 +88,14 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
             ).subscribe(
                 (partners: any[]) => {
                     this.listPartner = partners;
+                }
+            );
+
+        this._catalogueRepo.getListPartner(null, null, { active: true })
+            .subscribe(
+                (partners: Partner[]) => {
+                    console.log(partners)
+                    this.listPartnerPayee = partners;
                 }
             );
     }
@@ -179,7 +189,7 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     case CommonEnum.PartnerGroupEnum.CUSTOMER:
                         console.log(this.hbl);
                         chargeItem.payerName = this.hbl.customerName;
-                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.hbl.customerId).shortName;
+                        chargeItem.payerShortName = this.listPartnerPayee.find(p => p.id === this.hbl.customerId).shortName;
                         chargeItem.payerId = this.hbl.customerId;
 
                         if (chargeItem.invoiceNo) {
@@ -189,10 +199,10 @@ export class ShareBussinessOBHChargeComponent extends ShareBussinessBuyingCharge
                     case CommonEnum.PartnerGroupEnum.CARRIER:
                         chargeItem.payerName = this.shipment.supplierName;
                         chargeItem.payerId = this.shipment.coloaderId;
-                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.shipment.coloaderId).shortName;
+                        chargeItem.payerShortName = this.listPartnerPayee.find(p => p.id === this.shipment.coloaderId).shortName;
                         break;
                     case CommonEnum.PartnerGroupEnum.AGENT:
-                        chargeItem.payerShortName = this.listPartner.find(p => p.id === this.shipment.agentId).shortName;
+                        chargeItem.payerShortName = this.listPartnerPayee.find(p => p.id === this.shipment.agentId).shortName;
                         chargeItem.payerId = this.shipment.agentId;
                         chargeItem.payerName = this.shipment.agentName;
 
