@@ -4570,8 +4570,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
-                workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount??0).Sum();
+                workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmountVND).Sum();
+                _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmountVND ?? 0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
                 workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in OBHCharges)
@@ -4589,8 +4589,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
-                workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
-                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount??0).Sum();
+                workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmountVND).Sum();
+                _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmountVND ?? 0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
                 workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
                 foreach (var invoice in CreditInvoiceCharges)

@@ -10,5 +10,6 @@
         public string ChargeNote { get; set; }
         public string ChargeType { get; set; }
         public string SurType { get; set; }
+        public decimal? ChargeAmountVND { get; set; }
     }
 }

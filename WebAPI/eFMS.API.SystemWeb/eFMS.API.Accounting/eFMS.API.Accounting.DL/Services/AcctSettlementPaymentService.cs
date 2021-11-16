@@ -4973,6 +4973,7 @@ namespace eFMS.API.Accounting.DL.Services
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
+                infoShipmentCharge.ChargeAmountVND = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0); 
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                 infoShipmentCharge.ChargeNote = sur.Notes;
                 string _chargeType = string.Empty;
