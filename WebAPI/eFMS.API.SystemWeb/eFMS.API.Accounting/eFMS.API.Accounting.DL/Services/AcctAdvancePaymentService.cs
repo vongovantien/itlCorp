@@ -320,8 +320,11 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 return "settled";
             }
-
-            return "notsettled";
+            else if(settled == 0 && notsettled > 0)
+            {
+                return "notsettled";
+            }
+            return null;
         }
 
         private IQueryable<AcctAdvancePayment> QueryWithAdvanceRequest(IQueryable<AcctAdvancePayment> advancePayments, AcctAdvancePaymentCriteria criteria)
@@ -641,12 +644,16 @@ namespace eFMS.API.Accounting.DL.Services
                 item.ApproveDate = acctApproveAdvanceRepo.Get(x => x.AdvanceNo == item.AdvanceNo && x.IsDeny == false).FirstOrDefault()?.BuheadAprDate;
                 
 
-                var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo)?.FirstOrDefault();
+                var surchargeAdvanceNo = surcharge.Where(x => x.AdvanceNo == item.AdvanceNo && x.SettlementCode != null)?.FirstOrDefault();
+                if (surchargeAdvanceNo?.SettlementCode == null)
+                {
+                    surchargeAdvanceNo = surcharge.Where(x => x.Hblno == item.Hbl && x.SettlementCode != null)?.FirstOrDefault();
+                }
                 if (surchargeAdvanceNo != null && surchargeAdvanceNo.SettlementCode != null)
                 {
                     string _settleCode = surchargeAdvanceNo.SettlementCode;
                     var data = acctApproveSettlementRepo.Get(x => x.SettlementNo == _settleCode)?.FirstOrDefault();
-                    if (data != null && data.IsDeny==false)
+                    if (data != null && item.StatusPayment=="Settled")
                     {
                         item.SettleDate = data.RequesterAprDate;
                     }
