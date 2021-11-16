@@ -69,5 +69,7 @@ namespace eFMS.API.Accounting.Service.Models
         public string PaySyncedFrom { get; set; }
         public decimal? NetAmount { get; set; }
         public string VatPartnerId { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
     }
 }

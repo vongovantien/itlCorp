@@ -23,7 +23,6 @@ namespace eFMS.API.Catalogue.DL.Models.Criteria
         public string UserCreated { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public bool? Active { get; set; }
-        public bool? AgreeActive { get; set; }
         public string AccountNo { get; set; }
         public string CoLoaderCode { get; set; }
         public string Saleman { get; set; }

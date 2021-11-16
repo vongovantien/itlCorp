@@ -59,6 +59,8 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<AccAccountingManagement> accountingManagementRepository;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
+        private readonly IContextBase<AcctSoa> acctSoaRepo;
+        private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
 
@@ -90,7 +92,9 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<CatCommodityGroup> catCommodityGroupRepo,
             IContextBase<AccAccountingManagement> accountingManagementRepo,
             IContextBase<CatDepartment> catDepManagementRepo,
-            IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo
+            IContextBase<AcctCreditManagementAr> acctCreditManagementArRepo,
+            IContextBase<AcctSoa> acctSoa,
+            IContextBase<AcctCombineBilling> acctCombineBillingRepo
             ) : base(repository, mapper)
         {
             stringLocalizer = localizer;
@@ -122,6 +126,8 @@ namespace eFMS.API.Documentation.DL.Services
             accountingManagementRepository = accountingManagementRepo;
             departmentRepository = catDepManagementRepo;
             acctCreditManagementArRepository = acctCreditManagementArRepo;
+            acctSoaRepo = acctSoa;
+            acctCombineBillingRepository = acctCombineBillingRepo;
         }
 
         private string CreateCode(string typeCDNote, TransactionTypeEnum typeEnum)
@@ -441,6 +447,11 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_CDNOTE_NOT_NOT_FOUND].Value);
                 }
+
+                //[ADD][1/11/2021][16602-Update lại tỷ giá]
+                cdNote.ExcRateUsdToLocal = model.ExcRateUsdToLocal== null?cdNote.ExcRateUsdToLocal:model.ExcRateUsdToLocal;
+                //[END]
+
                 var entity = mapper.Map<AcctCdnote>(model);
                 entity.GroupId = cdNote.GroupId;
                 entity.DepartmentId = cdNote.DepartmentId;
@@ -507,6 +518,17 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         item.DebitNo = null;
                     }
+                    if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                    {
+                        if (cdNote.CombineBillingNo == item.CombineBillingNo)
+                        {
+                            item.CombineBillingNo = null;
+                        }
+                        if (cdNote.CombineBillingNo == item.ObhcombineBillingNo)
+                        {
+                            item.ObhcombineBillingNo = null;
+                        }
+                    }
                     surchargeUpdate.Add(item);
                     var hsSur = surchargeRepository.Update(item, x => x.Id == item.Id, false);
                 }
@@ -519,25 +541,42 @@ namespace eFMS.API.Documentation.DL.Services
                         if (charge.Type == DocumentConstants.CHARGE_BUY_TYPE)
                         {
                             charge.CreditNo = model.Code;
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                            }
                         }
                         else if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
                         {
                             charge.DebitNo = model.Code;
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                charge.CombineBillingNo = cdNote.CombineBillingNo;
+                            }
                         }
                         else
                         {
                             if (model.PartnerId == charge.PaymentObjectId)
                             {
                                 charge.DebitNo = model.Code;
+                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    charge.CombineBillingNo = cdNote.CombineBillingNo;
+                                }
                             }
                             if (model.PartnerId == charge.PayerId)
                             {
                                 charge.CreditNo = model.Code;
+                                if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    charge.ObhcombineBillingNo = cdNote.CombineBillingNo;
+                                }
                             }
                         }
 
-                        if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
-                        {
+                        //[9/11/2021][Cho update phí cập nhật lại tỷ giá]
+                        //if (string.IsNullOrEmpty(charge.Soano) && string.IsNullOrEmpty(charge.PaySoano))
+                        //{
                             //Cập nhật ExchangeDate của phí theo ngày Created Date CD Note & phí chưa có tạo SOA
                             charge.ExchangeDate = model.DatetimeCreated.HasValue ? model.DatetimeCreated.Value.Date : model.DatetimeCreated;
 
@@ -562,7 +601,10 @@ namespace eFMS.API.Documentation.DL.Services
                             charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
                             charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
                             charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
-                        }
+                        //}
+
+
+                 
 
                         charge.DatetimeModified = DateTime.Now;
                         charge.UserModified = currentUser.UserID;
@@ -596,7 +638,7 @@ namespace eFMS.API.Documentation.DL.Services
                         hsSurSc = surchargeRepository.SubmitChanges();
                         var hsOtSc = opstransRepository.SubmitChanges();
                         var hsCtSc = cstransRepository.SubmitChanges();
-                        
+                        acctSoaRepo.SubmitChanges();
 
                         trans.Commit();
                     }
@@ -608,6 +650,13 @@ namespace eFMS.API.Documentation.DL.Services
                     finally
                     {
                         trans.Dispose();
+                    }
+                }
+                if (hsSurSc.Success)
+                {
+                    if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                    {
+                        UpdateCombineBilling(cdNote.CombineBillingNo);
                     }
                 }
                 if (model.Type == "CREDIT" && hsSurSc.Success) // Update Credit AR
@@ -760,7 +809,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                    && (string.IsNullOrEmpty(x.PaySoano) || existCredit.SurchargeId.Split(';').Any(z => z == x.Id.ToString())) && action != "Delete");
                 }
 
-                // Update for credit note  
+                // Update for credit note
                 if (surchargeLst.Count() > 0)
                 {
                     // Get detail to update Credit AR
@@ -789,6 +838,7 @@ namespace eFMS.API.Documentation.DL.Services
                     acctCreditLst.Add(acctCredit);
                 }
             }
+        
             if (acctCreditLst.Count() > 0 || acctCreditDelete.Count() > 0)
             {
                 // Update database
@@ -897,6 +947,8 @@ namespace eFMS.API.Documentation.DL.Services
                 charge.UnitCode = unit?.Code;
                 charge.ChargeCode = catCharge?.Code;
                 charge.NameEn = catCharge?.ChargeNameEn;
+                charge.Soano = item.Soano;
+                charge.PaySoano = item.PaySoano;
 
                 string _syncedFromBy = null;
                 if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE && charge.CreditNo == cdNote.Code)
@@ -1121,6 +1173,18 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             foreach (var item in charges)
                             {
+                                // Remove combine no
+                                if(!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                                {
+                                    if(cdNote.CombineBillingNo == item.CombineBillingNo)
+                                    {
+                                        item.CombineBillingNo = null;
+                                    }
+                                    if(cdNote.CombineBillingNo == item.ObhcombineBillingNo)
+                                    {
+                                        item.ObhcombineBillingNo = null;
+                                    }
+                                }
                                 if (item.Type == DocumentConstants.CHARGE_BUY_TYPE)
                                 {
                                     item.CreditNo = null;
@@ -1160,11 +1224,28 @@ namespace eFMS.API.Documentation.DL.Services
                                 jobCSTrans.DatetimeModified = DateTime.Now;
                                 cstransRepository.Update(jobCSTrans, x => x.Id == jobCSTrans.Id, false);
                             }
+                            // Delete combine if exist
+                            var existingCombine = surchargeRepository.Any(x => !(x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code) && (x.CombineBillingNo == cdNote.CombineBillingNo || x.ObhcombineBillingNo == cdNote.CombineBillingNo));
+                            if (!existingCombine)
+                            {
+                                if (acctCombineBillingRepository.Any(x => x.CombineBillingNo == cdNote.CombineBillingNo))
+                                {
+                                    var hsCm = acctCombineBillingRepository.Delete(x => x.CombineBillingNo == cdNote.CombineBillingNo);
+                                }
+                            }
                         }
                         DataContext.SubmitChanges();
                         var hsSur = surchargeRepository.SubmitChanges();
                         opstransRepository.SubmitChanges();
                         cstransRepository.SubmitChanges();
+                        acctCombineBillingRepository.SubmitChanges();
+                        if (hsSur.Success)
+                        {
+                            if (!string.IsNullOrEmpty(cdNote.CombineBillingNo))
+                            {
+                                UpdateCombineBilling(cdNote.CombineBillingNo);
+                            }
+                        }
                         // Delete credit AR
                         if (cdNote.Type == "CREDIT" && hsSur.Success)
                         {
@@ -2916,7 +2997,7 @@ namespace eFMS.API.Documentation.DL.Services
             var charges = from charge in chargeData
                           join am in accMangData on charge.AcctManagementId equals am.Id into amGrp
                           from am in amGrp.DefaultIfEmpty()
-                          select new CsShipmentSurchargeModel { 
+                          select new CsShipmentSurchargeModel {
                               Id = charge.Id,
                               CurrencyId = charge.CurrencyId,
                               Total =charge.Total,
@@ -2935,7 +3016,7 @@ namespace eFMS.API.Documentation.DL.Services
                           };
 
             var query = from cdnote in cdNotes
-                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo) 
+                       join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
                        select new { cdnote, charge };
 
             if (criteria.FromAccountingDate != null && criteria.ToAccountingDate != null)
@@ -3090,5 +3171,29 @@ namespace eFMS.API.Documentation.DL.Services
             return result.FirstOrDefault();
         }
         #endregion
+
+        /// <summary>
+        /// Update Combine Billing Data
+        /// </summary>
+        /// <param name="combineNoUpd">combine no in cd note</param>
+        private void UpdateCombineBilling(string combineNoUpd)
+        {
+            var surchargeCmb = surchargeRepository.Get(x => x.CombineBillingNo == combineNoUpd || x.ObhcombineBillingNo == combineNoUpd);
+            var existCmb = surchargeCmb?.Count() ?? 0;
+            if (existCmb > 0)
+            {
+                var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
+                if (combineCurrent != null)
+                {
+                    combineCurrent.TotalAmountVnd = surchargeCmb.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd));
+                    combineCurrent.TotalAmountUsd = surchargeCmb.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd));
+                    acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo);
+                }
+            }
+            else
+            {
+                acctCombineBillingRepository.Delete(x => x.CombineBillingNo == combineNoUpd);
+            }
+        }
     }
 }

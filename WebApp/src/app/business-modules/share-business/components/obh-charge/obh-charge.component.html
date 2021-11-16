@@ -121,7 +121,7 @@
                                     </ng-template>
                                 </div>
                             </td>
-                            <td>
+                            <!-- <td>
                                 <div class="form-group col-md-12 dropdown-partner"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId ) }"
                                     [tooltip]="!!charge.paymentObjectId ? charge.receiverName : null">
@@ -170,6 +170,57 @@
                                         </div>
                                         <ng-template #container></ng-template>
                                     </div>
+                                </div>
+                            </td> -->
+                            <td>
+                                <div class="form-group col-md-12 dropdown-partner" dropdown
+                                    [tooltip]="charge.receiverName"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && (!charge.receiverName ||charge.paymentObjectId === charge.payerId )}">
+                                    <ng-container *ngIf="!!charge.creditNo 
+                                        || !!charge.debitNo 
+                                        || !!charge.settlementCode
+                                        || !!charge.soano
+                                        || !!charge.paySoano
+                                        || !!charge.voucherId
+                                        || !!charge.voucherIddate
+                                        || !!charge.voucherIdre
+                                        || !!charge.voucherIdreDate
+                                        || !charge.isFromShipment 
+                                        || (isLocked | async) === true; else partnerTemplate">
+                                        <input type="text" class="dropdown-toggle form-control" readonly disabled
+                                            [(ngModel)]="charge.receiverShortName">
+                                    </ng-container>
+                                    <ng-template #partnerTemplate>
+                                        <input type="text" class="dropdown-toggle form-control" dropdownToggle readonly
+                                            [(ngModel)]="charge.receiverName" placeholder="Partner Name"
+                                            [disabled]="isShowLoadingPartner ? 'disabled': null">
+                                        <combo-grid-icon (onDelete)="charge.payerId = null; 
+                                            charge.receiverName = null;charge.receiverName = null" [showDelete]="!!charge.receiverName 
+                                        && !charge.soano 
+                                        && !charge.paySoano
+                                        && !charge.creditNo
+                                        && !charge.debitNo
+                                        && !charge.settlementCode
+                                        && !charge.voucherId
+                                        && !charge.voucherIddate
+                                        && !charge.voucherIdre 
+                                        && !charge.voucherIdreDate">
+                                        </combo-grid-icon>
+                                        <div *dropdownMenu class="dropdown-menu dropdown-partner__content">
+                                            <div class="d-flex justify-content-end dropdown-partner__header">
+                                                <a class="text-primary text-underline m--margin-right-20 pointer"
+                                                    *ngFor="let type of partnerType; trackBy: trackByFn"
+                                                    [title]="type.displayName"
+                                                    (click)="selectPartnerTypes(type, charge, 'receiver')">{{type.displayName}}</a>
+                                            </div>
+                                            <app-combo-grid [headers]="headerPartner" [data]="listPartner"
+                                                [fields]="['shortName','taxCode','partnerNameEn']"
+                                                [active]="charge.paymentObjectId"
+                                                (onClick)="onSelectPayerReceiver($event, charge, 'receiver')">
+                                            </app-combo-grid>
+
+                                        </div>
+                                    </ng-template>
                                 </div>
                             </td>
                             <td>

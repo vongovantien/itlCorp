@@ -106,6 +106,8 @@
                     </div>
                 </div>
             </tab>
+            <tab heading="Combine Billing" *ngIf="menuSpecialPermission | async | specialPermission:'CombineBilling'"
+                (selectTab)="onSelectTab('combine-billing')"></tab>
         </tabset>
     </div>
 </div>

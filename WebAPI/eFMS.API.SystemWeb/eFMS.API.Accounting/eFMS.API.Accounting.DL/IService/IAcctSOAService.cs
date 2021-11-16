@@ -67,5 +67,6 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState RejectSoaCredit(RejectSoaModel model);
 
         List<ObjectReceivableModel> CalculatorReceivableSoa(string soaNo);
+        AcctSOADetailResult GetUpdateExcUsd(AcctSOADetailResult results);
     }
 }

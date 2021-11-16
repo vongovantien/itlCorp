@@ -19,7 +19,6 @@ namespace eFMS.API.ReportData.Models
         public DateTime? DatetimeModified { get; set; }
         public bool? Inactive { get; set; }
         public bool? Active { get; set; }
-        public bool? AgreeActive { get; set; }
         public string AccountNo { get; set; }
         public string Author { get; set; }
         public string PartnerType { get; set; }

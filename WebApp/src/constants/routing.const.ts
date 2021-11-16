@@ -44,6 +44,7 @@ export class RoutingConstants {
         SETTLEMENT_PAYMENT: `${RoutingConstants.ROOT_ACC}/settlement-payment`,
         STATEMENT_OF_ACCOUNT: `${RoutingConstants.ROOT_ACC}/statement-of-account`,
         ACCOUNTING_MANAGEMENT: `${RoutingConstants.ROOT_ACC}/management`,
+        COMBINE_BILLING: `${RoutingConstants.ROOT_ACC}/combine-billing`,
     };
 
     public static readonly CATALOGUE = {
