@@ -163,10 +163,10 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
     }
 
     exportStatementReceivableCustomer() {
-        if (!this.refPayments.length) {
-            this._toastService.warning('No Data To View, Please Re-Apply Filter');
-            return;
-        } else {
+        // if (!this.refPayments.length) {
+        //     this._toastService.warning('No Data To View, Please Re-Apply Filter');
+        //     return;
+        // } else {
             this._spinner.hide();
             this.loadingPopupComponent.show();
             this._exportRepo.exportStatementReceivableCustomer(this.dataSearch)
@@ -179,7 +179,7 @@ export class ARHistoryPaymentListInvoiceComponent extends AppList implements OnI
                         this.startDownloadReport(res, 'Statement of Receivable Customer - eFMS.xlsx');
                     }
                 );
-        }
+        // }
     }
 
     exportAdvanceReceiptData() {
