@@ -4912,7 +4912,6 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
                     shipmentSettlement.ServiceDate = ops.ServiceDate;
-
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;

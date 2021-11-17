@@ -4576,7 +4576,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmountVND).Sum();
                 _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmountVND ?? 0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
-                workSheet.Cells[k, 6].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[k, 6].Style.Numberformat.Format = settlementExport.InfoSettlement.SettlementCurrency == "VND" ? numberFormat2 : numberFormat;
                 foreach (var invoice in OBHCharges)
                 {
                     if (workSheet.Cells[k, 2].Value == null)
@@ -4595,7 +4595,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmountVND).Sum();
                 _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmountVND ?? 0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
-                workSheet.Cells[k, 7].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[k, 7].Style.Numberformat.Format = settlementExport.InfoSettlement.SettlementCurrency == "VND" ? numberFormat2 : numberFormat;
                 foreach (var invoice in CreditInvoiceCharges)
                 {
                     if (workSheet.Cells[k, 2].Value == null)
@@ -4607,6 +4607,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         workSheet.Cells[k, 2].Value += ";" + invoice.InvoiceNo;
                     }
                 }
+
                 #endregion
 
                 workSheet.Cells[j, 1].Value = headers[8]; //Số lô hàng
@@ -4679,9 +4680,9 @@ namespace eFMS.API.ReportData.FormatExcel
             #endregion--TOTAL--
             //bôi đen dòng tổng cộng ở cuối
             workSheet.Cells["a" + (p-2) + ":g" + (p - 2)].Style.Font.Bold = true;
-            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = numberFormat2;
+            workSheet.Cells["a" + (p - 2) + ":g" + (p - 2)].Style.Numberformat.Format = settlementExport.InfoSettlement.SettlementCurrency == "VND" ? numberFormat2 : numberFormat;
             workSheet.Cells["a" + p + ":g" + p].Style.Font.Bold = true;
-            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = numberFormat2;
+            workSheet.Cells["a" + p + ":g" + p].Style.Numberformat.Format = settlementExport.InfoSettlement.SettlementCurrency == "VND" ? numberFormat2 : numberFormat;
 
             //In đậm border dòng 14
             workSheet.Cells[18, 1, 19, 7].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
