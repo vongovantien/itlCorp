@@ -18,9 +18,10 @@
                             (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
                             <ng-template tabHeading>
                                 <span class="m--margin-right-10">Summary</span>
-                                <ng-container *ngIf="!!totalAr">
-                                    <span class="badge badge-info">{{totalAr}}</span>
-                                </ng-container>
+                                <span class="badge badge-info">{{totalItems}}</span>
+                                <!-- <ng-container *ngIf="!!totalAr">
+
+                                </ng-container> -->
                             </ng-template>
                             <list-trial-official-account-receivable></list-trial-official-account-receivable>
                         </tab>
