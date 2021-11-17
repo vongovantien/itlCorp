@@ -9,9 +9,8 @@ import { AccountReceivableListGuaranteedComponent } from '../components/list-gua
 import { AccountReceivableListOtherComponent } from '../components/list-other/list-other-account-receivable.component';
 import { AccountReceivableFormSearchComponent } from '../components/form-search/account-receivable/form-search-account-receivable.component';
 import { RoutingConstants } from '@constants';
-import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState } from './store/reducers';
+import { getAccountReceivablePagingState, getAccountReceivableSearchState, IAccountReceivableState, getAccountReceivableListState } from './store/reducers';
 import { Store } from '@ngrx/store';
-import { LoadListAccountReceivable, SearchListAccountReceivable } from './store/actions';
 import { getCurrentUserState } from '@store';
 
 @Component({
@@ -51,12 +50,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
             .pipe(takeUntil(this.ngUnsubscribe))
             // tslint:disable-next-line:no-any
             .subscribe((param: { [key: string]: any }) => {
-                if (param.subTab) {
-                    this.selectedSubTab = param.subTab.toUpperCase();
-                } else {
-                    this.selectedSubTab = 'trial_official'.toUpperCase();
-                    this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
-                }
+                // if (param.subTab) {
+                //     this.selectedSubTab = param.subTab.toUpperCase();
+                // } else {
+                this.selectedSubTab = 'trial_official'.toUpperCase();
+                this.setParameterToPagingTab(CommonEnum.TabTypeAccountReceivableEnum.TrialOrOffical, this.trialOfficalListComponent);
+                //}
 
             });
         this._cd.detectChanges();
@@ -92,6 +91,12 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
     setParameterToSearch(dataSearch: AccountingInterface.IAccReceivableSearch, tabComponent: any) {
         tabComponent.dataSearch = dataSearch;
         tabComponent.getPagingList();
+        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
+            if (lst && lst.totalItems !== null) {
+                //let a = this.totalItems;
+                this.totalItems = lst.totalItems;
+            }
+        });
     }
 
     onSelectTabAccountReceivable(tabname: string) {
@@ -155,5 +160,10 @@ export class AccountReceivableTabComponent extends AppList implements OnInit {
                 });
         tabComponent.dataSearch = this.dataSearch;
         tabComponent.getPagingList();
+        this._store.select(getAccountReceivableListState).pipe(takeUntil(this.ngUnsubscribe)).subscribe((lst) => {
+            if (lst && lst.totalItems !== null) {
+                this.totalItems = lst.totalItems;
+            }
+        });
     }
 }
