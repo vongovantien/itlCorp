@@ -1777,7 +1777,7 @@ namespace eFMS.API.Accounting.DL.Services
                     res = res.Where(x => x.Over16To30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.Over30:
-                    res = res.Where(x => x.Over16To30Day > 0).ToList();
+                    res = res.Where(x => x.Over30Day > 0).ToList();
                     break;
                 case OverDueDayEnum.All:
                     break;
