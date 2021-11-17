@@ -1284,9 +1284,9 @@ namespace eFMS.API.Accounting.DL.Services
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
 
-                if(receivables.Any(x => DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
-                || DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) 
-                || DataTypeEx.IsNullOrValue(x.Over30Day, 0))) {
+                if(receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
+                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) 
+                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0))) {
                     UpdateAgreementPartners(partnerIds, true);
                 }
                 else
