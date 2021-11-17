@@ -376,6 +376,10 @@ export class ShareBussinessCdNoteAddAirPopupComponent extends PopupBase {
                             (res: CommonInterface.IResult) => {
                                 if (res.status) {
                                     this._toastService.success(res.message);
+                                    let checkSoa = this.listCharges.find(x=>x.soano !== "" && x.soano !== null);
+                                    if(checkSoa){
+                                        this._toastService.warning("Vui lòng cập nhật SOA");
+                                    }
                                     this.onUpdate.emit();
                                     this.closePopup();
                                 } else {
