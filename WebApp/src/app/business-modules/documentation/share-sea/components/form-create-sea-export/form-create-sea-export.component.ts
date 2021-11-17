@@ -195,7 +195,10 @@ export class ShareSeaServiceFormCreateSeaExportComponent extends AppForm impleme
 
             serviceDate: [null, Validators.required],
 
-            mawb: [],
+            mawb: ['', Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             voyNo: [],
             flightVesselName: [],
             pono: [],
