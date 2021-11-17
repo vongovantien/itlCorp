@@ -1763,9 +1763,9 @@ namespace eFMS.API.Accounting.DL.Services
                         break;
                 }
             }
-            if (criteria.Staffs != null)
+            if (criteria.Staffs != null && criteria.Staffs.Count > 0)
                 res = res.Where(x => criteria.Staffs.Contains(x.AgreementSalesmanId)).ToList();
-            if (criteria.OfficeIds != null)
+            if (criteria.OfficeIds != null && criteria.OfficeIds.Count > 0)
                 res = res.Where(x => x.OfficeId != null && criteria.OfficeIds.Contains(x.OfficeId)).ToList();
 
             switch (criteria.OverDueDay)
