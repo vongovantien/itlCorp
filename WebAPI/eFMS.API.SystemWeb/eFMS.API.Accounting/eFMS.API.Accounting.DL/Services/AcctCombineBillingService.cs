@@ -9,6 +9,8 @@ using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
@@ -180,6 +182,36 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
+        /// Check view detail permission
+        /// </summary>
+        /// <param name="combineNo"></param>
+        /// <returns></returns>
+        public bool CheckAllowViewDetailCombine(Guid combineId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == combineId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        /// <summary>
         /// Insert data
         /// </summary>
         /// <param name="model"></param>
@@ -196,6 +228,10 @@ namespace eFMS.API.Accounting.DL.Services
                 //model.Id = Guid.NewGuid();
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.UserCreated = model.UserModified = userCurrent;
+                model.GroupId = currentUser.GroupId;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.OfficeId = currentUser.OfficeID;
+                model.CompanyId = currentUser.CompanyID;
                 model.TotalAmountVnd = model.Shipments.Sum(x => x.AmountVnd ?? 0);
                 model.TotalAmountUsd = model.Shipments.Sum(x => x.AmountUsd ?? 0);
 
@@ -239,6 +275,10 @@ namespace eFMS.API.Accounting.DL.Services
                 var combine = mapper.Map<AcctCombineBilling>(model);
                 combine.DatetimeCreated = currentCombine.DatetimeCreated;
                 combine.UserCreated = currentCombine.UserCreated;
+                combine.GroupId = currentCombine.GroupId;
+                combine.DepartmentId = currentCombine.DepartmentId;
+                combine.OfficeId = currentCombine.OfficeId;
+                combine.CompanyId = currentCombine.CompanyId;
                 combine.DatetimeModified = DateTime.Now;
                 combine.UserModified = userCurrent;
 
@@ -394,8 +434,9 @@ namespace eFMS.API.Accounting.DL.Services
             var users = userRepo.Get();
             var employee = employeeRepo.Get();
             var dataCombineBilling = DataContext.Get(query);
-            var surcharges = surchargeRepo.Get();
+            var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
             var result = from data in dataCombineBilling
+                         join part in partners on data.PartnerId equals part.Id
                          join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
                          from surcharge in grpCombine.DefaultIfEmpty()
                          join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.CombineBillingNo into grpCombineObh
@@ -406,6 +447,7 @@ namespace eFMS.API.Accounting.DL.Services
                          {
                              Id = data.Id,
                              CombineBillingNo = data.CombineBillingNo,
+                             PartnerName = part.ShortName,
                              UserCreated = data.UserCreated,
                              TotalAmountVnd = data.TotalAmountVnd,
                              TotalAmountUsd = data.TotalAmountUsd,
@@ -648,7 +690,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// 
+        /// get data detail of combine
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>

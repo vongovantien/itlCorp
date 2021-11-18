@@ -14,7 +14,7 @@ import { CombineBilling } from 'src/app/shared/models/accouting/combine-billing.
 import { LoadListCombineBilling } from './store/actions';
 import { getCombineBillingListState, getCombineBillingLoadingListState, getCombineBillingPagingState, getDataSearchCombineBillingState } from './store/reducers';
 import {
-  ConfirmPopupComponent
+  ConfirmPopupComponent, Permission403PopupComponent
 } from '@common';
 import { InjectViewContainerRefDirective } from '@directives';
 @Component({
@@ -24,6 +24,7 @@ import { InjectViewContainerRefDirective } from '@directives';
 export class CombineBillingComponent extends AppList implements OnInit {
   @ViewChild(InjectViewContainerRefDirective) confirmPopupContainerRef: InjectViewContainerRefDirective;
   @ViewChild(ConfirmPopupComponent) confirmPopup: ConfirmPopupComponent;
+  @ViewChild(Permission403PopupComponent) permissionPopup: Permission403PopupComponent;
 
   billings: CombineBilling[] = [];
   // Get data with 6 month from current
@@ -158,6 +159,16 @@ deleteCombineBilling(id: string) {
   }
 
   viewDetail(data: any): void {
-    this._router.navigate([`${RoutingConstants.ACCOUNTING.COMBINE_BILLING}/detail/${data.id}`]);
+    console.log('datas', data)
+    this._accountingRepo
+            .checkAllowViewDetailCombine(data.id)
+            .subscribe((value: boolean) => {
+                if (value) {
+                  this._router.navigate([`${RoutingConstants.ACCOUNTING.COMBINE_BILLING}/detail/${data.id}`]);
+                } else {
+                    this.permissionPopup.show();
+                }
+            });
+    
   }
 }
