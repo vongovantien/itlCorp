@@ -131,7 +131,7 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
     showDebitDetail(agreementId, option) {
         let offi = "";
-        if(this.dataSearch){offi = this.dataSearch.officeIds.join("|");}
+        if(this.dataSearch && this.dataSearch.officeIds){offi = this.dataSearch.officeIds.join("|");}
         this._accountingRepo.getDataDebitDetail(agreementId, option,offi,'')
             .pipe(
                 catchError(this.catchError),

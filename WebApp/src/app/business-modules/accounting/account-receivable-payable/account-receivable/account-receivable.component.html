@@ -16,6 +16,13 @@
                     <tabset class="custom-class-tab">
                         <tab [active]="selectedSubTab === 'TRIAL_OFFICIAL'" heading="Summary"
                             (selectTab)="onSelectTabAccountReceivable('TRIAL_OFFICIAL')">
+                            <ng-template tabHeading>
+                                <span class="m--margin-right-10">Summary</span>
+                                <span class="badge badge-info">{{totalItems}}</span>
+                                <!-- <ng-container *ngIf="!!totalAr">
+
+                                </ng-container> -->
+                            </ng-template>
                             <list-trial-official-account-receivable></list-trial-official-account-receivable>
                         </tab>
                         <!-- <tab [active]="selectedSubTab === 'GUARANTEED'" heading="Guaranteed"
