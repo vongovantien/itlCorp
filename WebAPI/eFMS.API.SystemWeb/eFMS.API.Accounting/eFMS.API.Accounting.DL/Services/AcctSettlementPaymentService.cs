@@ -4866,7 +4866,7 @@ namespace eFMS.API.Accounting.DL.Services
                 DueDate = settlementPayment.DueDate,
                 SOADate = soa.FirstOrDefault()?.SoaformDate,
                 SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
-                Supplier = partner.ShortName,
+                Supplier = partner?.ShortName,
                 Note=settlementPayment.Note,
                 SettlementCurrency=settlementPayment.SettlementCurrency
             };
