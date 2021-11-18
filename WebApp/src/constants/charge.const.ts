@@ -32,4 +32,17 @@ export class ChargeConstants {
     public static readonly SELLING_DEFAULT_LCL_EXPORT = ["SS_OCF_Sea", "SS_BL_Sea", "SS_SEL_Sea", "SS_THCL_Sea"];
     public static readonly SELLING_DEFAULT_FCL_IMPORT = ["SS_OCF_Sea", "SS_D_O_Sea", "SS_CIC_Sea", "SS_THCF_Sea", "SS_HDL_Sea"];
     public static readonly SELLING_DEFAULT_LCL_IMPORT = ["SS_OCF_Sea", "SS_D_O_Sea", "SS_CIC_Sea", "SS_THCL_Sea", "SS_HDL_Sea", "SS_CFS_Sea"];
+
+    public static ServiceTypeMapping: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
+        { id: ChargeConstants.AE_CODE, text: ChargeConstants.AE_DES },
+        { id: ChargeConstants.AI_CODE, text: ChargeConstants.AI_DES },
+        { id: ChargeConstants.SFE_CODE, text: ChargeConstants.SFE_DES },
+        { id: ChargeConstants.SFI_CODE, text: ChargeConstants.SFI_DES },
+        { id: ChargeConstants.SLE_CODE, text: ChargeConstants.SLE_DES },
+        { id: ChargeConstants.SLI_CODE, text: ChargeConstants.SLI_DES },
+        { id: ChargeConstants.CL_CODE, text: ChargeConstants.CL_DES },
+        { id: ChargeConstants.IT_CODE, text: ChargeConstants.IT_DES },
+        { id: ChargeConstants.SCE_CODE, text: ChargeConstants.SCE_DES },
+        { id: ChargeConstants.SCI_CODE, text: ChargeConstants.SCI_DES }
+    ];
 }
