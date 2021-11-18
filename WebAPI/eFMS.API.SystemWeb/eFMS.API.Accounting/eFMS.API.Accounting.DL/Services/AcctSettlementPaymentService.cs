@@ -4867,7 +4867,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SOADate = soa.FirstOrDefault()?.SoaformDate,
                 SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
                 Supplier = partner.ShortName,
-                Note=settlementPayment.Note
+                Note=settlementPayment.Note,
+                SettlementCurrency=settlementPayment.SettlementCurrency
             };
             return infoSettlement;
         }
@@ -4962,17 +4963,17 @@ namespace eFMS.API.Accounting.DL.Services
                 //Quy đổi theo currency của Settlement
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
-                    infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
-                    infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, sur.CurrencyId, settlementCurrency)??0;
+                    infoShipmentCharge.ChargeVatAmount = sur.VatAmountUsd * currencyExchangeService.CurrencyExchangeRateConvert(null, null, "USD", settlementCurrency) ?? 0;
+                    infoShipmentCharge.ChargeAmount = (sur.AmountUsd * currencyExchangeService.CurrencyExchangeRateConvert(null, null, "USD", settlementCurrency) ?? 0) + (sur.VatAmountUsd * currencyExchangeService.CurrencyExchangeRateConvert(null, null, "USD", settlementCurrency) ?? 0);
                 }
                 else
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
-                infoShipmentCharge.ChargeAmountVND = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0); 
+                
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                 infoShipmentCharge.ChargeNote = sur.Notes;
                 string _chargeType = string.Empty;
