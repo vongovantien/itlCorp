@@ -173,8 +173,15 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     initForm() {
         this.formEdit = this._fb.group({
             jobNo: [null],
-            hwbno: [null, Validators.required],
-            mblno: [null, Validators.required],
+            hwbno: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
+
+            mblno: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             flightVessel: [],
             purchaseOrderNo: [],
 

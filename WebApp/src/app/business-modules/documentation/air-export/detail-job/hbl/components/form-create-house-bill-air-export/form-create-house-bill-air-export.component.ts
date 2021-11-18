@@ -284,8 +284,14 @@ export class AirExportHBLFormCreateComponent extends AppForm implements OnInit {
 
     initForm() {
         this.formCreate = this._fb.group({
-            mawb: [null, Validators.required],
-            hwbno: [null, Validators.required],
+            mawb: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
+            hwbno: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             consigneeDescription: [],
             shipperDescription: [null, Validators.required],
             forwardingAgentDescription: [],
