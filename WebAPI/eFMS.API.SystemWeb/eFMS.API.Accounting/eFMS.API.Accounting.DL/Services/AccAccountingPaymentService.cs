@@ -1080,10 +1080,10 @@ namespace eFMS.API.Accounting.DL.Services
                 query = query.And(x => acctManagementIds.Contains(x.Id));
             }
 
-            //if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0)
-            //{
-            //    query = query.And(x => (x.Type == "InvoiceTemp") || (x.Type == "Invoice" && criteria.PaymentStatus.Contains(x.PaymentStatus ?? "Unpaid")));
-            //}
+            if (criteria.PaymentStatus != null && criteria.PaymentStatus.Count > 0 && !criteria.PaymentStatus.Any(x => x == "Paid"))
+            {
+                query = query.And(x => x.SourceModified == null && x.SourceModified != "1" && x.Status != "Paid");
+            }
             if (criteria.IssuedDate != null)
             {
                 query = query.And(x => x.Date != null && x.Date.Value.Date <= criteria.IssuedDate.Value.Date);
@@ -2153,7 +2153,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (!isValidDebit)
                     {
                         invoiceDe = null;
-                        if (!isValidObh || invoiceObhGroup == null)
+                        if (!isValidObh || invoiceObhGroup == null || invoiceObhGroup.Count() == 0)
                         {
                             continue;
                         }
