@@ -1043,7 +1043,7 @@ namespace eFMS.API.Accounting.DL.Services
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds, bool isOverDue = false)
+        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds, bool isOverDue = false)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1053,7 +1053,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partner.ParentId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1064,7 +1065,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
@@ -1078,7 +1080,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, bool isOverDue = false)
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds, bool isOverDue = false)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1088,7 +1090,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partnerId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1099,7 +1102,8 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
@@ -1130,7 +1134,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
             var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-            UpdateAgreementPartners(partnerIds);
+            var agreementIds = receivables.Select(s => s.ContractId).ToList();
+            UpdateAgreementPartners(partnerIds, agreementIds);
 
             return hs;
         }
@@ -1155,16 +1160,17 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
 
-                if (receivables.Any(x => DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
-                 || DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
-                 || DataTypeEx.IsNullOrValue(x.Over30Day, 0)))
+                if (receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                 || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                 || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)))
                 {
-                    await UpdateAgreementPartnersAsync(partnerIds, true);
+                    await UpdateAgreementPartnersAsync(partnerIds, agreementIds, true);
                 }
                 else
                 {
-                    await UpdateAgreementPartnersAsync(partnerIds);
+                    await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
                 }
                 
 
@@ -1283,15 +1289,16 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
 
-                if(receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
+                if (receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
                 || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) 
                 || !DataTypeEx.IsNullOrValue(x.Over30Day, 0))) {
-                    UpdateAgreementPartners(partnerIds, true);
+                    UpdateAgreementPartners(partnerIds, agreementIds, true);
                 }
                 else
                 {
-                    UpdateAgreementPartners(partnerIds);
+                    UpdateAgreementPartners(partnerIds, agreementIds);
                 }
 
                 return hs;
