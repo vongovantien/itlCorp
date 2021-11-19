@@ -799,6 +799,7 @@ namespace eFMS.API.Accounting.DL.Services
             var listJob = combineDetail.Shipments.Select(x => x.JobNo).ToList();
             var opsTransaction = opsTransactionRepo.Get(x => listJob.Any(z => z == x.JobNo)).FirstOrDefault();
             var partner = partnerRepo.Get(x => x.Id == combineDetail.PartnerId).FirstOrDefault();
+            var currentCombine = DataContext.Get(x => x.Id == combineDetail.Id).FirstOrDefault();
             model.JobNo = opsTransaction?.JobNo;
             model.CBM = opsTransaction?.SumCbm;
             model.GW = opsTransaction?.SumGrossWeight;
@@ -819,7 +820,11 @@ namespace eFMS.API.Accounting.DL.Services
             model.PartnerTaxcode = partner?.TaxCode;
             model.PartnerFax = partner?.Fax;
             model.CreatedDate = DateTime.Now.ToString("dd'/'MM'/'yyyy");
-            model.UserCreated = combineDetail.UserCreated;
+            model.UserCreated = currentCombine?.UserCreated;
+            model.GroupId = currentCombine?.GroupId;
+            model.DepartmentId = currentCombine?.DepartmentId;
+            model.OfficeId = currentCombine?.OfficeId;
+            model.CompanyId = currentCombine?.CompanyId;
             model.CombineBillingNo = combineDetail.CombineBillingNo;
             if (opsTransaction?.WarehouseId != null)
             {
@@ -960,18 +965,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     decimal? _vatAmount = 0, _vatAmountUsd = 0, exchangeRateToUsd = 0, exchangeRateToVnd = 0;
-
-                    // Get Vat amount
-                    if (item.CurrencyId != AccountingConstants.CURRENCY_LOCAL && item.CurrencyId != AccountingConstants.CURRENCY_USD)
-                    {
-                        decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, AccountingConstants.CURRENCY_USD);
-                        //Quy đổi về USD đối với các currency khác
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
-                    }
-                    else
-                    {
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
-                    }
+                    exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                    _vatAmount = item.VatAmountVnd;
 
                     var acctCDNo = new CombineDebitTemplatReport
                     {
@@ -997,7 +992,7 @@ namespace eFMS.API.Accounting.DL.Services
                         Delivery = null,
                         HWBNO = model.HbLadingNo,
                         Description = item.NameEn,
-                        Quantity = (item.Quantity * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber,
+                        Quantity = (item.Quantity * exchangeRateToVnd * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber,
                         QUnit = "N/A",
                         UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = ((_vatAmount ?? 0) * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber, //Cộng thêm phần thập phân
@@ -1026,7 +1021,7 @@ namespace eFMS.API.Accounting.DL.Services
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),
                         TransDate = null,
-                        Unit = item.CurrencyId,
+                        Unit = AccountingConstants.CURRENCY_LOCAL,
                         UnitPieaces = "N/A",
                         CustomDate = _clearance?.ClearanceDate,
                         JobNo = model.JobNo,
