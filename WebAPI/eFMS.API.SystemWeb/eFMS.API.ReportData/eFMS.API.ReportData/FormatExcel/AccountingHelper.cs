@@ -742,6 +742,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("Branch", item.BranchName);
                         listKeyData.Add("Salesman", item.Salesman);
                         listKeyData.Add("Creator", item.Creator);
+                        listKeyData.Add("CombineNo", item.CombineNo);
                     }
                     else
                     {
