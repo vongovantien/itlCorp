@@ -157,9 +157,9 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("GetDebitDetail")]
-        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode)
+        public IActionResult GetDebitDetail(Guid argeementId,string option,string officeId,string serviceCode ,int overDueDay = 0)
         {
-            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode);
+            var data = accountReceivableService.GetDataDebitDetail(argeementId,option,officeId,serviceCode, overDueDay);
             return Ok(data);
         }
 

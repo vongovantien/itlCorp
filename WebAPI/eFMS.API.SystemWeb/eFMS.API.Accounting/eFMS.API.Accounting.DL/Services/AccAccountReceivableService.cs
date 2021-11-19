@@ -2198,7 +2198,7 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode)
+        public IEnumerable<object> GetDataDebitDetail(Guid argeementId, string option, string officeId, string serviceCode,int overDueDay = 0)
         {
             if (argeementId == null || argeementId == Guid.Empty) return null;
             DbParameter[] parameters =
@@ -2206,7 +2206,8 @@ namespace eFMS.API.Accounting.DL.Services
                 SqlParam.GetParameter("argid", argeementId),
                 SqlParam.GetParameter("option", option),
                 SqlParam.GetParameter("officeId",!string.IsNullOrEmpty(officeId)?officeId:""),
-                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:"")
+                SqlParam.GetParameter("serviceCode",!string.IsNullOrEmpty(serviceCode)?serviceCode:""),
+                SqlParam.GetParameter("overDueDay",overDueDay)
             };
             var data = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDebitDetailByArgId>(parameters);
             return data;
