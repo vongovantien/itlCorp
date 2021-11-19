@@ -1208,7 +1208,9 @@ namespace eFMS.API.Accounting.DL.Services
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                     && x.PartnerId == model.PartnerId
                                                                     && x.OfficeId.Contains(model.Office.ToString())
-                                                                    && x.SaleService.Contains(model.Service)).FirstOrDefault();
+                                                                    && x.SaleService.Contains(model.Service)).OrderBy(x => x.ContractType)
+                                                                    .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+                                                                    .FirstOrDefault();
                     if (contractPartner == null)
                     {
                         // Lấy currency local và use created of partner gán cho Receivable
