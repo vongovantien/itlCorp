@@ -708,15 +708,15 @@ namespace eFMS.API.Accounting.DL.Services
                 var totalStr = string.Empty;
                 if (detail.Type == "Debit")
                 {
-                    totalStr = totalUsd > 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
                 }
                 else
                 {
-                    totalStr = totalUsd > 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
                 }
                 detail.AmountStr = totalStr;
                 detail.AmountVnd = item.data.Sum(x => x.AmountVnd ?? 0) * (detail.Type.ToLower() == "debit" ? 1 : -1);
@@ -768,15 +768,15 @@ namespace eFMS.API.Accounting.DL.Services
                 var totalStr = string.Empty;
                 if (detail.Type == "Debit")
                 {
-                    totalStr = totalUsd > 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
                 }
                 else
                 {
-                    totalStr = totalUsd > 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
                 }
                 detail.AmountStr = totalStr;
                 detail.AmountVnd = item.data.Sum(x => x.AmountVnd ?? 0) * (detail.Type.ToLower() == "debit" ? 1 : -1);
