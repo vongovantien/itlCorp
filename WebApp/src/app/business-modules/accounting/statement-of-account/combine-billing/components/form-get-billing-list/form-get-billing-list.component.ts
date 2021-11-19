@@ -113,7 +113,6 @@ export class FormGetBillingListComponent extends AppForm {
   }
   getService() {
     this.serviceList = ChargeConstants.ServiceTypeMapping;
-    this.serviceList.unshift({ id: 'All', text: 'All' });
     this.service.setValue([this.serviceList[0].id]);
   }
 
