@@ -2023,7 +2023,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
                                 detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
                                 detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
-                                if (detail.PaidAmount > 0 || detail.PaidAmountOBH > 0 || detail.PaidAmountUsd > 0 || detail.PaidAmountOBHUsd > 0)
+                                //if (detail.PaidAmount > 0 || detail.PaidAmountOBH > 0 || detail.PaidAmountUsd > 0 || detail.PaidAmountOBHUsd > 0)
                                 {
                                     payment.PaidAmount += (detail.PaidAmount ?? 0);
                                     payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
@@ -2047,7 +2047,7 @@ namespace eFMS.API.Accounting.DL.Services
                         detail.PaidAmountOBH = isValidObh ? (invoiceObhPaid?.Sum(z => z.invc.FirstOrDefault()?.PaidAmountVnd ?? 0) ?? 0) : 0;
                         detail.PaidAmountUsd = invoiceDebitPaid.FirstOrDefault()?.PaidAmountUsd ?? 0;
                         detail.PaidAmountOBHUsd = isValidObh ? (invoiceObhPaid?.Sum(z => z.invc.FirstOrDefault()?.PaidAmountUsd ?? 0) ?? 0) : 0;
-                        if (detail.PaidAmount > 0 || detail.PaidAmountOBH > 0 || detail.PaidAmountUsd > 0 || detail.PaidAmountOBHUsd > 0)
+                        //if (detail.PaidAmount > 0 || detail.PaidAmountOBH > 0 || detail.PaidAmountUsd > 0 || detail.PaidAmountOBHUsd > 0)
                         {
                             payment.PaidAmount += (detail.PaidAmount ?? 0);
                             payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
