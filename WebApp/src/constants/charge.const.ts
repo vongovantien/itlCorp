@@ -33,7 +33,8 @@ export class ChargeConstants {
     public static readonly SELLING_DEFAULT_FCL_IMPORT = ["SS_OCF_Sea", "SS_D_O_Sea", "SS_CIC_Sea", "SS_THCF_Sea", "SS_HDL_Sea"];
     public static readonly SELLING_DEFAULT_LCL_IMPORT = ["SS_OCF_Sea", "SS_D_O_Sea", "SS_CIC_Sea", "SS_THCL_Sea", "SS_HDL_Sea", "SS_CFS_Sea"];
 
-    public static ServiceTypeMapping: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
+    public static readonly ServiceTypeMapping: CommonInterface.INg2Select[] = <CommonInterface.INg2Select[]>[
+        { id: 'All', text: 'All' },
         { id: ChargeConstants.AE_CODE, text: ChargeConstants.AE_DES },
         { id: ChargeConstants.AI_CODE, text: ChargeConstants.AI_DES },
         { id: ChargeConstants.SFE_CODE, text: ChargeConstants.SFE_DES },

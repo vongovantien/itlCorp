@@ -422,6 +422,45 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
+        private IQueryable<AcctCombineBilling> GetCombinePermission()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
+
+            IQueryable<AcctCombineBilling> combine = null;
+            switch (_permissionRange)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    combine = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    combine = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    break;
+                case PermissionRange.Group:
+                    combine = DataContext.Get(x => x.GroupId == _user.GroupId
+                                            && x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    combine = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    combine = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    combine = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    break;
+            }
+            return combine;
+        }
+
         /// <summary>
         /// Get data combine
         /// </summary>
@@ -433,7 +472,7 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepo.Get();
             var users = userRepo.Get();
             var employee = employeeRepo.Get();
-            var dataCombineBilling = DataContext.Get(query);
+            var dataCombineBilling = GetCombinePermission().Where(query);
             var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
             var result = from data in dataCombineBilling
                          join part in partners on data.PartnerId equals part.Id
@@ -838,11 +877,11 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
             Crystal result = null;
-            var user = sysUserLevelRepo.Get(x => x.UserCreated == model.UserCreated).FirstOrDefault();
+            var user = sysUserLevelRepo.Get(x => x.UserId == model.UserCreated && x.GroupId == model.GroupId && x.DepartmentId == model.DepartmentId && x.OfficeId == model.OfficeId && x.CompanyId == model.CompanyId).FirstOrDefault();
             // Thông tin Company của Creator
-            var companyOfUser = sysCompanyRepo.Get(x => x.Id == user.CompanyId).FirstOrDefault();
+            var companyOfUser = user == null ? null : sysCompanyRepo.Get(x => x.Id == user.CompanyId).FirstOrDefault();
             //Lấy thông tin Office của Creator
-            var officeOfUser = sysOfficeRepo.Get(x => x.Id == user.OfficeId).FirstOrDefault();
+            var officeOfUser = user == null ? null : sysOfficeRepo.Get(x => x.Id == user.OfficeId).FirstOrDefault();
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
