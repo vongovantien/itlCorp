@@ -131,8 +131,10 @@ export class AccountReceivableListTrialOfficialComponent extends AppList impleme
 
     showDebitDetail(agreementId, option) {
         let offi = "";
+        let overDueDay = 0;
         if(this.dataSearch && this.dataSearch.officeIds){offi = this.dataSearch.officeIds.join("|");}
-        this._accountingRepo.getDataDebitDetail(agreementId, option,offi,'')
+        if(this.dataSearch && this.dataSearch.overDueDay){overDueDay = this.dataSearch.overDueDay;}
+        this._accountingRepo.getDataDebitDetailList(agreementId, option,offi,'',overDueDay)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
