@@ -10,9 +10,9 @@ namespace eFMS.API.Common.Globals
             if (_number == 0)
                 return String.Format("Không {0}.", currency);
 
-            string _source = String.Format("{0:0,0}", _number);
+            string _source = currency == "USD" ? String.Format("{0:0.##}", _number) : String.Format("{0:0,0}", _number);
 
-            string[] _arrsource = _source.Split(',');
+            string[] _arrsource = currency == "USD" ? _source.Split('.') : _source.Split(',');
 
             string _letter = "";
 
