@@ -35,6 +35,7 @@ namespace FMS.API.ReportData.Models.Accounting
         public string Creator { get; set; }
         public string AccountNo { get; set; }
         public string BranchName { get; set; }
+        public string CombineNo { get; set; }
         public List<AccountingReceiptDetail> receiptDetail;
     }
     

@@ -36,6 +36,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string Status { get; set; }
         public string AccountNo { get; set; }
         public string BranchName { get; set; }
+        public string CombineNo { get; set; }
         public List<AccountingReceiptDetail> receiptDetail;
     }
     
