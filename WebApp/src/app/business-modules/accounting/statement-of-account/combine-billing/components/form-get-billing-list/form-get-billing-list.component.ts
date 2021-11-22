@@ -3,6 +3,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppForm } from '@app';
+import { ChargeConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccountingRepo, CatalogueRepo, SystemRepo } from '@repositories';
@@ -33,7 +34,7 @@ export class FormGetBillingListComponent extends AppForm {
 
   billingTypeList: string[] = ['All', 'Debit', 'Credit'];
   typeDateSearch: string[] = ['Issue Date', 'Service Date'];
-  serviceList: any[] = [];
+  serviceList: CommonInterface.INg2Select[] = [];
   documentTypes: string[] = ['CD Note', 'Soa', 'Job No', 'HBL No', 'Custom No'];
   partners: any;
   billing: CombineBilling;
@@ -111,18 +112,8 @@ export class FormGetBillingListComponent extends AppForm {
       );
   }
   getService() {
-    this._systemRepo.getListServiceByPermision()
-      .pipe(catchError(this.catchError))
-      .subscribe(
-        (res: any) => {
-          if (!!res) {
-            this.serviceList = this.utility.prepareNg2SelectData(res, 'value', 'displayName');
-            this.serviceList = this.serviceList.sort((one, two) => (one.text > two.text ? 1 : -1));
-            this.serviceList.unshift({ id: 'All', text: 'All' });
-            this.service.setValue([this.serviceList[0].id]);
-          }
-        },
-      );
+    this.serviceList = ChargeConstants.ServiceTypeMapping;
+    this.service.setValue([this.serviceList[0].id]);
   }
 
   selelectedService(event: any) {

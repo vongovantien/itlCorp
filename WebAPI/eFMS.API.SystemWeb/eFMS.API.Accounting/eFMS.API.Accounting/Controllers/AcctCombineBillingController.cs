@@ -194,6 +194,18 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         /// <summary>
+        /// Check allow detail
+        /// </summary>
+        /// <param name="id">Id of combine</param>
+        /// <returns></returns>
+        [HttpGet("CheckAllowViewDetailCombine/{id}")]
+        public IActionResult CheckAllowDetail(Guid id)
+        {
+            var result = combineBillingService.CheckAllowViewDetailCombine(id);
+            return Ok(result);
+        }
+
+        /// <summary>
         /// Get list charge shipment by conditions
         /// </summary>
         /// <returns></returns>

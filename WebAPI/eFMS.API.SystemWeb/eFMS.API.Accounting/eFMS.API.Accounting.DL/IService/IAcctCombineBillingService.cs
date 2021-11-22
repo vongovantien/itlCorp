@@ -18,6 +18,7 @@ namespace eFMS.API.Accounting.DL.IService
         HandleState DeleteCombineBilling(Guid? id);
         string GenerateCombineBillingNo();
         string CheckDocumentNoExisted(ShipmentCombineCriteria criteria);
+        bool CheckAllowViewDetailCombine(Guid id);
         AcctCombineBillingModel GetCombineBillingDetailList(ShipmentCombineCriteria criteria);
         bool CheckExistedCombineData(Guid id);
         AcctCombineBillingModel GetCombineBillingDetailWithId(string Id);

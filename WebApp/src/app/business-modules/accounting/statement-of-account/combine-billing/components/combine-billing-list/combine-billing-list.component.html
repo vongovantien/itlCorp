@@ -56,16 +56,16 @@
                             <td ALIGN="right">{{item.amountStr}}
                             </td>
                             <td ALIGN="right">
-                                <span *ngIf="item.type === 'Debit'">{{item.amountVnd | number:'.0-2' }}
+                                <span *ngIf="item.type === 'Debit' && item.amountVnd >= 0">{{item.amountVnd | number:'.0-2' }}
                                 </span>
-                                <span *ngIf="item.type === 'Credit'">
+                                <span *ngIf="item.type === 'Credit' || item.amountVnd < 0">
                                     ({{item.amountVnd | abs | number:'.0-2' }})
                                 </span>
                             </td>
                             <td ALIGN="right">
-                                <span *ngIf="item.type === 'Debit'">{{item.amountUsd | number:'.0-2' }}
+                                <span *ngIf="item.type === 'Debit' && item.amountUsd >= 0">{{item.amountUsd | number:'.0-2' }}
                                 </span>
-                                <span *ngIf="item.type === 'Credit'">
+                                <span *ngIf="item.type === 'Credit' || item.amountUsd < 0">
                                     ({{item.amountUsd | abs | number:'.0-2' }})
                                 </span>
                             </td>

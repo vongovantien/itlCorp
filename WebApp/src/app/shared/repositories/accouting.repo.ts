@@ -973,6 +973,13 @@ export class AccountingRepo {
             })
         );
     }
+
+    checkAllowViewDetailCombine(id: string) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/CheckAllowViewDetailCombine/${id}`).pipe(
+            map((data: any) => data)
+        );
+    }
+
 }
 
 

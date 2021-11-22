@@ -628,6 +628,13 @@
             <param name="criteria"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.CheckAllowDetail(System.Guid)">
+            <summary>
+            Check allow detail
+            </summary>
+            <param name="id">Id of combine</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetListShipmentInfo(eFMS.API.Accounting.DL.Models.Criteria.ShipmentCombineCriteria)">
             <summary>
             Get list charge shipment by conditions

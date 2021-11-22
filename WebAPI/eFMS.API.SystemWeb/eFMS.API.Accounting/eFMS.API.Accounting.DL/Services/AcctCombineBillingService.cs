@@ -9,6 +9,8 @@ using eFMS.API.Accounting.Service.Models;
 using eFMS.API.Accounting.Service.ViewModels;
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Models;
+using eFMS.API.Infrastructure.Extensions;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection;
@@ -180,6 +182,36 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
+        /// Check view detail permission
+        /// </summary>
+        /// <param name="combineNo"></param>
+        /// <returns></returns>
+        public bool CheckAllowViewDetailCombine(Guid combineId)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+            if (permissionRange == PermissionRange.None)
+                return false;
+
+            var detail = DataContext.Get(x => x.Id == combineId)?.FirstOrDefault();
+            if (detail == null) return false;
+
+            BaseUpdateModel baseModel = new BaseUpdateModel
+            {
+                UserCreated = detail.UserCreated,
+                CompanyId = detail.CompanyId,
+                DepartmentId = detail.DepartmentId,
+                OfficeId = detail.OfficeId,
+                GroupId = detail.GroupId
+            };
+            int code = PermissionExtention.GetPermissionCommonItem(baseModel, permissionRange, _user);
+
+            if (code == 403) return false;
+
+            return true;
+        }
+
+        /// <summary>
         /// Insert data
         /// </summary>
         /// <param name="model"></param>
@@ -196,6 +228,10 @@ namespace eFMS.API.Accounting.DL.Services
                 //model.Id = Guid.NewGuid();
                 model.DatetimeCreated = model.DatetimeModified = DateTime.Now;
                 model.UserCreated = model.UserModified = userCurrent;
+                model.GroupId = currentUser.GroupId;
+                model.DepartmentId = currentUser.DepartmentId;
+                model.OfficeId = currentUser.OfficeID;
+                model.CompanyId = currentUser.CompanyID;
                 model.TotalAmountVnd = model.Shipments.Sum(x => x.AmountVnd ?? 0);
                 model.TotalAmountUsd = model.Shipments.Sum(x => x.AmountUsd ?? 0);
 
@@ -239,6 +275,10 @@ namespace eFMS.API.Accounting.DL.Services
                 var combine = mapper.Map<AcctCombineBilling>(model);
                 combine.DatetimeCreated = currentCombine.DatetimeCreated;
                 combine.UserCreated = currentCombine.UserCreated;
+                combine.GroupId = currentCombine.GroupId;
+                combine.DepartmentId = currentCombine.DepartmentId;
+                combine.OfficeId = currentCombine.OfficeId;
+                combine.CompanyId = currentCombine.CompanyId;
                 combine.DatetimeModified = DateTime.Now;
                 combine.UserModified = userCurrent;
 
@@ -382,6 +422,45 @@ namespace eFMS.API.Accounting.DL.Services
             return data.ToList();
         }
 
+        private IQueryable<AcctCombineBilling> GetCombinePermission()
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSOA);
+            PermissionRange _permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.List);
+            if (_permissionRange == PermissionRange.None) return null;
+
+            IQueryable<AcctCombineBilling> combine = null;
+            switch (_permissionRange)
+            {
+                case PermissionRange.None:
+                    break;
+                case PermissionRange.All:
+                    combine = DataContext.Get();
+                    break;
+                case PermissionRange.Owner:
+                    combine = DataContext.Get(x => x.UserCreated == _user.UserID);
+                    break;
+                case PermissionRange.Group:
+                    combine = DataContext.Get(x => x.GroupId == _user.GroupId
+                                            && x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Department:
+                    combine = DataContext.Get(x => x.DepartmentId == _user.DepartmentId
+                                            && x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Office:
+                    combine = DataContext.Get(x => x.OfficeId == _user.OfficeID
+                                            && x.CompanyId == _user.CompanyID);
+                    break;
+                case PermissionRange.Company:
+                    combine = DataContext.Get(x => x.CompanyId == _user.CompanyID);
+                    break;
+            }
+            return combine;
+        }
+
         /// <summary>
         /// Get data combine
         /// </summary>
@@ -393,9 +472,10 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepo.Get();
             var users = userRepo.Get();
             var employee = employeeRepo.Get();
-            var dataCombineBilling = DataContext.Get(query);
-            var surcharges = surchargeRepo.Get();
+            var dataCombineBilling = GetCombinePermission().Where(query);
+            var surcharges = surchargeRepo.Get(x => !string.IsNullOrEmpty(x.CombineBillingNo) || !string.IsNullOrEmpty(x.ObhcombineBillingNo));
             var result = from data in dataCombineBilling
+                         join part in partners on data.PartnerId equals part.Id
                          join surcharge in surcharges on data.CombineBillingNo equals surcharge.CombineBillingNo into grpCombine
                          from surcharge in grpCombine.DefaultIfEmpty()
                          join surcharge2 in surcharges on data.CombineBillingNo equals surcharge2.CombineBillingNo into grpCombineObh
@@ -406,6 +486,7 @@ namespace eFMS.API.Accounting.DL.Services
                          {
                              Id = data.Id,
                              CombineBillingNo = data.CombineBillingNo,
+                             PartnerName = part.ShortName,
                              UserCreated = data.UserCreated,
                              TotalAmountVnd = data.TotalAmountVnd,
                              TotalAmountUsd = data.TotalAmountUsd,
@@ -627,15 +708,15 @@ namespace eFMS.API.Accounting.DL.Services
                 var totalStr = string.Empty;
                 if (detail.Type == "Debit")
                 {
-                    totalStr = totalUsd > 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? (totalUsd < 0 ? "(" + (totalUsd * -1).ToString("N02") + ")" : totalUsd.ToString("N02") + " USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? (totalVnd < 0 ? "(" + (totalVnd * -1).ToString("N0") + ")" : totalVnd.ToString("N0") + " VND") : string.Empty;
                 }
                 else
                 {
-                    totalStr = totalUsd > 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? totalUsd < 0 ? (totalUsd * -1).ToString("N02") : ("(" + totalUsd.ToString("N02") + ") USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? totalVnd < 0 ? (totalVnd * -1).ToString("N0") : ("(" + totalVnd.ToString("N0") + ") VND") : string.Empty;
                 }
                 detail.AmountStr = totalStr;
                 detail.AmountVnd = item.data.Sum(x => x.AmountVnd ?? 0) * (detail.Type.ToLower() == "debit" ? 1 : -1);
@@ -648,7 +729,7 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         /// <summary>
-        /// 
+        /// get data detail of combine
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
@@ -687,15 +768,15 @@ namespace eFMS.API.Accounting.DL.Services
                 var totalStr = string.Empty;
                 if (detail.Type == "Debit")
                 {
-                    totalStr = totalUsd > 0 ? (totalUsd.ToString("N02") + " USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? (totalVnd.ToString("N0") + " VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? (totalUsd < 0 ? "(" + (totalUsd * -1).ToString("N02") + ")" : totalUsd.ToString("N02") + " USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? (totalVnd < 0 ? "(" + (totalVnd * -1).ToString("N0") + ")" : totalVnd.ToString("N0") + " VND") : string.Empty;
                 }
                 else
                 {
-                    totalStr = totalUsd > 0 ? "(" + (totalUsd.ToString("N02") + ") USD") : totalStr;
-                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd > 0 ? " | " : string.Empty;
-                    totalStr += totalVnd > 0 ? "(" + (totalVnd.ToString("N0") + ") VND") : string.Empty;
+                    totalStr = totalUsd != 0 ? totalUsd < 0 ? (totalUsd * -1).ToString("N02") : ("(" + totalUsd.ToString("N02") + ") USD") : totalStr;
+                    totalStr += !string.IsNullOrEmpty(totalStr) && totalVnd != 0 ? " | " : string.Empty;
+                    totalStr += totalVnd != 0 ? totalVnd < 0 ? (totalVnd * -1).ToString("N0") : ("(" + totalVnd.ToString("N0") + ") VND") : string.Empty;
                 }
                 detail.AmountStr = totalStr;
                 detail.AmountVnd = item.data.Sum(x => x.AmountVnd ?? 0) * (detail.Type.ToLower() == "debit" ? 1 : -1);
@@ -718,6 +799,7 @@ namespace eFMS.API.Accounting.DL.Services
             var listJob = combineDetail.Shipments.Select(x => x.JobNo).ToList();
             var opsTransaction = opsTransactionRepo.Get(x => listJob.Any(z => z == x.JobNo)).FirstOrDefault();
             var partner = partnerRepo.Get(x => x.Id == combineDetail.PartnerId).FirstOrDefault();
+            var currentCombine = DataContext.Get(x => x.Id == combineDetail.Id).FirstOrDefault();
             model.JobNo = opsTransaction?.JobNo;
             model.CBM = opsTransaction?.SumCbm;
             model.GW = opsTransaction?.SumGrossWeight;
@@ -738,7 +820,11 @@ namespace eFMS.API.Accounting.DL.Services
             model.PartnerTaxcode = partner?.TaxCode;
             model.PartnerFax = partner?.Fax;
             model.CreatedDate = DateTime.Now.ToString("dd'/'MM'/'yyyy");
-            model.UserCreated = combineDetail.UserCreated;
+            model.UserCreated = currentCombine?.UserCreated;
+            model.GroupId = currentCombine?.GroupId;
+            model.DepartmentId = currentCombine?.DepartmentId;
+            model.OfficeId = currentCombine?.OfficeId;
+            model.CompanyId = currentCombine?.CompanyId;
             model.CombineBillingNo = combineDetail.CombineBillingNo;
             if (opsTransaction?.WarehouseId != null)
             {
@@ -796,11 +882,11 @@ namespace eFMS.API.Accounting.DL.Services
                 return null;
             }
             Crystal result = null;
-            var user = sysUserLevelRepo.Get(x => x.UserCreated == model.UserCreated).FirstOrDefault();
+            var user = sysUserLevelRepo.Get(x => x.UserId == model.UserCreated && x.GroupId == model.GroupId && x.DepartmentId == model.DepartmentId && x.OfficeId == model.OfficeId && x.CompanyId == model.CompanyId).FirstOrDefault();
             // Thông tin Company của Creator
-            var companyOfUser = sysCompanyRepo.Get(x => x.Id == user.CompanyId).FirstOrDefault();
+            var companyOfUser = user == null ? null : sysCompanyRepo.Get(x => x.Id == user.CompanyId).FirstOrDefault();
             //Lấy thông tin Office của Creator
-            var officeOfUser = sysOfficeRepo.Get(x => x.Id == user.OfficeId).FirstOrDefault();
+            var officeOfUser = user == null ? null : sysOfficeRepo.Get(x => x.Id == user.OfficeId).FirstOrDefault();
             var _accountName = officeOfUser?.BankAccountNameVn ?? string.Empty;
             var _accountNameEN = officeOfUser?.BankAccountNameEn ?? string.Empty;
             var _bankName = officeOfUser?.BankNameLocal ?? string.Empty;
@@ -879,18 +965,8 @@ namespace eFMS.API.Accounting.DL.Services
                     }
 
                     decimal? _vatAmount = 0, _vatAmountUsd = 0, exchangeRateToUsd = 0, exchangeRateToVnd = 0;
-
-                    // Get Vat amount
-                    if (item.CurrencyId != AccountingConstants.CURRENCY_LOCAL && item.CurrencyId != AccountingConstants.CURRENCY_USD)
-                    {
-                        decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, AccountingConstants.CURRENCY_USD);
-                        //Quy đổi về USD đối với các currency khác
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : (((item.UnitPrice * item.Quantity) * item.Vatrate) / 100) * _exchangeRateToUsd;
-                    }
-                    else
-                    {
-                        _vatAmount = item.Vatrate != null && item.Vatrate < 0 ? Math.Abs(item.Vatrate.Value) : ((item.UnitPrice * item.Quantity) * item.Vatrate) / 100;
-                    }
+                    exchangeRateToVnd = currencyExchangeService.CurrencyExchangeRateConvert(item.FinalExchangeRate, item.ExchangeDate, item.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                    _vatAmount = item.VatAmountVnd;
 
                     var acctCDNo = new CombineDebitTemplatReport
                     {
@@ -916,7 +992,7 @@ namespace eFMS.API.Accounting.DL.Services
                         Delivery = null,
                         HWBNO = model.HbLadingNo,
                         Description = item.NameEn,
-                        Quantity = (item.Quantity * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber,
+                        Quantity = (item.Quantity * exchangeRateToVnd * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber,
                         QUnit = "N/A",
                         UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
                         VAT = ((_vatAmount ?? 0) * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber, //Cộng thêm phần thập phân
@@ -945,7 +1021,7 @@ namespace eFMS.API.Accounting.DL.Services
                         Cuakhau = port,
                         DeliveryPlace = model.WarehouseName?.ToUpper(),
                         TransDate = null,
-                        Unit = item.CurrencyId,
+                        Unit = AccountingConstants.CURRENCY_LOCAL,
                         UnitPieaces = "N/A",
                         CustomDate = _clearance?.ClearanceDate,
                         JobNo = model.JobNo,
