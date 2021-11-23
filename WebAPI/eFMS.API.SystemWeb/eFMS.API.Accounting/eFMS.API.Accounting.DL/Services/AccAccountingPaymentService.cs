@@ -1957,11 +1957,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var isValidDebit = true;
                     if (invoiceDe.invc.Count() > 0)
                     {
-                        statusDebit = invoiceDe.invc.FirstOrDefault().Status;
+                        statusDebit = invoiceDe.invc.FirstOrDefault().Status; // Lay status hien tai cua inv debit nhung sau do tinh lai theo paid amount
                     }
                     if (invoiceObhGroup != null && invoiceObhGroup.Count() > 0)
                     {
                         // Check if obh payment have valid status on search
+                        // Lay status hien tai cua inv obh nhung sau do tinh lai theo paid amount
                         var unpaidOBH = invoiceObhGroup.Sum(x => x?.invc.FirstOrDefault().UnpaidAmountVnd ?? 0);
                         var totalPaidOBH = invoiceObhGroup.Sum(x => x?.invc.FirstOrDefault().TotalAmountVnd ?? 0);
                         if (unpaidOBH <= 0)
@@ -2099,7 +2100,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    // Get status obh invoice
+                    // Get status obh invoice theo thoi gian duoc chon
                     if ((payment.UnpaidAmountOBH - payment.PaidAmountOBH) == payment.UnpaidAmountOBH)
                     {
                         statusOBH = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -2117,7 +2118,7 @@ namespace eFMS.API.Accounting.DL.Services
                         isValidObh = false;
                     }
 
-                    if (!isValidObh && invoiceDe.invc.Count() == 0)
+                    if (!isValidObh && invoiceDe.invc.Count() == 0) // if invoice obh invalid and invoice debit is null then break
                     {
                         continue;
                     }
@@ -2126,9 +2127,10 @@ namespace eFMS.API.Accounting.DL.Services
                         var validObh = (item.payment.Any(x => x.Type == "OBH" && string.IsNullOrEmpty(x.PaymentRefNo)) && statusOBH == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) || (item.payment.Any(x => x.Type == "OBH" && x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date) && isValidObh);
                         if (!validObh)
                         {
+                            // if invoice obh is invalid => reset value to 0
                             invoiceObhGroup = null;
-                            payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
-                            if (invoiceDe.invc.Count() == 0)
+                            payment.UnpaidAmountOBH = payment.UnpaidAmountOBHUsd = payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
+                            if (invoiceDe.invc.Count() == 0)  // if invoice obh invalid and invoice debit is null then break
                             {
                                 continue;
                             }
@@ -2142,7 +2144,9 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         if (!isValidObh)
                         {
-                            payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
+                            // if invoice obh is invalid => reset value to 0
+                            invoiceObhGroup = null;
+                            payment.UnpaidAmountOBH = payment.UnpaidAmountOBHUsd = payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
                             foreach(var obh in payment.receiptDetail)
                             {
                                 obh.PaidAmountOBH = obh.PaidAmountOBHUsd = 0;
@@ -2150,7 +2154,7 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
-                    // Get status debit invoice
+                    // Get status debit invoice theo thoi gian duoc chon
                     if ((payment.UnpaidAmountInv - payment.PaidAmount) == payment.UnpaidAmountInv)
                     {
                         statusDebit = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -2169,8 +2173,10 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (!isValidDebit)
                     {
+                        // if invoice debit is invalid => reset value to 0
                         invoiceDe = null;
-                        payment.PaidAmount = payment.PaidAmountUsd = 0;
+                        payment.UnpaidAmountInv = payment.UnpaidAmountInvUsd = payment.PaidAmount = payment.PaidAmountUsd = 0;
+                        // if invoice debit invalid and invoice obh is null then break
                         if (!isValidObh || invoiceObhGroup == null || invoiceObhGroup.Count() == 0)
                         {
                             continue;
@@ -2182,7 +2188,7 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     payment.receiptDetail = payment.receiptDetail.Where(detail => detail.PaidAmount != 0 || detail.PaidAmountOBH != 0 || detail.PaidAmountUsd != 0 || detail.PaidAmountOBHUsd != 0).ToList();
                     #endregion
-
+                    // get info remain columns if inv debit or obh has valid value
                     var sur = item.surcharge.FirstOrDefault();
                     payment.PartnerId = item.grp.PartnerId;
                     payment.PartnerCode = item.grp.PartnerCode;
@@ -2197,7 +2203,6 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaymentTerm = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.PaymentTerm : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
                     if (invoiceDe?.invc.Count() > 0)
                     {
-                        //statusDebit = invoiceDe.invc.FirstOrDefault().Status;
                         payment.AccountNo = invoiceDe.invc.FirstOrDefault()?.AccountNo;
                     }
                     if (invoiceObhGroup?.Count() > 0)
@@ -2243,7 +2248,7 @@ namespace eFMS.API.Accounting.DL.Services
             results = results?.OrderBy(x => x.PartnerId).ThenBy(x => x.InvoiceDate).ThenBy(x => x.InvoiceNo).ToList();
 
             // Caculate advance amount
-            // [CR:23/11/21] get data adv with all type
+            // [CR:23/11/21] update get adv amount data with payment type and receipt method
             var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
             
             List<string> methodsAdv = new List<string> {
