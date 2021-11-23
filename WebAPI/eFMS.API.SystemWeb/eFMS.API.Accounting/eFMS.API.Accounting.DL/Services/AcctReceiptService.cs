@@ -1333,7 +1333,15 @@ namespace eFMS.API.Accounting.DL.Services
             string _paymentStatus = invoice.PaymentStatus;
             if (invoice.UnpaidAmount <= 0)
             {
-                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                if(invoice.TotalAmountVnd < 0) // Hóa đơn giảm
+                {
+                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                }
+                else
+                {
+                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+
+                }
             }
             else if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
             {
