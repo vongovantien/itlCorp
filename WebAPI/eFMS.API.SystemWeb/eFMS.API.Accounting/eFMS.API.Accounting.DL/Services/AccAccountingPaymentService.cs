@@ -1761,8 +1761,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                         {
                             var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+                            payment.UnpaidAmountOBH = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBH : obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBHUsd : obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                         }
                         foreach (var rcp in receiptGroup)
                         {
@@ -1995,7 +1995,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (receiptGroup != null && receiptGroup.Count() > 0)
                     {
                         var debitGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
-                        if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                        if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && debitGrp != null)
                         {
                             payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
                             payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
@@ -2003,8 +2003,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                         {
                             var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+                            payment.UnpaidAmountOBH = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBH : obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBHUsd : obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                         }
                         if (debitGrp != null || isValidObh)
                         {
@@ -2084,19 +2084,17 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var debitGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
                             var obhGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            if (debitGrp != null || obhGrp != null)
-                            {
-                                if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
-                                {
-                                    payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
-                                    payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
-                                }
-                                if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
-                                {
-                                    payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                                    payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
 
-                                }
+                            if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && debitGrp != null)
+                            {
+                                payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
+                                payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
+                            }
+                            if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && obhGrp != null)
+                            {
+                                payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                                payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+
                             }
                         }
                     }
@@ -2129,9 +2127,25 @@ namespace eFMS.API.Accounting.DL.Services
                         if (!validObh)
                         {
                             invoiceObhGroup = null;
+                            payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
                             if (invoiceDe.invc.Count() == 0)
                             {
                                 continue;
+                            }
+                            foreach (var obh in payment.receiptDetail)
+                            {
+                                obh.PaidAmountOBH = obh.PaidAmountOBHUsd = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!isValidObh)
+                        {
+                            payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
+                            foreach(var obh in payment.receiptDetail)
+                            {
+                                obh.PaidAmountOBH = obh.PaidAmountOBHUsd = 0;
                             }
                         }
                     }
@@ -2156,11 +2170,17 @@ namespace eFMS.API.Accounting.DL.Services
                     if (!isValidDebit)
                     {
                         invoiceDe = null;
+                        payment.PaidAmount = payment.PaidAmountUsd = 0;
                         if (!isValidObh || invoiceObhGroup == null || invoiceObhGroup.Count() == 0)
                         {
                             continue;
                         }
+                        foreach (var db in payment.receiptDetail)
+                        {
+                            db.PaidAmountOBH = db.PaidAmountOBHUsd = 0;
+                        }
                     }
+                    payment.receiptDetail = payment.receiptDetail.Where(detail => detail.PaidAmount != 0 || detail.PaidAmountOBH != 0 || detail.PaidAmountUsd != 0 || detail.PaidAmountOBHUsd != 0).ToList();
                     #endregion
 
                     var sur = item.surcharge.FirstOrDefault();
