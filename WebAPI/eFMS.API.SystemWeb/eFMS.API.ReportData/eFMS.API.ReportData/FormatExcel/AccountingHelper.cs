@@ -4766,7 +4766,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells[p, 6].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
 
             workSheet.Cells[p, 7].Merge = true;
-            workSheet.Cells[p, 7].Value = "ITL BOD"; //Value Giám đốc
+            workSheet.Cells[p, 7].Value = settlementExport.InfoSettlement.BOD; ; //Value Giám đốc
+            workSheet.Cells[p, 7].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+            workSheet.Cells[p, 7].Style.WrapText = true;
             #endregion--END_FORM--
         }
 

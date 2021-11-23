@@ -4814,15 +4814,16 @@ namespace eFMS.API.Accounting.DL.Services
         public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
         {
             string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
-
             #region -- Info Manager, Accoutant & Department --
             var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
             string _manager = string.Empty;
             string _accountant = string.Empty;
+            string _bod = string.Empty;
             if (_settlementApprove != null)
             {
                 _manager = string.IsNullOrEmpty(_settlementApprove.Manager) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Manager)?.EmployeeNameVn;
                 _accountant = string.IsNullOrEmpty(_settlementApprove.Accountant) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Accountant)?.EmployeeNameVn;
+                _bod = string.IsNullOrEmpty(_settlementApprove.Buhead) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Buhead)?.EmployeeNameVn;
             }
 
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
@@ -4863,6 +4864,12 @@ namespace eFMS.API.Accounting.DL.Services
                 Note=settlementPayment.Note,
                 SettlementCurrency=settlementPayment.SettlementCurrency
             };
+            
+            SOADate = soa?.SoaformDate,
+            SOANo = soa?.Soano,
+            ReasonForRequest = soa?.Note,
+            BOD = _bod,
+
             return infoSettlement;
         }
 
