@@ -4863,7 +4863,6 @@ namespace eFMS.API.Accounting.DL.Services
                 Supplier = partner?.ShortName,
                 Note=settlementPayment.Note,
                 SettlementCurrency=settlementPayment.SettlementCurrency,
-                ReasonForRequest = soa?.FirstOrDefault().Note,
                 BOD = _bod,
             };
                 
@@ -5102,7 +5101,7 @@ namespace eFMS.API.Accounting.DL.Services
                             HBL = s.Key.HBL,
                             CustomNo = s.Key.CustomNo,
                             SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
-                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, out advTotalAmount),
+                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo,s.FirstOrDefault().Currency, out advTotalAmount),
                             AdvanceTotalAmount = advTotalAmount,
                             BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
                         }).OrderByDescending(x => x.JobID).ToList();
@@ -5127,14 +5126,14 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         private List<SettlementExportDefault> getRequestList(List<SettlementExportDefault> data, string JobID,
-            string HBL, string MBL, string SettleNo, out decimal? advTotalAmount)
+            string HBL, string MBL, string SettleNo, string Currency, out decimal? advTotalAmount)
         {
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
             var settleDesc = DataContext.Get().Where(x => x.SettlementNo == SettleNo).FirstOrDefault().Note;
             //
-            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
-                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
+            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl, x.RequestCurrency })
+                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, z.RequestCurrency, Currency)) });
             var groupAdvReqByStatus = from advReq in groupAdvReq
                                       join advPay in advPayment on advReq.AdvanceNo equals advPay.AdvanceNo
                                       where advPay.StatusApproval == "Done"
@@ -5169,14 +5168,14 @@ namespace eFMS.API.Accounting.DL.Services
                     MBL = y.Key.MBL,
                     SettleNo = y.Key.SettleNo,
                     AdvanceNo = y.Key.AdvanceNo,
-                    SettlementAmount = y.Key.Currency=="VND"? Math.Round(y.Sum(z => (decimal)z.SettlementAmount),0):Math.Round(y.Sum(z => (decimal)z.SettlementAmount),2),
+                    SettlementAmount = y.Key.Currency == "VND" ? Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 0) : Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 2),
                     ApproveDate = y.Key.ApproveDate,
                     Currency = y.Key.Currency,
                     CustomNo = y.Key.CustomNo,
                     Description = settleDesc,
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
-                });;
+                }); ;
             var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
             groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
@@ -5216,6 +5215,7 @@ namespace eFMS.API.Accounting.DL.Services
             return output;
 
         }
+
 
         /// <summary>
         /// Get data for General Preview
