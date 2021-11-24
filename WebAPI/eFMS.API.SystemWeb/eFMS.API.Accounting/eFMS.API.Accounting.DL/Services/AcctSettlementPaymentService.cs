@@ -4862,14 +4862,11 @@ namespace eFMS.API.Accounting.DL.Services
                 SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
                 Supplier = partner?.ShortName,
                 Note=settlementPayment.Note,
-                SettlementCurrency=settlementPayment.SettlementCurrency
+                SettlementCurrency=settlementPayment.SettlementCurrency,
+                ReasonForRequest = soa?.FirstOrDefault().Note,
+                BOD = _bod,
             };
-            
-            SOADate = soa?.SoaformDate,
-            SOANo = soa?.Soano,
-            ReasonForRequest = soa?.Note,
-            BOD = _bod,
-
+                
             return infoSettlement;
         }
 
