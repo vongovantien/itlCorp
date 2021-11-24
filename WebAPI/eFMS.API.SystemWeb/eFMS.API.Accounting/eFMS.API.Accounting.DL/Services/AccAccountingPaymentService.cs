@@ -170,7 +170,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 results = results != null ? results.Union(advData) : advData;
             }
-            return results?.OrderBy(x => x.DatetimeSorting).ThenBy(x => x.RefNo).ThenBy(x=>x.Type);
+            return results?.OrderBy(x => x.DatetimeSorting).ThenBy(x => x.RefNo).ThenBy(x => x.Type);
         }
 
 
@@ -384,7 +384,7 @@ namespace eFMS.API.Accounting.DL.Services
                 payment.DueDate = invoice.FirstOrDefault().DueDate;
                 payment.OverdueDays = invoice.FirstOrDefault().OverdueDays;
                 payment.DatetimeSorting = invoice.FirstOrDefault().IssuedDate;
-                
+
                 payment.Status = item.Key.Type != "OBH" ? invoice.FirstOrDefault()?.Status : statusOBH;
                 payment.ExtendDays = invoice.FirstOrDefault()?.ExtendDays;
                 payment.PaidAmount = payment.PaidAmountVnd = payment.PaidAmountUsd = 0;
@@ -554,7 +554,7 @@ namespace eFMS.API.Accounting.DL.Services
             //        query = query.And(x => false);
             //        break;
             //}
-            if(criteria.OverDueDays != OverDueDate.All)
+            if (criteria.OverDueDays != OverDueDate.All)
             {
                 return null;
             }
@@ -1761,8 +1761,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                         {
                             var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+                            payment.UnpaidAmountOBH = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBH : obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBHUsd : obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                         }
                         foreach (var rcp in receiptGroup)
                         {
@@ -1935,7 +1935,7 @@ namespace eFMS.API.Accounting.DL.Services
                             var creator = string.IsNullOrEmpty(creatorId) ? string.Empty : userLst[creatorId].FirstOrDefault()?.EmployeeId;
                             payment.Creator = string.IsNullOrEmpty(creatorId) ? string.Empty : employeeLst[creator].FirstOrDefault()?.EmployeeNameEn;
                         }
-                        
+
                         results.Add(payment);
                     }
                     #endregion
@@ -1957,11 +1957,12 @@ namespace eFMS.API.Accounting.DL.Services
                     var isValidDebit = true;
                     if (invoiceDe.invc.Count() > 0)
                     {
-                        statusDebit = invoiceDe.invc.FirstOrDefault().Status;
+                        statusDebit = invoiceDe.invc.FirstOrDefault().Status; // Lay status hien tai cua inv debit nhung sau do tinh lai theo paid amount
                     }
                     if (invoiceObhGroup != null && invoiceObhGroup.Count() > 0)
                     {
                         // Check if obh payment have valid status on search
+                        // Lay status hien tai cua inv obh nhung sau do tinh lai theo paid amount
                         var unpaidOBH = invoiceObhGroup.Sum(x => x?.invc.FirstOrDefault().UnpaidAmountVnd ?? 0);
                         var totalPaidOBH = invoiceObhGroup.Sum(x => x?.invc.FirstOrDefault().TotalAmountVnd ?? 0);
                         if (unpaidOBH <= 0)
@@ -1995,7 +1996,7 @@ namespace eFMS.API.Accounting.DL.Services
                     if (receiptGroup != null && receiptGroup.Count() > 0)
                     {
                         var debitGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
-                        if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
+                        if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && debitGrp != null)
                         {
                             payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
                             payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
@@ -2003,8 +2004,8 @@ namespace eFMS.API.Accounting.DL.Services
                         if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
                         {
                             var obhGrp = receiptGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+                            payment.UnpaidAmountOBH = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBH : obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                            payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp == null ? payment.UnpaidAmountOBHUsd : obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                         }
                         if (debitGrp != null || isValidObh)
                         {
@@ -2084,24 +2085,22 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             var debitGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "DEBIT")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "DEBIT").FirstOrDefault();
                             var obhGrp = receiptRMGroup.Where(z => z.Payment.Any(pm => pm.PaymentType == "OBH")).FirstOrDefault()?.Payment.Where(z => z.PaymentType == "OBH").FirstOrDefault();
-                            if (debitGrp != null || obhGrp != null)
-                            {
-                                if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
-                                {
-                                    payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
-                                    payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
-                                }
-                                if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID)
-                                {
-                                    payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
-                                    payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
 
-                                }
+                            if (!string.IsNullOrEmpty(statusDebit) && statusDebit != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && debitGrp != null)
+                            {
+                                payment.UnpaidAmountInv = debitGrp?.UnpaidPaymentAmountVnd ?? 0;
+                                payment.UnpaidAmountInvUsd = debitGrp?.UnpaidPaymentAmountUsd ?? 0;
+                            }
+                            if (!string.IsNullOrEmpty(statusOBH) && isValidObh && statusOBH != AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID && obhGrp != null)
+                            {
+                                payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
+                                payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
+
                             }
                         }
                     }
 
-                    // Get status obh invoice
+                    // Get status obh invoice theo thoi gian duoc chon
                     if ((payment.UnpaidAmountOBH - payment.PaidAmountOBH) == payment.UnpaidAmountOBH)
                     {
                         statusOBH = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -2119,7 +2118,7 @@ namespace eFMS.API.Accounting.DL.Services
                         isValidObh = false;
                     }
 
-                    if (!isValidObh && invoiceDe.invc.Count() == 0)
+                    if (!isValidObh && invoiceDe.invc.Count() == 0) // if invoice obh invalid and invoice debit is null then break
                     {
                         continue;
                     }
@@ -2128,15 +2127,34 @@ namespace eFMS.API.Accounting.DL.Services
                         var validObh = (item.payment.Any(x => x.Type == "OBH" && string.IsNullOrEmpty(x.PaymentRefNo)) && statusOBH == AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID) || (item.payment.Any(x => x.Type == "OBH" && x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date) && isValidObh);
                         if (!validObh)
                         {
+                            // if invoice obh is invalid => reset value to 0
                             invoiceObhGroup = null;
-                            if (invoiceDe.invc.Count() == 0)
+                            payment.UnpaidAmountOBH = payment.UnpaidAmountOBHUsd = payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
+                            if (invoiceDe.invc.Count() == 0)  // if invoice obh invalid and invoice debit is null then break
                             {
                                 continue;
+                            }
+                            foreach (var obh in payment.receiptDetail)
+                            {
+                                obh.PaidAmountOBH = obh.PaidAmountOBHUsd = 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (!isValidObh)
+                        {
+                            // if invoice obh is invalid => reset value to 0
+                            invoiceObhGroup = null;
+                            payment.UnpaidAmountOBH = payment.UnpaidAmountOBHUsd = payment.PaidAmountOBH = payment.PaidAmountOBHUsd = 0;
+                            foreach(var obh in payment.receiptDetail)
+                            {
+                                obh.PaidAmountOBH = obh.PaidAmountOBHUsd = 0;
                             }
                         }
                     }
 
-                    // Get status debit invoice
+                    // Get status debit invoice theo thoi gian duoc chon
                     if ((payment.UnpaidAmountInv - payment.PaidAmount) == payment.UnpaidAmountInv)
                     {
                         statusDebit = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
@@ -2155,14 +2173,22 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (!isValidDebit)
                     {
+                        // if invoice debit is invalid => reset value to 0
                         invoiceDe = null;
+                        payment.UnpaidAmountInv = payment.UnpaidAmountInvUsd = payment.PaidAmount = payment.PaidAmountUsd = 0;
+                        // if invoice debit invalid and invoice obh is null then break
                         if (!isValidObh || invoiceObhGroup == null || invoiceObhGroup.Count() == 0)
                         {
                             continue;
                         }
+                        foreach (var db in payment.receiptDetail)
+                        {
+                            db.PaidAmountOBH = db.PaidAmountOBHUsd = 0;
+                        }
                     }
+                    payment.receiptDetail = payment.receiptDetail.Where(detail => detail.PaidAmount != 0 || detail.PaidAmountOBH != 0 || detail.PaidAmountUsd != 0 || detail.PaidAmountOBHUsd != 0).ToList();
                     #endregion
-
+                    // get info remain columns if inv debit or obh has valid value
                     var sur = item.surcharge.FirstOrDefault();
                     payment.PartnerId = item.grp.PartnerId;
                     payment.PartnerCode = item.grp.PartnerCode;
@@ -2177,7 +2203,6 @@ namespace eFMS.API.Accounting.DL.Services
                     payment.PaymentTerm = invoiceDe?.invc.Count() > 0 ? invoiceDe?.invc.FirstOrDefault()?.PaymentTerm : invoiceObhGroup.FirstOrDefault()?.invc.FirstOrDefault()?.PaymentTerm;
                     if (invoiceDe?.invc.Count() > 0)
                     {
-                        //statusDebit = invoiceDe.invc.FirstOrDefault().Status;
                         payment.AccountNo = invoiceDe.invc.FirstOrDefault()?.AccountNo;
                     }
                     if (invoiceObhGroup?.Count() > 0)
@@ -2223,27 +2248,64 @@ namespace eFMS.API.Accounting.DL.Services
             results = results?.OrderBy(x => x.PartnerId).ThenBy(x => x.InvoiceDate).ThenBy(x => x.InvoiceNo).ToList();
 
             // Caculate advance amount
+            // [CR:23/11/21] update get adv amount data with payment type and receipt method
             var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
-            var paymentAdv = from dataAdv in DataContext.Get(x => x.Type == "ADV" || x.Type == "COLL_OBH")
-                             join rcpt in receiptData on dataAdv.ReceiptId equals rcpt.Id
+            
+            List<string> methodsAdv = new List<string> {
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK,
+                AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH,
+                AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL,
+            };
+            var receiptMethod = from rcpt in receiptData.Where(x => methodsAdv.Any(z => z == x.PaymentMethod))
+                                join payment in DataContext.Get() on rcpt.Id equals payment.ReceiptId
+                                select new
+                                {
+                                    PartnerId = payment.PartnerId,
+                                    payment.OfficeId,
+                                    CusAdvanceAmountUsd = rcpt.CusAdvanceAmountUsd ?? 0,
+                                    CusAdvanceAmountVnd = rcpt.CusAdvanceAmountVnd ?? 0,
+                                    rcpt.PaymentDate,
+                                    ReceiptTimeCreated = rcpt.DatetimeCreated,
+                                    AgreementAdvanceAmountUsd = rcpt.AgreementAdvanceAmountUsd ?? 0,
+                                    AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
+                                };
+            var receiptAdv = from payment in DataContext.Get(x => x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
+                             join rcpt in receiptData on payment.ReceiptId equals rcpt.Id
                              select new
                              {
-                                 dataAdv,
+                                 PartnerId = payment.PartnerId,
+                                 payment.OfficeId,
                                  CusAdvanceAmountUsd = rcpt.CusAdvanceAmountUsd ?? 0,
                                  CusAdvanceAmountVnd = rcpt.CusAdvanceAmountVnd ?? 0,
                                  rcpt.PaymentDate,
+                                 ReceiptTimeCreated = rcpt.DatetimeCreated,
                                  AgreementAdvanceAmountUsd = rcpt.AgreementAdvanceAmountUsd ?? 0,
                                  AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
                              };
+            var paymentAdv = receiptMethod.Union(receiptAdv);
             #region Get ADVANCE AMOUNT row
-            if (criteria.IssuedDate != null)
+            // [CR:23/11/21: get adv amount với PT có payment date gần nhất]
+            if (criteria.IssuedDate != null || criteria.DueDate != null || criteria.FromUpdatedDate != null)
             {
                 foreach (var item in grpPartner)
                 {
                     var payment = new AccountingCustomerPaymentExport();
-                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.IssuedDate.Value.Date && (x.AgreementAdvanceAmountVnd > 0 || x.AgreementAdvanceAmountUsd > 0)).OrderByDescending(x => x.dataAdv.PaidDate).ThenByDescending(x => x.dataAdv.DatetimeCreated).FirstOrDefault();
-
-                    if (pm != null)
+                    var pm = paymentAdv.Where(x => x.PartnerId == item.Key);
+                    if (criteria.IssuedDate != null)
+                    {
+                        pm = pm.Where(x => x.PaymentDate.Value.Date <= criteria.IssuedDate.Value.Date);
+                    }
+                    else if (criteria.DueDate != null)
+                    {
+                        pm = pm.Where(x => x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date);
+                    }
+                    else if (criteria.FromUpdatedDate != null)
+                    {
+                        pm = pm.Where(x => (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
+                    }
+                    var pmAdvOrder = pm.OrderByDescending(x => x.PaymentDate).ThenByDescending(x => x.ReceiptTimeCreated).FirstOrDefault();
+                    if (pmAdvOrder != null)
                     {
 
                         var indexOfLastGrp = results.IndexOf(item.Last());
@@ -2252,9 +2314,9 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.PartnerName = item.FirstOrDefault().PartnerName;
                         payment.ParentCode = item.FirstOrDefault().ParentCode;
                         payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.BranchName = officeData[(Guid)pm.dataAdv.OfficeId].FirstOrDefault()?.ShortName;
-                        payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
-                        payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
+                        payment.BranchName = officeData[(Guid)pmAdvOrder.OfficeId].FirstOrDefault()?.ShortName;
+                        payment.AdvanceAmountVnd = pmAdvOrder.AgreementAdvanceAmountVnd;
+                        payment.AdvanceAmountUsd = pmAdvOrder.AgreementAdvanceAmountUsd;
                         if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                         {
                             results.Insert(indexOfLastGrp + 1, payment);
@@ -2262,75 +2324,115 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
-            else if (criteria.DueDate != null)
-            {
-                foreach (var item in grpPartner)
-                {
-                    var payment = new AccountingCustomerPaymentExport();
-                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date && (x.AgreementAdvanceAmountVnd > 0 || x.AgreementAdvanceAmountUsd > 0)).OrderByDescending(x => x.dataAdv.PaidDate).ThenByDescending(x => x.dataAdv.DatetimeCreated).FirstOrDefault();
+            #region Remove Old <=[CR:23/11/21: get adv amount với PT có payment date gần nhất]
+            //var paymentAdv = from dataAdv in DataContext.Get(x => x.Type == "ADV" || x.Type == "COLL_OBH")
+            //                 join rcpt in receiptData on dataAdv.ReceiptId equals rcpt.Id
+            //                 select new
+            //                 {
+            //                     dataAdv,
+            //                     CusAdvanceAmountUsd = rcpt.CusAdvanceAmountUsd ?? 0,
+            //                     CusAdvanceAmountVnd = rcpt.CusAdvanceAmountVnd ?? 0,
+            //                     rcpt.PaymentDate,
+            //                     AgreementAdvanceAmountUsd = rcpt.AgreementAdvanceAmountUsd ?? 0,
+            //                     AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
+            //                 };
+            //if (criteria.IssuedDate != null)
+            //{
+            //    foreach (var item in grpPartner)
+            //    {
+            //        var payment = new AccountingCustomerPaymentExport();
+            //        var pm = paymentAdv.Where(x => x.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.IssuedDate.Value.Date).OrderByDescending(x => x.PaymentDate).ThenByDescending(x => x.ReceiptTimeCreated).FirstOrDefault();
 
-                    if (pm != null)
-                    {
+            //        if (pm != null)
+            //        {
 
-                        var indexOfLastGrp = results.IndexOf(item.Last());
-                        payment.PartnerId = item.FirstOrDefault().PartnerId;
-                        payment.PartnerCode = item.FirstOrDefault().PartnerCode;
-                        payment.PartnerName = item.FirstOrDefault().PartnerName;
-                        payment.ParentCode = item.FirstOrDefault().ParentCode;
-                        payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.BranchName = officeData[(Guid)pm.dataAdv.OfficeId].FirstOrDefault()?.ShortName;
-                        payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
-                        payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
-                    }
-                }
-            }
-            else if (criteria.FromUpdatedDate != null)
-            {
-                foreach (var item in grpPartner)
-                {
-                    var payment = new AccountingCustomerPaymentExport();
-                    var receiptList = new List<AccountingReceiptDetail>();
-                    foreach (var it in item)
-                    {
-                        receiptList.AddRange(it.receiptDetail);
-                    }
-                    var pm = paymentAdv.Where(x => x.dataAdv.PartnerId == item.FirstOrDefault().PartnerId && (x.dataAdv.PaidDate != null && x.dataAdv.PaidDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.dataAdv.PaidDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
-                    foreach (var dt in pm)
-                    {
-                        var detail = new AccountingReceiptDetail();
-                        detail.ReceiptId = dt.dataAdv.ReceiptId;
-                        detail.CusAdvanceAmountVnd = dt.CusAdvanceAmountVnd;
-                        detail.CusAdvanceAmountUsd = dt.CusAdvanceAmountUsd;
-                        receiptList.Add(detail);
-                    }
+            //            var indexOfLastGrp = results.IndexOf(item.Last());
+            //            payment.PartnerId = item.FirstOrDefault().PartnerId;
+            //            payment.PartnerCode = item.FirstOrDefault().PartnerCode;
+            //            payment.PartnerName = item.FirstOrDefault().PartnerName;
+            //            payment.ParentCode = item.FirstOrDefault().ParentCode;
+            //            payment.BillingRefNo = "ADVANCE AMOUNT";
+            //            payment.BranchName = officeData[(Guid)pm.OfficeId].FirstOrDefault()?.ShortName;
+            //            payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
+            //            payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
+            //            if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+            //            {
+            //                results.Insert(indexOfLastGrp + 1, payment);
+            //            }
+            //        }
+            //    }
+            //}
+            //else if (criteria.DueDate != null)
+            //{
+            //    foreach (var item in grpPartner)
+            //    {
+            //        var payment = new AccountingCustomerPaymentExport();
+            //        var pm = paymentAdv.Where(x => x.PartnerId == item.Key && x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date).OrderByDescending(x => x.PaymentDate).ThenByDescending(x => x.ReceiptTimeCreated).FirstOrDefault();
 
-                    receiptList = receiptList.GroupBy(x => x.ReceiptId).Select(x => x.FirstOrDefault()).ToList();
-                    if (pm != null && pm.Count() > 0)
-                    {
-                        var indexOfLastGrp = results.IndexOf(item.Last());
-                        payment.PartnerId = item.FirstOrDefault().PartnerId;
-                        payment.PartnerCode = item.FirstOrDefault().PartnerCode;
-                        payment.PartnerName = item.FirstOrDefault().PartnerName;
-                        payment.ParentCode = item.FirstOrDefault().ParentCode;
-                        payment.BillingRefNo = "ADVANCE AMOUNT";
-                        payment.AdvanceAmountVnd = pm.Sum(x => x.dataAdv.PaymentAmountVnd ?? 0);
-                        payment.AdvanceAmountVnd += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
+            //        if (pm != null)
+            //        {
 
-                        payment.AdvanceAmountUsd = pm.Sum(x => x.dataAdv.PaymentAmountUsd ?? 0);
-                        payment.AdvanceAmountUsd += receiptList.Sum(x => x.CusAdvanceAmountUsd ?? 0);
-                        payment.BranchName = pm.FirstOrDefault().dataAdv == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().dataAdv.OfficeId].FirstOrDefault()?.ShortName;
-                        if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
-                        {
-                            results.Insert(indexOfLastGrp + 1, payment);
-                        }
-                    }
-                }
-            }
-            else
+            //            var indexOfLastGrp = results.IndexOf(item.Last());
+            //            payment.PartnerId = item.FirstOrDefault().PartnerId;
+            //            payment.PartnerCode = item.FirstOrDefault().PartnerCode;
+            //            payment.PartnerName = item.FirstOrDefault().PartnerName;
+            //            payment.ParentCode = item.FirstOrDefault().ParentCode;
+            //            payment.BillingRefNo = "ADVANCE AMOUNT";
+            //            payment.BranchName = officeData[(Guid)pm.OfficeId].FirstOrDefault()?.ShortName;
+            //            payment.AdvanceAmountVnd = pm.AgreementAdvanceAmountVnd;
+            //            payment.AdvanceAmountUsd = pm.AgreementAdvanceAmountUsd;
+            //            if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+            //            {
+            //                results.Insert(indexOfLastGrp + 1, payment);
+            //            }
+            //        }
+            //    }
+            //}
+            //else if (criteria.FromUpdatedDate != null)
+            //{
+            //    foreach (var item in grpPartner)
+            //    {
+            //        var payment = new AccountingCustomerPaymentExport();
+            //        var receiptList = new List<AccountingReceiptDetail>();
+            //        foreach (var it in item)
+            //        {
+            //            receiptList.AddRange(it.receiptDetail);
+            //        }
+            //        var pm = paymentAdv.Where(x => x.PartnerId == item.FirstOrDefault().PartnerId && (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
+
+            //        foreach (var dt in pm)
+            //        {
+            //            var detail = new AccountingReceiptDetail();
+            //            detail.ReceiptId = dt.dataAdv.ReceiptId;
+            //            detail.CusAdvanceAmountVnd = dt.CusAdvanceAmountVnd;
+            //            detail.CusAdvanceAmountUsd = dt.CusAdvanceAmountUsd;
+            //            receiptList.Add(detail);
+            //        }
+
+            //        receiptList = receiptList.GroupBy(x => x.ReceiptId).Select(x => x.FirstOrDefault()).ToList();
+            //        if (pm != null && pm.Count() > 0)
+            //        {
+            //            var indexOfLastGrp = results.IndexOf(item.Last());
+            //            payment.PartnerId = item.FirstOrDefault().PartnerId;
+            //            payment.PartnerCode = item.FirstOrDefault().PartnerCode;
+            //            payment.PartnerName = item.FirstOrDefault().PartnerName;
+            //            payment.ParentCode = item.FirstOrDefault().ParentCode;
+            //            payment.BillingRefNo = "ADVANCE AMOUNT";
+            //            payment.AdvanceAmountVnd = pm.Sum(x => x.dataAdv.PaymentAmountVnd ?? 0);
+            //            payment.AdvanceAmountVnd += receiptList.Sum(x => x.CusAdvanceAmountVnd ?? 0);
+
+            //            payment.AdvanceAmountUsd = pm.Sum(x => x.dataAdv.PaymentAmountUsd ?? 0);
+            //            payment.AdvanceAmountUsd += receiptList.Sum(x => x.CusAdvanceAmountUsd ?? 0);
+            //            payment.BranchName = pm.FirstOrDefault().dataAdv == null ? string.Empty : officeData[(Guid)pm.FirstOrDefault().dataAdv.OfficeId].FirstOrDefault()?.ShortName;
+            //            if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
+            //            {
+            //                results.Insert(indexOfLastGrp + 1, payment);
+            //            }
+            //        }
+            //    }
+            //}
+            #endregion
+            else // Case: filter without date search
             {
                 foreach (var item in grpPartner)
                 {
