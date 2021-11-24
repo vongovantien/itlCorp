@@ -1328,12 +1328,28 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private string GetAndUpdateStatusInvoice(AccAccountingManagement invoice)
+        private string GetAndUpdateStatusInvoice(AccAccountingManagement invoice, SaveAction action = SaveAction.SAVEDONE)
         {
             string _paymentStatus = invoice.PaymentStatus;
             if (invoice.UnpaidAmount <= 0)
             {
-                _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                if(action == SaveAction.SAVECANCEL)
+                {
+                    if (invoice.TotalAmountVnd < 0) // Hóa đơn giảm
+                    {
+                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID;
+                    }
+                    else
+                    {
+                        _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+
+                    }
+                }
+                else
+                {
+                    _paymentStatus = AccountingConstants.ACCOUNTING_PAYMENT_STATUS_PAID;
+                }
+
             }
             else if (invoice.UnpaidAmount > 0 && invoice.UnpaidAmount < invoice.TotalAmount)
             {
@@ -1622,7 +1638,7 @@ namespace eFMS.API.Accounting.DL.Services
                         invoice.PaidAmount = invoice.PaidAmountUsd;
                         invoice.UnpaidAmount = invoice.UnpaidAmountUsd;
                     }
-                    invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice);
+                    invoice.PaymentStatus = GetAndUpdateStatusInvoice(invoice, SaveAction.SAVECANCEL);
 
                     hsInvoiceUpdate = acctMngtRepository.Update(invoice, x => x.Id == invoice.Id);
 
