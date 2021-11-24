@@ -700,10 +700,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
                         var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
                         var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
-                        remainDb = remainDb < 0 ? 0 : remainDb;
-                        remainObh = remainObh < 0 ? 0 : remainObh;
-                        remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
-                        remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
+                        //remainDb = remainDb < 0 ? 0 : remainDb;
+                        //remainObh = remainObh < 0 ? 0 : remainObh;
+                        //remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
+                        //remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
                         // Sum total
                         sumRemainDb += remainDb;
                         sumRemainObh += remainObh;
