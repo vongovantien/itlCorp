@@ -992,9 +992,9 @@ namespace eFMS.API.Accounting.DL.Services
                         Delivery = null,
                         HWBNO = model.HbLadingNo,
                         Description = item.NameEn,
-                        Quantity = (item.Quantity * exchangeRateToVnd * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber,
+                        Quantity = item.AmountVnd,
                         QUnit = "N/A",
-                        UnitPrice = (item.UnitPrice ?? 0) + _decimalNumber, //Cộng thêm phần thập phân
+                        UnitPrice = 1, //Cộng thêm phần thập phân
                         VAT = ((_vatAmount ?? 0) * (item.BillingType == "Debit" ? 1 : -1)) + _decimalNumber, //Cộng thêm phần thập phân
                         Debit = _decimalNumber, //Cộng thêm phần thập phân
                         Credit = _decimalNumber, //Cộng thêm phần thập phân
