@@ -2441,12 +2441,22 @@ namespace eFMS.API.Documentation.DL.Services
                 VoucherIddate = s.VoucherIddate
             });
 
-            var query = from cdnote in cdNotes
-                        join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
-                        select new { cdnote, charge };
+            //var query = from cdnote in cdNotes
+            //            join charge in charges on cdnote.Code equals (charge.DebitNo ?? charge.CreditNo)
+            //            select new { cdnote, charge };
 
-            var grpQuery = query.GroupBy(g => new {
-                ReferenceNo = g.charge.DebitNo ?? g.charge.CreditNo,
+            var query = from cdnote in cdNotes
+                        join charge in charges on cdnote.Code equals (charge.DebitNo)
+                        select new { cdnote, charge, codeGroup = charge.DebitNo };
+
+            var query2 = from cdnote in cdNotes
+                         join charge in charges on cdnote.Code equals (charge.CreditNo)
+                         select new { cdnote, charge, codeGroup = charge.CreditNo };
+
+            var allData = query.Union(query2);
+
+            var grpQuery = allData.GroupBy(g => new {
+                ReferenceNo = g.codeGroup,
                 Currency = g.charge.CurrencyId
             }).Select(se => new {
                 ReferenceNo = se.Key.ReferenceNo,
