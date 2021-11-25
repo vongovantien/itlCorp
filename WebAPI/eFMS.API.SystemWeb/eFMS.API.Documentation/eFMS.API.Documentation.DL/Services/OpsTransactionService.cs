@@ -766,6 +766,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     var clearance = UpdateInfoConvertClearance(model);
                     clearance.JobNo = opsTransaction.JobNo;
+
                     customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                 }
                 else
@@ -786,6 +787,8 @@ namespace eFMS.API.Documentation.DL.Services
 
         private OpsTransaction GetNewShipmentToConvert(string productService, CustomsDeclarationModel model)
         {
+            // config setting replicate
+
             var opsTransaction = new OpsTransaction
             {
                 Id = Guid.NewGuid(),
