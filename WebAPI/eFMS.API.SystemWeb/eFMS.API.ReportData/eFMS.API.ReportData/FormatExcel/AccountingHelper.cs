@@ -755,6 +755,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("AdvanceAmountUsd", item.AdvanceAmountUsd);
                         listKeyData.Add("TotalAmountUsdAdv", 0);
                         listKeyData.Add("BranchAdv", item.BranchName);
+                        listKeyData.Add("SalesmanAdv", item.Salesman);
                     }
                     excel.SetData(listKeyData);
                     startRow++;
