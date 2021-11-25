@@ -3699,12 +3699,12 @@ namespace eFMS.API.ReportData.FormatExcel
         private void SetWidthColumnExcelDetailSettlementPaymentSOA(ExcelWorksheet workSheet)
         {
             workSheet.Column(1).Width = 30; //Cột A
-            workSheet.Column(2).Width = 20; //Cột B
-            workSheet.Column(3).Width = 20; //Cột C
-            workSheet.Column(4).Width = 30; //Cột D
-            workSheet.Column(5).Width = 30; //Cột E
-            workSheet.Column(6).Width = 20; //Cột F
-            workSheet.Column(7).Width = 20; //Cột G
+            workSheet.Column(2).Width = 12; //Cột B
+            workSheet.Column(3).Width = 12; //Cột C
+            workSheet.Column(4).Width = 25; //Cột D
+            workSheet.Column(5).Width = 15; //Cột E
+            workSheet.Column(6).Width = 25; //Cột F
+            workSheet.Column(7).Width = 25; //Cột G
         }
 
         private List<string> GetHeaderExcelDetailSettlementPayment(string language)
@@ -3831,15 +3831,15 @@ namespace eFMS.API.ReportData.FormatExcel
                 "PAYMENT REQUEST", //2
                 "Requester:", //3
                 "Date SOA:", //4
-                "SOA No.:", //5
+                "SOA No:", //5
                 "Department:", //6
                 "Reason for request", //7
-                "Job ID:", //8
-                "Invoice No", //9
-                "Custom No:", //10
+                "Job ID", //8
+                "Invoice No.", //9
+                "Custom No.", //10
                 "H-BL No.\n(HAWB):", //11
                 "M-BL No.\n(MAWB):", //12
-                "Amount(VND)",//13
+                "Amount (VND)",//13
                 "OBH",//14
                 "Credit",//15
                 "Total Amount",//16
@@ -4408,7 +4408,7 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         private void BindingDataDetailSettlementPaymentSOAExcel(ExcelWorksheet workSheet, SettlementExport settlementExport, string language)
         {
-            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 11));
+            workSheet.Cells.Style.Font.SetFromFont(new Font("Times New Roman", 9));
             workSheet.Cells.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 
             SetWidthColumnExcelDetailSettlementPaymentSOA(workSheet);
@@ -4421,7 +4421,6 @@ namespace eFMS.API.ReportData.FormatExcel
             }
 
             List<string> headers = GetHeaderExcelDetailSettlementPaymentSOA(language);
-
             #region #Header
             workSheet.Cells["F1:L1"].Merge = true;
             workSheet.Cells["F1"].Value = headers[0];
@@ -4449,21 +4448,20 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A5"].Style.Font.Bold = true;
             workSheet.Cells["C5"].Value = settlementExport.InfoSettlement.Requester;
 
-            workSheet.Cells["F5"].Value = headers[4]; //Ngày SOA
-            workSheet.Cells["F5"].Style.Font.Bold = true;
-            workSheet.Cells["G5"].Value = settlementExport.InfoSettlement.SOADate;
-            workSheet.Cells["G5"].Style.Numberformat.Format = "dd MMM, yyyy";
-            workSheet.Cells["G5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
+            workSheet.Cells["E5"].Value = headers[4]; //Ngày SOA
+            workSheet.Cells["E5"].Style.Font.Bold = true;
+            workSheet.Cells["F5"].Value = settlementExport.InfoSettlement.SOADate;
+            workSheet.Cells["F5"].Style.Numberformat.Format = "dd MMM, yyyy";
+            workSheet.Cells["F5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
             workSheet.Cells["A6:B6"].Merge = true;
             workSheet.Cells["A6"].Value = headers[6]; //Bộ phận
             workSheet.Cells["A6"].Style.Font.Bold = true;
             workSheet.Cells["C6"].Value = settlementExport.InfoSettlement.Department;
 
-            workSheet.Cells["A7:B7"].Merge = true;
             workSheet.Cells["A7"].Value = headers[22]; //Supplier
             workSheet.Cells["A7"].Style.Font.Bold = true;
-            workSheet.Cells["C7"].Value = settlementExport.InfoSettlement.Supplier;
+            workSheet.Cells["B7"].Value = settlementExport.InfoSettlement.Supplier;
 
             workSheet.Cells["A8"].Value = headers[7]; //Reson for request
             workSheet.Cells["A8"].Style.Font.Bold = true;
@@ -4474,34 +4472,34 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A11"].Style.Font.Bold = true;
             workSheet.Cells["B11"].Value = settlementExport.InfoSettlement.PaymentMethod;
 
-            workSheet.Cells["F6"].Value = headers[5]; //Số SOA
-            workSheet.Cells["F6"].Style.Font.Bold = true;
-            workSheet.Cells["G6"].Value = settlementExport.InfoSettlement.SOANo;
+            workSheet.Cells["E6"].Value = headers[5]; //Số SOA
+            workSheet.Cells["E6"].Style.Font.Bold = true;
+            workSheet.Cells["F6"].Value = settlementExport.InfoSettlement.SOANo;
 
             // By Bank transfer
-            workSheet.Cells["F12"].Value = headers[23];
-            workSheet.Cells["F12"].Style.Font.Bold = true;
-            workSheet.Cells["G12"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("BANK") ? "X" : string.Empty;
+            workSheet.Cells["E12"].Value = headers[23];
+            workSheet.Cells["E12"].Style.Font.Bold = true;
+            workSheet.Cells["F12"].Value = settlementExport.InfoSettlement.PaymentMethod.ToUpper().Contains("BANK") ? "X" : string.Empty;
 
             // Beneficiary
-            workSheet.Cells["F13"].Value = headers[24];
-            workSheet.Cells["F13"].Style.Font.Bold = true;
-            workSheet.Cells["G13"].Value = settlementExport.InfoSettlement.BankAccountName;
+            workSheet.Cells["E13"].Value = headers[24];
+            workSheet.Cells["E13"].Style.Font.Bold = true;
+            workSheet.Cells["F13"].Value = settlementExport.InfoSettlement.BankAccountName;
 
             // Acc No
-            workSheet.Cells["F14"].Value = headers[25];
-            workSheet.Cells["F14"].Style.Font.Bold = true;
-            workSheet.Cells["G14"].Value = settlementExport.InfoSettlement.BankAccountNo;
+            workSheet.Cells["E14"].Value = headers[25];
+            workSheet.Cells["E14"].Style.Font.Bold = true;
+            workSheet.Cells["F14"].Value = settlementExport.InfoSettlement.BankAccountNo;
 
             // Bank
-            workSheet.Cells["F15"].Value = headers[26];
-            workSheet.Cells["F15"].Style.Font.Bold = true;
-            workSheet.Cells["G15"].Value = settlementExport.InfoSettlement.BankName;
+            workSheet.Cells["E15"].Value = headers[26];
+            workSheet.Cells["E15"].Style.Font.Bold = true;
+            workSheet.Cells["F15"].Value = settlementExport.InfoSettlement.BankName;
 
             // Bank Code
-            workSheet.Cells["F16"].Value = headers[27];
-            workSheet.Cells["F16"].Style.Font.Bold = true;
-            workSheet.Cells["G16"].Value = settlementExport.InfoSettlement.BankCode;
+            workSheet.Cells["E16"].Value = headers[27];
+            workSheet.Cells["E16"].Style.Font.Bold = true;
+            workSheet.Cells["F16"].Value = settlementExport.InfoSettlement.BankCode;
 
             // By Cash
             workSheet.Cells["B12"].Value = headers[28];
@@ -4571,9 +4569,9 @@ namespace eFMS.API.ReportData.FormatExcel
             {
 
                 var OBHCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.SurType == "OBH");
-
-                workSheet.Cells[k, 6].Value = headers[14];
+                
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
+                workSheet.Cells[k, 6].Value = headers[14];
                 workSheet.Cells[k, 6].Value = OBHCharges.Select(s => s.ChargeAmount).Sum();
                 _sumTotalOBH += OBHCharges.Select(s => s.ChargeAmount ?? 0).Sum();
                 workSheet.Cells[k, 6].Style.Font.Bold = true;
@@ -4591,8 +4589,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
                 var CreditInvoiceCharges = settlementExport.ShipmentsSettlement[i].ShipmentCharges.Where(w => w.SurType == "BUY");
 
-                workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
+                workSheet.Cells[k, 7].Value = headers[15];
                 workSheet.Cells[k, 7].Value = CreditInvoiceCharges.Select(s => s.ChargeAmount).Sum();
                 _sumTotalCredit += CreditInvoiceCharges.Select(s => s.ChargeAmount ?? 0).Sum();
                 workSheet.Cells[k, 7].Style.Font.Bold = true;
