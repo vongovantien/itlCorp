@@ -278,9 +278,9 @@ namespace eFMS.API.ReportData.FormatExcel
         /// Delete row in excel file
         /// </summary>
         /// <param name="_row">row to delete</param>
-        public void DeleteRow(int _row)
+        public void DeleteRow(int _row, int numsDel = 1)
         {
-            Worksheet.DeleteRow(_row);
+            Worksheet.DeleteRow(_row, numsDel);
         }
 
         /// <summary>
