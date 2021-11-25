@@ -664,6 +664,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
+                var isExistGroup = true;
                 var isExistDetail = true;
                 var isExistAdvRow = true;
                 if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate == null)
@@ -676,7 +677,18 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 if (!isExistDetail)
                 {
-                    excel.DeleteRow(7);
+                    if (customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == customerPayment.Count) // If report only have adv amount row
+                    {
+                        isExistGroup = false;
+                    }
+                    if (!isExistGroup)
+                    {
+                        excel.DeleteRow(6, 2);
+                    }
+                    else
+                    {
+                        excel.DeleteRow(7);
+                    }
                     if (!isExistAdvRow)
                     {
                         excel.DeleteRow(7);
@@ -746,7 +758,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     }
                     else
                     {
-                        excel.IndexOfGroup = 2;
+                        excel.IndexOfGroup = isExistGroup ? 2 : 1;
                         excel.SetGroupsTable();
                         sumAdvanceAmountVnd += (item.AdvanceAmountVnd ?? 0);
                         sumAdvanceAmountUsd += (item.AdvanceAmountUsd ?? 0);
