@@ -2249,16 +2249,15 @@ namespace eFMS.API.Accounting.DL.Services
 
             // Caculate advance amount
             // [CR:23/11/21] update get adv amount data with payment type and receipt method
-            var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
-            
+            #region Get ADVANCE AMOUNT row
             List<string> methodsAdv = new List<string> {
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE,
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_BANK,
                 AccountingConstants.PAYMENT_METHOD_CLEAR_ADVANCE_CASH,
                 AccountingConstants.PAYMENT_METHOD_COLL_INTERNAL,
             };
-            var receiptMethod = from rcpt in receiptData.Where(x => methodsAdv.Any(z => z == x.PaymentMethod))
-                                join payment in DataContext.Get() on rcpt.Id equals payment.ReceiptId
+            var receiptMethod = from rcpt in receiptData.Where(x => methodsAdv.Any(z => z == x.PaymentMethod) && (string.IsNullOrEmpty(criteria.PartnerId) || criteria.PartnerId == x.CustomerId))
+                                join payment in DataContext.Get(x => (string.IsNullOrEmpty(criteria.PartnerId) || criteria.PartnerId == x.PartnerId)) on rcpt.Id equals payment.ReceiptId
                                 select new
                                 {
                                     PartnerId = payment.PartnerId,
@@ -2270,7 +2269,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     AgreementAdvanceAmountUsd = rcpt.AgreementAdvanceAmountUsd ?? 0,
                                     AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
                                 };
-            var receiptAdv = from payment in DataContext.Get(x => x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH)
+            var receiptAdv = from payment in DataContext.Get(x => x.Type == AccountingConstants.PAYMENT_TYPE_CODE_ADVANCE || x.Type == AccountingConstants.PAYMENT_TYPE_CODE_COLLECT_OBH && (string.IsNullOrEmpty(criteria.PartnerId) || criteria.PartnerId == x.PartnerId))
                              join rcpt in receiptData on payment.ReceiptId equals rcpt.Id
                              select new
                              {
@@ -2284,42 +2283,65 @@ namespace eFMS.API.Accounting.DL.Services
                                  AgreementAdvanceAmountVnd = rcpt.AgreementAdvanceAmountVnd ?? 0
                              };
             var paymentAdv = receiptMethod.Union(receiptAdv);
-            #region Get ADVANCE AMOUNT row
+
+            var listAdvRemain = new List<AccountingCustomerPaymentExport>();
+            var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
+            if (grpPartner.Count() == 0 && !string.IsNullOrEmpty(criteria.PartnerId)) // if search only 1 partner then get this partner
+            {
+                partners = partners.Where(x => x.Id == criteria.PartnerId);
+            }
             // [CR:23/11/21: get adv amount với PT có payment date gần nhất]
             if (criteria.IssuedDate != null || criteria.DueDate != null || criteria.FromUpdatedDate != null)
             {
-                foreach (var item in grpPartner)
+                if (criteria.IssuedDate != null)
+                {
+                    paymentAdv = paymentAdv.Where(x => x.PaymentDate.Value.Date <= criteria.IssuedDate.Value.Date);
+                }
+                else if (criteria.DueDate != null)
+                {
+                    paymentAdv = paymentAdv.Where(x => x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date);
+                }
+                else if (criteria.FromUpdatedDate != null)
+                {
+                    paymentAdv = paymentAdv.Where(x => (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
+                }
+                var customerAdvLst = paymentAdv.Select(z => z.PartnerId).ToList();
+                partners = partners.Where(x => customerAdvLst.Any(z => z == x.Id));
+                foreach (var item in partners)
                 {
                     var payment = new AccountingCustomerPaymentExport();
-                    var pm = paymentAdv.Where(x => x.PartnerId == item.Key);
-                    if (criteria.IssuedDate != null)
-                    {
-                        pm = pm.Where(x => x.PaymentDate.Value.Date <= criteria.IssuedDate.Value.Date);
-                    }
-                    else if (criteria.DueDate != null)
-                    {
-                        pm = pm.Where(x => x.PaymentDate.Value.Date <= criteria.DueDate.Value.Date);
-                    }
-                    else if (criteria.FromUpdatedDate != null)
-                    {
-                        pm = pm.Where(x => (x.PaymentDate != null && x.PaymentDate.Value.Date >= criteria.FromUpdatedDate.Value.Date && x.PaymentDate.Value.Date <= criteria.ToUpdatedDate.Value.Date));
-                    }
+                    var pm = paymentAdv.Where(x => x.PartnerId == item.Id);
                     var pmAdvOrder = pm.OrderByDescending(x => x.PaymentDate).ThenByDescending(x => x.ReceiptTimeCreated).FirstOrDefault();
                     if (pmAdvOrder != null)
                     {
-
-                        var indexOfLastGrp = results.IndexOf(item.Last());
-                        payment.PartnerId = item.FirstOrDefault().PartnerId;
-                        payment.PartnerCode = item.FirstOrDefault().PartnerCode;
-                        payment.PartnerName = item.FirstOrDefault().PartnerName;
-                        payment.ParentCode = item.FirstOrDefault().ParentCode;
+                        var dataCustomerInList = grpPartner.Where(x => x.Key == item.Id).FirstOrDefault();
+                        var indexOfLastGrp = dataCustomerInList == null ? 0 : results.IndexOf(dataCustomerInList.Last());
+                        payment.PartnerId = item.Id;
+                        payment.PartnerCode = item.AccountNo;
+                        payment.PartnerName = item.ShortName;
+                        if (indexOfLastGrp > 0)
+                        {
+                            payment.ParentCode = dataCustomerInList.FirstOrDefault().ParentCode;
+                        }
+                        else
+                        {
+                            var parentData = partners.Where(x => x.Id == item.ParentId).FirstOrDefault();
+                            payment.ParentCode = parentData?.AccountNo;
+                        }
                         payment.BillingRefNo = "ADVANCE AMOUNT";
                         payment.BranchName = officeData[(Guid)pmAdvOrder.OfficeId].FirstOrDefault()?.ShortName;
                         payment.AdvanceAmountVnd = pmAdvOrder.AgreementAdvanceAmountVnd;
                         payment.AdvanceAmountUsd = pmAdvOrder.AgreementAdvanceAmountUsd;
                         if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                         {
-                            results.Insert(indexOfLastGrp + 1, payment);
+                            if (indexOfLastGrp > 0)
+                            {
+                                results.Insert(indexOfLastGrp + 1, payment);
+                            }
+                            else
+                            {
+                                listAdvRemain.Add(payment);
+                            }
                         }
                     }
                 }
@@ -2434,31 +2456,56 @@ namespace eFMS.API.Accounting.DL.Services
             #endregion
             else // Case: filter without date search
             {
-                foreach (var item in grpPartner)
+                var customerAdvLst = paymentAdv.Select(z => z.PartnerId).ToList();
+                partners = partners.Where(x => customerAdvLst.Any(z => z == x.Id));
+                foreach (var item in partners)
                 {
                     var payment = new AccountingCustomerPaymentExport();
                     var agreementIds = new List<Guid>();
-                    foreach (var it in item)
+                    var dataCustomerInList = grpPartner.Where(x => x.Key == item.Id).FirstOrDefault();
+                    var indexOfLastGrp = dataCustomerInList == null ? 0 : results.IndexOf(dataCustomerInList.Last());
+                    if (indexOfLastGrp > 0)
                     {
-                        if (it.receiptDetail != null)
+                        foreach (var it in dataCustomerInList)
                         {
-                            agreementIds.AddRange(it.receiptDetail.Where(x => x.AgreementId != null).Select(x => (Guid)x.AgreementId));
+                            if (it.receiptDetail != null)
+                            {
+                                agreementIds.AddRange(it.receiptDetail.Where(x => x.AgreementId != null && agreementIds.Any(z => z == x.AgreementId)).Select(x => (Guid)x.AgreementId));
+                            }
                         }
                     }
-                    var indexOfLastGrp = results.IndexOf(item.Last());
-                    payment.PartnerId = item.FirstOrDefault().PartnerId;
-                    payment.PartnerCode = item.FirstOrDefault().PartnerCode;
-                    payment.PartnerName = item.FirstOrDefault().PartnerName;
-                    payment.ParentCode = item.FirstOrDefault().ParentCode;
+                    payment.PartnerId = item.Id;
+                    payment.PartnerCode = item.AccountNo;
+                    payment.PartnerName = item.ShortName;
+                    if (indexOfLastGrp > 0)
+                    {
+                        payment.ParentCode = dataCustomerInList.FirstOrDefault().ParentCode;
+                    }
+                    else
+                    {
+                        var parentData = partners.Where(x => x.Id == item.ParentId).FirstOrDefault();
+                        payment.ParentCode = parentData?.AccountNo;
+                    }
                     payment.BillingRefNo = "ADVANCE AMOUNT";
-                    var contractInfo = agreementIds.Count > 0 ? catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)) : catContractRepository.Get(x => x.PartnerId == item.Key);
+                    var contractInfo = agreementIds.Count > 0 ? catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)) : catContractRepository.Get(x => x.PartnerId == item.Id && x.Active == true);
                     payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
                     payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
                     if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
                     {
-                        results.Insert(indexOfLastGrp + 1, payment);
+                        if (indexOfLastGrp > 0)
+                        {
+                            results.Insert(indexOfLastGrp + 1, payment);
+                        }
+                        else
+                        {
+                            listAdvRemain.Add(payment);
+                        }
                     }
                 }
+            }
+            if(listAdvRemain.Count > 0)
+            {
+                results.AddRange(listAdvRemain);
             }
             #endregion
             return results.AsQueryable();
