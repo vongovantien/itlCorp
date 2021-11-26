@@ -3,39 +3,32 @@
     .sticky-col {
       position: -webkit-sticky;
       position: sticky;
+      z-index: 1;
+      padding: 3px;
     }
-
     .first-col {
       width: 100px;
       min-width: 100px;
       max-width: 100px;
       left: -1px;
-      z-index: 1;
-      position: static;
     }
     .second-col {
       width: 200px;
       min-width: 200px;
       max-width: 200px;
       left: 80px;
-      z-index: 1;
-      position: static;
     }
     .three-col {
       width: 200px;
       min-width: 200px;
       max-width: 200px;
       left: 180px;
-      z-index: 1;
-      position: static;
     }
     .four-col {
       width: 90px;
       min-width: 90px;
       max-width: 90px;
       left: 374px;
-      z-index: 1;
-      position: static;
     }
   }
 }
