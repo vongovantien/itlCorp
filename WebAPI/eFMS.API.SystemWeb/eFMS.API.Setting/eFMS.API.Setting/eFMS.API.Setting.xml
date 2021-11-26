@@ -4,6 +4,41 @@
         <name>eFMS.API.Setting</name>
     </assembly>
     <members>
+        <member name="T:eFMS.API.Setting.Controllers.CsRuleLinkFeeController">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CsRuleLinkFeeController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.IdentityServer.DL.UserManager.ICurrentUser,eFMS.API.Setting.DL.IService.ICsRuleLinkFeeService)">
+            <summary>
+            
+            </summary>
+            <param name="localizer"></param>
+            <param name="curUser"></param>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CsRuleLinkFeeController.AddNewRule(eFMS.API.Setting.DL.Models.CsRuleLinkFeeModel)">
+            <summary>
+            Add New Rule Link Fee
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CsRuleLinkFeeController.Paging(eFMS.API.Setting.DL.Models.Criteria.CsRuleLinkFeeCriteria,System.Int32,System.Int32)">
+            <summary>
+            get and paging the list of Rule Link Fee by conditions
+            </summary>
+            <param name="criteria">search conditions</param>
+            <param name="pageNumber">page to retrieve data</param>
+            <param name="pageSize">number items per page</param>
+            <returns></returns>
+        </member>
+        <member name="M:eFMS.API.Setting.Controllers.CsRuleLinkFeeController.UpdateRuleLinkFee(eFMS.API.Setting.DL.Models.CsRuleLinkFeeModel)">
+            <summary>
+            Update Settlement Payment
+            </summary>
+            <param name="model">object to update</param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Setting.Controllers.TariffController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{eFMS.API.Common.Globals.LanguageSub},eFMS.API.Setting.DL.IService.ITariffService,eFMS.IdentityServer.DL.UserManager.ICurrentUser)">
             <summary>
             Contructor

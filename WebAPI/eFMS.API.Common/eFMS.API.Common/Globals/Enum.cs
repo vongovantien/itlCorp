@@ -157,6 +157,7 @@
         settingExchangeRate,
         settingIDDefinition,
         settingKPI,
+        settingLinkFee,
         settingSupplier,
         settingTariff,
         settingUnlock,
