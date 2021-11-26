@@ -1921,7 +1921,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.BranchName = officeData[(Guid)invoiceObhGroup.FirstOrDefault().invc.FirstOrDefault()?.OfficeId].FirstOrDefault()?.ShortName;
 
                         // Get saleman name
-                        var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault().AgreementId;
+                        var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
                         var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
                         if (string.IsNullOrEmpty(salemanId))
                         {
@@ -2228,7 +2228,7 @@ namespace eFMS.API.Accounting.DL.Services
                         payment.CustomNo = customsDeclarationRepository.Get(x => x.JobNo == sur.JobNo).FirstOrDefault()?.ClearanceNo;
                     }
                     // Get saleman name
-                    var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault().AgreementId;
+                    var agreementId = item.payment.Where(x => x.AgreementId != null).FirstOrDefault()?.AgreementId;
                     var salemanId = catContractRepository.Get(x => x.Id == agreementId).FirstOrDefault()?.SaleManId;
                     if (string.IsNullOrEmpty(salemanId))
                     {
