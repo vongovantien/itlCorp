@@ -648,6 +648,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     customerPayment.Add(new AccountingCustomerPaymentExport());
                 }
+                var isExistGroup = true;
                 var isExistDetail = true;
                 var isExistAdvRow = true;
                 if (customerPayment.FirstOrDefault().receiptDetail == null || customerPayment.Count(x => x.receiptDetail != null && x.receiptDetail.Count() > 0) == 0 || paymentCriteria.DueDate != null || paymentCriteria.FromUpdatedDate == null)
@@ -660,7 +661,18 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
                 if (!isExistDetail)
                 {
-                    excel.DeleteRow(7);
+                    if (customerPayment.Where(x => x.BillingRefNo == "ADVANCE AMOUNT").Count() == customerPayment.Count) // If report only have adv amount row
+                    {
+                        isExistGroup = false;
+                    }
+                    if (!isExistGroup)
+                    {
+                        excel.DeleteRow(6, 2);
+                    }
+                    else
+                    {
+                        excel.DeleteRow(7);
+                    }
                     if (!isExistAdvRow)
                     {
                         excel.DeleteRow(7);
@@ -700,10 +712,10 @@ namespace eFMS.API.ReportData.FormatExcel
                         var remainObh = (item.UnpaidAmountOBH ?? 0) - (item.PaidAmountOBH ?? 0);
                         var remainDbUsd = (item.UnpaidAmountInvUsd ?? 0) - (item.PaidAmountUsd ?? 0);
                         var remainObhUsd = (item.UnpaidAmountOBHUsd ?? 0) - (item.PaidAmountOBHUsd ?? 0);
-                        remainDb = remainDb < 0 ? 0 : remainDb;
-                        remainObh = remainObh < 0 ? 0 : remainObh;
-                        remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
-                        remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
+                        //remainDb = remainDb < 0 ? 0 : remainDb;
+                        //remainObh = remainObh < 0 ? 0 : remainObh;
+                        //remainDbUsd = remainDbUsd < 0 ? 0 : remainDbUsd;
+                        //remainObhUsd = remainObhUsd < 0 ? 0 : remainObhUsd;
                         // Sum total
                         sumRemainDb += remainDb;
                         sumRemainObh += remainObh;
@@ -730,7 +742,7 @@ namespace eFMS.API.ReportData.FormatExcel
                     }
                     else
                     {
-                        excel.IndexOfGroup = 2;
+                        excel.IndexOfGroup = isExistGroup ? 2 : 1;
                         excel.SetGroupsTable();
                         sumAdvanceAmountVnd += (item.AdvanceAmountVnd ?? 0);
                         sumAdvanceAmountUsd += (item.AdvanceAmountUsd ?? 0);
@@ -743,6 +755,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         listKeyData.Add("AdvanceAmountUsd", item.AdvanceAmountUsd);
                         listKeyData.Add("TotalAmountUsdAdv", 0);
                         listKeyData.Add("BranchAdv", item.BranchName);
+                        listKeyData.Add("SalesmanAdv", item.Salesman);
                     }
                     excel.SetData(listKeyData);
                     startRow++;

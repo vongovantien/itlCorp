@@ -900,6 +900,12 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
+    getDataDebitDetailList(agreementId: any, option: any, officeId: any, serviceCode: any,overDueDay:any) {
+        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode,overDueDay:overDueDay}).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
 
     quickUpdateReceipt(receiptId: string, body: any) {
         return this._api.put(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctReceipt/${receiptId}/QuickUpdate`, body);

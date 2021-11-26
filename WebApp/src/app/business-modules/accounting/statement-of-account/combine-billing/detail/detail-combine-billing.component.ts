@@ -183,7 +183,7 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
       id: this.billingId,
       combineBillingNo: this.formSearchBillingDetail.billingNo.value,
       partnerId: this.formSearchBillingDetail.partnerId.value,
-      type: !!type ? type.join(';') : null,
+      type: !!type ? type : null,
       totalAmountVnd: this.combineBillingListDetail.sumTotalObj.totalAmountVnd,
       totalAmountUsd: this.combineBillingListDetail.sumTotalObj.totalAmountUsd,
       description: this.formSearchBillingDetail.description.value,
