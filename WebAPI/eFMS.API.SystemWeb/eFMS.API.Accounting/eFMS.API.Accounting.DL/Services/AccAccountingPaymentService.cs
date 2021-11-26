@@ -2512,9 +2512,10 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     payment.BillingRefNo = "ADVANCE AMOUNT";
                     var contractInfo = agreementIds.Count > 0 ? catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)) : catContractRepository.Get(x => x.PartnerId == item.Id && x.Active == true);
-                    if (contractInfo.Count() > 0)
+                    if (contractInfo?.Count() > 0)
                     {
-                        var employeeId = employeeLst.Where(x => x.Id == contractInfo.FirstOrDefault().SaleManId).FirstOrDefault();
+                        var saleManId = contractInfo.FirstOrDefault().SaleManId;
+                        var employeeId = employeeLst.Where(x => x.Id == saleManId).FirstOrDefault();
                         payment.Salesman = employeeId == null ? string.Empty : employeeId.EmployeeNameEn;
                     }
                     payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
