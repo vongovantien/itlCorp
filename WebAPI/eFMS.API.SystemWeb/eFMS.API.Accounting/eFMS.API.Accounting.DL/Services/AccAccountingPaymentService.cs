@@ -1847,27 +1847,27 @@ namespace eFMS.API.Accounting.DL.Services
                                     payment.UnpaidAmountOBH = isValidObh ? obhGrp?.UnpaidPaymentAmountVnd ?? 0 : 0;
                                     payment.UnpaidAmountOBHUsd = isValidObh ? obhGrp?.UnpaidPaymentAmountUsd ?? 0 : 0;
                                 }
-                                foreach (var rcp in receiptRMGroup)
-                                {
-                                    var detail = new AccountingReceiptDetail();
-                                    detail.ReceiptId = rcp.grp.ReceiptId;
-                                    detail.PaymentRefNo = rcp.grp.PaymentRefNo;
-                                    detail.PaymentDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
-                                    var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
-                                    detail.PaidAmount = 0;
-                                    detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
-                                    detail.PaidAmountUsd = 0;
-                                    detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
-                                    detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
-                                    detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
-                                    detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
+                                //foreach (var rcp in receiptRMGroup)
+                                //{
+                                //    var detail = new AccountingReceiptDetail();
+                                //    detail.ReceiptId = rcp.grp.ReceiptId;
+                                //    detail.PaymentRefNo = rcp.grp.PaymentRefNo;
+                                //    detail.PaymentDate = rcp.Payment.FirstOrDefault()?.PaymentDate;
+                                //    var paymentOBH = rcp.Payment.Where(z => z.PaymentType == "OBH");
+                                //    detail.PaidAmount = 0;
+                                //    detail.PaidAmountOBH = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountVnd ?? 0) ?? 0) : 0;
+                                //    detail.PaidAmountUsd = 0;
+                                //    detail.PaidAmountOBHUsd = isValidObh ? (paymentOBH?.Sum(x => x.PaymentAmountUsd ?? 0) ?? 0) : 0;
+                                //    detail.CusAdvanceAmountVnd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountVnd ?? 0;
+                                //    detail.CusAdvanceAmountUsd = rcp.Payment.FirstOrDefault()?.CusAdvanceAmountUsd ?? 0;
+                                //    detail.AgreementId = rcp.Payment.FirstOrDefault()?.AgreementId;
 
-                                    payment.PaidAmount += (detail.PaidAmount ?? 0);
-                                    payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
-                                    payment.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
-                                    payment.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
-                                    payment.receiptDetail.Add(detail);
-                                }
+                                //    payment.PaidAmount += (detail.PaidAmount ?? 0);
+                                //    payment.PaidAmountOBH += isValidObh ? (detail.PaidAmountOBH ?? 0) : 0;
+                                //    payment.PaidAmountUsd += (detail.PaidAmountUsd ?? 0);
+                                //    payment.PaidAmountOBHUsd += isValidObh ? (detail.PaidAmountOBHUsd ?? 0) : 0;
+                                //    payment.receiptDetail.Add(detail);
+                                //}
                             }
                         }
                     }
@@ -2299,7 +2299,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var listAdvRemain = new List<AccountingCustomerPaymentExport>();
             var grpPartner = results.GroupBy(x => x.PartnerId).Select(x => x);
-            if (grpPartner.Count() == 0 && !string.IsNullOrEmpty(criteria.PartnerId)) // if search only 1 partner then get this partner
+            if (!string.IsNullOrEmpty(criteria.PartnerId)) // if search only 1 partner then get this partner
             {
                 partners = partners.Where(x => x.Id == criteria.PartnerId);
             }
