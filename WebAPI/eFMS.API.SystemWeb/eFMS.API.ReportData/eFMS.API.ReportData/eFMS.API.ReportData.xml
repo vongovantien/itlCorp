@@ -402,7 +402,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteria)">
+        <member name="M:eFMS.API.ReportData.Controllers.DocumentationController.ExportAccountingManagementDebCreInvoice(eFMS.API.ReportData.Models.Criteria.AccAccountingManagementCriteriaDebCreInvoice)">
             <summary>
             Export accounting management
             </summary>

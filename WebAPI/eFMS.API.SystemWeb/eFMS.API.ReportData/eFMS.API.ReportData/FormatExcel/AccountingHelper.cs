@@ -3711,10 +3711,10 @@ namespace eFMS.API.ReportData.FormatExcel
         }
         private void SetWidthColumnExcelDetailSettlementPaymentSOA(ExcelWorksheet workSheet)
         {
-            workSheet.Column(1).Width = 30; //Cột A
-            workSheet.Column(2).Width = 12; //Cột B
-            workSheet.Column(3).Width = 12; //Cột C
-            workSheet.Column(4).Width = 25; //Cột D
+            workSheet.Column(1).Width = 15; //Cột A
+            workSheet.Column(2).Width = 15; //Cột B
+            workSheet.Column(3).Width = 15; //Cột C
+            workSheet.Column(4).Width = 15; //Cột D
             workSheet.Column(5).Width = 15; //Cột E
             workSheet.Column(6).Width = 25; //Cột F
             workSheet.Column(7).Width = 25; //Cột G
@@ -4454,12 +4454,10 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A3"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
             workSheet.Cells["A3"].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
 
-            workSheet.Cells["A5:J6"].Style.Font.SetFromFont(new Font("Times New Roman", 12));
 
-            workSheet.Cells["A5:B5"].Merge = true;
             workSheet.Cells["A5"].Value = headers[3]; //Người yêu cầu
             workSheet.Cells["A5"].Style.Font.Bold = true;
-            workSheet.Cells["C5"].Value = settlementExport.InfoSettlement.Requester;
+            workSheet.Cells["B5"].Value = settlementExport.InfoSettlement.Requester;
 
             workSheet.Cells["E5"].Value = headers[4]; //Ngày SOA
             workSheet.Cells["E5"].Style.Font.Bold = true;
@@ -4467,10 +4465,9 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["F5"].Style.Numberformat.Format = "dd MMM, yyyy";
             workSheet.Cells["F5"].Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
 
-            workSheet.Cells["A6:B6"].Merge = true;
             workSheet.Cells["A6"].Value = headers[6]; //Bộ phận
             workSheet.Cells["A6"].Style.Font.Bold = true;
-            workSheet.Cells["C6"].Value = settlementExport.InfoSettlement.Department;
+            workSheet.Cells["B6"].Value = settlementExport.InfoSettlement.Department;
 
             workSheet.Cells["A7"].Value = headers[22]; //Supplier
             workSheet.Cells["A7"].Style.Font.Bold = true;
@@ -4478,7 +4475,7 @@ namespace eFMS.API.ReportData.FormatExcel
 
             workSheet.Cells["A8"].Value = headers[7]; //Reson for request
             workSheet.Cells["A8"].Style.Font.Bold = true;
-            workSheet.Cells["C8"].Value = settlementExport.InfoSettlement.Note;
+            workSheet.Cells["B8"].Value = settlementExport.InfoSettlement.Note;
 
 
             workSheet.Cells["A11"].Value = headers[30]; //Reson for request
@@ -4508,6 +4505,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["E15"].Value = headers[26];
             workSheet.Cells["E15"].Style.Font.Bold = true;
             workSheet.Cells["F15"].Value = settlementExport.InfoSettlement.BankName;
+            workSheet.Cells["F15"].Style.WrapText = true;
 
             // Bank Code
             workSheet.Cells["E16"].Value = headers[27];
@@ -4522,7 +4520,7 @@ namespace eFMS.API.ReportData.FormatExcel
             // Due Date
             workSheet.Cells["A10"].Value = headers[29];
             workSheet.Cells["A10"].Style.Font.Bold = true;
-            workSheet.Cells["C10"].Value = settlementExport.InfoSettlement.DueDate?.ToString("dd/MM/yyyy");
+            workSheet.Cells["B10"].Value = settlementExport.InfoSettlement.DueDate?.ToString("dd/MM/yyyy");
             #endregion
             //Bôi đen header
             //workSheet.Cells["A15:K15"].Style.Font.Bold = true;
