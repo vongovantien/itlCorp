@@ -4,6 +4,7 @@ import { IDDefinitionComponent } from './id-definition/id-definition.component';
 import { KPIComponent } from './kpi/kpi.component';
 import { SupplierComponent } from './supplier/supplier.component';
 import { LogViewerComponent } from './log-viewer/log-viewer.component';
+import { LinkFeeComponent } from './link-fee/link-fee.component';
 
 const routes: Routes = [
     {
@@ -62,6 +63,14 @@ const routes: Routes = [
         component: SupplierComponent,
         data: {
             name: "Supplier",
+            level: 2
+        }
+    },
+    {
+        path: 'link-fee',
+        component: LinkFeeComponent,
+        data: {
+            name: "Link Fee",
             level: 2
         }
     },

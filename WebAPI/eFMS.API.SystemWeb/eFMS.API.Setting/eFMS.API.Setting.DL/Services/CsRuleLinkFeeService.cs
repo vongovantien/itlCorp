@@ -160,7 +160,7 @@ namespace eFMS.API.Setting.DL.Services
 
         public HandleState UpdateRuleLinkFee(CsRuleLinkFeeModel model)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctSP);
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
             if (permissionRange == PermissionRange.None) return new HandleState(403, "");
 
@@ -178,5 +178,17 @@ namespace eFMS.API.Setting.DL.Services
                 return new HandleState(ex.Message);
             }
         }
+
+        //public CsRuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee)
+        //{
+        //    ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
+        //    var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
+        //    if (permissionRange == PermissionRange.None) return null;
+
+        //    var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
+        //    if (ruleLinkFee == null) return null;
+        //    return mapper.Map<CsRuleLinkFeeModel>(ruleLinkFee); ;
+        //}
+
     }
 }

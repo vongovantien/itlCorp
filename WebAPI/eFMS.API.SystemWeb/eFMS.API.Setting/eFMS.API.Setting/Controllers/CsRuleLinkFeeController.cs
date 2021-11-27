@@ -122,7 +122,7 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="model">object to update</param>
         /// <returns></returns>
         [HttpPut]
-        [Route("Update")]
+        [Route("Update")]   
         [Authorize]
         public IActionResult UpdateRuleLinkFee(CsRuleLinkFeeModel model)
         {
@@ -139,5 +139,34 @@ namespace eFMS.API.Setting.Controllers
             
             return Ok(result);
         }
+
+        /// <summary>
+        /// Get details settlement payment by settlementId
+        /// </summary>
+        /// <param name="settlementId"></param>
+        /// <returns></returns>
+        //[HttpGet]
+        //[Route("GetDetailRuleLinkFeeById")]
+        //[Authorize]
+        //public IActionResult GetDetailRuleLinkFeeById(Guid ruleId)
+        //{
+        //    //var isAllowViewDetail = acctSettlementPaymentService.CheckDetailPermissionBySettlementId(settlementId);
+        //    //if (isAllowViewDetail == false)
+        //    //{
+        //    //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
+        //    //}
+
+        //    var settlement = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
+        //    List<ShipmentSettlement> chargeGrpSettlement = new List<ShipmentSettlement>();
+        //    List<ShipmentChargeSettlement> chargeNoGrpSettlement = new List<ShipmentChargeSettlement>();
+        //    if (settlement != null)
+        //    {
+        //        chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+        //        chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+        //    }
+        //    var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
+        //    return Ok(data);
+        //}   
+
     }
 }
