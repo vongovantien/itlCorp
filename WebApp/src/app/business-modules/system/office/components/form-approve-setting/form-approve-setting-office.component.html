@@ -151,13 +151,16 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="">Replicate office</label>
-                            <input type="text" class="form-control">
+                            <ng-select [(ngModel)]="replicateOffice.replicateOfficeId" [items]="(offices | async)"
+                                class="custom" bindLabel="shortName" bindValue="id">
+                            </ng-select>
                         </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label for="">Replicate prefix</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" placeholder="...R"
+                                [(ngModel)]="replicateOffice.replicatePrefix">
                         </div>
                     </div>
                 </div>

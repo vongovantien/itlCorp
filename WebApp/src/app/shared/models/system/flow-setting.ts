@@ -16,6 +16,8 @@ export class FlowSetting {
     userModified: string = null;
     datetimeCreated: string = null;
     datetimeModified: string = null;
+    replicateOfficeId: string = null;
+    replicatePrefix: string = null;
 
     constructor(data?: any) {
         const self = this;
