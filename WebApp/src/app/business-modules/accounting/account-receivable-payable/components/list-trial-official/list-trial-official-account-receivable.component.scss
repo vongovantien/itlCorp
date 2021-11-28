@@ -3,39 +3,32 @@
     .sticky-col {
       position: -webkit-sticky;
       position: sticky;
-    }
-
-    .first-col {
-      width: 100px;
-      min-width: 100px;
-      max-width: 100px;
-      left: -1px;
       z-index: 1;
-      position: static;
+      padding: 3px;
+    }
+    .first-col {
+      width: 90px;
+      min-width: 90px;
+      max-width: 90px;
+      left: -1px;
     }
     .second-col {
-      width: 200px;
-      min-width: 200px;
-      max-width: 200px;
+      width: 150px;
+      min-width: 150px;
+      max-width: 150px;
       left: 80px;
-      z-index: 1;
-      position: static;
     }
     .three-col {
       width: 200px;
       min-width: 200px;
       max-width: 200px;
-      left: 180px;
-      z-index: 1;
-      position: static;
+      left: 225px;
     }
     .four-col {
       width: 90px;
       min-width: 90px;
       max-width: 90px;
-      left: 374px;
-      z-index: 1;
-      position: static;
+      left: 420px;
     }
   }
 }
