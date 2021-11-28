@@ -2554,8 +2554,7 @@ namespace eFMS.API.Accounting.DL.Services
                                (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                             :
                             settlement.SettlementCurrency;
-
-                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                        _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
                 }
                 fe.Inword = _inword;
             });
@@ -4815,15 +4814,16 @@ namespace eFMS.API.Accounting.DL.Services
         public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
         {
             string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
-
             #region -- Info Manager, Accoutant & Department --
             var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
             string _manager = string.Empty;
             string _accountant = string.Empty;
+            string _bod = string.Empty;
             if (_settlementApprove != null)
             {
                 _manager = string.IsNullOrEmpty(_settlementApprove.Manager) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Manager)?.EmployeeNameVn;
                 _accountant = string.IsNullOrEmpty(_settlementApprove.Accountant) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Accountant)?.EmployeeNameVn;
+                _bod = string.IsNullOrEmpty(_settlementApprove.Buhead) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Buhead)?.EmployeeNameVn;
             }
 
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
@@ -4832,9 +4832,12 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
+            var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
+            var soa = acctSoaRepo.Get(x => soapayNo.Contains(x.Soano)).ToList();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
+            var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.FirstOrDefault().JobNo).FirstOrDefault();
+            var partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
 
             var infoSettlement = new InfoSettlementExport
             {
@@ -4855,10 +4858,14 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
                 DueDate = settlementPayment.DueDate,
-                SOADate = soa?.SoaformDate,
-                SOANo = soa?.Soano,
-                ReasonForRequest = soa?.Note
-    };
+                SOADate = soa.FirstOrDefault()?.SoaformDate,
+                SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
+                Supplier = partner?.ShortName,
+                Note=settlementPayment.Note,
+                SettlementCurrency=settlementPayment.SettlementCurrency,
+                BOD = _bod,
+            };
+                
             return infoSettlement;
         }
 
@@ -4902,7 +4909,6 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
                     shipmentSettlement.ServiceDate = ops.ServiceDate;
-
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;
@@ -4953,16 +4959,17 @@ namespace eFMS.API.Accounting.DL.Services
                 //Quy đổi theo currency của Settlement
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
+                
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                 infoShipmentCharge.ChargeNote = sur.Notes;
                 string _chargeType = string.Empty;
@@ -4979,7 +4986,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeType = "NO_INVOICE";
                 }
                 infoShipmentCharge.ChargeType = _chargeType;
-
+                infoShipmentCharge.SurType = sur.Type;
                 listCharge.Add(infoShipmentCharge);
             }
             return listCharge;
@@ -5012,107 +5019,98 @@ namespace eFMS.API.Accounting.DL.Services
         public List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode)
         {
             var results = new List<SettlementExportGroupDefault>();
-            var settlements = DataContext.Get();
-            var surcharges = csShipmentSurchargeRepo.Get();
-            var opsTransations = opsTransactionRepo.Get();
-            var csTransations = csTransactionRepo.Get();
-            var csTranstionDetails = csTransactionDetailRepo.Get();  // HBL
-            var custom = customsDeclarationRepo.Get();
-
             try
             {
                 if (settlementCode.Count() > 0)
                 {
-                    foreach (var settleCode in settlementCode)
-                    {
-                        var currentSettlement = settlements.Where(x => x.SettlementNo == settleCode).FirstOrDefault();
 
-                        string requesterID = DataContext.First(x => x.SettlementNo == settleCode).Requester;
-                        string employeeID = "";
-                        if (!string.IsNullOrEmpty(requesterID))
-                        {
-                            employeeID = sysUserRepo.Get(x => x.Id == requesterID).FirstOrDefault()?.EmployeeId;
-                        }
+                    var settlements = DataContext.Get().Where(x => settlementCode.Contains(x.SettlementNo)).ToList();
+                    var surcharges = csShipmentSurchargeRepo.Get();
+                    var opsTransations = opsTransactionRepo.Get();
+                    var custom = customsDeclarationRepo.Get();
+                    var approve = acctApproveSettlementRepo.Get();
+                    var employee = sysEmployeeRepo.Get();
+                    var csTransations = csTransactionRepo.Get();
+                    var csTranstionDetails = csTransactionDetailRepo.Get();
+                    // Get Operation
+                    var dataOperation = from set in settlements
+                                        join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc // Join Surcharge.
+                                        from sur in sc.DefaultIfEmpty()
+                                        join ops in opsTransations on sur?.Hblid equals ops.Hblid // Join OpsTranstion    
+                                        join cus in custom on ops.JobNo equals cus.JobNo into cus1
+                                        from cus in cus1.DefaultIfEmpty()//join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                        join app in approve on set.SettlementNo equals app.SettlementNo into gr1
+                                        from app in gr1.DefaultIfEmpty()
+                                        join em in employee on set.Requester equals em.Id into gr2
+                                        from em in gr2.DefaultIfEmpty()
+                                            //join ar in advRequest on sur.JobNo equals ar.JobId
+                                        select new SettlementExportDefault
+                                        {
+                                            JobID = ops.JobNo,
+                                            HBL = ops.Hwbno,
+                                            MBL = ops.Mblno,
+                                            CustomNo = cus?.ClearanceNo,
+                                            SettleNo = set.SettlementNo,
+                                            Currency = set.SettlementCurrency,
+                                            AdvanceNo = sur.AdvanceNo,
+                                            Requester = em?.EmployeeNameEn,
+                                            RequestDate = set.RequestDate,
+                                            ApproveDate = app?.BuheadAprDate,
+                                            Description = sur.Notes,
+                                            SettlementAmount = sur.Total * currencyExchangeService.CurrencyExchangeRateConvert(null, null, sur.CurrencyId, set.SettlementCurrency),
+                                        };
 
-                        var approveDate = acctApproveSettlementRepo.Get(x => x.SettlementNo == settleCode).FirstOrDefault()?.BuheadAprDate;
-                        string requesterName = sysEmployeeRepo.Get(x => x.Id == employeeID).FirstOrDefault()?.EmployeeNameVn;
 
-                        // Get Operation
-                        var dataOperation = from set in settlements
-                                            join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc // Join Surcharge.
-                                            from sur in sc.DefaultIfEmpty()
-                                            join ops in opsTransations on sur.Hblid equals ops.Hblid // Join OpsTranstion
-                                            //join cus in custom on new { JobNo = (ops.JobNo != null ? ops.JobNo : ops.JobNo), HBL = (ops.Hwbno != null ? ops.Hwbno : ops.Hwbno), MBL = (ops.Mblno != null ? ops.Mblno : ops.Mblno) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
-                                            join cus in custom on ops.JobNo equals cus.JobNo into cus1
-                                            from cus in cus1.DefaultIfEmpty()
-                                                //join ar in advRequest on sur.JobNo equals ar.JobId
-                                            where sur.SettlementCode == settleCode
-                                            select new SettlementExportDefault
-                                            {
-                                                JobID = ops.JobNo,
-                                                HBL = ops.Hwbno,
-                                                MBL = ops.Mblno,
-                                                CustomNo = cus.ClearanceNo,
-                                                SettleNo = currentSettlement.SettlementNo,
-                                                Currency = currentSettlement.SettlementCurrency,
-                                                AdvanceNo = sur.AdvanceNo,
-                                                Requester = requesterName,
-                                                RequestDate = currentSettlement.RequestDate,
-                                                ApproveDate = approveDate,
-                                                Description = sur.Notes,
-                                                SettlementAmount = sur.Total,
-                                            };
-
-                        // Get Document
-                        var dataService = from set in settlements
-                                          join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc  // Join Surcharge.
-                                          from sur in sc.DefaultIfEmpty()
-
-                                          join cstd in csTranstionDetails on sur.Hblid equals cstd.Id // Join HBL
-                                          join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
-                                          from cst in cs.DefaultIfEmpty()
+                    // Get Document
+                    var dataService = from set in settlements
+                                      join sur in surcharges on set.SettlementNo equals sur.SettlementCode into sc  // Join Surcharge.
+                                      from sur in sc.DefaultIfEmpty()
+                                      join cstd in csTranstionDetails on sur?.Hblid equals cstd.Id // Join HBL
+                                      join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
+                                      from cst in cs.DefaultIfEmpty()
+                                      join app in approve on set.SettlementNo equals app.SettlementNo into gr1
+                                      from app in gr1.DefaultIfEmpty()
+                                      join em in employee on set.Requester equals em.Id into gr2
+                                      from em in gr2.DefaultIfEmpty()
                                           //join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
                                           //from cus in cus1.DefaultIfEmpty()
 
-                                          where sur.SettlementCode == settleCode
-                                          select new SettlementExportDefault
-                                          {
-                                              JobID = cst.JobNo,
-                                              HBL = cstd.Hwbno,
-                                              MBL = cst.Mawb,
-                                              SettlementAmount = sur.Total,
-                                              CustomNo = string.Empty,
-                                              SettleNo = currentSettlement.SettlementNo,
-                                              Currency = currentSettlement.SettlementCurrency,
-                                              AdvanceNo = sur.AdvanceNo,
-                                              Requester = requesterName,
-                                              RequestDate = currentSettlement.RequestDate,
-                                              ApproveDate = approveDate,
-                                              Description = sur.Notes
-                                          };
-
-                        var data = dataOperation.Union(dataService).ToList();
-
-                        decimal? advTotalAmount;
-                        var group = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
-                            .Select(s => new SettlementExportGroupDefault
-                            {
-                                JobID = s.Key.JobID,
-                                MBL = s.Key.MBL,
-                                HBL = s.Key.HBL,
-                                CustomNo = s.Key.CustomNo,
-                                SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
-                                requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, out advTotalAmount),
-                                AdvanceTotalAmount = advTotalAmount,
-                                BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
-                            });
-
-                        // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
-                        foreach (var item in group)
+                                          //where sur.SettlementCode == settleCode
+                                      select new SettlementExportDefault
+                                      {
+                                          JobID = cst.JobNo,
+                                          HBL = cstd.Hwbno,
+                                          MBL = cst.Mawb,
+                                          SettlementAmount = sur.Total,
+                                          CustomNo = string.Empty,
+                                          SettleNo = set.SettlementNo,
+                                          Currency = set.SettlementCurrency,
+                                          AdvanceNo = sur.AdvanceNo,
+                                          Requester = em?.EmployeeNameEn,
+                                          RequestDate = set.RequestDate,
+                                          ApproveDate = app?.BuheadAprDate,
+                                          Description = sur.Notes
+                                      };
+                    var data = dataOperation.Union(dataService).ToList();
+                    decimal? advTotalAmount;
+                    results = data.GroupBy(d => new { d.SettleNo, d.JobID, d.HBL, d.MBL, d.CustomNo })
+                        .Select(s => new SettlementExportGroupDefault
                         {
-                            results.Add(item);
-                        }
-                    }
+                            JobID = s.Key.JobID,
+                            MBL = s.Key.MBL,
+                            HBL = s.Key.HBL,
+                            CustomNo = s.Key.CustomNo,
+                            SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
+                            requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo,s.FirstOrDefault().Currency, out advTotalAmount),
+                            AdvanceTotalAmount = advTotalAmount,
+                            BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
+                        }).OrderByDescending(x => x.JobID).ToList();
+
+                    // data = data.o.OrderByDescending(x => x.JobID).AsQueryable();
+                    //foreach (var item in group)
+                    //{
+                    //    results.Add(item);
+                    //}
                 }
                 else
                 {
@@ -5128,14 +5126,14 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         private List<SettlementExportDefault> getRequestList(List<SettlementExportDefault> data, string JobID,
-            string HBL, string MBL, string SettleNo, out decimal? advTotalAmount)
+            string HBL, string MBL, string SettleNo, string Currency, out decimal? advTotalAmount)
         {
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
             var settleDesc = DataContext.Get().Where(x => x.SettlementNo == SettleNo).FirstOrDefault().Note;
             //
-            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
-                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
+            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl, x.RequestCurrency })
+                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, z.RequestCurrency, Currency)) });
             var groupAdvReqByStatus = from advReq in groupAdvReq
                                       join advPay in advPayment on advReq.AdvanceNo equals advPay.AdvanceNo
                                       where advPay.StatusApproval == "Done"
@@ -5170,14 +5168,14 @@ namespace eFMS.API.Accounting.DL.Services
                     MBL = y.Key.MBL,
                     SettleNo = y.Key.SettleNo,
                     AdvanceNo = y.Key.AdvanceNo,
-                    SettlementAmount = y.Sum(z => z.SettlementAmount),
+                    SettlementAmount = y.Key.Currency == "VND" ? Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 0) : Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 2),
                     ApproveDate = y.Key.ApproveDate,
                     Currency = y.Key.Currency,
                     CustomNo = y.Key.CustomNo,
                     Description = settleDesc,
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
-                });
+                }); ;
             var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
             groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
@@ -5217,6 +5215,7 @@ namespace eFMS.API.Accounting.DL.Services
             return output;
 
         }
+
 
         /// <summary>
         /// Get data for General Preview

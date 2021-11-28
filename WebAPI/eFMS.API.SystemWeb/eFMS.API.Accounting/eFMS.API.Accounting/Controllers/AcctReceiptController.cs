@@ -262,7 +262,7 @@ namespace eFMS.API.Accounting.Controllers
                     result = new ResultHandle { Status = hs.Success, Message = "Save Done Receipt Successful", Data = receiptModel };
                     break;
                 case SaveAction.SAVECANCEL:
-                    result = new ResultHandle { Status = hs.Success, Message = "Save Cancel Receipt Successful", Data = receiptModel };
+                    result = new ResultHandle { Status = hs.Success, Message = hs.Success ? "Save Cancel Receipt Successful" : hs.Message.ToString(), Data = receiptModel };
                     break;
                 default:
                     result = new ResultHandle { Status = false, Message = "Save Receipt fail" };

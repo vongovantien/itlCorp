@@ -206,14 +206,14 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             pod: [null, Validators.required],
             supplier: [],
             placeOfIssues: [],
-            masterBill: ['',
-
-                Validators.required
-            ],
-            hbOfladingNo: ['',
-
-                Validators.required
-            ],
+            masterBill: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
+            hbOfladingNo: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             hbOfladingType: [null,
                 Validators.required],
             finalDestination: [

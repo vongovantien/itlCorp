@@ -249,7 +249,7 @@ export class ShareAirServiceFormCreateComponent extends AppForm implements OnIni
                 // Validators.pattern(/^(.{3}-\d{4} \d{4}|XXX-XXXX XXXX)$/)
                 // Validators.pattern(SystemConstants.CPATTERN.MAWB),
                 // FormValidators.validateMAWB,
-
+                FormValidators.validateSpecialChar
             ])],
             flightVesselName: [],
             packageQty: [null, Validators.compose([
