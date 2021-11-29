@@ -1653,7 +1653,7 @@ namespace eFMS.API.Accounting.DL.Services
             var partners = partnerRepository.Get(x => x.PartnerType == "Customer" && x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
             var surchargeData = surchargeRepository.Get(x => x.AcctManagementId != null);
-            var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE);
+            var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE && (criteria.Office == null || criteria.Office.Count == 0 || criteria.Office.Contains(x.OfficeId.ToString())));
             var officeData = sysOfficeRepository.Get().ToLookup(x => x.Id);
             var resultsQuery = (from invoice in data
                                 join surcharge in surchargeData on invoice.RefId.ToLower() equals surcharge.AcctManagementId.ToString()
@@ -2346,7 +2346,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var saleManId = catContractRepository.Get(x => x.Id == pmAdvOrder.AgreementId).FirstOrDefault()?.SaleManId;
                         if (!string.IsNullOrEmpty(saleManId))
                         {
-                            var employeeId = employeeLst.Where(x=>x.Id == saleManId).FirstOrDefault();
+                            var employeeId = employeeLst.Where(x => x.Id == saleManId).FirstOrDefault();
                             payment.Salesman = employeeId == null ? string.Empty : employeeId.EmployeeNameEn;
                         }
                         else
@@ -2512,12 +2512,15 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     payment.BillingRefNo = "ADVANCE AMOUNT";
                     var contractInfo = agreementIds.Count > 0 ? catContractRepository.Get(x => agreementIds.Any(ag => ag == x.Id)) : catContractRepository.Get(x => x.PartnerId == item.Id && x.Active == true);
+                    // (criteria.Office == null || criteria.Office.Count == 0 || x.OfficeId.Split(';', StringSplitOptions.RemoveEmptyEntries).Any(z => criteria.Office.Contains(z))) case office in contract
                     if (contractInfo?.Count() > 0)
                     {
                         var saleManId = contractInfo.FirstOrDefault().SaleManId;
                         var employeeId = employeeLst.Where(x => x.Id == saleManId).FirstOrDefault();
                         payment.Salesman = employeeId == null ? string.Empty : employeeId.EmployeeNameEn;
                     }
+                    var office = paymentAdv.Where(x => x.PartnerId == item.Id).FirstOrDefault()?.OfficeId;
+                    payment.BranchName = office == null ? string.Empty : officeData[(Guid)office].FirstOrDefault()?.ShortName;
                     payment.AdvanceAmountVnd = contractInfo.Sum(x => x.CustomerAdvanceAmountVnd ?? 0);
                     payment.AdvanceAmountUsd = contractInfo.Sum(x => x.CustomerAdvanceAmountUsd ?? 0);
                     if (payment.AdvanceAmountVnd > 0 || payment.AdvanceAmountUsd > 0)
