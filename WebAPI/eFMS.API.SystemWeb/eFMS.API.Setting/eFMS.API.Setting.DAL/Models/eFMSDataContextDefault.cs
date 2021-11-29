@@ -1181,8 +1181,6 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.ExpirationDate).HasColumnType("datetime");
 
-                entity.Property(e => e.InactiveOn).HasColumnType("datetime");
-
                 entity.Property(e => e.NameRule)
                     .HasMaxLength(200)
                     .IsUnicode(false);
