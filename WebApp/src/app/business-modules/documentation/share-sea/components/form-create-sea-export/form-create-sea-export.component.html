@@ -41,7 +41,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="form-group">
+                        <div class="form-group"
+                            [ngClass]="{'m-form__group has-danger':(isSubmitted || mawb.dirty) && !mawb.valid }">
                             <label>MBL No</label>
                             <input type="text" class="form-control" formControlName="mawb">
                         </div>

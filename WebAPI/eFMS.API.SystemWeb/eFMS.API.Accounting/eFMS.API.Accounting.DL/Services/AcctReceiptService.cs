@@ -1008,7 +1008,7 @@ namespace eFMS.API.Accounting.DL.Services
             _payment.PartnerId = paymentGroupOBH.PartnerId;
 
             _payment.UserCreated = _payment.UserModified = currentUser.UserID;
-            _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
+            _payment.DatetimeCreated = _payment.DatetimeModified = receipt.DatetimeCreated;
             _payment.GroupId = currentUser.GroupId;
             _payment.DepartmentId = currentUser.DepartmentId;
             _payment.OfficeId = currentUser.OfficeID;
@@ -1197,7 +1197,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                 _payment.Hblid = payment.Hblid;
                 _payment.UserCreated = _payment.UserModified = currentUser.UserID;
-                _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
+                _payment.DatetimeCreated = _payment.DatetimeModified = receipt.DatetimeCreated;
                 _payment.GroupId = currentUser.GroupId;
                 _payment.DepartmentId = currentUser.DepartmentId;
                 _payment.OfficeId = currentUser.OfficeID;
@@ -2091,6 +2091,45 @@ namespace eFMS.API.Accounting.DL.Services
                 if (receiptCurrent.Status == AccountingConstants.RECEIPT_STATUS_DRAFT)
                 {
                     return new HandleState((object)"Trạng thái của phiếu thu không hợp lệ");
+                }
+
+                if(receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_ADVANCE)
+                {
+                    var hasReceiptNewest = DataContext.Get(x => x.CustomerId == receiptCurrent.CustomerId 
+                    && x.Id != receiptCurrent.Id 
+                    && x.Status == AccountingConstants.RECEIPT_STATUS_DONE
+                    && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
+                    );
+                    if(hasReceiptNewest.Count() > 0)
+                    {
+                        CatPartner partnerInfo = catPartnerRepository.Get(x => x.Id == receiptCurrent.CustomerId).FirstOrDefault();
+                        string _customerName = partnerInfo?.ShortName;
+                        return new HandleState((object)string.Format(
+                            "You can not cancel this receipt, because {0} have payment time later than this receipt time. Please cancel the lastest receipts first!", _customerName
+                            ));
+                    }
+                }
+                else if(receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT)
+                {
+                    IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
+                    && x.PartnerId == receiptCurrent.CustomerId
+                    && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                    && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
+                    );
+
+                    var query = from p in hasPayments
+                                join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                where r.Status == AccountingConstants.RECEIPT_STATUS_DONE
+                                select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
+
+                    if(query != null && query.Count() > 0)
+                    {
+                        return new HandleState((object)string.Format(
+                            "You can not cancel this receipt, because {0} - {1} have payment time later than this receipt. please cancel the lastest receipts first!",
+                            query.FirstOrDefault()?.InvoiceNo,
+                            query.FirstOrDefault()?.PaymentRefNo
+                            ));
+                    }
                 }
 
                 receiptCurrent.Status = AccountingConstants.RECEIPT_STATUS_CANCEL;

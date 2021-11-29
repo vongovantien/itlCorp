@@ -9,8 +9,16 @@ namespace eFMS.API.Common.Globals
         {
             if (_number == 0)
                 return String.Format("Không {0}.", currency);
-
-            string _source = String.Format("{0:0,0}", _number);
+            decimal _numberUSD = 0;
+            string _numOdd = "";
+            if (currency == "USD")
+            {
+                string _sourceUSD = String.Format("{0:0.##}", _number);
+                string[] _arrsourceUSD = _sourceUSD.Split('.');
+                _numberUSD = Decimal.Parse(_arrsourceUSD[0]);
+                _numOdd = _arrsourceUSD[1];
+            }
+            string _source = currency == "USD" ? String.Format("{0:0,0}", _numberUSD) : String.Format("{0:0,0}", _number);
 
             string[] _arrsource = _source.Split(',');
 
@@ -29,6 +37,11 @@ namespace eFMS.API.Common.Globals
             if (_letter.StartsWith("lẻ"))
                 _letter = _letter.Substring(3, _letter.Length - 3);
 
+            if (currency == "USD")
+            {
+                string cent = Int32.Parse(_numOdd.Substring(1, 1)) >= 2 ? " cents" : " cent";
+                return String.Format("{0}{1} {2}", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency + " và " + TwoNumber2Letter(_numOdd) + cent);
+            }
             return String.Format("{0}{1} {2}.", _letter.Substring(0, 1).ToUpper(), _letter.Substring(1, _letter.Length - 1).Trim(), currency);
         }
 
@@ -73,6 +86,41 @@ namespace eFMS.API.Common.Globals
                         return String.Format("{0} trăm {1} mươi tư", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""));
                     else
                         return String.Format("{0} trăm {1} mươi {2}", OneNumber2Letter(_hunit, ""), OneNumber2Letter(_tunit, ""), OneNumber2Letter(_nunit, "muoi"));
+            }
+        }
+
+        private static string TwoNumber2Letter(string _number)
+        {
+            int _tunit = 0, _nunit = 0;
+            if (_number.Length == 2)
+            {
+                _tunit = int.Parse(_number.Substring(0, 1));
+                _nunit = int.Parse(_number.Substring(1, 1));
+            }
+            else if (_number.Length == 1)
+                _nunit = int.Parse(_number.Substring(0, 1));
+
+            if (_tunit == 0 && _nunit == 0)
+                return "";
+
+            switch (_tunit)
+            {
+                case 0:
+                    if (_nunit == 0)
+                        return String.Format("0", OneNumber2Letter(_tunit, ""));
+                    else
+                        return String.Format("{0}", OneNumber2Letter(_nunit, ""));
+                default:
+                    if (_nunit == 0)
+                        return String.Format("{0} mươi", OneNumber2Letter(_tunit, ""));
+                    else if (_nunit == 1)
+                        return String.Format("{0} mươi mốt", OneNumber2Letter(_tunit, ""));
+                    else if (_nunit == 4)
+                        return String.Format("{0} mươi tư", OneNumber2Letter(_tunit, ""), OneNumber2Letter(_tunit, ""));
+                    else if (_nunit == 5)
+                        return String.Format("{0} mươi lăm", OneNumber2Letter(_tunit, ""), OneNumber2Letter(_tunit, ""));
+                    else
+                        return String.Format("{0} mươi {1}", OneNumber2Letter(_tunit, ""), OneNumber2Letter(_nunit, ""));
             }
         }
 
