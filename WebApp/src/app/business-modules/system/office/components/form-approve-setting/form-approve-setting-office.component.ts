@@ -17,7 +17,9 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     approvePayments: FlowSetting[] = [];
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
-    replicateOffice: FlowSetting = new FlowSetting();
+
+    initRepilicate = new FlowSetting({ type: 'Other', flow: 'Replicate' });
+    replicateOffice: FlowSetting = this.initRepilicate;
 
     settings: CommonInterface.ICommonTitleValue[] = [
         { title: 'None', value: 'None' },
@@ -92,8 +94,13 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     getSetting(officeId: string) {
         this._systemRepo.getSettingFlowByOffice(officeId)
             .subscribe(
-                (res: { lockingDateShipment: LockShipmentSetting[], approvals: FlowSetting[], unlocks: FlowSetting[], account: FlowSetting }) => {
-
+                (res: {
+                    lockingDateShipment: LockShipmentSetting[],
+                    approvals: FlowSetting[],
+                    unlocks: FlowSetting[],
+                    account: FlowSetting,
+                    replicateOffice: FlowSetting
+                }) => {
                     if (!res.lockingDateShipment.length) {
                         this.initLockingShipmentSetting();
                     } else {
@@ -117,6 +124,7 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
                     } else {
                         this.accountReceivable = res.account;
                     }
+                    this.replicateOffice = !!res['replicateOffice'] ? res['replicateOffice'] : this.initRepilicate;
                 }
             );
     }
