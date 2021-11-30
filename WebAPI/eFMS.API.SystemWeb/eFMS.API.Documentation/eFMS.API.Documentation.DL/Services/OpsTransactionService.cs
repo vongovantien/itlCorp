@@ -1161,7 +1161,11 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 existedMblHbl = DataContext.Any(x => x.Id != model.Id 
                 && x.CurrentStatus != TermData.Canceled
-                && (x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && (!string.IsNullOrEmpty(x.ServiceNo) || string.IsNullOrEmpty(x.ServiceNo) && x.JobNo != model.ServiceNo))
+                && (
+                    x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && ((!string.IsNullOrEmpty(x.ServiceNo) 
+                    ? x.ServiceNo != model.JobNo 
+                    : x.JobNo != model.ServiceNo) )
+                    )
                 );
             }
             if (existedMblHbl)
