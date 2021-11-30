@@ -291,7 +291,6 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
 
             // * Input
             mawb: [null,Validators.compose([
-                Validators.required,
                 FormValidators.validateSpecialChar
             ])],
             hwbno: [null,Validators.compose([
