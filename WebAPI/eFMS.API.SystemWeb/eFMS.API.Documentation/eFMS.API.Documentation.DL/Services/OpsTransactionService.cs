@@ -255,21 +255,24 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (office.Code == "ITLHAN")
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE 
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                          && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
@@ -278,7 +281,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
@@ -892,14 +896,19 @@ namespace eFMS.API.Documentation.DL.Services
         {
             if (id == 0)
             {
-                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo 
+                && x.ClearanceDate == model.ClearanceDate 
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))
                 {
                     return true;
                 }
             }
             else
             {
-                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo 
+                && x.Id != id 
+                && x.ClearanceDate == model.ClearanceDate 
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))) // không check trùng vs tk replicate (có thể phát sinh tk rác)
                 {
                     return true;
                 }
@@ -1042,10 +1051,17 @@ namespace eFMS.API.Documentation.DL.Services
             SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
             if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
             {
+                string preFix = "R";
+                if(!string.IsNullOrEmpty(settingFlowOffice.ReplicatePrefix))
+                {
+                    preFix = settingFlowOffice.ReplicatePrefix;
+                }
                 OpsTransaction opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
-                opsTransactionReplicate.JobNo = opsTransaction.JobNo + (settingFlowOffice.ReplicatePrefix ?? "R");
+                opsTransactionReplicate.JobNo = preFix + opsTransaction.JobNo;
                 opsTransactionReplicate.ServiceNo = opsTransaction.JobNo;
                 opsTransactionReplicate.ServiceHblId = opsTransaction.Hblid;
+                opsTransactionReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
+                opsTransactionReplicate.OfficeId = settingFlowOffice.ReplicateOfficeId; // office của setting replicate
 
                 HandleState hsAddOpsReplicate = DataContext.Add(opsTransactionReplicate);
                 CustomsDeclaration clearanceReplicate = new CustomsDeclaration

@@ -3593,6 +3593,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.LastDateUnLocked).HasColumnType("datetime");
 
+                entity.Property(e => e.LinkSource)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.LockedDate).HasColumnType("datetime");
 
                 entity.Property(e => e.LockedUser).HasMaxLength(50);

@@ -62,5 +62,6 @@ namespace eFMS.API.Documentation.Service.Models
         public Guid? ServiceHblId { get; set; }
         public string Note { get; set; }
         public bool? IsLinkFee { get; set; }
+        public string LinkSource { get; set; }
     }
 }
