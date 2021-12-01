@@ -1449,14 +1449,19 @@ namespace eFMS.API.Documentation.DL.Services
             string message = null;
             if (id == 0)
             {
-                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo 
+                && x.ClearanceDate == model.ClearanceDate
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))
                 {
                     message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
                 }
             }
             else
             {
-                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo 
+                && x.Id != id 
+                && x.ClearanceDate == model.ClearanceDate
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE)))
                 {
                     message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
                 }
