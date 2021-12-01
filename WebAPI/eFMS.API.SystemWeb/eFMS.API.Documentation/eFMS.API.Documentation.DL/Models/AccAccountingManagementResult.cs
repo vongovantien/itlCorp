@@ -25,5 +25,7 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public DateTime? VoucherIddate { get; set; }
         public DateTime? IssueDate { get; set; }
         public string AccountNo { get; set; }
+        public DateTime? ETA { get; set; }
+        public DateTime? ETD { get; set; }
     }
 }
