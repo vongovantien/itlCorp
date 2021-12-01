@@ -207,6 +207,7 @@ export class ShareSeaServiceFormCreateHouseBillSeaImportComponent extends AppFor
             supplier: [],
             placeOfIssues: [],
             masterBill: [null,Validators.compose([
+                Validators.required,
                 FormValidators.validateSpecialChar
             ])],
             hbOfladingNo: [null,Validators.compose([
