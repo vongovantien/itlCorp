@@ -1107,26 +1107,20 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var it in item.Charges)
                 {
-                    // VAT amount
-                    if (it.VATRate > 0)
+                    if (it.Currency == AccountingConstants.CURRENCY_LOCAL)
+                        it.NetAmount = it.Quantity * it.UnitPrice;
+                    else
+                        it.NetAmount = Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
+
+                    if (it.Type == "BUY")
                     {
-                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATAmountLocal ?? 0) : NumberHelper.RoundNumber(it.VATAmountUSD ?? 0, 2));
+                        it.VATAmount = it.VATAmountLocal * (-1);
+                        it.NetAmount = it.NetAmount * (-1);
                     }
                     else
                     {
-                        it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
+                        it.VATAmount = it.VATAmountLocal ;
                     }
-
-
-                    if (it.Currency == AccountingConstants.CURRENCY_USD)
-                    {
-                        //decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
-                        //Quy đổi về USD đối với các currency khác
-                        it.VATAmount =  Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
-                    }
-
-                    // Net amount
-                    it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
                 }
             }
             return ops;
@@ -1211,6 +1205,9 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
 
+                var soaSur = soaRepo.Get(x => x.Soano == ((!string.IsNullOrEmpty(sur.Soano) || !string.IsNullOrEmpty(sur.PaySoano)) ? sur.Soano : sur.Type == AccountingConstants.TYPE_CHARGE_SELL ? sur.DebitNo : sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? sur.CreditNo : string.Empty)).FirstOrDefault();
+                var exRate = soaSur != null ? soaSur.ExcRateUsdToLocal : sur.FinalExchangeRate;
+
                 var chg = new ChargeCombineResult()
                 {
                     ID = sur.Id,
@@ -1264,7 +1261,7 @@ namespace eFMS.API.Accounting.DL.Services
                     CDNote = _cdNote,
                     TypeCharge = charge?.Type,
                     ExchangeDate = sur.ExchangeDate,
-                    FinalExchangeRate = sur.FinalExchangeRate,
+                    FinalExchangeRate = exRate,
                     PIC = null,
                     IsSynced = _isSynced,
                     NetAmount = sur.NetAmount,
