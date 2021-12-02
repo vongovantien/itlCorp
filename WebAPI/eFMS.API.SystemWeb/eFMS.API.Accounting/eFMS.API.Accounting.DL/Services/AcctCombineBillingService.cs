@@ -1123,6 +1123,26 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                 }
             }
+
+            if (combine.ServiceDateFrom != null)
+            {
+                ops.FromDate = combine.ServiceDateFrom;
+                ops.ToDate = combine.ServiceDateTo;
+            }
+            else if (combine.IssuedDateFrom != null)
+            {
+                ops.FromDate = combine.IssuedDateFrom;
+                ops.ToDate = combine.IssuedDateTo;
+            }
+            else
+            {
+                var chagerOrder = charges.OrderByDescending(x => x.ExchangeDate);
+                var lastdate = chagerOrder.FirstOrDefault();
+                var firstdate = chagerOrder.LastOrDefault();
+                ops.FromDate = firstdate != null ? firstdate.ExchangeDate : null;
+                ops.ToDate = lastdate != null ? lastdate.ExchangeDate : null;
+            }
+
             return ops;
         }
             
@@ -1378,7 +1398,12 @@ namespace eFMS.API.Accounting.DL.Services
             else if (combineBilling.IssuedDateFrom != null)
                 parameter.UptoDate = string.Format("{0} - {1}", combineBilling.IssuedDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.IssuedDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
             else
-                parameter.UptoDate = string.Empty;
+            {
+                var chagerOrder = charges.OrderByDescending(x=>x.ExchangeDate);
+                var lastdate  = chagerOrder.FirstOrDefault();
+                var firstdate = chagerOrder.LastOrDefault();
+                parameter.UptoDate = string.Format("{0} - {1}", firstdate.ExchangeDate?.ToString("dd/MM/yyyy") ?? string.Empty, lastdate.ExchangeDate?.ToString("dd/MM/yyyy") ?? string.Empty); //
+            }
 
             parameter.dtPrintDate = combineBilling.DatetimeCreated?.ToString("dd/MM/yyyy") ?? string.Empty; //Created Date SOA
             parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
