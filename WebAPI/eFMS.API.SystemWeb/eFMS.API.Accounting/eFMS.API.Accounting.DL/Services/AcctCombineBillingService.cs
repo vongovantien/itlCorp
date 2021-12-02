@@ -1116,6 +1116,15 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         it.VATAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.VATRate ?? 0) : NumberHelper.RoundNumber(it.VATRate ?? 0, 2));
                     }
+
+
+                    if (it.Currency == AccountingConstants.CURRENCY_USD)
+                    {
+                        //decimal _exchangeRateToUsd = currencyExchangeService.CurrencyExchangeRateConvert(it.FinalExchangeRate, it.ExchangeDate, AccountingConstants.CURRENCY_LOCAL, AccountingConstants.CURRENCY_USD);
+                        //Quy đổi về USD đối với các currency khác
+                        it.VATAmount =  Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
+                    }
+
                     // Net amount
                     it.NetAmount = (it.Currency == AccountingConstants.CURRENCY_LOCAL ? NumberHelper.RoundNumber(it.AmountVND ?? 0) : NumberHelper.RoundNumber(it.AmountUSD ?? 0, 2));
                 }
@@ -1134,6 +1143,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 var charge = catChargeRepo.Get().Where(x => x.Id == sur.ChargeId).FirstOrDefault();
                 var unit = catUnitRepo.Get().Where(x => x.Id == sur.UnitId).FirstOrDefault();
+                var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == sur.JobNo).FirstOrDefault();
                 DateTime? _serviceDate, _createdDate, _shippmentDate;
                 string _service, _userCreated, _commodity, _flightNo, _packageContainer, _customNo;
                 Guid? _aol, _aod;
@@ -1156,7 +1166,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _grossWeight = opst?.SumGrossWeight;
                     _chargeWeight = opst?.SumChargeWeight;
                     _cbm = opst?.SumCbm;
-                    _customNo = sur.ClearanceNo;
+                    _customNo = cus!=null?cus.ClearanceNo:string.Empty;
                 }
                 else
                 {
@@ -1178,7 +1188,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeWeight = csTransDe?.ChargeWeight;
                     _cbm = csTransDe?.Cbm;
                     _packageContainer = csTransDe?.PackageContainer;
-                    _customNo = string.Empty;
+                    _customNo = cus != null ? cus.ClearanceNo : string.Empty;
                 }
 
                 bool _isSynced = false;
@@ -1293,7 +1303,9 @@ namespace eFMS.API.Accounting.DL.Services
                 #region -- Info MBL, HBL --
                 _mawb = charge.Mblno;
                 _hwbNo = charge.Hblno;
-                _customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
+                //_customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
+                var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == charge.JobNo).FirstOrDefault();
+                _customNo = cus != null ? cus.ClearanceNo :string.Empty;
                 _jobNo = charge.JobNo;
                 #endregion -- Info MBL, HBL --
 
@@ -1302,7 +1314,8 @@ namespace eFMS.API.Accounting.DL.Services
                 #endregion -- Info CD Note --
 
                 // Exchange Rate from currency charge to current soa
-                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
+//                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
+                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, "VND");
 
                 var c = new CombineReportGeneral();
                 c.PartnerID = partner?.Id;
@@ -1310,7 +1323,7 @@ namespace eFMS.API.Accounting.DL.Services
                 c.PersonalContact = partner?.ContactPerson?.ToUpper();
                 c.Email = string.Empty; //NOT USE
                 c.Address = partner?.AddressEn?.ToUpper(); //Address En 
-                c.Workphone = partner?.WorkPhoneEx;
+                c.Workphone = partner?.Tel;
                 c.Fax = string.Empty; //NOT USE
                 c.Taxcode = string.Empty; //NOT USE
                 c.TransID = string.Empty; //NOT USE
@@ -1320,7 +1333,8 @@ namespace eFMS.API.Accounting.DL.Services
                 c.Order = string.Empty; //NOT USE
                 c.InvID = charge.InvoiceNo;
                 c.Amount = _amount + _decimalNumber; //Cộng thêm phần thập phân
-                c.Curr = charge.CurrencyId?.Trim(); //Currency SOA
+                //c.Curr = charge.CurrencyId?.Trim(); //Currency SOA
+                c.Curr = "VND"; //Currency SOA
                 c.Dpt = charge.Type == AccountingConstants.TYPE_CHARGE_SELL ? true : false;
                 c.Vessel = string.Empty; //NOT USE
                 c.Routine = string.Empty; //NOT USE
@@ -1362,7 +1376,10 @@ namespace eFMS.API.Accounting.DL.Services
             var p = partnerRepo.Get(x=>x.Id == combineBilling.PartnerId).FirstOrDefault();
             var office = sysOfficeRepo.Get(x => x.Id == p.OfficeId).FirstOrDefault();
 
-            parameter.UptoDate = string.Format("{0} - {1}", combineBilling.ServiceDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.ServiceDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //From - To SOA
+            if (combineBilling.ServiceDateFrom != null)
+                parameter.UptoDate = string.Format("{0} - {1}", combineBilling.ServiceDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.ServiceDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
+            else if (combineBilling.IssuedDateFrom != null)
+                parameter.UptoDate = string.Format("{0} - {1}", combineBilling.IssuedDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.IssuedDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
 
             parameter.dtPrintDate = combineBilling.DatetimeCreated?.ToString("dd/MM/yyyy") ?? string.Empty; //Created Date SOA
             parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
