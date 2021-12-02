@@ -5062,7 +5062,9 @@ namespace eFMS.API.ReportData.FormatExcel
                 "BU",//15
                 "Service Date",//16
                 "Issue Date",//17
-                "Account No"//18
+                "Account No",//18
+                "ETD",//19
+                "ETA"//20
             };
             int rowStart = 1;
             for (int i = 0; i < headers.Count; i++)
@@ -5104,13 +5106,16 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 workSheet.Cells[rowStart, 19].Value = item.AccountNo;
+                workSheet.Cells[rowStart, 20].Value = item.ETD != null ? item.ETD.Value.ToString("dd/MM/yyyyy"):string.Empty ;
+                workSheet.Cells[rowStart, 21].Value = item.ETA != null ? item.ETA.Value.ToString("dd/MM/yyyy") : string.Empty;
+
                 rowStart += 1;
             }
 
-            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
-            workSheet.Cells["A1:S" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Top.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Left.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Right.Style = ExcelBorderStyle.Thin;
+            workSheet.Cells["A1:U" + (rowStart - 1)].Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
         }
 
         //public Stream GenerateAccountingReceivableExcel(List<AccountReceivableResultExport> acctMngts, ARTypeEnum arType, Stream stream = null)
