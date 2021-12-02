@@ -248,5 +248,21 @@ namespace eFMS.API.Accounting.Controllers
             return Ok(result);
         }
 
+        [HttpGet("GetDataExportCombineOps")]
+        public IActionResult GetDataExportCombineOpsByAccMangId(string combineBillingNo)
+        {
+            var data = combineBillingService.GetDataExportCombineOps(combineBillingNo);
+            return Ok(data);
+        }
+
+        [HttpPost]
+        [Route("PreviewConfirmBilling")]
+        [Authorize]
+        public IActionResult PreviewConfirmBilling(string combineBillingNo)
+        {
+            var result = combineBillingService.PreviewConfirmBilling(combineBillingNo);
+            return Ok(result);
+        }
+
     }
 }

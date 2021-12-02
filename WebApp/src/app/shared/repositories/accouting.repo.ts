@@ -6,7 +6,6 @@ import { throwError, Observable } from "rxjs";
 
 @Injectable({ providedIn: 'root' })
 export class AccountingRepo {
-
     private VERSION: string = 'v1';
     constructor(protected _api: ApiService) {
     }
@@ -17,6 +16,11 @@ export class AccountingRepo {
         );
     }
 
+    previewConfirmBilling(combineBillingNo: string) {
+        return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctCombineBilling/PreviewConfirmBilling`, {}, { combineBillingNo: combineBillingNo }).pipe(
+            map((data: any) => data)
+        );
+    }
     getListSOA(page?: number, size?: number, body: any = {}) {
         if (!!page && !!size) {
             return this._api.post(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSOA/paging`, body, {
