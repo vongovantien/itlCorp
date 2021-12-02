@@ -1380,6 +1380,8 @@ namespace eFMS.API.Accounting.DL.Services
                 parameter.UptoDate = string.Format("{0} - {1}", combineBilling.ServiceDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.ServiceDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
             else if (combineBilling.IssuedDateFrom != null)
                 parameter.UptoDate = string.Format("{0} - {1}", combineBilling.IssuedDateFrom?.ToString("dd/MM/yyyy") ?? string.Empty, combineBilling.IssuedDateTo?.ToString("dd/MM/yyyy") ?? string.Empty); //
+            else
+                parameter.UptoDate = string.Empty;
 
             parameter.dtPrintDate = combineBilling.DatetimeCreated?.ToString("dd/MM/yyyy") ?? string.Empty; //Created Date SOA
             parameter.CompanyName = office?.BranchNameEn.ToUpper() ?? string.Empty;
