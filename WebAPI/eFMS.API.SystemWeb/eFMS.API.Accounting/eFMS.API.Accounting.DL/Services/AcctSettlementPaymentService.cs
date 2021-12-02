@@ -4837,8 +4837,11 @@ namespace eFMS.API.Accounting.DL.Services
             var soa = acctSoaRepo.Get(x => soapayNo.Contains(x.Soano)).ToList();
 
             var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.FirstOrDefault().JobNo).FirstOrDefault();
-            var partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
-
+            var partner = new CatPartner();
+            if (ops != null)
+            {
+                partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
+            }
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
