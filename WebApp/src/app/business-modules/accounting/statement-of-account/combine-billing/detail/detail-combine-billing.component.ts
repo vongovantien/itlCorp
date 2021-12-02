@@ -7,7 +7,7 @@ import { ReportPreviewComponent } from '@common';
 import { JobConstants, RoutingConstants } from '@constants';
 import { Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo, CatalogueRepo, ExportRepo, SystemRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
@@ -16,6 +16,7 @@ import { CombineBilling } from 'src/app/shared/models/accouting/combine-billing.
 import { isUUID } from 'validator';
 import { CombineBillingListComponent } from '../components/combine-billing-list/combine-billing-list.component';
 import { FormGetBillingListComponent } from '../components/form-get-billing-list/form-get-billing-list.component';
+import { delayTime } from '@decorators';
 
 @Component({
   selector: 'detail-combine-billing',
@@ -44,10 +45,6 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
     protected _accountingRepo: AccountingRepo,
     private _activedRoute: ActivatedRoute,
     private _ngProgressService: NgProgress,
-    private _fb: FormBuilder,
-    private _catalogueRepo: CatalogueRepo,
-    private _systemRepo: SystemRepo,
-    private _store: Store<IAppState>,
     private _dataService: DataService,
     private _exportRepo: ExportRepo,
 
