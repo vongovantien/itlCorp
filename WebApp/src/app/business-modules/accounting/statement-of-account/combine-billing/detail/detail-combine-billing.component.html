@@ -11,8 +11,8 @@
                             </app-default-button>
 
                             <app-dropdown #dropdownMenu>
-                                <a class="dropdown-item pointer">OPS Template</a>
-                                <a class="dropdown-item pointer">General Template</a>
+                                <a class="dropdown-item pointer" (click)="exportCombineOps()">OPS Template</a>
+                                <a class="dropdown-item pointer" (click)="previewConfirmBilling()">General Template</a>
                                 <a class="dropdown-item pointer" (click)="previewDebitTemplate()">As Debit Template</a>
                             </app-dropdown>
                         </div>
@@ -45,7 +45,7 @@
     </div>
 </div>
 
+<ng-template inject></ng-template>
 <ng-container *ngIf="dataReport">
     <app-report-preview [data]="dataReport"></app-report-preview>
 </ng-container>
-<ng-template inject></ng-template>
