@@ -3111,6 +3111,8 @@ namespace eFMS.API.Documentation.DL.Services
                               VoucherIddate = cd.VoucherIddate,
                               IssueDate = cd.IssueDate,
                               AccountNo = cd.AccountNo,
+                              ETA = trans.Eta,
+                              ETD = trans.Etd
                           };
 
             var dataOps = from cd in _resultDatas
@@ -3142,6 +3144,8 @@ namespace eFMS.API.Documentation.DL.Services
                               VoucherIddate = cd.VoucherIddate,
                               IssueDate = cd.IssueDate,
                               AccountNo = cd.AccountNo,
+                              ETA = null,
+                              ETD = null
                           };
 
             var res = dataTrans.Union(dataOps).ToList<AccAccountingManagementResult>();

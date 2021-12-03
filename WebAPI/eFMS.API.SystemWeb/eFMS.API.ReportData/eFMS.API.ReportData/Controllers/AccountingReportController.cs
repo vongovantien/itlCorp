@@ -560,5 +560,23 @@ namespace eFMS.API.ReportData.Controllers
             return fileContent;
         }
 
+        [Route("ExportCombineOps")]
+        [HttpGet]
+        public async Task<IActionResult> ExportCombineOps(string combineBillingNo)
+        {
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataCombineOpsUrl + combineBillingNo);
+
+            var dataObjects = responseFromApi.Content.ReadAsAsync<CombineOPSModel>();
+
+            var stream = new AccountingHelper().GenerateCombineOPSExcel(dataObjects.Result);
+
+            if (stream == null)
+            {
+                return null;
+            }
+            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "SOA OPS.xlsx");
+
+            return fileContent;
+        }
     }
 }
