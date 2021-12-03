@@ -6,7 +6,7 @@
             <div class="m-portlet__body">
                 <tabset class="custom-class-tab">
                     <tab heading="Advance Info" [active]="true">
-                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)">
+                        <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" (onChangeAdvanceFor)="changeAdvanceFor($event)">
                         </adv-payment-form-create>
                         <div class="row" *ngIf="!!advancePayment">
                             <div class="col-6">
@@ -43,8 +43,9 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [state]="actionList" [statusApproval]="statusApproval">
+                    <adv-payment-list-request *ngIf="!isAdvCarrier" [state]="actionList" [statusApproval]="statusApproval">
                     </adv-payment-list-request>
+                    <list-advance-payment-carrier *ngIf="isAdvCarrier" [state]="actionList" [statusApproval]="statusApproval"></list-advance-payment-carrier>
                 </div>
                 <div class="row height-row-12" *ngIf="!!advancePayment">
                     <div class="col-12">

@@ -22,6 +22,7 @@ using Microsoft.Extensions.Localization;
 using System.Linq.Expressions;
 using eFMS.API.Common.Helpers;
 using System.Text;
+using eFMS.API.Accounting.DL.Models.AdvancePayment;
 
 namespace eFMS.API.Accounting.DL.Services
 {
@@ -487,7 +488,8 @@ namespace eFMS.API.Accounting.DL.Services
                            UserModifiedName = Umgrp.Username,
                            ReasonReject = advancePayment.ReasonReject,
                            PayeeName = payeeGrp.ShortName,
-                           DepartmentName = departAdvGrp.DeptNameAbbr
+                           DepartmentName = departAdvGrp.DeptNameAbbr,
+                           AdvanceFor = advancePayment.AdvanceFor
                        };
 
             //Gom nhóm
@@ -543,7 +545,8 @@ namespace eFMS.API.Accounting.DL.Services
                 UserModifiedName = s.FirstOrDefault().UserModifiedName,
                 ReasonReject = s.FirstOrDefault().ReasonReject,
                 PayeeName = s.FirstOrDefault().PayeeName,
-                DepartmentName = s.FirstOrDefault().DepartmentName
+                DepartmentName = s.FirstOrDefault().DepartmentName,
+                AdvanceFor = s.FirstOrDefault().AdvanceFor
             });
 
             return data;
@@ -763,6 +766,28 @@ namespace eFMS.API.Accounting.DL.Services
             advanceModel.IsApproved = CheckUserIsApproved(currentUser, advance, advanceApprove);
             advanceModel.IsShowBtnDeny = CheckIsShowBtnDeny(currentUser, advance, advanceApprove);
 
+            if (!string.IsNullOrEmpty(advanceModel.AdvanceFor))
+            {
+                foreach (var adv in advanceModel.AdvanceRequests)
+                {
+                    var charges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Hblid == adv.Hblid && x.ClearanceNo == adv.CustomNo && x.AdvanceNoFor == advance.AdvanceNo).ToList();
+                    if (charges.Count > 0)
+                    {
+                        var surcharge = new List<ShipmentChargeAdvance>();
+                        foreach (var item in charges)
+                        {
+                            var chargeMappper = mapper.Map<ShipmentChargeAdvance>(item);
+                            chargeMappper.JobId = item.JobNo;
+                            chargeMappper.Hbl = item.Hblno;
+                            chargeMappper.Mbl = item.Mblno;
+                            chargeMappper.ClearanceNo = item.ClearanceNo;
+                            chargeMappper.StatusPayment = adv.StatusPayment;
+                            surcharge.Add(chargeMappper);
+                        }
+                        adv.Surcharge = surcharge;
+                    }
+                }
+            }
             return advanceModel;
         }
         #endregion --- DETAIL ---
@@ -845,6 +870,26 @@ namespace eFMS.API.Accounting.DL.Services
             return prefix + stt;
         }
 
+        private string GetTransactionTypeOfChargeByHblId(Guid? hblId)
+        {
+            string transactionType = string.Empty;
+            var ops = opsTransactionRepo.Get(x => x.Hblid == hblId).FirstOrDefault();
+            if (ops != null)
+            {
+                transactionType = "CL";
+            }
+            else
+            {
+                var tranDetail = csTransactionDetailRepo.Get(x => x.Id == hblId).FirstOrDefault();
+                if (tranDetail != null)
+                {
+                    var tran = csTransactionRepo.Get(x => x.Id == tranDetail.JobId).FirstOrDefault();
+                    transactionType = tran?.TransactionType;
+                }
+            }
+            return transactionType;
+        }
+
         public HandleState AddAdvancePayment(AcctAdvancePaymentModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
@@ -877,6 +922,10 @@ namespace eFMS.API.Accounting.DL.Services
                         var hs = DataContext.Add(advance);
                         if (hs.Success)
                         {
+                            if (!string.IsNullOrEmpty(model.AdvanceFor))
+                            {
+                                model = AddChargeAdvance(model);
+                            }
                             var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
                             foreach (var item in request)
                             {
@@ -898,9 +947,10 @@ namespace eFMS.API.Accounting.DL.Services
                                     item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                 }
                                 #endregion -- Tính AmountUsd, AmountVnd --
-                                var hsAddRequest = acctAdvanceRequestRepo.Add(item);
+                                var hsAddRequest = acctAdvanceRequestRepo.Add(item, false);
                             }
                         }
+                        acctAdvanceRequestRepo.SubmitChanges();
                         trans.Commit();
                         return hs;
                     }
@@ -1069,8 +1119,14 @@ namespace eFMS.API.Accounting.DL.Services
                         var hs = DataContext.Delete(x => x.Id == advance.Id, false);
                         if (hs.Success)
                         {
+                            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+                            {
+                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).Select(x => x.Id).ToList();
+                                var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
+                            }
                             acctAdvanceRequestRepo.SubmitChanges();
                             acctApproveAdvanceRepo.SubmitChanges();
+                            csShipmentSurchargeRepo.SubmitChanges();
                             DataContext.SubmitChanges();
                             trans.Commit();
                         }
@@ -1181,6 +1237,81 @@ namespace eFMS.API.Accounting.DL.Services
             return true;
         }
 
+        /// <summary>
+        /// Update Charge - Update Advance Carrier
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private AcctAdvancePaymentModel AddChargeAdvance(AcctAdvancePaymentModel model)
+        {
+            decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+            var existAdvanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == model.AdvanceNo);
+            var surcharges = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == model.AdvanceNo);
+            if(surcharges?.Count() > 0)
+            {
+                var idDelete = surcharges.Select(x => x.Id).ToList();
+                var hsSur = csShipmentSurchargeRepo.Delete(x => idDelete.Any(z => z == x.Id), false);
+            }
+
+            foreach (var item in model.AdvanceRequests)
+            {
+                var _totalAmount = 0m;
+                foreach (var sur in item.Surcharge)
+                {
+                    CsShipmentSurcharge charge = new CsShipmentSurcharge();
+                    var surcharge = surcharges.Where(x => x.Id == sur.Id).FirstOrDefault();
+                    charge = mapper.Map<CsShipmentSurcharge>(sur);
+                    charge.Id = Guid.NewGuid();
+                    charge.JobNo = item.JobId;
+                    charge.Hblid = (Guid)item.Hblid;
+                    charge.Mblno = item.Mbl;
+                    charge.Hblno = item.Hbl;
+                    charge.ClearanceNo = item.CustomNo;
+                    charge.AdvanceNoFor = model.AdvanceNo;
+                    charge.Type = "ADV";
+                    charge.PaymentObjectId = model.Payee;
+                    if (surcharge == null)
+                    {
+                        charge.ExchangeDate = DateTime.Now;
+                        charge.UserCreated = currentUser.UserID;
+                        charge.DatetimeCreated = DateTime.Now;
+                    }
+                    else
+                    {
+                        charge.ExchangeDate = surcharge.ExchangeDate;
+                        charge.FinalExchangeRate = surcharge.FinalExchangeRate;
+                        charge.UserCreated = surcharge.UserCreated;
+                        charge.DatetimeCreated = surcharge.DatetimeCreated;
+                    }
+                    charge.DatetimeModified = DateTime.Now;
+                    charge.UserModified = currentUser.UserID;
+                    charge.ExchangeDate = DateTime.Now;
+
+                    #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                    var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                    charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                    charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                    charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                    charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                    charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                    charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                    charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                    #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+
+                    _totalAmount += currencyExchangeService.ConvertAmountChargeToAmountObj(charge, model.AdvanceCurrency);
+
+                    charge.TransactionType = GetTransactionTypeOfChargeByHblId(charge.Hblid);
+                    charge.OfficeId = currentUser.OfficeID;
+                    charge.CompanyId = currentUser.CompanyID;
+
+                    csShipmentSurchargeRepo.Add(charge, false);
+                }
+                item.Amount = _totalAmount;
+            }
+            var hs = csShipmentSurchargeRepo.SubmitChanges();
+            return model;
+        }
+
         public HandleState UpdateAdvancePayment(AcctAdvancePaymentModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.acctAP);
@@ -1234,6 +1365,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (hs.Success)
                         {
+                            if (!string.IsNullOrEmpty(model.AdvanceFor))
+                            {
+                                model = AddChargeAdvance(model);
+                            }
+
                             var request = mapper.Map<List<AcctAdvanceRequest>>(model.AdvanceRequests);
                             //Lấy ra các Request cũ cần update
                             var requestUpdate = request.Where(x => x.Id != Guid.Empty).ToList();
@@ -1270,7 +1406,7 @@ namespace eFMS.API.Accounting.DL.Services
                                         item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                     }
                                     #endregion -- Tính AmountUsd, AmountVnd --
-                                    var hsRequestNew = acctAdvanceRequestRepo.Add(item);
+                                    var hsRequestNew = acctAdvanceRequestRepo.Add(item, false);
                                 }
                             }
 
@@ -1294,9 +1430,10 @@ namespace eFMS.API.Accounting.DL.Services
                                         item.AmountUsd = NumberHelper.RoundNumber(item.Amount ?? 0, 2);
                                     }
                                     #endregion -- Tính AmountUsd, AmountVnd --
-                                    var hsRequestUpdate = acctAdvanceRequestRepo.Update(item, x => x.Id == item.Id);
+                                    var hsRequestUpdate = acctAdvanceRequestRepo.Update(item, x => x.Id == item.Id, false);
                                 }
                             }
+                            acctAdvanceRequestRepo.SubmitChanges();
                         }
                         trans.Commit();
                         return hs;
@@ -1785,6 +1922,10 @@ namespace eFMS.API.Accounting.DL.Services
                             var sendMailSuggest = true;
                             if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
+                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                                {
+                                    UpdateChargesApprove(advancePayment);
+                                }
                                 //Send Mail Approved
                                 sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
                                 //// to do send notification
@@ -2129,6 +2270,10 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                         {
+                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                            {
+                                UpdateChargesApprove(advancePayment);
+                            }
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
                         }
@@ -2147,6 +2292,58 @@ namespace eFMS.API.Accounting.DL.Services
                         }
                     }
 
+                    return new HandleState();
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState(ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update charges in advance carrier TO buy charges in shipment
+        /// </summary>
+        /// <param name="advancePayment"></param>
+        /// <returns></returns>
+        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment)
+        {
+            using (var trans = DataContext.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var advanceRequest = acctAdvanceRequestRepo.Get(x => x.AdvanceNo == advancePayment.AdvanceNo);
+                    foreach(var adv in advanceRequest)
+                    {
+                        var surcharges = csShipmentSurchargeRepo.Get(x => x.JobNo == adv.JobId && x.Mblno == adv.Mbl && x.Hblid == adv.Hblid && x.ClearanceNo == adv.CustomNo && x.AdvanceNoFor == adv.AdvanceNo);
+                        decimal kickBackExcRate = currentUser.KbExchangeRate ?? 20000;
+                        foreach (var charge in surcharges)
+                        {
+                            charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
+                            charge.IsFromShipment = true;
+                            charge.UserModified = currentUser.UserID;
+                            charge.DatetimeModified = DateTime.Now;
+                            charge.ExchangeDate = DateTime.Now;
+                            charge.FinalExchangeRate = null;
+                            #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                            charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                            charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+                            charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
+                            charge.AmountVnd = amountSurcharge.AmountVnd; //Thành tiền trước thuế (Local)
+                            charge.VatAmountVnd = amountSurcharge.VatAmountVnd; //Tiền thuế (Local)
+                            charge.AmountUsd = amountSurcharge.AmountUsd; //Thành tiền trước thuế (USD)
+                            charge.VatAmountUsd = amountSurcharge.VatAmountUsd; //Tiền thuế (USD)
+                            #endregion -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
+                            var hsSur = csShipmentSurchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                        }
+                    }
+                    var hs = csShipmentSurchargeRepo.SubmitChanges();
                     return new HandleState();
                 }
                 catch (Exception ex)
@@ -4055,6 +4252,29 @@ namespace eFMS.API.Accounting.DL.Services
             return result;
         }
 
+        /// <summary>
+        /// Check if allow deny with advance carrier
+        /// </summary>
+        /// <param name="Ids"></param>
+        /// <returns></returns>
+        public string CheckAdvanceAllowDenyDelete(List<Guid> Ids)
+        {
+            foreach (Guid Id in Ids)
+            {
+                var adv = DataContext.First(x => x.Id == Id);
+                if (!string.IsNullOrEmpty(adv.AdvanceFor))
+                {
+                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && !string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).FirstOrDefault();
+                    if (surcharge != null)
+                    {
+                        var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
+                        return messageNotAllow;
+                    }
+                }
+            }
+            return string.Empty;
+        }
+
         public HandleState DenyAdvancePayments(List<Guid> Ids)
         {
             HandleState result = new HandleState();
@@ -4129,5 +4349,71 @@ namespace eFMS.API.Accounting.DL.Services
         }
         #endregion --- Calculator Receivable Advance ---
 
+
+        /// <summary>
+        /// Check duplicate charge on shipment
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public string CheckDuplicateCharge(AcctAdvancePaymentModel model)
+        {
+            var dataDuplicate = string.Empty;
+            var surcharges = new List<ShipmentChargeAdvance>();
+            foreach (var shipment in model.AdvanceRequests)
+            {
+                surcharges.AddRange(shipment.Surcharge);
+            }
+            if (model.AdvanceFor == "HBL")
+            {
+                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo, x.AdvanceType }).ToList();
+                foreach (var sm in shipmentTypeGrp)
+                {
+                    if (sm.Count() > 1)
+                    {
+                        dataDuplicate = string.Format("Cant set differrent type in {0}-{1}-{2}", sm.Key.JobId, sm.Key.Mbl, sm.Key.Hbl);
+                        return dataDuplicate;
+                    }
+                }
+                var duplicateCharges = surcharges.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.ClearanceNo, x.ChargeId, x.ChargeCode }).ToList();
+                foreach (var charge in duplicateCharges)
+                {
+                    if (charge.Count() > 1)
+                    {
+                        dataDuplicate = string.Format("Duplicate charge {0} in {1}-{2}-{3}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl, charge.Key.Hbl);
+                        return dataDuplicate;
+                    }
+                    else
+                    {
+                        var chargeExisted = csShipmentSurchargeRepo.Get(x => x.JobNo == charge.Key.JobId && x.Mblno == charge.Key.Mbl && x.Hblid == charge.Key.Hblid && x.ChargeId == charge.Key.ChargeId && x.PaymentObjectId == model.Payee && x.AdvanceNoFor != model.AdvanceNo).FirstOrDefault();
+                        if (chargeExisted != null)
+                        {
+                            dataDuplicate = string.Format("Charge {0} existed in {1}-{2}-{3}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl, charge.Key.Hbl);
+                            return dataDuplicate;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var duplicateCharges = surcharges.GroupBy(x => new { x.JobId, x.Mbl, x.ChargeId, x.ChargeCode }).ToList();
+                foreach (var charge in duplicateCharges)
+                {
+                    if (charge.Count() > 1)
+                    {
+                        dataDuplicate = string.Format("Duplicate charge {0} in {1}-{2}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl);
+                    }
+                    else
+                    {
+                        var chargeExisted = csShipmentSurchargeRepo.Get(x => x.JobNo == charge.Key.JobId && x.Mblno == charge.Key.Mbl && x.ChargeId == charge.Key.ChargeId).FirstOrDefault();
+                        if (chargeExisted != null)
+                        {
+                            dataDuplicate = string.Format("Charge {0} existed in {1}-{2}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl);
+                        }
+                    }
+                }
+            }
+
+            return dataDuplicate;
+        }
     }
 }

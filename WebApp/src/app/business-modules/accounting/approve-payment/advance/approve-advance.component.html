@@ -72,7 +72,8 @@
         <div class="m-form">
             <div class="m-portlet__body">
                 <div>
-                    <adv-payment-list-request [state]="'read'"> </adv-payment-list-request>
+                    <adv-payment-list-request *ngIf="!isAdvCarrier" [state]="'read'"> </adv-payment-list-request>
+                    <list-advance-payment-carrier *ngIf="isAdvCarrier" [state]="'read'"></list-advance-payment-carrier>
                 </div>
             </div>
         </div>

@@ -58,6 +58,7 @@ export class AdvancePaymentComponent extends AppList {
     messageVoucherExisted: string = '';
 
     advanceSyncIds: any[] = [];
+    action = { action: "carrier" };
 
     constructor(
         private _accoutingRepo: AccountingRepo,
@@ -189,8 +190,8 @@ export class AdvancePaymentComponent extends AppList {
 
     prepareDeleteAdvance(selectedAdv: AdvancePayment) {
         this._accoutingRepo.checkAllowDeleteAdvance(selectedAdv.id)
-            .subscribe((value: boolean) => {
-                if (value) {
+            .subscribe((value: any) => {
+                if (value.status) {
                     this.selectedAdv = new AdvancePayment(selectedAdv);
 
                     this.showPopupDynamicRender<ConfirmPopupComponent>(
@@ -203,7 +204,11 @@ export class AdvancePaymentComponent extends AppList {
                         this.onDeleteAdvPayment();
                     })
                 } else {
-                    this.permissionPopup.show();
+                    if (!!value.message) {
+                        this._toastService.error(value.message, value.title);
+                    } else {
+                        this.permissionPopup.show();
+                    }
                 }
             });
     }
@@ -239,10 +244,24 @@ export class AdvancePaymentComponent extends AppList {
                     switch (adv.statusApproval) {
                         case 'New':
                         case 'Denied':
-                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`]);
+                            if (!adv.advanceFor || !adv.advanceFor.length) {
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`]);
+                            } else {
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}`], {
+                                    queryParams: Object.assign({}, this.action)
+                                });
+                            }
                             break;
                         default:
-                            this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
+
+                            if (!adv.advanceFor || !adv.advanceFor.length) {
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`]);
+                            } else {
+                                
+                                this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/${adv.id}/approve`], {
+                                    queryParams: Object.assign({}, this.action)
+                                });
+                            }
                             break;
                     }
                 } else {
@@ -502,6 +521,12 @@ export class AdvancePaymentComponent extends AppList {
                     console.log(error);
                 }
             )
+    }
+
+    onCreateAdvCarrier() {
+        this._router.navigate([`${RoutingConstants.ACCOUNTING.ADVANCE_PAYMENT}/new`], {
+            queryParams: Object.assign({}, this.action)
+        });
     }
 }
 

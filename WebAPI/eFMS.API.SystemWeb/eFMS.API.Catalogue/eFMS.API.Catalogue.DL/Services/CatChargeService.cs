@@ -590,5 +590,66 @@ namespace eFMS.API.Catalogue.DL.Services
             data = QueryByPermission(criteria, rangeSearch);
             return data;
         }
+
+        /// <summary>
+        /// Get charge data with current user service and charge type
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IQueryable<CatChargeModel> GetChargesWithCurrentUserService(List<string> serviceType, string type)
+        {
+            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.catCharge);
+            var rangeSearch = PermissionExtention.GetPermissionRange(currentUser.UserMenuPermission.List);
+            if (rangeSearch == PermissionRange.None)
+            {
+                return null;
+            }
+
+            Expression<Func<CatCharge, bool>> query = null;
+
+            if (serviceType.Count > 0)
+            {
+                query = x => (serviceType.Any(z => x.ServiceTypeId.Contains(z)));
+            }
+            if (!string.IsNullOrEmpty(type))
+            {
+                if (query == null)
+                {
+                    query = x => (x.Type ?? "").IndexOf(type ?? "", StringComparison.OrdinalIgnoreCase) > -1;
+                }
+                else
+                {
+                    query = query.And(x => (x.Type ?? "").IndexOf(type ?? "", StringComparison.OrdinalIgnoreCase) > -1);
+                }
+            }
+            // Query with Permission Range.
+            switch (rangeSearch)
+            {
+                case PermissionRange.Owner:
+                    query = query.And(x => x.UserCreated == currentUser.UserID && x.CompanyId == currentUser.CompanyID);
+                    break;
+                case PermissionRange.Group:
+                    query = query.And(x => (x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Department:
+                    query = query.And(x => (x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
+                                        || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Office:
+                    query = query.And(x => (x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID) || x.UserCreated == currentUser.UserID);
+                    break;
+                case PermissionRange.Company:
+                    query = query.And(x => x.CompanyId == currentUser.CompanyID || x.UserCreated == currentUser.UserID);
+                    break;
+                default:
+                    break;
+            }
+            var data = DataContext.Get(query);
+
+            var datamap = data.ProjectTo<CatChargeModel>(mapper.ConfigurationProvider);
+            return datamap;
+        }
     }
 }
