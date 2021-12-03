@@ -1,5 +1,5 @@
 <div class="form-update-advpayment">
-    <form [formGroup]="formCreate">
+    <form class="m-form m-form--state" [formGroup]="formCreate">
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group">
@@ -110,8 +110,10 @@
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label>Payee:</label>
+                <div class="form-group"
+                    [ngClass]="{'m-form__group has-danger': isSubmitted && isAdvCarrier && !selectedPayee }">
+                    <label *ngIf="!isAdvCarrier">Payee:</label>
+                    <label required *ngIf="isAdvCarrier">Payee:</label>
                     <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
                         (itemSelected)="payee.setValue($event.id); onSelectPayee($event)"
                         [dataSources]="customers | async" [displayFields]="[
@@ -121,18 +123,35 @@
                         [disabled]="isDisabled" placeholder="Select payee"
                         (remove)="resetFormControl(payee);selectedPayee = null">
                     </app-combo-grid-virtual-scroll>
+                    <div class="form-control-feedback" *ngIf="isSubmitted && isAdvCarrier && !selectedPayee">
+                        Payee is required!
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="form-group">
-                    <label class="form-control-label" for="">
-                        Currency:
-                    </label>
-                    <select class="form-control" formControlName="currency" name="currency"
-                        (ngModelChange)="changeCurrency($event)">
-                        <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
-                        </option>
-                    </select>
+                <div class="row">
+                    <div [ngClass]="isAdvCarrier ? 'col-lg-6' : 'col-lg-12'">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Currency:
+                            </label>
+                            <select class="form-control" formControlName="currency" name="currency"
+                                (ngModelChange)="changeCurrency($event)">
+                                <option *ngFor="let currency of currencyList" [ngValue]="currency.id">{{currency.id}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" *ngIf="isAdvCarrier">
+                        <div class="form-group">
+                            <label class="form-control-label" for="">
+                                Advance For:
+                            </label>
+                            <ng-select formControlName="advanceFor" [clearable]="false" [items]="advanceForDatas" placeholder=""
+                                class="custom" (ngModelChange)="changeAdvanceFor($event)">
+                            </ng-select>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-4">

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using eFMS.API.Accounting.DL.Models;
+using eFMS.API.Accounting.DL.Models.AdvancePayment;
 using eFMS.API.Accounting.DL.Models.ExportResults;
 using eFMS.API.Accounting.DL.Models.SettlementPayment;
 using eFMS.API.Accounting.DL.ViewModel;
@@ -27,7 +28,8 @@ namespace eFMS.API.Accounting.Infrastructure
             CreateMap<CatContract, CatContractModel>();
             CreateMap<AcctCombineBilling, AcctCombineBillingModel>();
             CreateMap<CsShipmentSurcharge, CsShipmentSurchargeDetailsModel>();
-
+            CreateMap<ShipmentChargeAdvance, CsShipmentSurcharge>();
+            CreateMap<CsShipmentSurcharge, ShipmentChargeAdvance>();
 
             // Map to entity model
             CreateMap<AcctSoaModel, AcctSoa>();

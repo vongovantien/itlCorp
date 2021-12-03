@@ -1,25 +1,25 @@
-﻿using System;
-using System.Linq;
-using eFMS.API.Common;
-using eFMS.API.Common.Globals;
-using eFMS.API.Accounting.DL.Common;
+﻿using eFMS.API.Accounting.DL.Common;
 using eFMS.API.Accounting.DL.IService;
 using eFMS.API.Accounting.DL.Models;
 using eFMS.API.Accounting.DL.Models.Criteria;
+using eFMS.API.Accounting.Infrastructure.Middlewares;
+using eFMS.API.Common;
+using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
+using eFMS.API.Common.Infrastructure.Common;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
-using eFMS.API.Accounting.Infrastructure.Middlewares;
-using System.Collections.Generic;
-using eFMS.API.Common.Infrastructure.Common;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using eFMS.API.Common.Helpers;
-using Microsoft.AspNetCore.Http;
 using OfficeOpenXml;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -149,17 +149,27 @@ namespace eFMS.API.Accounting.Controllers
             if (model.AdvanceRequests.Count > 0)
             {
                 //Nếu sum(Amount) > 100.000.000 & Payment Method là Cash thì báo lỗi
-                if (model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
+                if (model.AdvanceCurrency == AccountingConstants.CURRENCY_LOCAL && model.PaymentMethod.Equals(AccountingConstants.PAYMENT_METHOD_CASH))
                 {
-                    var totalAmount = model.AdvanceRequests.Sum(x => x.Amount);
+                    var totalAmount = model.AdvanceRequests.Sum(z=>z.Surcharge.Sum(x => x.Total));
                     if (totalAmount > 100000000)
                     {
                         ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
                         return BadRequest(_result);
                     }
                 }
-            }
 
+                if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+                {
+                    //Check Duplicate phí
+                    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+                    if (!string.IsNullOrEmpty(messDuplicateCharge))
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+                        return BadRequest(_result);
+                    }
+                }
+            }
             var hs = acctAdvancePaymentService.AddAdvancePayment(model);
             if (hs.Code == 403)
             {
@@ -207,7 +217,18 @@ namespace eFMS.API.Accounting.Controllers
         [Authorize]
         public IActionResult CheckAllowDelete(Guid id)
         {
-            var result = acctAdvancePaymentService.CheckDeletePermissionByAdvanceId(id);
+            var isValid = acctAdvancePaymentService.CheckDeletePermissionByAdvanceId(id);
+            if (isValid)
+            {
+                var ids = new List<Guid> { id };
+                var checkAllowDeny = acctAdvancePaymentService.CheckAdvanceAllowDenyDelete(ids);
+                if (!string.IsNullOrEmpty(checkAllowDeny))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = checkAllowDeny, Data = id };
+                    return BadRequest(_result);
+                }
+            }
+            ResultHandle result = new ResultHandle { Status = isValid };
             return Ok(result);
         }
 
@@ -341,6 +362,16 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 }
             }
+            if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+            {
+                //Check Duplicate phí
+                var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+                if (!string.IsNullOrEmpty(messDuplicateCharge))
+                {
+                    ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+                    return BadRequest(_result);
+                }
+            }
 
             var hs = acctAdvancePaymentService.UpdateAdvancePayment(model);
             if (hs.Code == 403)
@@ -405,7 +436,17 @@ namespace eFMS.API.Accounting.Controllers
                         ResultHandle _result = new ResultHandle { Status = false, Message = "Total Advance Amount by cash is not exceed 100.000.000 VND" };
                         return BadRequest(_result);
                     }
-                }                
+                }
+                if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+                {
+                    //Check Duplicate phí
+                    var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
+                    if (!string.IsNullOrEmpty(messDuplicateCharge))
+                    {
+                        ResultHandle _result = new ResultHandle { Status = false, Message = messDuplicateCharge, Data = null };
+                        return BadRequest(_result);
+                    }
+                }
             }
 
             #region -- Check Validate Email Requester --
@@ -889,6 +930,12 @@ namespace eFMS.API.Accounting.Controllers
         public IActionResult DenyAdvances(List<Guid> Ids)
         {
             currentUser.Action = "DenyAdvancePaymentsAdvancePayment";
+            var checkAllowDeny = acctAdvancePaymentService.CheckAdvanceAllowDenyDelete(Ids);
+            if (!string.IsNullOrEmpty(checkAllowDeny))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = checkAllowDeny, Data = Ids };
+                return BadRequest(_result);
+            }
 
             HandleState hs = acctAdvancePaymentService.DenyAdvancePayments(Ids);
 
