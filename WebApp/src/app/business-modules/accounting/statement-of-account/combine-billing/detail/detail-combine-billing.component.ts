@@ -5,9 +5,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppForm } from '@app';
 import { ReportPreviewComponent } from '@common';
 import { JobConstants, RoutingConstants } from '@constants';
-import {  Partner } from '@models';
+import { Partner } from '@models';
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo, ExportRepo, SystemRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { DataService } from '@services';
 import { ToastrService } from 'ngx-toastr';
 import { of } from 'rxjs';
@@ -16,6 +16,7 @@ import { CombineBilling } from 'src/app/shared/models/accouting/combine-billing.
 import { isUUID } from 'validator';
 import { CombineBillingListComponent } from '../components/combine-billing-list/combine-billing-list.component';
 import { FormGetBillingListComponent } from '../components/form-get-billing-list/form-get-billing-list.component';
+import { delayTime } from '@decorators';
 
 @Component({
   selector: 'detail-combine-billing',
@@ -37,15 +38,16 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
   billingId: string = '';
   dataSearch: any = {};
   detailCombine: CombineBilling;
-  
+
   constructor(
     protected _router: Router,
     protected _toastService: ToastrService,
     protected _accountingRepo: AccountingRepo,
     private _activedRoute: ActivatedRoute,
     private _ngProgressService: NgProgress,
+    private _dataService: DataService,
     private _exportRepo: ExportRepo,
-    private _dataService: DataService
+
   ) {
     super();
     this._progressRef = this._ngProgressService.ref();
@@ -109,11 +111,11 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
     const listService = Service.split(";");
     let activeServiceList: any = [];
     listService.forEach(item => {
-        const element = this.formSearchBillingDetail.serviceList.find(x => x.id === item.trim());
-        if (element !== undefined) {
-            const activeService = item.trim();
-            activeServiceList = [...activeServiceList, activeService];
-        }
+      const element = this.formSearchBillingDetail.serviceList.find(x => x.id === item.trim());
+      if (element !== undefined) {
+        const activeService = item.trim();
+        activeServiceList = [...activeServiceList, activeService];
+      }
     });
     return activeServiceList;
   }
@@ -188,14 +190,14 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
       totalAmountUsd: this.combineBillingListDetail.sumTotalObj.totalAmountUsd,
       description: this.formSearchBillingDetail.description.value,
       services: !!service ? service.join(';') : null,
-      issuedDateFrom: this.formSearchBillingDetail.billingDateType.value == "Issue Date" ? 
-                      (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.startDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.startDate, 'yyyy-MM-dd', 'en')) : null,
-      issuedDateTo: this.formSearchBillingDetail.billingDateType.value == "Issue Date" ? 
-                      (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.endDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
-      serviceDateFrom: this.formSearchBillingDetail.billingDateType.value == "Service Date" ? 
-                      (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.startDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.startDate, 'yyyy-MM-dd', 'en')) : null,
-      serviceDateTo: this.formSearchBillingDetail.billingDateType.value == "Service Date" ? 
-                      (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.endDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
+      issuedDateFrom: this.formSearchBillingDetail.billingDateType.value == "Issue Date" ?
+        (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.startDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.startDate, 'yyyy-MM-dd', 'en')) : null,
+      issuedDateTo: this.formSearchBillingDetail.billingDateType.value == "Issue Date" ?
+        (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.endDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
+      serviceDateFrom: this.formSearchBillingDetail.billingDateType.value == "Service Date" ?
+        (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.startDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.startDate, 'yyyy-MM-dd', 'en')) : null,
+      serviceDateTo: this.formSearchBillingDetail.billingDateType.value == "Service Date" ?
+        (!this.formSearchBillingDetail.billingDate.value || !this.formSearchBillingDetail.billingDate.value.endDate ? null : formatDate(this.formSearchBillingDetail.billingDate.value.endDate, 'yyyy-MM-dd', 'en')) : null,
       userCreated: null,
       datetimeCreated: null,
       userModified: null,
@@ -209,6 +211,16 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
 
   back() {
     this._router.navigate([`${RoutingConstants.ACCOUNTING.COMBINE_BILLING}`]);
+  }
+
+  @delayTime(1000)
+  showReport(): void {
+    this.componentRef.instance.frm.nativeElement.submit();
+    this.componentRef.instance.show();
+  }
+
+  print() {
+
   }
 
   previewDebitTemplate() {
@@ -230,4 +242,44 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
       );
   }
 
+  exportCombineOps() {
+    this._progressRef.start();
+    this._exportRepo.exportCombineOps(this.detailCombine.combineBillingNo)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => this._progressRef.complete())
+      )
+      .subscribe(
+        (response: ArrayBuffer) => {
+          if (response.byteLength > 0) {
+            this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+          } else {
+            this._toastService.warning('No data found');
+          }
+        },
+      );
+  }
+
+  previewConfirmBilling() {
+    this._progressRef.start();
+    this._accountingRepo.previewConfirmBilling(this.detailCombine.combineBillingNo)
+      .pipe(
+        catchError(this.catchError),
+        finalize(() => this._progressRef.complete()),
+      )
+      .subscribe(
+        (res: any) => {
+          this.dataReport = res;
+          debugger
+          if (this.dataReport != null && res.dataSource.length > 0) {
+            setTimeout(() => {
+              this.previewPopup.frm.nativeElement.submit();
+              this.previewPopup.show();
+            }, 1000);
+          } else {
+            this._toastService.warning('There is no data to display preview');
+          }
+        },
+      );
+  }
 }
