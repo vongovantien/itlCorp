@@ -60,6 +60,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+        private readonly IContextBase<CatCharge> catChargeRepository;
 
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
@@ -94,7 +95,8 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
-            IContextBase<SysEmailSetting> sysEmailSettingRepo) : base(repository, mapper)
+            IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -127,6 +129,7 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
+            catChargeRepository = catChargeRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -3002,7 +3005,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
-                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a> </span></div>" +
+                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a> </span></div>" +
                                                 "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
@@ -3018,6 +3021,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("[Action]", "?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("[Action]", string.Empty);
+            }
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
@@ -3090,7 +3101,7 @@ namespace eFMS.API.Accounting.DL.Services
                                                 "<li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
-                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></div>" +
+                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a></span></div>" +
                                                 "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
@@ -3107,6 +3118,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("[Action]", "?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("[Action]", string.Empty);
+            }
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
@@ -4362,10 +4381,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (model.AdvanceFor == "HBL")
             {
-                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo, x.AdvanceType }).ToList();
+                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo }).ToList();
                 foreach (var sm in shipmentTypeGrp)
                 {
-                    if (sm.Count() > 1)
+                    if (sm.GroupBy(x => x.AdvanceType).Count() > 1)
                     {
                         dataDuplicate = string.Format("Cant set differrent type in {0}-{1}-{2}", sm.Key.JobId, sm.Key.Mbl, sm.Key.Hbl);
                         return dataDuplicate;
@@ -4387,6 +4406,12 @@ namespace eFMS.API.Accounting.DL.Services
                             dataDuplicate = string.Format("Charge {0} existed in {1}-{2}-{3}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl, charge.Key.Hbl);
                             return dataDuplicate;
                         }
+                    }
+                    var shipmentType = GetTransactionTypeOfChargeByHblId(charge.Key.Hblid);
+                    if(!catChargeRepository.First(x=>x.Id == charge.Key.ChargeId).ServiceTypeId.Contains(shipmentType))
+                    {
+                        dataDuplicate = string.Format("Charge {0} with {1} not compatible service", charge.Key.ChargeCode, charge.Key.JobId);
+                        return dataDuplicate;
                     }
                 }
             }

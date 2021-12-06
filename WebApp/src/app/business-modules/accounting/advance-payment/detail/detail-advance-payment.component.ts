@@ -176,7 +176,11 @@ export class AdvancePaymentDetailComponent
                     } else {
                         this.listAdvancePaymentCarrierComponent.advForType = this.advancePayment.advanceFor;
                         this.listAdvancePaymentCarrierComponent.setListAdvRequest(this.advancePayment.advanceRequests);
-                        
+                        const advanceRequestList = this.advancePayment.advanceRequests;
+                        this.listAdvancePaymentCarrierComponent.configShipment.dataSource = 
+                                advanceRequestList.filter((item: any) => advanceRequestList.map((sh) => sh.hblid).indexOf(item.hblid) === -1 && advanceRequestList.map((sh) => sh.customNo).indexOf(item.customNo) === -1);
+                        this.listAdvancePaymentCarrierComponent.configShipment.dataSource = [...this.listAdvancePaymentCarrierComponent.configShipment.dataSource, ...advanceRequestList];
+
                         this.listAdvancePaymentCarrierComponent.advanceNo =
                             this.advancePayment.advanceNo;
                     }
