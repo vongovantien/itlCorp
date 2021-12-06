@@ -110,7 +110,7 @@
                                 <td>
                                     <div class="form-group "
                                         [ngClass]="{'m-form__group has-danger': isSubmitted  && (charge.vatrate > 100) }">
-                                        <ng-container *ngIf="!state === 'update';else vatTpl ">
+                                        <ng-container *ngIf="state === 'update';else vatTpl ">
                                             <input type="number" class="form-control"
                                                 [(ngModel)]="charge.vatrate"
                                                 (ngModelChange)="calculateTotal($event, charge.quantity, charge.unitPrice, charge)"
