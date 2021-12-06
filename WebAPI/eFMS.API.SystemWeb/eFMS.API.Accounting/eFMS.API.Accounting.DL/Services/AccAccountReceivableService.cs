@@ -1083,7 +1083,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds, bool isOverDue = false)
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1098,7 +1098,6 @@ namespace eFMS.API.Accounting.DL.Services
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
-                        agreementPartner.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
                         hs = await contractPartnerRepo.UpdateAsync(agreementPartner, x => x.Id == agreementPartner.Id);
                     }
                     else
@@ -1110,7 +1109,6 @@ namespace eFMS.API.Accounting.DL.Services
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
-                            agreementParent.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
 
                             hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
                         }
@@ -1165,17 +1163,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
                 var agreementIds = receivables.Select(s => s.ContractId).ToList();
 
-                if (receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
-                 || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
-                 || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)))
-                {
-                    await UpdateAgreementPartnersAsync(partnerIds, agreementIds, true);
-                }
-                else
-                {
-                    await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
-                }
-                
+                await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
 
                 return hs;
             }
