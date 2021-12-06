@@ -103,6 +103,7 @@ export class AdvancePaymentDetailComponent
         } else {
             for (const item of this.listAdvancePaymentCarrierComponent.listAdvanceCarrier) {
                 item.requestCurrency = currency;
+                item.currencyId = currency;
             }
             this.listAdvancePaymentCarrierComponent.currency = currency;
         }
@@ -352,6 +353,7 @@ export class AdvancePaymentDetailComponent
                 return true;
             }
             this.formCreateComponent.isSubmitted = false;
+            this.listAdvancePaymentCarrierComponent.isSubmitted = false;
         }
         return false;
     }

@@ -1098,7 +1098,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(advance.AdvanceFor))
                             {
-                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).Select(x => x.Id).ToList();
+                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo)).Select(x => x.Id).ToList();
                                 var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
                             }
                             acctAdvanceRequestRepo.SubmitChanges();
@@ -1245,27 +1245,36 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Hblno = item.Hbl;
                     charge.ClearanceNo = item.CustomNo;
                     charge.AdvanceNoFor = model.AdvanceNo;
-                    charge.Type = "ADV";
+                    charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
                     charge.PaymentObjectId = model.Payee;
+                    charge.ExchangeDate = model.RequestDate;
                     if (surcharge == null)
                     {
-                        charge.ExchangeDate = DateTime.Now;
                         charge.UserCreated = currentUser.UserID;
                         charge.DatetimeCreated = DateTime.Now;
+                        charge.ExchangeDate = DateTime.Now;
+                        charge.FinalExchangeRate = null;
                     }
                     else
                     {
-                        charge.ExchangeDate = surcharge.ExchangeDate;
-                        charge.FinalExchangeRate = surcharge.FinalExchangeRate;
                         charge.UserCreated = surcharge.UserCreated;
                         charge.DatetimeCreated = surcharge.DatetimeCreated;
+                        charge.ExchangeDate = surcharge.ExchangeDate;
+                        if(surcharge.CurrencyId != charge.CurrencyId || surcharge.ExchangeDate != charge.ExchangeDate)
+                        {
+                            charge.FinalExchangeRate = null;
+                        }
+                        else
+                        {
+                            charge.FinalExchangeRate = surcharge.FinalExchangeRate;
+                        }
                     }
                     charge.DatetimeModified = DateTime.Now;
                     charge.UserModified = currentUser.UserID;
-                    charge.ExchangeDate = DateTime.Now;
 
                     #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                    charge.Type = "ADV";
                     charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -1342,7 +1351,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (hs.Success)
                         {
-                            if (!string.IsNullOrEmpty(model.AdvanceFor))
+                            if (!string.IsNullOrEmpty(model.AdvanceFor)) // TH: advance carrier
                             {
                                 model = AddChargeAdvance(model);
                             }
@@ -1899,9 +1908,9 @@ namespace eFMS.API.Accounting.DL.Services
                             var sendMailSuggest = true;
                             if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
-                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && advanceApprove.BuheadAprDate != null) // Create Charge For Shipment [advance carrier]
                                 {
-                                    UpdateChargesApprove(advancePayment);
+                                    UpdateChargesApprove(advancePayment, advanceApprove.BuheadAprDate);
                                 }
                                 //Send Mail Approved
                                 sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2247,9 +2256,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                         {
-                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && approve.BuheadAprDate != null) // Create Charge For Shipment [Advance carrier]
                             {
-                                UpdateChargesApprove(advancePayment);
+                                UpdateChargesApprove(advancePayment, approve.BuheadAprDate);
                             }
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2288,7 +2297,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="advancePayment"></param>
         /// <returns></returns>
-        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment)
+        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment, DateTime? approveDate)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -2305,7 +2314,7 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.IsFromShipment = true;
                             charge.UserModified = currentUser.UserID;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.ExchangeDate = DateTime.Now;
+                            charge.ExchangeDate = approveDate; // exchange date = approve date
                             charge.FinalExchangeRate = null;
                             #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                             var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
@@ -4241,7 +4250,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var adv = DataContext.First(x => x.Id == Id);
                 if (!string.IsNullOrEmpty(adv.AdvanceFor))
                 {
-                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && !string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).FirstOrDefault();
+                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && (!string.IsNullOrEmpty(x.SettlementCode) || !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.CreditNo))).FirstOrDefault();
                     if (surcharge != null)
                     {
                         var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
@@ -4287,12 +4296,23 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
+
+                                    if (!string.IsNullOrEmpty(adv.AdvanceFor))
+                                    {
+                                        var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo);
+                                        foreach (var charge in surcharge)
+                                        {
+                                            charge.Type = "ADV";
+                                            var hsSur = csShipmentSurchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     DataContext.SubmitChanges();
                     acctApproveAdvanceRepo.SubmitChanges();
+                    csShipmentSurchargeRepo.SubmitChanges();
                     trans.Commit();
                     return result;
                 }
