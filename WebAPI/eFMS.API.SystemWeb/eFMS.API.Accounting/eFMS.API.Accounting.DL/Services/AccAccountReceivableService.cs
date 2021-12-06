@@ -1039,11 +1039,16 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     agreement.IsOverLimit = false;
                 }
+
+                agreement.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
+                );
             }
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds, bool isOverDue = false)
+        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1058,7 +1063,6 @@ namespace eFMS.API.Accounting.DL.Services
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
-                        agreementPartner.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
                         hs = contractPartnerRepo.Update(agreementPartner, x => x.Id == agreementPartner.Id);
                     }
                     else
@@ -1070,7 +1074,6 @@ namespace eFMS.API.Accounting.DL.Services
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
-                            agreementParent.IsOverDue = isOverDue; // Có hóa đơn quá hạn.
 
                             hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
                         }
@@ -1293,15 +1296,7 @@ namespace eFMS.API.Accounting.DL.Services
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
                 var agreementIds = receivables.Select(s => s.ContractId).ToList();
 
-                if (receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0) 
-                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0) 
-                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0))) {
-                    UpdateAgreementPartners(partnerIds, agreementIds, true);
-                }
-                else
-                {
-                    UpdateAgreementPartners(partnerIds, agreementIds);
-                }
+                UpdateAgreementPartners(partnerIds, agreementIds);
 
                 return hs;
             }
