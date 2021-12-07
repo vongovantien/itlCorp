@@ -19,6 +19,7 @@
 
         #region -- TYPE CHARGE --
         public static readonly string TYPE_CHARGE_BUY = "BUY";
+        public static readonly string TYPE_CHARGE_OTHER = "OTHER";
         public static readonly string TYPE_CHARGE_SELL = "SELL";
         public static readonly string TYPE_CHARGE_OBH = "OBH";
         public static readonly string TYPE_CHARGE_OBH_BUY = "OBH-BUY";
