@@ -1101,7 +1101,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(advance.AdvanceFor))
                             {
-                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo)).Select(x => x.Id).ToList();
+                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.PaySoano)).Select(x => x.Id).ToList();
                                 var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
                             }
                             acctAdvanceRequestRepo.SubmitChanges();
@@ -2658,7 +2658,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("{{CurrencyAdvance}}", advance.AdvanceCurrency);
             body = body.Replace("{{JobIds}}", jobIds);
             body = body.Replace("{{RequestDate}}", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
-            body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve");
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve");
+            }
             body = body.Replace("{{LogoEFMS}}", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> toEmails = new List<string> {
@@ -3006,7 +3013,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             "</ul>" +
                                             "<p>" +
                                                 "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a> </span></div>" +
-                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
+                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
                                          "</div>");
@@ -3102,7 +3109,7 @@ namespace eFMS.API.Accounting.DL.Services
                                             "</ul>" +
                                             "<p>" +
                                                 "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a></span></div>" +
-                                                "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
+                                                "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
                                          "</div>");
@@ -4269,10 +4276,10 @@ namespace eFMS.API.Accounting.DL.Services
                 var adv = DataContext.First(x => x.Id == Id);
                 if (!string.IsNullOrEmpty(adv.AdvanceFor))
                 {
-                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && (!string.IsNullOrEmpty(x.SettlementCode) || !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.CreditNo))).FirstOrDefault();
+                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && (!string.IsNullOrEmpty(x.SettlementCode) || !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.PaySoano))).FirstOrDefault();
                     if (surcharge != null)
                     {
-                        var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
+                        var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No/Soa No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
                         return messageNotAllow;
                     }
                 }

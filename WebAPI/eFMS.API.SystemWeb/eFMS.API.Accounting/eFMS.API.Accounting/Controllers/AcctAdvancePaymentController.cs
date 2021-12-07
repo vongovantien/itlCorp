@@ -159,7 +159,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 }
 
-                if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+                if (!string.IsNullOrEmpty(model.AdvanceFor))
                 {
                     //Check Duplicate phí
                     var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
@@ -362,7 +362,7 @@ namespace eFMS.API.Accounting.Controllers
                     }
                 }
             }
-            if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+            if (!string.IsNullOrEmpty(model.AdvanceFor))
             {
                 //Check Duplicate phí
                 var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
@@ -437,7 +437,7 @@ namespace eFMS.API.Accounting.Controllers
                         return BadRequest(_result);
                     }
                 }
-                if (model.AdvanceRequests.FirstOrDefault().Surcharge.Count > 0)
+                if (!string.IsNullOrEmpty(model.AdvanceFor))
                 {
                     //Check Duplicate phí
                     var messDuplicateCharge = acctAdvancePaymentService.CheckDuplicateCharge(model);
