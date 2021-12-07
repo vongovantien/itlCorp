@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { AccountingRepo, CatalogueRepo } from '@repositories';
+import { AccountingRepo, CatalogueRepo, ExportRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AccAccountingManagementModel, Partner, ChartOfAccounts } from '@models';
@@ -69,7 +69,7 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
         private _catalogueRepo: CatalogueRepo,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -173,4 +173,5 @@ export class ConfirmBillingDetailComponent extends AppForm implements OnInit {
     gotoList() {
         this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/confirm-billing`]);
     }
+
 }

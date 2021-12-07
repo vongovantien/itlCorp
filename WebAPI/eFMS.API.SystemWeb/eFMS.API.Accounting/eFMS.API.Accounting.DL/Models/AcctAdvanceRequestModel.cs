@@ -1,10 +1,13 @@
-﻿using eFMS.API.Accounting.Service.Models;
+﻿using eFMS.API.Accounting.DL.Models.AdvancePayment;
+using eFMS.API.Accounting.Service.Models;
 using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.DL.Models
 {
     public class AcctAdvanceRequestModel : AcctAdvanceRequest
     {
+        public List<ShipmentChargeAdvance> Surcharge { get; set; }
         public DateTime? RequestDate { get; set; }
         public DateTime? ApproveDate { get; set; }
         public DateTime? SettleDate { get; set; }

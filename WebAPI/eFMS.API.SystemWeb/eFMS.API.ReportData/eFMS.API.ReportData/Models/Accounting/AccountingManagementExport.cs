@@ -67,5 +67,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public DateTime? ServiceDate { get; set; }
         public DateTime? VoucherIddate { get; set; }
         public DateTime? IssueDate { get; set; }
+        public DateTime? ETA { get; set; }
+        public DateTime? ETD { get; set; }
     }
 }

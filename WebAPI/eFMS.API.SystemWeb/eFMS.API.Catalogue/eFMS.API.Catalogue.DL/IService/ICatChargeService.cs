@@ -25,5 +25,6 @@ namespace eFMS.API.Catalogue.DL.IService
         IQueryable<CatChargeModel> GetSettlePaymentCharges(string keySearch, bool? Active, int? size);
         object GetListService();
         bool CheckAllowPermissionAction(Guid id, PermissionRange range);
+        IQueryable<CatChargeModel> GetChargesWithCurrentUserService(List<string> serviceType, string type);
     }
 }

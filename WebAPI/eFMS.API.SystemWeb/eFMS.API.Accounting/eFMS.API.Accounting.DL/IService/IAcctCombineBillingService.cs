@@ -24,5 +24,7 @@ namespace eFMS.API.Accounting.DL.IService
         AcctCombineBillingModel GetCombineBillingDetailWithId(string Id);
         CombineBillingDebitDetailsModel GetDataPreviewDebitNoteTemplate(AcctCombineBillingModel combineDetail);
         Crystal PreviewCombineDebitTemplate(CombineBillingDebitDetailsModel model);
+        CombineOPSModel GetDataExportCombineOps(string combineBillingNo);
+        Crystal PreviewConfirmBilling(string combineBillingNo);
     }
 }

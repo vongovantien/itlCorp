@@ -4,7 +4,7 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)"></adv-payment-form-create>
+                <adv-payment-form-create (onChangeCurrency)="onChangeCurrency($event)" (onChangeAdvanceFor)="changeAdvanceFor($event)"></adv-payment-form-create>
             </div>
         </div>
     </div>
@@ -12,7 +12,8 @@
     <div class="m-portlet">
         <div class="m-form">
             <div class="m-portlet__body">
-                <adv-payment-list-request></adv-payment-list-request>
+                <adv-payment-list-request *ngIf="!isAdvCarrier"></adv-payment-list-request>
+                <list-advance-payment-carrier *ngIf="isAdvCarrier"></list-advance-payment-carrier>
                 <div class="row">
                     <div class="col-12">
                         <div class="m--align-center m--margin-top-20">
