@@ -78,7 +78,8 @@ namespace eFMS.API.System.DL.Services
             }
 
             list.Add(model.ReplicateOffice);
-          
+            list.Add(model.AccountReceivable);
+
 
             if (data.Count() == 0)
             {
