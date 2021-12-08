@@ -2111,24 +2111,31 @@ namespace eFMS.API.Accounting.DL.Services
                 }
                 else if(receiptCurrent.Class == AccountingConstants.RECEIPT_CLASS_CLEAR_DEBIT)
                 {
+                    // kiểm tra hóa đơn phát sinh payment # với payment trong receipt current.
+                    List<string> receiptCurrentPaymentInvoiceList = acctPaymentRepository.Get(x => x.ReceiptId == receiptCurrent.Id).Select(x => x.InvoiceNo).ToList();
+                    
                     IQueryable<AccAccountingPayment> hasPayments = acctPaymentRepository.Get(x => x.ReceiptId != receiptCurrent.Id
                     && x.PartnerId == receiptCurrent.CustomerId
                     && (x.Type == AccountingConstants.ACCOUNTANT_TYPE_DEBIT || x.Type == AccountingConstants.TYPE_CHARGE_OBH)
                     && DateTime.Compare(x.DatetimeCreated ?? DateTime.Now, receiptCurrent.DatetimeCreated ?? DateTime.Now) > 0
+                    && receiptCurrentPaymentInvoiceList.Any(invoice => invoice == x.InvoiceNo)
                     );
 
-                    var query = from p in hasPayments
-                                join r in DataContext.Get() on p.ReceiptId equals r.Id
-                                where r.Status == AccountingConstants.RECEIPT_STATUS_DONE
-                                select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
-
-                    if(query != null && query.Count() > 0)
+                    if(hasPayments.Count() > 0)
                     {
-                        return new HandleState((object)string.Format(
-                            "You can not cancel this receipt, because {0} - {1} have payment time later than this receipt. please cancel the lastest receipts first!",
-                            query.FirstOrDefault()?.InvoiceNo,
-                            query.FirstOrDefault()?.PaymentRefNo
-                            ));
+                        var query = from p in hasPayments
+                                    join r in DataContext.Get() on p.ReceiptId equals r.Id
+                                    where r.Status == AccountingConstants.RECEIPT_STATUS_DONE
+                                    select new { r.Id, p.InvoiceNo, r.PaymentRefNo };
+
+                        if (query != null && query.Count() > 0)
+                        {
+                            return new HandleState((object)string.Format(
+                                "You can not cancel this receipt, because {0} - {1} have payment time later than this receipt. please cancel the lastest receipts first!",
+                                query.FirstOrDefault()?.InvoiceNo,
+                                query.FirstOrDefault()?.PaymentRefNo
+                                ));
+                        }
                     }
                 }
 
