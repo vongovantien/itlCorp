@@ -11,15 +11,16 @@ import { Partner } from 'src/app/shared/models';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { formatDate } from '@angular/common';
 @Component({
-  selector: 'app-form-search-rule',
-  templateUrl: './form-search-rule.component.html',
-  styleUrls: ['./form-search-rule.component.scss']
+    selector: 'app-form-search-rule',
+    templateUrl: './form-search-rule.component.html'
 })
 export class FormSearchRuleComponent extends AppForm {
 
     @Output() onSearch: EventEmitter<Partial<ITariffSearch> | any> = new EventEmitter<Partial<ITariffSearch> | any>();
     tariffTypes: CommonInterface.IValueDisplay[] | any[];
     selectedTariffType: CommonInterface.IValueDisplay = null;
+
+    services: CommonInterface.IComboGirdConfig | any = {};
 
     status: CommonInterface.IValueDisplay[] | any[];
     selectedStatus: CommonInterface.IValueDisplay = null;
@@ -84,6 +85,8 @@ export class FormSearchRuleComponent extends AppForm {
         this.getCustomer();
         this.getCarrierAndShipper();
         this.getOffice();
+        this.getService();
+        this.getStatus();
     }
 
     initFormSearch() {
@@ -101,6 +104,28 @@ export class FormSearchRuleComponent extends AppForm {
         this.tariffDate = this.formSearchTariff.controls['tariffDate'];
         this.tariffDateType = this.formSearchTariff.controls['tariffDateType'];
         this.tariffStatus = this.formSearchTariff.controls['tariffStatus'];
+    }
+    getService() {
+        this.services = [
+            { displayName: 'Air Export', value: 'AE' },
+            { displayName: 'Air Import', value: 'AI' },
+            { displayName: 'Sea Consol Export', value: 'SCE' },
+            { displayName: 'Sea Consol Import', value: 'SCI' },
+            { displayName: 'Sea FCL Export', value: 'SFE' },
+            { displayName: 'Sea FCL Import', value: 'SFI' },
+            { displayName: 'Sea LCL Export', value: 'SLE' },
+            { displayName: 'Sea LCL Import', value: 'SLI' },
+            // { displayName: 'Job OPS', value: 'JovOPS' },
+            // { displayName: 'Custom Logistic', value: 'CustomLogistic' },
+            // { displayName: 'Inland Trucking', value: 'InlandTrucking' },
+        ];
+    }
+    getStatus() {
+        this.status = [
+            { displayName: 'All', value: 'all' },
+            { displayName: 'Active', value: 'active' },
+            { displayName: 'Inactive', value: 'inactive' },
+        ];
     }
 
     getBasicData() {

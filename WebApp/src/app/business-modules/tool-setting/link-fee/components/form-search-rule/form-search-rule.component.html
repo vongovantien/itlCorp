@@ -2,9 +2,58 @@
     <div class="m-portlet__body">
         <div class="m-form">
             <div class="row" [formGroup]="formSearchTariff">
-                <div class="col-md-6">
+                <div class="col-md-3">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !nameRule}">
+                        <label required>Rule Name</label>
+                        <input type="text" class="form-control" formControlName="nameRule">
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !nameRule">
+                            Rule Name is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !serviceSelling}">
+                        <label required>Service Buying</label>
+                        <select formControlName="serviceSelling" class="form-control">
+                            <option *ngFor="let item of services" [ngValue]="item.value">
+                                {{item.displayName}}
+                            </option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !serviceSelling">
+                            Service Selling is required !
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !serviceSelling}">
+                        <label required>Service Selling</label>
+                        <select formControlName="serviceSelling" class="form-control">
+                            <option *ngFor="let item of services" [ngValue]="item.value">
+                                {{item.displayName}}
+                            </option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !serviceSelling">
+                            Service Selling is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !serviceSelling}">
+                        <label required>Status</label>
+                        <select formControlName="serviceSelling" class="form-control">
+                            <option *ngFor="let item of status" [ngValue]="item.value">
+                                {{item.displayName}}
+                            </option>
+                        </select>
+                        <div class="form-control-feedback" *ngIf="isSubmitted && !serviceSelling">
+                            Service Selling is required !
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="">Service Buying</label>
+                        <label for="">Partner Buying</label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="configCustomer.selectedDisplayFields"
@@ -13,9 +62,9 @@
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label for="">Service Selling</label>
+                        <label for="">Partner Selling</label>
                         <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedCustomer"
                             (itemSelected)="onSelectDataFormInfo($event, 'customer')"
                             [selectedDisplayFields]="configCustomer.selectedDisplayFields"
@@ -24,7 +73,7 @@
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Date</label>
                         <div class="m-input-icon m-input-icon--right down daterange-rtl">
@@ -40,7 +89,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="">Type Date</label>
                         <select formControlName="tariffType" class="form-control">
@@ -48,8 +97,8 @@
                         </select>
                     </div>
                 </div>
-                
-                
+
+
             </div>
             <div class="form-actions">
                 <div class="row">

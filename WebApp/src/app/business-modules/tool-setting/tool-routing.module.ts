@@ -68,10 +68,10 @@ const routes: Routes = [
     },
     {
         path: 'link-fee',
-        component: LinkFeeComponent,
+        component: LinkFeeComponent, loadChildren: () => import('./link-fee/link-fee.module').then(m => m.LinkFeeModule),
         data: {
             name: "Link Fee",
-            level: 2
+            title:"eFMS Link Fee"
         }
     },
 ];

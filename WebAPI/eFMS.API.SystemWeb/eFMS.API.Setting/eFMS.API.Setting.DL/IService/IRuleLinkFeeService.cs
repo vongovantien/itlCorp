@@ -9,11 +9,12 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.IService
 {
-    public interface ICsRuleLinkFeeService : IRepositoryBase<CsRuleLinkFee, CsRuleLinkFeeModel>
+    public interface IRuleLinkFeeService : IRepositoryBase<CsRuleLinkFee, CsRuleLinkFeeModel>
     {
         HandleState AddNewRuleLinkFee(CsRuleLinkFeeModel model);
         HandleState UpdateRuleLinkFee(CsRuleLinkFeeModel model);
-        HandleState DeleteRuleLinkFee(Guid idRuleLinkFee);
         List<CsRuleLinkFeeModel> Paging(CsRuleLinkFeeCriteria criteria, int page, int size, out int rowsCount);
+        CsRuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee);
+        HandleState DeleteRuleLinkFee(Guid? id);
     }
 }

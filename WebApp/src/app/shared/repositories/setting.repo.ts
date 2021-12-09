@@ -147,6 +147,39 @@ export class SettingRepo {
             map((data: any) => data)
         );
     }
+
+    getRule(page?: number, size?: number, body: any = {}) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Paging`, body, {
+            pageNumber: '' + page,
+            pageSize: '' + size
+        }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    deleteRule(ruleId: string) {
+        return this._api.delete(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Delete`, { id: ruleId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    addRule(body: any) {
+        return this._api.post(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/Add`, body).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    getDetailRule(ruleId: string) {
+        return this._api.get(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkFee/getRuleByID`, { id: ruleId }).pipe(
+            map((data: any) => data)
+        );
+    }
+
+    updateRule(body: any) {
+        return this._api.put(`${environment.HOST.SETTING}/api/${this.VERSION}/en-US/RuleLinkfee/Update`, body).pipe(
+            map((data: any) => data)
+        );
+    }
 }
 
 

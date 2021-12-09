@@ -25,23 +25,23 @@ namespace eFMS.API.Setting.Controllers
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     //[Authorize]
-    public class CsRuleLinkFeeController : ControllerBase
+    public class RuleLinkFeeController : ControllerBase
     {
         private readonly IStringLocalizer stringLocalizer;
         private ICurrentUser currentUser;
-        private ICsRuleLinkFeeService csRuleLinkFeeService;
+        private IRuleLinkFeeService ruleLinkFeeService;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="curUser"></param>
-        public CsRuleLinkFeeController(IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser curUser, ICsRuleLinkFeeService service)
+        public RuleLinkFeeController(IStringLocalizer<LanguageSub> localizer,
+            ICurrentUser curUser, IRuleLinkFeeService service)
         {
             stringLocalizer = localizer;
             currentUser = curUser;
-            csRuleLinkFeeService = service;
+            ruleLinkFeeService = service;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace eFMS.API.Setting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             currentUser.Action = "AddNewRuleLinkFee";
-            var hs = csRuleLinkFeeService.AddNewRuleLinkFee(model);
+            var hs = ruleLinkFeeService.AddNewRuleLinkFee(model);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -84,7 +84,7 @@ namespace eFMS.API.Setting.Controllers
         [Authorize]
         public IActionResult Paging(CsRuleLinkFeeCriteria criteria, int pageNumber, int pageSize)
         {
-            var data = csRuleLinkFeeService.Paging(criteria, pageNumber, pageSize, out int totalItems);
+            var data = ruleLinkFeeService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
             return Ok(result);
         }
@@ -95,12 +95,12 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult DeleteRuleLinkFee(Guid id)
         {
             currentUser.Action = "DeleteRuleLinkFee";
-            var data = csRuleLinkFeeService.Get(x => x.Id == id)?.FirstOrDefault();
+            var data = ruleLinkFeeService.GetRuleLinkFeeById(id);
             if (data == null)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND].Value });
             }
-            HandleState hs = csRuleLinkFeeService.DeleteRuleLinkFee(id);
+            HandleState hs = ruleLinkFeeService.DeleteRuleLinkFee(data.Id);
             if (hs.Code == 403)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
@@ -128,7 +128,7 @@ namespace eFMS.API.Setting.Controllers
         {
             currentUser.Action = "UpdateCsRuleLinkFee";
             if (!ModelState.IsValid) return BadRequest();
-            var hs = csRuleLinkFeeService.UpdateRuleLinkFee(model);
+            var hs = ruleLinkFeeService.UpdateRuleLinkFee(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
@@ -140,33 +140,18 @@ namespace eFMS.API.Setting.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Get details settlement payment by settlementId
-        /// </summary>
-        /// <param name="settlementId"></param>
-        /// <returns></returns>
-        //[HttpGet]
-        //[Route("GetDetailRuleLinkFeeById")]
-        //[Authorize]
-        //public IActionResult GetDetailRuleLinkFeeById(Guid ruleId)
-        //{
-        //    //var isAllowViewDetail = acctSettlementPaymentService.CheckDetailPermissionBySettlementId(settlementId);
-        //    //if (isAllowViewDetail == false)
-        //    //{
-        //    //    return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
-        //    //}
-
-        //    var settlement = acctSettlementPaymentService.GetSettlementPaymentById(settlementId);
-        //    List<ShipmentSettlement> chargeGrpSettlement = new List<ShipmentSettlement>();
-        //    List<ShipmentChargeSettlement> chargeNoGrpSettlement = new List<ShipmentChargeSettlement>();
-        //    if (settlement != null)
-        //    {
-        //        chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-        //        chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-        //    }
-        //    var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
-        //    return Ok(data);
-        //}   
+        [HttpGet]
+        [Route("getRuleByID")]
+        [Authorize]
+        public IActionResult getdetailrulelinkfeebyid(Guid id)
+        {
+            var rule = ruleLinkFeeService.GetRuleLinkFeeById(id);
+            if (rule==null)
+            {
+                return BadRequest();
+            }
+            return Ok(rule);
+        }
 
     }
 }
