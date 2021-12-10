@@ -9,7 +9,11 @@ namespace eFMS.API.ForPartner.Service.Models
         public Guid? AcctManagementId { get; set; }
         public string Type { get; set; }
         public string PartnerId { get; set; }
+        public string RefNo { get; set; }
         public Guid? Hblid { get; set; }
+        public decimal? TotalAmountVnd { get; set; }
+        public decimal? TotalAmountUsd { get; set; }
+        public decimal? TotalAmount { get; set; }
         public decimal? UnpaidAmount { get; set; }
         public decimal? UnpaidAmountVnd { get; set; }
         public decimal? UnpaidAmountUsd { get; set; }

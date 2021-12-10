@@ -23,6 +23,7 @@ using eFMS.API.ForPartner.Service.ViewModels;
 using System.Data;
 using eFMS.API.ForPartner.DL.ViewModel;
 using eFMS.API.ForPartner.DL.Models.Receivable;
+using System.Threading.Tasks;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -50,6 +51,8 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
         private readonly IContextBase<AccAccountReceivable> accReceivableRepository;
+        private readonly IContextBase<SysOffice> officeRepository;
+
 
         public AccAccountingManagementService(
             IContextBase<AccAccountingManagement> repository,
@@ -76,7 +79,9 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<CatContract> catContractRepo,
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<AcctReceiptSync> receiptSyncRepo,
-            IContextBase<AccAccountReceivable> accReceivableRepo
+            IContextBase<AccAccountReceivable> accReceivableRepo,
+            IContextBase<SysOffice> officeRepo
+
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -101,6 +106,7 @@ namespace eFMS.API.ForPartner.DL.Service
             acctAdvanceRequestRepository = acctAdvanceRequestRepo;
             receiptSyncRepository = receiptSyncRepo;
             accReceivableRepository = accReceivableRepo;
+            officeRepository = officeRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -2236,6 +2242,335 @@ namespace eFMS.API.ForPartner.DL.Service
             };
             var result = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_UpdateVoucherExpense>(parameters);
             return result.FirstOrDefault();
+        }
+
+        public async Task<HandleState> InsertVoucher(VoucherCreateModel model, string apiKey)
+        {
+            SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
+            if (office == null)
+            {
+                return new HandleState((object)model.OfficeCode + " không tồn tại");
+            }
+            var refNos = model.Details.Select(x => x.BravoRefNo).ToList();
+
+            var voucherExistedRefNo = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE && refNos.Contains(x.ReferenceNo));
+            if(voucherExistedRefNo != null && voucherExistedRefNo.Count() > 0)
+            {
+                return new HandleState((object)string.Format("Số {0} đã tồn tại", string.Join(",", voucherExistedRefNo.Select(x => x.VoucherId))));
+            }
+            string _messageInvalidDoc = string.Empty;
+            switch (model.DocType)
+            {
+                case "SOA":
+                    AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == model.DocID.ToString())?.FirstOrDefault();
+                    if(soa == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ SOA {0} không tồn tại", model.DocCode);
+                    }
+                    break;
+                case "CDNOTE":
+                    AcctCdnote cdNote = acctCdNoteRepo.Get(x => x.Id == model.DocID)?.FirstOrDefault();
+                    if (cdNote == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ CDNOTE {0} không tồn tại", model.DocCode);
+                    }
+                    break;
+                case "SETTLEMENT":
+                    AcctSettlementPayment sm = settlementPaymentRepo.Get(x => x.Id == model.DocID)?.FirstOrDefault();
+                    if (sm == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ SETTLEMENT {0} không tồn tại", model.DocCode);
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+            if(!string.IsNullOrEmpty(_messageInvalidDoc))
+            {
+                return new HandleState((object)_messageInvalidDoc);
+            }
+
+
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = office.Id;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "InsertVoucher";
+
+            HandleState hsInsertVoucher = await InsertVoucher(model);
+
+            return hsInsertVoucher;
+        }
+
+        private async Task<HandleState> InsertVoucher(VoucherCreateModel model)
+        {
+            HandleState rs = new HandleState();
+
+            var customer = partnerRepo.Get(x => x.AccountNo == model.CustomerCode)?.FirstOrDefault();
+            if(customer == null)
+            {
+                return new HandleState((object)"Đối tượng " + model.OfficeCode + " không tồn tại");
+            }
+            // gom các detail cùng voucherNo, voucherDate,
+            var grpVoucherDetail = model.Details
+                .GroupBy(x => new { x.VoucherNo, x.TransactionType })
+                .Select(s => new {
+                    s.Key.VoucherNo,
+                    s.Key.TransactionType,
+                    voucherData = s.FirstOrDefault(),
+                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId}).ToList()
+                    })
+                .ToList();
+            if(grpVoucherDetail.Count > 0)
+            {
+                List<AccAccountingManagement> vouchers = new List<AccAccountingManagement>();
+
+                foreach (var item in grpVoucherDetail)
+                {
+                    SysOffice officeCurrent = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
+
+                    var isVoucherExisted = DataContext.Any(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
+                                                            && x.VoucherId == item.VoucherNo
+                                                            && x.OfficeId == officeCurrent.Id && x.Date.Value.Month == item.voucherData.VoucherDate.Month);
+                    if(isVoucherExisted)
+                    {
+                        return new HandleState((object)string.Format("Voucher {0} - {1} đã tồn tại", item.VoucherNo, item.voucherData.VoucherDate.Month));
+                    }
+
+                    VoucherCreateRowModel itemGroup = item.voucherData;
+                    AccAccountingManagement voucher = new AccAccountingManagement
+                    {
+                        Id = Guid.NewGuid(),
+                        Type = ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE,
+                        VoucherId = itemGroup.VoucherNo,
+                        VoucherType = itemGroup.VoucherType,
+                        AccountNo = itemGroup.AccountNo,
+                        Currency = itemGroup.Currency,
+                        Date = itemGroup.VoucherDate,
+                        PaymentTerm = itemGroup.PaymentTerm,
+                        TotalAmountVnd = itemGroup.AmountVnd,
+                        TotalAmountUsd = itemGroup.AmountUsd,
+                        TotalAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? itemGroup.AmountVnd : itemGroup.AmountUsd,
+                        UnpaidAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? itemGroup.AmountVnd : itemGroup.AmountUsd,
+                        UnpaidAmountVnd = itemGroup.AmountVnd,
+                        UnpaidAmountUsd = itemGroup.AmountUsd,
+                        PaymentDueDate = itemGroup.VoucherDate.AddDays((double)(itemGroup.PaymentTerm)),
+                        PaymentMethod = itemGroup.PaymentMethod,
+                        TotalExchangeRate = itemGroup.ExchangeRate,
+                        TransactionType = itemGroup.TransactionType,
+                        AttachDocInfo = model.DocCode,
+                        ReferenceNo = itemGroup.BravoRefNo,
+
+                        PartnerId = customer.Id,
+                        PartnerAddress = customer.AddressEn,
+                        PersonalName = customer.ShortName,
+
+                        Status = ForPartnerConstants.ACCOUNTING_INVOICE_STATUS_NEW,
+                        PaymentStatus = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
+                        SyncStatus = ForPartnerConstants.STATUS_SYNCED,
+                        Description = "Voucher được đồng bộ từ bravo",
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
+                        DatetimeCreated = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        GroupId = currentUser.GroupId,
+                        DepartmentId = currentUser.DepartmentId,
+                        OfficeId = currentUser.OfficeID,
+                        CompanyId = currentUser.CompanyID,
+                        LastSyncDate = DateTime.Now,
+                        ServiceType = null, // Invoice mới cần Service type
+                        SourceCreated = "Bravo",
+                    };
+
+                    vouchers.Add(voucher);
+
+                }
+                using (var transVoucher = DataContext.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        HandleState hs = await DataContext.AddAsync(vouchers);
+                        if(hs.Success)
+                        {
+                            transVoucher.Commit();
+                            using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
+                            {
+                                try
+                                {
+                                    foreach (var itemGrp in grpVoucherDetail)
+                                    {
+                                        List<Guid> surchargesIdInvoucher = itemGrp.surcharges.Select(x => x.ChargeId).ToList();
+                                        IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => surchargesIdInvoucher.Contains(x.Id));
+
+                                        AccAccountingManagement voucher = vouchers.Where(v => v.VoucherId == itemGrp.VoucherNo && v.Date == itemGrp.voucherData.VoucherDate)?.FirstOrDefault();
+
+                                        if (surcharges.Count() > 0)
+                                        {
+                                            foreach (var surcharge in surcharges)
+                                            {
+                                                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                                {
+                                                    surcharge.VoucherIdre = itemGrp.VoucherNo;
+                                                    surcharge.VoucherIdredate = voucher.Date;
+                                                    surcharge.PayerAcctManagementId = voucher.Id;
+                                                }
+                                                else
+                                                {
+                                                    surcharge.VoucherId = itemGrp.VoucherNo;
+                                                    surcharge.VoucherIddate = voucher.Date;
+                                                    surcharge.AcctManagementId = voucher.Id;
+                                                }
+                                                
+                                                surcharge.InvoiceNo = itemGrp.voucherData.InvoiceNo;
+                                                surcharge.InvoiceDate = itemGrp.voucherData.InvoiceDate;
+                                                surcharge.SeriesNo = itemGrp.voucherData.SerieNo;
+                                                surcharge.DatetimeModified = voucher.DatetimeCreated;
+                                                surcharge.UserModified = currentUser.UserID;
+                                                surcharge.ReferenceNo = itemGrp.voucherData.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
+                                                surcharge.VatAmountVnd = itemGrp.voucherData.VatAmountVnd;
+                                                surcharge.AmountVnd = itemGrp.voucherData.AmountVnd;
+                                                surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;
+                                                surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
+                                                surcharge.FinalExchangeRate = itemGrp.voucherData.ExchangeRate;
+                                               
+                                                AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
+                                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
+                                                surcharge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
+
+                                                surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+
+                                            }
+
+                                            if(model.DocType == ForPartnerConstants.SYNCED_FROM_SETTLEMENT)
+                                            {
+                                                string settlementNo = surcharges.FirstOrDefault().SettlementCode; // các phí trong detail phải cùng số SM.
+                                                if(!string.IsNullOrEmpty(settlementNo))
+                                                {
+                                                    await UpdateVoucherSettlement(settlementNo, voucher.VoucherId, voucher.Date);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    HandleState hsSurcharge = surchargeRepo.SubmitChanges();
+                                    if (hsSurcharge.Success)
+                                    {
+                                        transSurcharge.Commit();
+                                        if (model.DocType == ForPartnerConstants.SYNCED_FROM_SETTLEMENT)
+                                        {
+                                            using (var transSM = acctSettlementRepo.DC.Database.BeginTransaction())
+                                            {
+                                                try
+                                                {
+                                                    acctSettlementRepo.SubmitChanges();
+                                                    transSM.Commit();
+                                                }
+                                                catch (Exception ex)
+                                                {
+                                                    transSM.Rollback();
+                                                    throw ex;
+                                                }
+                                                finally
+                                                {
+                                                    transSM.Dispose();
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            switch (model.DocType)
+                                            {
+                                                case "SOA":
+                                                    var hsUpdateSoa = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_SOA);
+                                                    break;
+                                                case "CDNOTE":
+                                                    var hsUpdateCdenote = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_CDNOTE);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                    }       
+                                }
+                                catch (Exception ex)
+                                {
+                                    transSurcharge.Rollback();
+                                    throw ex;
+
+                                }
+                                finally
+                                {
+                                    transSurcharge.Dispose();
+                                }
+                            }                           
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transVoucher.Rollback();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        transVoucher.Dispose();
+                    }
+                }
+            }
+
+            return rs;
+        }
+
+        private async Task<HandleState> UpdateStatusBilling(Guid Id, string _status, string _type)
+        {
+            HandleState hs = new HandleState();
+            if(_type == ForPartnerConstants.SYNCED_FROM_CDNOTE)
+            {
+                // List<AcctCdnote> cdNotelistAsync = await acctCdNoteRepo.GetAsync(x => x.Id.ToString() == Id.ToString());
+                // AcctCdnote cdNote = cdNotelistAsync.FirstOrDefault();
+                AcctCdnote cdNote = acctCdNoteRepo.Get(x => x.Id.ToString() == Id.ToString()).FirstOrDefault();
+
+                cdNote.Status = _status;
+                cdNote.UserModified = currentUser.UserID;
+                cdNote.DatetimeModified = DateTime.Now;
+
+                hs = await acctCdNoteRepo.UpdateAsync(cdNote, x => x.Id == cdNote.Id);
+
+            }
+            else if(_type == ForPartnerConstants.SYNCED_FROM_SOA)
+            {
+                List<AcctSoa> soalistAsync = await acctSOARepository.GetAsync(x => x.Id.ToString() == Id.ToString());
+                AcctSoa soa = soalistAsync.FirstOrDefault();
+
+                soa.Status = _status;
+                soa.UserModified = currentUser.UserID;
+                soa.DatetimeModified = DateTime.Now;
+
+                hs = await acctSOARepository.UpdateAsync(soa, x => x.Id == soa.Id);
+
+            }
+
+            return hs;
+        }
+
+        private async Task<HandleState> UpdateVoucherSettlement(string _settleCode, string _voucherNo, DateTime? _voucherDate)
+        {
+            AcctSettlementPayment settlement = settlementPaymentRepo.Get(x => x.SettlementNo == _settleCode).FirstOrDefault();
+            if (settlement != null)
+            {
+                settlement.VoucherDate = _voucherDate;
+                settlement.VoucherNo = _voucherNo;
+                settlement.UserModified = currentUser.UserID;
+                settlement.DatetimeModified = DateTime.Now;
+            }
+
+            return await settlementPaymentRepo.UpdateAsync(settlement, x => x.Id == settlement.Id, false);
+        }
+
+        private string GetTransactionType(List<string> jobNos)
+        {
+            return string.Empty;
         }
     }
 }

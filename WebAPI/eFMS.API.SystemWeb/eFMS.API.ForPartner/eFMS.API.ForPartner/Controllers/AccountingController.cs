@@ -705,5 +705,38 @@ namespace eFMS.API.ForPartner.Controllers
                 return Ok(result);
             return Ok(result);
         }
+
+        [HttpPut("CreateVoucher")]
+        public async Task<IActionResult> CreateVoucher(VoucherCreateModel model, [Required] string apiKey, [Required] string hash)
+        {
+            var _startDateProgress = DateTime.Now;
+            string _objectRequest = JsonConvert.SerializeObject(model);
+
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+
+            HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+
+            #region -- Ghi Log --
+            string _funcLocal = "CreateVoucher";
+            string _major = "Tạo voucher";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion
+
+            return Ok(result);
+        }
     }
 }

@@ -58,6 +58,7 @@
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
         public static readonly string PAYMENT_METHOD_BANK = "Bank";
         public static readonly string PAYMENT_METHOD_BANK_OR_CASH = "Bank Transfer / Cash";
+        public static readonly string PAYMENT_METHOD_OTHER = "Other";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -150,5 +151,8 @@
 
         public static readonly string SYNCED_FROM_CDNOTE = "CDNOTE";
         public static readonly string SYNCED_FROM_SOA = "SOA";
+        public static readonly string SYNCED_FROM_SETTLEMENT = "SETTLEMENT";
+
+        public static readonly int KB_EXCHANGE_RATE = 20000;
     }
 }
