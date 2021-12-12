@@ -181,7 +181,9 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             flightVesselName: [],
             voyNo: [],
             pono: [],
-            mawb: [],
+            mawb: ['', Validators.compose([
+                FormValidators.validateSpecialChar
+            ])],
             podDescription: [null, Validators.required],
             polDescription: [],
             // * select

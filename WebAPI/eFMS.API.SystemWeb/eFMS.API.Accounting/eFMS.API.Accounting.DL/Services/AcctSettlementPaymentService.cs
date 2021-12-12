@@ -2554,8 +2554,7 @@ namespace eFMS.API.Accounting.DL.Services
                                (_amount % 1 > 0 ? "đồng lẻ" : "đồng chẵn")
                             :
                             settlement.SettlementCurrency;
-
-                    _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
+                        _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
                 }
                 fe.Inword = _inword;
             });
@@ -4815,15 +4814,16 @@ namespace eFMS.API.Accounting.DL.Services
         public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
         {
             string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
-
             #region -- Info Manager, Accoutant & Department --
             var _settlementApprove = acctApproveSettlementRepo.Get(x => x.SettlementNo == settlementPayment.SettlementNo && x.IsDeny == false).FirstOrDefault();
             string _manager = string.Empty;
             string _accountant = string.Empty;
+            string _bod = string.Empty;
             if (_settlementApprove != null)
             {
                 _manager = string.IsNullOrEmpty(_settlementApprove.Manager) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Manager)?.EmployeeNameVn;
                 _accountant = string.IsNullOrEmpty(_settlementApprove.Accountant) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Accountant)?.EmployeeNameVn;
+                _bod = string.IsNullOrEmpty(_settlementApprove.Buhead) ? string.Empty : userBaseService.GetEmployeeByUserId(_settlementApprove.Buhead)?.EmployeeNameVn;
             }
 
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
@@ -4832,10 +4832,16 @@ namespace eFMS.API.Accounting.DL.Services
             var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
 
-            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).FirstOrDefault();
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
+            var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
+            var soa = acctSoaRepo.Get(x => soapayNo.Contains(x.Soano)).ToList();
 
-            var soa = acctSoaRepo.Get(x => x.Soano == surcharge.PaySoano).FirstOrDefault();
-
+            var ops = opsTransactionRepo.Get(x => x.JobNo == surcharge.FirstOrDefault().JobNo).FirstOrDefault();
+            var partner = new CatPartner();
+            if (ops != null)
+            {
+                partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
+            }
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4855,10 +4861,14 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = settlementPayment.BankName,
                 BankCode = settlementPayment.BankCode,
                 DueDate = settlementPayment.DueDate,
-                SOADate = soa?.SoaformDate,
-                SOANo = soa?.Soano,
-                ReasonForRequest = soa?.Note
-    };
+                SOADate = soa.FirstOrDefault()?.SoaformDate,
+                SOANo = string.Join(";",soa?.Select(x=>x.Soano)),
+                Supplier = partner?.ShortName,
+                Note=settlementPayment.Note,
+                SettlementCurrency=settlementPayment.SettlementCurrency,
+                BOD = _bod,
+            };
+                
             return infoSettlement;
         }
 
@@ -4902,7 +4912,6 @@ namespace eFMS.API.Accounting.DL.Services
                     shipmentSettlement.Pcs = ops.SumPackages;
                     shipmentSettlement.Cbm = ops.SumCbm;
                     shipmentSettlement.ServiceDate = ops.ServiceDate;
-
                     var employeeId = sysUserRepo.Get(x => x.Id == ops.BillingOpsId).FirstOrDefault()?.EmployeeId;
                     _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                     shipmentSettlement.PersonInCharge = _personInCharge;
@@ -4932,7 +4941,7 @@ namespace eFMS.API.Accounting.DL.Services
                             _personInCharge = sysEmployeeRepo.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                             shipmentSettlement.PersonInCharge = _personInCharge;
                             shipmentSettlement.ServiceDate = trans.ServiceDate;
-                        }
+                        }   
                         listData.Add(shipmentSettlement);
                     }
                 }
@@ -4953,16 +4962,17 @@ namespace eFMS.API.Accounting.DL.Services
                 //Quy đổi theo currency của Settlement
                 if (settlementCurrency == AccountingConstants.CURRENCY_LOCAL)
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountVnd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountVnd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0);
                 }
                 else
                 {
-                    infoShipmentCharge.ChargeNetAmount = (sur.AmountUsd ?? 0);
+                    infoShipmentCharge.ChargeNetAmount = sur.NetAmount;
                     infoShipmentCharge.ChargeVatAmount = (sur.VatAmountUsd ?? 0);
                     infoShipmentCharge.ChargeAmount = (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0);
                 }
+                
                 infoShipmentCharge.InvoiceNo = sur.InvoiceNo;
                 infoShipmentCharge.ChargeNote = sur.Notes;
                 string _chargeType = string.Empty;
@@ -4979,7 +4989,7 @@ namespace eFMS.API.Accounting.DL.Services
                     _chargeType = "NO_INVOICE";
                 }
                 infoShipmentCharge.ChargeType = _chargeType;
-
+                infoShipmentCharge.SurType = sur.Type;
                 listCharge.Add(infoShipmentCharge);
             }
             return listCharge;
@@ -5071,8 +5081,8 @@ namespace eFMS.API.Accounting.DL.Services
                                           join cstd in csTranstionDetails on sur.Hblid equals cstd.Id // Join HBL
                                           join cst in csTransations on cstd.JobId equals cst.Id into cs // join Cs Transation
                                           from cst in cs.DefaultIfEmpty()
-                                          //join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
-                                          //from cus in cus1.DefaultIfEmpty()
+                                              //join cus in custom on new { JobNo = (cst.JobNo != null ? cst.JobNo : cst.JobNo), HBL = (cstd.Hwbno != null ? cstd.Hwbno : cstd.Hwbno), MBL = (cstd.Mawb != null ? cstd.Mawb : cstd.Mawb) } equals new { JobNo = cus.JobNo, HBL = cus.Hblid, MBL = cus.Mblid } into cus1
+                                              //from cus in cus1.DefaultIfEmpty()
 
                                           where sur.SettlementCode == settleCode
                                           select new SettlementExportDefault
@@ -5102,7 +5112,7 @@ namespace eFMS.API.Accounting.DL.Services
                                 HBL = s.Key.HBL,
                                 CustomNo = s.Key.CustomNo,
                                 SettlementTotalAmount = s.Sum(d => d.SettlementAmount),
-                                requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, out advTotalAmount),
+                                requestList = getRequestList(data, s.Key.JobID, s.Key.HBL, s.Key.MBL, s.Key.SettleNo, s.FirstOrDefault().Currency, out advTotalAmount),
                                 AdvanceTotalAmount = advTotalAmount,
                                 BalanceTotalAmount = advTotalAmount - s.Sum(d => d.SettlementAmount)
                             });
@@ -5127,15 +5137,16 @@ namespace eFMS.API.Accounting.DL.Services
 
         }
 
+
         private List<SettlementExportDefault> getRequestList(List<SettlementExportDefault> data, string JobID,
-            string HBL, string MBL, string SettleNo, out decimal? advTotalAmount)
+            string HBL, string MBL, string SettleNo, string Currency, out decimal? advTotalAmount)
         {
             var advRequest = acctAdvanceRequestRepo.Get();
             var advPayment = acctAdvancePaymentRepo.Get();
             var settleDesc = DataContext.Get().Where(x => x.SettlementNo == SettleNo).FirstOrDefault().Note;
             //
-            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl })
-                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount) });
+            var groupAdvReq = advRequest.GroupBy(x => new { x.JobId, x.AdvanceNo, x.Hbl, x.Mbl, x.RequestCurrency })
+                            .Select(y => new { y.Key.JobId, y.Key.Hbl, y.Key.Mbl, y.Key.AdvanceNo, AdvanceAmount = y.Sum(z => z.Amount * currencyExchangeService.CurrencyExchangeRateConvert(null, null, z.RequestCurrency, Currency)) });
             var groupAdvReqByStatus = from advReq in groupAdvReq
                                       join advPay in advPayment on advReq.AdvanceNo equals advPay.AdvanceNo
                                       where advPay.StatusApproval == "Done"
@@ -5170,14 +5181,14 @@ namespace eFMS.API.Accounting.DL.Services
                     MBL = y.Key.MBL,
                     SettleNo = y.Key.SettleNo,
                     AdvanceNo = y.Key.AdvanceNo,
-                    SettlementAmount = y.Sum(z => z.SettlementAmount),
+                    SettlementAmount = y.Key.Currency == "VND" ? Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 0) : Math.Round(y.Sum(z => (decimal)z.SettlementAmount), 2),
                     ApproveDate = y.Key.ApproveDate,
                     Currency = y.Key.Currency,
                     CustomNo = y.Key.CustomNo,
                     Description = settleDesc,
                     RequestDate = y.Key.RequestDate,
                     Requester = y.Key.Requester
-                });
+                }); ;
             var groupDataAdvanceNoIsNull = groupData.Where(x => x.AdvanceNo == null);
             groupData = groupData.Where(x => x.AdvanceNo != null);
             var result = from gd in groupData
@@ -5217,6 +5228,7 @@ namespace eFMS.API.Accounting.DL.Services
             return output;
 
         }
+
 
         /// <summary>
         /// Get data for General Preview

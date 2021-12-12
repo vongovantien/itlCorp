@@ -29,6 +29,8 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string SupplierName { get; set; }
         public DateTime? SOADate { get; set; }
         public string SOANo { get; set; }
+        public string Supplier { get; set; }
         public string ReasonForRequest { get; set; }
+        public string BOD { get; set; }
     }
 }

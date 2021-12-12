@@ -290,8 +290,13 @@ export class ShareSeaServiceFormCreateHouseBillSeaExportComponent extends AppFor
             issueHbldate: [],
 
             // * Input
-            mawb: [null],
-            hwbno: [null, Validators.required],
+            mawb: [null,Validators.compose([
+                FormValidators.validateSpecialChar
+            ])],
+            hwbno: [null,Validators.compose([
+                Validators.required,
+                FormValidators.validateSpecialChar
+            ])],
             localVoyNo: [],
             finalDestinationPlace: [],
             oceanVoyNo: [null, Validators.required],
