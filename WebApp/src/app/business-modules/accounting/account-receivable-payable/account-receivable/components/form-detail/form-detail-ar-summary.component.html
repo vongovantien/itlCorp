@@ -129,6 +129,9 @@
                                     {{ accReceivableDetail.agreementType === "Guaranteed" ? "%"
                                     : accReceivableDetail.agreementCurrency }}
                                 </span>
+                                <span *ngIf="!!accReceivableDetail.isOverLimit" title="Contract is over credit limit">
+                                    <i class="la la-exclamation la-lg text-danger"></i>
+                                </span>
                             </div>
 
                         </div>
@@ -168,6 +171,9 @@
                             <span
                                 *ngIf="(accReceivableDetail.agreementType === 'Guaranteed' && accReceivableDetail.saleCreditLimited)">
                                 {{accReceivableDetail.agreementCurrency}}
+                            </span>
+                            <span *ngIf="accReceivableDetail.isExpired">
+                                <i class="la la-history la-lg"></i>
                             </span>
                         </div>
                     </div>
@@ -299,12 +305,14 @@
 
                     </div>
                     <div class="col-lg-6">
-                        <div><span class="text-danger">{{ accReceivableDetail.over1To15Day |
-                                number: '.0-3' }}</span>
-                            <span *ngIf="accReceivableDetail.over1To15Day">
-                                {{ accReceivableDetail.arCurrency }}
+                        <span class="text-danger">{{ accReceivableDetail.over1To15Day |
+                            number: '.0-3' }}</span>
+                        <span *ngIf="accReceivableDetail.over1To15Day">
+                            {{ accReceivableDetail.arCurrency }}
+                            <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
+                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
                             </span>
-                        </div>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -346,12 +354,15 @@
                         <h6 class="font-weight-bold">Over 16-30 days:</h6>
                     </div>
                     <div class="col-lg-6">
-                        <div><span class="text-danger">{{ accReceivableDetail.over16To30Day
-                                | number: '.0-3'}}</span>
-                            <span *ngIf="accReceivableDetail.over16To30Day">
-                                {{ accReceivableDetail.arCurrency }}
+                        <span class="text-danger">{{ accReceivableDetail.over16To30Day
+                            | number: '.0-3'}}</span>
+                        <span *ngIf="accReceivableDetail.over16To30Day">
+                            {{ accReceivableDetail.arCurrency }}
+                            <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
+                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
                             </span>
-                        </div>
+                        </span>
+
                     </div>
                 </div>
             </div>
@@ -407,14 +418,15 @@
                         </div>
                     </div>
                     <div class="col-lg-6">
-                        <div>
-                            <div><span class="text-danger">{{ accReceivableDetail.over30Day |
-                                    number: '.0-3'}}</span>
-                                <span *ngIf="accReceivableDetail.over30Day">
-                                    {{ accReceivableDetail.arCurrency }}
-                                </span>
-                            </div>
-                        </div>
+                        <span class="text-danger">{{ accReceivableDetail.over30Day |
+                            number: '.0-3'}}</span>
+                        <span *ngIf="accReceivableDetail.over30Day">
+                            {{ accReceivableDetail.arCurrency }}
+                            <span *ngIf="!!accReceivableDetail.isOverDue" title="Contract have overdued">
+                                <i class="la la-exclamation-triangle la-lg text-warning"></i>
+                            </span>
+                        </span>
+
                     </div>
                 </div>
             </div>
@@ -450,7 +462,8 @@
                         <h6 class="font-weight-bold">Over Amount:</h6>
                     </div>
                     <div class="col-lg-7">
-                        <div><span class="text-primary">{{(accReceivableDetail.debitAmount - accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
+                        <div><span class="text-primary">{{(accReceivableDetail.debitAmount -
+                                accReceivableDetail.creditLimited)| number: '.0-3'}}</span>
                             <span *ngIf="accReceivableDetail.creditAmount">
                                 {{ accReceivableDetail.arCurrency }}
                             </span>

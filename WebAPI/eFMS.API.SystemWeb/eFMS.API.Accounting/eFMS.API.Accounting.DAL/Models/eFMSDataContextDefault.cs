@@ -1665,6 +1665,12 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
+                entity.Property(e => e.IsExpired).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsOverDue).HasDefaultValueSql("((0))");
+
+                entity.Property(e => e.IsOverLimit).HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.OfficeId)
                     .HasColumnName("OfficeID")
                     .IsUnicode(false);
