@@ -19,6 +19,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Common.Helpers;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -706,8 +707,8 @@ namespace eFMS.API.ForPartner.Controllers
             return Ok(result);
         }
 
-        [HttpPut("CreateVoucher")]
-        public async Task<IActionResult> CreateVoucher(VoucherCreateModel model, [Required] string apiKey, [Required] string hash)
+        [HttpPost("CreateVoucher")]
+        public async Task<IActionResult> CreateVoucher(VoucherSyncCreateModel model, [Required] string apiKey, [Required] string hash)
         {
             var _startDateProgress = DateTime.Now;
             string _objectRequest = JsonConvert.SerializeObject(model);
@@ -720,7 +721,7 @@ namespace eFMS.API.ForPartner.Controllers
             {
                 return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
             }
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values);
 
             HandleState hs = await accountingManagementService.InsertVoucher(model, apiKey);
 
@@ -735,6 +736,31 @@ namespace eFMS.API.ForPartner.Controllers
             string _major = "Tạo voucher";
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion
+
+            //  TODO: ghi nhận công nợ phải trả,
+            return Ok(result);
+        }
+
+        [HttpPut("UpdateVoucher")]
+        public async Task<IActionResult> UpdateVoucher(VoucherSyncUpdateModel model,[Required] string apiKey, [Required] string hash)
+        {
+
+            HandleState hs = await accountingManagementService.UpdateVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Cập nhật voucher thành công" : string.Format("{0} Cập nhật voucher thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            return Ok(result);
+        }
+
+        [HttpDelete("DeleteVoucher")]
+        public async Task<IActionResult> DeleteVoucher(VoucherSyncDeleteModel model, [Required] string apiKey, [Required] string hash)
+        {
+            // TODO check voucher công nợ đã có thanh toán
+            HandleState hs = await accountingManagementService.DeleteVoucher(model, apiKey);
+
+            string _message = hs.Success ? "Xóa voucher thành công" : string.Format("{0} Xóa voucher thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
 
             return Ok(result);
         }

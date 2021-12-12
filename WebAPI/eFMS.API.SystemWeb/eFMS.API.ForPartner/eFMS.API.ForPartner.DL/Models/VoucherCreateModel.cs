@@ -1,16 +1,21 @@
-﻿using System;
+﻿using eFMS.API.ForPartner.DL.Anotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace eFMS.API.ForPartner.DL.Models
 {
-    public class VoucherCreateModel
+    public class VoucherSyncCreateModel
     {
         [Required]
         public Guid DocID { get; set; }
         [Required]
         public string DocCode { get; set; }
-        [Required]
+        [StringContainAttribute(AllowableValues = new string[] {
+            "CDNOTE",
+            "SETTLEMENT",
+            "SOA"
+        })]
         public string DocType { get; set; }
         [Required]
         public string CustomerCode { get; set; }
@@ -36,6 +41,12 @@ namespace eFMS.API.ForPartner.DL.Models
         public string SerieNo { get; set; }
         public string AccountNo { get; set; }
         public string VoucherType { get; set; }
+        [StringContainAttribute(AllowableValues = new string[] {
+            "CREDIT",
+            "ADV",
+            "OBH",
+            "NONE"
+        })]
         public string TransactionType { get; set; }
         public string JobNo { get; set; }
         public string MblNo { get; set; }
@@ -43,6 +54,44 @@ namespace eFMS.API.ForPartner.DL.Models
         public string PaymentMethod { get; set; }
         public string BravoRefNo { get; set; }
 
+    }
+
+    public class VoucherSyncUpdateModel
+    {
+        public Guid DocID { get; set; }
+        [Required]
+        public string DocCode { get; set; }
+        [StringContainAttribute(AllowableValues = new string[] {
+            "CDNOTE",
+            "SETTLEMENT",
+            "SOA"
+        })]
+        public string VoucherNo { get; set; }
+        [Required]
+        public string CustomerCode { get; set; }
+    }
+
+    public class VoucherSyncDeleteModel
+    {
+        public string VoucherNo { get; set; }
+        public DateTime VoucherDate { get; set; }
+        [Required]
+        public string DocCode { get; set; }
+        [StringContainAttribute(AllowableValues = new string[] {
+            "CDNOTE",
+            "SETTLEMENT",
+            "SOA"
+        })]
+        public string DocType { get; set; }
+        public string OfficeCode { get; set; }
+    }
+
+    public class VoucherGroupDetail
+    {
+        public string VoucherNo { get; set; }
+        public string TransactionType { get; set; }
+        public VoucherCreateRowModel VoucherData { get; set; }
+        public List<object> Surcharges { get; set; }
     }
 }
  

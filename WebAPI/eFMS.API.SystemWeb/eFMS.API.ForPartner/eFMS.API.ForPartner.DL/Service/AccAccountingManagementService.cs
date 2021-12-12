@@ -24,6 +24,7 @@ using System.Data;
 using eFMS.API.ForPartner.DL.ViewModel;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace eFMS.API.ForPartner.DL.Service
 {
@@ -2244,7 +2245,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return result.FirstOrDefault();
         }
 
-        public async Task<HandleState> InsertVoucher(VoucherCreateModel model, string apiKey)
+        public async Task<HandleState> InsertVoucher(VoucherSyncCreateModel model, string apiKey)
         {
             SysOffice office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
             if (office == null)
@@ -2305,7 +2306,7 @@ namespace eFMS.API.ForPartner.DL.Service
             return hsInsertVoucher;
         }
 
-        private async Task<HandleState> InsertVoucher(VoucherCreateModel model)
+        private async Task<HandleState> InsertVoucher(VoucherSyncCreateModel model)
         {
             HandleState rs = new HandleState();
 
@@ -2395,7 +2396,6 @@ namespace eFMS.API.ForPartner.DL.Service
                         HandleState hs = await DataContext.AddAsync(vouchers);
                         if(hs.Success)
                         {
-                            transVoucher.Commit();
                             using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
                             {
                                 try
@@ -2454,18 +2454,23 @@ namespace eFMS.API.ForPartner.DL.Service
                                             }
                                         }
                                     }
+
                                     HandleState hsSurcharge = surchargeRepo.SubmitChanges();
                                     if (hsSurcharge.Success)
                                     {
-                                        transSurcharge.Commit();
+                                        HandleState hsUpdateBilling = new HandleState();
+
                                         if (model.DocType == ForPartnerConstants.SYNCED_FROM_SETTLEMENT)
                                         {
                                             using (var transSM = acctSettlementRepo.DC.Database.BeginTransaction())
                                             {
                                                 try
                                                 {
-                                                    acctSettlementRepo.SubmitChanges();
-                                                    transSM.Commit();
+                                                    hsUpdateBilling = acctSettlementRepo.SubmitChanges();
+                                                    if(hsUpdateBilling.Success)
+                                                    {
+                                                        transSM.Commit();
+                                                    }
                                                 }
                                                 catch (Exception ex)
                                                 {
@@ -2483,19 +2488,37 @@ namespace eFMS.API.ForPartner.DL.Service
                                             switch (model.DocType)
                                             {
                                                 case "SOA":
-                                                    var hsUpdateSoa = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_SOA);
+                                                    hsUpdateBilling = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_SOA);
                                                     break;
                                                 case "CDNOTE":
-                                                    var hsUpdateCdenote = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_CDNOTE);
+                                                    hsUpdateBilling = await UpdateStatusBilling(model.DocID, ForPartnerConstants.STATUS_SOA_ISSUED_VOUCHER, ForPartnerConstants.SYNCED_FROM_CDNOTE);
                                                     break;
                                                 default:
                                                     break;
                                             }
                                         }
-                                    }       
+
+                                        if(hsUpdateBilling.Success)
+                                        {
+                                            transVoucher.Commit();
+                                            transSurcharge.Commit();
+                                        }
+                                        else
+                                        {
+                                            transVoucher.Rollback();
+                                            transSurcharge.Rollback();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        transVoucher.Rollback();
+                                        transSurcharge.Rollback();
+
+                                    }
                                 }
                                 catch (Exception ex)
                                 {
+                                    transVoucher.Rollback();
                                     transSurcharge.Rollback();
                                     throw ex;
 
@@ -2568,9 +2591,114 @@ namespace eFMS.API.ForPartner.DL.Service
             return await settlementPaymentRepo.UpdateAsync(settlement, x => x.Id == settlement.Id, false);
         }
 
-        private string GetTransactionType(List<string> jobNos)
+        public async Task<HandleState> UpdateVoucher(VoucherSyncUpdateModel model, string apiKey)
         {
-            return string.Empty;
+            return new HandleState();
+        }
+
+        public async Task<HandleState> DeleteVoucher(VoucherSyncDeleteModel model, string apiKey)
+        {
+            HandleState hs = new HandleState();
+
+            var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
+            && x.VoucherId == model.VoucherNo
+            && x.Date == model.VoucherDate)?.FirstOrDefault();
+
+            if (voucherToDelete != null)
+            {
+                using (var transS = surchargeRepo.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+                        Expression<Func<CsShipmentSurcharge, bool>> query = q => true;
+                        switch (model.DocType)  
+                        {
+                            case "SOA":
+                                query = query.And(x => x.PaySoano == model.DocCode);
+                                break;
+                            case "CDNOTE":
+                                query = query.And(x => x.CreditNo == model.DocCode);
+                                break;
+                            case "SETTLEMENT":
+                                query = query.And(x => x.SettlementCode == model.DocCode);
+                                break;
+                            default:
+                                break;
+                        }
+                        surcharges = surchargeRepo.Get(query);
+
+                        if(surcharges.Count() > 0)
+                        {
+                            foreach (var surcharge in surcharges)
+                            {
+                                if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
+                                {
+                                    surcharge.VoucherIdre = null;
+                                    surcharge.PayerAcctManagementId = null;
+                                    surcharge.VoucherIdredate = null;
+                                }
+                                else
+                                {
+                                    surcharge.VoucherId = null;
+                                    surcharge.VoucherIddate = null;
+                                    surcharge.AcctManagementId = null;
+                                }
+
+                                // Giữ nguyên các giá trị amount hay recalculate ???
+                                /* 
+                                surcharge.InvoiceNo = null;
+                                surcharge.InvoiceDate = itemGrp.voucherData.InvoiceDate;
+                                surcharge.SeriesNo = itemGrp.voucherData.SerieNo;
+                                surcharge.DatetimeModified = voucher.DatetimeCreated;
+                                surcharge.VatAmountVnd = itemGrp.voucherData.VatAmountVnd;
+                                surcharge.AmountVnd = itemGrp.voucherData.AmountVnd;
+                                surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;
+                                surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
+                                surcharge.FinalExchangeRate = itemGrp.voucherData.ExchangeRate; 
+
+                                AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
+                                surcharge.NetAmount = amountSurcharge.NetAmountOrig; 
+                                surcharge.Total = amountSurcharge.GrossAmountOrig; 
+                                */
+
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.ReferenceNo = null; //remove số ref của bravo sync trước đó
+                                surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+
+                            }
+
+                            HandleState hsSurchargeUpdate = surchargeRepo.SubmitChanges();
+                        }
+
+                        using (var transV = DataContext.DC.Database.BeginTransaction())
+                        {
+                            HandleState hsDeletVoucher = await DataContext.DeleteAsync(x => x.Id == voucherToDelete.Id);
+                            if (hsDeletVoucher.Success)
+                            {
+                                transS.Commit();
+                                transV.Commit();
+                            }
+                            else
+                            {
+                                transS.Rollback();
+                                transV.Rollback();
+                            }
+                            transV.Dispose();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transS.Rollback();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        transS.Dispose();
+                    }
+                }
+            }                    
+            return hs;
         }
     }
 }
