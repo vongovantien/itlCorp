@@ -1176,6 +1176,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetShipmentAssignPICCarrier(System.String)">
+            <summary>
+            get list of shipment assign or PIC is current user for adv carrier
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Documentation.Controllers.ShipmentController.GetDataJobProfitAnalysis(eFMS.API.Documentation.DL.Models.Criteria.GeneralReportCriteria)">
             <summary>
             Get data for export accounting P/L

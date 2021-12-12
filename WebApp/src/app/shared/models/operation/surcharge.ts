@@ -66,6 +66,7 @@ export class Surcharge {
     vatPartnerShortName: string = null;
     syncedFrom: string = null;
     syncedFromBy: string = null;
+    advanceNoFor: string = null;
 
     // * Custom
     obhId: string = null;

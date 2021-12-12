@@ -419,6 +419,10 @@ namespace eFMS.API.Accounting.Service.Models
 
                 entity.Property(e => e.AdvanceCurrency).HasMaxLength(10);
 
+                entity.Property(e => e.AdvanceFor)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.AdvanceNo)
                     .IsRequired()
                     .HasMaxLength(11)
@@ -2318,6 +2322,10 @@ namespace eFMS.API.Accounting.Service.Models
                 entity.Property(e => e.AcctManagementId).HasColumnName("AcctManagementID");
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
+
+                entity.Property(e => e.AdvanceNoFor)
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.AmountUsd)
                     .HasColumnName("AmountUSD")
