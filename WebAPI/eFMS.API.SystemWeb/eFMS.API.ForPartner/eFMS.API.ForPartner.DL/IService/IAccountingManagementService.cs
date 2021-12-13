@@ -28,5 +28,7 @@ namespace eFMS.API.ForPartner.DL.IService
         Task<HandleState> UpdateVoucher(VoucherSyncUpdateModel model, string apiKey);
         Task<HandleState> DeleteVoucher(VoucherSyncDeleteModel model, string apiKey);
 
+        List<AccAccountPayable> GenerateListAccPayable(VoucherSyncCreateModel model, Guid? voucherID);
+
     }
 }

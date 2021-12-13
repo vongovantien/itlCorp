@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eFMS.API.ForPartner.Service.Models
+namespace eFMS.API.Accounting.Service.Models
 {
     public partial class AccAccountPayable
     {
@@ -9,7 +9,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public Guid? PartnerId { get; set; }
         public Guid? VoucherId { get; set; }
         public string PaymentNo { get; set; }
-        public string ReferenceNo { get; set; }
+        public byte[] ReferenceNo { get; set; }
         public string PaymentType { get; set; }
         public DateTime? PaymentDate { get; set; }
         public string Currency { get; set; }
@@ -25,7 +25,7 @@ namespace eFMS.API.ForPartner.Service.Models
         public decimal? RemainAmount { get; set; }
         public decimal? RemainAmountVnd { get; set; }
         public decimal? RemainAmountUsd { get; set; }
-        public string Status { get; set; }
+        public byte[] Status { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
@@ -34,8 +34,5 @@ namespace eFMS.API.ForPartner.Service.Models
         public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
         public Guid? CompanyId { get; set; }
-        public string TransactionType { get; set; }
-        public string BillingNo { get; set; }
-        public string BillingType { get; set; }
     }
 }

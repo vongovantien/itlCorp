@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using eFMS.API.ForPartner.Service.Models;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -668,6 +669,16 @@ namespace eFMS.API.ForPartner.Controllers
             return response;
         }
 
+        private async Task<HandleState> InsertAccountPayable(AccAccountPayable model)
+        {
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
+            // var urlApiAcct = "http://localhost:44368";
+
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable", model, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            return response;
+        }
+
         /// <summary>
         /// Cập nhật thông tin phiếu chi và số HT
         /// </summary>
@@ -738,7 +749,13 @@ namespace eFMS.API.ForPartner.Controllers
             #endregion
 
             //  TODO: ghi nhận công nợ phải trả,
-            return Ok(result);
+            //Response.OnCompleted(async () =>
+            //{
+
+            //}
+
+            List<AccAccountPayable> payables = accountingManagementService.GenerateListAccPayable(model, Guid.NewGuid());
+            return Ok(payables);
         }
 
         [HttpPut("UpdateVoucher")]

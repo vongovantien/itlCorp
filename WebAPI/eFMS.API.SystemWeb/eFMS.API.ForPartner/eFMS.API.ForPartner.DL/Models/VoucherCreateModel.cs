@@ -60,15 +60,24 @@ namespace eFMS.API.ForPartner.DL.Models
     {
         public Guid DocID { get; set; }
         [Required]
-        public string DocCode { get; set; }
-        [StringContainAttribute(AllowableValues = new string[] {
-            "CDNOTE",
-            "SETTLEMENT",
-            "SOA"
-        })]
         public string VoucherNo { get; set; }
         [Required]
         public string CustomerCode { get; set; }
+        public List<VoucherSyncUpdatRowModel> Details { get; set; }
+    }
+
+    public class VoucherSyncUpdatRowModel
+    {
+        public Guid ChargeID { get; set; }
+        [StringContainAttribute(AllowableValues = new string[] {
+            "CREDIT",
+            "ADV",
+            "OBH",
+            "NONE"
+        })]
+        public string TransactionType { get; set; }
+        public string AccountNo { get; set; }
+        public string BravoRefNo { get; set; }
     }
 
     public class VoucherSyncDeleteModel
@@ -93,5 +102,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public VoucherCreateRowModel VoucherData { get; set; }
         public List<object> Surcharges { get; set; }
     }
+
+ 
 }
  

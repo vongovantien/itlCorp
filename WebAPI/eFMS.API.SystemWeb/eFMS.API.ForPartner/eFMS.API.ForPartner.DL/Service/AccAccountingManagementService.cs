@@ -2259,33 +2259,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 return new HandleState((object)string.Format("Số {0} đã tồn tại", string.Join(",", voucherExistedRefNo.Select(x => x.VoucherId))));
             }
-            string _messageInvalidDoc = string.Empty;
-            switch (model.DocType)
-            {
-                case "SOA":
-                    AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == model.DocID.ToString())?.FirstOrDefault();
-                    if(soa == null)
-                    {
-                        _messageInvalidDoc = string.Format("Số chứng từ SOA {0} không tồn tại", model.DocCode);
-                    }
-                    break;
-                case "CDNOTE":
-                    AcctCdnote cdNote = acctCdNoteRepo.Get(x => x.Id == model.DocID)?.FirstOrDefault();
-                    if (cdNote == null)
-                    {
-                        _messageInvalidDoc = string.Format("Số chứng từ CDNOTE {0} không tồn tại", model.DocCode);
-                    }
-                    break;
-                case "SETTLEMENT":
-                    AcctSettlementPayment sm = settlementPaymentRepo.Get(x => x.Id == model.DocID)?.FirstOrDefault();
-                    if (sm == null)
-                    {
-                        _messageInvalidDoc = string.Format("Số chứng từ SETTLEMENT {0} không tồn tại", model.DocCode);
-                    }
-                    break;
-                default:
-                    break;
-            }
+            string _messageInvalidDoc = IsValidDoc(model.DocID, model.DocCode, model.DocType);
 
             if(!string.IsNullOrEmpty(_messageInvalidDoc))
             {
@@ -2591,13 +2565,111 @@ namespace eFMS.API.ForPartner.DL.Service
             return await settlementPaymentRepo.UpdateAsync(settlement, x => x.Id == settlement.Id, false);
         }
 
+        private string IsValidDoc(Guid docID, string docCode, string docType)
+        {
+            string _messageInvalidDoc = string.Empty;
+            switch (docType)
+            {
+                case "SOA":
+                    AcctSoa soa = acctSOARepository.Get(x => x.Id.ToString() == docID.ToString())?.FirstOrDefault();
+                    if (soa == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ SOA {0} không tồn tại", docCode);
+                    }
+                    break;
+                case "CDNOTE":
+                    AcctCdnote cdNote = acctCdNoteRepo.Get(x => x.Id == docID)?.FirstOrDefault();
+                    if (cdNote == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ CDNOTE {0} không tồn tại", docCode);
+                    }
+                    break;
+                case "SETTLEMENT":
+                    AcctSettlementPayment sm = settlementPaymentRepo.Get(x => x.Id == docID)?.FirstOrDefault();
+                    if (sm == null)
+                    {
+                        _messageInvalidDoc = string.Format("Số chứng từ SETTLEMENT {0} không tồn tại", docCode);
+                    }
+                    break;
+                default:
+                    break;
+            }
+            return _messageInvalidDoc;
+        }
         public async Task<HandleState> UpdateVoucher(VoucherSyncUpdateModel model, string apiKey)
         {
-            return new HandleState();
+            HandleState hs = new HandleState();
+
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "SyncUpdateVoucher";
+
+            IQueryable<CsShipmentSurcharge> surcharges = Enumerable.Empty<CsShipmentSurcharge>().AsQueryable();
+            Expression<Func<CsShipmentSurcharge, bool>> query = q => (q.VoucherId == model.VoucherNo || q.VoucherIdre == model.VoucherNo);
+            List<Guid> surchargeIds = model.Details.Select(x => x.ChargeID).ToList();
+
+            surcharges = surchargeRepo.Get(query).Where(x => surchargeIds.Contains(x.Id));
+            if(surcharges.Count() == 0)
+            {
+                return new HandleState((object)string.Format("Không tìm thấy {0} trên hệ thống", model.VoucherNo));
+            }
+            if (model.Details.Count() > 0)
+            {
+                using (var transSurcharge = surchargeRepo.DC.Database.BeginTransaction())
+                {
+                    try
+                    {
+                        foreach (var item in model.Details)
+                        {
+                            var surcharge = surcharges.Where(x => x.Id == item.ChargeID)?.FirstOrDefault();
+                            if (surcharge != null)
+                            {
+                                surcharge.ReferenceNo = item.BravoRefNo;
+                                surcharge.UserModified = currentUser.UserID;
+                                surcharge.DatetimeModified = DateTime.Now;
+
+                                surchargeRepo.Update(surcharge, x => x.Id == surcharge.Id, false);
+                            }
+                        }
+
+                        hs = surchargeRepo.SubmitChanges();
+                        if(hs.Success)
+                        {
+                            transSurcharge.Commit();
+                        }
+                        else
+                        {
+                            transSurcharge.Rollback();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        transSurcharge.Rollback();
+                        return new HandleState((object)ex.Message);
+                    }
+                    finally
+                    {
+                        transSurcharge.Dispose();
+                    }
+                }
+            } 
+           
+         return hs;
         }
 
         public async Task<HandleState> DeleteVoucher(VoucherSyncDeleteModel model, string apiKey)
         {
+            ICurrentUser _currentUser = SetCurrentUserPartner(currentUser, apiKey);
+            currentUser.UserID = _currentUser.UserID;
+            currentUser.GroupId = _currentUser.GroupId;
+            currentUser.DepartmentId = _currentUser.DepartmentId;
+            currentUser.OfficeID = _currentUser.OfficeID;
+            currentUser.CompanyID = _currentUser.CompanyID;
+            currentUser.Action = "SyncDeleteVoucher";
             HandleState hs = new HandleState();
 
             var voucherToDelete = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
@@ -2699,6 +2771,59 @@ namespace eFMS.API.ForPartner.DL.Service
                 }
             }                    
             return hs;
+        }
+
+        public List<AccAccountPayable> GenerateListAccPayable(VoucherSyncCreateModel model, Guid? voucherID)
+        {
+            List<AccAccountPayable> payables = new List<AccAccountPayable>();
+
+            var grpVoucherDetail = model.Details
+              .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
+              .Select(s => new {
+                  s.Key.VoucherNo,
+                  s.Key.TransactionType,
+                  voucherData = s.FirstOrDefault(),
+              })
+              .ToList();
+            grpVoucherDetail.ForEach(c =>
+            {
+                var customer = partnerRepo.Get(x => x.AccountNo == model.CustomerCode)?.FirstOrDefault();
+                var office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
+
+                AccAccountPayable payable = new AccAccountPayable {
+                    Id = Guid.NewGuid(),
+                    Currency = c.voucherData.Currency,
+                    PartnerId = Guid.Parse(customer?.Id),
+                    PaymentAmount = 0,
+                    PaymentAmountVnd = 0,
+                    PaymentAmountUsd = 0,
+                    RemainAmount = 0,
+                    RemainAmountVnd = 0,
+                    RemainAmountUsd = 0,
+                    TotalAmountVnd = c.voucherData.VatAmountVnd + c.voucherData.AmountVnd,
+                    TotalAmountUsd = c.voucherData.VatAmountUsd + c.voucherData.AmountUsd,
+                    ReferenceNo = c.voucherData.BravoRefNo,
+                    Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
+                    CompanyId = currentUser.CompanyID,
+                    OfficeId = office.Id,
+                    TransactionType = c.voucherData.TransactionType,
+                    VoucherId = voucherID,
+                    BillingNo = model.DocCode,
+                    BillingType = model.DocType
+                };
+
+                payables.Add(payable);
+
+            });
+
+            foreach (var item in payables)
+            {
+                item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                item.UnpaidAmountVnd = item.TotalAmountVnd;
+                item.UnpaidAmountUsd = item.TotalAmountUsd;
+                item.UnpaidAmount = item.TotalAmount;
+            }
+            return payables;
         }
     }
 }

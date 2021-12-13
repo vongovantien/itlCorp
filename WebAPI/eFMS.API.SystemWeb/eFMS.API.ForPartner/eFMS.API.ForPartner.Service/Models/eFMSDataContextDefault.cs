@@ -60,6 +60,14 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
+                entity.Property(e => e.BillingNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.BillingType)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.CompanyId).HasColumnName("CompanyID");
 
                 entity.Property(e => e.Currency)
@@ -98,7 +106,9 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(10)
                     .IsUnicode(false);
 
-                entity.Property(e => e.ReferenceNo).HasMaxLength(50);
+                entity.Property(e => e.ReferenceNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.RemainAmount).HasColumnType("decimal(18, 4)");
 
@@ -110,7 +120,9 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("RemainAmountVND")
                     .HasColumnType("decimal(18, 4)");
 
-                entity.Property(e => e.Status).HasMaxLength(30);
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 4)");
 
@@ -121,6 +133,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.TotalAmountVnd)
                     .HasColumnName("TotalAmountVND")
                     .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
 
