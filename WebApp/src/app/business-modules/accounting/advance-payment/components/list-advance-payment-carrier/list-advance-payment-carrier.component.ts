@@ -95,6 +95,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
     this.getUnits();
     this.getListShipment(this.advForType);
     this.getCurrency();
+    this.getChargeGroup();
   }
 
   getCharges() {
@@ -230,17 +231,17 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
         adv.chargeGroup = data.chargeGroup;
         adv.type = this.updateChargeType(data.type);
         let charges = [];
-                this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
-                    if (!!res) {
-                        charges = res;
-                        const chargeGrp = (charges || []).find(x => x.id === adv.chargeGroup);
-                        if (chargeGrp && chargeGrp.name === 'Com') {
-                            adv.kickBack = true;
-                        } else {
-                            adv.kickBack = false;
-                        }
-                    }
-                });
+        this.listChargeGroup.subscribe((res: ChargeGroup[]) => {
+          if (!!res) {
+            charges = res;
+            const chargeGrp = (charges || []).find(x => x.id === adv.chargeGroup);
+            if (chargeGrp && chargeGrp.name === 'Com') {
+              adv.kickBack = true;
+            } else {
+              adv.kickBack = false;
+            }
+          }
+        });
         // * Unit, Unit Price had value
         if (!adv.unitId || adv.unitPrice == null) {
           this.listUnits.pipe(
@@ -283,6 +284,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
       }
       listRequest.filter(x => x.hblid === advRequest.hblid && x.customNo === advRequest.customNo && x.advanceType === advRequest.advanceType)[0].surcharge.push(charge);
     })
+    console.log('listRequest', listRequest)
     return listRequest;
   }
 
@@ -316,7 +318,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
       statusPayment: null
     });
   }
-  
+
   setListAdvRequest(listRequest: AdvancePaymentRequest[]) {
     this.listAdvanceCarrier = [];
     listRequest.forEach((item: AdvancePaymentRequest) => {
@@ -330,7 +332,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
         mbl: it.mbl,
         hbl: it.hbl,
         requestCurrency: this.currency,
-        currencyId: this.currency,
+        currencyId: it.currencyId,
         hblid: it.hblid,
         settlementCode: it.settlementCode,
         clearanceNo: it.clearanceNo,
@@ -360,8 +362,6 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
         || charge.unitPrice === null
         || charge.quantity < 0
         || charge.vatrate > 100
-        || charge.type.toLowerCase() === CommonEnum.CHARGE_TYPE.OBH.toLowerCase() && !charge.obhId
-
       ) {
         return false;
       }

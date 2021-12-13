@@ -111,7 +111,7 @@
             </div>
             <div class="col-lg-4">
                 <div class="form-group"
-                    [ngClass]="{'m-form__group has-danger': isSubmitted && isAdvCarrier && !selectedPayee }">
+                    [ngClass]="{'m-form__group has-danger': isSubmitted && isAdvCarrier && !payee.value }">
                     <label *ngIf="!isAdvCarrier">Payee:</label>
                     <label required *ngIf="isAdvCarrier">Payee:</label>
                     <app-combo-grid-virtual-scroll [currentActiveItemId]="{field:'id',value:payee.value}"
@@ -123,7 +123,7 @@
                         [disabled]="isDisabled" placeholder="Select payee"
                         (remove)="resetFormControl(payee);selectedPayee = null">
                     </app-combo-grid-virtual-scroll>
-                    <div class="form-control-feedback" *ngIf="isSubmitted && isAdvCarrier && !selectedPayee">
+                    <div class="form-control-feedback" *ngIf="isSubmitted && isAdvCarrier && !payee.value">
                         Payee is required!
                     </div>
                 </div>

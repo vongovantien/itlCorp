@@ -10,7 +10,7 @@ import { ToastrService } from "ngx-toastr";
 
 import { AppPage } from "@app";
 import { AccountingRepo, ExportRepo } from "@repositories";
-import { AdvancePayment, SysImage } from "@models";
+import { AdvancePayment, AdvancePaymentRequest, SysImage } from "@models";
 import { ReportPreviewComponent } from "@common";
 import { RoutingConstants } from "@constants";
 import { delayTime } from "@decorators";
@@ -103,6 +103,7 @@ export class AdvancePaymentDetailComponent
         } else {
             for (const item of this.listAdvancePaymentCarrierComponent.listAdvanceCarrier) {
                 item.requestCurrency = currency;
+                item.currencyId = currency;
             }
             this.listAdvancePaymentCarrierComponent.currency = currency;
         }
@@ -175,7 +176,18 @@ export class AdvancePaymentDetailComponent
                     } else {
                         this.listAdvancePaymentCarrierComponent.advForType = this.advancePayment.advanceFor;
                         this.listAdvancePaymentCarrierComponent.setListAdvRequest(this.advancePayment.advanceRequests);
-                        
+                        let advanceRequestList = [];
+                        this.advancePayment.advanceRequests.forEach((x: AdvancePaymentRequest)=> advanceRequestList.push({
+                            jobId: x.jobId,
+                            mbl: x.mbl,
+                            hbl: x.hbl,
+                            hblid: x.hblid,
+                            customNo: x.customNo
+                        }));
+                        advanceRequestList = 
+                            advanceRequestList.filter((item: any) =>  this.listAdvancePaymentCarrierComponent.configShipment.dataSource.some(x => x.hblid !== item.hblid && x.jobId !== item.jobId));
+                        this.listAdvancePaymentCarrierComponent.configShipment.dataSource = [...this.listAdvancePaymentCarrierComponent.configShipment.dataSource, ...advanceRequestList];
+
                         this.listAdvancePaymentCarrierComponent.advanceNo =
                             this.advancePayment.advanceNo;
                     }
@@ -352,6 +364,7 @@ export class AdvancePaymentDetailComponent
                 return true;
             }
             this.formCreateComponent.isSubmitted = false;
+            this.listAdvancePaymentCarrierComponent.isSubmitted = false;
         }
         return false;
     }

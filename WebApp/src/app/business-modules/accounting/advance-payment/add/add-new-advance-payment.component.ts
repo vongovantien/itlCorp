@@ -65,6 +65,7 @@ export class AdvancePaymentAddNewComponent extends AppPage {
         }else{
             for (const item of this.listAdvancePaymentCarrierComponent.listAdvanceCarrier) {
                 item.requestCurrency = currency;
+                item.currencyId = currency;
             }
             this.listAdvancePaymentCarrierComponent.currency = currency;
         }

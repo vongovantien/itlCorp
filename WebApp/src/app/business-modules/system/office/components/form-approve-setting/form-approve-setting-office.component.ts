@@ -7,28 +7,46 @@ import { SystemRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
-    selector: 'form-approve-setting-office',
-    templateUrl: './form-approve-setting-office.component.html',
+    selector: "form-approve-setting-office",
+    templateUrl: "./form-approve-setting-office.component.html",
 })
-export class OfficeFormApproveSettingComponent extends AppForm implements OnInit {
-
+export class OfficeFormApproveSettingComponent
+    extends AppForm
+    implements OnInit
+{
     approvePayments: FlowSetting[] = [];
     unlockShipments: FlowSetting[] = [];
     accountReceivable: FlowSetting = new FlowSetting();
 
     settings: CommonInterface.ICommonTitleValue[] = [
-        { title: 'None', value: 'None' },
-        { title: 'Auto', value: 'Auto' },
-        { title: 'Approval', value: 'Approval' },
+        { title: "None", value: "None" },
+        { title: "Auto", value: "Auto" },
+        { title: "Approval", value: "Approval" },
+    ];
+
+    partners: CommonInterface.ICommonTitleValue[] = [
+        { title: "None", value: "None" },
+        { title: "Customer", value: "Customer" },
+        { title: "Agent", value: "Agent" },
+        { title: "Both", value: "Both" },
+    ];
+
+    types: CommonInterface.ICommonTitleValue[] = [
+        { title: "None", value: "None" },
+        { title: "Alert", value: "Alert" },
+        { title: "Check Point", value: "Check Point" },
     ];
 
     settingSpecials: CommonInterface.ICommonTitleValue[] = [
         ...this.settings,
-        { title: 'Special', value: 'Special' },
+        { title: "Special", value: "Special" },
     ];
 
     serviceLockSettings: LockShipmentSetting[] = [];
-    dates: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30];
+    dates: number[] = [
+        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+        21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    ];
     services: string[] = [
         ChargeConstants.AE_CODE,
         ChargeConstants.AI_CODE,
@@ -51,7 +69,6 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     }
 
     ngOnInit(): void {
-
         this._activedRouter.params.subscribe((param: Params) => {
             if (param.id) {
                 this.officeId = param.id;
@@ -61,31 +78,42 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
     }
 
     initUnlockShipmentSetting() {
-        this.unlockShipments.push(...[
-            new FlowSetting({ type: 'Shipment', flow: 'Unlock' }),
-            new FlowSetting({ type: 'Advance', flow: 'Unlock' }),
-            new FlowSetting({ type: 'Settlement', flow: 'Unlock' }),
-        ]);
+        this.unlockShipments.push(
+            ...[
+                new FlowSetting({ type: "Shipment", flow: "Unlock" }),
+                new FlowSetting({ type: "Advance", flow: "Unlock" }),
+                new FlowSetting({ type: "Settlement", flow: "Unlock" }),
+            ]
+        );
     }
 
     initLockingShipmentSetting() {
         for (let index = 0; index < 9; index++) {
-            this.serviceLockSettings.push(new LockShipmentSetting({ serviceType: this.services[index] }));
+            this.serviceLockSettings.push(
+                new LockShipmentSetting({ serviceType: this.services[index] })
+            );
         }
     }
 
     initApprovalSetting() {
-        this.approvePayments.push(...[
-            new FlowSetting({ type: 'Advance', flow: 'Approval' }),
-            new FlowSetting({ type: 'Settlement', flow: 'Approval' }),
-        ]);
+        this.approvePayments.push(
+            ...[
+                new FlowSetting({ type: "Advance", flow: "Approval" }),
+                new FlowSetting({ type: "Settlement", flow: "Approval" }),
+            ]
+        );
     }
 
     getSetting(officeId: string) {
-        this._systemRepo.getSettingFlowByOffice(officeId)
+        this._systemRepo
+            .getSettingFlowByOffice(officeId)
             .subscribe(
-                (res: { lockingDateShipment: LockShipmentSetting[], approvals: FlowSetting[], unlocks: FlowSetting[], account: FlowSetting }) => {
-
+                (res: {
+                    lockingDateShipment: LockShipmentSetting[];
+                    approvals: FlowSetting[];
+                    unlocks: FlowSetting[];
+                    account: FlowSetting;
+                }) => {
                     if (!res.lockingDateShipment.length) {
                         this.initLockingShipmentSetting();
                     } else {
@@ -105,10 +133,16 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
                     }
                     if (!res.account) {
                         this.accountReceivable = new FlowSetting();
-                        this.accountReceivable.type = 'AccountReceivable';
+                        this.accountReceivable.type = "AccountReceivable";
                     } else {
                         this.accountReceivable = res.account;
                     }
+                    if(!res.account.applyPartner){
+                        this.accountReceivable.applyPartner="None";
+                    } 
+                    if(!res.account.applyType){
+                        this.accountReceivable.applyType="None";
+                    } 
                 }
             );
     }
@@ -126,25 +160,23 @@ export class OfficeFormApproveSettingComponent extends AppForm implements OnInit
             approvePayments: this.approvePayments,
             unlockShipments: this.unlockShipments,
             lockShipmentDate: this.serviceLockSettings,
-            accountReceivable: this.accountReceivable
+            accountReceivable: this.accountReceivable,
         };
 
-        this._systemRepo.updateSettingFlow(body)
-            .subscribe(
-                (res: CommonInterface.IResult) => {
-                    if (res.status) {
-                        this._toastService.success(res.message);
-                    }
+        this._systemRepo
+            .updateSettingFlow(body)
+            .subscribe((res: CommonInterface.IResult) => {
+                if (res.status) {
+                    this._toastService.success(res.message);
                 }
-            );
+            });
     }
 
     checkValidate() {
         let valid = true;
 
         for (const charge of this.serviceLockSettings) {
-            if (!charge.lockDate || !charge.lockAfterUnlocking
-            ) {
+            if (!charge.lockDate || !charge.lockAfterUnlocking) {
                 valid = false;
                 break;
             }

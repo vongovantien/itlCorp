@@ -482,6 +482,7 @@ namespace eFMS.API.Catalogue.Controllers
         /// <param name="type"></param>
         /// <returns></returns>
         [HttpPost("GetChargesWithCurrentUserService")]
+        [Authorize]
         public IActionResult GetChargesWithCurrentUserService(List<string> serviceType, string type)
         {
             var data = catChargeService.GetChargesWithCurrentUserService(serviceType, type);

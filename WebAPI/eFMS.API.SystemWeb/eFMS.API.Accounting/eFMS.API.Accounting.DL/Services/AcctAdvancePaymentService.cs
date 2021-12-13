@@ -60,6 +60,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IAccAccountReceivableService accAccountReceivableService;
         private readonly IContextBase<SysEmailTemplate> sysEmailTemplateRepository;
         private readonly IContextBase<SysEmailSetting> sysEmailSettingRepository;
+        private readonly IContextBase<CatCharge> catChargeRepository;
 
 
         public AcctAdvancePaymentService(IContextBase<AcctAdvancePayment> repository,
@@ -94,7 +95,8 @@ namespace eFMS.API.Accounting.DL.Services
             IUserBaseService userBase,
             IAccAccountReceivableService accAccountReceivable,
             IContextBase<SysEmailTemplate> sysEmailTemplateRepo,
-            IContextBase<SysEmailSetting> sysEmailSettingRepo) : base(repository, mapper)
+            IContextBase<SysEmailSetting> sysEmailSettingRepo,
+            IContextBase<CatCharge> catChargeRepo) : base(repository, mapper)
         {
             currentUser = user;
             webUrl = wUrl;
@@ -127,6 +129,7 @@ namespace eFMS.API.Accounting.DL.Services
             accAccountReceivableService = accAccountReceivable;
             sysEmailTemplateRepository = sysEmailTemplateRepo;
             sysEmailSettingRepository = sysEmailSettingRepo;
+            catChargeRepository = catChargeRepo;
         }
 
         #region --- LIST & PAGING ---
@@ -1121,7 +1124,7 @@ namespace eFMS.API.Accounting.DL.Services
                         {
                             if (!string.IsNullOrEmpty(advance.AdvanceFor))
                             {
-                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).Select(x => x.Id).ToList();
+                                var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == advanceNo && string.IsNullOrEmpty(x.SettlementCode) && string.IsNullOrEmpty(x.VoucherId) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.PaySoano)).Select(x => x.Id).ToList();
                                 var hsSur = csShipmentSurchargeRepo.Delete(x => surcharge.Any(z => z == x.Id), false);
                             }
                             acctAdvanceRequestRepo.SubmitChanges();
@@ -1268,27 +1271,36 @@ namespace eFMS.API.Accounting.DL.Services
                     charge.Hblno = item.Hbl;
                     charge.ClearanceNo = item.CustomNo;
                     charge.AdvanceNoFor = model.AdvanceNo;
-                    charge.Type = "ADV";
+                    charge.Type = AccountingConstants.TYPE_CHARGE_BUY;
                     charge.PaymentObjectId = model.Payee;
+                    charge.ExchangeDate = model.RequestDate;
                     if (surcharge == null)
                     {
-                        charge.ExchangeDate = DateTime.Now;
                         charge.UserCreated = currentUser.UserID;
                         charge.DatetimeCreated = DateTime.Now;
+                        charge.ExchangeDate = DateTime.Now;
+                        charge.FinalExchangeRate = null;
                     }
                     else
                     {
-                        charge.ExchangeDate = surcharge.ExchangeDate;
-                        charge.FinalExchangeRate = surcharge.FinalExchangeRate;
                         charge.UserCreated = surcharge.UserCreated;
                         charge.DatetimeCreated = surcharge.DatetimeCreated;
+                        charge.ExchangeDate = surcharge.ExchangeDate;
+                        if(surcharge.CurrencyId != charge.CurrencyId || surcharge.ExchangeDate != charge.ExchangeDate)
+                        {
+                            charge.FinalExchangeRate = null;
+                        }
+                        else
+                        {
+                            charge.FinalExchangeRate = surcharge.FinalExchangeRate;
+                        }
                     }
                     charge.DatetimeModified = DateTime.Now;
                     charge.UserModified = currentUser.UserID;
-                    charge.ExchangeDate = DateTime.Now;
 
                     #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                     var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
+                    charge.Type = "ADV";
                     charge.NetAmount = amountSurcharge.NetAmountOrig; //Thành tiền trước thuế (Original)
                     charge.Total = amountSurcharge.GrossAmountOrig; //Thành tiền sau thuế (Original)
                     charge.FinalExchangeRate = amountSurcharge.FinalExchangeRate; //Tỉ giá so với Local
@@ -1365,7 +1377,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (hs.Success)
                         {
-                            if (!string.IsNullOrEmpty(model.AdvanceFor))
+                            if (!string.IsNullOrEmpty(model.AdvanceFor)) // TH: advance carrier
                             {
                                 model = AddChargeAdvance(model);
                             }
@@ -1922,9 +1934,9 @@ namespace eFMS.API.Accounting.DL.Services
                             var sendMailSuggest = true;
                             if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                             {
-                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                                if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && advanceApprove.BuheadAprDate != null) // Create Charge For Shipment [advance carrier]
                                 {
-                                    UpdateChargesApprove(advancePayment);
+                                    UpdateChargesApprove(advancePayment, advanceApprove.BuheadAprDate);
                                 }
                                 //Send Mail Approved
                                 sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2270,9 +2282,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                         if (advancePayment.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE)
                         {
-                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor)) // Create Charge For Shipment
+                            if (!string.IsNullOrEmpty(advancePayment.AdvanceFor) && approve.BuheadAprDate != null) // Create Charge For Shipment [Advance carrier]
                             {
-                                UpdateChargesApprove(advancePayment);
+                                UpdateChargesApprove(advancePayment, approve.BuheadAprDate);
                             }
                             //Send Mail Approved
                             sendMailApproved = SendMailApproved(advancePayment.AdvanceNo, DateTime.Now);
@@ -2311,7 +2323,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="advancePayment"></param>
         /// <returns></returns>
-        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment)
+        private HandleState UpdateChargesApprove(AcctAdvancePayment advancePayment, DateTime? approveDate)
         {
             using (var trans = DataContext.DC.Database.BeginTransaction())
             {
@@ -2328,7 +2340,7 @@ namespace eFMS.API.Accounting.DL.Services
                             charge.IsFromShipment = true;
                             charge.UserModified = currentUser.UserID;
                             charge.DatetimeModified = DateTime.Now;
-                            charge.ExchangeDate = DateTime.Now;
+                            charge.ExchangeDate = approveDate; // exchange date = approve date
                             charge.FinalExchangeRate = null;
                             #region -- Tính giá trị các field cho phí hiện trường: FinalExchangeRate, NetAmount, Total, AmountVnd, VatAmountVnd, AmountUsd, VatAmountUsd --
                             var amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(charge, kickBackExcRate);
@@ -2669,7 +2681,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("{{CurrencyAdvance}}", advance.AdvanceCurrency);
             body = body.Replace("{{JobIds}}", jobIds);
             body = body.Replace("{{RequestDate}}", advance.RequestDate.Value.ToString("dd/MM/yyyy"));
-            body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve");
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("{{Address}}", webUrl.Value.Url.ToString() + "/en/#/home/accounting/advance-payment/" + advance.Id.ToString() + "/approve");
+            }
             body = body.Replace("{{LogoEFMS}}", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
             List<string> toEmails = new List<string> {
@@ -3016,8 +3035,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 "<li>Request date/ <i>Thời gian đề nghị</i> : <b>[RequestDate]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
-                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a> </span></div>" +
-                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
+                                                "<div>You can click here to check more detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a> </span></div>" +
+                                                "<div> <i>Anh/ Chị có thể chọn vào đây để biết thêm thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Chi tiết tạm ứng</a> </span> </i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
                                          "</div>");
@@ -3032,6 +3051,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("[Action]", "?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("[Action]", string.Empty);
+            }
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
@@ -3104,8 +3131,8 @@ namespace eFMS.API.Accounting.DL.Services
                                                 "<li>Comment/ <i>Lý do từ chối</i> : <b>[Comment]</b></li>" +
                                             "</ul>" +
                                             "<p>" +
-                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Detail Advance Request</a></span></div>" +
-                                                "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
+                                                "<div>You click here to recheck detail: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Detail Advance Request</a></span></div>" +
+                                                "<div><i>Anh/ Chị chọn vào đây để kiểm tra lại thông tin chi tiết: <span> <a href='[Url]/[lang]/[UrlFunc]/[AdvanceId][Action]' target='_blank'>Chi tiết tạm ứng</a></span></i></div>" +
                                             "</p>" +
                                             "<p>Thanks and Regards,<p><p> <b>eFMS System,</b></p><p> <img src='[logoEFMS]'/></p>" +
                                          "</div>");
@@ -3121,6 +3148,14 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[lang]", "en");
             body = body.Replace("[UrlFunc]", "#/home/accounting/advance-payment");
             body = body.Replace("[AdvanceId]", advance.Id.ToString());
+            if (!string.IsNullOrEmpty(advance.AdvanceFor))
+            {
+                body = body.Replace("[Action]", "?action=carrier");
+            }
+            else
+            {
+                body = body.Replace("[Action]", string.Empty);
+            }
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
             List<string> toEmails = new List<string> {
                 emailRequester
@@ -4264,10 +4299,10 @@ namespace eFMS.API.Accounting.DL.Services
                 var adv = DataContext.First(x => x.Id == Id);
                 if (!string.IsNullOrEmpty(adv.AdvanceFor))
                 {
-                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && !string.IsNullOrEmpty(x.SettlementCode) && !string.IsNullOrEmpty(x.VoucherId) && !string.IsNullOrEmpty(x.CreditNo)).FirstOrDefault();
+                    var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo && (!string.IsNullOrEmpty(x.SettlementCode) || !string.IsNullOrEmpty(x.VoucherId) || !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.PaySoano))).FirstOrDefault();
                     if (surcharge != null)
                     {
-                        var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
+                        var messageNotAllow = string.Format("Advance {0} with Job {1} adready issue Billing doc As Credit No/Settlment No/Soa No, Please contact CS to check it!", adv.AdvanceNo, surcharge.JobNo);
                         return messageNotAllow;
                     }
                 }
@@ -4310,12 +4345,23 @@ namespace eFMS.API.Accounting.DL.Services
 
                                         acctApproveAdvanceRepo.Update(approve, x => x.Id == approve.Id, false);
                                     }
+
+                                    if (!string.IsNullOrEmpty(adv.AdvanceFor))
+                                    {
+                                        var surcharge = csShipmentSurchargeRepo.Get(x => x.AdvanceNoFor == adv.AdvanceNo);
+                                        foreach (var charge in surcharge)
+                                        {
+                                            charge.Type = "ADV";
+                                            var hsSur = csShipmentSurchargeRepo.Update(charge, x => x.Id == charge.Id, false);
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                     DataContext.SubmitChanges();
                     acctApproveAdvanceRepo.SubmitChanges();
+                    csShipmentSurchargeRepo.SubmitChanges();
                     trans.Commit();
                     return result;
                 }
@@ -4365,10 +4411,10 @@ namespace eFMS.API.Accounting.DL.Services
             }
             if (model.AdvanceFor == "HBL")
             {
-                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo, x.AdvanceType }).ToList();
+                var shipmentTypeGrp = model.AdvanceRequests.GroupBy(x => new { x.JobId, x.Mbl, x.Hblid, x.Hbl, x.CustomNo }).ToList();
                 foreach (var sm in shipmentTypeGrp)
                 {
-                    if (sm.Count() > 1)
+                    if (sm.GroupBy(x => x.AdvanceType).Count() > 1)
                     {
                         dataDuplicate = string.Format("Cant set differrent type in {0}-{1}-{2}", sm.Key.JobId, sm.Key.Mbl, sm.Key.Hbl);
                         return dataDuplicate;
@@ -4390,6 +4436,12 @@ namespace eFMS.API.Accounting.DL.Services
                             dataDuplicate = string.Format("Charge {0} existed in {1}-{2}-{3}", charge.Key.ChargeCode, charge.Key.JobId, charge.Key.Mbl, charge.Key.Hbl);
                             return dataDuplicate;
                         }
+                    }
+                    var shipmentType = GetTransactionTypeOfChargeByHblId(charge.Key.Hblid);
+                    if(!catChargeRepository.First(x=>x.Id == charge.Key.ChargeId).ServiceTypeId.Contains(shipmentType))
+                    {
+                        dataDuplicate = string.Format("Charge {0} with {1} not compatible service", charge.Key.ChargeCode, charge.Key.JobId);
+                        return dataDuplicate;
                     }
                 }
             }

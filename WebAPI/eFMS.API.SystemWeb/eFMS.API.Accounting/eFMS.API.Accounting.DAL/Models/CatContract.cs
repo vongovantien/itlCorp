@@ -44,5 +44,8 @@ namespace eFMS.API.Accounting.Service.Models
         public decimal? AutoExtendDays { get; set; }
         public decimal? CustomerAdvanceAmountVnd { get; set; }
         public decimal? CustomerAdvanceAmountUsd { get; set; }
+        public bool? IsExpired { get; set; }
+        public bool? IsOverLimit { get; set; }
+        public bool? IsOverDue { get; set; }
     }
 }
