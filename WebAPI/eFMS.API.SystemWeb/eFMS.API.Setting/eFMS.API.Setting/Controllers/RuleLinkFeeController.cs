@@ -122,7 +122,7 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="model">object to update</param>
         /// <returns></returns>
         [HttpPut]
-        [Route("Update")]   
+        [Route("Update")]
         [Authorize]
         public IActionResult UpdateRuleLinkFee(CsRuleLinkFeeModel model)
         {
@@ -136,7 +136,7 @@ namespace eFMS.API.Setting.Controllers
             {
                 return BadRequest(result);
             }
-            
+
             return Ok(result);
         }
 
@@ -146,7 +146,7 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult getdetailrulelinkfeebyid(Guid id)
         {
             var rule = ruleLinkFeeService.GetRuleLinkFeeById(id);
-            if (rule==null)
+            if (rule == null)
             {
                 return BadRequest();
             }

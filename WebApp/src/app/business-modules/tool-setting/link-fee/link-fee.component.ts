@@ -104,7 +104,7 @@ export class LinkFeeComponent extends AppList {
       .subscribe(
         (res: RuleLinkFee) => {
           if (!!res) {
-            this.formRule.formAdd.patchValue(res);
+            this.formRule.formGroup.patchValue(res);
             this.formRule.title = 'Detail/Edit Rule';
             this.formRule.rule.id = id;
             this.formRule.datetimeCreated = res.datetimeCreated;
@@ -117,8 +117,8 @@ export class LinkFeeComponent extends AppList {
             this.formRule.rule.partnerSelling = res.partnerSelling;
             this.formRule.rule.chargeBuying = res.chargeBuying;
             this.formRule.rule.chargeSelling = res.chargeSelling;
-            this.formRule.expirationDate.setValue({startDate:new Date(res.expirationDate)});
-            this.formRule.effectiveDate.setValue({startDate:new Date(res.effectiveDate)});
+            this.formRule.expirationDate.setValue({ startDate: new Date(res.expirationDate) });
+            this.formRule.effectiveDate.setValue({ startDate: new Date(res.effectiveDate) });
             var chargeBuying = this.formRule.configChargeBuying.dataSource.find(
               x => x.id === res.chargeBuying
             );
@@ -148,13 +148,13 @@ export class LinkFeeComponent extends AppList {
 
   showCreateRule() {
     this.formRule.title = 'Add new Rule Link Fee';
-    this.formRule.formAdd.reset();
+    this.formRule.formGroup.reset();
     this.formRule.selectedChargeBuying = { field: 'chargeNameEn', value: null, data: null };
     this.formRule.selectedChargeSelling = { field: 'chargeNameEn', value: null, data: null };
     this.formRule.selectedPartnerBuying = { field: 'shortName', value: null, data: null };
     this.formRule.selectedPartnerSelling = { field: 'shortName', value: null, data: null };
-    this.formRule.isBuying=true;
-    this.formRule.isSelling=true;
+    this.formRule.isBuying = true;
+    this.formRule.isSelling = true;
     this.formRule.isShowUpdate = false;
     this.formRule.show();
   }

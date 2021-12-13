@@ -27,7 +27,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CatPartner> catPartnerRepo;
         private readonly IContextBase<CatCharge> catChargeRepo;
 
-        public RuleLinkFeeService(IStringLocalizer<LanguageSub> localizer, IMapper mapper, ICurrentUser user, 
+        public RuleLinkFeeService(IStringLocalizer<LanguageSub> localizer, IMapper mapper, ICurrentUser user,
                                     IContextBase<CsRuleLinkFee> repository,
                                     IContextBase<SysUser> sysUser,
                                     IContextBase<CatPartner> catPartner,
@@ -128,9 +128,9 @@ namespace eFMS.API.Setting.DL.Services
                 ruleLinkFees = ruleLinkFees.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
             }
             var users = sysUserRepo.Get();
-            var partners=catPartnerRepo.Get();
-            var chargeBuyings=catChargeRepo.Where(x=>x.Type=="CREDIT");
-            var chargeSellings=catChargeRepo.Where(x=>x.Type=="DEBIT");
+            var partners = catPartnerRepo.Get();
+            var chargeBuyings = catChargeRepo.Where(x => x.Type == "CREDIT");
+            var chargeSellings = catChargeRepo.Where(x => x.Type == "DEBIT");
 
             var data = from rule in ruleLinkFees
                        join user in users on rule.UserCreated equals user.Id into gr
@@ -143,10 +143,9 @@ namespace eFMS.API.Setting.DL.Services
                        from chargeBuy in gr3.DefaultIfEmpty()
                        join chargeSell in chargeSellings on rule.ChargeSelling equals chargeSell.Id.ToString() into gr4
                        from chargeSell in gr4.DefaultIfEmpty()
-
                        select new CsRuleLinkFeeModel()
                        {
-                           Id=rule.Id,
+                           Id = rule.Id,
                            NameRule = rule.NameRule,
                            ServiceBuying = rule.ServiceBuying,
                            ChargeBuying = rule.ChargeBuying,
@@ -168,6 +167,13 @@ namespace eFMS.API.Setting.DL.Services
         private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(CsRuleLinkFeeCriteria criteria)
         {
             Expression<Func<CsRuleLinkFee, bool>> query = q => true;
+            if (!string.IsNullOrEmpty(criteria.RuleName))
+            {
+                query = query.And(x =>
+                                   x.NameRule == criteria.RuleName
+                );
+            }
+
             if (!string.IsNullOrEmpty(criteria.ServiceSelling))
             {
                 query = query.And(x =>
@@ -180,14 +186,32 @@ namespace eFMS.API.Setting.DL.Services
                 query = query.And(x => x.ServiceBuying == criteria.ServiceBuying);
             }
 
-            if (criteria.EffectiveDate.HasValue)
+            if (!string.IsNullOrEmpty(criteria.Datetype))
             {
-                query = query.And(x => x.EffectiveDate == criteria.EffectiveDate);
-            }
-
-            if (criteria.ExpirationDate.HasValue)
-            {
-                query = query.And(x => x.ExpirationDate == criteria.ExpirationDate);
+                if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
+                {
+                    switch (criteria.Datetype)
+                    {
+                        case "CreateDate":
+                            query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromDate.Value.Date &&
+                            x.DatetimeCreated.Value.Date <= criteria.ToDate.Value.Date);
+                            break;
+                        case "EffectiveDate":
+                            query = query.And(x => x.EffectiveDate.Value.Date >= criteria.FromDate.Value.Date &&
+                            x.EffectiveDate.Value.Date <= criteria.ToDate.Value.Date);
+                            break;
+                        case "ModifiedDate":
+                            query = query.And(x => x.DatetimeModified.Value.Date >= criteria.FromDate.Value.Date
+                            && x.DatetimeModified.Value.Date <= criteria.ToDate.Value.Date);
+                            break;
+                        case "ExpiredDate":
+                            query = query.And(x => x.ExpirationDate.Value.Date >= criteria.FromDate.Value.Date &&
+                            x.ExpirationDate.Value.Date <= criteria.ToDate.Value.Date);
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
 
             if (criteria.Status != null)
@@ -206,14 +230,14 @@ namespace eFMS.API.Setting.DL.Services
 
             try
             {
-                var rule=DataContext.Get(x=>x.Id==model.Id).FirstOrDefault();
+                var rule = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
                 var userCurrent = currentUser.UserID;
                 var ruleLinkFee = mapper.Map<CsRuleLinkFee>(model);
                 ruleLinkFee.UserModified = currentUser.UserID;
                 ruleLinkFee.DatetimeModified = DateTime.Now;
                 ruleLinkFee.UserCreated = rule.UserCreated;
                 ruleLinkFee.DatetimeCreated = rule.DatetimeCreated;
-                ruleLinkFee.Status =rule.Status;
+                ruleLinkFee.Status = rule.Status;
                 var hs = DataContext.Update(ruleLinkFee, x => x.Id == ruleLinkFee.Id);
                 return hs;
             }
@@ -232,7 +256,7 @@ namespace eFMS.API.Setting.DL.Services
             var user = sysUserRepo.Get();
             var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
             if (ruleLinkFee == null) return null;
-            var modelMap= mapper.Map<CsRuleLinkFeeModel>(ruleLinkFee);
+            var modelMap = mapper.Map<CsRuleLinkFeeModel>(ruleLinkFee);
             modelMap.UserNameCreated = user.Where(x => x.Id == modelMap.UserCreated).FirstOrDefault().Username;
             modelMap.UserNameModified = user.Where(x => x.Id == modelMap.UserModified).FirstOrDefault().Username;
             return modelMap;

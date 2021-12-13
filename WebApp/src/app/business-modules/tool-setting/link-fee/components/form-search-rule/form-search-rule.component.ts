@@ -4,11 +4,10 @@ import { DataService } from 'src/app/shared/services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CatalogueRepo, SystemRepo } from 'src/app/shared/repositories';
 import { catchError } from 'rxjs/operators';
-import { PartnerGroupEnum } from 'src/app/shared/enums/partnerGroup.enum';
-import { forkJoin } from 'rxjs';
 import _uniqBy from 'lodash/uniqBy';
-import { Partner } from 'src/app/shared/models';
+import { Charge, Partner } from 'src/app/shared/models';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
+import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
 @Component({
     selector: 'app-form-search-rule',
@@ -16,7 +15,7 @@ import { formatDate } from '@angular/common';
 })
 export class FormSearchRuleComponent extends AppForm {
 
-    @Output() onSearch: EventEmitter<Partial<ITariffSearch> | any> = new EventEmitter<Partial<ITariffSearch> | any>();
+    @Output() onSearch: EventEmitter<Partial<IRuleSearch> | any> = new EventEmitter<Partial<IRuleSearch> | any>();
     tariffTypes: CommonInterface.IValueDisplay[] | any[];
     selectedTariffType: CommonInterface.IValueDisplay = null;
 
@@ -31,25 +30,24 @@ export class FormSearchRuleComponent extends AppForm {
     dateTypes: CommonInterface.IValueDisplay[] | any[];
     selectedDateType: CommonInterface.IValueDisplay = null;
 
-    configCustomer: CommonInterface.IComboGirdConfig | any = {};
-    configOffice: CommonInterface.IComboGirdConfig | any = {};
+    configPartner: CommonInterface.IComboGirdConfig | any = {};
+    configChargeBuying: CommonInterface.IComboGirdConfig | any = {};
+    configChargeSelling: CommonInterface.IComboGirdConfig | any = {};
 
-    selectedCustomer: Partial<CommonInterface.IComboGridData> | any = {};
-    selectedSupplier: Partial<CommonInterface.IComboGridData> | any = {};
-    selectedOffice: Partial<CommonInterface.IComboGridData> | any = {};
-
+    selectedChargeBuying: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedChargeSelling: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedPartnerBuying: Partial<CommonInterface.IComboGridData> | any = {};
+    selectedPartnerSelling: Partial<CommonInterface.IComboGridData> | any = {};
 
     suppliers: Partner[] = [];
 
-    formSearchTariff: FormGroup;
+    formSearchRule: FormGroup;
 
-    tariffName: AbstractControl;
-    tariffType: AbstractControl;
-    tariffShipmentMode: AbstractControl;
-    tariffDate: AbstractControl;
-    tariffDateType: AbstractControl;
-    tariffStatus: AbstractControl;
-
+    ruleName: AbstractControl;
+    serviceBuying: AbstractControl;
+    serviceSelling: AbstractControl;
+    dateType: AbstractControl;
+    date: AbstractControl;
     constructor(
         protected _dataService: DataService,
         protected _catalogueRepo: CatalogueRepo,
@@ -58,73 +56,69 @@ export class FormSearchRuleComponent extends AppForm {
     ) {
         super();
         this.requestSearch = this.submitSearch;
-        this.requestReset = this.resetForm;
+        //this.requestReset = this.resetForm;
 
     }
 
     ngOnInit(): void {
-        this.configCustomer = Object.assign({}, this.configComoBoGrid, {
+        this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
                 { field: 'id', label: 'PartnerID' },
                 { field: 'shortName', label: 'Abbr Name' },
                 { field: 'partnerNameEn', label: 'Name EN' },
+
             ]
         }, { selectedDisplayFields: ['shortName'], });
 
-        this.configOffice = Object.assign({}, this.configComoBoGrid, {
+        this.configChargeBuying = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'code', label: 'Office Code' },
-                { field: 'shortName', label: 'Office' },
-                { field: 'companyName', label: 'Company' },
-            ],
-        }, { selectedDisplayFields: ['shortName'], });
+                { field: 'chargeNameEn', label: 'Name' },
+                { field: 'unitPrice', label: 'Unit Price' },
+                { field: 'unit', label: 'Unit' },
+                { field: 'code', label: 'Code' },
+            ]
+        }, { selectedDisplayFields: ['chargeNameEn'], });
+
+        this.configChargeSelling = Object.assign({}, this.configComoBoGrid, {
+            displayFields: [
+                { field: 'chargeNameEn', label: 'Name' },
+                { field: 'unitPrice', label: 'Unit Price' },
+                { field: 'unit', label: 'Unit' },
+                { field: 'code', label: 'Code' },
+            ]
+        }, { selectedDisplayFields: ['chargeNameEn'], });
 
         this.initFormSearch();
 
         this.getBasicData();
-        this.getCustomer();
-        this.getCarrierAndShipper();
-        this.getOffice();
+
         this.getService();
+        this.getPartner();
+        this.getChargeBuying();
+        this.getChargeSelling();
         this.getStatus();
     }
 
     initFormSearch() {
-        this.formSearchTariff = this._fb.group({
-            tariffName: [],
-            tariffType: [],
-            tariffShipmentMode: [],
-            tariffDate: [],
-            tariffDateType: [],
-            tariffStatus: [],
+        this.formSearchRule = this._fb.group({
+            ruleName: [],
+            serviceBuying: [],
+            serviceSelling: [],
+            dateType: [],
+            status: [],
+            date: [],
         });
-        this.tariffName = this.formSearchTariff.controls['tariffName'];
-        this.tariffType = this.formSearchTariff.controls['tariffType'];
-        this.tariffShipmentMode = this.formSearchTariff.controls['tariffShipmentMode'];
-        this.tariffDate = this.formSearchTariff.controls['tariffDate'];
-        this.tariffDateType = this.formSearchTariff.controls['tariffDateType'];
-        this.tariffStatus = this.formSearchTariff.controls['tariffStatus'];
-    }
-    getService() {
-        this.services = [
-            { displayName: 'Air Export', value: 'AE' },
-            { displayName: 'Air Import', value: 'AI' },
-            { displayName: 'Sea Consol Export', value: 'SCE' },
-            { displayName: 'Sea Consol Import', value: 'SCI' },
-            { displayName: 'Sea FCL Export', value: 'SFE' },
-            { displayName: 'Sea FCL Import', value: 'SFI' },
-            { displayName: 'Sea LCL Export', value: 'SLE' },
-            { displayName: 'Sea LCL Import', value: 'SLI' },
-            // { displayName: 'Job OPS', value: 'JovOPS' },
-            // { displayName: 'Custom Logistic', value: 'CustomLogistic' },
-            // { displayName: 'Inland Trucking', value: 'InlandTrucking' },
-        ];
+        this.serviceBuying = this.formSearchRule.controls['serviceBuying'];
+        this.serviceSelling = this.formSearchRule.controls['serviceSelling'];
+        this.ruleName = this.formSearchRule.controls['ruleName'];
+        this.dateType = this.formSearchRule.controls['dateType'];
+        this.date = this.formSearchRule.controls['date'];
     }
     getStatus() {
         this.status = [
-            { displayName: 'All', value: 'all' },
-            { displayName: 'Active', value: 'active' },
-            { displayName: 'Inactive', value: 'inactive' },
+            { displayName: 'All', value: null },
+            { displayName: 'Active', value: true },
+            { displayName: 'Inactive', value: false },
         ];
     }
 
@@ -144,7 +138,7 @@ export class FormSearchRuleComponent extends AppForm {
         ];
 
         this.dateTypes = [
-            { displayName: 'All', value: 'All' },
+            //{ displayName: 'All', value: 'All' },
             { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
@@ -158,126 +152,115 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Import', value: 'Import' },
         ];
 
-        this.updateDefaultValue();
+        //this.updateDefaultValue();
 
     }
+    getService() {
+        this.services = [
+            { displayName: 'Air Export', value: 'AE' },
+            { displayName: 'Air Import', value: 'AI' },
+            { displayName: 'Sea Consol Export', value: 'SCE' },
+            { displayName: 'Sea Consol Import', value: 'SCI' },
+            { displayName: 'Sea FCL Export', value: 'SFE' },
+            { displayName: 'Sea FCL Import', value: 'SFI' },
+            { displayName: 'Sea LCL Export', value: 'SLE' },
+            { displayName: 'Sea LCL Import', value: 'SLI' },
+        ];
+    }
 
-    getCustomer() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER)) {
-            this.configCustomer.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CUSTOMER) || [];
+    getPartner() {
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
+            this.configPartner.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER) || [];
         } else {
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CUSTOMER)
+            this._catalogueRepo.getListPartner(null, null, { active: true })
                 .pipe(catchError(this.catchError))
                 .subscribe(
-                    (dataPartner: any) => {
-                        this.configCustomer.dataSource = dataPartner || [];
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CUSTOMER, dataPartner || []);
+                    (dataPartner: any = []) => {
+                        this.configPartner.dataSource = dataPartner || [];
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.PARTNER, dataPartner || []);
+                    },
+                );
+        }
+    }
+    getChargeBuying() {
+        console.log(this.serviceBuying.value);
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
+            this.configChargeBuying.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE) || [];
+        } else {
+            this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceBuying.value, type: CommonEnum.CHARGE_TYPE.CREDIT })
+                .pipe(catchError(this.catchError))
+                .subscribe(
+                    (dataCharge: any = []) => {
+                        this.configChargeBuying.dataSource = dataCharge;
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CHARGE, dataCharge || []);
                     },
                 );
         }
     }
 
-    getCarrierAndShipper() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) && !!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER)) {
-            this.configCustomer.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) || [];
-
-            this.suppliers = [...this._dataService.getDataByKey(SystemConstants.CSTORAGE.CARRIER) || [], ...this._dataService.getDataByKey(SystemConstants.CSTORAGE.SHIPPER) || []];
-            this.suppliers = _uniqBy(this.suppliers, 'id');
-        }
-        forkJoin([
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.CARRIER),
-            this._catalogueRepo.getPartnersByType(PartnerGroupEnum.SHIPPER),
-        ]).pipe(catchError(this.catchError))
-            .subscribe(
-                ([carries, shippers]: any[] = [[], []]) => {
-                    this.suppliers = [...new Set(carries), ...shippers];
-                    this.suppliers = _uniqBy(this.suppliers, 'id');
-
-                    this._dataService.setDataService(SystemConstants.CSTORAGE.CARRIER, carries || []);
-                    this._dataService.setDataService(SystemConstants.CSTORAGE.SHIPPER, carries || []);
-                }
-            );
-    }
-
-    getOffice() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.OFFICE)) {
-            this.configOffice.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.OFFICE) || [];
+    getChargeSelling() {
+        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
+            this.configChargeSelling.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE);
         } else {
-            this._systemRepo.getAllOffice()
+            this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceSelling.value, type: CommonEnum.CHARGE_TYPE.DEBIT })
                 .pipe(catchError(this.catchError))
                 .subscribe(
-                    (res: any) => {
-                        this.configOffice.dataSource = res || [];
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.OFFICE, res || []);
-                    }
+                    (dataCharge: any = []) => {
+                        this.configChargeSelling.dataSource = dataCharge;
+                        this._dataService.setDataService(SystemConstants.CSTORAGE.CHARGE, dataCharge);
+                    },
                 );
         }
     }
-
-    onSelectDataFormInfo(data: any, key: string | any) {
+    onSelectDataFormInfo(data: Charge | Partner | any, key: string | any) {
         switch (key) {
-            case 'customer':
-                this.selectedCustomer = { field: 'shortName', value: data.shortName, data: data };
-                break;
-            case 'supplier':
-                this.selectedSupplier = { field: 'shortName', value: data.shortName, data: data };
-                break;
-            case 'office':
-                this.selectedOffice = { field: 'shortName', value: data.shortName, data: data };
+            case 'partnerBuying':
+                this.selectedPartnerBuying = { field: 'shortName', value: data.shortName, data: data };
+            case 'partnerSelling':
+                this.selectedPartnerSelling = { field: 'shortName', value: data.shortName, data: data };
                 break;
             default:
                 break;
         }
+
+
     }
 
     submitSearch(formSearch: any) {
-        const bodySearch: Partial<ITariffSearch> = {
-            name: formSearch.tariffName,
-            serviceMode: formSearch.tariffShipmentMode.value,
-            tariffType: formSearch.tariffType.value,
-            dateType: formSearch.tariffDateType.value,
-            status: formSearch.tariffStatus.value,
-            customerID: !!this.selectedCustomer.data ? this.selectedCustomer.data.id : null,
-            supplierID: !!this.selectedSupplier.data ? this.selectedSupplier.data.id : null,
-            officeId: !!this.selectedOffice.data ? this.selectedOffice.data.id : '00000000-0000-0000-0000-000000000000',
-            fromDate: !!formSearch.tariffDate ? formatDate(formSearch.tariffDate.startDate, "yyyy-MM-dd", 'en') : null,
-            toDate: !!formSearch.tariffDate ? formatDate(formSearch.tariffDate.endDate, "yyyy-MM-dd", 'en') : null,
+        const bodySearch: Partial<IRuleSearch> = {
+            ruleName: formSearch.ruleName,
+            servicebuying: formSearch.serviceBuying,
+            serviceSelling: formSearch.serviceSelling,
+            partnerBuying: formSearch.partnerBuying,
+            partnerSelling: formSearch.partnerSelling,
+            dateType: !!formSearch.dateType?formSearch.dateType.value:null,
+            fromDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            toDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            status: formSearch.status,
         };
         this.onSearch.emit(bodySearch);
     }
 
-    updateDefaultValue() {
-        this.tariffType.setValue(this.tariffTypes[4]);
-        this.tariffShipmentMode.setValue(this.shipmentModes[0]);
-        this.tariffDateType.setValue(this.dateTypes[0]);
-        this.tariffStatus.setValue(this.status[1]);
+    submitReset(formSearch: any) {
+        this.selectedPartnerBuying = { field: 'shortName', value: null, data: null };
+        this.selectedPartnerSelling = { field: 'shortName', value: null, data: null };
+        this.formSearchRule.reset();
+        const bodySearch: Partial<IRuleSearch> = {
+        };
+        this.onSearch.emit(bodySearch);
     }
 
-    resetForm() {
-        this.selectedCustomer = {};
-        this.selectedOffice = {};
-        this.selectedSupplier = {};
-
-        this.updateDefaultValue();
-
-        this.resetFormControl(this.tariffName);
-        this.resetFormControl(this.tariffDate);
-
-
-        this.onSearch.emit({});
-    }
 }
 
 
-interface ITariffSearch {
-    name: string;
-    serviceMode: string;
-    customerID: string;
-    supplierID: string;
-    tariffType: string;
+interface IRuleSearch {
+    ruleName: string;
+    servicebuying: string;
+    serviceSelling: string;
+    partnerBuying: string;
+    partnerSelling: string;
     dateType: string;
     fromDate: string;
     toDate: string;
     status: boolean;
-    officeId: string;
 }

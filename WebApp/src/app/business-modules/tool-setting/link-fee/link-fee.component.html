@@ -12,7 +12,8 @@
             </div>
         </div>
     </div>
-    <app-form-search-rule></app-form-search-rule>
+
+    <app-form-search-rule (onSearch)="searchRule($event)"></app-form-search-rule>
     <div class="table-wrapper">
         <table class="table table-striped table-brand dataTable">
             <thead app-table-header [headers]="headers" (onClick)="sortBy($event.sortField ? $event.sortField : '')">
@@ -57,4 +58,4 @@
     </div>
 
     <confirm-popup body="Do you want to delete?" (onSubmit)="onDeleteRule()"></confirm-popup>
-    <form-rule #formAddRule></form-rule>
+    <form-rule #formAddRule (onUpdate)="resetSearch()"></form-rule>
