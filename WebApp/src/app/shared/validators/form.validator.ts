@@ -72,7 +72,7 @@ export class FormValidators extends Validators {
             // if ((mawbNumber % 7) !== checkDigit) {
             //     return { invalidMawb: true };
             // }
-            if(billNo.match(/['\"\\\/:*<>;?]/m)){
+            if (billNo.match(/['\":*<>;?]/m)) {
                 return { invalidSpecial: false };
             }
             return null;
