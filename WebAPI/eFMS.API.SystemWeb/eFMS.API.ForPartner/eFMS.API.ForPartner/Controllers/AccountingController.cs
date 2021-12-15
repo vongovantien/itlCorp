@@ -675,7 +675,8 @@ namespace eFMS.API.ForPartner.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        private async Task<IActionResult> InsertAccountPayable(List<AccAccountPayableModel> model)
+        [HttpPost("InsertPayablePayment")]
+        public async Task<IActionResult> InsertPayablePayment(List<AccAccountPayableModel> model)
         {
             var urlApiAcct = apiUrl.Value.Url + "/Accounting";
             // var urlApiAcct = "http://localhost:44368";
@@ -691,7 +692,8 @@ namespace eFMS.API.ForPartner.Controllers
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-        private async Task<IActionResult> CancelAccountPayable(List<CancelPayablePayment> model)
+        [HttpPut("CancelPayablePayment")]
+        public async Task<IActionResult> CancelPayablePayment(List<CancelPayablePayment> model)
         {
             var urlApiAcct = apiUrl.Value.Url + "/Accounting";
             // var urlApiAcct = "http://localhost:44368";
