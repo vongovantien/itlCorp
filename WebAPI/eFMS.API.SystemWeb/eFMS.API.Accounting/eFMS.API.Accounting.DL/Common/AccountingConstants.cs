@@ -220,6 +220,7 @@
 
         public static readonly string EMAIL_SETTING_AR_ALERT = "AR - Alert";
 
+        public static readonly int MAX_CREDIT_LIMIT_RATE_CONTRACT = 120;
         #region PAYABLE
         public static readonly string TRANSACTION_TYPE_PAYABLE_CREDIT = "CREDIT";
         public static readonly string TRANSACTION_TYPE_PAYABLE_OBH = "OBH";
