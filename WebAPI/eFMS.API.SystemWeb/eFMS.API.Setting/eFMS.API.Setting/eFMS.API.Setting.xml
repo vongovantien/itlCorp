@@ -16,14 +16,14 @@
             <param name="localizer"></param>
             <param name="curUser"></param>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.AddNewRule(eFMS.API.Setting.DL.Models.CsRuleLinkFeeModel)">
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.AddNewRule(eFMS.API.Setting.DL.Models.RuleLinkFeeModel)">
             <summary>
             Add New Rule Link Fee
             </summary>
             <param name="model"></param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.Paging(eFMS.API.Setting.DL.Models.Criteria.CsRuleLinkFeeCriteria,System.Int32,System.Int32)">
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.Paging(eFMS.API.Setting.DL.Models.Criteria.RuleLinkFeeCriteria,System.Int32,System.Int32)">
             <summary>
             get and paging the list of Rule Link Fee by conditions
             </summary>
@@ -32,7 +32,7 @@
             <param name="pageSize">number items per page</param>
             <returns></returns>
         </member>
-        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.UpdateRuleLinkFee(eFMS.API.Setting.DL.Models.CsRuleLinkFeeModel)">
+        <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.UpdateRuleLinkFee(eFMS.API.Setting.DL.Models.RuleLinkFeeModel)">
             <summary>
             Update Settlement Payment
             </summary>

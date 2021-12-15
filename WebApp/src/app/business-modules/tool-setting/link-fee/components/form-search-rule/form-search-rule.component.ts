@@ -56,8 +56,6 @@ export class FormSearchRuleComponent extends AppForm {
     ) {
         super();
         this.requestSearch = this.submitSearch;
-        //this.requestReset = this.resetForm;
-
     }
 
     ngOnInit(): void {
@@ -138,11 +136,10 @@ export class FormSearchRuleComponent extends AppForm {
         ];
 
         this.dateTypes = [
-            //{ displayName: 'All', value: 'All' },
             { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
-            { displayName: 'ExpiredDate', value: 'ExpiredDate' },
+            { displayName: 'Expired Date', value: 'ExpiredDate' },
 
         ];
 
@@ -151,8 +148,6 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Export', value: 'Export' },
             { displayName: 'Import', value: 'Import' },
         ];
-
-        //this.updateDefaultValue();
 
     }
     getService() {

@@ -1,9 +1,9 @@
 
 export class RuleLinkFee {
     id: string = '';
-    nameRule: string = '';
+    ruleName: string = '';
     effectiveDate: any = null;
-    expirationDate: any = null;
+    expiredDate: any = null;
     
     status: boolean = null;
     userCreated: string = '';

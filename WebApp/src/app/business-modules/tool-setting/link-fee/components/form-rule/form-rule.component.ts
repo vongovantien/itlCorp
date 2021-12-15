@@ -1,6 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { PopupBase } from 'src/app/popup.base';
-import { SystemRepo, OperationRepo, SettingRepo } from '@repositories';
+import { SettingRepo } from '@repositories';
 import { FormBuilder, FormGroup, AbstractControl, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { Charge, Partner, Tariff, User } from '@models';
@@ -20,10 +20,9 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     @Output() onUpdate: EventEmitter<boolean> = new EventEmitter<boolean>();
     @Input() rule: RuleLinkFee = new RuleLinkFee();
     formGroup: FormGroup;
-    nameRule: AbstractControl;
+    ruleName: AbstractControl;
     serviceBuying: AbstractControl;
     serviceSelling: AbstractControl;
-    chargeBuying: AbstractControl;
 
     selectedChargeBuying: Partial<CommonInterface.IComboGridData> | any = {};
     selectedChargeSelling: Partial<CommonInterface.IComboGridData> | any = {};
@@ -36,7 +35,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     configChargeBuying: CommonInterface.IComboGirdConfig | any = {};
     configChargeSelling: CommonInterface.IComboGirdConfig | any = {};
 
-    expirationDate: AbstractControl;
+    expiredDate: AbstractControl;
     effectiveDate: AbstractControl;
 
     minDateEffective: any = null;
@@ -71,50 +70,35 @@ export class FormRuleComponent extends PopupBase implements OnInit {
 
     initForm() {
         this.formGroup = this._fb.group({
-            nameRule: [null,Validators.compose([
+            ruleName: [null, Validators.compose([
                 Validators.required
             ])],
-            serviceBuying: [null,Validators.compose([
+            serviceBuying: [null, Validators.compose([
                 Validators.required
             ])],
-            serviceSelling: [null,Validators.compose([
+            serviceSelling: [null, Validators.compose([
                 Validators.required
             ])],
-            expirationDate: [null,Validators.compose([
+            expiredDate: [null, Validators.compose([
                 Validators.required
             ])],
-            effectiveDate: [null,Validators.compose([
-                Validators.required
-            ])],
-            chargeBuying: [null,Validators.compose([
-                Validators.required
-            ])],
-            chargeSelling: [null,Validators.compose([
-                Validators.required
-            ])],
-            partnerBuying: [null,Validators.compose([
-                Validators.required
-            ])],
-            partnerSelling: [null,Validators.compose([
-                Validators.required
-            ])],
+            effectiveDate: [null]
         });
         this.serviceBuying = this.formGroup.controls['serviceBuying'];
         this.serviceSelling = this.formGroup.controls['serviceSelling'];
-        this.nameRule = this.formGroup.controls['nameRule'];
-        this.expirationDate = this.formGroup.controls['expirationDate'];
+        this.ruleName = this.formGroup.controls['ruleName'];
+        this.expiredDate = this.formGroup.controls['expiredDate'];
         this.effectiveDate = this.formGroup.controls['effectiveDate'];
-        this.chargeBuying = this.formGroup.controls['chargeBuying'];
         this.formGroup.get("effectiveDate").valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
                 map((data: any) => data.startDate)
-               
+
             )
             .subscribe((value: any) => {
                 this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
-            
+
     }
 
     initBasicData() {
@@ -215,7 +199,6 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                 this.selectedChargeBuying = { field: 'shortName', value: data.chargeNameEn, data: data };
                 this.rule.chargeBuying = data.id;
                 break;
-
             case 'chargeSelling':
                 this.selectedChargeSelling = { field: 'shortName', value: data.chargeNameEn, data: data };
                 this.rule.chargeSelling = data.id;
@@ -236,14 +219,16 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     onSaveRule() {
         this.isSubmitted = true;
         const valueForm = this.formGroup.getRawValue();
-        console.log('running');
+        console.log(this.formGroup.invalid);
         const rule: RuleLinkFee = new RuleLinkFee(valueForm);
-        //if (this.formGroup.invalid) { return; }
+        if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.selectedPartnerSelling.value){
+            return;
+        }
+        if (this.formGroup.invalid) { return; }
         if (!this.isShowUpdate) {
-            console.log('running');
             rule.id = '';
             rule.effectiveDate = formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en'),
-                rule.expirationDate = formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en'),
+                rule.expiredDate = formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en'),
                 rule.partnerBuying = this.rule.partnerBuying,
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,
@@ -252,7 +237,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
-                               
+
                                 this._toast.success(res.message);
                                 this.isSubmitted = false;
                                 this.onUpdate.emit(true);
@@ -265,10 +250,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         } else {
             console.log('running');
             rule.id = this.rule.id,
-                // rule.effectiveDate = formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en'),
-                // rule.expirationDate = formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en'),
-                rule.effectiveDate= this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-                rule.expirationDate= this.expirationDate.value ? (this.expirationDate.value.startDate !== null ? formatDate(this.expirationDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+                rule.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
+                rule.expiredDate = this.expiredDate.value ? (this.expiredDate.value.startDate !== null ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 rule.partnerBuying = this.rule.partnerBuying,
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,
@@ -276,14 +259,14 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                 this._settingRepo.updateRule(rule).subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-                            
+
                             this._toast.success(res.message);
                             this.isSubmitted = false;
                             this.onUpdate.emit(true);
                             this.hide();
                             return;
                         }
-                        
+
                         this._toast.error(res.message);
                     });
         }

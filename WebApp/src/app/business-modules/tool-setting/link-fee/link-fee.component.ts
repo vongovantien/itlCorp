@@ -6,7 +6,6 @@ import { NgProgress } from '@ngx-progressbar/core';
 import { SortService } from 'src/app/shared/services';
 import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shared/common/popup';
 import { ToastrService } from 'ngx-toastr';
-import { Router } from '@angular/router';
 import { AppList } from 'src/app/app.list';
 import { FormRuleComponent } from './components/form-rule/form-rule.component';
 @Component({
@@ -34,7 +33,7 @@ export class LinkFeeComponent extends AppList {
 
   ngOnInit() {
     this.headers = [
-      { field: 'nameRule', title: 'Name Rule', sortable: false },
+      { field: 'ruleName', title: 'Name Rule', sortable: false },
       { field: 'serviceBuying', title: 'Service Buying', sortable: false },
       { field: 'chargeNameBuying', title: 'Charge Buying', sortable: false },
       { field: 'partnerNameBuying', title: 'Partner Buying', sortable: false },
@@ -45,7 +44,7 @@ export class LinkFeeComponent extends AppList {
       { field: 'modifiedDate', title: 'Modified Date', sortable: false },
       { field: 'status', title: 'Status', sortable: false },
       { field: 'effectiveDate', title: 'Effective Date', sortable: false },
-      { field: 'expirationDate', title: 'Expiration Date', sortable: false },
+      { field: 'expiredDate', title: 'Expiration Date', sortable: false },
     ];
 
     this.searchRule({});
@@ -111,24 +110,24 @@ export class LinkFeeComponent extends AppList {
             this.formRule.userNameCreated = res.userNameCreated;
             this.formRule.datetimeModified = res.datetimeModified;
             this.formRule.userNameModified = res.userNameModified;
-            this.formRule.rule.expirationDate = res.expirationDate;
+            this.formRule.rule.expiredDate = res.expiredDate;
             this.formRule.rule.effectiveDate = res.effectiveDate;
             this.formRule.rule.partnerBuying = res.partnerBuying;
             this.formRule.rule.partnerSelling = res.partnerSelling;
             this.formRule.rule.chargeBuying = res.chargeBuying;
             this.formRule.rule.chargeSelling = res.chargeSelling;
-            this.formRule.expirationDate.setValue({ startDate: new Date(res.expirationDate) });
+            this.formRule.expiredDate.setValue({ startDate: new Date(res.expiredDate) });
             this.formRule.effectiveDate.setValue({ startDate: new Date(res.effectiveDate) });
-            var chargeBuying = this.formRule.configChargeBuying.dataSource.find(
+            let chargeBuying = this.formRule.configChargeBuying.dataSource.find(
               x => x.id === res.chargeBuying
             );
-            var chargeSelling = this.formRule.configChargeSelling.dataSource.find(
+            let chargeSelling = this.formRule.configChargeSelling.dataSource.find(
               x => x.id === res.chargeSelling
             );
-            var partnerBuying = this.formRule.configPartner.dataSource.find(
+            let partnerBuying = this.formRule.configPartner.dataSource.find(
               x => x.id === res.partnerBuying
             );
-            var partnerSelling = this.formRule.configPartner.dataSource.find(
+            let partnerSelling = this.formRule.configPartner.dataSource.find(
               x => x.id === res.partnerSelling
             );
             this.formRule.selectedChargeBuying =

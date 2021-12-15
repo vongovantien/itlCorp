@@ -35,7 +35,7 @@
                             </div>
                         </td>
 
-                        <td>{{rule.nameRule}}</td>
+                        <td>{{rule.ruleName}}</td>
                         <td>{{rule.serviceBuying}}</td>
                         <td>{{rule.chargeNameBuying }}</td>
                         <td>{{rule.partnerNameBuying}}</td>
@@ -47,7 +47,7 @@
                         <td [ngClass]="rule.status ? 'text-success' : 'text-danger'">
                             {{rule.status ? 'Active' : 'Inactive'}}</td>
                         <td>{{rule.effectiveDate | date: 'dd/MM/yyyy'}}</td>
-                        <td>{{rule.expirationDate | date: 'dd/MM/yyyy'}}</td>
+                        <td>{{rule.expiredDate | date: 'dd/MM/yyyy'}}</td>
 
                     </tr>
                 </ng-container>

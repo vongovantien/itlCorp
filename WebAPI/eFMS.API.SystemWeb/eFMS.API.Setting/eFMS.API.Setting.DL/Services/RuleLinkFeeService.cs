@@ -2,6 +2,7 @@
 using eFMS.API.Common.Globals;
 using eFMS.API.Common.Helpers;
 using eFMS.API.Infrastructure.Extensions;
+using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
@@ -19,7 +20,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Services
 {
-    public class RuleLinkFeeService : RepositoryBase<CsRuleLinkFee, CsRuleLinkFeeModel>, IRuleLinkFeeService
+    public class RuleLinkFeeService : RepositoryBase<CsRuleLinkFee, RuleLinkFeeModel>, IRuleLinkFeeService
     {
         private readonly IStringLocalizer stringLocalizer;
         private readonly ICurrentUser currentUser;
@@ -41,7 +42,7 @@ namespace eFMS.API.Setting.DL.Services
             catChargeRepo = catCharge;
         }
 
-        public HandleState AddNewRuleLinkFee(CsRuleLinkFeeModel model)
+        public HandleState AddNewRuleLinkFee(RuleLinkFeeModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -57,9 +58,9 @@ namespace eFMS.API.Setting.DL.Services
                 rule.UserModified = currentUser.UserID;
                 rule.Status = true;
 
-                if (DataContext.Any(x => x.NameRule == rule.NameRule && x.Id != rule.Id))
+                if (DataContext.Any(x => x.RuleName == rule.RuleName && x.Id != rule.Id))
                 {
-                    return new HandleState((object)string.Format("Rule {0} was existied", model.NameRule));
+                    return new HandleState((object)string.Format("Rule {0} was existied", model.RuleName));
                 }
 
                 var hs = DataContext.Add(rule);
@@ -90,7 +91,7 @@ namespace eFMS.API.Setting.DL.Services
 
         }
 
-        public List<CsRuleLinkFeeModel> Paging(CsRuleLinkFeeCriteria criteria, int page, int size, out int rowsCount)
+        public List<RuleLinkFeeModel> Paging(RuleLinkFeeCriteria criteria, int page, int size, out int rowsCount)
         {
             var data = GetRuleByCriteria(criteria);
             if (data == null)
@@ -99,7 +100,7 @@ namespace eFMS.API.Setting.DL.Services
                 return null;
             }
 
-            var result = new List<CsRuleLinkFeeModel>();
+            var result = new List<RuleLinkFeeModel>();
 
             //Phân trang
             var _totalItem = data.Select(s => s.Id).Count();
@@ -118,9 +119,9 @@ namespace eFMS.API.Setting.DL.Services
             return result;
         }
 
-        public IQueryable<CsRuleLinkFeeModel> GetRuleByCriteria(CsRuleLinkFeeCriteria criteria)
+        public IQueryable<RuleLinkFeeModel> GetRuleByCriteria(RuleLinkFeeCriteria criteria)
         {
-            List<CsRuleLinkFeeModel> queryable = new List<CsRuleLinkFeeModel>();
+            List<RuleLinkFeeModel> queryable = new List<RuleLinkFeeModel>();
             var queryRuleLinkFee = ExpressionQuery(criteria);
             var ruleLinkFees = DataContext.Where(queryRuleLinkFee);
             if (ruleLinkFees != null)
@@ -143,10 +144,10 @@ namespace eFMS.API.Setting.DL.Services
                        from chargeBuy in gr3.DefaultIfEmpty()
                        join chargeSell in chargeSellings on rule.ChargeSelling equals chargeSell.Id.ToString() into gr4
                        from chargeSell in gr4.DefaultIfEmpty()
-                       select new CsRuleLinkFeeModel()
+                       select new RuleLinkFeeModel()
                        {
                            Id = rule.Id,
-                           NameRule = rule.NameRule,
+                           RuleName = rule.RuleName,
                            ServiceBuying = rule.ServiceBuying,
                            ChargeBuying = rule.ChargeBuying,
                            PartnerNameBuying = buy.ShortName,
@@ -157,20 +158,20 @@ namespace eFMS.API.Setting.DL.Services
                            DatetimeModified = rule.DatetimeModified,
                            Status = rule.Status,
                            EffectiveDate = rule.EffectiveDate,
-                           ExpirationDate = rule.ExpirationDate,
+                           ExpiredDate = rule.ExpiredDate,
                            ChargeNameBuying = chargeBuy.ChargeNameVn,
                            ChargeNameSelling = chargeSell.ChargeNameVn,
                        };
 
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
-        private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(CsRuleLinkFeeCriteria criteria)
+        private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(RuleLinkFeeCriteria criteria)
         {
             Expression<Func<CsRuleLinkFee, bool>> query = q => true;
             if (!string.IsNullOrEmpty(criteria.RuleName))
             {
                 query = query.And(x =>
-                                   x.NameRule == criteria.RuleName
+                                   x.RuleName == criteria.RuleName
                 );
             }
 
@@ -205,8 +206,8 @@ namespace eFMS.API.Setting.DL.Services
                             && x.DatetimeModified.Value.Date <= criteria.ToDate.Value.Date);
                             break;
                         case "ExpiredDate":
-                            query = query.And(x => x.ExpirationDate.Value.Date >= criteria.FromDate.Value.Date &&
-                            x.ExpirationDate.Value.Date <= criteria.ToDate.Value.Date);
+                            query = query.And(x => x.ExpiredDate.Value.Date >= criteria.FromDate.Value.Date &&
+                            x.ExpiredDate.Value.Date <= criteria.ToDate.Value.Date);
                             break;
                         default:
                             break;
@@ -222,7 +223,7 @@ namespace eFMS.API.Setting.DL.Services
             return query;
         }
 
-        public HandleState UpdateRuleLinkFee(CsRuleLinkFeeModel model)
+        public HandleState UpdateRuleLinkFee(RuleLinkFeeModel model)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
@@ -248,7 +249,7 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
-        public CsRuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee)
+        public RuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee)
         {
             ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
             var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
@@ -256,10 +257,117 @@ namespace eFMS.API.Setting.DL.Services
             var user = sysUserRepo.Get();
             var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
             if (ruleLinkFee == null) return null;
-            var modelMap = mapper.Map<CsRuleLinkFeeModel>(ruleLinkFee);
+            var modelMap = mapper.Map<RuleLinkFeeModel>(ruleLinkFee);
             modelMap.UserNameCreated = user.Where(x => x.Id == modelMap.UserCreated).FirstOrDefault().Username;
             modelMap.UserNameModified = user.Where(x => x.Id == modelMap.UserModified).FirstOrDefault().Username;
             return modelMap;
+        }
+
+        /// <summary>
+        /// * Check tồn tại rule. Check theo các field: 
+        /// - Rule Name (Không được trùng tên), 
+        /// - Effective Date - Expried Date
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        public HandleState CheckExistsDataRule(RuleLinkFeeModel model)
+        {
+            try
+            {
+                var hs = CheckDuplicateRule(model);
+                if (!hs.Success)
+                {
+                    return hs;
+                }
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
+
+        public HandleState CheckDuplicateRule(RuleLinkFeeModel model)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return new HandleState("Rule is not null");
+                }
+
+                //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
+                {
+                    return new HandleState("Expired Date cannot be less than the Effective Date");
+                }
+
+                //Trường hợp Insert (Id of rule is null or empty)
+                if (model.Id == Guid.Empty)
+                {
+                    var ruleNameExists = DataContext.Get(x => x.RuleName == model.RuleName).Any();
+                    if (ruleNameExists)
+                    {
+                        return new HandleState("Rule name already exists");
+                    }
+
+                    //Check all rule
+                    var rule = DataContext.Get(x => x.ServiceBuying == model.ServiceBuying
+                                                    && x.ChargeBuying == model.ChargeBuying
+                                                    && x.PartnerBuying == model.PartnerBuying
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    && x.ChargeSelling == model.ChargeSelling
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    );
+                    if (rule.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        rule = rule
+                            .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
+                                     && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
+                        if (rule.Any())
+                        {
+                            return new HandleState(ErrorCode.Existed, "Already exists");
+                        }
+                    }
+                }
+                else //Trường hợp Update (Id of rule is not null & not empty)
+                {
+                    var ruleNameExists = DataContext.Get(x => x.Id != model.Id
+                                                             && x.RuleName == model.RuleName).Any();
+                    if (ruleNameExists)
+                    {
+                        return new HandleState("rule name already exists");
+                    }
+
+                    //Check all rule
+                    var rule = DataContext.Get(x => x.ServiceBuying == model.ServiceBuying
+                                                    && x.ChargeBuying == model.ChargeBuying
+                                                    && x.PartnerBuying == model.PartnerBuying
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    && x.ChargeSelling == model.ChargeSelling
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    );
+                    if (rule.Any())
+                    {
+                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
+                        rule = rule
+                            .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
+                                     && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
+                        if (rule.Any())
+                        {
+                            return new HandleState(ErrorCode.Existed, "Already exists");
+                        }
+                    }
+                }
+
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
         }
 
     }

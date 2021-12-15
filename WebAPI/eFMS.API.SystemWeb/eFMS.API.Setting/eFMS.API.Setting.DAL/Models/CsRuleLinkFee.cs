@@ -1,4 +1,4 @@
-﻿    using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace eFMS.API.Setting.Service.Models
@@ -13,8 +13,8 @@ namespace eFMS.API.Setting.Service.Models
         public string PartnerBuying { get; set; }
         public string PartnerSelling { get; set; }
         public DateTime? EffectiveDate { get; set; }
-        public DateTime? ExpirationDate { get; set; }
-        public string NameRule { get; set; }
+        public DateTime? ExpiredDate { get; set; }
+        public string RuleName { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

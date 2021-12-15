@@ -5,7 +5,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Models
 {
-    public class CsRuleLinkFeeModel
+    public class RuleLinkFeeModel
     {
         public Guid? Id { get; set; }
         public string ServiceBuying { get; set; }
@@ -15,8 +15,8 @@ namespace eFMS.API.Setting.DL.Models
         public string PartnerBuying { get; set; }
         public string PartnerSelling { get; set; }
         public DateTime? EffectiveDate { get; set; }
-        public DateTime? ExpirationDate { get; set; }
-        public string NameRule { get; set; }
+        public DateTime? ExpiredDate { get; set; }
+        public string RuleName { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace eFMS.API.Setting.DL.Models.Criteria
 {
-    public class CsRuleLinkFeeCriteria
+    public class RuleLinkFeeCriteria
     {
         public string RuleName { get; set; }
         public string Datetype { get; set; }

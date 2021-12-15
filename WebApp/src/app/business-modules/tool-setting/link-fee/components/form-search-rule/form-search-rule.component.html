@@ -11,7 +11,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Service Buying</label>
-                        <select formControlName="serviceBuying" class="form-control" (ngModelChange)="enableBuying()">
+                        <select formControlName="serviceBuying" class="form-control" >
                             <option *ngFor="let item of services" [ngValue]="item.value">
                                 {{item.displayName}}
                             </option>
@@ -22,7 +22,7 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>Service Selling</label>
-                        <select formControlName="serviceSelling" class="form-control" (ngModelChange)="enableSelling()">
+                        <select formControlName="serviceSelling" class="form-control">
                             <option *ngFor="let item of services" [ngValue]="item.value">
                                 {{item.displayName}}
                             </option>

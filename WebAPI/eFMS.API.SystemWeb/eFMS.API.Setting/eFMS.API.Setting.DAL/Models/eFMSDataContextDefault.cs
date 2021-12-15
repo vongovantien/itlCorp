@@ -1179,17 +1179,17 @@ namespace eFMS.API.Setting.Service.Models
 
                 entity.Property(e => e.EffectiveDate).HasColumnType("datetime");
 
-                entity.Property(e => e.ExpirationDate).HasColumnType("datetime");
-
-                entity.Property(e => e.NameRule)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
 
                 entity.Property(e => e.PartnerBuying)
                     .HasMaxLength(200)
                     .IsUnicode(false);
 
                 entity.Property(e => e.PartnerSelling)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.RuleName)
                     .HasMaxLength(200)
                     .IsUnicode(false);
 

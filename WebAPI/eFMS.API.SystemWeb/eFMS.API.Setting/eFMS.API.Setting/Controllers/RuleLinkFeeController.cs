@@ -51,10 +51,13 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Add")]
-        [Authorize]
-        public IActionResult AddNewRule(CsRuleLinkFeeModel model)
+        public IActionResult AddNewRule(RuleLinkFeeModel model)
         {
             if (!ModelState.IsValid) return BadRequest();
+
+            var checkData = ruleLinkFeeService.CheckExistsDataRule(model);
+            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
+
             currentUser.Action = "AddNewRuleLinkFee";
             var hs = ruleLinkFeeService.AddNewRuleLinkFee(model);
             if (hs.Code == 403)
@@ -81,8 +84,7 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Paging")]
-        [Authorize]
-        public IActionResult Paging(CsRuleLinkFeeCriteria criteria, int pageNumber, int pageSize)
+        public IActionResult Paging(RuleLinkFeeCriteria criteria, int pageNumber, int pageSize)
         {
             var data = ruleLinkFeeService.Paging(criteria, pageNumber, pageSize, out int totalItems);
             var result = new { data, totalItems, pageNumber, pageSize };
@@ -90,7 +92,6 @@ namespace eFMS.API.Setting.Controllers
         }
 
         [HttpDelete]
-        [Authorize]
         [Route("Delete")]
         public IActionResult DeleteRuleLinkFee(Guid id)
         {
@@ -123,11 +124,14 @@ namespace eFMS.API.Setting.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Update")]
-        [Authorize]
-        public IActionResult UpdateRuleLinkFee(CsRuleLinkFeeModel model)
+        public IActionResult UpdateRuleLinkFee(RuleLinkFeeModel model)
         {
             currentUser.Action = "UpdateCsRuleLinkFee";
             if (!ModelState.IsValid) return BadRequest();
+
+            var checkData = ruleLinkFeeService.CheckExistsDataRule(model);
+            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
+
             var hs = ruleLinkFeeService.UpdateRuleLinkFee(model);
 
             var message = HandleError.GetMessage(hs, Crud.Update);
@@ -142,7 +146,6 @@ namespace eFMS.API.Setting.Controllers
 
         [HttpGet]
         [Route("getRuleByID")]
-        [Authorize]
         public IActionResult getdetailrulelinkfeebyid(Guid id)
         {
             var rule = ruleLinkFeeService.GetRuleLinkFeeById(id);

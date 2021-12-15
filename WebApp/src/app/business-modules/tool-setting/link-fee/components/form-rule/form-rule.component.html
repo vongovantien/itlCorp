@@ -14,10 +14,10 @@
                         <div class="row m-form m-form m-form--state">
                             <div class="col-md-4">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (nameRule.dirty && !nameRule.valid) || (isSubmitted && !nameRule.valid) }">
+                                    [ngClass]="{'m-form__group has-danger': (ruleName.dirty && !ruleName.valid) || (isSubmitted && !ruleName.valid) }">
                                     <label required>Rule Name</label>
-                                    <input type="text" class="form-control" formControlName="nameRule">
-                                    <div class="form-control-feedback" *ngIf="(nameRule.dirty && !nameRule.valid) || (isSubmitted && !nameRule.valid)">
+                                    <input type="text" class="form-control" formControlName="ruleName">
+                                    <div class="form-control-feedback" *ngIf="(ruleName.dirty && !ruleName.valid) || (isSubmitted && !ruleName.valid)">
                                         Rule Name is required !
                                     </div>
                                 </div>
@@ -115,29 +115,28 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"  
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !expirationDate.value.startDate}">
+                                [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate}">
                                     <label required>Expired Date</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
-                                            readonly [singleDatePicker]="true" formControlName="expirationDate"
-                                            [alwaysShowCalendars]="true" [autoApply]="true" />
+                                            readonly [singleDatePicker]="true" formControlName="expiredDate"
+                                            [alwaysShowCalendars]="true" [autoApply]="true"/>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
                                     </div>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !expirationDate.value.startDate">
-                                        ExpirationDate Date is required !
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !expiredDate.value.startDate">
+                                        expiredDate Date is required !
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !effectiveDate.value.startDate}">
-                                    <label required>Effective Date</label>
+                                <div class="form-group">
+                                    <label>Effective Date</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -149,9 +148,6 @@
                                                 <i class="la la-calendar"></i>
                                             </span>
                                         </span>
-                                    </div>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !effectiveDate.value.startDate">
-                                        Effective Date is required !
                                     </div>
                                 </div>
                             </div>
