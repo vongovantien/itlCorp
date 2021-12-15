@@ -219,5 +219,12 @@
         #endregion
 
         public static readonly string EMAIL_SETTING_AR_ALERT = "AR - Alert";
+
+        #region PAYABLE
+        public static readonly string TRANSACTION_TYPE_PAYABLE_CREDIT = "CREDIT";
+        public static readonly string TRANSACTION_TYPE_PAYABLE_OBH = "OBH";
+        public static readonly string TRANSACTION_TYPE_PAYABLE_ADV = "ADV";
+        public static readonly string TRANSACTION_TYPE_PAYABLE_COMBINE = "COMBINE";
+        #endregion
     }
 }

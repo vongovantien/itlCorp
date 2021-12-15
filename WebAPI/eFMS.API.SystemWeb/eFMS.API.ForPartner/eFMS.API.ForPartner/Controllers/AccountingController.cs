@@ -21,6 +21,7 @@ using eFMS.API.ForPartner.DL.Models.Receivable;
 using eFMS.API.Common.Helpers;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using eFMS.API.ForPartner.Service.Models;
+using eFMS.API.ForPartner.DL.Models.Payable;
 
 namespace eFMS.API.ForPartner.Controllers
 {
@@ -669,14 +670,36 @@ namespace eFMS.API.ForPartner.Controllers
             return response;
         }
 
-        private async Task<HandleState> InsertAccountPayable(AccAccountPayable model)
+        /// <summary>
+        /// Ghi nhận công nợ phải trả
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private async Task<IActionResult> InsertAccountPayable(List<AccAccountPayableModel> model)
         {
             var urlApiAcct = apiUrl.Value.Url + "/Accounting";
             // var urlApiAcct = "http://localhost:44368";
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable", model, null);
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable/InsertPayablePayment", model, null);
             var response = await resquest.Content.ReadAsAsync<HandleState>();
-            return response;
+            ResultHandle result = new ResultHandle { Status = response.Success, Message = response.Message.ToString(), Data = model };
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Hủy thanh toán giảm trừ công nợ phải trả
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private async Task<IActionResult> CancelAccountPayable(List<CancelPayablePayment> model)
+        {
+            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
+            // var urlApiAcct = "http://localhost:44368";
+
+            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable/CancelPayablePayment", model, null);
+            var response = await resquest.Content.ReadAsAsync<HandleState>();
+            ResultHandle result = new ResultHandle { Status = response.Success, Message = response.Message.ToString(), Data = model };
+            return Ok(result);
         }
 
         /// <summary>
@@ -738,6 +761,10 @@ namespace eFMS.API.ForPartner.Controllers
 
             string _message = hs.Success ? "Tạo mới voucher thành công" : string.Format("{0}. Tạo mới voucher thất bại", hs.Message.ToString());
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+            if (hs.Success)
+            {
+                var payables = await accountingManagementService.InsertAccPayable(model, Guid.NewGuid());
+            }
 
             var _endDateProgress = DateTime.Now;
 
@@ -748,14 +775,12 @@ namespace eFMS.API.ForPartner.Controllers
             var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
             #endregion
 
+            return Ok(hs);
             //  TODO: ghi nhận công nợ phải trả,
             //Response.OnCompleted(async () =>
             //{
 
             //}
-
-            List<AccAccountPayable> payables = accountingManagementService.GenerateListAccPayable(model, Guid.NewGuid());
-            return Ok(payables);
         }
 
         [HttpPut("UpdateVoucher")]

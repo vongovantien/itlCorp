@@ -53,6 +53,7 @@ namespace eFMS.API.ForPartner.DL.Service
         private readonly IContextBase<AcctReceiptSync> receiptSyncRepository;
         private readonly IContextBase<AccAccountReceivable> accReceivableRepository;
         private readonly IContextBase<SysOffice> officeRepository;
+        private readonly IContextBase<AccAccountPayable> accAccountPayableRepository;
 
 
         public AccAccountingManagementService(
@@ -81,8 +82,8 @@ namespace eFMS.API.ForPartner.DL.Service
             IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo,
             IContextBase<AcctReceiptSync> receiptSyncRepo,
             IContextBase<AccAccountReceivable> accReceivableRepo,
-            IContextBase<SysOffice> officeRepo
-
+            IContextBase<SysOffice> officeRepo,
+            IContextBase<AccAccountPayable> accAccountPayableRepo
             ) : base(repository, mapper)
         {
             currentUser = cUser;
@@ -108,6 +109,7 @@ namespace eFMS.API.ForPartner.DL.Service
             receiptSyncRepository = receiptSyncRepo;
             accReceivableRepository = accReceivableRepo;
             officeRepository = officeRepo;
+            accAccountPayableRepository = accAccountPayableRepo;
         }
 
         public AccAccountingManagementModel GetById(Guid id)
@@ -2773,57 +2775,86 @@ namespace eFMS.API.ForPartner.DL.Service
             return hs;
         }
 
-        public List<AccAccountPayable> GenerateListAccPayable(VoucherSyncCreateModel model, Guid? voucherID)
+        /// <summary>
+        /// Insert first row of accounting payable after insert voucher
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="voucherID"></param>
+        /// <returns></returns>
+        public async Task<HandleState> InsertAccPayable(VoucherSyncCreateModel model, Guid? voucherID)
         {
+            HandleState hsAddPayable = new HandleState();
             List<AccAccountPayable> payables = new List<AccAccountPayable>();
-
-            var grpVoucherDetail = model.Details
+            using (var trans = accAccountPayableRepository.DC.Database.BeginTransaction())
+            {
+                try
+                {
+                    var grpVoucherDetail = model.Details
               .GroupBy(x => new { x.VoucherNo, x.TransactionType, model.DocType, model.DocCode, x.BravoRefNo })
-              .Select(s => new {
-                  s.Key.VoucherNo,
-                  s.Key.TransactionType,
-                  voucherData = s.FirstOrDefault(),
-              })
-              .ToList();
-            grpVoucherDetail.ForEach(c =>
-            {
-                var customer = partnerRepo.Get(x => x.AccountNo == model.CustomerCode)?.FirstOrDefault();
-                var office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
+              .Select(s => s).ToList();
+                    var customer = partnerRepo.Get(x => x.AccountNo == model.CustomerCode)?.FirstOrDefault();
+                    var office = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
+                    grpVoucherDetail.ForEach(c =>
+                    {
+                        if (c.Key.TransactionType != "NONE")
+                        {
+                            AccAccountPayable payable = new AccAccountPayable
+                            {
+                                Currency = c.FirstOrDefault().Currency,
+                                PartnerId = Guid.Parse(customer?.Id),
+                                PaymentAmount = 0,
+                                PaymentAmountVnd = 0,
+                                PaymentAmountUsd = 0,
+                                RemainAmount = 0,
+                                RemainAmountVnd = 0,
+                                RemainAmountUsd = 0,
+                                TotalAmountVnd = c.Sum(pa => pa.VatAmountVnd + pa.AmountVnd),
+                                TotalAmountUsd = c.Sum(pa => pa.VatAmountUsd + pa.AmountUsd),
+                                ReferenceNo = c.FirstOrDefault().BravoRefNo,
+                                Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
+                                CompanyId = currentUser.CompanyID,
+                                OfficeId = office.Id,
+                                GroupId = currentUser.GroupId,
+                                DepartmentId = currentUser.DepartmentId,
+                                TransactionType = c.FirstOrDefault().TransactionType,
+                                VoucherId = voucherID,
+                                BillingNo = model.DocCode,
+                                BillingType = model.DocType,
+                                ExchangeRate = c.FirstOrDefault().ExchangeRate,
+                                UserCreated = currentUser.UserID,
+                                DatetimeCreated = DateTime.Now,
+                                UserModified = currentUser.UserID,
+                                DatetimeModified = DateTime.Now
+                            };
 
-                AccAccountPayable payable = new AccAccountPayable {
-                    Id = Guid.NewGuid(),
-                    Currency = c.voucherData.Currency,
-                    PartnerId = Guid.Parse(customer?.Id),
-                    PaymentAmount = 0,
-                    PaymentAmountVnd = 0,
-                    PaymentAmountUsd = 0,
-                    RemainAmount = 0,
-                    RemainAmountVnd = 0,
-                    RemainAmountUsd = 0,
-                    TotalAmountVnd = c.voucherData.VatAmountVnd + c.voucherData.AmountVnd,
-                    TotalAmountUsd = c.voucherData.VatAmountUsd + c.voucherData.AmountUsd,
-                    ReferenceNo = c.voucherData.BravoRefNo,
-                    Status = ForPartnerConstants.ACCOUNTING_PAYMENT_STATUS_UNPAID,
-                    CompanyId = currentUser.CompanyID,
-                    OfficeId = office.Id,
-                    TransactionType = c.voucherData.TransactionType,
-                    VoucherId = voucherID,
-                    BillingNo = model.DocCode,
-                    BillingType = model.DocType
-                };
+                            payables.Add(payable);
+                        }
+                    });
 
-                payables.Add(payable);
-
-            });
-
-            foreach (var item in payables)
-            {
-                item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
-                item.UnpaidAmountVnd = item.TotalAmountVnd;
-                item.UnpaidAmountUsd = item.TotalAmountUsd;
-                item.UnpaidAmount = item.TotalAmount;
+                    foreach (var item in payables)
+                    {
+                        item.PaymentAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                        item.UnpaidAmountVnd = item.TotalAmountVnd;
+                        item.UnpaidAmountUsd = item.TotalAmountUsd;
+                        item.UnpaidAmount = item.TotalAmount;
+                        item.RemainAmount = item.UnpaidAmount;
+                        item.RemainAmountVnd = item.UnpaidAmountVnd;
+                        item.RemainAmountUsd = item.UnpaidAmountUsd;
+                        hsAddPayable = await accAccountPayableRepository.AddAsync(item, false);
+                    }
+                    accAccountPayableRepository.SubmitChanges();
+                    return hsAddPayable;
+                }
+                catch (Exception ex)
+                {
+                    trans.Rollback();
+                    return new HandleState((object)ex.Message);
+                }
+                finally
+                {
+                    trans.Dispose();
+                }
             }
-            return payables;
         }
     }
 }

@@ -6,13 +6,13 @@ namespace eFMS.API.Accounting.Service.Models
     public partial class AccAccountPayablePayment
     {
         public Guid Id { get; set; }
-        public Guid? PartnerId { get; set; }
+        public string PartnerId { get; set; }
         public string PaymentNo { get; set; }
-        public byte[] ReferenceNo { get; set; }
-        public DateTime? PaymentDate { get; set; }
+        public string ReferenceNo { get; set; }
         public string PaymentType { get; set; }
         public string Currency { get; set; }
         public decimal? ExchangeRate { get; set; }
+        public string Status { get; set; }
         public decimal? PaymentAmount { get; set; }
         public decimal? PaymentAmountVnd { get; set; }
         public decimal? PaymentAmountUsd { get; set; }
