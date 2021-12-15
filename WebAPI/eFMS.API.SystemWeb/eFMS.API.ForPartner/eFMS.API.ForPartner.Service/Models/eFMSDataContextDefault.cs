@@ -88,6 +88,12 @@ namespace eFMS.API.ForPartner.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.Over16To30Day).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Over1To15Day).HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.Over30Day).HasColumnType("decimal(18, 4)");
+
                 entity.Property(e => e.PartnerId)
                     .HasColumnName("PartnerID")
                     .HasMaxLength(50)
@@ -102,6 +108,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.PaymentAmountVnd)
                     .HasColumnName("PaymentAmountVND")
                     .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PaymentDueDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentTerm).HasColumnType("decimal(18, 4)");
 
                 entity.Property(e => e.ReferenceNo)
                     .HasMaxLength(30)
@@ -135,16 +145,6 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(30)
                     .IsUnicode(false);
 
-                entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.UnpaidAmountUsd)
-                    .HasColumnName("UnpaidAmountUSD")
-                    .HasColumnType("decimal(18, 4)");
-
-                entity.Property(e => e.UnpaidAmountVnd)
-                    .HasColumnName("UnpaidAmountVND")
-                    .HasColumnType("decimal(18, 4)");
-
                 entity.Property(e => e.UserCreated)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -153,7 +153,9 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
-                entity.Property(e => e.VoucherId).HasColumnName("VoucherID");
+                entity.Property(e => e.VoucherNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<AccAccountPayablePayment>(entity =>
