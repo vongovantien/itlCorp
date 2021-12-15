@@ -2801,7 +2801,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             AccAccountPayable payable = new AccAccountPayable
                             {
                                 Currency = c.FirstOrDefault().Currency,
-                                PartnerId = Guid.Parse(customer?.Id),
+                                PartnerId = customer?.Id,
                                 PaymentAmount = 0,
                                 PaymentAmountVnd = 0,
                                 PaymentAmountUsd = 0,
