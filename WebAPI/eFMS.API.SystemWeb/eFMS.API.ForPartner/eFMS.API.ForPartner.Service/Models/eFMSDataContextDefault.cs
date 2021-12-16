@@ -60,8 +60,6 @@ namespace eFMS.API.ForPartner.Service.Models
                     .HasColumnName("ID")
                     .ValueGeneratedNever();
 
-                entity.Property(e => e.BillingDate).HasColumnType("datetime");
-
                 entity.Property(e => e.BillingNo)
                     .HasMaxLength(30)
                     .IsUnicode(false);
@@ -198,6 +196,10 @@ namespace eFMS.API.ForPartner.Service.Models
                 entity.Property(e => e.PaymentAmountVnd)
                     .HasColumnName("PaymentAmountVND")
                     .HasColumnType("decimal(18, 4)");
+
+                entity.Property(e => e.PaymentDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentMethod).HasMaxLength(50);
 
                 entity.Property(e => e.PaymentNo)
                     .HasMaxLength(30)

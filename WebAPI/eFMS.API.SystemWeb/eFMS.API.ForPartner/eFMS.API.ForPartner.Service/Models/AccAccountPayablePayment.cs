@@ -10,6 +10,8 @@ namespace eFMS.API.ForPartner.Service.Models
         public string PaymentNo { get; set; }
         public string ReferenceNo { get; set; }
         public string PaymentType { get; set; }
+        public string PaymentMethod { get; set; }
+        public DateTime? PaymentDate { get; set; }
         public string Currency { get; set; }
         public decimal? ExchangeRate { get; set; }
         public string Status { get; set; }

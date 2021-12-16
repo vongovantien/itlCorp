@@ -9,8 +9,5 @@ namespace eFMS.API.Accounting.DL.IService
 {
     public interface IAccountPayableService: IRepositoryBase<AccAccountPayable, AccAccountPayableModel>
     {
-        HandleState InsertAccountPayable(List<AccAccountPayableModel> model);
-        //Task<HandleState> UpdateAccountPayable();
-        //Task<HandleState> DeleteAccountPayable();
     }
 }

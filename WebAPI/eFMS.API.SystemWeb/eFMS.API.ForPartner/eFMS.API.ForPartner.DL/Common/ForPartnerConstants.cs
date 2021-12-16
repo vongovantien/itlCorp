@@ -155,5 +155,16 @@
         public static readonly string SYNCED_FROM_VOUCHER = "VOUCHER";
 
         public static readonly int KB_EXCHANGE_RATE = 20000;
+
+        #region PAYABLE
+        public static readonly string PAYABLE_TRANSACTION_TYPE_CREDIT = "CREDIT";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_OBH = "OBH";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_ADV = "ADV";
+        public static readonly string PAYABLE_TRANSACTION_TYPE_COMBINE = "COMBINE";
+
+        public static readonly string PAYABLE_PAYMENT_TYPE_CREDIT = "CREDIT";
+        public static readonly string PAYABLE_PAYMENT_TYPE_NETOFF = "NETOFF";
+        public static readonly string PAYABLE_PAYMENT_TYPE_ADV = "ADV";
+        #endregion
     }
 }

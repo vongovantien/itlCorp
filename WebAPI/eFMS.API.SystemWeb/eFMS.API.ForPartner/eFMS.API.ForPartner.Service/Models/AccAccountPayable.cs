@@ -11,7 +11,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public string ReferenceNo { get; set; }
         public string BillingNo { get; set; }
         public string BillingType { get; set; }
-        public DateTime? BillingDate { get; set; }
         public string Currency { get; set; }
         public decimal? ExchangeRate { get; set; }
         public decimal? TotalAmount { get; set; }

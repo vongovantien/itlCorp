@@ -24,20 +24,6 @@ namespace eFMS.API.Accounting.Controllers
         {
             accPayableService = accPayable;
         }
-
-        [HttpPost("InsertPayablePayment")]
-        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model)
-        {
-
-            HandleState hs = accPayableService.InsertAccountPayable(model);
-            return Ok(hs);
-        }
-
-        [HttpDelete("CancelPayablePayment")]
-        public IActionResult CancelPayablePayment(List<CancelPayablePayment> model)
-        {
-            return Ok(new ResultHandle());
-        }
     }
 
 }

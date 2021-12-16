@@ -677,16 +677,45 @@ namespace eFMS.API.ForPartner.Controllers
         /// Ghi nhận công nợ phải trả
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="apiKey">API Key</param>
+        /// <param name="hash">Hash Value</param>s
         /// <returns></returns>
         [HttpPost("InsertPayablePayment")]
-        public async Task<IActionResult> InsertPayablePayment(List<AccAccountPayableModel> model)
+        public IActionResult InsertPayablePayment(List<AccAccountPayableModel> model, [Required] string apiKey, [Required] string hash)
         {
-            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
-            // var urlApiAcct = "http://localhost:44368";
+            var _startDateProgress = DateTime.Now;
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+            var checkPayableData = accPayableService.CheckIsValidPayable(model);
+            if (!string.IsNullOrEmpty(checkPayableData))
+            {
+                ResultHandle _result = new ResultHandle { Status = false, Message = checkPayableData, Data = model };
+                return Ok(_result);
+            }
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable/InsertPayablePayment", model, null);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            ResultHandle result = new ResultHandle { Status = response.Success, Message = response.Message.ToString(), Data = model };
+            var hs = accPayableService.InsertAccountPayablePayment(model, apiKey);
+
+            string _message = hs.Success ? "Ghi nhận giảm trừ công nợ thành công" : string.Format("{0}. Ghi nhận giảm trừ công nợ thất bại", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+            #region -- Ghi Log --
+            string _funcLocal = "InsertPayablePayment";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = string.Format("Ghi nhận giảm trừ công nợ");
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion -- Ghi Log --
+
+            if (!hs.Success)
+                return Ok(result);
             return Ok(result);
         }
 
@@ -694,16 +723,37 @@ namespace eFMS.API.ForPartner.Controllers
         /// Hủy thanh toán giảm trừ công nợ phải trả
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="apiKey"></param>
+        /// <param name="hash"></param>
         /// <returns></returns>
         [HttpPut("CancelPayablePayment")]
-        public async Task<IActionResult> CancelPayablePayment(List<CancelPayablePayment> model)
+        public IActionResult CancelPayablePayment(List<CancelPayablePayment> model, [Required] string apiKey, [Required] string hash)
         {
-            var urlApiAcct = apiUrl.Value.Url + "/Accounting";
-            // var urlApiAcct = "http://localhost:44368";
+            var _startDateProgress = DateTime.Now;
 
-            HttpResponseMessage resquest = await HttpClientService.PostAPI(urlApiAcct + "/api/v1/e/AccountPayable/CancelPayablePayment", model, null);
-            var response = await resquest.Content.ReadAsAsync<HandleState>();
-            ResultHandle result = new ResultHandle { Status = response.Success, Message = response.Message.ToString(), Data = model };
+            if (!accountingManagementService.ValidateApiKey(apiKey))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.API_KEY_INVALID);
+            }
+            if (!accountingManagementService.ValidateHashString(model, apiKey, hash))
+            {
+                return new CustomUnauthorizedResult(ForPartnerConstants.HASH_INVALID);
+            }
+            if (!ModelState.IsValid) return BadRequest();
+
+            var hs = accPayableService.CancelAccountPayablePayment(model, apiKey);
+            string _message = hs.Success ? "Hủy giao dịch giảm trừ thành công" : string.Format("{0}.Hủy giao dịch giảm trừ", hs.Message.ToString());
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = _message, Data = model };
+
+            var _endDateProgress = DateTime.Now;
+
+            #region -- Ghi Log --
+            string _funcLocal = "CancelPayablePayment";
+            string _objectRequest = JsonConvert.SerializeObject(model);
+            string _major = "Hủy giao dịch giảm trừ";
+            var hsAddLog = actionFuncLogService.AddActionFuncLog(_funcLocal, _objectRequest, JsonConvert.SerializeObject(result), _major, _startDateProgress, _endDateProgress);
+            #endregion -- Ghi Log --
+
             return Ok(result);
         }
 
