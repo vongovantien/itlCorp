@@ -1079,7 +1079,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get(x => string.IsNullOrEmpty(x.AdvanceNoFor)); // Not use advance no carrier
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
