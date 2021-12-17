@@ -115,7 +115,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                     foreach (var item in payables)
                     {
-                        item.PaymentAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
+                        item.TotalAmount = item.Currency == ForPartnerConstants.CURRENCY_LOCAL ? item.TotalAmountVnd : item.TotalAmountUsd;
                         item.RemainAmount = item.TotalAmountVnd; ;
                         item.RemainAmountVnd = item.TotalAmountVnd;
                         item.RemainAmountUsd = item.TotalAmountUsd;
