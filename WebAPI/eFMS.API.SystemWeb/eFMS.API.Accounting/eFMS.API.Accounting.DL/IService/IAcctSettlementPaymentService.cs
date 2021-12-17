@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
-        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
+        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool? isCopyCharge);
 
         ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
 

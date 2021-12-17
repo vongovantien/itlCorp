@@ -226,7 +226,7 @@ namespace eFMS.API.Accounting.Controllers
             if (settlement != null)
             {
                 chargeGrpSettlement = acctSettlementPaymentService.GetListShipmentSettlementBySettlementNo(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
-                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo).OrderBy(x => x.JobId).ToList();
+                chargeNoGrpSettlement = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlement.SettlementNo, false).OrderBy(x => x.JobId).ToList();
             }
             var data = new { settlement, chargeGrpSettlement, chargeNoGrpSettlement };
             return Ok(data);
@@ -893,7 +893,7 @@ namespace eFMS.API.Accounting.Controllers
             List<ShipmentChargeSettlement> data = new List<ShipmentChargeSettlement>();
             if (checkSettleOfUser)
             {
-                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false).ToList();
+                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo, true).Where(x => x.IsFromShipment == false).ToList();
             }
             return Ok(data);
             //End change request
