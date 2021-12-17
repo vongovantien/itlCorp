@@ -1077,9 +1077,9 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
+        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool? isCopyCharge)
         {
-            var surcharge = csShipmentSurchargeRepo.Get(x => string.IsNullOrEmpty(x.AdvanceNoFor)); // Not use advance no carrier
+            var surcharge = csShipmentSurchargeRepo.Get(x => (isCopyCharge == true ? string.IsNullOrEmpty(x.AdvanceNo) : true)); // Not use advance no carrier in copy charge
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
