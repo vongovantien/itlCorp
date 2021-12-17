@@ -47,7 +47,8 @@
                             </thead>
                             <tbody class="tbody-group">
                                 <ng-container *ngIf="!!this.userLevels.length">
-                                    <tr *ngFor="let lv of userLevels; let i = index; trackBy: trackByFn">
+                                    <tr [contextMenu]="usrLvMenuContext" (onTouch)="onSelectContextMenu(lv)"
+                                        *ngFor="let lv of userLevels; let i = index; trackBy: trackByFn">
                                         <td class="table-actions-col">
                                             <div class="table-actions" style="width: 70px">
                                                 <button type="button" (click)="deleteGroup(lv)"
@@ -62,6 +63,9 @@
                                         <td>{{lv.officeAbbrName}}</td>
                                         <td>{{lv.departmentAbbrName}}</td>
                                         <td>{{lv.position}}</td>
+                                        <td>
+                                            <app-switch size="md" [ngModel]="lv.isDefault" disabled></app-switch>
+                                        </td>
                                     </tr>
                                 </ng-container>
                                 <tr *ngIf="!this.userLevels.length" app-table-none-record
@@ -84,3 +88,9 @@
 
 <confirm-popup body="Are you sure want to delete this user group" (onSubmit)="onSubmitDelete()" title="Warning">
 </confirm-popup>
+
+<app-context-menu #usrLvMenuContext (clickOutside)="!selectedUserLevel">
+    <div class="menu-context__item" (click)="onSelectConfirmSetDefault()">
+        <span><i class="la la-cloud-upload "></i><span> Set default login</span></span>
+    </div>
+</app-context-menu>

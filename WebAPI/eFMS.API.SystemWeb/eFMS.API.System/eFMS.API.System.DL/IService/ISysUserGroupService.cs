@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace eFMS.API.System.DL.IService
 {
@@ -19,5 +20,6 @@ namespace eFMS.API.System.DL.IService
         IQueryable<SysUserLevelModel> GetByUserId(string id);
         IQueryable<SysUserLevelModel> GetUsersByType(UserLevelCriteria criteria);
         List<SysUserLevelModel> GetListUsersByCurrentCompany(SysUserLevelModel model);
+        Task<HandleState> SetDefault(int Id);
     }
 }

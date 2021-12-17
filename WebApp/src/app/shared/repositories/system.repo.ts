@@ -501,6 +501,14 @@ export class SystemRepo {
             );
     }
 
+    updateUserLevelById(body) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel`, body)
+    }
+
+    setdefaultUserLeve(id: number) {
+        return this._api.put(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserLevel/SetDefault`, null, { Id: id });
+    }
+
     deleteRole(id: string) {
         return this._api.delete(`${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysUserPermission/${id}`)
             .pipe(
@@ -676,7 +684,7 @@ export class SystemRepo {
             map((data: any) => data)
         );
     }
-    
+
     getListEmailSettingByDeptID(Id: number) {
         return this._api.get(
             `${environment.HOST.SYSTEM}/api/${this.VERSION}/en-US/SysEmailSetting/GetEmailSettingByDeptId/`,
