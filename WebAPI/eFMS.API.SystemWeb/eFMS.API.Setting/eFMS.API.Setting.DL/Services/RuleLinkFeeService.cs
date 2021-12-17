@@ -187,6 +187,18 @@ namespace eFMS.API.Setting.DL.Services
                 query = query.And(x => x.ServiceBuying == criteria.ServiceBuying);
             }
 
+            if (!string.IsNullOrEmpty(criteria.PartnerSelling))
+            {
+                query = query.And(x =>
+                                   x.PartnerSelling == criteria.PartnerSelling
+                );
+            }
+
+            if (!string.IsNullOrEmpty(criteria.PartnerBuying))
+            {
+                query = query.And(x => x.PartnerBuying == criteria.PartnerBuying);
+            }
+
             if (!string.IsNullOrEmpty(criteria.Datetype))
             {
                 if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
@@ -238,7 +250,6 @@ namespace eFMS.API.Setting.DL.Services
                 ruleLinkFee.DatetimeModified = DateTime.Now;
                 ruleLinkFee.UserCreated = rule.UserCreated;
                 ruleLinkFee.DatetimeCreated = rule.DatetimeCreated;
-                ruleLinkFee.Status = rule.Status;
                 var hs = DataContext.Update(ruleLinkFee, x => x.Id == ruleLinkFee.Id);
                 return hs;
             }
@@ -297,10 +308,13 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Rule is not null");
                 }
 
-                //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
-                if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
+                if(model.ExpiredDate != null)
                 {
-                    return new HandleState("Expired Date cannot be less than the Effective Date");
+                    //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                    if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
+                    {
+                        return new HandleState("Expired Date cannot be less than the Effective Date");
+                    }
                 }
 
                 //Trường hợp Insert (Id of rule is null or empty)
@@ -338,7 +352,7 @@ namespace eFMS.API.Setting.DL.Services
                                                              && x.RuleName == model.RuleName).Any();
                     if (ruleNameExists)
                     {
-                        return new HandleState("rule name already exists");
+                        return new HandleState("Rule name already exists");
                     }
 
                     //Check all rule

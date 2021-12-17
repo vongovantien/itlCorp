@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 import { SettingRepo } from 'src/app/shared/repositories';
 import { map, catchError, finalize } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { FormRuleComponent } from './components/form-rule/form-rule.component';
   selector: 'app-link-fee',
   templateUrl: './link-fee.component.html',
 })
-export class LinkFeeComponent extends AppList {
+export class LinkFeeComponent extends AppList implements OnInit{
   @ViewChild(FormRuleComponent) formRule: FormRuleComponent;
   @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
   @ViewChild(Permission403PopupComponent) permission403Popup: Permission403PopupComponent;
@@ -28,7 +28,7 @@ export class LinkFeeComponent extends AppList {
   ) {
     super();
     this._progressRef = this._progressService.ref();
-    this.requestList = this.searchRule();
+    this.requestList = this.searchRule;
   }
 
   ngOnInit() {
@@ -46,8 +46,10 @@ export class LinkFeeComponent extends AppList {
       { field: 'effectiveDate', title: 'Effective Date', sortable: false },
       { field: 'expiredDate', title: 'Expiration Date', sortable: false },
     ];
-
-    this.searchRule({});
+    this.dataSearch = {
+      all: null
+    };
+    this.searchRule(this.dataSearch);
   }
 
   searchRule(dataSearch?: any) {
@@ -66,6 +68,10 @@ export class LinkFeeComponent extends AppList {
       ).subscribe(
         (res: any) => {
           this.totalItems = res.totalItems || 0;
+          this.rules=res.data.forEach(element => {
+            element.serviceBuying=this.convertServiceName(element.serviceBuying),
+            element.serviceSelling=this.convertServiceName(element.serviceSelling)
+          });
           this.rules = res.data || [];
         },
       );
@@ -94,6 +100,33 @@ export class LinkFeeComponent extends AppList {
             this._toastService.error(res.message);
           }
         });
+  }
+
+  convertServiceName(serviceCode: string) {
+    switch (serviceCode) {
+      case 'AI':
+        return 'Air Import';
+      case 'CL':
+        return 'Custom logistic';
+      case 'AE':
+        return 'Air Export';
+      case 'SFE':
+        return 'Sea FCL Export';
+      case 'SFI':
+        return 'Sea FCL Import';
+      case 'SLI':
+        return 'Sea LCL Export';
+      case 'SLE':
+        return 'Sea LCL Import';
+      case 'IT':
+        return 'Inland Trucking';
+      case 'SCE':
+        return 'Sea Consol Export';
+      case 'SCI':
+        return 'Sea Consol Import';
+      default:
+        break;
+    }
   }
 
   getRuleDetail(id: string) {

@@ -23,6 +23,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
     serviceSelling: AbstractControl;
+    status: AbstractControl;
 
     selectedChargeBuying: Partial<CommonInterface.IComboGridData> | any = {};
     selectedChargeSelling: Partial<CommonInterface.IComboGridData> | any = {};
@@ -79,16 +80,18 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             serviceSelling: [null, Validators.compose([
                 Validators.required
             ])],
-            expiredDate: [null, Validators.compose([
+            effectiveDate: [null, Validators.compose([
                 Validators.required
             ])],
-            effectiveDate: [null]
+            expiredDate: [null],
+            status: [true]
         });
         this.serviceBuying = this.formGroup.controls['serviceBuying'];
         this.serviceSelling = this.formGroup.controls['serviceSelling'];
         this.ruleName = this.formGroup.controls['ruleName'];
         this.expiredDate = this.formGroup.controls['expiredDate'];
         this.effectiveDate = this.formGroup.controls['effectiveDate'];
+        this.status = this.formGroup.controls['status'];
         this.formGroup.get("effectiveDate").valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
@@ -104,7 +107,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     initBasicData() {
         this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'PartnerID' },
+                { field: 'taxCode', label: 'Partner Code' },
                 { field: 'shortName', label: 'Abbr Name' },
                 { field: 'partnerNameEn', label: 'Name EN' },
 
@@ -132,6 +135,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
 
     getService() {
         this.services = [
+            { displayName: 'Custom Logistic', value: 'CL' },
             { displayName: 'Air Export', value: 'AE' },
             { displayName: 'Air Import', value: 'AI' },
             { displayName: 'Sea Consol Export', value: 'SCE' },
@@ -140,6 +144,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             { displayName: 'Sea FCL Import', value: 'SFI' },
             { displayName: 'Sea LCL Export', value: 'SLE' },
             { displayName: 'Sea LCL Import', value: 'SLI' },
+            { displayName: 'Inland Trucking', value: 'IT' },
         ];
     }
 
@@ -221,14 +226,18 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         const valueForm = this.formGroup.getRawValue();
         console.log(this.formGroup.invalid);
         const rule: RuleLinkFee = new RuleLinkFee(valueForm);
-        if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.selectedPartnerSelling.value){
+        if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.selectedPartnerSelling.value||!this.effectiveDate.value.startDate){
             return;
+        }
+        if(!this.expiredDate.value.startDate){
+            rule.expiredDate=null
+        }else{
+            rule.expiredDate = formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en')
         }
         if (this.formGroup.invalid) { return; }
         if (!this.isShowUpdate) {
             rule.id = '';
-            rule.effectiveDate = formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en'),
-                rule.expiredDate = formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en'),
+            rule.effectiveDate = formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en')
                 rule.partnerBuying = this.rule.partnerBuying,
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,

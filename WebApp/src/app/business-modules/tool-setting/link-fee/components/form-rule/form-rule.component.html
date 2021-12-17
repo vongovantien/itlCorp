@@ -114,29 +114,8 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group"  
-                                [ngClass]="{'m-form__group has-danger': isSubmitted && !expiredDate.value.startDate}">
-                                    <label required>Expired Date</label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
-                                            readonly [singleDatePicker]="true" formControlName="expiredDate"
-                                            [alwaysShowCalendars]="true" [autoApply]="true"/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
-                                            </span>
-                                        </span>
-                                    </div>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !expiredDate.value.startDate">
-                                        expiredDate Date is required !
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label>Effective Date</label>
+                                <div class="form-group" [ngClass]="{'m-form__group has-danger': isSubmitted && !effectiveDate.value.startDate}">
+                                    <label required>Effective Date</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
@@ -149,8 +128,37 @@
                                             </span>
                                         </span>
                                     </div>
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !effectiveDate.value.startDate">
+                                        Effective Date is required !
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-group"  >
+                                    <label>Expired Date</label>
+                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                        <input type="text" class="form-control m-input m-input--square"
+                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                            [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
+                                            readonly [singleDatePicker]="true" formControlName="expiredDate"
+                                            [alwaysShowCalendars]="true" [autoApply]="true"/>
+                                        <span class="m-input-icon__icon m-input-icon__icon--right">
+                                            <span>
+                                                <i class="la la-calendar"></i>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                                <div class="col-md-12" *ngIf="!!isShowUpdate"> 
+                                    <div class="form-group">
+                                        <label class="form-control-label">Status</label>
+                                        <div class="m-checkbox-inline">
+                                            <app-switch formControlName="status">
+                                            </app-switch>
+                                        </div>
+                                    </div>
+                                </div>
                             <ng-container *ngIf="!!isShowUpdate">
                                 <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                     <span class="m--font-bolder">Create:</span>
@@ -165,7 +173,6 @@
                                         date:'dd/MM/yyyy h:mm:ss a'}}</span>
                                     <span class="m--font-bolder m--margin-left-5">by</span>
                                     <span class="m--font-success m--margin-left-5">{{userNameModified}}</span>
-
                                 </div>
                             </ng-container>
                         </div>

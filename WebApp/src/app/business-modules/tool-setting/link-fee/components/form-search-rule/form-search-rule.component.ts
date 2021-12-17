@@ -9,6 +9,7 @@ import { Charge, Partner } from 'src/app/shared/models';
 import { FormGroup, AbstractControl, FormBuilder } from '@angular/forms';
 import { CommonEnum } from '@enums';
 import { formatDate } from '@angular/common';
+import { RuleLinkFee } from 'src/app/shared/models/tool-setting/rule-link-fee';
 @Component({
     selector: 'app-form-search-rule',
     templateUrl: './form-search-rule.component.html'
@@ -43,6 +44,8 @@ export class FormSearchRuleComponent extends AppForm {
 
     formSearchRule: FormGroup;
 
+    rule: RuleLinkFee = new RuleLinkFee();
+
     ruleName: AbstractControl;
     serviceBuying: AbstractControl;
     serviceSelling: AbstractControl;
@@ -61,7 +64,7 @@ export class FormSearchRuleComponent extends AppForm {
     ngOnInit(): void {
         this.configPartner = Object.assign({}, this.configComoBoGrid, {
             displayFields: [
-                { field: 'id', label: 'PartnerID' },
+                { field: 'taxCode', label: 'Partner Code' },
                 { field: 'shortName', label: 'Abbr Name' },
                 { field: 'partnerNameEn', label: 'Name EN' },
 
@@ -127,31 +130,20 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Inactive', value: false },
         ];
 
-        this.tariffTypes = [
-            { displayName: 'General', value: 'General' },
-            { displayName: 'Customer', value: 'Customer' },
-            { displayName: 'Supplier', value: 'Supplier' },
-            { displayName: 'Agent', value: 'Agent' },
-            { displayName: 'All', value: null },
-        ];
-
         this.dateTypes = [
+            { displayName: 'All', value: null },
+            { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
             { displayName: 'Expired Date', value: 'ExpiredDate' },
 
         ];
-
-        this.shipmentModes = [
-            { displayName: 'All', value: null },
-            { displayName: 'Export', value: 'Export' },
-            { displayName: 'Import', value: 'Import' },
-        ];
-
     }
     getService() {
         this.services = [
+            { displayName: 'All', value: null },
+            { displayName: 'Custom Logistic', value: 'CL' },
             { displayName: 'Air Export', value: 'AE' },
             { displayName: 'Air Import', value: 'AI' },
             { displayName: 'Sea Consol Export', value: 'SCE' },
@@ -160,6 +152,7 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Sea FCL Import', value: 'SFI' },
             { displayName: 'Sea LCL Export', value: 'SLE' },
             { displayName: 'Sea LCL Import', value: 'SLI' },
+            { displayName: 'Inland Trucking', value: 'IT' },
         ];
     }
 
@@ -211,8 +204,11 @@ export class FormSearchRuleComponent extends AppForm {
         switch (key) {
             case 'partnerBuying':
                 this.selectedPartnerBuying = { field: 'shortName', value: data.shortName, data: data };
+                this.rule.partnerBuying = data.id;
+                break;
             case 'partnerSelling':
                 this.selectedPartnerSelling = { field: 'shortName', value: data.shortName, data: data };
+                this.rule.partnerSelling = data.id;
                 break;
             default:
                 break;
@@ -226,8 +222,8 @@ export class FormSearchRuleComponent extends AppForm {
             ruleName: formSearch.ruleName,
             servicebuying: formSearch.serviceBuying,
             serviceSelling: formSearch.serviceSelling,
-            partnerBuying: formSearch.partnerBuying,
-            partnerSelling: formSearch.partnerSelling,
+            partnerBuying: this.rule.partnerBuying,
+            partnerSelling: this.rule.partnerSelling,
             dateType: !!formSearch.dateType?formSearch.dateType.value:null,
             fromDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
             toDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
@@ -236,7 +232,7 @@ export class FormSearchRuleComponent extends AppForm {
         this.onSearch.emit(bodySearch);
     }
 
-    submitReset(formSearch: any) {
+    submitReset() {
         this.selectedPartnerBuying = { field: 'shortName', value: null, data: null };
         this.selectedPartnerSelling = { field: 'shortName', value: null, data: null };
         this.formSearchRule.reset();

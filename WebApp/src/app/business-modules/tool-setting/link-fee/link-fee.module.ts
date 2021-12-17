@@ -26,13 +26,13 @@ const routing: Routes = [
     declarations: [
         FormRuleComponent,
         LinkFeeComponent,
-        FormSearchRuleComponent
+        FormSearchRuleComponent,
     ],
     imports: [
         RouterModule.forChild(routing),
         SharedModule,
         NgSelectModule,
-        PaginationModule,
+        PaginationModule.forRoot(),
         ModalModule,
         NgxDaterangepickerMd.forRoot(),
     ],
