@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { AppList } from '@app';
 import { ComboGridVirtualScrollComponent } from '@common';
 import { SystemConstants } from '@constants';
@@ -64,12 +64,16 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
     private _documentationRepo: DocumentationRepo,
     private _systemRepo: SystemRepo,
     private _store: Store<IAppState>,
-    private _toastService: ToastrService
+    private _toastService: ToastrService,
+    private _cd: ChangeDetectorRef
   ) {
     super();
   }
 
   ngOnInit() {
+  }
+
+  ngAfterViewInit(){
     this.headers = [
       { title: 'Shipment info', field: '', sortable: true, width: 330 },
       { title: 'Discription', field: 'chargeNameEn', sortable: true, width: 250 },
@@ -96,6 +100,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
     this.getListShipment(this.advForType);
     this.getCurrency();
     this.getChargeGroup();
+    this._cd.detectChanges();
   }
 
   getCharges() {
@@ -325,7 +330,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
       item.surcharge.forEach((it: Surcharge) => this.listAdvanceCarrier.push({
         id: it.id,
         chargeId: it.chargeId,
-        chargeCode: null,
+        // chargeCode: null,
         chargeGroup: it.chargeGroup,
         kickBack: it.kickBack,
         jobId: it.jobId,
