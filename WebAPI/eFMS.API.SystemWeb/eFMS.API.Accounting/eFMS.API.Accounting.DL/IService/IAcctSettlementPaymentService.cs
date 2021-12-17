@@ -34,7 +34,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         List<ShipmentChargeSettlement> GetExistsCharge(ExistsChargeCriteria criteria);
 
-        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool? isCopyCharge);
+        IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo);
 
         ResultModel CheckDuplicateShipmentSettlement(CheckDuplicateShipmentSettlementCriteria criteria, out List<DuplicateShipmentSettlementResultModel> data);
 
@@ -95,7 +95,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
-        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode);
+        List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode, bool isCopyCharge = false);
         InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
 
         List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode);
