@@ -3745,8 +3745,9 @@ namespace eFMS.API.Accounting.DL.Services
         public List<AcctAdvanceRequestModel> GetAdvancesOfShipment(string jobId, Guid _HblId, string settlementCode)
         {
             //Advance Payment has Status Approve is Done
+            // Not use advance no carrier
             var request = from ar in acctAdvanceRequestRepo.Get()
-                          join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE) on ar.AdvanceNo equals adv.AdvanceNo
+                          join adv in DataContext.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && string.IsNullOrEmpty(x.AdvanceFor)) on ar.AdvanceNo equals adv.AdvanceNo
                           where ar.JobId == jobId && ar.Hblid == _HblId
                           select new { ar.AdvanceNo, ar.Hbl, ar.Amount, ar.RequestCurrency, ar.JobId, ar.Hblid, ar.Mbl };
 

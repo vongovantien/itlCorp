@@ -4087,7 +4087,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = GetListAdvanceNoForShipment(shipment.HBLID)?.FirstOrDefault();
+                var advance = GetListAdvanceNoForShipment(shipment.HBLID, null, null, null, true)?.FirstOrDefault();
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
@@ -5588,7 +5588,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// <param name="mbl"></param>
         /// <param name="hbl"></param>
         /// <returns></returns>
-        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null, string settlementNo = null)
+        public List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId = null, string requester = null, string settlementNo = null, bool isCopyCharge = false)
         {
             var advanceNoLst = acctAdvanceRequestRepo.Get(x => x.StatusPayment == AccountingConstants.STATUS_PAYMENT_NOTSETTLED && x.Hblid == hblId).Select(x => new { x.JobId, x.AdvanceNo }).Distinct().ToList();
             IQueryable<AcctAdvancePayment> advancePayments = null;
@@ -5605,13 +5605,14 @@ namespace eFMS.API.Accounting.DL.Services
 
             if (string.IsNullOrEmpty(payeeId))
             {
-                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo))).OrderBy(x=>x.RequestDate);
+                // TH copy charge không dùng adv no của adv carrier
+                advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == (x.AdvanceNo)) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x=>x.RequestDate);
             }
             else
             {
                 if (!string.IsNullOrEmpty(payeeId))
                 {
-                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId)).OrderBy(x => x.RequestDate);
+                    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && (x.Payee == payeeId) && (isCopyCharge ? string.IsNullOrEmpty(x.AdvanceFor) : true)).OrderBy(x => x.RequestDate);
                 }
                 // [CR]: tam thoi bo search theo requester
                 //if (!string.IsNullOrEmpty(requester) && (advancePayments == null || advancePayments.Count() == 0))
