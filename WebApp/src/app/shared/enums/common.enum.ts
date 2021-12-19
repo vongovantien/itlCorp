@@ -80,7 +80,8 @@ export namespace CommonEnum {
         BUYING_RATE = "BUY",
         SELLING_RATE = "SELL",
         OBH = "OBH",
-        CHARGE = "CHARGE"
+        CHARGE = "CHARGE",
+        OTHER = "OTHER"
     }
 
     export enum TableActions {
