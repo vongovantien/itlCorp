@@ -384,5 +384,110 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
+        public List<RuleLinkFeeImportModel> CheckRuleLinkFeeValidImport(List<RuleLinkFeeImportModel> list)
+        {
+            var results = new List<RuleLinkFeeImportModel>();
+            foreach (var item in list)
+            {
+                if (string.IsNullOrEmpty(item.RuleName))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ServiceBuying))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ServiceSelling))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ChargeNameBuying))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.ChargeNameSelling))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameBuying))
+                {
+                    item.IsValid = false;
+                }
+                if (string.IsNullOrEmpty(item.PartnerNameSelling))
+                {
+                    item.IsValid = false;
+                }
+
+                results.Add(item);
+            }
+            return results;
+        }
+
+        private string convertService(string serviceName)
+        {
+            switch (serviceName)
+            {
+                case "Air Import":
+                    return "AI";
+                case "Custom Logistic":
+                    return "CL";
+                case "Air Export":
+                    return "AE";
+                case "Sea FCL Export":
+                    return "SFE";
+                case "Sea FCL Import":
+                    return "SFI";
+                case "Sea LCL Export":
+                    return "SLE";
+                case "Sea LCL Import":
+                    return "SLI";
+                case "Inland Trucking":
+                    return "IT";
+                case "Sea Consol Export":
+                    return "SCE";
+                case "Sea Consol Import":
+                    return "SCI";
+                default:
+                    return null;
+            }
+        }
+
+        public HandleState Import(List<RuleLinkFeeImportModel> data)
+        {
+            try
+            {
+                var charge = catChargeRepo.Get();
+                var partner = catPartnerRepo.Get();
+                foreach (var item in data)
+                {
+                    bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
+                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
+                    var ruleLinkFee = new CsRuleLinkFee
+                    {
+                        Id = Guid.NewGuid(),
+                        RuleName = item.RuleName,
+                        ChargeBuying = charge.Where(x => x.ChargeNameVn.Contains(item.ChargeNameBuying)).FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.ChargeNameVn.Contains(item.ChargeNameSelling)).FirstOrDefault().Id.ToString(),
+                        PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
+                        PartnerSelling = partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id,
+                        ServiceBuying = convertService(item.ServiceBuying),
+                        ServiceSelling = convertService(item.ServiceSelling),
+                        EffectiveDate = DateTime.Now,
+                        DatetimeModified = DateTime.Now,
+                        DatetimeCreated = DateTime.Now,
+                        UserCreated = currentUser.UserID,
+                        UserModified = currentUser.UserID,
+                    };
+                    DataContext.Add(ruleLinkFee, false);
+                }
+                DataContext.SubmitChanges();
+                Get();
+                return new HandleState();
+            }
+            catch (Exception ex)
+            {
+                return new HandleState(ex.Message);
+            }
+        }
     }
 }

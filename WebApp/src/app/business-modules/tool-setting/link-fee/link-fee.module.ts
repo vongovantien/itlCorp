@@ -8,6 +8,7 @@ import { FormRuleComponent } from './components/form-rule/form-rule.component';
 import { LinkFeeComponent } from './link-fee.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormSearchRuleComponent } from './components/form-search-rule/form-search-rule.component';
+import { LinkFeeImportComponent } from './link-fee-import/link-fee-import.component';
 
 const routing: Routes = [
     {
@@ -15,9 +16,7 @@ const routing: Routes = [
             {
                 path: '', component: LinkFeeComponent
             },
-            {
-                path: 'new', component: FormRuleComponent, data: { name: "New" }
-            },
+            { path: 'import', component: LinkFeeImportComponent, data: { name: "Import", level: 3 } },
         ]
     },
 ];
@@ -27,6 +26,7 @@ const routing: Routes = [
         FormRuleComponent,
         LinkFeeComponent,
         FormSearchRuleComponent,
+        LinkFeeImportComponent,
     ],
     imports: [
         RouterModule.forChild(routing),

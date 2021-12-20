@@ -3,6 +3,7 @@ using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.BL;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,5 +18,7 @@ namespace eFMS.API.Setting.DL.IService
         RuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee);
         HandleState DeleteRuleLinkFee(Guid? id);
         HandleState CheckExistsDataRule(RuleLinkFeeModel model);
+        List<RuleLinkFeeImportModel> CheckRuleLinkFeeValidImport(List<RuleLinkFeeImportModel> list);
+        HandleState Import(List<RuleLinkFeeImportModel> data);
     }
 }

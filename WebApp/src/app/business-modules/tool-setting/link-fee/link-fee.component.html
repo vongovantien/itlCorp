@@ -7,8 +7,7 @@
             <div class="c-button-actions">
                 <app-permission-button title="Create Rule Link" (onClick)="showCreateRule()"></app-permission-button>
                 <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                    <app-permission-button data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        title="Import" type="import">
+                    <app-permission-button [routerLink]="['/home/tool/link-fee/import']" type="import" title="Import">
                     </app-permission-button>
                 </div>
             </div>

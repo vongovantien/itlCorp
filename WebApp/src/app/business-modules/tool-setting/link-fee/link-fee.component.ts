@@ -107,16 +107,16 @@ export class LinkFeeComponent extends AppList implements OnInit{
       case 'AI':
         return 'Air Import';
       case 'CL':
-        return 'Custom logistic';
+        return 'Custom Logistic';
       case 'AE':
         return 'Air Export';
       case 'SFE':
         return 'Sea FCL Export';
       case 'SFI':
         return 'Sea FCL Import';
-      case 'SLI':
-        return 'Sea LCL Export';
       case 'SLE':
+        return 'Sea LCL Export';
+      case 'SLI':
         return 'Sea LCL Import';
       case 'IT':
         return 'Inland Trucking';
@@ -130,7 +130,6 @@ export class LinkFeeComponent extends AppList implements OnInit{
   }
 
   getRuleDetail(id: string) {
-    this._progressRef.start();
     this._settingRepo.getDetailRule(id)
       .pipe()
       .subscribe(

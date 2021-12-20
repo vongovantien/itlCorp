@@ -1,19 +1,25 @@
 ﻿using eFMS.API.Common;
 using eFMS.API.Common.Globals;
+using eFMS.API.Common.Helpers;
 using eFMS.API.Common.Infrastructure.Common;
+using eFMS.API.Setting.DL.Common;
 using eFMS.API.Setting.DL.IService;
 using eFMS.API.Setting.DL.Models;
 using eFMS.API.Setting.DL.Models.Criteria;
 using eFMS.API.Setting.Infrastructure.Middlewares;
+using eFMS.API.Setting.Service.Models;
 using eFMS.IdentityServer.DL.UserManager;
 using ITL.NetCore.Common;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Setting.Controllers
 {
@@ -30,6 +36,7 @@ namespace eFMS.API.Setting.Controllers
         private readonly IStringLocalizer stringLocalizer;
         private ICurrentUser currentUser;
         private IRuleLinkFeeService ruleLinkFeeService;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         /// <summary>
         /// 
@@ -37,11 +44,12 @@ namespace eFMS.API.Setting.Controllers
         /// <param name="localizer"></param>
         /// <param name="curUser"></param>
         public RuleLinkFeeController(IStringLocalizer<LanguageSub> localizer,
-            ICurrentUser curUser, IRuleLinkFeeService service)
+            ICurrentUser curUser, IRuleLinkFeeService service, IHostingEnvironment hostingEnvironment)
         {
             stringLocalizer = localizer;
             currentUser = curUser;
             ruleLinkFeeService = service;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         /// <summary>
@@ -57,8 +65,6 @@ namespace eFMS.API.Setting.Controllers
 
             var checkData = ruleLinkFeeService.CheckExistsDataRule(model);
             if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
-
-            currentUser.Action = "AddNewRuleLinkFee";
             var hs = ruleLinkFeeService.AddNewRuleLinkFee(model);
             if (hs.Code == 403)
             {
@@ -95,7 +101,6 @@ namespace eFMS.API.Setting.Controllers
         [Route("Delete")]
         public IActionResult DeleteRuleLinkFee(Guid id)
         {
-            currentUser.Action = "DeleteRuleLinkFee";
             var data = ruleLinkFeeService.GetRuleLinkFeeById(id);
             if (data == null)
             {
@@ -126,9 +131,7 @@ namespace eFMS.API.Setting.Controllers
         [Route("Update")]
         public IActionResult UpdateRuleLinkFee(RuleLinkFeeModel model)
         {
-            currentUser.Action = "UpdateCsRuleLinkFee";
             if (!ModelState.IsValid) return BadRequest();
-
             var checkData = ruleLinkFeeService.CheckExistsDataRule(model);
             if (checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
 
@@ -155,6 +158,101 @@ namespace eFMS.API.Setting.Controllers
             }
             return Ok(rule);
         }
+
+        /// <summary>
+        /// download an excel file from server
+        /// </summary>
+        /// <param name="type">type of partner</param>
+        /// <returns></returns>
+        [HttpGet("DownloadExcel")]
+        public async Task<ActionResult> DownloadExcel()
+        {
+            string fileName = "RuleLinkFeeImportTemplate.xlsx" ;
+            string templateName = _hostingEnvironment.ContentRootPath;
+            var result = await new FileHelper().ExportExcel(templateName, fileName);
+            if (result != null)
+            {
+                return result;
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        /// <summary>
+        /// read data from excel file
+        /// </summary>
+        /// <param name="uploadedFile">file upload</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("UpLoadFile")]
+        //[Authorize]
+        public IActionResult UpLoadFile(IFormFile uploadedFile)
+        {
+            var file = new FileHelper().UploadExcel(uploadedFile);
+            if (file != null)
+            {
+                ExcelWorksheet worksheet = file.Workbook.Worksheets[1];
+                int rowCount = worksheet.Dimension.Rows;
+                int ColCount = worksheet.Dimension.Columns;
+                if (rowCount < 2) return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.NOT_FOUND_DATA_EXCEL].Value });
+
+                List<RuleLinkFeeImportModel> list = null;
+                list = ReadRuleLinkFeeFromExel(worksheet,rowCount);
+                var data = ruleLinkFeeService.CheckRuleLinkFeeValidImport(list);
+                var totalValidRows = data.Count(x => x.IsValid == true);
+                var results = new { data, totalValidRows };
+                return Ok(results);
+            }
+            return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.FILE_NOT_FOUND].Value });
+        }
+
+        private List<RuleLinkFeeImportModel> ReadRuleLinkFeeFromExel(ExcelWorksheet worksheet, int rowCount)
+        {
+            List<RuleLinkFeeImportModel> list = new List<RuleLinkFeeImportModel>();
+            for (int row = 2; row <= rowCount; row++)
+            {
+                var rulelinkfee = new RuleLinkFeeImportModel
+                {
+                    IsValid = true,
+                    RuleName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    ServiceBuying = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                    ChargeNameBuying = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    PartnerNameBuying = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    ServiceSelling = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    ChargeNameSelling = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    PartnerNameSelling = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                    Status = "Active",
+                };
+                list.Add(rulelinkfee);
+            }
+            list = list.Where(x => !string.IsNullOrEmpty(x.RuleName)
+                || !string.IsNullOrEmpty(x.ServiceBuying)
+                || !string.IsNullOrEmpty (x.ChargeNameBuying)
+                || !string.IsNullOrEmpty(x.PartnerNameBuying)
+                || !string.IsNullOrEmpty(x.ServiceSelling)
+                || !string.IsNullOrEmpty(x.ChargeNameSelling)
+                || !string.IsNullOrEmpty(x.PartnerNameSelling)).ToList();
+            return list;
+        }
+
+        /// <summary>
+        /// import partner data
+        /// </summary>
+        /// <param name="data">data to import</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Import")]
+        public IActionResult Import([FromBody] List<RuleLinkFeeImportModel> data)
+        {
+            var hs = ruleLinkFeeService.Import(data);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        
 
     }
 }
