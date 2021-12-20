@@ -162,12 +162,11 @@ namespace eFMS.API.Setting.Controllers
         /// <summary>
         /// download an excel file from server
         /// </summary>
-        /// <param name="type">type of partner</param>
         /// <returns></returns>
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string fileName = "RuleLinkFeeImportTemplate.xlsx" ;
+            string fileName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx; ;
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
@@ -224,13 +223,20 @@ namespace eFMS.API.Setting.Controllers
                 };
                 list.Add(rulelinkfee);
             }
-            list = list.Where(x => !string.IsNullOrEmpty(x.RuleName)
-                || !string.IsNullOrEmpty(x.ServiceBuying)
-                || !string.IsNullOrEmpty (x.ChargeNameBuying)
-                || !string.IsNullOrEmpty(x.PartnerNameBuying)
-                || !string.IsNullOrEmpty(x.ServiceSelling)
-                || !string.IsNullOrEmpty(x.ChargeNameSelling)
-                || !string.IsNullOrEmpty(x.PartnerNameSelling)).ToList();
+            //list = list.Where(x => !string.IsNullOrEmpty(x.RuleName)
+            //    || !string.IsNullOrEmpty(x.ServiceBuying)
+            //    || !string.IsNullOrEmpty (x.ChargeNameBuying)
+            //    || !string.IsNullOrEmpty(x.PartnerNameBuying)
+            //    || !string.IsNullOrEmpty(x.ServiceSelling)
+            //    || !string.IsNullOrEmpty(x.ChargeNameSelling)
+            //    || !string.IsNullOrEmpty(x.PartnerNameSelling)).ToList();
+            list = list.Where(x => x.RuleName != null
+                || x.ServiceBuying != null
+                || x.ChargeNameBuying != null
+                || x.PartnerNameBuying != null
+                || x.ServiceSelling != null
+                || x.ChargeNameSelling != null
+                || x.PartnerNameSelling != null).ToList();
             return list;
         }
 

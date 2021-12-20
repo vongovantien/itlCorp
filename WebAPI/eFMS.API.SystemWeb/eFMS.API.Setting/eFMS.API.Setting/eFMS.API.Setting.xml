@@ -43,7 +43,6 @@
             <summary>
             download an excel file from server
             </summary>
-            <param name="type">type of partner</param>
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Setting.Controllers.RuleLinkFeeController.UpLoadFile(Microsoft.AspNetCore.Http.IFormFile)">
