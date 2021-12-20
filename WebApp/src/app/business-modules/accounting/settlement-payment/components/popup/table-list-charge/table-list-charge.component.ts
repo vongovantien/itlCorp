@@ -527,7 +527,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
         newCharge.jobId = this.selectedShipment.jobId;
         newCharge.mbl = this.selectedShipment.mbl;
         newCharge.hbl = this.selectedShipment.hbl;
-        newCharge.advanceNo = newCharge.originAdvanceNo =!!this.advanceNo ? this.advanceNo.value : null;
+        newCharge.advanceNo = newCharge.originAdvanceNo = !!this.advanceNo ? this.advanceNo.value : null;
         newCharge.clearanceNo = !!this.selectedCD ? this.selectedCD.clearanceNo : null;
         newCharge.settlementCode = this.settlementCode;
         newCharge.debitNo = null;
@@ -589,7 +589,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
             charge.hbl = this.selectedShipment.hbl;
             charge.hblid = this.selectedShipment.hblid;
             // *end: cập nhật shipment charges
-            if(charge.finalExchangeRate <= 0){
+            if (charge.finalExchangeRate <= 0) {
                 charge.finalExchangeRate = null;
             }
 
@@ -712,6 +712,8 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
                 return CommonEnum.SurchargeTypeEnum.BUYING_RATE;
             case CommonEnum.CHARGE_TYPE.DEBIT:
                 return CommonEnum.SurchargeTypeEnum.SELLING_RATE;
+            case CommonEnum.CHARGE_TYPE.OTHER:
+                return CommonEnum.SurchargeTypeEnum.OTHER;
             default:
                 return CommonEnum.SurchargeTypeEnum.OBH;
         }
@@ -719,7 +721,7 @@ export class SettlementTableListChargePopupComponent extends PopupBase implement
 
     removeAdvanceNo() {
         this.charges.forEach(element => {
-            if(element.advanceNo == this.advanceNo.value && element.isSelected){
+            if (element.advanceNo == this.advanceNo.value && element.isSelected) {
                 element.advanceNo = element.originAdvanceNo = null;
             }
         });

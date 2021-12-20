@@ -955,7 +955,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     AmountUSD = sur.AmountUsd,
                                     VatAmountUSD = sur.VatAmountUsd,
                                     PayerId = sur.PayerId,
-                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    Payer = ((sur.Type == AccountingConstants.TYPE_CHARGE_BUY || sur.Type == AccountingConstants.TYPE_CHARGE_OTHER) ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
                                     OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                     InvoiceNo = sur.InvoiceNo,
@@ -976,7 +976,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySyncedFrom = sur.PaySyncedFrom,
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
-                                    CreditNo = sur.CreditNo
+                                    CreditNo = sur.CreditNo,
+                                    SyncedFromBy = GetSyncedFrom(sur)
 
                                 };
             var dataDocument = from sur in surcharge
@@ -1027,7 +1028,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    AmountUSD = sur.AmountUsd,
                                    VatAmountUSD = sur.VatAmountUsd,
                                    PayerId = sur.PayerId,
-                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   Payer = ((sur.Type == AccountingConstants.TYPE_CHARGE_BUY || sur.Type == AccountingConstants.TYPE_CHARGE_OTHER) ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
                                    OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                    InvoiceNo = sur.InvoiceNo,
@@ -1048,31 +1049,11 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySyncedFrom = sur.PaySyncedFrom,
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
-                                   CreditNo = sur.CreditNo
+                                   CreditNo = sur.CreditNo,
+                                   SyncedFromBy = GetSyncedFrom(sur)
+
                                };
             var data = dataOperation.Union(dataDocument).ToList();
-
-            foreach (var item in data)
-            {
-                string _syncedFromBy = string.Empty;
-
-                if (item.IsFromShipment == false && item.Type == AccountingConstants.TYPE_CHARGE_OBH)
-                {
-                    switch (item.SyncedFrom)
-                    {
-                        case "SOA":
-                            _syncedFromBy = item.Soano;
-                            break;
-                        case "CDNOTE":
-                            _syncedFromBy = item.DebitNo;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                item.SyncedFromBy = _syncedFromBy;
-            }
 
             return data;
         }
@@ -1133,7 +1114,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     AmountUSD = sur.AmountUsd,
                                     TotalAmountVnd = sur.VatAmountVnd + sur.AmountVnd,
                                     PayerId = sur.PayerId,
-                                    Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                    Payer = ((sur.Type == AccountingConstants.TYPE_CHARGE_BUY || sur.Type == AccountingConstants.TYPE_CHARGE_OTHER) ? pae.ShortName : par.ShortName),//par.ShortName,
                                     PaymentObjectId = sur.PaymentObjectId,
                                     OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                     InvoiceNo = sur.InvoiceNo,
@@ -1158,7 +1139,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     PaySyncedFrom = sur.PaySyncedFrom,
                                     PaySoano = sur.PaySoano,
                                     DebitNo = sur.DebitNo,
-                                    CreditNo = sur.CreditNo
+                                    CreditNo = sur.CreditNo,
+                                    SyncedFromBy = GetSyncedFrom(sur)
 
                                 };
             var dataDocument = from sur in surcharge
@@ -1206,7 +1188,7 @@ namespace eFMS.API.Accounting.DL.Services
                                    AmountUSD = sur.AmountUsd,
                                    TotalAmountVnd = sur.VatAmountVnd + sur.AmountVnd,
                                    PayerId = sur.PayerId,
-                                   Payer = (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? pae.ShortName : par.ShortName),//par.ShortName,
+                                   Payer = ((sur.Type == AccountingConstants.TYPE_CHARGE_BUY || sur.Type == AccountingConstants.TYPE_CHARGE_OTHER) ? pae.ShortName : par.ShortName),//par.ShortName,
                                    PaymentObjectId = sur.PaymentObjectId,
                                    OBHPartnerName = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH ? pae.ShortName : par.ShortName),//pae.ShortName,
                                    InvoiceNo = sur.InvoiceNo,
@@ -1231,35 +1213,36 @@ namespace eFMS.API.Accounting.DL.Services
                                    PaySyncedFrom = sur.PaySyncedFrom,
                                    PaySoano = sur.PaySoano,
                                    DebitNo = sur.DebitNo,
-                                   CreditNo = sur.CreditNo
-                                   
+                                   CreditNo = sur.CreditNo,
+                                   SyncedFromBy = GetSyncedFrom(sur)
+
 
                                };
-            List<ShipmentChargeSettlement> data = dataOperation.Union(dataDocument).ToList();
+            var data = dataOperation.Union(dataDocument);
+            return data.OrderByDescending(x => x.JobId);
 
-            foreach (var item in data)
+        }
+
+        private string GetSyncedFrom(CsShipmentSurcharge surcharge )
+        {
+            string _syncedFromBy = string.Empty;
+
+            if (surcharge.IsFromShipment == false && surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH)
             {
-                string _syncedFromBy = string.Empty;
-
-                if (item.IsFromShipment == false && item.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                switch (surcharge.SyncedFrom)
                 {
-                    switch (item.SyncedFrom)
-                    {
-                        case "SOA":
-                            _syncedFromBy = item.Soano;
-                            break;
-                        case "CDNOTE":
-                            _syncedFromBy = item.DebitNo;
-                            break;
-                        default:
-                            break;
-                    }
+                    case "SOA":
+                        _syncedFromBy = surcharge.Soano;
+                        break;
+                    case "CDNOTE":
+                        _syncedFromBy = surcharge.DebitNo;
+                        break;
+                    default:
+                        break;
                 }
-
-                item.SyncedFromBy = _syncedFromBy;
             }
 
-            return data.ToArray().OrderByDescending(x => x.JobId).AsQueryable();
+            return _syncedFromBy;
         }
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---

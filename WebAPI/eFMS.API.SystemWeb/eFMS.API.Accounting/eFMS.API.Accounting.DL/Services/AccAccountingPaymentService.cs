@@ -1648,9 +1648,9 @@ namespace eFMS.API.Accounting.DL.Services
         /// <returns></returns>
         public IQueryable<AccountingCustomerPaymentExport> GetDataExportAccountingCustomerPayment(PaymentCriteria criteria)
         {
-            var data = Query(criteria);
+            var data = Query(criteria).Where(x => x.Currency == AccountingConstants.CURRENCY_LOCAL); // CR: 16859 => lấy tất cả partner và lọc theo currency vnd của billing
             if (data == null) return null;
-            var partners = partnerRepository.Get(x => x.PartnerType == "Customer" && x.Active == true);
+            var partners = partnerRepository.Get(x => x.Active == true);
             var paymentData = QueryInvoiceDataPayment(criteria);
             var surchargeData = surchargeRepository.Get(x => x.AcctManagementId != null);
             var receiptData = acctReceiptRepository.Get(x => x.Status == AccountingConstants.RECEIPT_STATUS_DONE && (criteria.Office == null || criteria.Office.Count == 0 || criteria.Office.Contains(x.OfficeId.ToString())));
