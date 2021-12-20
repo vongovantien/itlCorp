@@ -1323,7 +1323,7 @@ namespace eFMS.API.Operation.DL.Services
             //Get list custom có shipment operation chưa bị lock, list shipment đã được assign cho current user hoặc shipment có PIC là current user
             var userCurrent = currentUser.UserID;
             var customs = DataContext.Get(x => !string.IsNullOrEmpty(x.JobNo));
-            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var shipmentsOperation = from ops in shipments
                                      join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
                                      where osa.MainPersonInCharge == userCurrent

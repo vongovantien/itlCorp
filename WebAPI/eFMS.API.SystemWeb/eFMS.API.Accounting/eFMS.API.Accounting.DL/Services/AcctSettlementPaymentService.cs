@@ -1066,8 +1066,8 @@ namespace eFMS.API.Accounting.DL.Services
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var vatPartners = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransD = csTransactionDetailRepo.Get();
+            var opsTrans = opsTransactionRepo.Get(x => x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            var csTransD = csTransactionDetailRepo.Get(x => x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var csTrans = csTransactionRepo.Get();
             var userRepo = sysUserRepo.Get();
 
