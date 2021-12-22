@@ -4099,7 +4099,7 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var shipment in criteria.shipments)
             {
                 //Lấy ra advance cũ nhất chưa có settlement của shipment(JobId)
-                var advance = GetListAdvanceNoForShipment(shipment.HBLID, null, null, null, true)?.FirstOrDefault();
+                var advance = GetListAdvanceNoForShipment(shipment.HBLID, null, currentUser.UserID, null, true)?.FirstOrDefault();
                 foreach (var charge in criteria.charges)
                 {
                     var chargeCopy = new ShipmentChargeSettlement();
@@ -5631,6 +5631,10 @@ namespace eFMS.API.Accounting.DL.Services
                 //{
                 //    advancePayments = acctAdvancePaymentRepo.Get(x => x.StatusApproval == AccountingConstants.STATUS_APPROVAL_DONE && advanceNo.Any(ad => ad == x.AdvanceNo) && x.Requester == requester);
                 //}
+            }
+            if (!string.IsNullOrEmpty(requester)) // only for case copy charge get requester != null
+            {
+                advancePayments = advancePayments.Where(x => x.Requester == requester).OrderBy(x => x.RequestDate);
             }
             return advancePayments == null ? new List<string>() : advancePayments.Select(x => x.AdvanceNo).ToList();
         }

@@ -181,7 +181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 });
 
             IQueryable<Shipments> shipments = shipmentsDocumention
-                .Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                .Where(x => x.JobId != null && x.HBL != null)
                 .Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
@@ -199,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                                              MBL = ops.Mblno,
                                          };
 
-                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
             var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
@@ -337,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryUnion = shipmentOperation;
             }
-            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
