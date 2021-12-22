@@ -24,47 +24,16 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedChargeBuying.value}">
-                                    <label required for="">Charge Buying</label>
-                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedChargeBuying"
-                                        (itemSelected)="onSelectDataFormInfo($event, 'chargeBuying')"
-                                        [selectedDisplayFields]="configChargeBuying.selectedDisplayFields"
-                                        [dataSources]="configChargeBuying.dataSource" [disabled]="this.isBuying"
-                                        [displayFields]="configChargeBuying.displayFields" [height]="200">
-                                    </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeBuying.value">
-                                        Charge Buying is required !
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPartnerBuying.value}">
-                                    <label required for="">Partner Buying</label>
-                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartnerBuying"
-                                        [disabled]="this.isBuying"
-                                        (itemSelected)="onSelectDataFormInfo($event, 'partnerBuying')"
-                                        [selectedDisplayFields]="configPartner.selectedDisplayFields"
-                                        [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200">
-                                    </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerBuying.value">
-                                        Partner Buying is required !
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)}">
-                                    <label required>Service Buying</label>
-                                    <select formControlName="serviceBuying" class="form-control"
-                                        (ngModelChange)="enableBuying()">
+                                    [ngClass]="{'m-form__group has-danger': (serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)}">
+                                    <label required>Service Selling</label>
+                                    <select formControlName="serviceSelling" class="form-control"
+                                        (ngModelChange)="enableSelling()">
                                         <option *ngFor="let item of services" [ngValue]="item.value">
                                             {{item.displayName}}
                                         </option>
                                     </select>
-                                    <div class="form-control-feedback" *ngIf="(serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)">
-                                        Service Buying is required !
+                                    <div class="form-control-feedback" *ngIf="(serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)">
+                                        Service Selling is required !
                                     </div>
                                 </div>
                             </div>
@@ -100,16 +69,47 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': (serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)}">
-                                    <label required>Service Selling</label>
-                                    <select formControlName="serviceSelling" class="form-control"
-                                        (ngModelChange)="enableSelling()">
+                                    [ngClass]="{'m-form__group has-danger': (serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)}">
+                                    <label required>Service Buying</label>
+                                    <select formControlName="serviceBuying" class="form-control"
+                                        (ngModelChange)="enableBuying()">
                                         <option *ngFor="let item of services" [ngValue]="item.value">
                                             {{item.displayName}}
                                         </option>
                                     </select>
-                                    <div class="form-control-feedback" *ngIf="(serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)">
-                                        Service Selling is required !
+                                    <div class="form-control-feedback" *ngIf="(serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)">
+                                        Service Buying is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedChargeBuying.value}">
+                                    <label required for="">Charge Buying</label>
+                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedChargeBuying"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'chargeBuying')"
+                                        [selectedDisplayFields]="configChargeBuying.selectedDisplayFields"
+                                        [dataSources]="configChargeBuying.dataSource" [disabled]="this.isBuying"
+                                        [displayFields]="configChargeBuying.displayFields" [height]="200">
+                                    </app-combo-grid-virtual-scroll>
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeBuying.value">
+                                        Charge Buying is required !
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPartnerBuying.value}">
+                                    <label required for="">Partner Buying</label>
+                                    <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartnerBuying"
+                                        [disabled]="this.isBuying"
+                                        (itemSelected)="onSelectDataFormInfo($event, 'partnerBuying')"
+                                        [selectedDisplayFields]="configPartner.selectedDisplayFields"
+                                        [dataSources]="configPartner.dataSource"
+                                        [displayFields]="configPartner.displayFields" [height]="200">
+                                    </app-combo-grid-virtual-scroll>
+                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerBuying.value">
+                                        Partner Buying is required !
                                     </div>
                                 </div>
                             </div>
@@ -120,6 +120,7 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDateEffective" name="daterange" placeholder="Please Select"
+                                            [maxDate]="maxDateEffective"
                                             readonly [singleDatePicker]="true" formControlName="effectiveDate"
                                             [alwaysShowCalendars]="true" [autoApply]="true" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -135,12 +136,14 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"  >
-                                    <label>Expired Date</label>
+                                    <label>Expiration Date</label>
                                     <div class="m-input-icon m-input-icon--right down daterange-rtl">
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
                                             readonly [singleDatePicker]="true" formControlName="expiredDate"
+                                            [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate"
+                                            (remove)="resetExpiredDate()"
                                             [alwaysShowCalendars]="true" [autoApply]="true"/>
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
                                             <span>

@@ -133,11 +133,9 @@ export class FormSearchRuleComponent extends AppForm {
         this.dateTypes = [
             { displayName: 'All', value: null },
             { displayName: 'Create Date', value: 'CreateDate' },
-            { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
             { displayName: 'Expired Date', value: 'ExpiredDate' },
-
         ];
     }
     getService() {
@@ -225,10 +223,11 @@ export class FormSearchRuleComponent extends AppForm {
             partnerBuying: this.rule.partnerBuying,
             partnerSelling: this.rule.partnerSelling,
             dateType: !!formSearch.dateType?formSearch.dateType.value:null,
-            fromDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
-            toDate: !!formSearch.date?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            fromDate: !!formSearch.date.startDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            toDate: !!formSearch.date.endDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
             status: formSearch.status,
         };
+        console.log(formSearch.date);
         this.onSearch.emit(bodySearch);
     }
 
@@ -239,6 +238,10 @@ export class FormSearchRuleComponent extends AppForm {
         const bodySearch: Partial<IRuleSearch> = {
         };
         this.onSearch.emit(bodySearch);
+    }
+
+    resetDate(){
+        this.date.setValue(null);
     }
 
 }

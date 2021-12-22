@@ -40,6 +40,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     effectiveDate: AbstractControl;
 
     minDateEffective: any = null;
+    maxDateEffective: any = null;
     minDateExpired: any = null;
 
     datetimeCreated: string;
@@ -100,6 +101,15 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             )
             .subscribe((value: any) => {
                 this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
+            });
+        this.formGroup.get("expiredDate").valueChanges
+            .pipe(
+                distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
+                map((data: any) => data.startDate)
+
+            )
+            .subscribe((value: any) => {
+                this.maxDateEffective = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
 
     }
@@ -260,7 +270,6 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             console.log('running');
             rule.id = this.rule.id,
                 rule.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
-                rule.expiredDate = this.expiredDate.value ? (this.expiredDate.value.startDate !== null ? formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 rule.partnerBuying = this.rule.partnerBuying,
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,
@@ -280,6 +289,10 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                     });
         }
 
+    }
+
+    resetExpiredDate(){
+        this.expiredDate.setValue(null);
     }
 
 }

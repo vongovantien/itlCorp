@@ -148,8 +148,8 @@ export class LinkFeeComponent extends AppList implements OnInit{
             this.formRule.rule.partnerSelling = res.partnerSelling;
             this.formRule.rule.chargeBuying = res.chargeBuying;
             this.formRule.rule.chargeSelling = res.chargeSelling;
-            this.formRule.expiredDate.setValue({ startDate: new Date(res.expiredDate) });
-            this.formRule.effectiveDate.setValue({ startDate: new Date(res.effectiveDate) });
+            this.formRule.expiredDate.setValue({ startDate: res.expiredDate?new Date(res.expiredDate):null });
+            this.formRule.effectiveDate.setValue({ startDate: res.effectiveDate? new Date(res.effectiveDate):null });
             let chargeBuying = this.formRule.configChargeBuying.dataSource.find(
               x => x.id === res.chargeBuying
             );

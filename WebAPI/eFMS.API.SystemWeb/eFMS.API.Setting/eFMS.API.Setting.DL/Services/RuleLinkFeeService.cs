@@ -423,7 +423,7 @@ namespace eFMS.API.Setting.DL.Services
             return results;
         }
 
-        private string convertService(string serviceName)
+        private string ConvertService(string serviceName)
         {
             switch (serviceName)
             {
@@ -470,8 +470,8 @@ namespace eFMS.API.Setting.DL.Services
                         ChargeSelling = charge.Where(x => x.ChargeNameVn.Contains(item.ChargeNameSelling)).FirstOrDefault().Id.ToString(),
                         PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
                         PartnerSelling = partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id,
-                        ServiceBuying = convertService(item.ServiceBuying),
-                        ServiceSelling = convertService(item.ServiceSelling),
+                        ServiceBuying = ConvertService(item.ServiceBuying),
+                        ServiceSelling = ConvertService(item.ServiceSelling),
                         EffectiveDate = DateTime.Now,
                         DatetimeModified = DateTime.Now,
                         DatetimeCreated = DateTime.Now,
