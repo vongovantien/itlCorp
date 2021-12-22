@@ -46,9 +46,27 @@ namespace eFMS.API.Operation.DL.Services
             assignedItem.Status = OperationConstants.InSchedule;
             assignedItem.RealPersonInCharge = assignedItem.MainPersonInCharge;
             assignedItem.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
-            var orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
+            int orderNumberProcess = DataContext.Count(x => x.JobId == model.JobId);
             assignedItem.OrderNumberProcessed = orderNumberProcess + 1;
-            var hs = DataContext.Add(assignedItem);
+
+            DataContext.Add(assignedItem, false);
+            if(model.IsUseReplicate)
+            {
+                var jobReplicate = opsTransRepository.Get(x => x.Id == model.JobId)?.FirstOrDefault();
+                var assignedItemReplicate = mapper.Map<OpsStageAssigned>(model);
+
+                assignedItemReplicate.Id = Guid.NewGuid();
+                assignedItemReplicate.JobId = (jobReplicate?.ReplicatedId) ?? Guid.NewGuid();
+                assignedItemReplicate.Status = OperationConstants.InSchedule;
+                assignedItemReplicate.RealPersonInCharge = assignedItem.MainPersonInCharge;
+                assignedItemReplicate.DatetimeCreated = assignedItem.DatetimeModified = DateTime.Now;
+                int orderNumberProcessRep = DataContext.Count(x => x.JobId == assignedItemReplicate.JobId);
+                assignedItemReplicate.OrderNumberProcessed = orderNumberProcessRep + 1;
+
+                DataContext.Add(assignedItemReplicate, false);
+            }
+
+            HandleState hs = DataContext.SubmitChanges();
             return hs;
         }
 
