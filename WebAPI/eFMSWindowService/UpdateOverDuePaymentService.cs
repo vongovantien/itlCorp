@@ -59,6 +59,11 @@ namespace eFMSWindowService
                     FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDue15_30Service] [Updated]:" + DateTime.Now + "\n" + "=======" + "\n" + log_15_30 + "\n" + "======= ");
                     FileHelper.WriteToFile("OverduePaymentService", "[LogUpdateOverDue30Service] [Updated]:" + DateTime.Now + "\n" + "=======" + "\n" + log_30 + "\n" + "======= ");
                 }
+
+                if (_timer.Interval != 24 * 60 * 60 * 1000)
+                {
+                    _timer.Interval = 24 * 60 * 60 * 1000;
+                }
             }
             catch (Exception ex)
             {
