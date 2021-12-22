@@ -25,16 +25,17 @@ namespace eFMS.API.Operation.Service.Models
         public string StaffCode { get; set; }
         public string SaleResource { get; set; }
         public Guid? LdapObjectGuid { get; set; }
+        public byte[] Signature { get; set; }
         public string UserCreated { get; set; }
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
-        public byte[] Signature { get; set; }
         public bool? Active { get; set; }
         public DateTime? InactiveOn { get; set; }
-        public string BankName { get; set; }
         public string BankAccountNo { get; set; }
+        public string BankName { get; set; }
         public string Photo { get; set; }
         public string PersonalId { get; set; }
+        public string BankCode { get; set; }
     }
 }

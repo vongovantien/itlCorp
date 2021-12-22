@@ -20,8 +20,8 @@ namespace eFMS.API.Operation.Service.Models
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public short? GroupId { get; set; }
-        public int? DepartmentId { get; set; }
         public Guid? OfficeId { get; set; }
+        public int? DepartmentId { get; set; }
         public Guid? CompanyId { get; set; }
     }
 }

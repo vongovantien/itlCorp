@@ -759,7 +759,6 @@ namespace eFMS.API.Documentation.DL.Services
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
                 }
 
-                HandleState hsAddOps = DataContext.Add(opsTransaction);
 
                 if (model.Id > 0)
                 {
@@ -775,7 +774,11 @@ namespace eFMS.API.Documentation.DL.Services
                     HandleState hsAddCd = customDeclarationRepository.Add(clearance);
                 }
 
-                CreateJobAndClearanceReplicate(opsTransaction, productService, model, customerContract);
+
+                CreateJobAndClearanceReplicate(opsTransaction, productService, model, customerContract, out OpsTransaction opsReplicate);
+
+                opsTransaction.ReplicatedId = opsReplicate.Id;  // ID của job Replicate.
+                HandleState hsAddOps = DataContext.Add(opsTransaction);
 
             }
             catch (Exception ex)
@@ -873,7 +876,10 @@ namespace eFMS.API.Documentation.DL.Services
             opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
             opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
             opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
-            
+
+            var supllier = partnerRepository.Get(x => x.TaxCode == DocumentConstants.NON_CARRIER_PARTNER_CODE).FirstOrDefault();
+            opsTransaction.SupplierId = supllier?.Id;
+
             return opsTransaction;
         }
 
@@ -1007,7 +1013,6 @@ namespace eFMS.API.Documentation.DL.Services
                                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
                                 }
 
-                                DataContext.Add(opsTransaction);
 
                                 CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
 
@@ -1016,9 +1021,10 @@ namespace eFMS.API.Documentation.DL.Services
 
                                 i = i + 1;
 
+                                CreateJobAndClearanceReplicate(opsTransaction, productService, item, customerContract, out OpsTransaction opsReplicate);
+                                opsTransaction.ReplicatedId = opsReplicate.Id;
+                                DataContext.Add(opsTransaction);
                                 trans.Commit();
-
-                                CreateJobAndClearanceReplicate(opsTransaction, productService, item, customerContract);
                             }
                             catch (Exception)
                             {
@@ -1046,8 +1052,9 @@ namespace eFMS.API.Documentation.DL.Services
             return result;
         }
 
-        private void CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd, CatContract customerContract)
+        private void CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd, CatContract customerContract, out OpsTransaction opsTransactionReplicate)
         {
+            opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
             SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
             if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
             {
@@ -1056,7 +1063,7 @@ namespace eFMS.API.Documentation.DL.Services
                 {
                     preFix = settingFlowOffice.ReplicatePrefix;
                 }
-                OpsTransaction opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
+                // opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
                 opsTransactionReplicate.JobNo = preFix + opsTransaction.JobNo;
                 opsTransactionReplicate.ServiceNo = opsTransaction.JobNo;
                 opsTransactionReplicate.ServiceHblId = opsTransaction.Hblid;

@@ -20,6 +20,7 @@ namespace eFMS.API.Operation.Service.Models
         public string PayerId { get; set; }
         public string ObjectBePaid { get; set; }
         public string PaymentObjectId { get; set; }
+        public bool? KickBack { get; set; }
         public DateTime? ExchangeDate { get; set; }
         public string Notes { get; set; }
         public string SettlementCode { get; set; }
@@ -48,20 +49,28 @@ namespace eFMS.API.Operation.Service.Models
         public string VoucherIdre { get; set; }
         public DateTime? VoucherIdredate { get; set; }
         public decimal? FinalExchangeRate { get; set; }
-        public bool? KickBack { get; set; }
+        public bool? Kb { get; set; }
         public string AdvanceNo { get; set; }
         public string JobNo { get; set; }
         public string Mblno { get; set; }
         public string Hblno { get; set; }
         public Guid? AcctManagementId { get; set; }
+        public Guid? PayerAcctManagementId { get; set; }
+        public decimal? AmountVnd { get; set; }
+        public decimal? VatAmountVnd { get; set; }
+        public decimal? AmountUsd { get; set; }
+        public decimal? VatAmountUsd { get; set; }
         public Guid? ChargeGroup { get; set; }
         public string TransactionType { get; set; }
         public Guid? OfficeId { get; set; }
-        public decimal? AmountVnd { get; set; }
-        public decimal? VatAmountVnd { get; set; }
         public string ReferenceNo { get; set; }
         public Guid? CompanyId { get; set; }
         public string SyncedFrom { get; set; }
         public string PaySyncedFrom { get; set; }
+        public decimal? NetAmount { get; set; }
+        public string VatPartnerId { get; set; }
+        public string CombineBillingNo { get; set; }
+        public string ObhcombineBillingNo { get; set; }
+        public string AdvanceNoFor { get; set; }
     }
 }

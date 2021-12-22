@@ -246,6 +246,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.TotalExchangeRate).HasColumnType("decimal(18, 4)");
 
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(20)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Type).HasMaxLength(50);
 
                 entity.Property(e => e.UnpaidAmount).HasColumnType("decimal(18, 4)");
@@ -283,6 +287,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .ValueGeneratedNever();
 
                 entity.Property(e => e.AdvanceCurrency).HasMaxLength(10);
+
+                entity.Property(e => e.AdvanceFor)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.AdvanceNo)
                     .IsRequired()
@@ -2451,6 +2459,10 @@ namespace eFMS.API.Documentation.Service.Models
 
                 entity.Property(e => e.AdvanceNo).HasMaxLength(11);
 
+                entity.Property(e => e.AdvanceNoFor)
+                    .HasMaxLength(11)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.AmountUsd)
                     .HasColumnName("AmountUSD")
                     .HasColumnType("decimal(18, 4)");
@@ -3621,6 +3633,8 @@ namespace eFMS.API.Documentation.Service.Models
                 entity.Property(e => e.PurchaseOrderNo)
                     .HasMaxLength(100)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ReplicatedId).HasColumnName("ReplicatedID");
 
                 entity.Property(e => e.SalemanId)
                     .HasColumnName("SalemanID")
