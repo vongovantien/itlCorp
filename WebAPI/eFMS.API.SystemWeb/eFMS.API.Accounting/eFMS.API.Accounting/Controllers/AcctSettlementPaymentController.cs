@@ -317,6 +317,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetExistsCharge")]
+        [Authorize]
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria, string settlementCode)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
