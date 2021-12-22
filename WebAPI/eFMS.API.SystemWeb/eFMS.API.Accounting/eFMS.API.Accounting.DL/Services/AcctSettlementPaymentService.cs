@@ -1490,7 +1490,8 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@creditNo", Value = string.Join(';',criteria.creditNo) },
                 new SqlParameter(){ ParameterName = "@servicesType", Value = criteria.servicesType },
                 new SqlParameter(){ ParameterName = "@personInCharge", Value = criteria.personInCharge },
-                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester }
+                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester },
+                new SqlParameter(){ ParameterName = "@office", Value = currentUser.OfficeID }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExistsCharge>(parameters);
             return list;
