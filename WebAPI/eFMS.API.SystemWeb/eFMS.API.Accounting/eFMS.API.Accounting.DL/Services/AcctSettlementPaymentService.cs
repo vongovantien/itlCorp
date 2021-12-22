@@ -1058,7 +1058,13 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <param name="getCopyCharge">true: function copy charge in settle, false: get detail charge no group in settle</param>
+        /// <returns></returns>
+        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool getCopyCharge = false)
         {
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
             var charge = catChargeRepo.Get();
@@ -1066,8 +1072,8 @@ namespace eFMS.API.Accounting.DL.Services
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var vatPartners = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get(x => x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
-            var csTransD = csTransactionDetailRepo.Get(x => x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            var opsTrans = opsTransactionRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
+            var csTransD = csTransactionDetailRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
             var csTrans = csTransactionRepo.Get();
             var userRepo = sysUserRepo.Get();
 
