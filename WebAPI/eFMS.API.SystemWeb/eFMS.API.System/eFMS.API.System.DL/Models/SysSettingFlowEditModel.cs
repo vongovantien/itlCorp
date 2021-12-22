@@ -12,7 +12,7 @@ namespace eFMS.API.System.Models
         public List<SysSettingFlowModel> UnlockShipments { get; set; }
         public List<SetLockingDateShipment> LockShipmentDate { get; set; }
         public SysSettingFlowModel AccountReceivable { get; set; }
-
-
+        public SysSettingFlowModel ReplicateOffice { get; set; }
     }
+
 }

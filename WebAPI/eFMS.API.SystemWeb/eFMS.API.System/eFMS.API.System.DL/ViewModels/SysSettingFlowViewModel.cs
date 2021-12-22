@@ -11,6 +11,7 @@ namespace eFMS.API.System.DL.ViewModels
         public List<SysSettingFlow> Unlocks { get; set; }
         public List<SetLockingDateShipment> LockingDateShipment { get; set; }
         public SysSettingFlow Account { get; set; }
+        public SysSettingFlow ReplicateOffice { get; set; }
 
     }
 }
