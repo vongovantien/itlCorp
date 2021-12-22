@@ -927,7 +927,7 @@ namespace eFMS.API.Accounting.DL.Services
                                      && opst.JobNo == JobId
                                      && opst.Hwbno == HBL
                                      && opst.Mblno == MBL
-                                     && sur.AdvanceNo == AdvNo
+                                     && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
                                      && sur.ClearanceNo == clearanceNo
                                 select new ShipmentChargeSettlement
                                 {
@@ -1000,7 +1000,7 @@ namespace eFMS.API.Accounting.DL.Services
                                     && cst.JobNo == JobId
                                     && cstd.Hwbno == HBL
                                     && cst.Mawb == MBL
-                                    && sur.AdvanceNo == AdvNo
+                                    && (string.IsNullOrEmpty(sur.AdvanceNo) ? null : sur.AdvanceNo) == AdvNo
                                     && sur.ClearanceNo == clearanceNo
                                select new ShipmentChargeSettlement
                                {
