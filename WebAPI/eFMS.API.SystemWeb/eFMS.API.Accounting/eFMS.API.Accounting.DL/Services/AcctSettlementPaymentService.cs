@@ -1060,7 +1060,7 @@ namespace eFMS.API.Accounting.DL.Services
 
         public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
         {
-            var surcharge = csShipmentSurchargeRepo.Get();
+            var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
             var charge = catChargeRepo.Get();
             var unit = catUnitRepo.Get();
             var payer = catPartnerRepo.Get();
@@ -1085,8 +1085,6 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
-                                where
-                                     sur.SettlementCode == settlementNo
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -1125,8 +1123,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = sur.AdvanceNo,
-                                    OriginAdvanceNo = sur.AdvanceNo,
+                                    AdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, opst.UserCreated),
+                                    OriginAdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, opst.UserCreated),
                                     ShipmentId = opst.Id,
                                     TypeService = "OPS",
                                     IsLocked = opst.IsLocked,
@@ -1160,7 +1158,6 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                from user in sysUser.DefaultIfEmpty()
-                               where sur.SettlementCode == settlementNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1199,8 +1196,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = sur.AdvanceNo,
-                                   OriginAdvanceNo = sur.AdvanceNo,
+                                   AdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, cst.UserCreated),
+                                   OriginAdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, cst.UserCreated),
                                    ShipmentId = cst.Id,
                                    TypeService = "DOC",
                                    IsLocked = cst.IsLocked,
@@ -1243,6 +1240,21 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             return _syncedFromBy;
+        }
+
+        /// <summary>
+        /// Get advance no from adv no in surcharge and usercreated in shipment
+        /// </summary>
+        /// <param name="advanceNoCharge"></param>
+        /// <param name="requester"></param>
+        /// <returns></returns>
+        private string GetAdvanceNoSettle(string advanceNoCharge, string requester)
+        {
+            if(acctAdvancePaymentRepo.Any(x=>x.AdvanceNo == advanceNoCharge && x.Requester == requester))
+            {
+                return advanceNoCharge;
+            }
+            return string.Empty;
         }
 
         #endregion --- DETAILS SETTLEMENT PAYMENT ---
