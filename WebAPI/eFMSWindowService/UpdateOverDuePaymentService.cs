@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.ServiceProcess;
 using System.Timers;
 
@@ -41,15 +42,15 @@ namespace eFMSWindowService
             _timer.Enabled = true;
         }
 
-        private async void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
                 using (eFMSTestEntities db = new eFMSTestEntities())
                 {
-                    List<sp_GetOverDuePayment> over_15 = await db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15DaysOverDueReceivable]").ToListAsync();
-                    List<sp_GetOverDuePayment> over_15_30 = await db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15To30DaysOverDueReceivable]").ToListAsync();
-                    List<sp_GetOverDuePayment> over_30 = await db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice30DaysOverDueReceivable]").ToListAsync();
+                    List<sp_GetOverDuePayment> over_15 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15DaysOverDueReceivable]").ToList();
+                    List<sp_GetOverDuePayment> over_15_30 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice15To30DaysOverDueReceivable]").ToList();
+                    List<sp_GetOverDuePayment> over_30 = db.Database.SqlQuery<sp_GetOverDuePayment>("[dbo].[sp_CalculateInvoice30DaysOverDueReceivable]").ToList();
 
                     string log_15 = JsonConvert.SerializeObject(over_15);
                     string log_15_30 = JsonConvert.SerializeObject(over_15_30);
