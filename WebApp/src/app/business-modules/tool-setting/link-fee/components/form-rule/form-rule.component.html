@@ -44,7 +44,7 @@
                                         Service Selling<span class="m--font-danger">(*)</span>
                                     </label>
     
-                                    <ng-select (selected)="selected($event)" [multiple]="false" class="custom"
+                                    <ng-select [multiple]="false" class="custom"
                                         bindLabel="text" [items]="services" placeholder="Select Service Selling"
                                         formControlName="serviceSelling" (ngModelChange)="enableSelling()">
                                     </ng-select>
@@ -108,7 +108,7 @@
                                         Service Buying<span class="m--font-danger">(*)</span>
                                     </label>
     
-                                    <ng-select (selected)="selected($event)" [multiple]="false" class="custom"
+                                    <ng-select [multiple]="false" class="custom"
                                         bindLabel="text" [items]="services" placeholder="Select Service Buying"
                                         formControlName="serviceBuying" (ngModelChange)="enableBuying()">
                                     </ng-select>
