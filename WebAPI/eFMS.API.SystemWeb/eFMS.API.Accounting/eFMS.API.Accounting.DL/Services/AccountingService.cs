@@ -2527,6 +2527,11 @@ namespace eFMS.API.Accounting.DL.Services
                 emails = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note").FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
 
+            if (emails.Count() == 0)
+            {
+                emails = emailAccountantDept?.Email.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+            }
+
             List<string> toEmails = emails;
             List<string> attachments = null;
 
