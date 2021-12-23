@@ -10,8 +10,8 @@ export class RuleLinkFee {
     datetimeCreated: string = '';
     userModified: string = '';
     datetimeModified: string = '';
-    serviceBuying : string = '';
-    serviceSelling : string = '';
+    serviceBuying : any = '';
+    serviceSelling : any = '';
     chargeBuying : string = '';
     chargeSelling : string = '';
     partnerBuying : string = '';

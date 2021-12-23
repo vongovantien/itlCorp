@@ -7,7 +7,7 @@ namespace eFMS.API.Setting.DL.Models.Criteria
     public class RuleLinkFeeCriteria
     {
         public string RuleName { get; set; }
-        public string Datetype { get; set; }
+        public string DateType { get; set; }
         public string ServiceBuying { get; set; }
         public string ServiceSelling { get; set; }
         public string PartnerBuying { get; set; }

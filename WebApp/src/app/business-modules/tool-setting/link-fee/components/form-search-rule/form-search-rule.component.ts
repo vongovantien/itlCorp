@@ -222,9 +222,9 @@ export class FormSearchRuleComponent extends AppForm {
             serviceSelling: formSearch.serviceSelling,
             partnerBuying: this.rule.partnerBuying,
             partnerSelling: this.rule.partnerSelling,
-            dateType: !!formSearch.dateType?formSearch.dateType.value:null,
-            fromDate: !!formSearch.date.startDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
-            toDate: !!formSearch.date.endDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            dateType: formSearch.dateType,
+            fromDate: !!formSearch.date?.startDate?formatDate(formSearch.date.startDate, "yyyy-MM-dd", 'en'):null,
+            toDate: !!formSearch.date?.endDate?formatDate(formSearch.date.endDate, "yyyy-MM-dd", 'en'):null,
             status: formSearch.status,
         };
         console.log(formSearch.date);

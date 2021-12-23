@@ -8,6 +8,7 @@ import { ConfirmPopupComponent, Permission403PopupComponent } from 'src/app/shar
 import { ToastrService } from 'ngx-toastr';
 import { AppList } from 'src/app/app.list';
 import { FormRuleComponent } from './components/form-rule/form-rule.component';
+import { ItemsList } from '@ng-select/ng-select/lib/items-list';
 @Component({
   selector: 'app-link-fee',
   templateUrl: './link-fee.component.html',
@@ -135,8 +136,14 @@ export class LinkFeeComponent extends AppList implements OnInit{
       .subscribe(
         (res: RuleLinkFee) => {
           if (!!res) {
-            this.formRule.formGroup.patchValue(res);
+            this.formRule.formGroup.patchValue({
+              serviceBuying: this.getCurrentService(res.serviceBuying),
+              serviceSelling: this.getCurrentService(res.serviceSelling),
+              ruleName: res.ruleName,
+            }
+            );
             this.formRule.title = 'Detail/Edit Rule';
+            this.formRule.rule.ruleName=res.ruleName;
             this.formRule.rule.id = id;
             this.formRule.datetimeCreated = res.datetimeCreated;
             this.formRule.userNameCreated = res.userNameCreated;
@@ -172,9 +179,19 @@ export class LinkFeeComponent extends AppList implements OnInit{
               { field: 'shortName', value: partnerSelling.shortName, data: partnerSelling };
             this.formRule.isShowUpdate = true;
             this.formRule.show();
+            console.log(this.formRule.rule);
+            
           }
         }
       );
+  }
+
+  getCurrentService(res: any) {
+    let currService: any;
+    currService = this.formRule.services.find(
+      x => x.id === res
+    );
+    return currService;
   }
 
   showCreateRule() {

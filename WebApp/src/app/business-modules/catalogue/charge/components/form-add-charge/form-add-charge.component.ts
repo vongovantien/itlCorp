@@ -185,6 +185,8 @@ export class FormAddChargeComponent extends AppForm {
                 activeServiceList.push(activeService);
             }
         });
+        console.log(activeServiceList);
+        
         return activeServiceList;
     }
 
@@ -212,5 +214,6 @@ export class FormAddChargeComponent extends AppForm {
             unit: res.charge.unitId,
             mode: res.charge.mode
         });
+        console.log(this.service);
     }
 }

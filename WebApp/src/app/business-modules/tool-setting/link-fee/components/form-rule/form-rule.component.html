@@ -22,7 +22,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': (serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)}">
                                     <label required>Service Selling</label>
@@ -34,6 +34,23 @@
                                     </select>
                                     <div class="form-control-feedback" *ngIf="(serviceSelling.dirty && !serviceSelling.valid) || (isSubmitted && !serviceSelling.valid)">
                                         Service Selling is required !
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !serviceSelling.valid}">
+                                    <label class="form-control-label">
+                                        Service Selling<span class="m--font-danger">(*)</span>
+                                    </label>
+    
+                                    <ng-select (selected)="selected($event)" [multiple]="false" class="custom"
+                                        bindLabel="text" [items]="services" placeholder="Select Service Selling"
+                                        formControlName="serviceSelling" (ngModelChange)="enableSelling()">
+                                    </ng-select>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !serviceSelling.valid">
+                                        Service is required !
                                     </div>
                                 </div>
                             </div>
@@ -67,7 +84,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <!-- <div class="col-md-4">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': (serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)}">
                                     <label required>Service Buying</label>
@@ -79,6 +96,23 @@
                                     </select>
                                     <div class="form-control-feedback" *ngIf="(serviceBuying.dirty && !serviceBuying.valid) || (isSubmitted && !serviceBuying.valid)">
                                         Service Buying is required !
+                                    </div>
+                                </div>
+                            </div> -->
+                            <div class="col-lg-4">
+                                <div class="form-group"
+                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !serviceBuying.valid}">
+                                    <label class="form-control-label">
+                                        Service Buying<span class="m--font-danger">(*)</span>
+                                    </label>
+    
+                                    <ng-select (selected)="selected($event)" [multiple]="false" class="custom"
+                                        bindLabel="text" [items]="services" placeholder="Select Service Buying"
+                                        formControlName="serviceBuying" (ngModelChange)="enableBuying()">
+                                    </ng-select>
+                                    <div class="form-control-feedback"
+                                        *ngIf="isSubmitted && !serviceBuying.valid">
+                                        Service is required !
                                     </div>
                                 </div>
                             </div>
@@ -134,25 +168,25 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="form-group"  >
-                                    <label>Expiration Date</label>
-                                    <div class="m-input-icon m-input-icon--right down daterange-rtl">
-                                        <input type="text" class="form-control m-input m-input--square"
-                                            ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
-                                            [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
-                                            readonly [singleDatePicker]="true" formControlName="expiredDate"
-                                            [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate"
-                                            (remove)="resetExpiredDate()"
-                                            [alwaysShowCalendars]="true" [autoApply]="true"/>
-                                        <span class="m-input-icon__icon m-input-icon__icon--right">
-                                            <span>
-                                                <i class="la la-calendar"></i>
+                                <div class="col-md-4">
+                                    <div class="form-group"  >
+                                        <label>Expiration Date</label>
+                                        <div class="m-input-icon m-input-icon--right down daterange-rtl">
+                                            <input type="text" class="form-control m-input m-input--square"
+                                                ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
+                                                [minDate]="minDateExpired" name="daterange" placeholder="Please Select"
+                                                readonly [singleDatePicker]="true" formControlName="expiredDate"
+                                                [allowRemove]="!!expiredDate.value && !!expiredDate.value.startDate"
+                                                (remove)="resetExpiredDate()"
+                                                [alwaysShowCalendars]="true" [autoApply]="true"/>
+                                            <span class="m-input-icon__icon m-input-icon__icon--right">
+                                                <span>
+                                                    <i class="la la-calendar"></i>
+                                                </span>
                                             </span>
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                                 <div class="col-md-12" *ngIf="!!isShowUpdate"> 
                                     <div class="form-group">
                                         <label class="form-control-label">Status</label>

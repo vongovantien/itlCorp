@@ -199,11 +199,11 @@ namespace eFMS.API.Setting.DL.Services
                 query = query.And(x => x.PartnerBuying == criteria.PartnerBuying);
             }
 
-            if (!string.IsNullOrEmpty(criteria.Datetype))
+            if (criteria.DateType!=null)
             {
                 if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
                 {
-                    switch (criteria.Datetype)
+                    switch (criteria.DateType)
                     {
                         case "CreateDate":
                             query = query.And(x => x.DatetimeCreated.Value.Date >= criteria.FromDate.Value.Date &&
@@ -318,7 +318,7 @@ namespace eFMS.API.Setting.DL.Services
                 }
 
                 //Trường hợp Insert (Id of rule is null or empty)
-                if (model.Id == Guid.Empty)
+                if (model.Id == null)
                 {
                     var ruleNameExists = DataContext.Get(x => x.RuleName == model.RuleName).Any();
                     if (ruleNameExists)

@@ -11,6 +11,7 @@ import { DataService } from '@services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { formatDate } from '@angular/common';
+import { ChargeConstants } from '@constants';
 
 @Component({
     selector: 'form-rule',
@@ -145,18 +146,19 @@ export class FormRuleComponent extends PopupBase implements OnInit {
 
     getService() {
         this.services = [
-            { displayName: 'Custom Logistic', value: 'CL' },
-            { displayName: 'Air Export', value: 'AE' },
-            { displayName: 'Air Import', value: 'AI' },
-            { displayName: 'Sea Consol Export', value: 'SCE' },
-            { displayName: 'Sea Consol Import', value: 'SCI' },
-            { displayName: 'Sea FCL Export', value: 'SFE' },
-            { displayName: 'Sea FCL Import', value: 'SFI' },
-            { displayName: 'Sea LCL Export', value: 'SLE' },
-            { displayName: 'Sea LCL Import', value: 'SLI' },
-            { displayName: 'Inland Trucking', value: 'IT' },
+            { text: 'Custom Logistic', id: 'CL' },
+            { text: 'Air Export', id: 'AE' },
+            { text: 'Air Import', id: 'AI' },
+            { text: 'Sea Consol Export', id: 'SCE' },
+            { text: 'Sea Consol Import', id: 'SCI' },
+            { text: 'Sea FCL Export', id: 'SFE' },
+            { text: 'Sea FCL Import', id: 'SFI' },
+            { text: 'Sea LCL Export', id: 'SLE' },
+            { text: 'Sea LCL Import', id: 'SLI' },
+            { text: 'Inland Trucking', id: 'IT' },
         ];
     }
+
 
     getPartner() {
         if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.PARTNER)) {
@@ -234,7 +236,6 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     onSaveRule() {
         this.isSubmitted = true;
         const valueForm = this.formGroup.getRawValue();
-        console.log(this.formGroup.invalid);
         const rule: RuleLinkFee = new RuleLinkFee(valueForm);
         if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.selectedPartnerSelling.value||!this.effectiveDate.value.startDate){
             return;
@@ -252,6 +253,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,
                 rule.chargeSelling = this.rule.chargeSelling,
+                rule.serviceBuying=rule.serviceBuying.id,
+                rule.serviceSelling=rule.serviceSelling.id,
                 this._settingRepo.addRule(rule)
                     .subscribe(
                         (res: CommonInterface.IResult) => {
@@ -266,18 +269,20 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                             console.log('running');
                             this._toast.error(res.message);
                         });
+                        console.log('submit '+ rule);
+                        
         } else {
-            console.log('running');
             rule.id = this.rule.id,
                 rule.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 rule.partnerBuying = this.rule.partnerBuying,
                 rule.partnerSelling = this.rule.partnerSelling,
                 rule.chargeBuying = this.rule.chargeBuying,
                 rule.chargeSelling = this.rule.chargeSelling,
+                rule.serviceBuying=rule.serviceBuying.id,
+                rule.serviceSelling=rule.serviceSelling.id,
                 this._settingRepo.updateRule(rule).subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {
-
                             this._toast.success(res.message);
                             this.isSubmitted = false;
                             this.onUpdate.emit(true);
@@ -287,6 +292,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
 
                         this._toast.error(res.message);
                     });
+                    console.log('update '+ rule);
         }
 
     }
@@ -294,6 +300,5 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     resetExpiredDate(){
         this.expiredDate.setValue(null);
     }
-
 }
 
