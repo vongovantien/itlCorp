@@ -72,16 +72,18 @@
                             <div class="col-md-4">
                                 <div class="form-group"
                                     [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPartnerSelling.value}">
-                                    <label required for="">Partner Selling</label>
+                                    <label for="">Partner Selling</label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartnerSelling"
                                         (itemSelected)="onSelectDataFormInfo($event, 'partnerSelling')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource" [disabled]="this.isSelling"
-                                        [displayFields]="configPartner.displayFields" [height]="200">
+                                        [displayFields]="configPartner.displayFields" [height]="200"
+                                        (remove)="resetPartner()"
+                                        >
                                     </app-combo-grid-virtual-scroll>
-                                    <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerSelling.value">
+                                    <!-- <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerSelling.value">
                                         Partner Selling is required !
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                             <!-- <div class="col-md-4">

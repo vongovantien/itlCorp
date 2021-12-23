@@ -11,7 +11,6 @@ import { DataService } from '@services';
 import { SystemConstants } from 'src/constants/system.const';
 import { CommonEnum } from 'src/app/shared/enums/common.enum';
 import { formatDate } from '@angular/common';
-import { ChargeConstants } from '@constants';
 
 @Component({
     selector: 'form-rule',
@@ -231,13 +230,19 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             default:
                 break;
         }
+        console.log(this.selectedPartnerSelling);
+    }
+
+    resetPartner(){
+        this.rule.partnerSelling=null;
     }
 
     onSaveRule() {
+        console.log(this.selectedPartnerSelling.value.length);
         this.isSubmitted = true;
         const valueForm = this.formGroup.getRawValue();
         const rule: RuleLinkFee = new RuleLinkFee(valueForm);
-        if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.selectedPartnerSelling.value||!this.effectiveDate.value.startDate){
+        if(!this.selectedChargeBuying.value||!this.selectedChargeSelling.value||!this.selectedPartnerBuying.value||!this.effectiveDate.value.startDate){
             return;
         }
         if(!this.expiredDate.value.startDate){
