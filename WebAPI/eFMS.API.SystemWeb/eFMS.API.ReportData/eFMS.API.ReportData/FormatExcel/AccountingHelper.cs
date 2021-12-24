@@ -1118,11 +1118,14 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailAdvancePayment(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (advanceExport.InfoAdvance.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column B
-                excelImage.SetPosition(0, 0, 1, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column B
+                    excelImage.SetPosition(0, 0, 1, 0);
+                }
             }
 
             List<string> headers = GetHeaderExcelDetailAdvancePayment(language);
@@ -3884,13 +3887,15 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailSettlementPayment(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (settlementExport.InfoSettlement.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column A
-                excelImage.SetPosition(0, 0, 0, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column A
+                    excelImage.SetPosition(0, 0, 0, 0);
+                }
             }
-
             List<string> headers = GetHeaderExcelDetailSettlementPayment(language);
 
             #region #Header
@@ -4426,11 +4431,14 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailSettlementPaymentSOA(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (settlementExport.InfoSettlement.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column A
-                excelImage.SetPosition(0, 0, 0, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column A
+                    excelImage.SetPosition(0, 0, 0, 0);
+                }
             }
 
             List<string> headers = GetHeaderExcelDetailSettlementPaymentSOA(language);
@@ -4807,8 +4815,21 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     return null;
                 }
+                List<string> headers = new List<string>()
+                {
+                   "INDO TRANS LOGISTICS CORPORATION", //0
+                   "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+                };
                 var excel = new ExcelExport(path);
                 var listKeyData = new Dictionary<string, object>();
+                if (settlementExport.IsDisplayLogo)
+                {
+                    // Set logo company
+                    Image image = Image.FromFile(CrystalEx.GetLogoITL());
+                    excel.SetPicture(image, "Logo", 0, 0);
+                }
+                listKeyData.Add("CompanyName", headers[0]);
+                listKeyData.Add("CompanyAddress", headers[1]);
                 listKeyData.Add("SettlementNo", settlementExport.SettlementNo);
                 listKeyData.Add("RequestDate", settlementExport.RequestDate);
                 listKeyData.Add("Requester", settlementExport.Requester);

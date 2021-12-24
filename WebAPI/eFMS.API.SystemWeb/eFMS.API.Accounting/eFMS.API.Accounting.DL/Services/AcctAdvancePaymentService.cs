@@ -1583,6 +1583,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var deptRequester = catDepartmentRepo.Get(x => x.Id == advance.DepartmentId).FirstOrDefault();
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
 
             var acctAdvance = new AdvancePaymentRequestReport();
             acctAdvance.AdvID = advance.AdvanceNo;
@@ -1658,6 +1659,7 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.AdvCSSignDate = null;
             acctAdvance.AdvCSStickApp = null;
             acctAdvance.AdvCSStickDeny = null;
+            acctAdvance.IsDisplayLogo = isCommonOffice;
 
             var _totalNorm = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_NORM).Select(s => s.Amount).Sum();
             var _totalInvoice = advance.AdvanceRequests.Where(x => x.AdvanceType == AccountingConstants.ADVANCE_TYPE_INVOICE).Select(s => s.Amount).Sum();
@@ -3964,6 +3966,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             var office = sysOfficeRepo.Get(x => x.Id == advancePayment.OfficeId).FirstOrDefault();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
 
             var infoAdvance = new InfoAdvanceExport
             {
@@ -3987,7 +3990,8 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = advancePayment.BankName,
                 BankCode = advancePayment.BankCode,
                 PaymentMethod = advancePayment.PaymentMethod,
-                DeadlinePayment = advancePayment?.DeadlinePayment
+                DeadlinePayment = advancePayment?.DeadlinePayment,
+                IsDisplayLogo = isCommonOffice
             };
             return infoAdvance;
         }

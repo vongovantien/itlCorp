@@ -32,5 +32,6 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string Supplier { get; set; }
         public string ReasonForRequest { get; set; }
         public string BOD { get; set; }
+        public bool IsDisplayLogo { get; set; }
     }
 }

@@ -26,5 +26,6 @@ namespace eFMS.API.Accounting.DL.Models.ExportResults
         public string BankCode { get; set; }
         public string PaymentMethod { get; set; }
         public DateTime? DeadlinePayment { get; set; }
+        public bool IsDisplayLogo { get; set; }
     }
 }
