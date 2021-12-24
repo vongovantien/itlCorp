@@ -79,3 +79,4 @@ CompanyAddress	String	255
 Website	String	100	
 Contact	String	255	
 AdvContactSignDate	Date	
+IsDisplayLogo	Boolean		

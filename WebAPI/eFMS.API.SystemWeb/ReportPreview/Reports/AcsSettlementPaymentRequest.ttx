@@ -44,3 +44,4 @@ Bank	String	50
 BankCode	String	50	
 ServiceDate	DateTime	
 DueDate	DateTime	
+IsDisplayLogo	Boolean	

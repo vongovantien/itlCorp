@@ -2501,6 +2501,8 @@ namespace eFMS.API.Accounting.DL.Services
             var firstShipment = GetFirstShipmentOfSettlement(settlementNo);
             //Lấy thông tin các User Approve Settlement
             var infoSettleAprove = GetInfoApproveSettlementNoCheckBySettlementNo(settlementNo);
+            // Check valid office
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
             listSettlementPayment.ForEach(fe =>
             {
                 fe.JobIdFirst = firstShipment.JobId;
@@ -2559,6 +2561,7 @@ namespace eFMS.API.Accounting.DL.Services
                         _inword = InWordCurrency.ConvertNumberCurrencyToString(_amount, _currency);
                 }
                 fe.Inword = _inword;
+                fe.IsDisplayLogo = isCommonOffice;
             });
             return listSettlementPayment;
         }
@@ -3669,7 +3672,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
             else
             {
-                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault().Email?.Split(";").ToList();
+                emailDeputies = catDepartmentRepo.Get(x => x.Id == deptAccountants).FirstOrDefault()?.Email?.Split(";").ToList();
             }
             result.EmailUser = userBaseService.GetEmployeeByEmployeeId(employeeIdOfAccountant)?.Email;
             result.EmailDeputies = emailDeputies;
@@ -4844,6 +4847,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
             }
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4869,6 +4873,7 @@ namespace eFMS.API.Accounting.DL.Services
                 Note=settlementPayment.Note,
                 SettlementCurrency=settlementPayment.SettlementCurrency,
                 BOD = _bod,
+                IsDisplayLogo = isCommonOffice
             };
                 
             return infoSettlement;
@@ -5267,7 +5272,7 @@ namespace eFMS.API.Accounting.DL.Services
             string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
                     :
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(settlementPayment.Amount ?? 0, "") + " " + settlementPayment.SettlementCurrency;
-
+            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -5288,7 +5293,8 @@ namespace eFMS.API.Accounting.DL.Services
                 BankName = settlementPayment.BankName,
                 BankAccountName = settlementPayment.BankAccountName,
                 PayeeName = _payeeName,
-                Note = settlementPayment.Note
+                Note = settlementPayment.Note,
+                IsDisplayLogo = isCommonOffice
             };
             return infoSettlement;
         }
