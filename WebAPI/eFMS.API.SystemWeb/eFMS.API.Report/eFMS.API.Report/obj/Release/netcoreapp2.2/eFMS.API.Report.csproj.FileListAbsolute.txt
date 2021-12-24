@@ -1,0 +1,14 @@
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Release\netcoreapp2.2\eFMS.API.Report.deps.json
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Release\netcoreapp2.2\eFMS.API.Report.runtimeconfig.json
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Release\netcoreapp2.2\eFMS.API.Report.runtimeconfig.dev.json
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Release\netcoreapp2.2\eFMS.API.Report.dll
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Release\netcoreapp2.2\eFMS.API.Report.pdb
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.csproj.CoreCompileInputs.cache
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.RazorAssemblyInfo.cache
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.RazorAssemblyInfo.cs
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.AssemblyInfoInputs.cache
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.AssemblyInfo.cs
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.RazorTargetAssemblyInfo.cache
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.dll
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.pdb
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Release\netcoreapp2.2\eFMS.API.Report.csprojAssemblyReference.cache
