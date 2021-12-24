@@ -21,6 +21,8 @@ namespace eFMS.API.ForPartner.DL.Models
         public string CustomerCode { get; set; }
         [Required]
         public string OfficeCode { get; set; }
+        public string PaymentMethod { get; set; }
+
         public List<VoucherCreateRowModel> Details { get; set; }
     }
 
@@ -37,7 +39,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public decimal VatAmountUsd { get; set; }
         public int PaymentTerm { get; set; }
         public string InvoiceNo { get; set; }
-        public DateTime InvoiceDate { get; set; }
+        public DateTime? InvoiceDate { get; set; }
         public string SerieNo { get; set; }
         public string AccountNo { get; set; }
         public string VoucherType { get; set; }
@@ -51,9 +53,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public string JobNo { get; set; }
         public string MblNo { get; set; }
         public string Hblno { get; set; }
-        public string PaymentMethod { get; set; }
         public string BravoRefNo { get; set; }
-
     }
 
     public class VoucherSyncUpdateModel

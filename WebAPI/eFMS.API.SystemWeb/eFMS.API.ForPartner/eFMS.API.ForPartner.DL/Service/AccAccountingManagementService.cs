@@ -2336,7 +2336,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         UnpaidAmountVnd = itemGroup.AmountVnd,
                         UnpaidAmountUsd = itemGroup.AmountUsd,
                         PaymentDueDate = itemGroup.VoucherDate.AddDays((double)(itemGroup.PaymentTerm)),
-                        PaymentMethod = itemGroup.PaymentMethod,
+                        PaymentMethod = model.PaymentMethod,
                         TotalExchangeRate = itemGroup.ExchangeRate,
                         TransactionType = itemGroup.TransactionType,
                         AttachDocInfo = model.DocCode,
