@@ -37,6 +37,8 @@
             this.serviceInstallerSendMailOverduePayment = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstallerSendMailExceededCreditLimit = new System.ServiceProcess.ServiceInstaller();
             this.serviceInstallerSendMailexpiredAgreement = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstaller5 = new System.ServiceProcess.ServiceInstaller();
+            this.serviceInstaller6 = new System.ServiceProcess.ServiceInstaller();
             // 
             // serviceProcessInstaller1
             // 
@@ -100,6 +102,17 @@
             this.serviceInstallerSendMailexpiredAgreement.ServiceName = "SendMailExpiredAgreementService";
             this.serviceInstallerSendMailexpiredAgreement.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
+            // serviceInstaller5
+            // 
+            this.serviceInstaller5.Description = "UpdateOverDuePaymentService";
+            this.serviceInstaller5.DisplayName = "eFMSWindowService.UpdateOverDuePaymentService";
+            this.serviceInstaller5.ServiceName = "UpdateOverDuePaymentService";
+            this.serviceInstaller5.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
+            // 
+            // serviceInstaller6
+            // 
+            this.serviceInstaller6.ServiceName = "Service1";
+            // 
             // ProjectInstaller
             // 
             this.Installers.AddRange(new System.Configuration.Install.Installer[] {
@@ -111,7 +124,8 @@
             this.serviceInstallerAutoLockShipment,
             this.serviceInstallerSendMailOverduePayment,
             this.serviceInstallerSendMailExceededCreditLimit,
-            this.serviceInstallerSendMailexpiredAgreement});
+            this.serviceInstallerSendMailexpiredAgreement,
+            this.serviceInstaller5});
 
         }
 
@@ -126,5 +140,7 @@
         private System.ServiceProcess.ServiceInstaller serviceInstallerSendMailOverduePayment;
         private System.ServiceProcess.ServiceInstaller serviceInstallerSendMailExceededCreditLimit;
         private System.ServiceProcess.ServiceInstaller serviceInstallerSendMailexpiredAgreement;
+        private System.ServiceProcess.ServiceInstaller serviceInstaller5;
+        private System.ServiceProcess.ServiceInstaller serviceInstaller6;
     }
 }
