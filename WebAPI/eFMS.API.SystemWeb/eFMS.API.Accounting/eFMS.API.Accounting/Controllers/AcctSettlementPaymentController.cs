@@ -317,6 +317,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetExistsCharge")]
+        [Authorize]
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria, string settlementCode)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
@@ -893,7 +894,7 @@ namespace eFMS.API.Accounting.Controllers
             List<ShipmentChargeSettlement> data = new List<ShipmentChargeSettlement>();
             if (checkSettleOfUser)
             {
-                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false).ToList();
+                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo, true).Where(x => x.IsFromShipment == false).ToList();
             }
             return Ok(data);
             //End change request

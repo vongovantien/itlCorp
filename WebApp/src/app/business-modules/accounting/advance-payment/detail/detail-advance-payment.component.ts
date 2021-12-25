@@ -184,8 +184,8 @@ export class AdvancePaymentDetailComponent
                             hblid: x.hblid,
                             customNo: x.customNo
                         }));
-                        advanceRequestList = 
-                            advanceRequestList.filter((item: any) =>  this.listAdvancePaymentCarrierComponent.configShipment.dataSource.some(x => x.hblid !== item.hblid && x.jobId !== item.jobId));
+                        advanceRequestList =
+                            [...advanceRequestList, ...advanceRequestList.filter((item: any) => this.listAdvancePaymentCarrierComponent.configShipment.dataSource.some(x => x.hblid !== item.hblid && x.jobId !== item.jobId))];
                         this.listAdvancePaymentCarrierComponent.configShipment.dataSource = [...this.listAdvancePaymentCarrierComponent.configShipment.dataSource, ...advanceRequestList];
 
                         this.listAdvancePaymentCarrierComponent.advanceNo =

@@ -1058,7 +1058,13 @@ namespace eFMS.API.Accounting.DL.Services
             return data;
         }
 
-        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="settlementNo"></param>
+        /// <param name="getCopyCharge">true: function copy charge in settle, false: get detail charge no group in settle</param>
+        /// <returns></returns>
+        public IQueryable<ShipmentChargeSettlement> GetListShipmentChargeSettlementNoGroup(string settlementNo, bool getCopyCharge = false)
         {
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementNo);
             var charge = catChargeRepo.Get();
@@ -1066,8 +1072,8 @@ namespace eFMS.API.Accounting.DL.Services
             var payer = catPartnerRepo.Get();
             var payee = catPartnerRepo.Get();
             var vatPartners = catPartnerRepo.Get();
-            var opsTrans = opsTransactionRepo.Get();
-            var csTransD = csTransactionDetailRepo.Get();
+            var opsTrans = opsTransactionRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
+            var csTransD = csTransactionDetailRepo.Get(x => getCopyCharge ? (x.OfficeId == currentUser.OfficeID) : true);  // Lấy theo office current user
             var csTrans = csTransactionRepo.Get();
             var userRepo = sysUserRepo.Get();
 
@@ -1490,7 +1496,8 @@ namespace eFMS.API.Accounting.DL.Services
                 new SqlParameter(){ ParameterName = "@creditNo", Value = string.Join(';',criteria.creditNo) },
                 new SqlParameter(){ ParameterName = "@servicesType", Value = criteria.servicesType },
                 new SqlParameter(){ ParameterName = "@personInCharge", Value = criteria.personInCharge },
-                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester }
+                new SqlParameter(){ ParameterName = "@requester", Value = criteria.requester },
+                new SqlParameter(){ ParameterName = "@office", Value = currentUser.OfficeID }
             };
             var list = ((eFMSDataContext)DataContext.DC).ExecuteProcedure<sp_GetDataExistsCharge>(parameters);
             return list;
