@@ -85,9 +85,8 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
         ]).pipe(
             map(([params, qParams]) => ({ ...params, ...qParams })),
             tap((param) => {
-                console.log('ops',param)
                 this.jobId = param.id;
-                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit': param.tab) : 'job-edit';
+                this.tab = !!param.tab ? (param.tab !== 'CDNOTE' ? 'job-edit' : param.tab) : 'job-edit';
                 if (param.action) {
                     this.isDuplicate = param.action.toUpperCase() === 'COPY';
                     this.selectedTabSurcharge = 'BUY';
@@ -408,12 +407,12 @@ export class OpsModuleBillingJobEditComponent extends AppForm implements OnInit,
                 (response: any) => {
                     if (response != null) {
                         this.opsTransaction = new OpsTransaction(response);
-                        console.log(this.opsTransaction);
 
                         this.hblid = this.opsTransaction.hblid;
 
                         this.getListContainersOfJob();
                         this.getSurCharges(CommonEnum.SurchargeTypeEnum.BUYING_RATE);
+
                         this.editForm.opsTransaction = this.opsTransaction;
                         const hbl = new CsTransactionDetail(this.opsTransaction);
                         hbl.id = this.opsTransaction.hblid;
