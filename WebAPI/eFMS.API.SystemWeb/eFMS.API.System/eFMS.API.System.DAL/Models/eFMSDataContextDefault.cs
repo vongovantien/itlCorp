@@ -994,6 +994,10 @@ namespace eFMS.API.System.Service.Models
 
                 entity.Property(e => e.OfficeId).HasColumnName("OfficeID");
 
+                entity.Property(e => e.ReplicatePrefix)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Type).HasMaxLength(100);
 
                 entity.Property(e => e.UserCreated)
