@@ -135,7 +135,7 @@ export class FormSearchRuleComponent extends AppForm {
             { displayName: 'Create Date', value: 'CreateDate' },
             { displayName: 'Effective Date', value: 'EffectiveDate' },
             { displayName: 'Modified Date', value: 'ModifiedDate' },
-            { displayName: 'Expired Date', value: 'ExpiredDate' },
+            { displayName: 'Expiration Date', value: 'ExpiredDate' },
         ];
     }
     getService() {

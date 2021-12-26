@@ -189,7 +189,6 @@
               this.formRule.isShowUpdate = true;
               this.formRule.show();
               console.log(this.formRule.rule);
-
             }
           }
         );
@@ -213,6 +212,7 @@
       this.formRule.isBuying = true;
       this.formRule.isSelling = true;
       this.formRule.isShowUpdate = false;
+      this.formRule.minDateEffective=this.minDate;
       this.formRule.show();
     }
 
