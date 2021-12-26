@@ -1091,6 +1091,8 @@ namespace eFMS.API.Accounting.DL.Services
                                 join opst in opsTrans on sur.Hblid equals opst.Hblid
                                 join user in userRepo on opst.UserCreated equals user.Id into sysUser
                                 from user in sysUser.DefaultIfEmpty()
+                                where
+                                     sur.SettlementCode == settlementNo
                                 select new ShipmentChargeSettlement
                                 {
                                     Id = sur.Id,
@@ -1129,8 +1131,8 @@ namespace eFMS.API.Accounting.DL.Services
                                     Notes = sur.Notes,
                                     IsFromShipment = sur.IsFromShipment,
                                     TypeOfFee = sur.TypeOfFee,
-                                    AdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, opst.UserCreated),
-                                    OriginAdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, opst.UserCreated),
+                                    AdvanceNo = sur.AdvanceNo,
+                                    OriginAdvanceNo = sur.AdvanceNo,
                                     ShipmentId = opst.Id,
                                     TypeService = "OPS",
                                     IsLocked = opst.IsLocked,
@@ -1164,6 +1166,8 @@ namespace eFMS.API.Accounting.DL.Services
                                from cst in cst2.DefaultIfEmpty()
                                join user in userRepo on cst.UserCreated equals user.Id into sysUser
                                from user in sysUser.DefaultIfEmpty()
+                               where
+                                     sur.SettlementCode == settlementNo
                                select new ShipmentChargeSettlement
                                {
                                    Id = sur.Id,
@@ -1202,8 +1206,8 @@ namespace eFMS.API.Accounting.DL.Services
                                    Notes = sur.Notes,
                                    IsFromShipment = sur.IsFromShipment,
                                    TypeOfFee = sur.TypeOfFee,
-                                   AdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, cst.UserCreated),
-                                   OriginAdvanceNo = GetAdvanceNoSettle(sur.AdvanceNo, cst.UserCreated),
+                                   AdvanceNo = sur.AdvanceNo,
+                                   OriginAdvanceNo = sur.AdvanceNo,
                                    ShipmentId = cst.Id,
                                    TypeService = "DOC",
                                    IsLocked = cst.IsLocked,
