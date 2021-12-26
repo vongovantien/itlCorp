@@ -2506,7 +2506,7 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[UrlFunc]", urlFunc);
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID).FirstOrDefault();
+            var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID)?.FirstOrDefault();
 
             List<string> emails = new List<string>();
 
@@ -2518,18 +2518,21 @@ namespace eFMS.API.Accounting.DL.Services
                 deptId = emailAccountantDept.Id;
             }
 
-            if (catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE")
+            var emailReceiveCredit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note");
+            var emailReceiveDebit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note");
+
+            if ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE") && emailReceiveDebit?.FirstOrDefault() != null)
             {
-                emails = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Debit Note").FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails =emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
-            if (catagory == "SOA_CREDIT" || catagory == "CDNOTE_CREDIT")
+            if ((catagory == "SOA_CREDIT" || catagory == "CDNOTE_CREDIT") && emailReceiveCredit?.FirstOrDefault() != null)
             {
-                emails = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note").FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails = emailReceiveCredit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
 
             if (emails.Count() == 0)
             {
-                emails = emailAccountantDept?.Email.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails = emailAccountantDept.Email.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
 
             List<string> toEmails = emails;
