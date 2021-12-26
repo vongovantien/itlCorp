@@ -26,26 +26,28 @@ export class LinkFeeComponent extends AppList implements OnInit{
     private _settingRepo: SettingRepo,
     private _progressService: NgProgress,
     private _toastService: ToastrService,
+    private _sortService: SortService,
   ) {
     super();
     this._progressRef = this._progressService.ref();
     this.requestList = this.searchRule;
+    this.requestSort = this.sortLocal;
   }
 
   ngOnInit() {
     this.headers = [
-      { field: 'ruleName', title: 'Name Rule', sortable: false },
-      { field: 'serviceBuying', title: 'Service Buying', sortable: false },
-      { field: 'chargeNameBuying', title: 'Charge Buying', sortable: false },
-      { field: 'partnerNameBuying', title: 'Partner Buying', sortable: false },
-      { field: 'serviceSelling', title: 'Service Selling', sortable: false },
-      { field: 'chargeNameSelling', title: 'Charge Selling', sortable: false },
-      { field: 'partnerSelling', title: 'Partner Selling', sortable: false },
-      { field: 'userNameCreated', title: 'Creator', sortable: false },
-      { field: 'modifiedDate', title: 'Modified Date', sortable: false },
-      { field: 'status', title: 'Status', sortable: false },
-      { field: 'effectiveDate', title: 'Effective Date', sortable: false },
-      { field: 'expiredDate', title: 'Expiration Date', sortable: false },
+      { field: 'ruleName', title: 'Rule Name', sortable: true },
+      { field: 'serviceBuying', title: 'Service Buying', sortable: true },
+      { field: 'chargeNameBuying', title: 'Charge Buying', sortable: true },
+      { field: 'partnerNameBuying', title: 'Partner Buying', sortable: true },
+      { field: 'serviceSelling', title: 'Service Selling', sortable: true },
+      { field: 'chargeNameSelling', title: 'Charge Selling', sortable: true },
+      { field: 'partnerSelling', title: 'Partner Selling', sortable: true },
+      { field: 'userNameCreated', title: 'Creator', sortable: true },
+      { field: 'modifiedDate', title: 'Modified Date', sortable: true },
+      { field: 'status', title: 'Status', sortable: true },
+      { field: 'effectiveDate', title: 'Effective Date', sortable: true },
+      { field: 'expiredDate', title: 'Expiration Date', sortable: true },
     ];
     this.dataSearch = {
       all: null
@@ -78,7 +80,9 @@ export class LinkFeeComponent extends AppList implements OnInit{
       );
   }
 
-
+  sortLocal(sort: string): void {
+    this.rules = this._sortService.sort(this.rules, sort, this.order);
+}
   deleteRule(rule: RuleLinkFee) {
     this._progressRef.start();
 
