@@ -38,7 +38,7 @@
                                                         </app-permission-button>
                                                         <ng-container>
                                                             <app-permission-button type="delete"
-                                                                (onClick)="deleteRule(rule)">
+                                                                (onClick)="onDeleteRule(rule)">
                                                             </app-permission-button>
                                                         </ng-container>
                                                     </div>
@@ -73,5 +73,5 @@
                     </div>
                 </div>
 
-                <confirm-popup body="Do you want to delete?" (onSubmit)="onDeleteRule()"></confirm-popup>
+                <confirm-popup body="Do you want to delete?" (onSubmit)="deleteRule()"></confirm-popup>
                 <form-rule #formAddRule (onUpdate)="resetSearch()"></form-rule>

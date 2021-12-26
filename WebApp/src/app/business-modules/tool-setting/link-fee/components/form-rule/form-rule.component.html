@@ -70,8 +70,7 @@
                                 </div>
                             </div>
                             <div class="col-md-4">
-                                <div class="form-group"
-                                    [ngClass]="{'m-form__group has-danger': isSubmitted && !selectedPartnerSelling.value}">
+                                <div class="form-group">
                                     <label for="">Partner Selling</label>
                                     <app-combo-grid-virtual-scroll [currentActiveItemId]="selectedPartnerSelling"
                                         (itemSelected)="onSelectDataFormInfo($event, 'partnerSelling')"
@@ -156,7 +155,6 @@
                                         <input type="text" class="form-control m-input m-input--square"
                                             ngxDaterangepickerMd [locale]="{applyLabel: 'apply', format: 'DD/MM/YYYY'}"
                                             [minDate]="minDateEffective" name="daterange" placeholder="Please Select"
-                                            [maxDate]="maxDateEffective"
                                             readonly [singleDatePicker]="true" formControlName="effectiveDate"
                                             [alwaysShowCalendars]="true" [autoApply]="true" />
                                         <span class="m-input-icon__icon m-input-icon__icon--right">
@@ -201,8 +199,8 @@
                             <ng-container *ngIf="!!isShowUpdate">
                                 <div class="col-md-6 m--margin-top-10 m--margin-bottom-5">
                                     <span class="m--font-bolder">Create:</span>
-                                    <span class="m--font-success m--margin-left-5">{{datetimeCreated | date:'dd/MM/yyyy
-                                        h:mm:ss a'}}</span>
+                                    <span class="m--font-success m--margin-left-5">{{datetimeCreated | 
+                                        date:'dd/MM/yyyy h:mm:ss a'}}</span>
                                     <span class="m--font-bolder m--margin-left-5">by</span>
                                     <span class="m--font-success m--margin-left-5">{{userNameCreated}}</span>
                                 </div>
@@ -231,3 +229,6 @@
         </div>
     </div>
 </div>
+
+<confirm-popup body="Do you want to create this Rule?" (onSubmit)="saveRule()"></confirm-popup>
+<info-popup body="Please recheck Data can't be Empty"></info-popup>
