@@ -156,13 +156,15 @@ namespace eFMS.API.Setting.DL.Services
                            UserNameCreated = user.Username,
                            ChargeSelling = rule.ChargeSelling,
                            DatetimeModified = rule.DatetimeModified,
-                           Status = rule.Status,
+                           Status = checkExpired(rule.ExpiredDate)?false:true,
                            EffectiveDate = rule.EffectiveDate,
                            ExpiredDate = rule.ExpiredDate,
                            ChargeNameBuying = chargeBuy.ChargeNameVn,
                            ChargeNameSelling = chargeSell.ChargeNameVn,
                        };
-
+            data.Where(x => checkExpired(x.ExpiredDate) && x.Status==true).ToList().ForEach(x =>
+              DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
+            DataContext.SubmitChanges();
             return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
         private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(RuleLinkFeeCriteria criteria)
@@ -269,9 +271,21 @@ namespace eFMS.API.Setting.DL.Services
             var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
             if (ruleLinkFee == null) return null;
             var modelMap = mapper.Map<RuleLinkFeeModel>(ruleLinkFee);
+            if (checkExpired(ruleLinkFee.ExpiredDate)&&ruleLinkFee.Status==true)
+            {
+                DataContext.Update(ruleLinkFee, x => x.Id == modelMap.Id);
+                DataContext.SubmitChanges();
+                modelMap.Status = false;
+            }
             modelMap.UserNameCreated = user.Where(x => x.Id == modelMap.UserCreated).FirstOrDefault().Username;
             modelMap.UserNameModified = user.Where(x => x.Id == modelMap.UserModified).FirstOrDefault().Username;
             return modelMap;
+        }
+
+        private bool checkExpired(DateTime? expriredDate)
+        {
+            if(DateTime.Now>=expriredDate) return true;
+            return false;
         }
 
         /// <summary>
