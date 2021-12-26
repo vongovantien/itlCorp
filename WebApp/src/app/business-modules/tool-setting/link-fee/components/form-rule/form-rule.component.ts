@@ -285,11 +285,12 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                                 return;
                             }
                             console.log('running');
-                            this._toast.error(res.message);                          
+                            this._toast.error(res.message);     
+                            this._progressRef.complete();
+                            this.confirmCreatePopup.hide();                     
                         });
 
         } else {
-            this.confirmCreatePopup.body = "Do you want to save this Rule ?"
             rule.id = this.rule.id,
                 rule.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
                 rule.partnerBuying = this.rule.partnerBuying,
@@ -310,6 +311,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                             return;
                         }
                         this._toast.error(res.message);
+                        this._progressRef.complete();
+                        this.confirmCreatePopup.hide();
                     });
         }
 

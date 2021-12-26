@@ -244,6 +244,13 @@ export class FormSearchRuleComponent extends AppForm {
         this.date.setValue(null);
     }
 
+    resetPartnerBuying(){
+        this.rule.partnerBuying=null;
+    }
+    resetPartnerSelling(){
+        this.rule.partnerSelling=null;
+    }
+
 }
 
 

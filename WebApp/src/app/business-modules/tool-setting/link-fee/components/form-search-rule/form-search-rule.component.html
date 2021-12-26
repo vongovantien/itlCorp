@@ -46,7 +46,7 @@
                             (itemSelected)="onSelectDataFormInfo($event, 'partnerBuying')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
                             [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
-                            [height]="200">
+                            [height]="200" (remove)="resetPartnerBuying()">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                             (itemSelected)="onSelectDataFormInfo($event, 'partnerSelling')"
                             [selectedDisplayFields]="configPartner.selectedDisplayFields"
                             [dataSources]="configPartner.dataSource" [displayFields]="configPartner.displayFields"
-                            [height]="200">
+                            [height]="200" (remove)="resetPartnerSelling()">
                         </app-combo-grid-virtual-scroll>
                     </div>
                 </div>

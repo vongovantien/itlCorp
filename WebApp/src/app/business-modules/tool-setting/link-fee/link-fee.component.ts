@@ -49,16 +49,19 @@
         { field: 'effectiveDate', title: 'Effective Date', sortable: true },
         { field: 'expiredDate', title: 'Expiration Date', sortable: true },
       ];
-      this.dataSearch = {
-        all: null
-      };
-      this.searchRule(this.dataSearch);
+      this.searchRule();
     }
 
-    searchRule(dataSearch?: any) {
+    onSearchRule(data: any){
+      this.page = 1;
+      this.dataSearch = data;
+      this.searchRule();
+    }
+    
+    searchRule() {
       this.isLoading = true;
       this._progressRef.start();
-      this._settingRepo.getRule(this.page, this.pageSize, Object.assign({}, dataSearch))
+      this._settingRepo.getRule(this.page, this.pageSize, Object.assign({}, this.dataSearch))
         .pipe(
           catchError(this.catchError),
           finalize(() => { this.isLoading = false; this._progressRef.complete(); }),
@@ -216,7 +219,7 @@
     resetSearch() {
       this.dataSearch = {};
       this.page = 1;
-      this.searchRule(this.dataSearch);
+      this.searchRule();
     }
 
   }

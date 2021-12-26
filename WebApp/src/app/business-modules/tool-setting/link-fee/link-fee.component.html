@@ -14,8 +14,8 @@
     </div>
     <div class="m-content">
         <div class="m-portlet">
-            <app-form-search-rule (onSearch)="searchRule($event)"></app-form-search-rule>
-            < </div>
+            <app-form-search-rule (onSearch)="onSearchRule($event)"></app-form-search-rule>
+            </div>
 
                 <div class="m-portlet">
                     <div class="m-form">
@@ -67,7 +67,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <app-pagination (onChange)="updatePagingData($event)" [data]="dataSearch" [total]="totalItems"
+                            <app-pagination (onChange)="updatePagingData($event)" [total]="totalItems"
                                 [pageNum]="page" [itemPerPage]="pageSize"></app-pagination>
                         </div>
                     </div>

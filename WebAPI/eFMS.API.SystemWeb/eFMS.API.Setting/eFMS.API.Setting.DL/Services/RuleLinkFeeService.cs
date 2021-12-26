@@ -337,12 +337,12 @@ namespace eFMS.API.Setting.DL.Services
                     if (rule.Any())
                     {
                         //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        rule = rule
-                            .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
-                                     && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
+                        //rule = rule
+                        //    .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
+                        //             && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
                         if (rule.Any())
                         {
-                            return new HandleState(ErrorCode.Existed, "Already exists");
+                            return new HandleState(ErrorCode.Existed, "Rule Already exists");
                         }
                     }
                 }
@@ -366,9 +366,9 @@ namespace eFMS.API.Setting.DL.Services
                     if (rule.Any())
                     {
                         //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        rule = rule
-                            .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
-                                     && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
+                        //rule = rule
+                        //    .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
+                        //             && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
                         if (rule.Any())
                         {
                             return new HandleState(ErrorCode.Existed, "Already exists");

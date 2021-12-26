@@ -230,5 +230,6 @@
     </div>
 </div>
 
-<confirm-popup body="Do you want to create this Rule?" (onSubmit)="saveRule()"></confirm-popup>
+<confirm-popup *ngIf="!this.isShowUpdate" body="Do you want to create this Rule?" (onSubmit)="saveRule()"></confirm-popup>
+<confirm-popup *ngIf="this.isShowUpdate" body="Do you want to save this Rule?" (onSubmit)="saveRule()"></confirm-popup>
 <info-popup body="Please recheck Data can't be Empty"></info-popup>
