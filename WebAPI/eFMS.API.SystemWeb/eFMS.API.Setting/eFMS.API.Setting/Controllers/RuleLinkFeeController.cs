@@ -166,7 +166,7 @@ namespace eFMS.API.Setting.Controllers
         [HttpGet("DownloadExcel")]
         public async Task<ActionResult> DownloadExcel()
         {
-            string fileName = Templates.CustomDeclaration.ExelImportFileName + Templates.ExelImportEx; ;
+            string fileName = "RuleLinkFeeImportTemplate.xlsx";
             string templateName = _hostingEnvironment.ContentRootPath;
             var result = await new FileHelper().ExportExcel(templateName, fileName);
             if (result != null)
