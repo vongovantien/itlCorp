@@ -286,7 +286,7 @@ namespace eFMS.API.Operation.DL.Services
                 rowsCount = 0;
                 return null;
             }
-            Expression<Func<CustomsDeclaration, bool>> query = x => (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
+            Expression<Func<CustomsDeclaration, bool>> query = x => x.Source != OperationConstants.FROM_REPLICATE && (criteria.ClearanceNo.Contains(x.ClearanceNo) || string.IsNullOrEmpty(criteria.ClearanceNo))
                                                                                     && (x.UserCreated == criteria.PersonHandle || string.IsNullOrEmpty(criteria.PersonHandle))
                                                                                     && (x.Type == criteria.CusType || string.IsNullOrEmpty(criteria.CusType))
                                                                                     && (x.ClearanceDate >= criteria.FromClearanceDate || criteria.FromClearanceDate == null)
@@ -1308,6 +1308,14 @@ namespace eFMS.API.Operation.DL.Services
                 foreach (var item in customs)
                 {
                     var hs = Delete(x => x.Id == item.Id, false);
+
+                    var hasReplicate = DataContext.Get(x => x.ClearanceNo == item.ClearanceNo && x.Id != item.Id 
+                    && x.Source == OperationConstants.FROM_REPLICATE
+                    && x.ClearanceDate == item.ClearanceDate)?.FirstOrDefault(); // do đang check trùng clearance theo ngày
+                    if(hasReplicate != null)
+                    {
+                        Delete(x => x.Id == hasReplicate.Id, false);
+                    }
                 }
                 DataContext.SubmitChanges();
             }
@@ -1323,7 +1331,7 @@ namespace eFMS.API.Operation.DL.Services
             //Get list custom có shipment operation chưa bị lock, list shipment đã được assign cho current user hoặc shipment có PIC là current user
             var userCurrent = currentUser.UserID;
             var customs = DataContext.Get(x => !string.IsNullOrEmpty(x.JobNo));
-            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false);
+            var shipments = opsTransactionRepo.Get(x => x.Hblid != Guid.Empty && x.CurrentStatus != "Canceled" && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var shipmentsOperation = from ops in shipments
                                      join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
                                      where osa.MainPersonInCharge == userCurrent

@@ -1030,11 +1030,25 @@ namespace eFMS.API.Accounting.DL.Services
                 agreement.CreditRate = _creditRate;
                 agreement.DatetimeModified = DateTime.Now;
                 agreement.UserModified = currentUser.UserID;
+
+                if (agreement.CreditRate > AccountingConstants.MAX_CREDIT_LIMIT_RATE_CONTRACT)
+                {
+                    agreement.IsOverLimit = true; // vượt hạn mức
+                }
+                else
+                {
+                    agreement.IsOverLimit = false;
+                }
+
+                agreement.IsOverDue = receivables.Any(x => !DataTypeEx.IsNullOrValue(x.Over1To15Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over16To30Day, 0)
+                || !DataTypeEx.IsNullOrValue(x.Over30Day, 0)
+                );
             }
             return agreement;
         }
 
-        private HandleState UpdateAgreementPartners(List<string> partnerIds)
+        private HandleState UpdateAgreementPartners(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1044,7 +1058,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partner.ParentId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1054,10 +1069,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+
                             hs = contractPartnerRepo.Update(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1066,7 +1083,7 @@ namespace eFMS.API.Accounting.DL.Services
             return hs;
         }
 
-        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds)
+        private async Task<HandleState> UpdateAgreementPartnersAsync(List<string> partnerIds, List<Guid?> agreementIds)
         {
             var hs = new HandleState();
             foreach (var partnerId in partnerIds)
@@ -1076,7 +1093,8 @@ namespace eFMS.API.Accounting.DL.Services
                 {
                     //Agreement của partner
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
-                                                                    && x.PartnerId == partnerId).FirstOrDefault();
+                                                                    && x.PartnerId == partnerId
+                                                                    && agreementIds.Contains(x.Id)).FirstOrDefault();
                     if (contractPartner != null)
                     {
                         var agreementPartner = CalculatorAgreement(contractPartner);
@@ -1086,10 +1104,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         //Agreement của AcRef của partner
                         var contractParent = contractPartnerRepo.Get(x => x.Active == true
-                                                                       && x.PartnerId == partner.ParentId).FirstOrDefault();
+                                                                       && x.PartnerId == partner.ParentId
+                                                                       && agreementIds.Contains(x.Id)).FirstOrDefault();
                         if (contractParent != null)
                         {
                             var agreementParent = CalculatorAgreement(contractParent);
+
                             hs = await contractPartnerRepo.UpdateAsync(agreementParent, x => x.Id == agreementParent.Id);
                         }
                     }
@@ -1115,7 +1135,8 @@ namespace eFMS.API.Accounting.DL.Services
 
             //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
             var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-            UpdateAgreementPartners(partnerIds);
+            var agreementIds = receivables.Select(s => s.ContractId).ToList();
+            UpdateAgreementPartners(partnerIds, agreementIds);
 
             return hs;
         }
@@ -1140,7 +1161,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                await UpdateAgreementPartnersAsync(partnerIds);
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+
+                await UpdateAgreementPartnersAsync(partnerIds, agreementIds);
 
                 return hs;
             }
@@ -1176,7 +1199,9 @@ namespace eFMS.API.Accounting.DL.Services
                     var contractPartner = contractPartnerRepo.Get(x => x.Active == true
                                                                     && x.PartnerId == model.PartnerId
                                                                     && x.OfficeId.Contains(model.Office.ToString())
-                                                                    && x.SaleService.Contains(model.Service)).FirstOrDefault();
+                                                                    && x.SaleService.Contains(model.Service)).OrderBy(x => x.ContractType)
+                                                                    .ThenBy(c => c.ContractType == AccountingConstants.ARGEEMENT_TYPE_OFFICIAL)
+                                                                    .FirstOrDefault();
                     if (contractPartner == null)
                     {
                         // Lấy currency local và use created of partner gán cho Receivable
@@ -1257,7 +1282,9 @@ namespace eFMS.API.Accounting.DL.Services
 
                 //Cập nhật giá trị công nợ vào Agreement của list Partner sau khi Insert or Update Receivable thành công
                 var partnerIds = receivables.Select(s => s.PartnerId).ToList();
-                UpdateAgreementPartners(partnerIds);
+                var agreementIds = receivables.Select(s => s.ContractId).ToList();
+
+                UpdateAgreementPartners(partnerIds, agreementIds);
 
                 return hs;
             }
@@ -1457,7 +1484,11 @@ namespace eFMS.API.Accounting.DL.Services
                     ArCurrency = s.First().acctReceivable != null ? s.First().acctReceivable.ContractCurrency : null,
                     CreditCurrency = s.First().contract.CreditCurrency,
                     ParentNameAbbr = string.Empty, //Get data bên dưới,
-                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified
+                    DatetimeModified = s.FirstOrDefault().acctReceivable.DatetimeModified,
+                    IsOverDue = s.FirstOrDefault().contract.IsOverDue,
+                    IsOverLimit = s.FirstOrDefault().contract.IsOverLimit,
+                    IsExpired = s.FirstOrDefault().contract.IsExpired,
+                    
                 });
 
             var data = from contract in groupByContract
@@ -1516,6 +1547,9 @@ namespace eFMS.API.Accounting.DL.Services
                            ParentNameAbbr = parent.ShortName,
                            DatetimeModified = contract.DatetimeModified,
                            OfficeContract = contract.OfficeContract,
+                           IsOverDue = contract.IsOverDue,
+                           IsExpired = contract.IsExpired,
+                           IsOverLimit = contract.IsOverLimit
                        };
             return data;
         }
@@ -1960,6 +1994,9 @@ namespace eFMS.API.Accounting.DL.Services
                         ObhUnPaidAmount = s.Sum(sum=>sum.ObhUnPaidAmount),
                         DatetimeModified = s.First().DatetimeModified,
                         OfficeContract = s.First().OfficeContract,
+                        IsExpired = s.First().IsExpired,
+                        IsOverLimit = s.First().IsOverLimit,
+                        IsOverDue = s.First().IsOverDue,
                     }).OrderByDescending(s=>s.DebitRate).AsQueryable();
             return groupbyAgreementId;
         }
@@ -2149,7 +2186,10 @@ namespace eFMS.API.Accounting.DL.Services
                 Over1To15Day = s.Sum(sum => sum.Over1To15Day),
                 Over16To30Day = s.Sum(sum => sum.Over16To30Day),
                 Over30Day = s.Sum(sum => sum.Over30Day),
-                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault()
+                ArCurrency = s.Select(se => se.ArCurrency).FirstOrDefault(),
+                IsExpired = s.FirstOrDefault().IsExpired,
+                IsOverLimit = s.FirstOrDefault().IsOverLimit,
+                IsOverDue = s.FirstOrDefault().IsOverDue,
             }).FirstOrDefault();
             detail.AccountReceivableGrpOffices = GetARGroupOffice(arPartners);
             return detail;

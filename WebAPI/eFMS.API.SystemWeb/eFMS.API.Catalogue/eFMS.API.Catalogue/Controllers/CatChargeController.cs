@@ -475,5 +475,18 @@ namespace eFMS.API.Catalogue.Controllers
             return Ok(catChargeService.CheckAllowPermissionAction(id, permissionRange));
         }
 
+        /// <summary>
+        /// Get charge data with current user service and charge type
+        /// </summary>
+        /// <param name="serviceType"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        [HttpPost("GetChargesWithCurrentUserService")]
+        [Authorize]
+        public IActionResult GetChargesWithCurrentUserService(List<string> serviceType, string type)
+        {
+            var data = catChargeService.GetChargesWithCurrentUserService(serviceType, type);
+            return Ok(data);
+        }
     }
 }

@@ -54,6 +54,9 @@ export class OpsTransaction extends BaseModel {
         shipmentType: string = null;
         serviceNo: string = null;
         serviceHblId: string = null;
+        linkSource: string = null;
+        replicatedId: string = null;
+
         note: string = '';
 
         permission: PermissionShipment = new PermissionShipment();

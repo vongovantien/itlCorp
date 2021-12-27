@@ -46,6 +46,7 @@ namespace eFMS.API.System.DL.Services
             resultData.Approvals = data.Where(x => x.Flow == "Approval").ToList();
             resultData.Unlocks = data.Where(x => x.Flow == "Unlock").ToList();
             resultData.Account = data.FirstOrDefault(x => x.Type == "AccountReceivable");
+            resultData.ReplicateOffice = data.FirstOrDefault(x => x.Type == "Other" && x.Flow == "Replicate");
 
             List<SetLockingDateShipment> dataLockingDateShipment = setLockingDateShipmentRepository.Where(x => x.OfficeId == officeId).ToList();
 
@@ -75,7 +76,10 @@ namespace eFMS.API.System.DL.Services
             {
                 list.Add(item);
             }
-          
+
+            list.Add(model.ReplicateOffice);
+            list.Add(model.AccountReceivable);
+
 
             if (data.Count() == 0)
             {
@@ -102,23 +106,38 @@ namespace eFMS.API.System.DL.Services
                     item.DatetimeModified = DateTime.Now;
 
                     hs = DataContext.Update(item, x => x.Id == item.Id, false);
+
+                }
+                if (list.Any(x => x.Id == Guid.Empty))
+                {
+                    var newFlowData = list.FindAll(x => x.Id == Guid.Empty);
+                    if(newFlowData.Count > 0)
+                    {
+                        foreach (var item in newFlowData)
+                        {
+                            item.OfficeId = model.OfficeId;
+                            item.UserCreated = item.UserModified = currentUser.UserID;
+                            item.Id = Guid.NewGuid();
+                            DataContext.Add(item, false);
+                        }
+                    }
                 }
 
-                if (model.AccountReceivable != null && !data.Any(x => x.Type == "AccountReceivable"))
-                {
-                    model.AccountReceivable.OfficeId = model.OfficeId;
-                    model.AccountReceivable.UserCreated = model.AccountReceivable.UserModified = currentUser.UserID;
-                    model.AccountReceivable.DatetimeCreated = model.AccountReceivable.DatetimeModified = DateTime.Now;
-                    model.AccountReceivable.Id = Guid.NewGuid();
-                    hs = DataContext.Add(model.AccountReceivable, false);
-                }
-                else if(data.Any(x => x.Type == "AccountReceivable"))
-                {
-                    model.AccountReceivable.OfficeId = model.OfficeId;
-                    model.AccountReceivable.UserModified = currentUser.UserID;
-                    model.AccountReceivable.DatetimeModified = DateTime.Now;
-                    hs = DataContext.Update(model.AccountReceivable, x=>x.Id == model.AccountReceivable.Id);
-                }
+                //if (model.AccountReceivable != null && !data.Any(x => x.Type == "AccountReceivable"))
+                //{
+                //    model.AccountReceivable.OfficeId = model.OfficeId;
+                //    model.AccountReceivable.UserCreated = model.AccountReceivable.UserModified = currentUser.UserID;
+                //    model.AccountReceivable.DatetimeCreated = model.AccountReceivable.DatetimeModified = DateTime.Now;
+                //    model.AccountReceivable.Id = Guid.NewGuid();
+                //    hs = DataContext.Add(model.AccountReceivable, false);
+                //}
+                //else if(data.Any(x => x.Type == "AccountReceivable"))
+                //{
+                //    model.AccountReceivable.OfficeId = model.OfficeId;
+                //    model.AccountReceivable.UserModified = currentUser.UserID;
+                //    model.AccountReceivable.DatetimeModified = DateTime.Now;
+                //    hs = DataContext.Update(model.AccountReceivable, x=>x.Id == model.AccountReceivable.Id);
+                //}
             }
             DataContext.SubmitChanges();
 

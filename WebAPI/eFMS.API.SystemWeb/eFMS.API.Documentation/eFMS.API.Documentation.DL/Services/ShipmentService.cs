@@ -45,6 +45,7 @@ namespace eFMS.API.Documentation.DL.Services
         readonly IContextBase<CatCommodityGroup> catCommodityGroupRepo;
         readonly IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<CatIncoterm> catIncotermRepository;
+        readonly IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepository;
         private readonly IContextBase<CsMawbcontainer> csMawbcontainerRepo;
         private readonly ICurrencyExchangeService currencyExchangeService;
 
@@ -70,7 +71,8 @@ namespace eFMS.API.Documentation.DL.Services
             ICurrencyExchangeService currencyExchange,
             IContextBase<CatDepartment> departmentRepo,
             IContextBase<CatIncoterm> catIncotermRepo,
-            IContextBase<CsMawbcontainer> csMawbcontainer) : base(repository, mapper)
+            IContextBase<CsMawbcontainer> csMawbcontainer,
+            IContextBase<AcctAdvanceRequest> acctAdvanceRequestRepo) : base(repository, mapper)
         {
             opsRepository = ops;
             detailRepository = detail;
@@ -94,6 +96,7 @@ namespace eFMS.API.Documentation.DL.Services
             departmentRepository = departmentRepo;
             catIncotermRepository = catIncotermRepo;
             csMawbcontainerRepo = csMawbcontainer;
+            acctAdvanceRequestRepository = acctAdvanceRequestRepo;
         }
 
         public IQueryable<Shipments> GetShipmentNotLocked()
@@ -178,7 +181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 });
 
             IQueryable<Shipments> shipments = shipmentsDocumention
-                .Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                .Where(x => x.JobId != null && x.HBL != null)
                 .Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
@@ -196,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                                              MBL = ops.Mblno,
                                          };
 
-                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
             var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
@@ -220,7 +223,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
 
             //OPS assign
             IQueryable<OpsTransaction> opstranAssign = from ops in opstransaction
@@ -286,7 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (searchOption != "ClearanceNo")
             {
-                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
                 //Transaction assign
                 IQueryable<CsTransaction> cstranAssign = from cstd in transactions
                                                          join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
@@ -334,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryUnion = shipmentOperation;
             }
-            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
@@ -711,7 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<Shipments> GetShipmentAssignPIC()
         {
             var userCurrent = currentUser.UserID;
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID); // Lấy theo office current user
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
                                join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
@@ -735,7 +738,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -763,6 +766,84 @@ namespace eFMS.API.Documentation.DL.Services
 
             var result = _shipmentsOperation.Union(_shipmentsDocumention);
             return result.OrderByDescending(o => o.MBL);
+        }
+
+        /// <summary>
+        /// get list of shipment assign or PIC is current user for adv carrier
+        /// </summary>
+        /// <returns></returns>
+        public IQueryable<Shipments> GetShipmentAssignPICCarrier(string typeAdvFor)
+        {
+            var userCurrent = currentUser.UserID;
+            var advanceRequestJob = acctAdvanceRequestRepository.Get().Select(x => new { x.JobId, x.Mbl, x.Hblid }).ToList();
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            var customs = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
+            // Shipment ops assign is current user
+            var shipmentsOps = from ops in operations
+                               join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
+                               where osa.MainPersonInCharge == userCurrent
+                               select ops;
+            //Shipment ops PIC is current user
+            var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
+            //Merger Shipment Ops assign & PIC
+            var shipmentsOpsMerge = from data in shipmentsOps.Union(shipmentsOpsPIC)
+                                    join cus in customs on data.JobNo equals cus.JobNo into grpCus
+                                    from cus in grpCus.DefaultIfEmpty()
+                                    select new Shipments
+                                    {
+                                        Id = data.Id,
+                                        JobId = data.JobNo,
+                                        HBL = data.Hwbno,
+                                        MBL = data.Mblno,
+                                        HBLID = data.Hblid,
+                                        Service = "CL",
+                                        CustomNo = cus == null ? string.Empty : cus.ClearanceNo
+                                    };
+
+            IQueryable<Shipments> _shipmentsOperation = null;
+            if (typeAdvFor == "HBL")
+            {
+                _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => new { g.HBLID, g.CustomNo }).Select(s => s.FirstOrDefault());
+            }
+            else
+            {
+                _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => new { g.MBL, g.HBLID }).Where(x => x.Count() > 1).Select(s => s.FirstOrDefault());
+            }
+
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
+            //Shipment doc assign is current user
+            var shipmentsDoc = from cst in transactions
+                               join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
+                               where osa.MainPersonInCharge == userCurrent
+                               select cst;
+            //Shipment doc PIC is current user
+            var shipmentsDocPIC = transactions.Where(x => x.PersonIncharge == userCurrent);
+            //Merge shipment Doc assign & PIC
+            var shipmentsDocMerge = shipmentsDoc.Union(shipmentsDocPIC);
+            shipmentsDocMerge = shipmentsDocMerge.Distinct();
+
+            var shipmentsDocumention = shipmentsDocMerge.Join(detailRepository.Get(), x => x.Id, y => y.JobId, (x, y) => new { x, y }).Select(x => new Shipments
+            {
+                Id = x.x.Id,
+                JobId = x.x.JobNo,
+                HBL = x.y.Hwbno,
+                MBL = x.x.Mawb,
+                HBLID = x.y.Id,
+                Service = x.x.TransactionType,
+                CustomNo = string.Empty
+            });
+            IQueryable<Shipments> _shipmentsDocumention = null;
+            if (typeAdvFor == "HBL")
+            {
+                _shipmentsDocumention = shipmentsDocumention.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
+            }
+            else
+            {
+                _shipmentsDocumention = shipmentsDocumention.GroupBy(g => new { g.MBL, g.HBLID }).Where(x => x.Count() > 1).Select(s => s.FirstOrDefault());
+            }
+
+            var result = _shipmentsOperation.Union(_shipmentsDocumention);
+            return result.OrderByDescending(o => o.JobId);
         }
 
         #region GET QUERY SEARCH WITH REPORT CRITERIA

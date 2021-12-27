@@ -110,34 +110,80 @@
         <hr />
         <div class="row m--margin-top-20">
             <div class="col-lg-12">
+
                 <h6 class="text-primary">Account Receivable :
                     <span>
                         <i class="la la-user text-warning" style="font-size:30px"></i>
                     </span>
                 </h6>
             </div>
-            <div class="form-group row ng-star-inserted">
-
-                <div class="col-lg-12 d-flex">
-                    <label class="col-lg-3 col-form-label"> Credit Limit </label>
-                    <div class="col-lg-4">
-                        <app-switch [(ngModel)]="accountReceivable.creditLimit"></app-switch>
-                    </div>
-                    <label class="col-lg-3 col-form-label"> Over Payment Term </label>
-                    <div class="col-lg-4">
-                        <app-switch [(ngModel)]="accountReceivable.overPaymentTerm"></app-switch>
-                    </div>
-                    <label class="col-lg-3 col-form-label"> Expired Agreement </label>
-                    <div class="col-lg-4">
-                        <app-switch [(ngModel)]="accountReceivable.expiredAgreement"></app-switch>
-                    </div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col font-weight-bold"> Credit Limit </div>
+                    <div class="col font-weight-bold"> Over Payment Term </div>
+                    <div class="col font-weight-bold"> Expired Agreement </div>
+                    <div class="col font-weight-bold"> Apply Type </div>
+                    <div class="col font-weight-bold"> Apply Partner </div>
                 </div>
-
+                <ng-container>
+                    <div class="row m--margin-top-10">
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountReceivable.creditLimit"></app-switch>
+                        </div>
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountReceivable.overPaymentTerm"></app-switch>
+                        </div>
+                        <div class="col">
+                            <app-switch [(ngModel)]="accountReceivable.expiredAgreement"></app-switch>
+                        </div>
+                        <div class="col">
+                            <select [(ngModel)]="accountReceivable.applyType" class="form-control">
+                                <option *ngFor="let type of types" [value]="type.value">
+                                    {{type.title}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select [(ngModel)]="accountReceivable.applyPartner" class="form-control">
+                                <option *ngFor="let partner of partners" [value]="partner.value">
+                                    {{partner.title}}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </ng-container>
             </div>
-
-
         </div>
         <hr />
+        <div class="row m--margin-top-20">
+            <div class="col-lg-12">
+                <h6 class="text-primary">Replicate Setting :
+                    <span>
+                        <i class="la la-clone text-primary" style="font-size:30px"></i>
+                    </span>
+                </h6>
+            </div>
+            <div class="col-lg-12">
+                <div class="row form-group">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label for="">Replicate office</label>
+                            <ng-select [(ngModel)]="replicateOffice.replicateOfficeId" [items]="(offices | async)"
+                                class="custom" bindLabel="shortName" bindValue="id" placeholder="None">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label for="">Replicate prefix</label>
+                            <input type="text" class="form-control"
+                                [attr.disabled]="!replicateOffice.replicateOfficeId ? true : null" placeholder="..R"
+                                [(ngModel)]="replicateOffice.replicatePrefix">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <hr />
         <div class="row m--margin-top-20">
             <div class="col-lg-12">

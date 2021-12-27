@@ -182,7 +182,6 @@ export class ShareSeaServiceFormCreateSeaImportComponent extends AppForm impleme
             voyNo: [],
             pono: [],
             mawb: ['', Validators.compose([
-                Validators.required,
                 FormValidators.validateSpecialChar
             ])],
             podDescription: [null, Validators.required],

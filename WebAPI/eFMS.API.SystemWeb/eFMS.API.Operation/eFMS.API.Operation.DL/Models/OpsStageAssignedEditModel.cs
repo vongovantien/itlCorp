@@ -19,5 +19,6 @@ namespace eFMS.API.Operation.DL.Models
         public string Comment { get; set; }
         public DateTime? Deadline { get; set; }
         public string Status { get; set; }
+        public bool IsUseReplicate { get; set; }
     }
 }

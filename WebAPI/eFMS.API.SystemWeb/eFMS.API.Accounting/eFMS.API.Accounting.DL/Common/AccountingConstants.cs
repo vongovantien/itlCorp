@@ -19,6 +19,7 @@
 
         #region -- TYPE CHARGE --
         public static readonly string TYPE_CHARGE_BUY = "BUY";
+        public static readonly string TYPE_CHARGE_OTHER = "OTHER";
         public static readonly string TYPE_CHARGE_SELL = "SELL";
         public static readonly string TYPE_CHARGE_OBH = "OBH";
         public static readonly string TYPE_CHARGE_OBH_BUY = "OBH-BUY";
@@ -219,5 +220,7 @@
         #endregion
 
         public static readonly string EMAIL_SETTING_AR_ALERT = "AR - Alert";
+
+        public static readonly int MAX_CREDIT_LIMIT_RATE_CONTRACT = 120;
     }
 }
