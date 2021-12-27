@@ -776,7 +776,7 @@ namespace eFMS.API.Operation.DL.Services
                 }
                 else
                 {
-                    var isFound = catPartnerApi.GetPartners().Result.Any(x => x.AccountNo == _partnerTaxCode);
+                    var isFound = customerRepository.Any(x => x.AccountNo == _partnerTaxCode);
                     if (!isFound)
                     {
                         item.CustomerName = stringLocalizer[LanguageSub.MSG_DATA_NOT_FOUND];
@@ -785,7 +785,7 @@ namespace eFMS.API.Operation.DL.Services
                     }
                     else
                     {
-                        var customer = catPartnerApi.GetPartners().Result.Where(x => x.AccountNo == _partnerTaxCode).First();
+                        var customer = customerRepository.Where(x => x.AccountNo == _partnerTaxCode).First();
                         item.CustomerName = customer.PartnerNameEn;
                         item.PartnerTaxCode = customer.TaxCode;
                     }
