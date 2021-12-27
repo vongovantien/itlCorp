@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using eFMS.API.Report.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eFMS.API.Report.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [MiddlewareFilter(typeof(LocalizationMiddleware))]
+    [Route("api/v{version:apiVersion}/{lang}/[controller]")]
     public class ValuesController : ControllerBase
     {
-        // GET api/values
+        /// <summary>
+        /// Sync list SOA to Accountant
+        /// </summary>
+        /// <param name="requests"></param>
+        /// <returns></returns>
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {

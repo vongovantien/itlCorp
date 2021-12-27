@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eFMS.API.Accounting.Infrastructure.Middlewares
+namespace eFMS.API.Report.Infrastructure.Middlewares
 {
     public class LocalizationMiddleware
     {

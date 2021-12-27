@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.Report</name>
+    </assembly>
+    <members>
+        <member name="M:eFMS.API.Report.Controllers.ValuesController.Get">
+            <summary>
+            Sync list SOA to Accountant
+            </summary>
+            <param name="requests"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

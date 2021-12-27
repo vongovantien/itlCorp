@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-using eFMS.API.Report;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json.Linq;
 
-namespace eFMS.API.Accounting
+namespace eFMS.API.Report
 {
     public class Program
     {
