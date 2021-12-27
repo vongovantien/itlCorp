@@ -474,8 +474,7 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
-                    bool active = string.IsNullOrEmpty(item.Status) || (item.Status.ToLower() == "active");
-                    DateTime? inactiveDate = active == false ? (DateTime?)DateTime.Now : null;
+                    bool active = item.Status.ToLower() == "active"?true:false;
                     var ruleLinkFee = new CsRuleLinkFee
                     {
                         Id = Guid.NewGuid(),
@@ -491,6 +490,7 @@ namespace eFMS.API.Setting.DL.Services
                         DatetimeCreated = DateTime.Now,
                         UserCreated = currentUser.UserID,
                         UserModified = currentUser.UserID,
+                        Status = active,
                     };
                     DataContext.Add(ruleLinkFee, false);
                 }
