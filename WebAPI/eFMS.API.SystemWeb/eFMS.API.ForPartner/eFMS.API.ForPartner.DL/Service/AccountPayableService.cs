@@ -19,14 +19,14 @@ using System.Threading.Tasks;
 namespace eFMS.API.ForPartner.DL.Service
 {
 
-    public class AccountPayableSetvice : RepositoryBase<AccAccountPayable, AccountPayableModel>, IAccountPayableService
+    public class AccountPayableService : RepositoryBase<AccAccountPayable, AccountPayableModel>, IAccountPayableService
     {
         private readonly ICurrentUser currentUser;
         private readonly IContextBase<CatPartner> partnerRepository;
         private readonly IContextBase<SysOffice> officeRepository;
         private readonly IContextBase<AccAccountPayablePayment> paymentRepository;
         private readonly IContextBase<SysPartnerApi> sysPartnerApiRepository;
-        public AccountPayableSetvice(IContextBase<AccAccountPayable> repository,
+        public AccountPayableService(IContextBase<AccAccountPayable> repository,
             IContextBase<CatPartner> partnerRepo,
             ICurrentUser cUser,
             IContextBase<SysOffice> officeRepo,
@@ -194,7 +194,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     return string.Format("Số phiếu chứng từ không hợp lệ");
                 }
-                foreach (var detail in acc.Detail)
+                foreach (var detail in acc.Details)
                 {
                     if (detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
                     {
@@ -238,7 +238,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var partner = partnerRepository.Get(x => x.AccountNo == acc.CustomerCode).FirstOrDefault();
                         var office = officeRepository.Get(x => x.Code == acc.OfficeCode).FirstOrDefault();
-                        foreach (var detail in acc.Detail)
+                        foreach (var detail in acc.Details)
                         {
 
                             if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT)

@@ -11,7 +11,7 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
         public string PaymentMethod { get; set; }
         public string CustomerCode { get; set; }
         public string OfficeCode { get; set; }
-        public List<PayablePaymentDetailModel> Detail { get; set; }
+        public List<PayablePaymentDetailModel> Details { get; set; }
     }
 
     public class PayablePaymentDetailModel
