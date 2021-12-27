@@ -194,7 +194,7 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     return string.Format("Số phiếu chứng từ không hợp lệ");
                 }
-                foreach (var detail in acc.PaymentDetail)
+                foreach (var detail in acc.Detail)
                 {
                     if (detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
                     {
@@ -238,7 +238,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     {
                         var partner = partnerRepository.Get(x => x.AccountNo == acc.CustomerCode).FirstOrDefault();
                         var office = officeRepository.Get(x => x.Code == acc.OfficeCode).FirstOrDefault();
-                        foreach (var detail in acc.PaymentDetail)
+                        foreach (var detail in acc.Detail)
                         {
 
                             if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT)
