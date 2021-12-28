@@ -75,6 +75,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         this.getPartner();
         this.getChargeBuying();
         this.getChargeSelling();
+        console.log(this.rule.expiredDate);
+
     }
 
     initForm() {
@@ -253,7 +255,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             this.showInfoPopUp()
             return;
         }
-        if (!this.expiredDate.value.startDate) {
+        if (!this.expiredDate.value?.startDate || !this.expiredDate) {
             rule.expiredDate = null
         } else {
             rule.expiredDate = formatDate(this.expiredDate.value.startDate, 'yyyy-MM-dd', 'en')
@@ -266,7 +268,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             rule.id = '';
             rule.effectiveDate = formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en')
             rule.partnerBuying = this.rule.partnerBuying,
-                rule.partnerSelling = this.rule.partnerSelling?.length>0?this.rule.partnerSelling:'All',
+                rule.partnerSelling = this.rule.partnerSelling?.length > 0 ? this.rule.partnerSelling : 'All',
                 rule.chargeBuying = this.rule.chargeBuying,
                 rule.chargeSelling = this.rule.chargeSelling,
                 rule.serviceBuying = rule.serviceBuying.id,
@@ -275,7 +277,6 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {
-
                                 this._toast.success(res.message);
                                 this.isSubmitted = false;
                                 this.onUpdate.emit(true);
@@ -284,10 +285,9 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                                 this.confirmCreatePopup.hide();
                                 return;
                             }
-                            console.log('running');
-                            this._toast.error(res.message);     
+                            this._toast.error(res.message);
                             this._progressRef.complete();
-                            this.confirmCreatePopup.hide();                     
+                            this.confirmCreatePopup.hide();
                         });
 
         } else {

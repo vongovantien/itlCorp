@@ -9,6 +9,7 @@
   import { AppList } from 'src/app/app.list';
   import { FormRuleComponent } from './components/form-rule/form-rule.component';
   import { ItemsList } from '@ng-select/ng-select/lib/items-list';
+import { I } from '@angular/cdk/keycodes';
   @Component({
     selector: 'app-link-fee',
     templateUrl: './link-fee.component.html',
@@ -164,8 +165,10 @@
               this.formRule.rule.partnerSelling = res.partnerSelling;
               this.formRule.rule.chargeBuying = res.chargeBuying;
               this.formRule.rule.chargeSelling = res.chargeSelling;
-              this.formRule.expiredDate.setValue({ startDate: res.expiredDate ? new Date(res.expiredDate) : null });
-              this.formRule.effectiveDate.setValue({ startDate: res.effectiveDate ? new Date(res.effectiveDate) : null });
+              this.formRule.status.setValue(res.status);
+              if(res.expiredDate!=null){
+                this.formRule.expiredDate.setValue({ startDate: new Date(res.expiredDate)});}
+              this.formRule.effectiveDate.setValue({ startDate: new Date(res.effectiveDate)});
               let chargeBuying = this.formRule.configChargeBuying.dataSource.find(
                 x => x.id === res.chargeBuying
               );
@@ -186,9 +189,14 @@
                 { field: 'shortName', value: partnerBuying.shortName, data: partnerBuying };
               this.formRule.selectedPartnerSelling =
                 { field: 'shortName', value: partnerSelling?.shortName, data: partnerSelling };
+              if(this.minDate>=res.effectiveDate){
+                this.formRule.minDateEffective=res.effectiveDate
+              }else{
+                this.formRule.minDateEffective=this.minDate
+              }
+              console.log(this.formRule.rule.status);
               this.formRule.isShowUpdate = true;
               this.formRule.show();
-              console.log(this.formRule.rule);
             }
           }
         );
