@@ -62,7 +62,10 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     return new HandleState((object)string.Format("Rule {0} was existied", model.RuleName));
                 }
-
+                if (checkExpired(rule.EffectiveDate, rule.ExpiredDate))
+                {
+                    rule.Status = false;
+                }
                 var hs = DataContext.Add(rule);
                 return hs;
             }
@@ -120,7 +123,7 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         public IQueryable<RuleLinkFeeModel> GetRuleByCriteria(RuleLinkFeeCriteria criteria)
-        {
+            {
             List<RuleLinkFeeModel> queryable = new List<RuleLinkFeeModel>();
             var queryRuleLinkFee = ExpressionQuery(criteria);
             var ruleLinkFees = DataContext.Where(queryRuleLinkFee);
@@ -156,16 +159,27 @@ namespace eFMS.API.Setting.DL.Services
                            UserNameCreated = user.Username,
                            ChargeSelling = rule.ChargeSelling,
                            DatetimeModified = rule.DatetimeModified,
-                           Status = checkExpired(rule.ExpiredDate)?false:true,
+                           Status = checkExpired(rule.EffectiveDate,rule.ExpiredDate)?false:true,
+                           //Status=rule.Status,
                            EffectiveDate = rule.EffectiveDate,
                            ExpiredDate = rule.ExpiredDate,
                            ChargeNameBuying = chargeBuy.ChargeNameVn,
                            ChargeNameSelling = chargeSell.ChargeNameVn,
+                           PartnerBuying=rule.PartnerBuying,
+                           PartnerSelling=rule.PartnerSelling,
+                           UserCreated = rule.UserCreated,
+                           DatetimeCreated=rule.DatetimeCreated,
+                           UserModified=rule.UserModified,
                        };
-            data.Where(x => checkExpired(x.ExpiredDate) && x.Status==true).ToList().ForEach(x =>
-              DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
+            //    data.Where(x => checkExpired(x.EffectiveDate,x.ExpiredDate)).ToList().ForEach(x =>
+            //   DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
+            //data.ToList().ForEach(x => x.Status = checkExpired(x.EffectiveDate, x.ExpiredDate) ? false : true);
+             data.ToList().ForEach(x =>
+                DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
+            
             DataContext.SubmitChanges();
-            return data.ToArray().OrderByDescending(o => o.DatetimeModified).AsQueryable();
+            
+            return data.ToList().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
         private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(RuleLinkFeeCriteria criteria)
         {
@@ -271,7 +285,13 @@ namespace eFMS.API.Setting.DL.Services
             var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
             if (ruleLinkFee == null) return null;
             var modelMap = mapper.Map<RuleLinkFeeModel>(ruleLinkFee);
-            if (checkExpired(ruleLinkFee.ExpiredDate)&&ruleLinkFee.Status==true)
+            if (checkExpired(ruleLinkFee.EffectiveDate, ruleLinkFee.ExpiredDate)&&ruleLinkFee.Status==true)
+            {
+                DataContext.Update(ruleLinkFee, x => x.Id == modelMap.Id);
+                DataContext.SubmitChanges();
+                modelMap.Status = false;
+            }
+            if (checkExpired(ruleLinkFee.EffectiveDate, ruleLinkFee.ExpiredDate) && ruleLinkFee.Status == true)
             {
                 DataContext.Update(ruleLinkFee, x => x.Id == modelMap.Id);
                 DataContext.SubmitChanges();
@@ -282,11 +302,21 @@ namespace eFMS.API.Setting.DL.Services
             return modelMap;
         }
 
-        private bool checkExpired(DateTime? expriredDate)
+        private bool checkExpired(DateTime? effectiveDate, DateTime? expriredDate)
         {
-            if(DateTime.Now>=expriredDate) return true;
+            if (effectiveDate.HasValue)
+            {
+                if (expriredDate.HasValue)
+                {
+                    if (DateTime.Now >= expriredDate.Value|| expriredDate.Value <= effectiveDate.Value) return true;
+                }
+                if (DateTime.Now < effectiveDate.Value) return true;
+                return false;
+            }
+            
             return false;
         }
+
 
         /// <summary>
         /// * Check tồn tại rule. Check theo các field: 
@@ -327,7 +357,7 @@ namespace eFMS.API.Setting.DL.Services
                     //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
                     if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
                     {
-                        return new HandleState("Expired Date cannot be less than the Effective Date");
+                        return new HandleState("Expiration date must be greater than or equal to the Effective date");
                     }
                 }
 
@@ -337,7 +367,7 @@ namespace eFMS.API.Setting.DL.Services
                     var ruleNameExists = DataContext.Get(x => x.RuleName == model.RuleName).Any();
                     if (ruleNameExists)
                     {
-                        return new HandleState("Rule name already exists");
+                        return new HandleState("Rule Name already exists");
                     }
 
                     //Check all rule
@@ -364,28 +394,13 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     var ruleNameExists = DataContext.Get(x => x.Id != model.Id
                                                              && x.RuleName == model.RuleName).Any();
-                    if (ruleNameExists)
+                    
+                    if (model.ExpiredDate != null)
                     {
-                        return new HandleState("Rule name already exists");
-                    }
-
-                    //Check all rule
-                    var rule = DataContext.Get(x => x.ServiceBuying == model.ServiceBuying
-                                                    && x.ChargeBuying == model.ChargeBuying
-                                                    && x.PartnerBuying == model.PartnerBuying
-                                                    && x.ServiceSelling == model.ServiceSelling
-                                                    && x.ChargeSelling == model.ChargeSelling
-                                                    && x.ServiceSelling == model.ServiceSelling
-                                                    );
-                    if (rule.Any())
-                    {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        //rule = rule
-                        //    .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
-                        //             && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
-                        if (rule.Any())
+                        //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
+                        if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
                         {
-                            return new HandleState(ErrorCode.Existed, "Already exists");
+                            return new HandleState("Expiration date must be greater than or equal to the Effective date");
                         }
                     }
                 }

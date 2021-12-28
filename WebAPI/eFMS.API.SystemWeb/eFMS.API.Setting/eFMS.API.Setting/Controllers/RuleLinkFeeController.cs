@@ -133,7 +133,7 @@ namespace eFMS.API.Setting.Controllers
         {
             if (!ModelState.IsValid) return BadRequest();
             var checkData = ruleLinkFeeService.CheckExistsDataRule(model);
-            if (checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
+            if (!checkData.Success) return Ok(new ResultHandle { Status = checkData.Success, Message = checkData.Exception.Message.ToString(), Data = checkData.Code });
 
             var hs = ruleLinkFeeService.UpdateRuleLinkFee(model);
 
