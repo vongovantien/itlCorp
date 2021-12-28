@@ -5156,7 +5156,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 workSheet.Cells[rowStart, 19].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 20].Value = item.ETD != null ? item.ETD.Value.ToString("dd/MM/yyyyy"):string.Empty ;
+                workSheet.Cells[rowStart, 20].Value = item.ETD != null ? item.ETD.Value.ToString("dd/MM/yyyy"):string.Empty ;
                 workSheet.Cells[rowStart, 21].Value = item.ETA != null ? item.ETA.Value.ToString("dd/MM/yyyy") : string.Empty;
 
                 rowStart += 1;
