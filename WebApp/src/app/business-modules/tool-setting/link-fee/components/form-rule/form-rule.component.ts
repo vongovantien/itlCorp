@@ -233,13 +233,20 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         console.log(this.selectedPartnerSelling);
     }
 
-    resetPartner() {
+    resetPartnerSelling() {
         this.rule.partnerSelling = null;
     }
-
-    onSaveRule() {
-        this._progressRef.start();
-        this.confirmCreatePopup.show();
+    resetPartnerBuying() {
+        this.rule.partnerBuying = null;
+        this.selectedPartnerBuying.value = null;
+    }
+    resetChargeSelling() {
+        this.rule.chargeSelling = null;
+        this.selectedChargeSelling.value = null;
+    }
+    resetChargeBuying() {
+        this.rule.chargeBuying = null;
+        this.selectedChargeBuying.value = null;
     }
 
     showInfoPopUp() {
@@ -248,6 +255,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     }
 
     saveRule() {
+        this._progressRef.start();
         this.isSubmitted = true;
         const valueForm = this.formGroup.getRawValue();
         const rule: RuleLinkFee = new RuleLinkFee(valueForm);
@@ -282,14 +290,12 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                                 this.onUpdate.emit(true);
                                 this.hide();
                                 this._progressRef.complete();
-                                this.confirmCreatePopup.hide();
                                 return;
                             }
                             this._toast.error(res.message);
                             this._progressRef.complete();
-                            this.confirmCreatePopup.hide();
                         });
-
+            this._progressRef.complete();
         } else {
             rule.id = this.rule.id,
                 rule.effectiveDate = this.effectiveDate.value ? (this.effectiveDate.value.startDate !== null ? formatDate(this.effectiveDate.value.startDate, 'yyyy-MM-dd', 'en') : null) : null,
@@ -307,13 +313,12 @@ export class FormRuleComponent extends PopupBase implements OnInit {
                             this.onUpdate.emit(true);
                             this.hide();
                             this._progressRef.complete();
-                            this.confirmCreatePopup.hide();
                             return;
                         }
                         this._toast.error(res.message);
                         this._progressRef.complete();
-                        this.confirmCreatePopup.hide();
                     });
+            this._progressRef.complete();
         }
 
     }

@@ -62,7 +62,9 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'chargeSelling')"
                                         [selectedDisplayFields]="configChargeSelling.selectedDisplayFields"
                                         [dataSources]="configChargeSelling.dataSource" [disabled]="this.isSelling"
-                                        [displayFields]="configChargeSelling.displayFields" [height]="200">
+                                        [displayFields]="configChargeSelling.displayFields" [height]="200"
+                                        (remove)="resetChargeSelling()"
+                                        >
                                     </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeSelling.value">
                                         Charge Selling is required !
@@ -77,7 +79,7 @@
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource" [disabled]="this.isSelling"
                                         [displayFields]="configPartner.displayFields" [height]="200"
-                                        (remove)="resetPartner()"
+                                        (remove)="resetPartnerSelling()"
                                         >
                                     </app-combo-grid-virtual-scroll>
                                     <!-- <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerSelling.value">
@@ -125,7 +127,9 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'chargeBuying')"
                                         [selectedDisplayFields]="configChargeBuying.selectedDisplayFields"
                                         [dataSources]="configChargeBuying.dataSource" [disabled]="this.isBuying"
-                                        [displayFields]="configChargeBuying.displayFields" [height]="200">
+                                        [displayFields]="configChargeBuying.displayFields" [height]="200"
+                                        (remove)="resetChargeBuying()"
+                                        >
                                     </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && !selectedChargeBuying.value">
                                         Charge Buying is required !
@@ -141,7 +145,8 @@
                                         (itemSelected)="onSelectDataFormInfo($event, 'partnerBuying')"
                                         [selectedDisplayFields]="configPartner.selectedDisplayFields"
                                         [dataSources]="configPartner.dataSource"
-                                        [displayFields]="configPartner.displayFields" [height]="200">
+                                        [displayFields]="configPartner.displayFields" [height]="200"
+                                        (remove)="resetPartnerBuying()">
                                     </app-combo-grid-virtual-scroll>
                                     <div class="form-control-feedback" *ngIf="isSubmitted && !selectedPartnerBuying.value">
                                         Partner Buying is required !
@@ -218,7 +223,7 @@
             </div>
             <div class="modal-footer m--align-center c-button-actions">
                 <ng-container>
-                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="onSaveRule()">
+                    <app-default-button [buttonSetting]="saveButtonSetting" (onClick)="saveRule()">
                     </app-default-button>
                 </ng-container>
 
@@ -230,6 +235,5 @@
     </div>
 </div>
 
-<confirm-popup *ngIf="!this.isShowUpdate" body="Do you want to create this Rule?" (onSubmit)="saveRule()"></confirm-popup>
 <confirm-popup *ngIf="this.isShowUpdate" body="Do you want to save this Rule?" (onSubmit)="saveRule()"></confirm-popup>
 <info-popup body="Please recheck Data can't be Empty"></info-popup>

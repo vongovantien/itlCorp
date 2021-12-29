@@ -20,15 +20,15 @@
                 <div class="m-portlet">
                     <div class="m-form">
                         <div class="m-portlet__body">
-                            <div class="table-wrapper">
-                                <table class="table table-striped table-brand dataTable">
+                            <div class="table-wrapper table-scrollable">
+                                <table class="table table-hover table-brand dataTable">
                                     <thead app-table-header [headers]="headers"
                                         (onClick)="sortBy($event.sortField ? $event.sortField : '')">
-                                        <th class="first table-actions-col"></th>
+                                        <th class="first table-actions-col">Action</th>
                                     </thead>
                                     <tbody>
                                         <ng-container *ngIf="!!rules.length">
-                                            <tr class=""
+                                            <tr class="collapse-toggle-row"
                                                 *ngFor="let rule of rules | filter : keyword : ['ruleName','ruleType','customerID','supplierID','serviceMode','status']; let i = index; trackBy: trackByFn">
 
                                                 <td class="table-actions-col">
@@ -46,11 +46,11 @@
 
                                                 <td>{{rule.ruleName}}</td>
                                                 <td>{{rule.serviceBuying}}</td>
-                                                <td>{{rule.chargeNameBuying }}</td>
-                                                <td>{{rule.partnerNameBuying}}</td>
+                                                <td style="min-width: 250px;max-width: 250px; white-space:initial">{{rule.chargeNameBuying }}</td>
+                                                <td style="min-width: 200px;max-width: 200px; white-space:initial">{{rule.partnerNameBuying}}</td>
                                                 <td>{{rule.serviceSelling}}</td>
-                                                <td>{{rule.chargeNameSelling}}</td>
-                                                <td>{{rule.partnerNameSelling}}</td>
+                                                <td style="min-width: 250px;max-width: 250px; white-space:initial">{{rule.chargeNameSelling}}</td>
+                                                <td style="min-width: 200px;max-width: 200px; white-space:initial">{{rule.partnerNameSelling}}</td>
                                                 <td>{{rule.userNameCreated}}</td>
                                                 <td>{{rule.datetimeModified | date: 'dd/MM/yyyy'}}</td>
                                                 <td [ngClass]="rule.status ? 'text-success' : 'text-danger'">

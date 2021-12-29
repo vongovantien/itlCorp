@@ -9,6 +9,7 @@ import { LinkFeeComponent } from './link-fee.component';
 import { NgxDaterangepickerMd } from 'ngx-daterangepicker-material';
 import { FormSearchRuleComponent } from './components/form-search-rule/form-search-rule.component';
 import { LinkFeeImportComponent } from './link-fee-import/link-fee-import.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 const routing: Routes = [
     {
@@ -35,6 +36,7 @@ const routing: Routes = [
         PaginationModule.forRoot(),
         ModalModule,
         NgxDaterangepickerMd.forRoot(),
+        CollapseModule.forRoot(),
     ],
     exports: [],
     providers: [],
