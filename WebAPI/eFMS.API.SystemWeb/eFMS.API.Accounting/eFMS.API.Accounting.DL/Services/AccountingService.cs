@@ -2519,7 +2519,7 @@ namespace eFMS.API.Accounting.DL.Services
             }
 
             var emailReceiveCredit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note");
-            var emailReceiveDebit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note");
+            var emailReceiveDebit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Debit Note");
 
             if ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE") && emailReceiveDebit?.FirstOrDefault() != null)
             {
