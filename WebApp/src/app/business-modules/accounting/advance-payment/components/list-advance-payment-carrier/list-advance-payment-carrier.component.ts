@@ -103,6 +103,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
     this._cd.detectChanges();
   }
 
+  // Get charges with services access
   getCharges() {
     this._systemRepo.getListServiceByPermision()
       .pipe(catchError(this.catchError))
@@ -281,6 +282,7 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
       let advRequest = new AdvancePaymentRequest(item);
       advRequest.id = SystemConstants.EMPTY_GUID;
       advRequest.advanceNo = this.advanceNo;
+      advRequest.customNo = item.clearanceNo;
       let charge = new Surcharge(item);
       charge.paymentObjectId = this.payeeId;
       if (!listRequest.length || listRequest.filter(x => x.hblid === advRequest.hblid && x.customNo === advRequest.customNo && x.advanceType === advRequest.advanceType).length === 0) {
@@ -289,7 +291,6 @@ export class ListAdvancePaymentCarrierComponent extends AppList implements OnIni
       }
       listRequest.filter(x => x.hblid === advRequest.hblid && x.customNo === advRequest.customNo && x.advanceType === advRequest.advanceType)[0].surcharge.push(charge);
     })
-    console.log('listRequest', listRequest)
     return listRequest;
   }
 
