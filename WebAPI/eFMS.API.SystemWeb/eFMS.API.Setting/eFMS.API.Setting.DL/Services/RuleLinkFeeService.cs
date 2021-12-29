@@ -62,10 +62,6 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     return new HandleState((object)string.Format("Rule {0} was existied", model.RuleName));
                 }
-                if (checkExpired(rule.EffectiveDate, rule.ExpiredDate))
-                {
-                    rule.Status = false;
-                }
                 var hs = DataContext.Add(rule);
                 return hs;
             }
@@ -123,14 +119,10 @@ namespace eFMS.API.Setting.DL.Services
         }
 
         public IQueryable<RuleLinkFeeModel> GetRuleByCriteria(RuleLinkFeeCriteria criteria)
-            {
+        {
             List<RuleLinkFeeModel> queryable = new List<RuleLinkFeeModel>();
             var queryRuleLinkFee = ExpressionQuery(criteria);
             var ruleLinkFees = DataContext.Where(queryRuleLinkFee);
-            if (ruleLinkFees != null)
-            {
-                ruleLinkFees = ruleLinkFees.OrderByDescending(orb => orb.DatetimeModified).AsQueryable();
-            }
             var users = sysUserRepo.Get();
             var partners = catPartnerRepo.Get();
             var chargeBuyings = catChargeRepo.Where(x => x.Type == "CREDIT");
@@ -159,26 +151,22 @@ namespace eFMS.API.Setting.DL.Services
                            UserNameCreated = user.Username,
                            ChargeSelling = rule.ChargeSelling,
                            DatetimeModified = rule.DatetimeModified,
-                           Status = checkExpired(rule.EffectiveDate,rule.ExpiredDate)?false:true,
-                           //Status=rule.Status,
+                           Status =rule.Status==true?( CheckExpired(rule.EffectiveDate, rule.ExpiredDate) ? false : true):rule.Status,
                            EffectiveDate = rule.EffectiveDate,
                            ExpiredDate = rule.ExpiredDate,
                            ChargeNameBuying = chargeBuy.ChargeNameVn,
                            ChargeNameSelling = chargeSell.ChargeNameVn,
-                           PartnerBuying=rule.PartnerBuying,
-                           PartnerSelling=rule.PartnerSelling,
+                           PartnerBuying = rule.PartnerBuying,
+                           PartnerSelling = rule.PartnerSelling,
                            UserCreated = rule.UserCreated,
-                           DatetimeCreated=rule.DatetimeCreated,
-                           UserModified=rule.UserModified,
+                           DatetimeCreated = rule.DatetimeCreated,
+                           UserModified = rule.UserModified,
                        };
-            //    data.Where(x => checkExpired(x.EffectiveDate,x.ExpiredDate)).ToList().ForEach(x =>
-            //   DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
-            //data.ToList().ForEach(x => x.Status = checkExpired(x.EffectiveDate, x.ExpiredDate) ? false : true);
-             data.ToList().ForEach(x =>
-                DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
-            
+            data.ToList().ForEach(x =>
+               DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
+
             DataContext.SubmitChanges();
-            
+
             return data.ToList().OrderByDescending(o => o.DatetimeModified).AsQueryable();
         }
         private Expression<Func<CsRuleLinkFee, bool>> ExpressionQuery(RuleLinkFeeCriteria criteria)
@@ -215,7 +203,7 @@ namespace eFMS.API.Setting.DL.Services
                 query = query.And(x => x.PartnerBuying == criteria.PartnerBuying);
             }
 
-            if (criteria.DateType!=null)
+            if (criteria.DateType != null)
             {
                 if (criteria.FromDate.HasValue && criteria.ToDate.HasValue)
                 {
@@ -253,10 +241,6 @@ namespace eFMS.API.Setting.DL.Services
 
         public HandleState UpdateRuleLinkFee(RuleLinkFeeModel model)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
-
             try
             {
                 var rule = DataContext.Get(x => x.Id == model.Id).FirstOrDefault();
@@ -278,42 +262,28 @@ namespace eFMS.API.Setting.DL.Services
 
         public RuleLinkFeeModel GetRuleLinkFeeById(Guid idRuleLinkFee)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Detail);
-            if (permissionRange == PermissionRange.None) return null;
             var user = sysUserRepo.Get();
             var ruleLinkFee = DataContext.Get(x => x.Id == idRuleLinkFee).FirstOrDefault();
             if (ruleLinkFee == null) return null;
             var modelMap = mapper.Map<RuleLinkFeeModel>(ruleLinkFee);
-            if (checkExpired(ruleLinkFee.EffectiveDate, ruleLinkFee.ExpiredDate)&&ruleLinkFee.Status==true)
+            if (CheckExpired(ruleLinkFee.EffectiveDate, ruleLinkFee.ExpiredDate) && ruleLinkFee.Status == true)
             {
+                modelMap.Status = false;
                 DataContext.Update(ruleLinkFee, x => x.Id == modelMap.Id);
                 DataContext.SubmitChanges();
-                modelMap.Status = false;
-            }
-            if (checkExpired(ruleLinkFee.EffectiveDate, ruleLinkFee.ExpiredDate) && ruleLinkFee.Status == true)
-            {
-                DataContext.Update(ruleLinkFee, x => x.Id == modelMap.Id);
-                DataContext.SubmitChanges();
-                modelMap.Status = false;
             }
             modelMap.UserNameCreated = user.Where(x => x.Id == modelMap.UserCreated).FirstOrDefault().Username;
             modelMap.UserNameModified = user.Where(x => x.Id == modelMap.UserModified).FirstOrDefault().Username;
             return modelMap;
         }
 
-        private bool checkExpired(DateTime? effectiveDate, DateTime? expriredDate)
+        private bool CheckExpired(DateTime? effectiveDate, DateTime? expriredDate)
         {
-            if (effectiveDate.HasValue)
+            if (expriredDate.HasValue)
             {
-                if (expriredDate.HasValue)
-                {
-                    if (DateTime.Now >= expriredDate.Value|| expriredDate.Value <= effectiveDate.Value) return true;
-                }
-                if (DateTime.Now < effectiveDate.Value) return true;
+                if (DateTime.Now > expriredDate.Value && effectiveDate.Value!=expriredDate.Value) return true;
                 return false;
             }
-            
             return false;
         }
 
@@ -352,9 +322,8 @@ namespace eFMS.API.Setting.DL.Services
                     return new HandleState("Rule is not null");
                 }
 
-                if(model.ExpiredDate != null)
+                if (model.ExpiredDate != null)
                 {
-                    //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
                     if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
                     {
                         return new HandleState("Expiration date must be greater than or equal to the Effective date");
@@ -380,10 +349,6 @@ namespace eFMS.API.Setting.DL.Services
                                                     );
                     if (rule.Any())
                     {
-                        //Check nằm trong khoảng EffectiveDate - ExpiredDate
-                        //rule = rule
-                        //    .Where(x => model.EffectiveDate.Value.Date >= x.EffectiveDate.Value.Date
-                        //             && model.ExpiredDate.Value.Date <= x.ExpiredDate.Value.Date);
                         if (rule.Any())
                         {
                             return new HandleState(ErrorCode.Existed, "Rule Already exists");
@@ -394,10 +359,9 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     var ruleNameExists = DataContext.Get(x => x.Id != model.Id
                                                              && x.RuleName == model.RuleName).Any();
-                    
+
                     if (model.ExpiredDate != null)
                     {
-                        //Ngày ExpiredDate không được nhỏ hơn ngày EffectiveDate
                         if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
                         {
                             return new HandleState("Expiration date must be greater than or equal to the Effective date");
@@ -489,7 +453,7 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
-                    bool active = item.Status.ToLower() == "active"?true:false;
+                    bool active = item.Status.ToLower() == "active" ? true : false;
                     var ruleLinkFee = new CsRuleLinkFee
                     {
                         Id = Guid.NewGuid(),
