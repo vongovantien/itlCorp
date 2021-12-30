@@ -1,28 +1,31 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using eFMS.API.Report.Infrastructure.Filters;
+using eFMS.API.Report.Service.Context;
+using ITL.NetCore.Connection.EF;
+using LocalizationCultureCore.StringLocalizer;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Localization;
 using Swashbuckle.AspNetCore.Swagger;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System;
-using eFMS.API.Report.Infrastructure.Filters;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Report.Infrastructure
 {
     public static class ServiceRegister
     {
-
         public static void Register(IServiceCollection services)
         {
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            //services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
-            //services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
-            //services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
+            services.AddScoped(typeof(IContextBase<>), typeof(Base<>));
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-          
+            services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
+            services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
@@ -45,9 +48,9 @@ namespace eFMS.API.Report.Infrastructure
                             description.GroupName,
                             new Info()
                             {
-                                Title = $"eFMS Report API {description.ApiVersion}",
+                                Title = $"eFMS Accounting API {description.ApiVersion}",
                                 Version = description.ApiVersion.ToString(),
-                                Description = "eFMS Report API Document"
+                                Description = "eFMS Accounting API Document"
                             });
                     }
 

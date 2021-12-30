@@ -11,14 +11,14 @@ namespace eFMS.API.Report.Controllers
     [ApiVersion("1.0")]
     [MiddlewareFilter(typeof(LocalizationMiddleware))]
     [Route("api/v{version:apiVersion}/{lang}/[controller]")]
-    public class ValuesController : ControllerBase
+    public class ReportController : ControllerBase
     {
-        /// <summary>
-        /// Sync list SOA to Accountant
-        /// </summary>
-        /// <param name="requests"></param>
-        /// <returns></returns>
-        [HttpGet]
+        public ReportController()
+        {
+
+        }
+       // GET api/values
+       [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
             return new string[] { "value1", "value2" };

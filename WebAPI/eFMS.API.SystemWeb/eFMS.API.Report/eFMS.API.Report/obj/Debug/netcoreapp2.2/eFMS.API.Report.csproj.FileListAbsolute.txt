@@ -1,8 +1,3 @@
-C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Debug\netcoreapp2.2\eFMS.API.Report.deps.json
-C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Debug\netcoreapp2.2\eFMS.API.Report.runtimeconfig.json
-C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Debug\netcoreapp2.2\eFMS.API.Report.runtimeconfig.dev.json
-C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Debug\netcoreapp2.2\eFMS.API.Report.dll
-C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\bin\Debug\netcoreapp2.2\eFMS.API.Report.pdb
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\bin\netcoreapp2.2\eFMS.API.Report.deps.json
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\bin\netcoreapp2.2\eFMS.API.Report.runtimeconfig.json
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\bin\netcoreapp2.2\eFMS.API.Report.runtimeconfig.dev.json
@@ -18,3 +13,4 @@ C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFM
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Debug\netcoreapp2.2\eFMS.API.Report.csproj.CopyComplete
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Debug\netcoreapp2.2\eFMS.API.Report.dll
 C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Debug\netcoreapp2.2\eFMS.API.Report.pdb
+C:\Users\kenny.thuong\Desktop\eFms\WebAPI\eFMS.API.SystemWeb\eFMS.API.Report\eFMS.API.Report\obj\Debug\netcoreapp2.2\eFMS.API.Report.csprojAssemblyReference.cache

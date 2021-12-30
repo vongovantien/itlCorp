@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 
 namespace eFMS.API.Report
@@ -25,12 +30,7 @@ namespace eFMS.API.Report
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
-                .UseKestrel(o =>
-                {
-                    o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(5);
-                    o.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(5);
-                });
+             WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>();
     }
 }

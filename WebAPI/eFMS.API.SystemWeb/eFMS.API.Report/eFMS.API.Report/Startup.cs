@@ -1,18 +1,14 @@
-﻿using AutoMapper;
-using eFMS.API.Common.Globals;
-using eFMS.API.Infrastructure;
-using eFMS.API.Report.Infrastructure;
+﻿using eFMS.API.Report.Infrastructure;
 using eFMS.API.Report.Infrastructure.Middlewares;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
+using eFMS.API.Infrastructure;
+using eFMS.API.Common.Globals;
 
 namespace eFMS.API.Report
 {
@@ -39,7 +35,7 @@ namespace eFMS.API.Report
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSession();
             services.AddMvc().AddDataAnnotationsLocalization().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddMvcCore().AddVersionedApiExplorer(o => o.GroupNameFormat = "'v'VVV").AddAuthorization();
@@ -47,37 +43,24 @@ namespace eFMS.API.Report
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
-            IHostingEnvironment env, IApiVersionDescriptionProvider provider)
+        IHostingEnvironment env, IApiVersionDescriptionProvider provider)
         {
+            loggerFactory.AddConsole();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
             else
             {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
-                app.UseExceptionHandler(errorApp =>
-                {
-                    errorApp.Run(async context =>
-                    {
-                        context.Response.StatusCode = 500;
-                        context.Response.ContentType = "text/plain";
-                        var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
-                        if (errorFeature != null)
-                        {
-                            var logger = loggerFactory.CreateLogger("Global exception logger");
-                            logger.LogError(500, errorFeature.Error, errorFeature.Error.Message);
-                        }
-
-                        await context.Response.WriteAsync("There was an error");
-                    });
-                });
             }
+
 
             app.UseHttpsRedirection();
 
@@ -87,16 +70,16 @@ namespace eFMS.API.Report
                 string swaggerJsonBasePath = string.IsNullOrWhiteSpace(options.RoutePrefix) ? "." : "..";
                 foreach (var description in provider.ApiVersionDescriptions)
                 {
-                    options.SwaggerEndpoint(
-                        $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json",
-                        description.GroupName.ToUpperInvariant());
+                    var path = $"{swaggerJsonBasePath}/swagger/{description.GroupName}/swagger.json";
+                    options.SwaggerEndpoint(path, description.GroupName.ToUpperInvariant());
                 }
             });
-            app.UseCors("AllowAllOrigins");
+                app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseMiddleware(typeof(ErrorHandlingMiddleware));
             app.UseSession();
             app.UseMvc();
+            app.UseStaticFiles();
         }
     }
 }
