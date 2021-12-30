@@ -61,6 +61,7 @@
             public const string AgencyPaymentUrl = "/api/v1/en-US/AccountingPayment/GetDataExportAccountingAgencyPayment";
             public const string GetDataExportReceiptAdvance = "/api/v1/en-US/AcctReceipt/GetDataExportReceiptAdvance";
             public const string GetDataCombineOpsUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOps?combineBillingNo=";
+            public const string GetDataCombineOpsByPartnerUrl = "/api/v1/en-US/AcctCombineBilling/GetDataExportCombineOpsByPartner";
         }
 
         public class Documentation

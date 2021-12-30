@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using System;
+using System.Collections.Generic;
 
 namespace eFMS.API.Accounting.Controllers
 {
@@ -249,9 +250,23 @@ namespace eFMS.API.Accounting.Controllers
         }
 
         [HttpGet("GetDataExportCombineOps")]
+        [Authorize]
         public IActionResult GetDataExportCombineOpsByAccMangId(string combineBillingNo)
         {
             var data = combineBillingService.GetDataExportCombineOps(combineBillingNo);
+            return Ok(data);
+        }
+
+        /// <summary>
+        /// Get Combine OPS data with partner and currency
+        /// </summary>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
+        [HttpPost("GetDataExportCombineOpsByPartner")]
+        [Authorize]
+        public IActionResult GetDataExportCombineOpsByPartner(AcctCombineBillingCriteria criteria)
+        {
+            var data = combineBillingService.GetDataExportCombineOpsByPartner(criteria);
             return Ok(data);
         }
 

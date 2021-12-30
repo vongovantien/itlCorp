@@ -745,7 +745,7 @@
             Set detail data for table
             </summary>
         </member>
-        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32)">
+        <member name="M:eFMS.API.ReportData.FormatExcel.ExcelExport.DeleteRow(System.Int32,System.Int32)">
             <summary>
             Delete row in excel file
             </summary>

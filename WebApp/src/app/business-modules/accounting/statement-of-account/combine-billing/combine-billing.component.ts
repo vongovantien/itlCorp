@@ -5,11 +5,11 @@ import { AppList } from '@app';
 import {  RoutingConstants } from '@constants';
 import { Store } from '@ngrx/store';
 import { NgProgress } from '@ngx-progressbar/core';
-import { AccountingRepo } from '@repositories';
+import { AccountingRepo, ExportRepo } from '@repositories';
 import { SortService } from '@services';
 import { getMenuUserSpecialPermissionState, IAppState } from '@store';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, map, takeUntil, withLatestFrom } from 'rxjs/operators';
+import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { CombineBilling } from 'src/app/shared/models/accouting/combine-billing.model';
 import { LoadListCombineBilling } from './store/actions';
 import { getCombineBillingListState, getCombineBillingLoadingListState, getCombineBillingPagingState, getDataSearchCombineBillingState } from './store/reducers';
@@ -28,11 +28,13 @@ export class CombineBillingComponent extends AppList implements OnInit {
 
   billings: CombineBilling[] = [];
   // Get data with 6 month from current
-  dataSearch = {
+  dataSearch : any = {
     createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en'),
   };
-
+  criteriaExport: any = {};
+  isExport: boolean = false;
+  
   constructor(
     private _progressService: NgProgress,
     private _sortService: SortService,
@@ -40,6 +42,7 @@ export class CombineBillingComponent extends AppList implements OnInit {
     private _toastService: ToastrService,
     private _router: Router,
     private _store: Store<IAppState>,
+    private _exportRepo: ExportRepo
   ) {
     super();
     this._progressRef = this._progressService.ref();
@@ -171,4 +174,43 @@ deleteCombineBilling(id: string) {
             });
     
   }
+
+  getDataSearch(data: any){
+    this.criteriaExport = data;
+  }
+
+  exportCombineOPS(currency: string) {
+    this.isExport = true;
+    if (this.criteriaExport.partnerId) {
+      let combineNos = [];
+      this.billings.forEach(combine => {
+        combineNos.push(combine.combineBillingNo)
+      });
+      if (combineNos.length) {
+        this._progressRef.start();
+        this.criteriaExport.referenceNo = combineNos;
+        this.criteriaExport.currency = currency;
+        this._exportRepo.exportCombineOps(this.criteriaExport)
+          .pipe(
+            catchError(this.catchError),
+            finalize(() => this._progressRef.complete())
+          )
+          .subscribe(
+            (response: ArrayBuffer) => {
+              if (response.byteLength > 0) {
+                this.downLoadFile(response, "application/ms-excel", 'SOA OPS.xlsx');
+              } else {
+                this._toastService.warning('No data found');
+              }
+            },
+          );
+        this.isExport = false;
+      }else{
+        this._toastService.warning("No data apply. Please re-check again.")
+      }
+    }else{
+      this._toastService.warning("Please apply search with partner.")
+    }
+  }
+
 }

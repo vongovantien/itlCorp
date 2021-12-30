@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace eFMS.API.Accounting.DL.Common
 {
@@ -40,5 +41,22 @@ namespace eFMS.API.Accounting.DL.Common
         {
             return (value ?? valueToCheck) == valueToCheck;
         }
+
+        /// <summary>
+        /// Display company logo when offices in HN, DN, HCM
+        /// </summary>
+        /// <param name="officeCode"></param>
+        /// <returns></returns>
+        public static bool IsCommonOffice(string officeCode)
+        {
+            var validCodeOffice = new List<string>()
+            {
+                AccountingConstants.OFFICE_CODE_HAN,
+                AccountingConstants.OFFICE_CODE_DAD,
+                AccountingConstants.OFFICE_CODE_HCM
+            };
+            return validCodeOffice.Any(z => z == officeCode);
+        }
+
     }
 }
