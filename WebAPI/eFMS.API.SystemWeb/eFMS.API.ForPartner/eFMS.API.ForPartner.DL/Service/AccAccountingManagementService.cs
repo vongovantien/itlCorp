@@ -2255,8 +2255,13 @@ namespace eFMS.API.ForPartner.DL.Service
                 return new HandleState((object)model.OfficeCode + " không tồn tại");
             }
             var refNos = model.Details.Select(x => x.BravoRefNo).ToList();
-
+            // Có case nào không có ghi nhận công nợ AP k?
+            //if(refNos.Count() == 0)
+            //{
+            //    return new HandleState((object)"Ref no không được để trống");
+            //}
             var voucherExistedRefNo = DataContext.Get(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE && refNos.Contains(x.ReferenceNo));
+
             if (voucherExistedRefNo != null && voucherExistedRefNo.Count() > 0)
             {
                 return new HandleState((object)string.Format("Số {0} đã tồn tại", string.Join(",", voucherExistedRefNo.Select(x => x.VoucherId))));
@@ -2299,7 +2304,7 @@ namespace eFMS.API.ForPartner.DL.Service
                     s.Key.VoucherNo,
                     s.Key.TransactionType,
                     voucherData = s.FirstOrDefault(),
-                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId }).ToList()
+                    surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
                 })
                 .ToList();
             if (grpVoucherDetail.Count > 0)
@@ -2319,6 +2324,22 @@ namespace eFMS.API.ForPartner.DL.Service
                     }
 
                     VoucherCreateRowModel itemGroup = item.voucherData;
+                    decimal _totalAmount = 0;
+                    decimal _totalAmountVnd = 0;
+                    decimal _totalAmountUsd = 0;
+
+                    var surchargesIds = item.surcharges.Select(x => x.ChargeId).ToList();
+                    var surcharges = surchargeRepo.Get(x => surchargesIds.Contains(x.Id)).ToList();
+                    if(surcharges.Count == 0)
+                    {
+                        return new HandleState((object)string.Format("Không tìm thấy ds charge {0}", string.Join(",", surchargesIds)));
+                    }
+                    if(itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL)
+                    {
+                        _totalAmountUsd = surcharges.Sum(x => x.VatAmountUsd + x.AmountUsd) ?? 0;
+                        _totalAmountVnd = item.surcharges.Sum(x => x.AmountVnd + x.VatAmountVnd);  // có lệch giữa efms-bravo vnd vs usd?.
+                    }
+
                     AccAccountingManagement voucher = new AccAccountingManagement
                     {
                         Id = Guid.NewGuid(),
@@ -2329,12 +2350,12 @@ namespace eFMS.API.ForPartner.DL.Service
                         Currency = itemGroup.Currency,
                         Date = itemGroup.VoucherDate,
                         PaymentTerm = itemGroup.PaymentTerm,
-                        TotalAmountVnd = itemGroup.AmountVnd,
-                        TotalAmountUsd = itemGroup.AmountUsd,
-                        TotalAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? itemGroup.AmountVnd : itemGroup.AmountUsd,
-                        UnpaidAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? itemGroup.AmountVnd : itemGroup.AmountUsd,
-                        UnpaidAmountVnd = itemGroup.AmountVnd,
-                        UnpaidAmountUsd = itemGroup.AmountUsd,
+                        TotalAmountVnd = _totalAmountVnd,
+                        TotalAmountUsd = _totalAmountUsd, // tính toán từ surcharges
+                        TotalAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? _totalAmountVnd : _totalAmountUsd,
+                        UnpaidAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? _totalAmountVnd : _totalAmountUsd,
+                        UnpaidAmountVnd = _totalAmountVnd,
+                        UnpaidAmountUsd = _totalAmountUsd,
                         PaymentDueDate = itemGroup.VoucherDate.AddDays((double)(itemGroup.PaymentTerm)),
                         PaymentMethod = model.PaymentMethod,
                         TotalExchangeRate = itemGroup.ExchangeRate,
@@ -2409,8 +2430,8 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 surcharge.ReferenceNo = itemGrp.voucherData.BravoRefNo; // Voucher sync từ bravo phải lưu sô ref, (trước đó voucher issue từ efms k có số ref)
                                                 surcharge.VatAmountVnd = itemGrp.voucherData.VatAmountVnd;
                                                 surcharge.AmountVnd = itemGrp.voucherData.AmountVnd;
-                                                surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;
-                                                surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
+                                                // surcharge.VatAmountUsd = itemGrp.voucherData.VatAmountUsd;  // giữ nguyên trên phí
+                                                // surcharge.AmountUsd = itemGrp.voucherData.AmountUsd;
                                                 surcharge.FinalExchangeRate = itemGrp.voucherData.ExchangeRate;
 
                                                 AmountSurchargeResult amountSurcharge = currencyExchangeService.CalculatorAmountSurcharge(surcharge, ForPartnerConstants.KB_EXCHANGE_RATE);
