@@ -42,6 +42,8 @@ export class UserDetailsComponent extends AppPage {
         { title: 'Office', field: 'officeName' },
         { title: 'Department', field: 'departmentName' },
         { title: 'Position', field: 'position' },
+        { title: 'Default', field: 'isDefault' },
+
     ];
 
     userLevels: UserLevel[] = [];
@@ -227,5 +229,26 @@ export class UserDetailsComponent extends AppPage {
 
     selectRoleTab() {
         this._dataService.setData('user-group', true);
+    }
+
+    onSelectContextMenu(item: UserLevel) {
+        this.selectedUserLevel = item;
+        console.log(item);
+    }
+
+    onSelectConfirmSetDefault() {
+        if (!!this.selectedUserLevel) {
+            this.selectedUserLevel.isDefault = true;
+            this._systemRepo.setdefaultUserLeve(this.selectedUserLevel.id)
+                .subscribe(
+                    (res: any) => {
+                        console.log(res);
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.getListUserLevelByUserId();
+                        }
+                    }
+                )
+        }
     }
 }

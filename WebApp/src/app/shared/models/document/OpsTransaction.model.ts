@@ -61,6 +61,8 @@ export class OpsTransaction extends BaseModel {
 
         permission: PermissionShipment = new PermissionShipment();
 
+        // * Custom
+        isReplicate: boolean = false;
 
         constructor(object?: any) {
                 super();
