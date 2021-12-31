@@ -175,25 +175,33 @@ namespace eFMS.IdentityServer.DL.Services
             // switch company
             if (permissionInfo == null)
             {
-                userLevel = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.CompanyId == companyId)?.FirstOrDefault();
+                var usrLvCompany = userLevelRepository.Get(lv => lv.UserId == userId && lv.OfficeId != null && lv.CompanyId == companyId);
+                var usrLvCompanyDefault = usrLvCompany.Where(x => x.IsDefault == true)?.FirstOrDefault();
+                userLevel = usrLvCompanyDefault != null ? usrLvCompanyDefault : usrLvCompany.FirstOrDefault();
             }
             // switch office
             else if (permissionInfo.OfficeID != null && (permissionInfo.GroupID == null))
             {
-                userLevel = userLevelRepository.Get(lv => lv.UserId == userId
+                var usrLvOffice = userLevelRepository.Get(lv => lv.UserId == userId
                 && lv.OfficeId == permissionInfo.OfficeID
                 && lv.CompanyId == companyId
-                )?.FirstOrDefault();
+                );
+
+                var usrLvCompanyDefault = usrLvOffice.Where(x => x.IsDefault == true)?.FirstOrDefault();
+                userLevel = usrLvCompanyDefault != null ? usrLvCompanyDefault : usrLvOffice.FirstOrDefault();
             }
             //switch group-dept
             else
             {
-                userLevel = userLevelRepository.Get(lv => lv.UserId == userId
+                var usrLvGrpDept = userLevelRepository.Get(lv => lv.UserId == userId
                 && lv.OfficeId == permissionInfo.OfficeID
                 && lv.CompanyId == companyId
                 && lv.DepartmentId == permissionInfo.DepartmentID
                 && lv.GroupId == permissionInfo.GroupID
-                )?.FirstOrDefault();
+                );
+
+                var usrLvGrpDeptDefault = usrLvGrpDept.Where(x => x.IsDefault == true)?.FirstOrDefault();
+                userLevel = usrLvGrpDeptDefault != null ? usrLvGrpDeptDefault : usrLvGrpDept.FirstOrDefault();
             }
 
             return userLevel;

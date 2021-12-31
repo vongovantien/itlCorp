@@ -11,6 +11,7 @@ using ITL.NetCore.Connection.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.System.DL.Services
 {
@@ -101,7 +102,14 @@ namespace eFMS.API.System.DL.Services
                               GroupAbbrName = g.ShortName,
                               CompanyAbbrName = c.BunameAbbr,
                               OfficeAbbrName = o.ShortName,
-                              DepartmentAbbrName = depart.DeptNameAbbr
+                              DepartmentAbbrName = depart.DeptNameAbbr,
+                              IsDefault = d.IsDefault,
+                              UserId = d.UserId,
+                              Active = d.Active,
+                              UserCreated = d.UserCreated,
+                              UserModified = d.UserModified,
+                              DatetimeCreated = d.DatetimeCreated,
+                              DatetimeModified = d.DatetimeModified,
                           };
 
             return results;
@@ -276,6 +284,35 @@ namespace eFMS.API.System.DL.Services
                                   OfficeName = (o == null ? string.Empty : o.ShortName)
                               }).ToList();
             return userList;
+        }
+
+        public async Task<HandleState> SetDefault(int Id)
+        {
+            HandleState hs = new HandleState();
+            var usrLv = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+
+            if(usrLv != null)
+            {
+                usrLv.IsDefault = true;
+
+                await DataContext.UpdateAsync(usrLv, x => x.Id == Id, false);
+
+                var usrLvLeast = DataContext.Get(x => x.Id != Id && usrLv.UserId == x.UserId)?.ToList();
+
+                if(usrLvLeast.Count > 0)
+                {
+                    foreach (var item in usrLvLeast)
+                    {
+                        item.IsDefault = false;
+                        await DataContext.UpdateAsync(item, x => x.Id == Id, false);
+                    }
+
+                }
+
+                hs = DataContext.SubmitChanges();
+            }
+
+            return hs;
         }
     }
 }
