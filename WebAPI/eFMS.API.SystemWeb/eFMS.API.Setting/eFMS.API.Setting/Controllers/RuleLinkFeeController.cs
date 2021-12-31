@@ -235,8 +235,7 @@ namespace eFMS.API.Setting.Controllers
                 || x.ChargeNameBuying != null
                 || x.PartnerNameBuying != null
                 || x.ServiceSelling != null
-                || x.ChargeNameSelling != null
-                || x.PartnerNameSelling != null).ToList();
+                || x.ChargeNameSelling != null).ToList();
             return list;
         }
 
@@ -250,10 +249,10 @@ namespace eFMS.API.Setting.Controllers
         public IActionResult Import([FromBody] List<RuleLinkFeeImportModel> data)
         {
             var hs = ruleLinkFeeService.Import(data);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !!!" };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = "Import successfully !" };
             if (!hs.Success)
             {
-                return BadRequest(result);
+                return Ok(new ResultHandle { Status = hs.Success, Message = hs.Exception.Message.ToString(), Data = hs.Code });
             }
             return Ok(result);
         }

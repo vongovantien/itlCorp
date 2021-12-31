@@ -154,8 +154,8 @@ namespace eFMS.API.Setting.DL.Services
                            Status =rule.Status==true?( CheckExpired(rule.EffectiveDate, rule.ExpiredDate) ? false : true):rule.Status,
                            EffectiveDate = rule.EffectiveDate,
                            ExpiredDate = rule.ExpiredDate,
-                           ChargeNameBuying = chargeBuy.ChargeNameVn,
-                           ChargeNameSelling = chargeSell.ChargeNameVn,
+                           ChargeNameBuying = chargeBuy.ChargeNameEn,
+                           ChargeNameSelling = chargeSell.ChargeNameEn,
                            PartnerBuying = rule.PartnerBuying,
                            PartnerSelling = rule.PartnerSelling,
                            UserCreated = rule.UserCreated,
@@ -312,7 +312,6 @@ namespace eFMS.API.Setting.DL.Services
                 return new HandleState(ex.Message);
             }
         }
-
         public HandleState CheckDuplicateRule(RuleLinkFeeModel model)
         {
             try
@@ -358,13 +357,26 @@ namespace eFMS.API.Setting.DL.Services
                 else //Trường hợp Update (Id of rule is not null & not empty)
                 {
                     var ruleNameExists = DataContext.Get(x => x.Id != model.Id
-                                                             && x.RuleName == model.RuleName).Any();
-
-                    if (model.ExpiredDate != null)
+                                         && x.RuleName == model.RuleName).Any();
+                    if (ruleNameExists)
                     {
-                        if (model.EffectiveDate.Value.Date > model.ExpiredDate.Value.Date)
+                        return new HandleState("Rule name already exists");
+                    }
+
+                    //Check all rule
+                    var rule = DataContext.Get(x => x.Id != model.Id
+                                                    && x.ServiceBuying == model.ServiceBuying
+                                                    && x.ChargeBuying == model.ChargeBuying
+                                                    && x.PartnerBuying == model.PartnerBuying
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    && x.ChargeSelling == model.ChargeSelling
+                                                    && x.ServiceSelling == model.ServiceSelling
+                                                    );
+                    if (rule.Any())
+                    {
+                        if (rule.Any())
                         {
-                            return new HandleState("Expiration date must be greater than or equal to the Effective date");
+                            return new HandleState(ErrorCode.Existed, "Rule Already exists");
                         }
                     }
                 }
@@ -403,10 +415,6 @@ namespace eFMS.API.Setting.DL.Services
                     item.IsValid = false;
                 }
                 if (string.IsNullOrEmpty(item.PartnerNameBuying))
-                {
-                    item.IsValid = false;
-                }
-                if (string.IsNullOrEmpty(item.PartnerNameSelling))
                 {
                     item.IsValid = false;
                 }
@@ -458,10 +466,10 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         Id = Guid.NewGuid(),
                         RuleName = item.RuleName,
-                        ChargeBuying = charge.Where(x => x.ChargeNameVn.Contains(item.ChargeNameBuying)).FirstOrDefault().Id.ToString(),
-                        ChargeSelling = charge.Where(x => x.ChargeNameVn.Contains(item.ChargeNameSelling)).FirstOrDefault().Id.ToString(),
+                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying)).FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling)).FirstOrDefault().Id.ToString(),
                         PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
-                        PartnerSelling = partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id,
+                        PartnerSelling = item.PartnerNameSelling!=null?partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id:null,
                         ServiceBuying = ConvertService(item.ServiceBuying),
                         ServiceSelling = ConvertService(item.ServiceSelling),
                         EffectiveDate = DateTime.Now,
@@ -471,6 +479,13 @@ namespace eFMS.API.Setting.DL.Services
                         UserModified = currentUser.UserID,
                         Status = active,
                     };
+                    var model = mapper.Map<RuleLinkFeeModel>(ruleLinkFee);
+                    model.Id = null;
+                    var hs = CheckExistsDataRule(model);
+                    if (!hs.Success)
+                    {
+                        return hs;
+                    }
                     DataContext.Add(ruleLinkFee, false);
                 }
                 DataContext.SubmitChanges();
