@@ -496,6 +496,10 @@ namespace eFMS.API.Documentation.DL.Services
                             OpsTransaction hbl = opsTransRepository.Get(x => x.Hblid == item.Hblid).FirstOrDefault();
                             item.OfficeId = hbl?.OfficeId ?? Guid.Empty;
                             item.CompanyId = hbl?.CompanyId ?? Guid.Empty;
+                            // set cứng thông tin từ lô hàng.
+                            item.JobNo = hbl.JobNo;
+                            item.Mblno = hbl.Mblno;
+                            item.Hblno = hbl.Hwbno;
                             //Cập nhật Clearance No cũ nhất cho phí (nếu có), nếu phí đã có Clearance No & Settlement thì không cập nhật [15563 - 29/03/2021]
                             item.ClearanceNo = !string.IsNullOrEmpty(item.ClearanceNo) && !string.IsNullOrEmpty(item.SettlementCode) ? item.ClearanceNo : GetCustomNoOldOfShipment(item.JobNo);
                         }
@@ -586,6 +590,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         }
 
+                        // set cứng thông tin từ lô hàng.
                         surcharge.JobNo = _jobNo;
                         surcharge.Mblno = _mblNo;
                         surcharge.Hblno = _hblNo;
