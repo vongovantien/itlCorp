@@ -62,7 +62,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<CsTransaction> transactionRepository;
         private readonly IContextBase<SysSettingFlow> settingFlowRepository;
-
+        private readonly IContextBase<CatCharge> catChargeRepository;
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
 
@@ -94,7 +94,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
             IContextBase<CatContract> catContractRepo,
             IContextBase<CsTransaction> transactionRepo,
-            IContextBase<SysSettingFlow> settingFlowRepo
+            IContextBase<SysSettingFlow> settingFlowRepo,
+            IContextBase<CatCharge> catChargeRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -128,6 +129,7 @@ namespace eFMS.API.Documentation.DL.Services
             catContractRepository = catContractRepo;
             transactionRepository = transactionRepo;
             settingFlowRepository = settingFlowRepo;
+            catChargeRepository = catChargeRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -2065,6 +2067,70 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
             return preFix;
+        }
+
+        public ResultHandle ChargeFromReplicate()
+        {
+            ResultHandle hs = new ResultHandle();
+            List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
+
+            try
+            {
+                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
+                if (lstJobRep != null)
+                {
+                    foreach (var jobRep in lstJobRep)
+                    {
+                        var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
+
+                        var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId==null);
+                        if (charges != null)
+                        {
+                            foreach (var charge in charges)
+                            {
+                                if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
+                                    continue;
+                               
+                                CsShipmentSurcharge surcharge = mapper.Map<CsShipmentSurcharge>(charge);
+
+                                if (charge.Type == DocumentConstants.CHARGE_SELL_TYPE)
+                                {
+                                    surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
+                                    var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
+                                    if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
+                                }
+                                else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                                    surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                else { continue; }
+
+                                surcharge.LinkChargeId = charge.Id.ToString();
+                                surcharge.Id = Guid.NewGuid();
+                                surcharge.JobNo = job.JobNo ?? "";
+                                surcharge.Hblid = job.Hblid;
+                                surcharge.Hblno = job.Hwbno;
+                                surcharge.Mblno = job.Mblno;
+
+                                surcharge.UserCreated = currentUser.UserID;
+                                surcharge.DatetimeCreated = DateTime.Now;
+
+                                surchargeAdds.Add(surcharge);
+                            }
+                        }
+
+                        if (surchargeAdds.Count > 0)
+                        {
+                            foreach (var item in surchargeAdds)
+                                surchargeRepository.Add(item);
+                        }
+                    }
+                }
+                return new ResultHandle { Status = true, Message = "ChargeFromReplicate sccuess", Data = null };
+            }
+            catch (Exception ex)
+            {
+                new LogHelper("eFMS_CHARGEFROMREPLICATE", ex.ToString());
+                return new ResultHandle { Status = false, Message = "Job can't be charge from replicate !" };
+            }
         }
     }
 }

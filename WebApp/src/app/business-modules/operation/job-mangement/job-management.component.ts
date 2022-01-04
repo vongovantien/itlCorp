@@ -7,12 +7,13 @@ import { Store } from '@ngrx/store';
 import { Shipment, CustomDeclaration } from '@models';
 import { SortService } from '@services';
 import { DocumentationRepo, OperationRepo } from '@repositories';
-import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
+import { ConfirmPopupComponent, LoadingPopupComponent, Permission403PopupComponent } from '@common';
 
 import { AppList } from 'src/app/app.list';
 import * as fromOperationStore from './../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 
 
@@ -24,6 +25,7 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     @ViewChild(ConfirmPopupComponent) confirmDeleteJobPopup: ConfirmPopupComponent;
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
+    @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
@@ -45,7 +47,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         private _toastService: ToastrService,
         private _operationRepo: OperationRepo,
         private _router: Router,
-        private _store: Store<fromOperationStore.IOperationState>
+        private _store: Store<fromOperationStore.IOperationState>,
+        private _spinner: NgxSpinnerService
     ) {
         super();
         this.requestSort = this.sortShipment;
@@ -244,4 +247,21 @@ export class JobManagementComponent extends AppList implements OnInit {
         this._router.navigate([`${RoutingConstants.LOGISTICS.JOB_MANAGEMENT}/new`]);
     }
 
+    chargeFromRep(){
+        this._spinner.hide();
+        this.loadingPopupComponent.body = "<a>The Link Charge Proccess is running ....!</a> <br><b>Please you wait a moment...</b>";
+        this.loadingPopupComponent.show();
+        this._documentRepo.chargeFromReplicate()
+        .pipe(
+            catchError(this.catchError),
+            finalize(() => {this._progressRef.complete();})
+        ).subscribe(
+            (respone: CommonInterface.IResult) => {
+                if (respone.status) {
+                    this.loadingPopupComponent.body = "<a>The Link Charge Proccess is Completed</b>";
+                    this.loadingPopupComponent.proccessCompleted();
+                }
+            },
+        );
+    }
 }

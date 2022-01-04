@@ -82,7 +82,7 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public string ReferenceNo { get; set; }
         public string VatPartnerId { get; set; }
         public string VatPartnerShortName { get; set; }
-
-
+        public bool? LinkFee { get; set; }
+        public string LinkChargeId { get; set; }
     }
 }
