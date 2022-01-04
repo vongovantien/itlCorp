@@ -1131,7 +1131,7 @@ namespace eFMS.API.ReportData.FormatExcel
             List<string> headers = GetHeaderExcelDetailAdvancePayment(language);
 
             workSheet.Cells["H1:K1"].Merge = true;
-            workSheet.Cells["H1"].Value = headers[0];
+            workSheet.Cells["H1"].Value = advanceExport.InfoAdvance.OfficeName;
             workSheet.Cells["H1"].Style.Font.SetFromFont(new Font("Arial Black", 12));
             workSheet.Cells["H1"].Style.Font.Italic = true;
             workSheet.Cells["H2:K2"].Merge = true;
@@ -3899,15 +3899,15 @@ namespace eFMS.API.ReportData.FormatExcel
             List<string> headers = GetHeaderExcelDetailSettlementPayment(language);
 
             #region #Header
-            workSheet.Cells["J1:M1"].Merge = true;
-            workSheet.Cells["J1"].Value = headers[0];
-            workSheet.Cells["J1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
-            workSheet.Cells["J1"].Style.Font.Italic = true;
-            workSheet.Cells["J2:M2"].Merge = true;
-            workSheet.Cells["J2"].Style.WrapText = true;
-            workSheet.Cells["J2"].Value = settlementExport.InfoSettlement.ContactOffice;
-            workSheet.Cells["J2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
-            workSheet.Cells["J2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["I1:M1"].Merge = true;
+            workSheet.Cells["I1"].Value = settlementExport.InfoSettlement.OfficeName;
+            workSheet.Cells["I1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
+            workSheet.Cells["I1"].Style.Font.Italic = true;
+            workSheet.Cells["I2:M2"].Merge = true;
+            workSheet.Cells["I2"].Style.WrapText = true;
+            workSheet.Cells["I2"].Value = settlementExport.InfoSettlement.ContactOffice;
+            workSheet.Cells["I2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
+            workSheet.Cells["I2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
 
             //Title
@@ -4444,7 +4444,7 @@ namespace eFMS.API.ReportData.FormatExcel
             List<string> headers = GetHeaderExcelDetailSettlementPaymentSOA(language);
             #region #Header
             workSheet.Cells["F1:L1"].Merge = true;
-            workSheet.Cells["F1"].Value = headers[0];
+            workSheet.Cells["F1"].Value = settlementExport.InfoSettlement.OfficeName;
             workSheet.Cells["F1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
             workSheet.Cells["F1"].Style.Font.Italic = true;
             workSheet.Cells["F2:M2"].Merge = true;
@@ -4828,8 +4828,8 @@ namespace eFMS.API.ReportData.FormatExcel
                     Image image = Image.FromFile(CrystalEx.GetLogoITL());
                     excel.SetPicture(image, "Logo", 0, 0);
                 }
-                listKeyData.Add("CompanyName", headers[0]);
-                listKeyData.Add("CompanyAddress", headers[1]);
+                listKeyData.Add("CompanyName", settlementExport.OfficeName);
+                listKeyData.Add("CompanyAddress", settlementExport.ContactOffice);
                 listKeyData.Add("SettlementNo", settlementExport.SettlementNo);
                 listKeyData.Add("RequestDate", settlementExport.RequestDate);
                 listKeyData.Add("Requester", settlementExport.Requester);
