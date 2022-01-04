@@ -85,7 +85,7 @@
                         <label class="form-control-label">
                             Currency
                         </label>
-                        <select [(ngModel)]="selectedCurrency" class="form-control"
+                        <select [(ngModel)]="selectedCurrency" class="form-control" [disabled]="selectedType.value === this.types[0].value"
                             (ngModelChange)="onSelectDataFormInfo($event , 'currency')">
                             <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
                             </option>

@@ -50,7 +50,7 @@
                             <label class="form-control-label" for="">
                                 Currency
                             </label>
-                            <select [(ngModel)]="selectedCurrency" class="form-control" name="currency">
+                            <select [(ngModel)]="selectedCurrency" class="form-control" name="currency" [disabled]="soa.type === 'Debit'">
                                 <option *ngFor="let currency of currencyList" [ngValue]="currency">{{currency.id}}
                                 </option>
                             </select>
