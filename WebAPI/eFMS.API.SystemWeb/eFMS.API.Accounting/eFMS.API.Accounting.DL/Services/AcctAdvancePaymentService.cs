@@ -1667,10 +1667,12 @@ namespace eFMS.API.Accounting.DL.Services
             acctAdvance.TotalNorm = _totalNorm != 0 ? _totalNorm : null;
             acctAdvance.TotalInvoice = _totalInvoice != 0 ? _totalInvoice : null;
             acctAdvance.TotalOrther = _totalOrther != 0 ? _totalOrther : null;
-            acctAdvance.CompanyName = AccountingConstants.COMPANY_NAME;
-            acctAdvance.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
-            acctAdvance.Website = AccountingConstants.COMPANY_WEBSITE;
-            acctAdvance.Contact = AccountingConstants.COMPANY_CONTACT;
+            // Get Office Info
+            var officeInfo = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            acctAdvance.CompanyName = officeInfo?.BranchNameEn?.ToUpper();
+            acctAdvance.CompanyAddress = officeInfo?.AddressEn;
+            acctAdvance.Website = string.IsNullOrEmpty(officeInfo?.Website) ? " www.itlvn.com" : officeInfo.Website;
+            acctAdvance.Contact = "Tel‎: " + officeInfo?.Tel + "  Fax‎: " + officeInfo?.Fax;
 
             //Chuyển tiền Amount thành chữ
             decimal _amount = acctAdvance.AdvValue.HasValue ? acctAdvance.AdvValue.Value : 0;
@@ -3964,9 +3966,10 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == advancePayment.OfficeId).FirstOrDefault();
-            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
-            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
+            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var officeName = office?.BranchNameEn?.ToUpper();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code); 
 
             var infoAdvance = new InfoAdvanceExport
             {
@@ -3984,6 +3987,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _advanceApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _advanceApprove?.AccountantAprDate != null,
                 IsBODApproved = _advanceApprove?.BuheadAprDate != null,
+                OfficeName = officeName,
                 ContactOffice = _contactOffice,
                 BankAccountNo = advancePayment.BankAccountNo,
                 BankAccountName = advancePayment.BankAccountName,

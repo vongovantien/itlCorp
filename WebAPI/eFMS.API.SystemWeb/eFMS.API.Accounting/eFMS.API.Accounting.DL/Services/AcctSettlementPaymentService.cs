@@ -2639,10 +2639,12 @@ namespace eFMS.API.Accounting.DL.Services
                 item.Debt = surcharge.Type == AccountingConstants.TYPE_CHARGE_OBH ? true : false;
                 item.Currency = string.Empty;
                 item.Note = surcharge.Notes;
-                item.CompanyName = AccountingConstants.COMPANY_NAME;
-                item.CompanyAddress = AccountingConstants.COMPANY_ADDRESS1;
-                item.Website = AccountingConstants.COMPANY_WEBSITE;
-                item.Tel = AccountingConstants.COMPANY_CONTACT;
+                // Get Office Info
+                var officeInfo = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+                item.CompanyName = officeInfo?.BranchNameEn?.ToUpper();
+                item.CompanyAddress = officeInfo?.AddressEn;
+                item.Website = string.IsNullOrEmpty(officeInfo?.Website) ? " www.itlvn.com" : officeInfo.Website;
+                item.Tel = "Tel‎: " + officeInfo?.Tel + "  Fax‎: " + officeInfo?.Fax;
                 item.Contact = currentUser.UserName;
 
                 data.Add(item);
@@ -4855,8 +4857,10 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == settlementPayment.OfficeId).FirstOrDefault();
-            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}\nWebsite: www.itlvn.com", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var officeName = office?.BranchNameEn?.ToUpper();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
             var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
@@ -4868,7 +4872,7 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 partner = catPartnerRepo.Get(x => x.Id == ops.SupplierId).FirstOrDefault();
             }
-            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
+            
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -4881,6 +4885,7 @@ namespace eFMS.API.Accounting.DL.Services
                 IsManagerApproved = _settlementApprove?.ManagerAprDate != null,
                 IsAccountantApproved = _settlementApprove?.AccountantAprDate != null,
                 IsBODApproved = _settlementApprove?.BuheadAprDate != null,
+                OfficeName = officeName,
                 ContactOffice = _contactOffice,
                 PaymentMethod = settlementPayment.PaymentMethod,
                 BankAccountName = settlementPayment.BankAccountName,
@@ -5293,7 +5298,11 @@ namespace eFMS.API.Accounting.DL.Services
             string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
                     :
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(settlementPayment.Amount ?? 0, "") + " " + settlementPayment.SettlementCurrency;
-            var isCommonOffice = sysOfficeRepo.Any(x => x.Id == currentUser.OfficeID && DataTypeEx.IsCommonOffice(x.Code));
+            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var officeName = office?.BranchNameEn?.ToUpper();
+            var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);
+
             var infoSettlement = new InfoSettlementExport
             {
                 Requester = _requester,
@@ -5315,7 +5324,9 @@ namespace eFMS.API.Accounting.DL.Services
                 BankAccountName = settlementPayment.BankAccountName,
                 PayeeName = _payeeName,
                 Note = settlementPayment.Note,
-                IsDisplayLogo = isCommonOffice
+                IsDisplayLogo = isCommonOffice,
+                OfficeName = officeName,
+                ContactOffice = _contactOffice
             };
             return infoSettlement;
         }
