@@ -567,8 +567,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || ( dataUserLevel.Contains(x.SalemanId) )
-                                                || x.UserCreated == currentUser.UserID));
+                                                || (dataUserLevel.Contains(x.SalemanId))));
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
@@ -576,19 +575,18 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || dataUserLevelDepartment.Contains(x.SalemanId)
-                                                || x.UserCreated == currentUser.UserID));
+                                                || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
-                                                || authorizeUserIds.Contains(x.SalemanId) 
-                                                || x.UserCreated == currentUser.UserID));
+                                                || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId)
+                                                && (x.CompanyId == currentUser.CompanyID 
+                                                || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) 
                                                 || x.UserCreated == currentUser.UserID));
                     break;
@@ -1307,14 +1305,36 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                existedMblHbl = DataContext.Any(x => x.Id != model.Id 
+                var duplicateHBLMBL = DataContext.Get(x => x.Id != model.Id
                 && x.CurrentStatus != TermData.Canceled
-                && (
-                    x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && ((!string.IsNullOrEmpty(x.ServiceNo) 
-                    ? x.ServiceNo != model.JobNo 
-                    : x.JobNo != model.ServiceNo) )
-                    )
-                );
+                && x.Hwbno == model.Hwbno
+                && x.Mblno == model.Mblno
+                ).ToList();
+                if(duplicateHBLMBL.Count > 0)
+                {
+                    if(model.ReplicatedId == null || model.ReplicatedId == Guid.Empty)
+                    {
+                        if(!string.IsNullOrEmpty(model.ServiceNo))
+                        {
+                            existedMblHbl = duplicateHBLMBL.Any(x => x.ReplicatedId != model.Id);
+                        }
+                        else
+                        {
+                            existedMblHbl = true;
+                        }
+                    }
+                    else
+                    {
+                        existedMblHbl = duplicateHBLMBL.Any(x => x.Id != model.ReplicatedId);
+                    }
+                }
+
+                //var existedMblHblData = DataContext.Get(x => x.Id != model.Id
+                //&& x.CurrentStatus != TermData.Canceled
+                //&& x.Hwbno == model.Hwbno 
+                //&& x.Mblno == model.Mblno
+                //&& (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
+                //).ToList();
             }
             if (existedMblHbl)
             {
