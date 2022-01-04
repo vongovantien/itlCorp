@@ -1307,14 +1307,19 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                existedMblHbl = DataContext.Any(x => x.Id != model.Id 
+                existedMblHbl = DataContext.Any(x => x.Id != model.Id
                 && x.CurrentStatus != TermData.Canceled
-                && (
-                    x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && ((!string.IsNullOrEmpty(x.ServiceNo) 
-                    ? x.ServiceNo != model.JobNo 
-                    : x.JobNo != model.ServiceNo) )
-                    )
+                && x.Hwbno == model.Hwbno
+                && x.Mblno == model.Mblno
+                && (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
                 );
+
+                var existedMblHblData = DataContext.Get(x => x.Id != model.Id
+                && x.CurrentStatus != TermData.Canceled
+                && x.Hwbno == model.Hwbno 
+                && x.Mblno == model.Mblno
+                && (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
+                ).ToList();
             }
             if (existedMblHbl)
             {
