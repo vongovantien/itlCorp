@@ -181,7 +181,7 @@ namespace eFMS.API.Documentation.DL.Services
                 });
 
             IQueryable<Shipments> shipments = shipmentsDocumention
-                .Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+                .Where(x => x.JobId != null && x.HBL != null)
                 .Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             //Nếu có chứa Service Custom Logistic
             if (services.Contains("CL"))
@@ -199,7 +199,7 @@ namespace eFMS.API.Documentation.DL.Services
                                              MBL = ops.Mblno,
                                          };
 
-                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null && x.MBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
+                shipments = shipmentsDocumention.Union(shipmentsOperation).Where(x => x.JobId != null && x.HBL != null).Select(s => new Shipments { JobId = s.JobId, HBL = s.HBL, MBL = s.MBL });
             }
 
             var shipmentsResult = shipments.GroupBy(x => new { x.JobId, x.HBL, x.MBL }).Select(s => new Shipments
@@ -223,7 +223,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Start change request Modified 14/10/2019 by Andy.Hoa
             //Get list shipment operation theo user current
-            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+            IQueryable<OpsTransaction> opstransaction = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
 
             //OPS assign
             IQueryable<OpsTransaction> opstranAssign = from ops in opstransaction
@@ -289,7 +289,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             if (searchOption != "ClearanceNo")
             {
-                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
+                IQueryable<CsTransaction> transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
                 //Transaction assign
                 IQueryable<CsTransaction> cstranAssign = from cstd in transactions
                                                          join osa in opsStageAssignedRepo.Get() on cstd.Id equals osa.JobId //So sánh bằng
@@ -337,7 +337,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 queryUnion = shipmentOperation;
             }
-            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null && x.MBL != null)
+            IQueryable<ShipmentsCopy> listShipment = queryUnion.Where(x => x.JobId != null && x.HBL != null)
                             .GroupBy(x => new { x.JobId, x.Customer, x.MBL, x.HBL, x.HBLID, x.CustomNo, x.Service })
                             .Select(s => new ShipmentsCopy
                             {
@@ -714,7 +714,7 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<Shipments> GetShipmentAssignPIC()
         {
             var userCurrent = currentUser.UserID;
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID); // Lấy theo office current user
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
                                join osa in opsStageAssignedRepo.Get() on ops.Id equals osa.JobId
@@ -738,7 +738,7 @@ namespace eFMS.API.Documentation.DL.Services
 
             var _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => g.HBLID).Select(s => s.FirstOrDefault());
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId
@@ -776,7 +776,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             var userCurrent = currentUser.UserID;
             var advanceRequestJob = acctAdvanceRequestRepository.Get().Select(x => new { x.JobId, x.Mbl, x.Hblid }).ToList();
-            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var operations = opsRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             var customs = customsDeclarationRepo.Get(x => !string.IsNullOrEmpty(x.JobNo));
             // Shipment ops assign is current user
             var shipmentsOps = from ops in operations
@@ -787,7 +787,7 @@ namespace eFMS.API.Documentation.DL.Services
             var shipmentsOpsPIC = operations.Where(x => x.BillingOpsId == userCurrent);
             //Merger Shipment Ops assign & PIC
             var shipmentsOpsMerge = from data in shipmentsOps.Union(shipmentsOpsPIC)
-                                    join cus in customs on data.Hwbno equals cus.Hblid into grpCus
+                                    join cus in customs on data.JobNo equals cus.JobNo into grpCus
                                     from cus in grpCus.DefaultIfEmpty()
                                     select new Shipments
                                     {
@@ -810,7 +810,7 @@ namespace eFMS.API.Documentation.DL.Services
                 _shipmentsOperation = shipmentsOpsMerge.GroupBy(g => new { g.MBL, g.HBLID }).Where(x => x.Count() > 1).Select(s => s.FirstOrDefault());
             }
 
-            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false);
+            var transactions = DataContext.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED && x.IsLocked == false && x.OfficeId == currentUser.OfficeID);  // Lấy theo office current user
             //Shipment doc assign is current user
             var shipmentsDoc = from cst in transactions
                                join osa in opsStageAssignedRepo.Get() on cst.Id equals osa.JobId

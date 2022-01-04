@@ -149,7 +149,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group"
-                                [ngClass]="{'m-form__group has-danger':  isSubmitted && !supplierId.value}">
+                                    [ngClass]="{'m-form__group has-danger':  isSubmitted && !supplierId.value}">
                                     <label class="form-control-label" required>
                                         Supplier/Carrier
                                     </label>
@@ -232,6 +232,14 @@
                                         size="15" [displayFields]="displayFieldSalesman" placeholder="Please select"
                                         (remove)="resetFormControl(salemansId)">
                                     </app-combo-grid-virtual-scroll>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
+                                    <label class="form-control-label">
+                                        Replicate
+                                    </label>
+                                    <app-switch size="md" formControlName="isReplicate"></app-switch>
                                 </div>
                             </div>
                         </div>

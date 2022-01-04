@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using eFMS.API.Common;
 using eFMS.API.Common.Globals;
@@ -482,6 +483,21 @@ namespace eFMS.API.System.Controllers
         {
             var results = userLevelService.GetListUsersByCurrentCompany(model);
             return Ok(results);
+        }
+
+
+        [HttpPut]
+        [Route("SetDefault")]
+        public async Task<IActionResult> SetDefault(int Id)
+        {
+            var hs = await userLevelService.SetDefault(Id);
+            var message = HandleError.GetMessage(hs, Crud.Update);
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

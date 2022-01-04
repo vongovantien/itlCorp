@@ -71,5 +71,6 @@ namespace eFMS.API.Documentation.Service.Models
         public string VatPartnerId { get; set; }
         public string CombineBillingNo { get; set; }
         public string ObhcombineBillingNo { get; set; }
+        public string AdvanceNoFor { get; set; }
     }
 }

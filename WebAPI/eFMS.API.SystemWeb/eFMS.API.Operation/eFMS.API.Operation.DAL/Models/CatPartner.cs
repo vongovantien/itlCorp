@@ -73,5 +73,7 @@ namespace eFMS.API.Operation.Service.Models
         public string PartnerLocation { get; set; }
         public string InternalCode { get; set; }
         public string CreditPayment { get; set; }
+        public string BankName { get; set; }
+        public string BankCode { get; set; }
     }
 }

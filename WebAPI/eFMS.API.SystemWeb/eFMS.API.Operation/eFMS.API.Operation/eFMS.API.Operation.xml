@@ -37,15 +37,15 @@
             <returns></returns>
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetCustomDeclaration(System.String,System.String,System.Boolean,System.Int32,System.Int32)">
-            <summary>
+             <summary>
             
-            </summary>
-            <param name="keySearch"></param>
-            <param name="customerNo"></param>
-            <param name="imporTed"></param>
-            <param name="page"></param>
-            <param name="size"></param>
-            <returns></returns>
+             </summary>
+             <param name="keySearch"></param>
+             <param name="customerNo"></param>
+             <param name="imporTed"></param>
+             <param name="page"></param>
+             <param name="size"></param>
+             <returns></returns>
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.Paging(eFMS.API.Operation.DL.Models.Criteria.CustomsDeclarationCriteria,System.Int32,System.Int32)">
             <summary>
@@ -149,7 +149,7 @@
         </member>
         <member name="M:eFMS.API.Operation.Controllers.CustomsDeclarationController.GetListCustomNoAsignPIC">
             <summary>
-            Get list custom of shipment operation (not locked, shipment asign or PIC is current user) 
+            Get list custom of shipment operation (not locked, shipment asign or PIC is current user)
             </summary>
             <returns></returns>
         </member>

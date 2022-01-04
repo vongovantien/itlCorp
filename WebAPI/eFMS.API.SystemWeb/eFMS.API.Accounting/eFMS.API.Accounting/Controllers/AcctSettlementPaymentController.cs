@@ -317,6 +317,7 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetExistsCharge")]
+        [Authorize]
         public IActionResult GetExistsCharge(ExistsChargeCriteria criteria, string settlementCode)
         {
             var data = acctSettlementPaymentService.GetExistsCharge(criteria);
@@ -325,7 +326,7 @@ namespace eFMS.API.Accounting.Controllers
             foreach (var item in dataGroups)
             {
                 var shipment = new ShipmentSettlement();
-                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, criteria.requester, settlementCode);
+                var advanceLst = acctSettlementPaymentService.GetListAdvanceNoForShipment(item.Key.Hblid, criteria.partnerId, null, settlementCode);
                 shipment.JobId = item.Key.JobId;
                 shipment.MBL = item.Key.MBL;
                 shipment.HBL = item.Key.HBL;
@@ -893,7 +894,7 @@ namespace eFMS.API.Accounting.Controllers
             List<ShipmentChargeSettlement> data = new List<ShipmentChargeSettlement>();
             if (checkSettleOfUser)
             {
-                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo).Where(x => x.IsFromShipment == false).ToList();
+                data = acctSettlementPaymentService.GetListShipmentChargeSettlementNoGroup(settlementNo, true).Where(x => x.IsFromShipment == false).ToList();
             }
             return Ok(data);
             //End change request
@@ -1103,7 +1104,7 @@ namespace eFMS.API.Accounting.Controllers
         [Route("GetListAdvanceNoForShipment")]
         public IActionResult GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode)
         {
-            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, requester, settlementCode);
+            var _result = acctSettlementPaymentService.GetListAdvanceNoForShipment(hblId, payeeId, null, settlementCode);
             return Ok(_result);
         }
 

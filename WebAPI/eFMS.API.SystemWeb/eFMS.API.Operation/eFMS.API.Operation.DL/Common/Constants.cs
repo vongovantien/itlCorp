@@ -23,6 +23,8 @@ namespace eFMS.API.Operation.DL.Common
         public const string Active = "Active";
         public const string FromEFMS = "eFMS";
         public const string FromEcus = "Ecus";
+        public const string FROM_REPLICATE= "Replicate";
+
 
         public static readonly List<ConstantData> OperationStages = new List<ConstantData>
         {

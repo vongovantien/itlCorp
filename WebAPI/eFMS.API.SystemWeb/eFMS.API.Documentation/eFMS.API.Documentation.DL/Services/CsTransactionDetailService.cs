@@ -1576,6 +1576,7 @@ namespace eFMS.API.Documentation.DL.Services
                 housebill.AlsoNotify = dataATTN?.PartnerNameEn; //NOT USE
                 housebill.Signature = data?.Hbltype?.ToUpper() ?? string.Empty; //HBL Type
                 housebill.AttachList = data.AttachList;
+                housebill.PackageConts = _pkgsConts;
                 if (data?.SailingDate != null)
                 {
                     housebill.SailingDate = data.SailingDate.Value; //NOT USE

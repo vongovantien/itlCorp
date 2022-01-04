@@ -25,5 +25,6 @@ namespace eFMS.API.Operation.Service.Models
         public string Description { get; set; }
         public decimal? CreditLimit { get; set; }
         public decimal? CreditRate { get; set; }
+        public string UserRole { get; set; }
     }
 }

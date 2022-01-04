@@ -22,5 +22,7 @@ namespace eFMS.API.System.Service.Models
         public bool? ExpiredAgreement { get; set; }
         public string ApplyType { get; set; }
         public string ApplyPartner { get; set; }
+        public Guid? ReplicateOfficeId { get; set; }
+        public string ReplicatePrefix { get; set; }
     }
 }
