@@ -1,6 +1,7 @@
 ﻿using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 
@@ -281,6 +282,19 @@ namespace eFMS.API.ReportData.FormatExcel
         public void DeleteRow(int _row, int numsDel = 1)
         {
             Worksheet.DeleteRow(_row, numsDel);
+        }
+
+        /// <summary>
+        /// Set picture with position in excel
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="picName"></param>
+        /// <param name="row"></param>
+        /// <param name="column"></param>
+        public void SetPicture(Image image, string picName, int row, int column)
+        {
+            var excelImage = Worksheet.Drawings.AddPicture(picName, image);
+            excelImage.SetPosition(row, 0, column, 0);
         }
 
         /// <summary>
