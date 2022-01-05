@@ -299,7 +299,7 @@ namespace eFMS.API.ReportData.Controllers
         /// Export detail settlement payment
         /// </summary>
         /// <param name="settlementId">Id of settlement payment</param>
-        /// <param name="language">VN (Việt Nam) or ENG (English)</param>
+        /// <param name="lang">VN (Việt Nam) or ENG (English)</param>
         /// <returns></returns>
         [Route("ExportDetailSettlementPayment")]
         [HttpGet]

@@ -18,6 +18,7 @@ namespace eFMS.API.ReportData.Models.Accounting
         public bool IsManagerApproved { get; set; }
         public bool IsAccountantApproved { get; set; }
         public bool IsBODApproved { get; set; }
+        public string OfficeName { get; set; }
         public string ContactOffice { get; set; }
 
         public string BankAccountNo { get; set; }
@@ -26,5 +27,6 @@ namespace eFMS.API.ReportData.Models.Accounting
         public string BankCode { get; set; }
         public string PaymentMethod { get; set; }
         public DateTime? DeadlinePayment { get; set; }
+        public bool IsDisplayLogo { get; set; }
     }
 }
