@@ -68,7 +68,6 @@ namespace eFMS.API.SystemFileManagement.Controllers
         }
 
         [HttpDelete("DeleteAttachedFile/{moduleName}/{folder}/{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteAttachedFile(string moduleName, string folder, Guid id)
         {
             HandleState hs = await _aWSS3Service.DeleteFile(moduleName,folder, id);
