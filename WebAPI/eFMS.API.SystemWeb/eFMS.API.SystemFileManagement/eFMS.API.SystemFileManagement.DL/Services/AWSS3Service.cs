@@ -92,8 +92,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 foreach (var file in model.Files)
                 {
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
+                    if (fileExe != null)
+                        fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#]+", "") + "_" + StringHelper.RandomString(5);
+
                     string extension = Path.GetExtension(file.FileName);
-                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + file.FileName;
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
 
                     var putRequest = new PutObjectRequest()
                     {
@@ -105,12 +109,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     PutObjectResponse putObjectResponse = _client.PutObjectAsync(putRequest).Result;
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        string urlImage = _domainTest +"/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + file.FileName;
+                        string urlImage = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + file.FileName;
                         var sysImage = new SysImage
                         {
                             Id = Guid.NewGuid(),
                             Url = urlImage,
-                            Name = file.FileName,
+                            Name = fileName + extension,
                             Folder = model.ModuleName + "/" + model.FolderName,
                             ObjectId = model.Id.ToString(),
                             UserCreated = currentUser.UserName,
@@ -176,7 +180,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     GetObjectResponse response = _client.GetObjectAsync(request).Result;
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
-                       var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
+                        var f = new InMemoryFile() { Content = streamToByteArray(response.ResponseStream), FileName = it.Name };
                         files.Add(f);
                     }
                 }
@@ -201,10 +205,10 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     {
                         var zipArchiveEntry = archive.CreateEntry(file.FileName, CompressionLevel.Fastest);
 
-                        using (var zipStream = zipArchiveEntry.Open()) 
+                        using (var zipStream = zipArchiveEntry.Open())
                         {
                             zipStream.Write(file.Content, 0, file.Content.Length);
-                        } 
+                        }
                     }
                 }
 
