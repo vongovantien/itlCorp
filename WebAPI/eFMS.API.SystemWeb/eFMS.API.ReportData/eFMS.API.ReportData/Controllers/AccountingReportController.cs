@@ -210,7 +210,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
          {
             var accessToken = Request.Headers["Authorization"].ToString();
@@ -303,7 +303,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDetailSettlementPayment")]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
@@ -327,7 +327,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDetailSettlementPaymentTemplate")]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
@@ -350,7 +350,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportGeneralSettlementPayment")]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
