@@ -47,7 +47,10 @@ namespace eFMS.API.SystemFileManagement
             services.AddInfrastructure<LanguageSub>(Configuration);
             ServiceRegister.Register(services);
             services.AddCustomSwagger();
-            var a = Configuration.GetSection("AWSS3:BucketName");
+            DbHelper.DbHelper.AWSS3BucketName = Configuration.GetSection("AWSS3:BucketName")?.Value;
+            DbHelper.DbHelper.AWSS3AccessKeyId = Configuration.GetSection("AWSS3:AccessKeyId")?.Value;
+            DbHelper.DbHelper.AWSS3SecretAccessKey = Configuration.GetSection("AWSS3:SecretAccessKey")?.Value;
+            DbHelper.DbHelper.AWSS3DomainApi = Configuration.GetSection("AWSS3:DomainApi")?.Value;
         }
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory,
             IHostingEnvironment env, IApiVersionDescriptionProvider provider)

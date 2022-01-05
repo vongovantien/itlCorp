@@ -28,7 +28,6 @@ namespace eFMS.API.SystemFileManagement.DL.Services
     public class AWSS3Service : IAWSS3Service
     {
         private ICurrentUser currentUser;
-        private IOptions<AWSS3Settings> webUrl;
         private AmazonS3Client _client;
         private IContextBase<SysImage> _sysImageRepo;
         private readonly string _awsAccessKeyId;
@@ -36,21 +35,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         private readonly string _awsSecretAccessKey;
         private readonly string _domainTest;
 
-        // private readonly ICurrentUser currentUser;
-        // private readonly IOptions<AWSS3Settings> webUrl;
-
-        //// private AmazonS3Client _client;
-        // private IContextBase<SysImage> _sysImageRepo;
-
-        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser, IOptions<AWSS3Settings> webUrl)
+        public AWSS3Service(IContextBase<SysImage> SysImageRepo, ICurrentUser currentUser)
         {
             this.currentUser = currentUser;
-            this.webUrl = webUrl;
 
-            _awsAccessKeyId = "AKIA2AI6JMUOY6IIKF4U";
-            _bucketName = "efms-test";
-            _awsSecretAccessKey = "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";
-            _domainTest = "http://localhost:44369/api/v1/en-Us/AWSS3/OpenFile/";
+            _awsAccessKeyId = DbHelper.DbHelper.AWSS3AccessKeyId;
+            _bucketName = DbHelper.DbHelper.AWSS3BucketName;
+            _awsSecretAccessKey = DbHelper.DbHelper.AWSS3SecretAccessKey;
+            _domainTest = DbHelper.DbHelper.AWSS3DomainApi;
 
             var credentials = new BasicAWSCredentials(_awsAccessKeyId, _awsSecretAccessKey);
             _client = new AmazonS3Client(credentials, RegionEndpoint.USEast1);
@@ -175,7 +167,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 var files = new List<InMemoryFile>();
                 foreach (var it in lst)
                 {
-                    var key = model.FolderName + "/" + model.ObjectId + "/" + it.Name;
+                    var key = it.Folder + "/" + model.ObjectId + "/" + it.Name;
                     var request = new GetObjectRequest()
                     {
                         BucketName = _bucketName,

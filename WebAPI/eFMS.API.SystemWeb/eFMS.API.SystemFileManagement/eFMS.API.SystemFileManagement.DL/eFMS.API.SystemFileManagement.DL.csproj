@@ -74,6 +74,7 @@
 
   <ItemGroup>
     <Folder Include="Helpers\" />
+    <Folder Include="ViewModel\" />
   </ItemGroup>
 
   <ItemGroup>
