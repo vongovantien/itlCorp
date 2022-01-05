@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eFMS.API.SystemFileManagement</name>
+    </assembly>
+    <members>
+        <member name="T:eFMS.API.SystemFileManagement.Controllers.AWSS3Controller">
+            <summary>
+            A base class for an MVC controller without view support.
+            </summary>
+        </member>
+    </members>
+</doc>
