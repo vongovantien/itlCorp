@@ -178,8 +178,8 @@ export class ExportRepo {
         );
     }
 
-    exportAdvancePaymentDetail(advanceId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}`).pipe(
+    exportAdvancePaymentDetail(advanceId: string, language: string, office: string = null) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${advanceId}&language=${language}&office=${office}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -206,22 +206,22 @@ export class ExportRepo {
         );
     }
 
-    exportSettlementPaymentDetail(settlementId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}`).pipe(
+    exportSettlementPaymentDetail(settlementId: string, language: string, office: string = null) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${settlementId}&language=${language}&office=${office}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
 
-    exportSettlementPaymentDetailTemplate(settlementId: string, language: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPaymentTemplate?settlementId=${settlementId}&language=${language}`).pipe(
+    exportSettlementPaymentDetailTemplate(settlementId: string, language: string, office: string = null) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPaymentTemplate?settlementId=${settlementId}&language=${language}&office=${office}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
     }
 
-    exportGeneralSettlementPayment(settlementId: string) {
-        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${settlementId}`).pipe(
+    exportGeneralSettlementPayment(settlementId: string, office: string = null) {
+        return this._api.downloadfile(`${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${settlementId}&office=${office}`).pipe(
             catchError((error) => throwError(error)),
             map(data => data)
         );
@@ -427,13 +427,13 @@ export class ExportRepo {
         );
     }
 
-    previewExportPayment(id: string, language: string, moduleName: string) {
+    previewExportPayment(id: string, language: string, moduleName: string, office: string) {
         if (moduleName === 'Settlement')
-            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${id}&language=${language}`, '_blank');
+            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailSettlementPayment?settlementId=${id}&language=${language}&office=${office}`, '_blank');
         else if (moduleName === 'Advance')
-            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${id}&language=${language}`, '_blank');
+            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/${language}/AccountingReport/ExportDetailAdvancePayment?advanceId=${id}&language=${language}&office=${office}`, '_blank');
         else if (moduleName === 'Settlement_General')
-            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${id}`, '_blank');
+            window.open(`https://gbc-excel.officeapps.live.com/op/view.aspx?src=${environment.HOST.EXPORT}/api/v1/vi/AccountingReport/ExportGeneralSettlementPayment?settlementId=${id}&office=${office}`, '_blank');
     }
 
     previewExportPaymentTemplate(id: string, language: string, moduleName: string) {

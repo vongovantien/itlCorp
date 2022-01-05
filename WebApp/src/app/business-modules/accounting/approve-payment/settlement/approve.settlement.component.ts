@@ -20,6 +20,8 @@ import { finalize, catchError, takeUntil, switchMap, tap, pluck } from 'rxjs/ope
 import isUUID from 'validator/lib/isUUID';
 import { ISettlementPaymentState, LoadDetailSettlePayment, LoadDetailSettlePaymentSuccess } from '../../settlement-payment/components/store';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { getCurrentUserState } from '@store';
 
 @Component({
     selector: 'app-approve-settlement',
@@ -47,6 +49,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
 
     attachFiles: SysImage[] = [];
     folderModuleName:string='Settlement';
+    userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
     
     constructor(
         private _activedRouter: ActivatedRoute,
@@ -72,7 +75,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
                     this.getDetailSettlement(this.settlementId);
                 }
             });
-
+        this.userLogged$ = this._store.select(getCurrentUserState);
     }
 
     onChangeCurrency(currency: string) {
@@ -249,8 +252,14 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language,'Settlement');
+
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
+            }
+        });   
     }
 
     exportGeneralPreview() {
@@ -275,8 +284,14 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
         }
-        
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General');
+
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General', u.officeId);
+            }
+        });
     }
     
     previewExportSettlementPaymentTemplate(language: string) {
@@ -285,7 +300,13 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             return;
         }
 
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement');
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
+            }
+        });
     }
 
     exportSettlementPaymentTemplate(language: string) {

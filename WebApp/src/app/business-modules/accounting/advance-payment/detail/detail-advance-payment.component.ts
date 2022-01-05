@@ -19,11 +19,13 @@ import { ICrystalReport } from "@interfaces";
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
 import { AdvancePaymentListRequestComponent } from "../components/list-advance-payment-request/list-advance-payment-request.component";
 
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, takeUntil } from "rxjs/operators";
 import isUUID from "validator/lib/isUUID";
 import { InjectViewContainerRefDirective } from "@directives";
 import { combineLatest } from "rxjs";
 import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
+import { getCurrentUserState, IAppState } from "@store";
+import { Store } from "@ngrx/store";
 
 @Component({
     selector: "app-advance-payment-detail",
@@ -58,7 +60,8 @@ export class AdvancePaymentDetailComponent
         private _toastService: ToastrService,
         private _router: Router,
         private _exportRepo: ExportRepo,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        private readonly _store: Store<IAppState>,
     ) {
         super();
     }
@@ -436,7 +439,13 @@ export class AdvancePaymentDetailComponent
     }
 
     previewExportAdvPayment(lang: string) {
-        this._exportRepo.previewExportPayment(this.advId, lang, "Advance");
+        this._store.select(getCurrentUserState)
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.advId, lang, "Advance", u.officeId);
+            }
+        });
     }
 
     changeAdvanceFor(data: string){

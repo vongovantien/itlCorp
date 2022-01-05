@@ -72,7 +72,7 @@ namespace eFMS.API.Accounting.DL.IService
 
         bool CheckUpdatePermissionBySettlementId(Guid settlementId);
 
-        SettlementExport SettlementExport(Guid settlementId);
+        SettlementExport SettlementExport(Guid settlementId, Guid officeId);
 
         List<SettlementExportGroupDefault> QueryDataSettlementExport(string[] settlementCode);
         List<AccountingSettlementExportGroup> GetDataExportSettlementDetail(AcctSettlementPaymentCriteria criteria);
@@ -96,7 +96,7 @@ namespace eFMS.API.Accounting.DL.IService
         string CheckSoaCDNoteIsSynced(ExistsChargeCriteria criteria);
 
         List<string> GetListAdvanceNoForShipment(Guid hblId, string payeeId, string requester, string settlementCode, bool isCopyCharge = false);
-        InfoSettlementExport GetGeneralSettlementExport(Guid settlementId);
+        InfoSettlementExport GetGeneralSettlementExport(Guid settlementId, Guid officeId);
 
         List<ObjectReceivableModel> CalculatorReceivableSettlement(string settlementCode);
         AdvanceInfo GetAdvanceBalanceInfo(string _settlementNo, string _hbl, string _settleCurrency, string _advanceNo, string clearanceNo = null);

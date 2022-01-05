@@ -4828,18 +4828,18 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #region --- EXPORT SETTLEMENT ---
-        public SettlementExport SettlementExport(Guid settlementId)
+        public SettlementExport SettlementExport(Guid settlementId, Guid officeId)
         {
             SettlementExport dataExport = new SettlementExport();
             var settlementPayment = GetSettlementPaymentById(settlementId);
             if (settlementPayment == null) return null;
 
-            dataExport.InfoSettlement = GetInfoSettlementExport(settlementPayment);
+            dataExport.InfoSettlement = GetInfoSettlementExport(settlementPayment, officeId);
             dataExport.ShipmentsSettlement = GetListShipmentSettlementExport(settlementPayment);
             return dataExport;
         }
 
-        public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment)
+        public InfoSettlementExport GetInfoSettlementExport(AcctSettlementPaymentModel settlementPayment, Guid officeId)
         {
             string _requester = string.IsNullOrEmpty(settlementPayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(settlementPayment.Requester)?.EmployeeNameVn;
             #region -- Info Manager, Accoutant & Department --
@@ -4857,10 +4857,10 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == settlementPayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var office = sysOfficeRepo.Get(x => x.Id == (currentUser == null ? officeId : currentUser.OfficeID)).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
-            var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);
+            var isCommonOffice = DataTypeEx.IsCommonOffice(office?.Code);
 
             var surcharge = csShipmentSurchargeRepo.Get(x => x.SettlementCode == settlementPayment.SettlementNo).ToList();
             var soapayNo = surcharge.Select(x => x.PaySoano).ToList();
@@ -5268,7 +5268,7 @@ namespace eFMS.API.Accounting.DL.Services
         /// </summary>
         /// <param name="settlementId"></param>
         /// <returns></returns>
-        public InfoSettlementExport GetGeneralSettlementExport(Guid settlementId)
+        public InfoSettlementExport GetGeneralSettlementExport(Guid settlementId, Guid officeId)
         {
             var settlementPayment = GetSettlementPaymentById(settlementId);
             if (settlementPayment == null) return null;
@@ -5298,7 +5298,7 @@ namespace eFMS.API.Accounting.DL.Services
             string _inWords = settlementPayment.SettlementCurrency == AccountingConstants.CURRENCY_LOCAL ? InWordCurrency.ConvertNumberCurrencyToString(settlementPayment.Amount ?? 0, settlementPayment.SettlementCurrency)
                     :
                         InWordCurrency.ConvertNumberCurrencyToStringUSD(settlementPayment.Amount ?? 0, "") + " " + settlementPayment.SettlementCurrency;
-            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var office = sysOfficeRepo.Get(x => x.Id == (currentUser == null ? officeId : currentUser.OfficeID)).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
             var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code);

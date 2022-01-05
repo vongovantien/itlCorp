@@ -19,10 +19,12 @@ import { DataService } from '@services';
 import { SettlementListChargeComponent } from '../components/list-charge-settlement/list-charge-settlement.component';
 import { SettlementFormCreateComponent } from '../components/form-create-settlement/form-create-settlement.component';
 
-import { catchError, pluck } from 'rxjs/operators';
+import { catchError, pluck, takeUntil } from 'rxjs/operators';
 import isUUID from 'validator/lib/isUUID';
 import { Store } from '@ngrx/store';
 import { LoadDetailSettlePaymentSuccess, LoadDetailSettlePayment } from '../components/store';
+import { Observable } from 'rxjs';
+import { getCurrentUserState } from '@store';
 @Component({
     selector: 'app-settlement-payment-detail',
     templateUrl: './detail-settlement-payment.component.html',
@@ -41,7 +43,8 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
 
     attachFiles: SysImage[] = [];
     folderModuleName: string = 'Settlement';
-
+    userLogged$: Observable<Partial<SystemInterface.IClaimUser>>;
+    
     constructor(
         private _activedRouter: ActivatedRoute,
         private _accoutingRepo: AccountingRepo,
@@ -66,6 +69,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
                     this.back();
                 }
             });
+        this.userLogged$ = this._store.select(getCurrentUserState);
     }
 
     onChangeCurrency(currency: string) {
@@ -328,7 +332,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement');
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
+            }
+        }); 
     }
 
     exportGeneralPreview() {
@@ -354,7 +364,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement');
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
+            }
+        }); 
     }
 
     previewGeneralPreview() {
@@ -363,7 +379,13 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             return;
         }
 
-        this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "", 'Settlement_General');
+        this.userLogged$
+        .pipe(takeUntil(this.ngUnsubscribe))
+        .subscribe((u) => {
+            if (!!u) {
+                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "", 'Settlement_General', u.officeId);
+            }
+        }); 
     }
 
     @delayTime(1000)
