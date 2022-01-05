@@ -1,0 +1,126 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\bin</OutputPath>
+    <DocumentationFile>eFMS.API.Accounting.xml</DocumentationFile>
+  </PropertyGroup>
+<PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AspNetCoreModuleName>AspNetCoreModule</AspNetCoreModuleName>
+    <AspNetCoreHostingModel>OutOfProcess</AspNetCoreHostingModel>
+    <TypeScriptToolsVersion>2.8</TypeScriptToolsVersion>
+</PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\SysEmployeesController.cs" />
+    <Compile Remove="Infrastructure\Common\HandleError.cs" />
+    <Compile Remove="Infrastructure\Middlewares\JsonLocalizationServiceCollectionEx.cs" />
+    <Compile Remove="Resources\LanguageSub.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+  <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+  <PackageReference Include="Microsoft.Extensions.Caching.Redis" Version="2.2.0" />
+  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.0" PrivateAssets="All" />   
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="EPPlus.Core" Version="1.5.4" />
+    <PackageReference Include="IdentityServer4.AccessTokenValidation" Version="2.7.0" />
+    <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="1.1.15" />
+    <PackageReference Include="LocalizationCultureCore" Version="1.1.2" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+    <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="Serilog" Version="2.9.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="4.0.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="4.0.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eFMS.API.SystemFileManagement.DAL\eFMS.API.SystemFileManagement.Service.csproj" />
+    <ProjectReference Include="..\eFMS.API.SystemFileManagement.DL\eFMS.API.SystemFileManagement.DL.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="eFMS.API.Common">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Infrastructure">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.API.Provider">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.API.Provider.dll</HintPath>
+    </Reference>
+    <Reference Include="eFMS.IdentityServer.DL">
+      <HintPath>..\bin\netcoreapp2.2\eFMS.IdentityServer.DL.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Common">
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ITL.NetCore.Connection">
+      <HintPath>..\bin\netcoreapp2.2\ITL.NetCore.Connection.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Prod.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Staging.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Test.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Resources\en-US.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Resources\vi-VN.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="eFMS.API.SystemFileManagement.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\InvoicePaymentImportTemplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\OBHPaymentImportTemplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\VatInvoiceImportTemplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Resources\Files\VoucherImportTemplate.xlsx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

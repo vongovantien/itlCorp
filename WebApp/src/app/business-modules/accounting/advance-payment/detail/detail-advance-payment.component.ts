@@ -34,8 +34,7 @@ import { Store } from "@ngrx/store";
 })
 export class AdvancePaymentDetailComponent
     extends AppPage
-    implements ICrystalReport
-{
+    implements ICrystalReport {
     @ViewChild(AdvancePaymentFormCreateComponent, { static: true }) formCreateComponent: AdvancePaymentFormCreateComponent;
     @ViewChild(AdvancePaymentListRequestComponent) listRequestAdvancePaymentComponent: AdvancePaymentListRequestComponent;
     @ViewChild(ListAdvancePaymentCarrierComponent) listAdvancePaymentCarrierComponent: ListAdvancePaymentCarrierComponent;
@@ -180,7 +179,7 @@ export class AdvancePaymentDetailComponent
                         this.listAdvancePaymentCarrierComponent.advForType = this.advancePayment.advanceFor;
                         this.listAdvancePaymentCarrierComponent.setListAdvRequest(this.advancePayment.advanceRequests);
                         let advanceRequestList = [];
-                        this.advancePayment.advanceRequests.forEach((x: AdvancePaymentRequest)=> advanceRequestList.push({
+                        this.advancePayment.advanceRequests.forEach((x: AdvancePaymentRequest) => advanceRequestList.push({
                             jobId: x.jobId,
                             mbl: x.mbl,
                             hbl: x.hbl,
@@ -198,85 +197,85 @@ export class AdvancePaymentDetailComponent
                 (error: any) => {
                     console.log(error);
                 },
-                () => {}
+                () => { }
             );
     }
 
     getAndModifiedBodyAdvance() {
-        if(!this.isAdvCarrier){
-        return {
-            advanceRequests:
-                this.listRequestAdvancePaymentComponent
-                    .listRequestAdvancePayment,
+        if (!this.isAdvCarrier) {
+            return {
+                advanceRequests:
+                    this.listRequestAdvancePaymentComponent
+                        .listRequestAdvancePayment,
 
-            requester: this.formCreateComponent.requester.value,
-            paymentMethod: this.formCreateComponent.paymentMethod.value,
-            advanceCurrency: this.formCreateComponent.currency.value || "VND",
-            requestDate: !!this.formCreateComponent.requestDate.value.startDate
-                ? formatDate(
-                      this.formCreateComponent.requestDate.value.startDate,
-                      "yyyy-MM-dd",
-                      "en"
-                  )
-                : null,
-            deadlinePayment: !!this.formCreateComponent.deadlinePayment.value
-                .startDate
-                ? formatDate(
-                      this.formCreateComponent.deadlinePayment.value.startDate,
-                      "yyyy-MM-dd",
-                      "en"
-                  )
-                : null,
-            advanceNote: this.formCreateComponent.note.value,
-            statusApproval: this.advancePayment.statusApproval,
-            advanceNo: this.advancePayment.advanceNo,
-            id: this.advancePayment.id,
-            UserCreated: this.advancePayment.userCreated,
-            DatetimeCreated: this.advancePayment.datetimeCreated,
-            paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
-            bankAccountNo: this.formCreateComponent.bankAccountNo.value,
-            bankAccountName: this.formCreateComponent.bankAccountName.value,
-            bankName: this.formCreateComponent.bankName.value,
-            payee: this.formCreateComponent.payee.value,
-            bankCode: this.formCreateComponent.bankCode.value,
-        };
-    }
-    else{
-        return {
-            advanceRequests: this.listAdvancePaymentCarrierComponent.getListAdvRequest(),
-            requester: this.formCreateComponent.requester.value,
-            paymentMethod: this.formCreateComponent.paymentMethod.value,
-            advanceCurrency: this.formCreateComponent.currency.value || "VND",
-            requestDate: !!this.formCreateComponent.requestDate.value.startDate
-                ? formatDate(
-                      this.formCreateComponent.requestDate.value.startDate,
-                      "yyyy-MM-dd",
-                      "en"
-                  )
-                : null,
-            deadlinePayment: !!this.formCreateComponent.deadlinePayment.value
-                .startDate
-                ? formatDate(
-                      this.formCreateComponent.deadlinePayment.value.startDate,
-                      "yyyy-MM-dd",
-                      "en"
-                  )
-                : null,
-            advanceNote: this.formCreateComponent.note.value,
-            statusApproval: this.advancePayment.statusApproval,
-            advanceNo: this.advancePayment.advanceNo,
-            id: this.advancePayment.id,
-            UserCreated: this.advancePayment.userCreated,
-            DatetimeCreated: this.advancePayment.datetimeCreated,
-            paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
-            bankAccountNo: this.formCreateComponent.bankAccountNo.value,
-            bankAccountName: this.formCreateComponent.bankAccountName.value,
-            bankName: this.formCreateComponent.bankName.value,
-            payee: this.formCreateComponent.payee.value,
-            bankCode: this.formCreateComponent.bankCode.value,
-            advanceFor: this.formCreateComponent.advanceFor.value
-        };
-    }
+                requester: this.formCreateComponent.requester.value,
+                paymentMethod: this.formCreateComponent.paymentMethod.value,
+                advanceCurrency: this.formCreateComponent.currency.value || "VND",
+                requestDate: !!this.formCreateComponent.requestDate.value.startDate
+                    ? formatDate(
+                        this.formCreateComponent.requestDate.value.startDate,
+                        "yyyy-MM-dd",
+                        "en"
+                    )
+                    : null,
+                deadlinePayment: !!this.formCreateComponent.deadlinePayment.value
+                    .startDate
+                    ? formatDate(
+                        this.formCreateComponent.deadlinePayment.value.startDate,
+                        "yyyy-MM-dd",
+                        "en"
+                    )
+                    : null,
+                advanceNote: this.formCreateComponent.note.value,
+                statusApproval: this.advancePayment.statusApproval,
+                advanceNo: this.advancePayment.advanceNo,
+                id: this.advancePayment.id,
+                UserCreated: this.advancePayment.userCreated,
+                DatetimeCreated: this.advancePayment.datetimeCreated,
+                paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
+                bankAccountNo: this.formCreateComponent.bankAccountNo.value,
+                bankAccountName: this.formCreateComponent.bankAccountName.value,
+                bankName: this.formCreateComponent.bankName.value,
+                payee: this.formCreateComponent.payee.value,
+                bankCode: this.formCreateComponent.bankCode.value,
+            };
+        }
+        else {
+            return {
+                advanceRequests: this.listAdvancePaymentCarrierComponent.getListAdvRequest(),
+                requester: this.formCreateComponent.requester.value,
+                paymentMethod: this.formCreateComponent.paymentMethod.value,
+                advanceCurrency: this.formCreateComponent.currency.value || "VND",
+                requestDate: !!this.formCreateComponent.requestDate.value.startDate
+                    ? formatDate(
+                        this.formCreateComponent.requestDate.value.startDate,
+                        "yyyy-MM-dd",
+                        "en"
+                    )
+                    : null,
+                deadlinePayment: !!this.formCreateComponent.deadlinePayment.value
+                    .startDate
+                    ? formatDate(
+                        this.formCreateComponent.deadlinePayment.value.startDate,
+                        "yyyy-MM-dd",
+                        "en"
+                    )
+                    : null,
+                advanceNote: this.formCreateComponent.note.value,
+                statusApproval: this.advancePayment.statusApproval,
+                advanceNo: this.advancePayment.advanceNo,
+                id: this.advancePayment.id,
+                UserCreated: this.advancePayment.userCreated,
+                DatetimeCreated: this.advancePayment.datetimeCreated,
+                paymentTerm: this.formCreateComponent.paymentTerm.value || 9,
+                bankAccountNo: this.formCreateComponent.bankAccountNo.value,
+                bankAccountName: this.formCreateComponent.bankAccountName.value,
+                bankName: this.formCreateComponent.bankName.value,
+                payee: this.formCreateComponent.payee.value,
+                bankCode: this.formCreateComponent.bankCode.value,
+                advanceFor: this.formCreateComponent.advanceFor.value
+            };
+        }
     }
 
     updateAdvPayment() {
@@ -355,10 +354,10 @@ export class AdvancePaymentDetailComponent
                 this._toastService.warning(`Advance Payment don't have any request in this period, Please check it again! `, "");
                 return true;
             }
-            if(!this.formCreateComponent.payee.value){
+            if (!this.formCreateComponent.payee.value) {
                 return true;
             }
-            if(!this.listAdvancePaymentCarrierComponent.checkValidate()){
+            if (!this.listAdvancePaymentCarrierComponent.checkValidate()) {
                 return true;
             }
             if (this.listAdvancePaymentCarrierComponent.totalAmount > 100000000 &&
@@ -448,9 +447,9 @@ export class AdvancePaymentDetailComponent
         });
     }
 
-    changeAdvanceFor(data: string){
-        if(this.isAdvCarrier){
-        this.listAdvancePaymentCarrierComponent.configDisplayShipment(data);
+    changeAdvanceFor(data: string) {
+        if (this.isAdvCarrier) {
+            this.listAdvancePaymentCarrierComponent.configDisplayShipment(data);
         }
     }
 }
