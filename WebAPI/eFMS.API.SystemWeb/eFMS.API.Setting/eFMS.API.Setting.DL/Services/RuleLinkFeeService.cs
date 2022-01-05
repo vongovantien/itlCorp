@@ -467,10 +467,10 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         Id = Guid.NewGuid(),
                         RuleName = item.RuleName,
-                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying)).FirstOrDefault().Id.ToString(),
-                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling)).FirstOrDefault().Id.ToString(),
+                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying) && x.Type == "CREDIT" && x.ServiceTypeId.Contains(ConvertService(item.ServiceBuying))).FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling) && x.Type == "DEBIT" && x.ServiceTypeId.Contains(ConvertService(item.ServiceSelling))).FirstOrDefault().Id.ToString(),
                         PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
-                        PartnerSelling = item.PartnerNameSelling!=null?partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id:null,
+                        PartnerSelling = item.PartnerNameSelling != null ? partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id : null,
                         ServiceBuying = ConvertService(item.ServiceBuying),
                         ServiceSelling = ConvertService(item.ServiceSelling),
                         EffectiveDate = DateTime.Now,
