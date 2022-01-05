@@ -281,7 +281,8 @@ namespace eFMS.API.Setting.DL.Services
         {
             if (expriredDate.HasValue)
             {
-                if (DateTime.Now > expriredDate.Value && effectiveDate.Value!=expriredDate.Value) return true;
+                //if (DateTime.Now > expriredDate.Value && effectiveDate.Value!=expriredDate.Value) return true;
+                if (DateTime.Now.Date > expriredDate.Value.Date) return true;
                 return false;
             }
             return false;
