@@ -948,9 +948,9 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet]
         [Route("DetailSettlementPaymentExport")]
         [Authorize]
-        public IActionResult DetailSettlementPaymentExport(Guid settlementId)
+        public IActionResult DetailSettlementPaymentExport(Guid settlementId, Guid officeId)
         {
-            var result = acctSettlementPaymentService.SettlementExport(settlementId);
+            var result = acctSettlementPaymentService.SettlementExport(settlementId, officeId);
             return Ok(result);
         }
 
@@ -962,9 +962,9 @@ namespace eFMS.API.Accounting.Controllers
         [HttpGet]
         [Route("GeneralSettlementPaymentExport")]
         [Authorize]
-        public IActionResult GeneralSettlementPaymentExport(Guid settlementId)
+        public IActionResult GeneralSettlementPaymentExport(Guid settlementId, Guid officeId)
         {
-            var result = acctSettlementPaymentService.GetGeneralSettlementExport(settlementId);
+            var result = acctSettlementPaymentService.GetGeneralSettlementExport(settlementId, officeId);
             return Ok(result);
         }
 

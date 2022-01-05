@@ -211,10 +211,10 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
+        public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang, Guid office)
          {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + lang, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailAdvancePaymentExportUrl + "?advanceId=" + advanceId + "&&language=" + lang + "?officeId=" + office, accessToken);
             var dataObjects = responseFromApi.Content.ReadAsAsync<AdvanceExport>();
 
             var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, lang);
@@ -304,10 +304,10 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPayment")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang)
+        public async Task<IActionResult> ExportDetailSettlementPayment(Guid settlementId, string lang, Guid office)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId + "?officeId=" + office, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
@@ -328,10 +328,10 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportDetailSettlementPaymentTemplate")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang)
+        public async Task<IActionResult> ExportDetailSettlementPaymentTemplate(Guid settlementId, string lang, Guid office)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.DetailSettlementPaymentExportUrl + "?settlementId=" + settlementId + "?officeId=" + office, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<SettlementExport>();
 
@@ -351,10 +351,10 @@ namespace eFMS.API.ReportData.Controllers
         [Route("ExportGeneralSettlementPayment")]
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId)
+        public async Task<IActionResult> ExportGeneralSettlementPayment(Guid settlementId, Guid office)
         {
             var accessToken = Request.Headers["Authorization"].ToString();
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GeneralSettlementPaymentExport + "?settlementId=" + settlementId, accessToken);
+            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GeneralSettlementPaymentExport + "?settlementId=" + settlementId + "?officeId=" + office, accessToken);
 
             var dataObjects = responseFromApi.Content.ReadAsAsync<InfoSettlementExport>();
 
