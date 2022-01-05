@@ -408,5 +408,5 @@ WebAPI/eFMS.API.SystemWeb/eFMS.API.ForPartner/.vs/eFMS.API.ForPartner/v15/Server
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.SystemFileManagement/eFMS.API.SystemFileManagement/obj
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.SystemFileManagement/eFMS.API.SystemFileManagement.DAL/obj
 /WebAPI/eFMS.API.SystemWeb/eFMS.API.SystemFileManagement/eFMS.API.SystemFileManagement.DL/obj
-/WebAPI/eFMS.API.SystemWeb/eFMS.API.SystemFileManagement/eFMS.API.SystemFileManagement/Properties/PublishProfiles
+
 .gitlab-ci.yml
