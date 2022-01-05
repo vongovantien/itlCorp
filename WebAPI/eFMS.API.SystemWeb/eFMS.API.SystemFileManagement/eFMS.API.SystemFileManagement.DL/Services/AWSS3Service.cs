@@ -62,7 +62,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 DeleteObjectRequest request = new DeleteObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = key,
+                    Key = it.KeyS3,
                 };
 
                 DeleteObjectResponse rsDelete = _client.DeleteObjectAsync(request).Result;
@@ -77,7 +77,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
         }
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
-            var res = await _sysImageRepo.GetAsync(x => x.Folder == moduleName + "/" + folder
+            var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
             && x.ObjectId == id.ToString() && x.ChildId == child);
 
             return res.OrderByDescending(x => x.DateTimeCreated).ToList();
@@ -115,13 +115,14 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                             Id = Guid.NewGuid(),
                             Url = urlImage,
                             Name = fileName + extension,
-                            Folder = model.ModuleName + "/" + model.FolderName,
+                            Folder = model.FolderName,
                             ObjectId = model.Id.ToString(),
                             UserCreated = currentUser.UserName,
                             UserModified = currentUser.UserName,
                             DateTimeCreated = DateTime.Now,
                             DatetimeModified = DateTime.Now,
-                            ChildId = model.Child
+                            ChildId = model.Child,
+                            KeyS3 = key
                         };
                         list.Add(sysImage);
                     }
@@ -166,16 +167,15 @@ namespace eFMS.API.SystemFileManagement.DL.Services
             HandleState result = new HandleState();
             try
             {
-                var lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId);
+                var lst = await _sysImageRepo.GetAsync(x => x.ObjectId == model.ObjectId && x.ChildId == model.ChillId);
                 if (lst == null) { return new HandleState("Not found data"); }
                 var files = new List<InMemoryFile>();
                 foreach (var it in lst)
                 {
-                    var key = it.Folder + "/" + model.ObjectId + "/" + it.Name;
                     var request = new GetObjectRequest()
                     {
                         BucketName = _bucketName,
-                        Key = key
+                        Key = it.KeyS3
                     };
                     GetObjectResponse response = _client.GetObjectAsync(request).Result;
                     if (response.HttpStatusCode == HttpStatusCode.OK)
