@@ -105,7 +105,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     PutObjectResponse putObjectResponse = _client.PutObjectAsync(putRequest).Result;
                     if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        string urlImage = _domainTest + "/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + file.FileName;
+                        string urlImage = _domainTest +"/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + file.FileName;
                         var sysImage = new SysImage
                         {
                             Id = Guid.NewGuid(),
