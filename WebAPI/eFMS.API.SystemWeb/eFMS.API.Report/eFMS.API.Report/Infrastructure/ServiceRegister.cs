@@ -1,4 +1,6 @@
-﻿using eFMS.API.Report.Infrastructure.Filters;
+﻿using eFMS.API.Report.DL.IService;
+using eFMS.API.Report.DL.Services;
+using eFMS.API.Report.Infrastructure.Filters;
 using eFMS.API.Report.Service.Context;
 using ITL.NetCore.Connection.EF;
 using LocalizationCultureCore.StringLocalizer;
@@ -26,6 +28,8 @@ namespace eFMS.API.Report.Infrastructure
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<IStringLocalizer, JsonStringLocalizer>();
             services.AddTransient<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+
+            services.AddTransient<IReportDocumentService, ReportDocumentService>();
         }
         public static IServiceCollection AddCustomSwagger(this IServiceCollection services)
         {
