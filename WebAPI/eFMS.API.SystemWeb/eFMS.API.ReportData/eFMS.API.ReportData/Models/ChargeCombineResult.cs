@@ -74,5 +74,6 @@ namespace eFMS.API.Accounting.DL.Models
         public string SeriesNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string CombineNo { get; set; }
+        public string CombineBillingType { get; set; }
     }
 }
