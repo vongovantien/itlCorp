@@ -22,5 +22,8 @@ namespace eFMS.API.Operation.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public decimal? AmountVnd { get; set; }
+        public decimal? AmountUsd { get; set; }
+        public string ReferenceNo { get; set; }
     }
 }

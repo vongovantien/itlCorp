@@ -81,6 +81,7 @@ export class OpsModuleStageManagementComponent extends AppList {
             ).subscribe(
                 (response: any) => {
                     this.data = response;
+                    console.log(this.data);
                 },
             );
     }
@@ -91,6 +92,7 @@ export class OpsModuleStageManagementComponent extends AppList {
 
     openPopUpAssignStage() {
         this.assignStagePopup.job = this.data;
+        this.assignStagePopup.isAssignReplicateJob = this.assignStagePopup.isShowReplicate = !!this.data.replicatedId;
         this.assignStagePopup.isAsignment = false;
 
         if (!!this.data.fieldOpsId) {

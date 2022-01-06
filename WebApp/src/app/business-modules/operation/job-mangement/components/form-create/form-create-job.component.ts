@@ -147,7 +147,7 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
 
     initForm() {
         this.formCreate = this._fb.group({
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 Validators.required,
                 FormValidators.validateSpecialChar
             ])],
@@ -172,7 +172,9 @@ export class JobManagementFormCreateComponent extends AppForm implements OnInit 
             supplierId: [null, Validators.required],
             agentId: [],
             billingOpsId: [this.userLogged.id, Validators.required],
-            salemansId: [null, Validators.required]
+            salemansId: [null, Validators.required],
+            isReplicate: [false]
+
         }, { validator: FormValidators.comparePort });
 
         this.hwbno = this.formCreate.controls['hwbno'];

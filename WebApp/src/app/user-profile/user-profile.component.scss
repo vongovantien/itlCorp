@@ -17,3 +17,18 @@
     object-fit: cover;
     height: 160px;
 }
+
+.icon-check {
+    margin: 10px 0px;
+    min-height: 10px;
+    i {
+        font-size: 20px;
+        background: #0ca940;
+        color: #fff;
+        border-radius: 50%;
+        -webkit-border-radius: 50%;
+        -moz-border-radius: 50%;
+        -ms-border-radius: 50%;
+        -o-border-radius: 50%;
+    }
+}

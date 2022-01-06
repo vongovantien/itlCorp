@@ -5,14 +5,14 @@ import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/opera
 import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { NgProgress } from '@ngx-progressbar/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
-import { SystemConstants } from '@constants';
+import { RoutingConstants, SystemConstants } from '@constants';
 import { AppForm } from '../app.form';
 import { environment } from 'src/environments/environment';
 import { GlobalState } from '../global-state';
-import { Employee, Bank } from '@models';
+import { Employee, Bank, UserLevel } from '@models';
 import * as fromShare from '../business-modules/share-business/store';
 import UUID from 'validator/lib/isUUID';
 
@@ -54,6 +54,19 @@ export class UserProfilePageComponent extends AppForm {
         { field: 'bankNameEn', label: 'Bank Name EN' },
     ];
 
+    headersuslv: CommonInterface.IHeaderTable[] = [
+        { title: '', field: 'isDefault' },
+        { title: 'Group Name', field: 'groupName' },
+        { title: 'Company', field: 'companyName' },
+        { title: 'Office', field: 'officeName' },
+        { title: 'Department', field: 'departmentName' },
+        { title: 'Position', field: 'position' },
+
+    ];
+
+    selectedUserLevel: UserLevel;
+
+    userLevels: UserLevel[] = [];
 
     constructor(
         private _ngProgressService: NgProgress,
@@ -64,6 +77,7 @@ export class UserProfilePageComponent extends AppForm {
         private _zone: NgZone,
         private _globalState: GlobalState,
         private _store: Store<any>,
+        private _router: Router,
 
     ) {
         super();
@@ -95,6 +109,8 @@ export class UserProfilePageComponent extends AppForm {
                     }
                 }
             );
+
+            this.getListUserLevelByUserId();
     }
 
     ngAfterViewInit() {
@@ -269,5 +285,46 @@ export class UserProfilePageComponent extends AppForm {
         user.bankName = body.bankName;
         user.bankCode = body.bankCode;
         this._store.dispatch(UpdateCurrentUser(user));
+        this.saveUserLevel();
+    }
+
+    getListUserLevelByUserId() {
+        this._systemRepo.getListUserLevelByUserId(this.currentUserId)
+            .pipe(
+                catchError(this.catchError),
+                finalize(() => { this.isLoading = false; }),
+            ).subscribe(
+                (res: any) => {
+                    if (!!res) {
+                        this.userLevels = res;
+                    }
+                },
+            );
+    }
+
+    onSelectUserLevel(item: UserLevel) {
+        this.selectedUserLevel = item;
+        this.userLevels.forEach(x=>x.isDefault=false);
+        item.isDefault=true;
+    }
+
+    cancel() {
+        this._router.navigate(['/home/dashboard']);
+    }
+
+    saveUserLevel() {
+        if (!!this.selectedUserLevel) {
+            this.selectedUserLevel.isDefault = true;
+            this._systemRepo.setdefaultUserLeve(this.selectedUserLevel.id)
+                .subscribe(
+                    (res: any) => {
+                        console.log(res);
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            this.getListUserLevelByUserId();
+                        }
+                    }
+                )
+        }
     }
 }

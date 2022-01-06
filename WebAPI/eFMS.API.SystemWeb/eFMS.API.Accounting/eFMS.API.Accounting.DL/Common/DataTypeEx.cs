@@ -57,6 +57,5 @@ namespace eFMS.API.Accounting.DL.Common
             };
             return validCodeOffice.Any(z => z == officeCode);
         }
-
     }
 }

@@ -1118,17 +1118,20 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailAdvancePayment(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (advanceExport.InfoAdvance.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column B
-                excelImage.SetPosition(0, 0, 1, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column B
+                    excelImage.SetPosition(0, 0, 1, 0);
+                }
             }
 
             List<string> headers = GetHeaderExcelDetailAdvancePayment(language);
 
             workSheet.Cells["H1:K1"].Merge = true;
-            workSheet.Cells["H1"].Value = headers[0];
+            workSheet.Cells["H1"].Value = advanceExport.InfoAdvance.OfficeName;
             workSheet.Cells["H1"].Style.Font.SetFromFont(new Font("Arial Black", 12));
             workSheet.Cells["H1"].Style.Font.Italic = true;
             workSheet.Cells["H2:K2"].Merge = true;
@@ -3884,25 +3887,27 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailSettlementPayment(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (settlementExport.InfoSettlement.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column A
-                excelImage.SetPosition(0, 0, 0, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column A
+                    excelImage.SetPosition(0, 0, 0, 0);
+                }
             }
-
             List<string> headers = GetHeaderExcelDetailSettlementPayment(language);
 
             #region #Header
-            workSheet.Cells["J1:M1"].Merge = true;
-            workSheet.Cells["J1"].Value = headers[0];
-            workSheet.Cells["J1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
-            workSheet.Cells["J1"].Style.Font.Italic = true;
-            workSheet.Cells["J2:M2"].Merge = true;
-            workSheet.Cells["J2"].Style.WrapText = true;
-            workSheet.Cells["J2"].Value = settlementExport.InfoSettlement.ContactOffice;
-            workSheet.Cells["J2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
-            workSheet.Cells["J2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            workSheet.Cells["I1:M1"].Merge = true;
+            workSheet.Cells["I1"].Value = settlementExport.InfoSettlement.OfficeName;
+            workSheet.Cells["I1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
+            workSheet.Cells["I1"].Style.Font.Italic = true;
+            workSheet.Cells["I2:M2"].Merge = true;
+            workSheet.Cells["I2"].Style.WrapText = true;
+            workSheet.Cells["I2"].Value = settlementExport.InfoSettlement.ContactOffice;
+            workSheet.Cells["I2"].Style.Font.SetFromFont(new Font("Microsoft Sans Serif", 9));
+            workSheet.Cells["I2"].Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             workSheet.Row(2).Height = 60;
 
             //Title
@@ -4426,17 +4431,20 @@ namespace eFMS.API.ReportData.FormatExcel
 
             SetWidthColumnExcelDetailSettlementPaymentSOA(workSheet);
 
-            using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+            if (settlementExport.InfoSettlement.IsDisplayLogo)
             {
-                var excelImage = workSheet.Drawings.AddPicture("Logo", image);
-                //add the image to row 1, column A
-                excelImage.SetPosition(0, 0, 0, 0);
+                using (Image image = Image.FromFile(CrystalEx.GetLogoITL()))
+                {
+                    var excelImage = workSheet.Drawings.AddPicture("Logo", image);
+                    //add the image to row 1, column A
+                    excelImage.SetPosition(0, 0, 0, 0);
+                }
             }
 
             List<string> headers = GetHeaderExcelDetailSettlementPaymentSOA(language);
             #region #Header
             workSheet.Cells["F1:L1"].Merge = true;
-            workSheet.Cells["F1"].Value = headers[0];
+            workSheet.Cells["F1"].Value = settlementExport.InfoSettlement.OfficeName;
             workSheet.Cells["F1"].Style.Font.SetFromFont(new Font("Arial Black", 11));
             workSheet.Cells["F1"].Style.Font.Italic = true;
             workSheet.Cells["F2:M2"].Merge = true;
@@ -4807,8 +4815,21 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     return null;
                 }
+                List<string> headers = new List<string>()
+                {
+                   "INDO TRANS LOGISTICS CORPORATION", //0
+                   "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
+                };
                 var excel = new ExcelExport(path);
                 var listKeyData = new Dictionary<string, object>();
+                if (settlementExport.IsDisplayLogo)
+                {
+                    // Set logo company
+                    Image image = Image.FromFile(CrystalEx.GetLogoITL());
+                    excel.SetPicture(image, "Logo", 0, 0);
+                }
+                listKeyData.Add("CompanyName", settlementExport.OfficeName);
+                listKeyData.Add("CompanyAddress", settlementExport.ContactOffice);
                 listKeyData.Add("SettlementNo", settlementExport.SettlementNo);
                 listKeyData.Add("RequestDate", settlementExport.RequestDate);
                 listKeyData.Add("Requester", settlementExport.Requester);
@@ -5135,7 +5156,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 18].Style.Numberformat.Format = "dd/MM/yyyy";
 
                 workSheet.Cells[rowStart, 19].Value = item.AccountNo;
-                workSheet.Cells[rowStart, 20].Value = item.ETD != null ? item.ETD.Value.ToString("dd/MM/yyyyy"):string.Empty ;
+                workSheet.Cells[rowStart, 20].Value = item.ETD != null ? item.ETD.Value.ToString("dd/MM/yyyy"):string.Empty ;
                 workSheet.Cells[rowStart, 21].Value = item.ETA != null ? item.ETA.Value.ToString("dd/MM/yyyy") : string.Empty;
 
                 rowStart += 1;

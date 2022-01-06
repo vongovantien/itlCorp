@@ -61,6 +61,7 @@ namespace eFMS.API.Documentation.DL.Services
         private readonly IContextBase<AcctSettlementPayment> acctSettlementPayment;
         private readonly IContextBase<CatContract> catContractRepository;
         private readonly IContextBase<CsTransaction> transactionRepository;
+        private readonly IContextBase<SysSettingFlow> settingFlowRepository;
 
         private decimal _decimalNumber = Constants.DecimalNumber;
         private decimal _decimalMinNumber = Constants.DecimalMinNumber;
@@ -92,7 +93,8 @@ namespace eFMS.API.Documentation.DL.Services
             IContextBase<OpsTransaction> _opsTransactionRepository,
             IContextBase<AcctAdvancePayment> _accAdvancePaymentRepository,
             IContextBase<CatContract> catContractRepo,
-            IContextBase<CsTransaction> transactionRepo
+            IContextBase<CsTransaction> transactionRepo,
+            IContextBase<SysSettingFlow> settingFlowRepo
             ) : base(repository, mapper)
         {
             //catStageApi = stageApi;
@@ -125,6 +127,7 @@ namespace eFMS.API.Documentation.DL.Services
             accAdvancePaymentRepository = _accAdvancePaymentRepository;
             catContractRepository = catContractRepo;
             transactionRepository = transactionRepo;
+            settingFlowRepository = settingFlowRepo;
         }
         public override HandleState Add(OpsTransactionModel model)
         {
@@ -168,13 +171,62 @@ namespace eFMS.API.Documentation.DL.Services
                     model.JobNo = CreateJobNoOps();
                     OpsTransaction entity = mapper.Map<OpsTransaction>(model);
 
-                    result = DataContext.Add(entity);
+                   
+                    if(model.IsReplicate) // replicate 1 job tương tự.
+                    {
+                        // Thông tin lv của current user bên office replicate
+                        SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
+                        if(settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
+                        {
+                            SysUserLevel dataUserLevel = userlevelRepository.Get(x => x.UserId == currentUser.UserID
+                        && x.OfficeId == settingFlowOffice.ReplicateOfficeId).FirstOrDefault();
+                            var officeReplicate = sysOfficeRepo.Get(x => x.Id == settingFlowOffice.ReplicateOfficeId)?.FirstOrDefault();
 
-                    trans.Commit();
+                            if (dataUserLevel == null)
+                            {
+                                return new HandleState((object)
+                                    string.Format("You don't have permission at {0}, Please you check with system admin!", officeReplicate.ShortName)
+                                    );
+                            };
+                            model.OfficeId = dataUserLevel.OfficeId;
+                            model.DepartmentId = dataUserLevel.DepartmentId;
+                            model.GroupId = dataUserLevel.GroupId;
+                            model.CompanyId = dataUserLevel.CompanyId;
+
+                            // mapping saleman
+                            var salemanDefault = userRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault();
+                            SaleManPermissionModel salemanPermissionInfoReplicate = GetAndUpdateSaleManInfo(salemanDefault.Id);
+                            model.SalesGroupId = salemanPermissionInfoReplicate.SalesGroupId;
+                            model.SalesDepartmentId = salemanPermissionInfoReplicate.SalesDepartmentId;
+                            model.SalesOfficeId = salemanPermissionInfoReplicate.SalesOfficeId;
+                            model.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
+
+                            model.JobNo = GeneratePreFixReplicate() + entity.JobNo;
+                            OpsTransaction entityReplicate = mapper.Map<OpsTransaction>(model);
+                            entityReplicate.Id = Guid.NewGuid();
+                            entityReplicate.Hblid = Guid.NewGuid();
+                            entityReplicate.ServiceNo = entity.JobNo;
+                            entityReplicate.ServiceHblId = entity.Hblid;
+                            entityReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
+
+                            DataContext.Add(entityReplicate, false);
+
+                            entity.ReplicatedId = entityReplicate.Id;
+                        }
+                        
+                    };
+
+                    DataContext.Add(entity, false);
+                    result = DataContext.SubmitChanges();
+                    if(result.Success)
+                    {
+                        trans.Commit();
+                    }
                     return result;
                 }
                 catch (Exception ex)
                 {
+                    new LogHelper("eFMS_Add_OpsTransaction_Log", ex.ToString());
                     trans.Rollback();
                     result = new HandleState(ex.Message);
                 }
@@ -252,21 +304,24 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 if (office.Code == "ITLHAN")
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE 
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: HAN -> H [15202]
                 }
                 else if (office.Code == "ITLDAD")
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-"))
                                                          .OrderByDescending(x => x.JobNo).FirstOrDefault(); //CR: DAD -> D [15202]
                 }
                 else
                 {
-                    currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                    currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                         && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                          && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                          && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                          && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
@@ -275,7 +330,8 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else
             {
-                currentShipment = DataContext.Get(x => x.DatetimeCreated.Value.Month == DateTime.Now.Month
+                currentShipment = DataContext.Get(x => x.LinkSource != DocumentConstants.CLEARANCE_FROM_REPLICATE
+                                                     && x.DatetimeCreated.Value.Month == DateTime.Now.Month
                                                      && x.DatetimeCreated.Value.Year == DateTime.Now.Year
                                                      && !x.JobNo.StartsWith("D") && !x.JobNo.StartsWith("DAD-")
                                                      && !x.JobNo.StartsWith("H") && !x.JobNo.StartsWith("HAN-"))
@@ -511,8 +567,7 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || ( dataUserLevel.Contains(x.SalemanId) )
-                                                || x.UserCreated == currentUser.UserID));
+                                                || (dataUserLevel.Contains(x.SalemanId))));
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
@@ -520,19 +575,18 @@ namespace eFMS.API.Documentation.DL.Services
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
-                                                || dataUserLevelDepartment.Contains(x.SalemanId)
-                                                || x.UserCreated == currentUser.UserID));
+                                                || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
-                                                || authorizeUserIds.Contains(x.SalemanId) 
-                                                || x.UserCreated == currentUser.UserID));
+                                                || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
                     data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
-                                                && (x.CompanyId == currentUser.CompanyID || authorizeUserIds.Contains(x.BillingOpsId)
+                                                && (x.CompanyId == currentUser.CompanyID 
+                                                || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) 
                                                 || x.UserCreated == currentUser.UserID));
                     break;
@@ -743,16 +797,8 @@ namespace eFMS.API.Documentation.DL.Services
                     return new HandleState(errorContract);
                 }
 
-                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model);
-                opsTransaction.JobNo = CreateJobNoOps();
-
-                opsTransaction.SalemanId = customerContract.SaleManId;
-                SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
-                opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
-                opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
-                opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
-                opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
-
+                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, model, customerContract);
+                opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
 
                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                 if (existedJobNo == true)
@@ -760,33 +806,56 @@ namespace eFMS.API.Documentation.DL.Services
                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
                 }
 
-                DataContext.Add(opsTransaction);
+                //if (model.Id > 0)
+                //{
+                //    CustomsDeclaration clearance = UpdateInfoConvertClearance(model);
+                //    clearance.JobNo = opsTransaction.JobNo;
 
-                if (model.Id > 0)
+                //    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
+                //}
+               
+                HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, model, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
+                if(rs.Message == null)
                 {
-                    var clearance = UpdateInfoConvertClearance(model);
-                    clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
+                    if(opsReplicate != null)
+                    {
+                        DataContext.Add(opsReplicate, false);
+                        opsTransaction.ReplicatedId = opsReplicate.Id;  // ID của job Replicate.
+                    }
+                    DataContext.Add(opsTransaction, false);
+
+                    result = DataContext.SubmitChanges();
+                    if (result.Success && model.Id == 0)
+                    {
+                        CustomsDeclaration clearance = GetNewClearanceModel(model);
+                        clearance.JobNo = opsTransaction.JobNo;
+                        HandleState hsAddCd = customDeclarationRepository.Add(clearance, false);
+
+                        if(cdReplicate != null)
+                        {
+                            cdReplicate.JobNo = opsReplicate.JobNo;
+                            HandleState hsAddCdReplicate = customDeclarationRepository.Add(cdReplicate, false);
+                        }
+                      
+                        result = customDeclarationRepository.SubmitChanges();
+                    }
                 }
                 else
                 {
-                    var clearance = GetNewClearanceModel(model);
-                    clearance.JobNo = opsTransaction.JobNo;
-                    customDeclarationRepository.Add(clearance);
+                    return new HandleState((object)rs.Message);
                 }
-                DataContext.SubmitChanges();
-                customDeclarationRepository.SubmitChanges();
             }
             catch (Exception ex)
             {
+                new LogHelper("eFMS_CONVERT_CLEARANCE_LOG", ex.ToString());
                 result = new HandleState(ex.Message);
             }
             return result;
         }
 
-        private OpsTransaction GetNewShipmentToConvert(string productService, CustomsDeclarationModel model)
+        private OpsTransaction GetNewShipmentToConvert(string productService, CustomsDeclarationModel model, CatContract customerContract)
         {
-            var opsTransaction = new OpsTransaction
+            OpsTransaction opsTransaction = new OpsTransaction
             {
                 Id = Guid.NewGuid(),
                 Hblid = Guid.NewGuid(),
@@ -814,7 +883,8 @@ namespace eFMS.API.Documentation.DL.Services
                 UserModified = currentUser.UserID,
                 ShipmentType = "Freehand",
             };
-            var customer = new CatPartner();
+
+            CatPartner customer = new CatPartner();
             if (model.AccountNo == null)
             {
                 customer = partnerRepository.Get(x => x.TaxCode == model.PartnerTaxCode).FirstOrDefault();
@@ -828,7 +898,7 @@ namespace eFMS.API.Documentation.DL.Services
                 opsTransaction.CustomerId = customer.Id;
 
             }
-            var port = placeRepository.Get(x => x.Code == model.Gateway).FirstOrDefault();
+            CatPlace port = placeRepository.Get(x => x.Code == model.Gateway).FirstOrDefault();
             if (port != null)
             {
                 if (model.Type == "Export")
@@ -843,7 +913,7 @@ namespace eFMS.API.Documentation.DL.Services
                 }
             }
 
-            var unit = unitRepository.Get(x => x.Code == model.UnitCode).FirstOrDefault();
+            CatUnit unit = unitRepository.Get(x => x.Code == model.UnitCode).FirstOrDefault();
             if (unit != null)
             {
                
@@ -863,6 +933,17 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 opsTransaction.CurrentStatus = TermData.Processing;
             }
+
+            opsTransaction.SalemanId = customerContract.SaleManId;
+            SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
+            opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
+            opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
+            opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
+            opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
+
+            var supllier = partnerRepository.Get(x => x.TaxCode == DocumentConstants.NON_CARRIER_PARTNER_CODE).FirstOrDefault();
+            opsTransaction.SupplierId = supllier?.Id;
+
             return opsTransaction;
         }
 
@@ -885,14 +966,19 @@ namespace eFMS.API.Documentation.DL.Services
         {
             if (id == 0)
             {
-                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo 
+                && x.ClearanceDate == model.ClearanceDate 
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))
                 {
                     return true;
                 }
             }
             else
             {
-                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo 
+                && x.Id != id 
+                && x.ClearanceDate == model.ClearanceDate 
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))) // không check trùng vs tk replicate (có thể phát sinh tk rác)
                 {
                     return true;
                 }
@@ -974,17 +1060,16 @@ namespace eFMS.API.Documentation.DL.Services
                         {
                             try
                             {
-                                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item);
+                                OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item, customerContract);
                                 opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
 
-                                // Update salemanInfo
-                                opsTransaction.SalemanId = customerContract.SaleManId;
-                                SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
-                                opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
-                                opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
-                                opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
-                                opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
-
+                                //// Update salemanInfo
+                                //opsTransaction.SalemanId = customerContract.SaleManId;
+                                //SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
+                                //opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
+                                //opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
+                                //opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
+                                //opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
 
                                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                                 if (existedJobNo == true)
@@ -992,20 +1077,49 @@ namespace eFMS.API.Documentation.DL.Services
                                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
                                 }
 
-                                DataContext.Add(opsTransaction);
 
                                 CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
 
-                                clearance.JobNo = opsTransaction.JobNo;
-                                customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
+                                HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, item, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
+                                if(rs.Message == null)
+                                {
+                                    DataContext.Add(opsTransaction, false);
+                                    if(opsReplicate != null)
+                                    {
+                                        opsTransaction.ReplicatedId = opsReplicate.Id;
+                                        DataContext.Add(opsReplicate, false);
+                                    }
 
-                                i = i + 1;
+                                    if(cdReplicate != null)
+                                    {
+                                        cdReplicate.JobNo = opsReplicate.JobNo;
+                                    }
+                                    customDeclarationRepository.Add(cdReplicate, false);
 
-                                trans.Commit();
+                                    result = DataContext.SubmitChanges();
+
+                                    if(result.Success)
+                                    {
+                                        clearance.JobNo = opsTransaction.JobNo;
+                                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+
+                                        customDeclarationRepository.SubmitChanges();
+                                    }
+                                   
+                                    i = i + 1;
+
+                                    trans.Commit();
+                                }
+                                else
+                                {
+                                    trans.Rollback();
+                                    return new HandleState(new Exception(Convert.ToString(rs.Message)));
+                                }
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
-
+                                trans.Rollback();
+                                return new HandleState(ex.Message);
                                 throw;
                             }
                             finally
@@ -1025,6 +1139,91 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 new LogHelper("eFMS_CONVERT_CLEARANCE_LOG", ex.ToString());
                 result = new HandleState(ex.Message);
+            }
+            return result;
+        }
+
+        private HandleState CreateJobAndClearanceReplicate(OpsTransaction opsTransaction, string productService, CustomsDeclarationModel cd, 
+            CatContract customerContract, out OpsTransaction opsTransactionReplicate, out CustomsDeclaration clearanceReplicate)
+        {
+            clearanceReplicate = null;
+            opsTransactionReplicate = null;
+            SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
+
+            HandleState result = new HandleState();
+            if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
+            {
+                SysUserLevel dataUserLevel = userlevelRepository.Get(x => x.UserId == currentUser.UserID
+                       && x.OfficeId == settingFlowOffice.ReplicateOfficeId).FirstOrDefault();
+                var officeReplicate = sysOfficeRepo.Get(x => x.Id == settingFlowOffice.ReplicateOfficeId)?.FirstOrDefault();
+
+                if (dataUserLevel == null)
+                {
+                    return new HandleState((object)
+                        string.Format("You don't have permission at {0}, Please you check with system admin!", officeReplicate.ShortName)
+                        );
+                };
+
+                string preFix = "R";
+                if(!string.IsNullOrEmpty(settingFlowOffice.ReplicatePrefix))
+                {
+                    preFix = settingFlowOffice.ReplicatePrefix;
+                }
+
+                opsTransactionReplicate = GetNewShipmentToConvert(productService, cd, customerContract);
+
+                opsTransactionReplicate.JobNo = preFix + opsTransaction.JobNo;
+                opsTransactionReplicate.ServiceNo = opsTransaction.JobNo;
+                opsTransactionReplicate.ServiceHblId = opsTransaction.Hblid;
+                opsTransactionReplicate.LinkSource = DocumentConstants.CLEARANCE_FROM_REPLICATE;
+                opsTransactionReplicate.OfficeId = settingFlowOffice.ReplicateOfficeId; // office của setting replicate
+
+                // mapping saleman
+                var salemanDefault = userRepository.Get(x => x.Username == DocumentConstants.ITL_BOD)?.FirstOrDefault();
+                SaleManPermissionModel salemanPermissionInfoReplicate = GetAndUpdateSaleManInfo(salemanDefault.Id);
+                opsTransactionReplicate.SalesGroupId = salemanPermissionInfoReplicate.SalesGroupId;
+                opsTransactionReplicate.SalesDepartmentId = salemanPermissionInfoReplicate.SalesDepartmentId;
+                opsTransactionReplicate.SalesOfficeId = salemanPermissionInfoReplicate.SalesOfficeId;
+                opsTransactionReplicate.SalesCompanyId = salemanPermissionInfoReplicate.SalesCompanyId;
+
+                // mapping permission
+                opsTransactionReplicate.OfficeId = dataUserLevel.OfficeId;
+                opsTransactionReplicate.DepartmentId = dataUserLevel.DepartmentId;
+                opsTransactionReplicate.GroupId = dataUserLevel.GroupId;
+                opsTransactionReplicate.CompanyId = dataUserLevel.CompanyId;
+
+                //HandleState hsAddOpsReplicate = DataContext.Add(opsTransactionReplicate);
+                clearanceReplicate = new CustomsDeclaration
+                {
+                    ConvertTime = DateTime.Now,
+                    DatetimeCreated = DateTime.Now,
+                    DatetimeModified = DateTime.Now,
+                    UserCreated = currentUser.UserID,
+                    UserModified = currentUser.UserID,
+                    Source = DocumentConstants.CLEARANCE_FROM_REPLICATE,
+                    GroupId = currentUser.GroupId,
+                    DepartmentId = currentUser.DepartmentId,
+                    OfficeId = settingFlowOffice.ReplicateOfficeId, // theo Office của Replicatate setting
+                    CompanyId = currentUser.CompanyID,
+                    JobNo = opsTransactionReplicate.JobNo,
+                    Hblid = cd.Hblid,
+                    Mblid = cd.Mblid,
+                    NetWeight = cd.NetWeight,
+                    Note = cd.Note,
+                    AccountNo = cd.AccountNo,
+                    PartnerTaxCode = cd.PartnerTaxCode,
+                    ServiceType = cd.ServiceType,
+                    Gateway = cd.Gateway,
+                    Type = cd.Type,
+                    CargoType = cd.CargoType,
+                    Shipper = cd.Shipper,
+                    Consignee = cd.Consignee,
+                    ClearanceDate = cd.ClearanceDate,
+                    ClearanceNo = cd.ClearanceNo,
+                    QtyCont = cd.QtyCont,
+                };
+
+                // result = customDeclarationRepository.Add(clearanceReplicate);
             }
             return result;
         }
@@ -1099,11 +1298,43 @@ namespace eFMS.API.Documentation.DL.Services
             var existedMblHbl = false;
             if (model == null)
             {
-                existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo && x.Mblno == mblNo && x.CurrentStatus != TermData.Canceled);
+                existedMblHbl = DataContext.Any(x => x.Hwbno == hblNo 
+                && x.Mblno == mblNo 
+                && x.CurrentStatus != TermData.Canceled 
+                );
             }
             else
             {
-                existedMblHbl = DataContext.Any(x => x.Id != model.Id && x.Hwbno == model.Hwbno && x.Mblno == model.Mblno && x.CurrentStatus != TermData.Canceled);
+                var duplicateHBLMBL = DataContext.Get(x => x.Id != model.Id
+                && x.CurrentStatus != TermData.Canceled
+                && x.Hwbno == model.Hwbno
+                && x.Mblno == model.Mblno
+                ).ToList();
+                if(duplicateHBLMBL.Count > 0)
+                {
+                    if(model.ReplicatedId == null || model.ReplicatedId == Guid.Empty)
+                    {
+                        if(!string.IsNullOrEmpty(model.ServiceNo))
+                        {
+                            existedMblHbl = duplicateHBLMBL.Any(x => x.ReplicatedId != model.Id);
+                        }
+                        else
+                        {
+                            existedMblHbl = true;
+                        }
+                    }
+                    else
+                    {
+                        existedMblHbl = duplicateHBLMBL.Any(x => x.Id != model.ReplicatedId);
+                    }
+                }
+
+                //var existedMblHblData = DataContext.Get(x => x.Id != model.Id
+                //&& x.CurrentStatus != TermData.Canceled
+                //&& x.Hwbno == model.Hwbno 
+                //&& x.Mblno == model.Mblno
+                //&& (x.ReplicatedId != Guid.Empty ? x.ReplicatedId == model.ReplicatedId : x.ReplicatedId != model.ReplicatedId)
+                //).ToList();
             }
             if (existedMblHbl)
             {
@@ -1370,14 +1601,19 @@ namespace eFMS.API.Documentation.DL.Services
             string message = null;
             if (id == 0)
             {
-                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo && x.ClearanceDate == model.ClearanceDate))
+                if (customDeclarationRepository.Any(x => x.ClearanceNo == model.ClearanceNo 
+                && x.ClearanceDate == model.ClearanceDate
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE))
                 {
                     message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
                 }
             }
             else
             {
-                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo && x.Id != id && x.ClearanceDate == model.ClearanceDate)))
+                if (customDeclarationRepository.Any(x => (x.ClearanceNo == model.ClearanceNo 
+                && x.Id != id 
+                && x.ClearanceDate == model.ClearanceDate
+                && x.Source != DocumentConstants.CLEARANCE_FROM_REPLICATE)))
                 {
                     message = string.Format("This clearance no '{0}' and clearance date '{1}' has been existed", model.ClearanceNo, model.ClearanceDate);
                 }
@@ -1782,6 +2018,20 @@ namespace eFMS.API.Documentation.DL.Services
             }
 
             return errorCode;
+        }
+
+        private string GeneratePreFixReplicate()
+        {
+            string preFix = "R";
+            SysSettingFlow settingFlowOffice = settingFlowRepository.Get(x => x.OfficeId == currentUser.OfficeID && x.Flow == "Replicate")?.FirstOrDefault();
+            if (settingFlowOffice != null && settingFlowOffice.ReplicateOfficeId != null)
+            {
+                if (!string.IsNullOrEmpty(settingFlowOffice.ReplicatePrefix))
+                {
+                    preFix = settingFlowOffice.ReplicatePrefix;
+                }
+            }
+            return preFix;
         }
     }
 }

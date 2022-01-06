@@ -23,7 +23,7 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public bool? AdvDpManagerStickApp { get; set; }
         public string AdvDpManagerName { get; set; }
         public DateTime? AdvDpSignDate { get; set; }
-        public string AdvAcsDpManagerID {get;set;}
+        public string AdvAcsDpManagerID { get; set; }
         public bool? AdvAcsDpManagerStickDeny { get; set; }
         public bool? AdvAcsDpManagerStickApp { get; set; }
         public string AdvAcsDpManagerName { get; set; }
@@ -85,5 +85,6 @@ namespace eFMS.API.Accounting.DL.Models.ReportResults
         public string Website { get; set; }
         public string Contact { get; set; }
         public DateTime? AdvContactSignDate { get; set; }
+        public bool IsDisplayLogo { get; set; }
     }
 }

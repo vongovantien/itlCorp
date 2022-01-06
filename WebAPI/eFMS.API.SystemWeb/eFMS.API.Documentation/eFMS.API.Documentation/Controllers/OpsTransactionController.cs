@@ -52,8 +52,8 @@ namespace eFMS.API.Documentation.Controllers
         /// <param name="curUser"></param>
         /// <param name="AccAccountReceivable"></param>
         /// <param name="menu"></param>
-        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer, 
-            IOpsTransactionService service, 
+        public OpsTransactionController(IStringLocalizer<LanguageSub> localizer,
+            IOpsTransactionService service,
             IHostingEnvironment hostingEnvironment,
             ICurrentUser curUser,
             IAccAccountReceivableService AccAccountReceivable,
@@ -152,6 +152,7 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(result);
             }
+
             return Ok(result);
         }
 
@@ -174,7 +175,7 @@ namespace eFMS.API.Documentation.Controllers
                 return BadRequest(new ResultHandle { Status = false, Message = existedMessage });
             }
 
-            string msgCheckUpdateServiceDate= CheckUpdateServiceDate(model);
+            string msgCheckUpdateServiceDate = CheckUpdateServiceDate(model);
             if (msgCheckUpdateServiceDate.Length > 0)
             {
                 return BadRequest(new ResultHandle { Status = false, Message = msgCheckUpdateServiceDate, Data = new { errorCode = "serviceDate" } });
@@ -221,9 +222,9 @@ namespace eFMS.API.Documentation.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = hs.Message });
             }
-            else if(surchargeIds.Count > 0)
+            else if (surchargeIds.Count > 0)
             {
-  
+
                 Response.OnCompleted(async () =>
                 {
                     //Tính công nợ sau khi tạo mới hóa đơn thành công
