@@ -5537,7 +5537,7 @@ namespace eFMS.API.ReportData.FormatExcel
             }
         }
 
-        public Stream GenerateCombineOPSExcel(CombineOPSModel result, Stream stream = null)
+        public Stream GenerateCombineOPSExcel(CombineOPSModel result, AcctCombineBillingCriteria criteria, Stream stream = null)
         {
             try
             {
@@ -5545,7 +5545,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 {
                     excelPackage.Workbook.Worksheets.Add("SOA OPS");
                     var workSheet = excelPackage.Workbook.Worksheets.First();
-                    BinddingDataCombineOPS(workSheet, result);
+                    BinddingDataCombineOPS(workSheet, result, criteria);
                     excelPackage.Save();
                     return excelPackage.Stream;
                 }
@@ -5557,7 +5557,7 @@ namespace eFMS.API.ReportData.FormatExcel
             return null;
         }
 
-        public void BinddingDataCombineOPS(ExcelWorksheet workSheet, CombineOPSModel lstSoa)
+        public void BinddingDataCombineOPS(ExcelWorksheet workSheet, CombineOPSModel lstSoa, AcctCombineBillingCriteria criteria)
         {
             if (lstSoa.IsDisplayLogo)
             {
@@ -5569,12 +5569,12 @@ namespace eFMS.API.ReportData.FormatExcel
                 }
             }
 
-            List<string> headers = new List<string>() 
+            List<string> headers = new List<string>()
             {
                "INDO TRANS LOGISTICS CORPORATION", //0
                "52-54-56 Truong Son St. Tan Binh Dist. HCM City. Vietnam\nTel: (84-8) 3948 6888  Fax: +84 8 38488 570\nE-mail:\nWebsite: www.itlvn.com", //1
                "BẢNG TỔNG HỢP CHI PHÍ PHÁT SINH/SUMMARY OF COSTS INCURRED", //2
-               "Tổng cộng/Total (VND) ", //3
+               string.Format("Tổng cộng/Total ({0}) ", string.IsNullOrEmpty(criteria.Currency) || criteria.Currency == "VND" ? "VND" : "USD"), //3
             };
 
             List<string> headerTable = new List<string>()
@@ -5642,7 +5642,7 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Value = lstSoa.PartnerNameVN;
             workSheet.Cells["A8:V8"].Merge = true;
             workSheet.Cells["A8"].Value = lstSoa.BillingAddressVN;
-            workSheet.Cells["A6:A7"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
+            workSheet.Cells["A6:A8"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
 
             workSheet.Cells[4, 1, 8, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells[4, 1, 8, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
@@ -5716,6 +5716,16 @@ namespace eFMS.API.ReportData.FormatExcel
 
             int addressStartContent = 11;
             Color colFromHex = System.Drawing.ColorTranslator.FromHtml("#eab286");
+            var formatNumberStr = string.Empty;
+            if (string.IsNullOrEmpty(criteria.Currency) || criteria.Currency == "VND")
+            {
+                formatNumberStr = numberFormat2;
+            }
+            else
+            {
+                formatNumberStr = numberFormat;
+            }
+
             if (lstSoa.exportOPS != null && lstSoa.exportOPS.Count() > 0)
             {
                 for (int i = 0; i < lstSoa.exportOPS.Count; i++)
@@ -5754,9 +5764,9 @@ namespace eFMS.API.ReportData.FormatExcel
                     workSheet.Cells[i + addressStartContent, 15].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t =>t.VATAmount);
 
                     workSheet.Cells[i + addressStartContent, 16].Value = item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.VATAmount) + item.Charges.Where(t => t.Type.Contains("OBH")).Sum(t => t.NetAmount);
-                    workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
+                    workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = formatNumberStr;
 
-                    workSheet.Cells[i + addressStartContent, 18].Value = item.Charges.Select(t => t.SOANo).FirstOrDefault() ?? item.Charges.Select(t => t.CDNote).FirstOrDefault();
+                    workSheet.Cells[i + addressStartContent, 18].Value = item.Charges.Select(t => t.CombineBillingType).FirstOrDefault() == "SOA" ? item.Charges.Select(t => t.SOANo).FirstOrDefault() : item.Charges.Select(t => t.CDNote).FirstOrDefault();
                     workSheet.Cells[i + addressStartContent, 19].Value = string.Join(';', item.Charges.Where(x => !string.IsNullOrEmpty(x.InvoiceNo)).Select(x => x.InvoiceNo));
                     workSheet.Cells[i + addressStartContent, 20].Value = "";
                     workSheet.Cells[i + addressStartContent, 21].Value = item.Charges.Select(t => t.CombineNo).FirstOrDefault();
@@ -5806,7 +5816,7 @@ namespace eFMS.API.ReportData.FormatExcel
                         decimal? TotalNormalCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 13].Value);
                         decimal? TotalOBHCharge = Convert.ToDecimal(workSheet.Cells[i + addressStartContent, 16].Value);
                         workSheet.Cells[i + addressStartContent, 17].Value = TotalNormalCharge + TotalOBHCharge;
-                        workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = numberFormat2;
+                        workSheet.Cells[i + addressStartContent, 11, i + addressStartContent, 17].Style.Numberformat.Format = formatNumberStr;
 
                         workSheet.Cells[i + addressStartContent, 19].Value = itemCharge.InvoiceNo;
                         workSheet.Cells[i + addressStartContent, 20].Value = itemCharge.InvoiceDate?.ToString("dd/MM/yyyy");
@@ -5868,32 +5878,32 @@ namespace eFMS.API.ReportData.FormatExcel
                 totalAll = totalOBHCharge + totalNormalCharge;
 
                 workSheet.Cells[addressTotalNext].Value = totalNetAmountNormalCharge;
-                workSheet.Cells[addressTotalNext].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressTotalNext].Style.Numberformat.Format = formatNumberStr;
 
                 string addressTotalVat = workSheet.Cells[addressStartContent, 12].Start.Address;
                 workSheet.Cells[addressTotalVat].Value = totalVATNormalCharge;
-                workSheet.Cells[addressTotalVat].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressTotalVat].Style.Numberformat.Format = formatNumberStr;
 
                 string addressTotalNormalCharge = workSheet.Cells[addressStartContent, 13].Start.Address;
                 workSheet.Cells[addressTotalNormalCharge].Value = totalNormalCharge;
-                workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressTotalNormalCharge].Style.Numberformat.Format = formatNumberStr;
 
                 string addressNetAmountCharge = workSheet.Cells[addressStartContent, 14].Start.Address;
                 workSheet.Cells[addressNetAmountCharge].Value = totalNetAmountOBHCharge;
-                workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressNetAmountCharge].Style.Numberformat.Format = formatNumberStr;
 
                 string addressVATChargeNext = workSheet.Cells[addressStartContent, 15].Start.Address;
                 workSheet.Cells[addressVATChargeNext].Value = totalVATOBHCharge;
-                workSheet.Cells[addressVATChargeNext].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressVATChargeNext].Style.Numberformat.Format = formatNumberStr;
 
                 string addressTotalChargeNext = workSheet.Cells[addressStartContent, 16].Start.Address;
                 workSheet.Cells[addressTotalChargeNext].Value = totalOBHCharge;
-                workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressTotalChargeNext].Style.Numberformat.Format = formatNumberStr;
 
 
                 string addressTotalAll = workSheet.Cells[addressStartContent, 17].Start.Address;
                 workSheet.Cells[addressTotalAll].Value = totalAll;
-                workSheet.Cells[addressTotalAll].Style.Numberformat.Format = numberFormat2;
+                workSheet.Cells[addressTotalAll].Style.Numberformat.Format = formatNumberStr;
 
 
                 workSheet.Column(1).Width = 8; //Cột A

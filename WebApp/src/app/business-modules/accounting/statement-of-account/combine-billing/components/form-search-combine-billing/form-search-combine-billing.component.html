@@ -13,7 +13,7 @@
                         <div class="form-group"
                             [ngClass]="{'m-form__group has-danger': isExport && (partnerId === null || !partnerId.value)}">
                             <label class="form-control-label" for="">
-                                Partner{{partnerId.value}}{{isExport}}
+                                Partner
                             </label>
                             <app-combo-grid-virtual-scroll
                                 [currentActiveItemId]="{ field: 'id', value: partnerId.value}"

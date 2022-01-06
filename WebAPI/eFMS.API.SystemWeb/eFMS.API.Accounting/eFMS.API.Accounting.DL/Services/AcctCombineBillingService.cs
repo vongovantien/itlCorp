@@ -1066,7 +1066,7 @@ namespace eFMS.API.Accounting.DL.Services
             var charges = GetChargeByCombineNo(combineBillingNo);
 
             List<ExportCombineOPS> lstOps = new List<ExportCombineOPS>();
-            var res = charges.GroupBy(x => new { x.JobId, x.HBL }).AsQueryable();
+            var res = charges.GroupBy(x => new { BillingNo = x.CombineBillingType == "SOA" ? x.SOANo : x.CDNote, x.JobId, x.HBL }).AsQueryable();
             foreach (var grp in res)
             {
                 ExportCombineOPS exportSOAOPS = new ExportCombineOPS();
@@ -1266,11 +1266,10 @@ namespace eFMS.API.Accounting.DL.Services
                     ChargeWeight = _chargeWeight,
                     CBM = _cbm,
                     PackageContainer = _packageContainer,
-                    CreditDebitNo = soa != null ? null : cdNote.Code,
                     DatetimeModified = sur.DatetimeModified,
                     CommodityGroupID = null,
                     Service = _service,
-                    CDNote = soa != null ? null : cdNote.Code,
+                    CDNote = cdNote != null ? cdNote.Code : null,
                     TypeCharge = charge?.Type,
                     ExchangeDate = sur.ExchangeDate,
                     FinalExchangeRate = exRate,
@@ -1282,7 +1281,8 @@ namespace eFMS.API.Accounting.DL.Services
                     SeriesNo = sur.SeriesNo,
                     InvoiceDate = sur.InvoiceDate,
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? partnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
-                    CombineNo = combineBillingNo
+                    CombineNo = combineBillingNo,
+                    CombineBillingType = soa != null ? "SOA" : "CDNOTE"
                 };
                 result.Add(chg);
             }
@@ -1472,7 +1472,8 @@ namespace eFMS.API.Accounting.DL.Services
                               CreditLocal = null,
                               DebitUSD = null,
                               CreditUSD = null,
-                              SOANo = null,
+                              SOANo = sur.Soano,
+                              PaySoaNo = sur.PaySoano,
                               IsOBH = false,
                               Currency = sur.CurrencyId,
                               InvoiceNo = sur.InvoiceNo,
@@ -1501,7 +1502,8 @@ namespace eFMS.API.Accounting.DL.Services
                               ChargeWeight = opst.SumChargeWeight,
                               CBM = opst.SumCbm,
                               PackageContainer = string.Empty,
-                              CreditDebitNo = null,
+                              CreditNo = sur.CreditNo,
+                              DebitNo = sur.DebitNo,
                               DatetimeModified = sur.DatetimeModified,
                               CommodityGroupID = null,
                               Service = "CL",
@@ -1542,7 +1544,8 @@ namespace eFMS.API.Accounting.DL.Services
                               CreditLocal = null,
                               DebitUSD = null,
                               CreditUSD = null,
-                              SOANo = null,
+                              SOANo = sur.Soano,
+                              PaySoaNo = sur.PaySoano,
                               IsOBH = false,
                               Currency = sur.CurrencyId,
                               InvoiceNo = sur.InvoiceNo,
@@ -1571,7 +1574,8 @@ namespace eFMS.API.Accounting.DL.Services
                               ChargeWeight = csTransDe.ChargeWeight,
                               CBM = csTransDe.Cbm,
                               PackageContainer = csTransDe.PackageContainer,
-                              CreditDebitNo = null,
+                              CreditNo = sur.CreditNo,
+                              DebitNo = sur.DebitNo,
                               DatetimeModified = sur.DatetimeModified,
                               CommodityGroupID = null,
                               Service = "CL",
@@ -1599,17 +1603,19 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var item in dataCharges)
             {
                 item.CustomNo = item.Service == "CL" ? clearanceDatas.Where(x => x.JobNo == item.JobId).OrderBy(x => x.ClearanceDate).FirstOrDefault()?.ClearanceNo : null;
-                var soaData = soaRepo.Get(x => x.CombineBillingNo == item.CombineNo).FirstOrDefault();
+                var soaData = soaRepo.Get(x => x.CombineBillingNo == item.CombineNo && (x.Soano == item.SOANo || x.Soano == item.PaySoaNo)).FirstOrDefault();
                 if (soaData != null)
                 {
                     item.SOANo = soaData.Soano;
                     item.FinalExchangeRate = soaData.ExcRateUsdToLocal;
+                    item.CombineBillingType = "SOA";
                 }
                 else
                 {
-                    var cdNote = cdNoteRepo.Get(x => x.CombineBillingNo == item.CombineNo).FirstOrDefault();
-                    item.CDNote = item.CreditDebitNo = cdNote.Code;
+                    var cdNote = cdNoteRepo.Get(x => x.CombineBillingNo == item.CombineNo && (x.Code == item.CreditNo || x.Code == item.DebitNo)).FirstOrDefault();
+                    item.CDNote = cdNote.Code;
                     item.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
+                    item.CombineBillingType = "CDNOTE";
                 }
                 if (item.Type == AccountingConstants.TYPE_CHARGE_BUY)
                 {
@@ -1620,7 +1626,7 @@ namespace eFMS.API.Accounting.DL.Services
 
             List<ExportCombineOPS> lstOps = new List<ExportCombineOPS>();
 
-            var res = dataCharges.OrderBy(x => x.CombineNo).GroupBy(x => new { x.CombineNo, x.JobId, x.HBL }).ToList();
+            var res = dataCharges.OrderBy(x => x.CombineNo).GroupBy(x => new { x.CombineNo, BillingNo = x.CombineBillingType == "SOA" ? x.SOANo : x.CDNote, x.JobId, x.HBL }).ToList();
             foreach (var grp in res)
             {
                 ExportCombineOPS exportSOAOPS = new ExportCombineOPS();
