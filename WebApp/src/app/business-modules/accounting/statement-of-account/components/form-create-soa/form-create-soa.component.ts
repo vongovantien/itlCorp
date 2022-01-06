@@ -531,7 +531,7 @@ export class StatementOfAccountFormCreateComponent extends AppPage {
                 }).subscribe(
                     (agreements: any[]) => {
                         if (!!agreements && !!agreements.length) {
-                            this.selectedCurrency.id = agreements[0].currencyId;
+                            this.selectedCurrency = this.currencyList.filter((curr) => curr.id === agreements[0].currencyId)[0];
                         }else{
                             this.selectedCurrency = this.currencyList.filter((curr) => curr.id === "VND")[0];
                         }
