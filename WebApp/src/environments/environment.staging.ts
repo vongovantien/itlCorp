@@ -17,7 +17,9 @@ export const environment = {
         INDENTITY_SERVER_URL: "https://efms-demo-api.logtechub.com/identityserver",
         // INDENTITY_SERVER_URL: "https://localhost:44369",
         EXPORT_CRYSTAL: "https://efms-demo-api.logtechub.com/ReportPreview/ExportCrystal.aspx",
-        PARTNER_API: "efms-demo-api.logtechub.com/partner"
+        PARTNER_API: "efms-demo-api.logtechub.com/partner",
+        FILE_SYSTEM: "test.api-efms.itlvn.com/File"
+
     },
     AUTHORIZATION:
     {

@@ -23,3 +23,6 @@ Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password
 
 * ForPartner
 Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.ForPartner.Service -Force -Table sysUser, accAccountingManagement, sysPartnerAPI, csShipmentSurcharge, catPartner, acctAdvancePayment, acctSOA, catCurrencyExchange, acctSettlementPayment, acctCDNote, sysActionFuncLog, sysNotifications, sysUserNotification, acctReceipt, sysCompany, catContract, acctAdvanceRequest, acctReceiptSync, accAccountReceivable, acctDebitManagementAR 
+
+* SystemFileManagement
+Scaffold-DbContext "Server=192.168.7.31; Database=eFMSTest; User ID=sa; Password=P@ssw0rd" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Context eFMSDataContextDefault -Project eFMS.API.SystemFileManagement.Service -Force -Table SysActionFuncLog,SysAuthorizedApproval,SysCompany,SysEmailSetting,SysEmailTemplate,SysEmployee,SysGroup,SysImage,SysNotifications,SysOffice,SysSettingFlow,SysUser,SysUserLevel,SysUserNotification,CatDepartment

@@ -859,22 +859,54 @@ export class AccountingRepo {
 
     uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string) {
         if (!!child) {
-            return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
+            return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Accounting/${folder}/${id}`, files, 'files', { child: child });
         }
-        return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files');
+        return this._api.putFile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/UploadAttachedFiles/Accounting/${folder}/${id}`, files, 'files');
     }
 
     getAttachedFiles(folder: string, id: string, child?: string) {
         if (!!child) {
-            return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/GetAttachedFiles/${folder}/${id}`, { child: child });
+            return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/GetAttachedFiles/Accounting/${folder}/${id}`, { child: child });
         }
-        return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/GetAttachedFiles/${folder}/${id}`);
+        return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/GetAttachedFiles/Accounting/${folder}/${id}`);
 
     }
-
     deleteAttachedFile(folder: string, id: string) {
-        return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/DeleteAttachedFile/${folder}/${id}`);
+        return this._api.delete(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/DeleteAttachedFile/Accounting/${folder}/${id}`);
     }
+
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-US/AWSS3/DowloadAllFileAttached`, body).pipe(
+            catchError((error) => throwError(error)),
+            map((data: any) => data)
+        );
+    }
+
+    // getAttachedFiles(folder: string, id: string, child?: string) {
+    //     if (!!child) {
+    //         return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/GetAttachedFiles/${folder}/${id}`, { child: child });
+    //     }
+    //     return this._api.get(`${environment.HOST.FILE_SYSTEM}/api/${this.VERSION}/en-Us/AWSS3/GetAttachedFiles/${folder}/${id}`);
+
+    // }
+
+    // deleteAttachedFile(folder: string, id: string) {
+    //     return this._api.delete(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-Us/Accounting/DeleteAttachedFile/${folder}/${id}`);
+    // }
+
+    // dowloadallAttach(body: any) {
+    //     return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`, body).pipe(
+    //         catchError((error) => throwError(error)),
+    //         map((data: any) => data)
+    //     );
+    // }
+
+    // uploadAttachedFiles(folder: string, id: string, files: FileList[], child?: string) {
+    //     if (!!child) {
+    //         return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files', { child: child });
+    //     }
+    //     return this._api.putFile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/UploadAttachedFiles/${folder}/${id}`, files, 'files');
+    // }
 
     getListAdvanceNoForShipment(hblId: string, payeeId: string = '', requester: string = '', settlementCode: string = null) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/AcctSettlementPayment/GetListAdvanceNoForShipment`, { hblId: hblId, payeeId: payeeId, requester: requester, settlementCode: settlementCode }).pipe(
@@ -891,12 +923,8 @@ export class AccountingRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body: any) {
-        return this._api.downloadfile(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-US/Accounting/DowloadAllFileAttached`, body).pipe(
-            catchError((error) => throwError(error)),
-            map((data: any) => data)
-        );
-    }
+
+
 
     getDataDebitDetail(agreementId: any, option: any, officeId: any, serviceCode: any) {
         return this._api.get(`${environment.HOST.ACCOUNTING}/api/${this.VERSION}/en-us/AccountReceivable/GetDebitDetail`, { argeementId: agreementId, option: option, officeId: officeId, serviceCode: serviceCode }).pipe(
