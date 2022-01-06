@@ -577,7 +577,7 @@ namespace eFMS.API.ReportData.Controllers
             }
             var dataObjects = responseFromApi.Content.ReadAsAsync<CombineOPSModel>();
 
-            var stream = new AccountingHelper().GenerateCombineOPSExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateCombineOPSExcel(dataObjects.Result, criteria);
 
             if (stream == null)
             {
