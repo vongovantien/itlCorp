@@ -186,14 +186,9 @@ import { I } from '@angular/cdk/keycodes';
               this.formRule.selectedChargeSelling =
                 { field: 'chargeNameEn', value: chargeSelling?.chargeNameEn, data: chargeSelling };
               this.formRule.selectedPartnerBuying =
-                { field: 'shortName', value: partnerBuying.shortName, data: partnerBuying };
+                { field: 'shortName', value: partnerBuying?.shortName, data: partnerBuying };
               this.formRule.selectedPartnerSelling =
                 { field: 'shortName', value: partnerSelling?.shortName, data: partnerSelling };
-              if(this.minDate>=res.effectiveDate){
-                this.formRule.minDateEffective=res.effectiveDate
-              }else{
-                this.formRule.minDateEffective=this.minDate
-              }
               console.log(this.formRule.rule.status);
               this.formRule.isShowUpdate = true;
               this.formRule.show();

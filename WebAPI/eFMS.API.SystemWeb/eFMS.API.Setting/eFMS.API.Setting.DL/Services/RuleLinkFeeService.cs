@@ -44,10 +44,6 @@ namespace eFMS.API.Setting.DL.Services
 
         public HandleState AddNewRuleLinkFee(RuleLinkFeeModel model)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Write);
-            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
-
             try
             {
                 var rule = mapper.Map<CsRuleLinkFee>(model);
@@ -75,9 +71,6 @@ namespace eFMS.API.Setting.DL.Services
 
         public HandleState DeleteRuleLinkFee(Guid? idRuleLinkFee)
         {
-            ICurrentUser _user = PermissionExtention.GetUserMenuPermission(currentUser, Menu.settingLinkFee);
-            var permissionRange = PermissionExtention.GetPermissionRange(_user.UserMenuPermission.Delete);
-            if (permissionRange == PermissionRange.None) return new HandleState(403, "");
             try
             {
                 var hs = DataContext.Delete(x => x.Id == idRuleLinkFee);
@@ -131,6 +124,7 @@ namespace eFMS.API.Setting.DL.Services
             var data = from rule in ruleLinkFees
                        join user in users on rule.UserCreated equals user.Id into gr
                        from user in gr.DefaultIfEmpty()
+                       join modified in users on rule.UserModified equals modified.Id
                        join sell in partners on rule.PartnerSelling equals sell.Id into gr1
                        from sell in gr1.DefaultIfEmpty()
                        join buy in partners on rule.PartnerBuying equals buy.Id into gr2
@@ -161,6 +155,7 @@ namespace eFMS.API.Setting.DL.Services
                            UserCreated = rule.UserCreated,
                            DatetimeCreated = rule.DatetimeCreated,
                            UserModified = rule.UserModified,
+                           UserNameModified = modified.Username,
                        };
             data.ToList().ForEach(x =>
                DataContext.Update(mapper.Map<CsRuleLinkFee>(x), y => y.Id == x.Id));
@@ -351,7 +346,7 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         if (rule.Any())
                         {
-                            return new HandleState(ErrorCode.Existed, "Rule Already exists");
+                            return new HandleState(ErrorCode.Existed, "Rule "+model.RuleName+ " redupplicated from Rule " +rule.FirstOrDefault().RuleName+" Already exists");
                         }
                     }
                 }
@@ -377,7 +372,7 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         if (rule.Any())
                         {
-                            return new HandleState(ErrorCode.Existed, "Rule Already exists");
+                            return new HandleState(ErrorCode.Existed, "Rule " + rule.FirstOrDefault().RuleName + " Already exists");
                         }
                     }
                 }
@@ -454,6 +449,18 @@ namespace eFMS.API.Setting.DL.Services
             }
         }
 
+        private bool CheckCharge(string chargeBuying, string chargeSelling)
+        {
+            var charge = catChargeRepo.Get();
+            var buying = charge.Where(x => x.ChargeNameEn.Contains(chargeBuying) && x.Type == "CREDIT").FirstOrDefault();
+            var selling = charge.Where(x => x.ChargeNameEn.Contains(chargeSelling) && x.Type == "CREDIT").FirstOrDefault();
+            if (buying!=null&&selling!=null)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public HandleState Import(List<RuleLinkFeeImportModel> data)
         {
             try
@@ -462,13 +469,17 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
+                    if (!CheckCharge(item.ChargeNameBuying,item.ChargeNameSelling))
+                    {
+                        return new HandleState(false, "Charge Buying or Selling not match Type");
+                    }
                     bool active = item.Status.ToLower() == "active" ? true : false;
                     var ruleLinkFee = new CsRuleLinkFee
                     {
                         Id = Guid.NewGuid(),
                         RuleName = item.RuleName,
-                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying) && x.Type == "CREDIT" && x.ServiceTypeId.Contains(ConvertService(item.ServiceBuying))).FirstOrDefault().Id.ToString(),
-                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling) && x.Type == "DEBIT" && x.ServiceTypeId.Contains(ConvertService(item.ServiceSelling))).FirstOrDefault().Id.ToString(),
+                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying) && x.Type == "CREDIT").FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling) && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
                         PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
                         PartnerSelling = item.PartnerNameSelling != null ? partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id : null,
                         ServiceBuying = ConvertService(item.ServiceBuying),

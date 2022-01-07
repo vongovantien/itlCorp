@@ -102,7 +102,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         this.expiredDate = this.formGroup.controls['expiredDate'];
         this.effectiveDate = this.formGroup.controls['effectiveDate'];
         this.status = this.formGroup.controls['status'];
-        this.formGroup.get("effectiveDate").valueChanges
+        if(this.isSubmitted){
+            this.formGroup.get("effectiveDate").valueChanges
             .pipe(
                 distinctUntilChanged((prev, curr) => prev.endDate === curr.endDate && prev.startDate === curr.startDate),
                 map((data: any) => data.startDate)
@@ -111,7 +112,7 @@ export class FormRuleComponent extends PopupBase implements OnInit {
             .subscribe((value: any) => {
                 this.minDateExpired = this.createMoment(value); // * Update MinDate -> ExpiredDate.
             });
-
+        }
     }
 
     initBasicData() {
@@ -326,5 +327,6 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     resetExpiredDate() {
         this.expiredDate.setValue(null);
     }
+
 }
 
