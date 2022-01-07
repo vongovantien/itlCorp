@@ -36,7 +36,6 @@
                                             ngxDaterangepickerMd [locale]="{format: 'DD/MM/YYYY'}" [autoApply]="true"
                                             [singleDatePicker]="true" [alwaysShowCalendars]="true" name="daterange"
                                             readonly placeholder="DD/MM/YYYY" formControlName="serviceDate"
-                                            [allowRemove]="!!serviceDate.value && !!serviceDate.value.startDate"
                                             (remove)="resetFormControl(serviceDate)" calendar />
                                     </div>
                                 </div>
@@ -76,7 +75,7 @@
                                             style="text-align: right;">
                                             <a class="pointer" style="text-decoration: underline;"
                                                 (click)="getASInfoToLink()">Link Air/Sea </a>&nbsp;&nbsp;
-                                            <span class="text-warning">{{shipmentInfo}}</span>
+                                            <span class="text-warning">{{jobLinkAirSeaNo}}</span>
                                         </div>
                                     </div>
                                     <ng-select class="custom" [items]="shipmentModes" placeholder="Please select"
