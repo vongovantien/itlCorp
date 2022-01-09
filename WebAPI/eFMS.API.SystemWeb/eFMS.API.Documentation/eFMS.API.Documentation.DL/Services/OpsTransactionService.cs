@@ -546,24 +546,25 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        public IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
+        public Expression<Func<OpsTransaction, bool>> QueryByPermission(PermissionRange range)
         {
-            IQueryable<OpsTransaction> data = null;
+            //IQueryable<OpsTransaction> data = null;
+            Expression<Func<OpsTransaction, bool>> query = q => true;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             switch (range)
             {
                 case PermissionRange.All:
-                    data = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
+                    query = query.And(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
                                                  || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)
                                                  || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
@@ -571,20 +572,20 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.CompanyId == currentUser.CompanyID 
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) 
@@ -592,7 +593,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
 
-            return data;
+            return query;
         }
 
         /// <summary>
@@ -621,11 +622,13 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
-            IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+            //IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
-            data = data.Where(queryDefault);
+            var data = DataContext.Get(queryDefault);
+            var queryPermission = QueryByPermission(criteria.RangeSearch);
+            data = data.Where(queryPermission);
 
             if (data == null) return null;
 
