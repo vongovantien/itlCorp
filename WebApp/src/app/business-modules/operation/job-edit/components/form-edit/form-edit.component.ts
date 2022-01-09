@@ -173,11 +173,11 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
     initForm() {
         this.formEdit = this._fb.group({
             jobNo: [null],
-            hwbno: [null,Validators.compose([
+            hwbno: [null, Validators.compose([
                 FormValidators.validateSpecialChar
             ])],
 
-            mblno: [null,Validators.compose([
+            mblno: [null, Validators.compose([
                 FormValidators.validateSpecialChar
             ])],
             flightVessel: [],
@@ -319,27 +319,24 @@ export class JobManagementFormEditComponent extends AppForm implements OnInit {
             this._documentRepo.getASTransactionInfo(this.mblno.value, this.hwbno.value, this.productService.value, this.serviceMode.value)
                 .pipe(catchError(this.catchError))
                 .subscribe((res: ILinkAirSeaInfoModel) => {
-                    if (!!res) {
+                    if (!!res?.jobNo) {
                         this.shipmentNo = res.jobNo;
+                        this.shipmentInfo = res.jobNo;
+                        this.formEdit.patchValue({
+                            sumGrossWeight: res.gw,
+                            sumCbm: res.cw,
+                            sumPackages: res.packageQty
+                        });
 
-                        if (!!res.jobNo) {
-                            this.shipmentInfo = res.jobNo;
-                            this.formEdit.patchValue({
-                                sumGrossWeight: res.gw,
-                                sumCbm: res.cw,
-                                sumPackages: res.packageQty
-                            });
-
-                            if (res.containers) {
-                                res.containers.forEach(c => {
-                                    c.id = SystemConstants.EMPTY_GUID;
-                                })
-                                this._store.dispatch(new GetContainerSuccessAction(res.containers));
-                            }
-                        } else {
-                            this.shipmentInfo = null;
-                            this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
+                        if (res.containers) {
+                            res.containers.forEach(c => {
+                                c.id = SystemConstants.EMPTY_GUID;
+                            })
+                            this._store.dispatch(new GetContainerSuccessAction(res.containers));
                         }
+                    } else {
+                        this.shipmentInfo = null;
+                        this._toaster.warning("There's no valid Air/Sea Shipment to display. Please check again!");
                     }
                 });
         }

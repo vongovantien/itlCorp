@@ -222,7 +222,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         trans.Commit();
                     }
-                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -235,6 +234,11 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+            if(model.CsMawbcontainers.Count > 0 && result.Success)
+            {
+                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+            }
+
 
             return result;
         }

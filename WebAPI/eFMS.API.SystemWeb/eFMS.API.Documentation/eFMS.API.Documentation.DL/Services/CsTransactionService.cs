@@ -892,25 +892,37 @@ namespace eFMS.API.Documentation.DL.Services
             string jobNo = null;
             string hblid = null;
             string jobId = null;
-            decimal? cw = null;
-            decimal? gw = null;
-            decimal? pkgQty = null;
+            LinkAirSeaInfoModel result = null;
 
             string shipmentType = GetServiceType(serviceName, serviceMode);
             if (!string.IsNullOrEmpty(shipmentType))
             {
-                var houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
+                IQueryable<CsTransactionDetail> houseDetail = string.IsNullOrEmpty(hblNo) ? null : csTransactionDetailRepo.Get(x => x.Hwbno == hblNo);
                 var transaction = houseDetail != null ?
                     transactionRepository
                     .Get(x => x.TransactionType == shipmentType && x.CurrentStatus != TermData.Canceled)
-                    .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new { x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty })
+                    .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new
+                    {
+                        x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty, y.CustomerId, y.SaleManId, x.ServiceDate
+                    })
                     : null;
 
                 if (transaction?.Count() == 1)
                 {
-                    jobNo = transaction.FirstOrDefault()?.JobNo.ToString();
-                    jobId = transaction.FirstOrDefault()?.jobId.ToString();
-                    hblid = transaction.FirstOrDefault().Id.ToString();
+                    var firstHblInfo = transaction.FirstOrDefault();
+                    jobId = firstHblInfo.jobId.ToString();
+                    hblid = firstHblInfo.Id.ToString();
+                    jobNo = firstHblInfo?.JobNo;
+
+                    result = new LinkAirSeaInfoModel
+                    {
+                        JobNo = jobNo,
+                        JobId = jobId,
+                        HblId = hblid,
+                        CustomerId = firstHblInfo.CustomerId,
+                        SalemanId = firstHblInfo.SaleManId,
+                        ServiceDate = firstHblInfo.ServiceDate,
+                    };
                 }
                 else
                 {
@@ -925,6 +937,15 @@ namespace eFMS.API.Documentation.DL.Services
                         jobNo = masDetail?.JobNo.ToString();
                         jobId = masDetail?.jobId.ToString();
                         hblid = null;
+
+                        result = new LinkAirSeaInfoModel
+                        {
+                            JobNo = masDetail?.JobNo.ToString(),
+                            JobId = masDetail?.jobId.ToString(),
+                            ServiceDate = masDetail.ServiceDate,
+                            SalemanId = masDetail.SaleManId,
+                            CustomerId = masDetail.CustomerId,
+                        };
                     }
                     else // không có hbl nào -> tìm theo mawb
                     {
@@ -936,6 +957,17 @@ namespace eFMS.API.Documentation.DL.Services
                         jobNo = masDetail?.JobNo.ToString();
                         jobId = masDetail?.Id.ToString();
                         hblid = null;
+
+                        if(masDetail != null)
+                        {
+                            result = new LinkAirSeaInfoModel
+                            {
+                                JobNo = masDetail?.JobNo.ToString(),
+                                JobId = masDetail?.Id.ToString(),
+                                ServiceDate = masDetail.ServiceDate,
+                            };
+                        }
+                        
                     }
                 }
             }
@@ -959,21 +991,13 @@ namespace eFMS.API.Documentation.DL.Services
 
                 if (hbls != null && hbls.Count() > 0)
                 {
-                    gw = hbls.Sum(x => x.GrossWeight);
-                    cw = hbls.Sum(x => x.GrossWeight);
-                    pkgQty = hbls.Sum(x => x.PackageQty);
+                    result.GW = hbls.Sum(x => x.GrossWeight);
+                    result.CW = hbls.Sum(x => x.GrossWeight);
+                    result.PackageQty = hbls.Sum(x => x.PackageQty);
+                    result.Containers = containers;
                 }
             }
-            return new LinkAirSeaInfoModel
-            {
-                JobNo = jobNo,
-                HblId = hblid,
-                JobId = jobId,
-                GW = gw,
-                CW = cw,
-                PackageQty = pkgQty,
-                Containers = containers
-            };
+            return result;
         }
 
         private string GetServiceType(string serviceName, string serviceMode)
