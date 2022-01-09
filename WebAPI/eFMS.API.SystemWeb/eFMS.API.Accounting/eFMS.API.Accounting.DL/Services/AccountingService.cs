@@ -53,6 +53,7 @@ namespace eFMS.API.Accounting.DL.Services
         private readonly IContextBase<CatPartnerEmail> partnerEmailRepository;
         private readonly IContextBase<CustomsDeclaration> customsDeclarationRepository;
         private readonly IContextBase<AcctReceiptSync> receiptSyncReposotory;
+        private readonly IContextBase<SysEmailSetting> emailSettingRepository;
         private readonly IUserBaseService userBaseService;
 
         private readonly IAcctSettlementPaymentService settlementPaymentService;
@@ -100,6 +101,7 @@ namespace eFMS.API.Accounting.DL.Services
             IContextBase<CatPartnerEmail> partnerEmailRepo,
             IContextBase<CustomsDeclaration> customsDeclarationRepo,
             IContextBase<AcctReceiptSync> receiptSyncRepo,
+            IContextBase<SysEmailSetting> emailSettingRepo,
             IUserBaseService userBase,
             ICurrentUser cUser,
             IAcctSettlementPaymentService settlementService,
@@ -137,6 +139,7 @@ namespace eFMS.API.Accounting.DL.Services
             partnerEmailRepository = partnerEmailRepo;
             customsDeclarationRepository = customsDeclarationRepo;
             receiptSyncReposotory = receiptSyncRepo;
+            emailSettingRepository = emailSettingRepo;
 
             settlementPaymentService = settlementService;
             // ---
@@ -2503,11 +2506,33 @@ namespace eFMS.API.Accounting.DL.Services
             body = body.Replace("[UrlFunc]", urlFunc);
             body = body.Replace("[logoEFMS]", apiUrl.Value.Url.ToString() + "/ReportPreview/Images/logo-eFMS.png");
 
-            var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID).FirstOrDefault()?.Email;
+            var emailAccountantDept = departmentRepo.Get(x => x.DeptType == AccountingConstants.DeptTypeAccountant && x.BranchId == currentUser.OfficeID)?.FirstOrDefault();
+
             List<string> emails = new List<string>();
-            if (!string.IsNullOrEmpty(emailAccountantDept))
+
+            int deptId = 0;
+
+            if (emailAccountantDept != null)
             {
-                emails = emailAccountantDept.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                emails = emailAccountantDept.Email.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+                deptId = emailAccountantDept.Id;
+            }
+
+            var emailReceiveCredit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Credit Note");
+            var emailReceiveDebit = emailSettingRepository.Where(x => x.DeptId == deptId && x.EmailType == "Receive Debit Note");
+
+            if ((catagory == "SOA_DEBIT" || catagory == "CDNOTE_DEBIT" || catagory == "CDNOTE_INVOICE") && emailReceiveDebit?.FirstOrDefault() != null)
+            {
+                emails =emailReceiveDebit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+            }
+            if ((catagory == "SOA_CREDIT" || catagory == "CDNOTE_CREDIT") && emailReceiveCredit?.FirstOrDefault() != null)
+            {
+                emails = emailReceiveCredit?.FirstOrDefault().EmailInfo.Split(';').Where(x => x.ToString() != string.Empty).ToList();
+            }
+
+            if (emails.Count() == 0)
+            {
+                emails = emailAccountantDept.Email.Split(';').Where(x => x.ToString() != string.Empty).ToList();
             }
 
             List<string> toEmails = emails;
