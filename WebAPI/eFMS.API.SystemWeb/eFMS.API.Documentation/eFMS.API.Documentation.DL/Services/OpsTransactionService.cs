@@ -2073,7 +2073,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             ResultHandle hs = new ResultHandle();
             List<CsShipmentSurcharge> surchargeAdds = new List<CsShipmentSurcharge>();
-
+            CatPartner partnerInternal = new CatPartner();
             try
             {
                 var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
@@ -2082,6 +2082,19 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var jobRep in lstJobRep)
                     {
                         var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
+                        if (job.OfficeId != null)
+                        {
+                            var offi = GetInfoOfficeOfUser(job.OfficeId);
+                            if (offi!=null && string.IsNullOrEmpty(offi.InternalCode))
+                                continue;
+                            var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
+                            if (part == null)
+                                continue;
+                            if (part.Count() > 1)
+                                continue;
+
+                            partnerInternal = part.FirstOrDefault();
+                        }
 
                         var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId==null);
                         if (charges != null)
@@ -2110,6 +2123,9 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.Hblno = job.Hwbno;
                                 surcharge.Mblno = job.Mblno;
 
+                                if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                    surcharge.PaymentObjectId = partnerInternal.Id;
+
                                 surcharge.UserCreated = currentUser.UserID;
                                 surcharge.DatetimeCreated = DateTime.Now;
 
@@ -2131,6 +2147,11 @@ namespace eFMS.API.Documentation.DL.Services
                 new LogHelper("eFMS_CHARGEFROMREPLICATE", ex.ToString());
                 return new ResultHandle { Status = false, Message = "Job can't be charge from replicate !" };
             }
+        }
+        private SysOffice GetInfoOfficeOfUser(Guid? officeId)
+        {
+            SysOffice result = sysOfficeRepo.Get(x => x.Id == officeId).FirstOrDefault();
+            return result;
         }
     }
 }
