@@ -903,7 +903,7 @@ namespace eFMS.API.Documentation.DL.Services
                     .Get(x => x.TransactionType == shipmentType && x.CurrentStatus != TermData.Canceled)
                     .Join(houseDetail, x => x.Id, y => y.JobId, (x, y) => new
                     {
-                        x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty, y.CustomerId, y.SaleManId, x.ServiceDate
+                        x.JobNo, jobId = x.Id, y.Id, x.Mawb, x.BookingNo, y.GrossWeight, y.ChargeWeight, y.PackageQty, y.CustomerId, y.SaleManId, x.ServiceDate, y.PackageContainer
                     })
                     : null;
 
@@ -922,6 +922,8 @@ namespace eFMS.API.Documentation.DL.Services
                         CustomerId = firstHblInfo.CustomerId,
                         SalemanId = firstHblInfo.SaleManId,
                         ServiceDate = firstHblInfo.ServiceDate,
+                        PackageContainer = firstHblInfo.PackageContainer
+
                     };
                 }
                 else
@@ -945,6 +947,8 @@ namespace eFMS.API.Documentation.DL.Services
                             ServiceDate = masDetail.ServiceDate,
                             SalemanId = masDetail.SaleManId,
                             CustomerId = masDetail.CustomerId,
+                            PackageContainer = masDetail.PackageContainer
+
                         };
                     }
                     else // không có hbl nào -> tìm theo mawb
@@ -994,6 +998,16 @@ namespace eFMS.API.Documentation.DL.Services
                     result.GW = hbls.Sum(x => x.GrossWeight);
                     result.CW = hbls.Sum(x => x.GrossWeight);
                     result.PackageQty = hbls.Sum(x => x.PackageQty);
+
+                    if(containers.Count > 0)
+                    {
+                        containers.ForEach(c =>
+                        {
+                            c.Id = Guid.Empty;
+                            c.Hblid = Guid.Empty;
+                            c.Mblid = Guid.Empty;
+                        });
+                    }
                     result.Containers = containers;
                 }
             }
