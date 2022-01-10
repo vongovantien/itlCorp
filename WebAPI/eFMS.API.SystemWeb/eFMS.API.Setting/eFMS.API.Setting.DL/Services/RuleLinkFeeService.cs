@@ -453,7 +453,7 @@ namespace eFMS.API.Setting.DL.Services
         {
             var charge = catChargeRepo.Get();
             var buying = charge.Where(x => x.ChargeNameEn.Contains(chargeBuying) && x.Type == "CREDIT").FirstOrDefault();
-            var selling = charge.Where(x => x.ChargeNameEn.Contains(chargeSelling) && x.Type == "CREDIT").FirstOrDefault();
+            var selling = charge.Where(x => x.ChargeNameEn.Contains(chargeSelling) && x.Type == "DEBIT").FirstOrDefault();
             if (buying!=null&&selling!=null)
             {
                 return true;
