@@ -54,6 +54,7 @@ export class JobManagementCreateJobComponent extends AppForm {
             opsTransaction.sumChargeWeight = this.formCreateComponent.jobLinkAirSeaInfo?.cw;
             opsTransaction.sumPackages = this.formCreateComponent.jobLinkAirSeaInfo?.packageQty;
             opsTransaction.csMawbcontainers = this.formCreateComponent.jobLinkAirSeaInfo?.containers || [];
+            opsTransaction.containerDescription = this.formCreateComponent.jobLinkAirSeaInfo?.packageContainer
         }
         return opsTransaction;
     }
