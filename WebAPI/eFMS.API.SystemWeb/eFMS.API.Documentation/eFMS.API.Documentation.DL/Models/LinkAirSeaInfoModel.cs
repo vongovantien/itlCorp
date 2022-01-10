@@ -14,6 +14,8 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? CW { get; set; }
         public string SalemanId { get; set; }
         public string CustomerId { get; set; }
+        public string PackageContainer { get; set; }
+
         public DateTime? ServiceDate { get; set; }
         public List<CsMawbcontainer> Containers { get; set; }
     }

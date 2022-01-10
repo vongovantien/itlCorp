@@ -11,4 +11,5 @@ export class LinkAirSeaModel {
     customerId: string;
     salemanId: string;
     serviceDate: Date;
+    packageContainer: string;
 }
