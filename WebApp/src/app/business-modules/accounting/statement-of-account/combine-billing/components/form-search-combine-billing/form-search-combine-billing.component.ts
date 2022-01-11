@@ -21,7 +21,6 @@ import { getDataSearchCombineBillingState } from '../../store/reducers';
 })
 export class FormSearchCombineBillingComponent extends AppForm implements OnInit {
   @Input() isExport: boolean = false;
-  @Output() onSearch: EventEmitter<any> = new EventEmitter<any>();
 
   referenceNo: AbstractControl;
   partnerId: AbstractControl;
@@ -118,6 +117,7 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
         case 'partner':
             this.partnerId.setValue((data as Partner).id);
             if(!!this.partnerId.value){
+              console.log('5456')
               this.isExport = false;
             }
             break;
@@ -163,7 +163,6 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
       creator: !!dataForm.creator ? this.getCreatorData(dataForm.creator) : null
     };
     this._store.dispatch(SearchListCombineBilling(body));
-    this.onSearch.emit(body);
   }
 
   resetSearch() {
@@ -175,7 +174,6 @@ export class FormSearchCombineBillingComponent extends AppForm implements OnInit
 
     this._store.dispatch(SearchListCombineBilling({createdDateFrom: formatDate(new Date(new Date().getFullYear(), new Date().getMonth() - 6, new Date().getDate()), 'yyyy-MM-dd', 'en'),
     createdDateTo: formatDate(new Date(), 'yyyy-MM-dd', 'en')}));
-    this.onSearch.emit({});
   }
 }
 

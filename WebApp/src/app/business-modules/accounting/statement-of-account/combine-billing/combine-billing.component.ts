@@ -175,12 +175,9 @@ deleteCombineBilling(id: string) {
     
   }
 
-  getDataSearch(data: any){
-    this.criteriaExport = data;
-  }
-
   exportCombineOPS(currency: string) {
     this.isExport = true;
+    this.criteriaExport = this.dataSearch;
     if (this.criteriaExport.partnerId) {
       let combineNos = [];
       this.billings.forEach(combine => {
