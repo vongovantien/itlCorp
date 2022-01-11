@@ -2076,7 +2076,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             try
             {
-                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
+                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.JobNo == "HMLOG2201/00053");
                 if (lstJobRep != null)
                 {
                     foreach (var jobRep in lstJobRep)
@@ -2087,7 +2087,7 @@ namespace eFMS.API.Documentation.DL.Services
 
                         if (job.OfficeId != null)
                         {
-                            var offi = GetInfoOfficeOfUser(job.OfficeId);
+                            var offi = GetInfoOfficeOfUser(jobRep.OfficeId);
                             if (offi!=null && string.IsNullOrEmpty(offi.InternalCode))
                                 continue;
                             var part = partnerRepository.Get(x => x.InternalCode == offi.InternalCode);
@@ -2114,9 +2114,15 @@ namespace eFMS.API.Documentation.DL.Services
                                     surcharge.Type = DocumentConstants.CHARGE_BUY_TYPE;
                                     var catCharge = catChargeRepository.Get(x => x.DebitCharge == charge.ChargeId && x.DebitCharge != null).FirstOrDefault();
                                     if (catCharge != null) { surcharge.ChargeId = catCharge.Id; };
+                                    if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                        surcharge.PaymentObjectId = partnerInternal.Id;
                                 }
                                 else if (charge.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                                {
                                     surcharge.Type = DocumentConstants.CHARGE_OBH_TYPE;
+                                    if (!string.IsNullOrEmpty(partnerInternal.Id))
+                                        surcharge.PayerId = partnerInternal.Id;
+                                }    
                                 else { continue; }
 
                                 surcharge.LinkChargeId = charge.Id.ToString();
@@ -2132,8 +2138,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.CreditNo = null;
                                 surcharge.DebitNo = null;
 
-                                if (!string.IsNullOrEmpty(partnerInternal.Id))
-                                    surcharge.PaymentObjectId = partnerInternal.Id;
+                                
 
                                 surcharge.UserCreated = currentUser.UserID;
                                 surcharge.DatetimeCreated = DateTime.Now;
