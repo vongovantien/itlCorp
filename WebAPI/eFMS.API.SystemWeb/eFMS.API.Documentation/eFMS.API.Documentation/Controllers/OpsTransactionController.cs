@@ -309,7 +309,7 @@ namespace eFMS.API.Documentation.Controllers
             HandleState hs = transactionService.ConvertClearanceToJob(model);
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
-            ResultHandle result = new ResultHandle { Status = hs.Success, Message = message };
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
             if (!hs.Success)
             {
                 return BadRequest(result);

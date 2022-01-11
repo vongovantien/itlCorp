@@ -1,4 +1,5 @@
 ﻿using eFMS.API.Documentation.Service.Models;
+using System;
 using System.Collections.Generic;
 
 namespace eFMS.API.Documentation.DL.Models
@@ -11,7 +12,11 @@ namespace eFMS.API.Documentation.DL.Models
         public decimal? GW { get; set; }
         public decimal? PackageQty { get; set; }
         public decimal? CW { get; set; }
+        public string SalemanId { get; set; }
+        public string CustomerId { get; set; }
+        public string PackageContainer { get; set; }
 
+        public DateTime? ServiceDate { get; set; }
         public List<CsMawbcontainer> Containers { get; set; }
     }
 }

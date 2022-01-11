@@ -72,7 +72,7 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
             });
     }
 
-    saveAndConvert() {
+    saveAndConvert(isReplicate: boolean) {
         this.detailComponent.isSubmitted = true;
         this.detailComponent.isConvertJob = true;
 
@@ -82,23 +82,21 @@ export class CustomClearanceEditComponent extends AppPage implements OnInit {
         if (this.detailComponent.formGroup.invalid || (!!this.detailComponent.clearanceDate.value && !this.detailComponent.clearanceDate.value.startDate)) {
             return;
         } else {
-            if (this.detailComponent.mblid.value == null || this.detailComponent.mblid.value === '') {
-                return;
-            }
-            if (this.detailComponent.hblid.value == null || this.detailComponent.hblid.value === '') {
+            if (!this.detailComponent.mblid.value || !this.detailComponent.hblid.value) {
                 return;
             }
         }
         this.detailComponent.getClearance();
-        this.updateAndConvertClearance();
+        this.customDeclaration.isReplicate = isReplicate;
+        this.updateAndConvertClearance(this.customDeclaration);
     }
 
-    updateAndConvertClearance() {
-        this._documentation.convertExistedClearanceToJob([this.customDeclaration])
+    updateAndConvertClearance(body: CustomClearance) {
+        this._documentation.convertExistedClearanceToJob([body])
             .subscribe((response) => {
                 if (response.status) {
-                    this._toart.success("Convert Successfull!!!");
-                    this.getCustomCleanranceById(this.customDeclaration.id);
+                    this._toart.success(`Convert ${body.clearanceNo} Successfull`);
+                    this.getCustomCleanranceById(body.id);
                 }
             });
     }
