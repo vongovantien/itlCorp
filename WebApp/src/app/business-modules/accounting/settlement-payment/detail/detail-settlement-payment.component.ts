@@ -292,7 +292,7 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
         this._router.navigate([`${RoutingConstants.ACCOUNTING.SETTLEMENT_PAYMENT}`]);
     }
 
-    exportSettlementPayment(language: string) {
+    exportSettlementPayment(language: string, typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -302,14 +302,18 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Form - eFMS.xlsx`);
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
-    exportSettlementPaymentTemplate(language: string) {
+    exportSettlementPaymentTemplate(language: string, typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -319,29 +323,19 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Template Form - eFMS.xlsx`);
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
-    previewExportSettlementPaymentTemplate(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
 
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
-            }
-        }); 
-    }
-
-    exportGeneralPreview() {
+    exportGeneralPreview(typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
             return;
@@ -351,41 +345,15 @@ export class SettlementPaymentDetailComponent extends AppPage implements ICrysta
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} General Preview - eFMS.xlsx`);
-                },
-            );
-    }
-
-    previewExportSettlementPayment(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
-            }
-        }); 
-    }
-
-    previewGeneralPreview() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "", 'Settlement_General', u.officeId);
-            }
-        }); 
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
     @delayTime(1000)

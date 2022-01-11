@@ -403,15 +403,20 @@ export class AdvancePaymentDetailComponent
             });
     }
 
-    exportAdvPayment(lang: string) {
+    exportAdvPayment(lang: string, typeExp: string) {
         this._exportRepo
             .exportAdvancePaymentDetail(this.advId, lang)
-            .subscribe((response: ArrayBuffer) => {
-                this.downLoadFile(
-                    response,
-                    "application/ms-excel",
-                    `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`
-                );
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
             });
     }
 
@@ -435,16 +440,6 @@ export class AdvancePaymentDetailComponent
                     this._toastService.error(res.message, "");
                 }
             });
-    }
-
-    previewExportAdvPayment(lang: string) {
-        this._store.select(getCurrentUserState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.advId, lang, "Advance", u.officeId);
-            }
-        });
     }
 
     changeAdvanceFor(data: string) {

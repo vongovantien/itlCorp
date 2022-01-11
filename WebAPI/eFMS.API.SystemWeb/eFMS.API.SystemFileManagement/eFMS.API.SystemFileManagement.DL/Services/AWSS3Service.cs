@@ -138,6 +138,45 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+
+        public async Task<string> PostFileReportAsync(FileUploadModel model)
+        {
+            var result = string.Empty;
+            try
+            {
+                var key = "";
+                List<SysImage> list = new List<SysImage>();
+                foreach (var file in model.Files)
+                {
+                    string fileName = Path.GetFileNameWithoutExtension(file.FileName);
+                    var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
+                    if (fileExe != null)
+                        fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#]+", "") + "_" + StringHelper.RandomString(5);
+
+                    string extension = Path.GetExtension(file.FileName);
+                    key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+
+                    var putRequest = new PutObjectRequest()
+                    {
+                        BucketName = _bucketName,
+                        Key = key,
+                        InputStream = file.OpenReadStream(),
+                    };
+
+                    PutObjectResponse putObjectResponse = _client.PutObjectAsync(putRequest).Result;
+                    if (putObjectResponse.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        result = _domainTest + "/OpenFile/" + model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
+                    }
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return ex.ToString();
+            }
+        }
+
         public async Task<HandleState> OpenFile(string moduleName, string folder, Guid objId, string fileName)
         {
             try
