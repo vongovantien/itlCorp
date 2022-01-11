@@ -2082,6 +2082,9 @@ namespace eFMS.API.Documentation.DL.Services
                     foreach (var jobRep in lstJobRep)
                     {
                         var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
+                        if (job == null)
+                            continue;
+
                         if (job.OfficeId != null)
                         {
                             var offi = GetInfoOfficeOfUser(job.OfficeId);
@@ -2122,6 +2125,12 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.Hblid = job.Hblid;
                                 surcharge.Hblno = job.Hwbno;
                                 surcharge.Mblno = job.Mblno;
+
+                                surcharge.VoucherId = null;
+                                surcharge.VoucherIddate = null;
+                                surcharge.Soano = null;
+                                surcharge.CreditNo = null;
+                                surcharge.DebitNo = null;
 
                                 if (!string.IsNullOrEmpty(partnerInternal.Id))
                                     surcharge.PaymentObjectId = partnerInternal.Id;
