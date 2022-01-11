@@ -117,14 +117,14 @@
                                     <app-dropdown #dropdownMenu>
                                         <a class="dropdown-item pointer" (click)="previewSettlementPayment()">Preview
                                             single</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('VN')">Preview multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPayment('ENG')">Preview multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN')">Print multiple (VN)</a>
-                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG')">Print multiple (ENG)</a>
-                                        <a class="dropdown-item pointer" (click)="previewGeneralPreview()">Preview General</a>
-                                        <a class="dropdown-item pointer" (click)="exportGeneralPreview()"> Print General</a>
-                                        <a class="dropdown-item pointer" (click)="previewExportSettlementPaymentTemplate('VN')">Preview Payment SOA Template</a>
-                                        <a class="dropdown-item pointer" (click)="exportSettlementPaymentTemplate('VN')">Print Payment SOA Template</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN', 'preview')">Preview multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG', 'preview')">Preview multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('VN', 'download')">Print multiple (VN)</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPayment('ENG', 'download')">Print multiple (ENG)</a>
+                                        <a class="dropdown-item pointer" (click)="exportGeneralPreview('preview')">Preview General</a>
+                                        <a class="dropdown-item pointer" (click)="exportGeneralPreview('download')"> Print General</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPaymentTemplate('VN', 'preview')">Preview Payment SOA Template</a>
+                                        <a class="dropdown-item pointer" (click)="exportSettlementPaymentTemplate('VN', 'download')">Print Payment SOA Template</a>
                                     </app-dropdown>
                                 </div>
                                 <app-default-button [buttonSetting]="cancelButtonSetting" (onClick)="back()">

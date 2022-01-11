@@ -263,18 +263,23 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
         }
     }
 
-    exportAdvPayment(lang: string) {
+    exportAdvPayment(lang: string, typeExp: string) {
         this._progressRef.start();
-        this._exportRepo.exportAdvancePaymentDetail(this.idAdvPayment, lang)
+        this._exportRepo
+            .exportAdvancePaymentDetail(this.idAdvPayment, lang)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
     recall() {
@@ -333,15 +338,5 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                     }
                 },
             );
-    }
-    
-    previewExportAdvPayment(lang: string) {
-        this._store.select(getCurrentUserState)
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.idAdvPayment, lang, 'Advance', u.officeId);
-            }
-        });
     }
 }

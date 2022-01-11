@@ -1,11 +1,9 @@
 ﻿using eFMS.API.Common.Globals;
 using eFMS.API.ReportData.Models;
 using eFMS.API.ReportData.Models.Accounting;
-using eFMS.API.ReportData.Models.Common.Enums;
 using eFMS.API.ReportData.Models.Criteria;
 using FMS.API.ReportData.Models.Accounting;
 using OfficeOpenXml;
-using OfficeOpenXml.Drawing.Controls;
 using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;

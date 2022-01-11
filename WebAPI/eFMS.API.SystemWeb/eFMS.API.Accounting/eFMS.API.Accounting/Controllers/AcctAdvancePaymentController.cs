@@ -717,10 +717,10 @@ namespace eFMS.API.Accounting.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("DetailAdvancePaymentExport")]
-        [Authorize]
-        public IActionResult DetailAdvancePaymentExport(Guid advanceId, string language, Guid officeId)
+        //[Authorize]
+        public IActionResult DetailAdvancePaymentExport(Guid advanceId, string language)
         {
-            var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId, language, officeId);
+            var result = acctAdvancePaymentService.AdvancePaymentExport(advanceId, language);
             return Ok(result);
         }
 

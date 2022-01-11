@@ -230,7 +230,7 @@ export class ApporveSettlementPaymentComponent extends AppPage {
         this.componentRef.instance.show();
     }
 
-    exportSettlementPayment(language: string) {
+    exportSettlementPayment(language: string, typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -240,29 +240,18 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Settlement Form - eFMS.xlsx');
-                },
-            );
-    }
-    
-    previewExportSettlementPayment(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
-            }
-        });   
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
-    exportGeneralPreview() {
+    exportGeneralPreview(typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `);
             return;
@@ -272,44 +261,18 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement General Preview - eFMS.xlsx`);
-                },
-            );
-    }
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
+    }   
 
-    previewGeneralPreview() {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, "",'Settlement_General', u.officeId);
-            }
-        });
-    }
-    
-    previewExportSettlementPaymentTemplate(language: string) {
-        if (!this.requestSurchargeListComponent.surcharges.length) {
-            this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
-            return;
-        }
-
-        this.userLogged$
-        .pipe(takeUntil(this.ngUnsubscribe))
-        .subscribe((u) => {
-            if (!!u) {
-                this._exportRepo.previewExportPayment(this.settlementPayment.settlement.id, language, 'Settlement', u.officeId);
-            }
-        });
-    }
-
-    exportSettlementPaymentTemplate(language: string) {
+    exportSettlementPaymentTemplate(language: string, typeExp: string) {
         if (!this.requestSurchargeListComponent.surcharges.length) {
             this._toastService.warning(`Settlement payment don't have any surcharge in this period, Please check it again! `, '');
             return;
@@ -319,11 +282,15 @@ export class ApporveSettlementPaymentComponent extends AppPage {
             .pipe(
                 catchError(this.catchError),
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", `Settlement ${this.settlementPayment?.settlement?.settlementNo} Template Form - eFMS.xlsx`);
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
     recall() {

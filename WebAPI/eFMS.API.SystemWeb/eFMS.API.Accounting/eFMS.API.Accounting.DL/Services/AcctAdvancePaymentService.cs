@@ -3913,18 +3913,18 @@ namespace eFMS.API.Accounting.DL.Services
         }
 
         #region --- EXPORT ADVANCE ---
-        public AdvanceExport AdvancePaymentExport(Guid advanceId, string language, Guid officeId)
+        public AdvanceExport AdvancePaymentExport(Guid advanceId, string language)
         {
             AdvanceExport dataExport = new AdvanceExport();
             var advancePayment = GetAdvancePaymentByAdvanceId(advanceId);
             if (advancePayment == null) return null;
 
-            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment, language, officeId);
+            dataExport.InfoAdvance = GetInfoAdvanceExport(advancePayment, language);
             dataExport.ShipmentsAdvance = GetListShipmentAdvanceExport(advancePayment);
             return dataExport;
         }
 
-        private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment, string language, Guid officeId)
+        private InfoAdvanceExport GetInfoAdvanceExport(AcctAdvancePaymentModel advancePayment, string language)
         {
             string _requester = string.IsNullOrEmpty(advancePayment.Requester) ? string.Empty : userBaseService.GetEmployeeByUserId(advancePayment.Requester)?.EmployeeNameVn;
 
@@ -3966,7 +3966,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == (currentUser == null ? officeId : currentUser.OfficeID)).FirstOrDefault();
+            var office = sysOfficeRepo.Get(x => x.Id == (currentUser.OfficeID)).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
             var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code); 
