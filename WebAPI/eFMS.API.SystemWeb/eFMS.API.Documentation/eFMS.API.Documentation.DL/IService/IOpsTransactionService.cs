@@ -28,7 +28,6 @@ namespace eFMS.API.Documentation.DL.IService
         string CheckExist(OpsTransactionModel model, string mblNo, string hblNo);
         Crystal PreviewFormPLsheet(Guid id, string currency);
         HandleState Update(OpsTransactionModel model);
-        IQueryable<OpsTransaction> QueryByPermission(PermissionRange range);
         ResultHandle CheckAllowConvertJob(List<CustomsDeclarationModel> list);
         HandleState LockOpsTransaction(Guid jobId);
         ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds);

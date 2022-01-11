@@ -222,7 +222,6 @@ namespace eFMS.API.Documentation.DL.Services
                     {
                         trans.Commit();
                     }
-                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -235,6 +234,11 @@ namespace eFMS.API.Documentation.DL.Services
                     trans.Dispose();
                 }
             }
+            if(model.CsMawbcontainers?.Count > 0 && result.Success)
+            {
+                var hsContainer = mawbcontainerService.UpdateMasterBill(model.CsMawbcontainers, model.Id);
+            }
+
 
             return result;
         }
@@ -546,24 +550,25 @@ namespace eFMS.API.Documentation.DL.Services
             }
             return true;
         }
-        public IQueryable<OpsTransaction> QueryByPermission(PermissionRange range)
+        public Expression<Func<OpsTransaction, bool>> QueryByPermission(PermissionRange range)
         {
-            IQueryable<OpsTransaction> data = null;
+            //IQueryable<OpsTransaction> data = null;
+            Expression<Func<OpsTransaction, bool>> query = q => true;
             List<string> authorizeUserIds = permissionService.GetAuthorizedIds("CL", currentUser);
             switch (range)
             {
                 case PermissionRange.All:
-                    data = DataContext.Get(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
+                    query = query.And(x => x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null);
                     break;
                 case PermissionRange.Owner:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.BillingOpsId == currentUser.UserID || x.SalemanId == currentUser.UserID
                                                  || authorizeUserIds.Contains(x.BillingOpsId) || authorizeUserIds.Contains(x.SalemanId)
                                                  || x.UserCreated == currentUser.UserID));
                     break;
                 case PermissionRange.Group:
                     var dataUserLevel = userlevelRepository.Get(x => x.GroupId == currentUser.GroupId).Select(t => t.UserId).ToList();
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.GroupId == currentUser.GroupId && x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
@@ -571,20 +576,20 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
                 case PermissionRange.Department:
                     var dataUserLevelDepartment = userlevelRepository.Get(x => x.DepartmentId == currentUser.DepartmentId).Select(t => t.UserId).ToList();
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.DepartmentId == currentUser.DepartmentId && x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)
                                                 || dataUserLevelDepartment.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Office:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && ((x.OfficeId == currentUser.OfficeID && x.CompanyId == currentUser.CompanyID)
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId)));
                     break;
                 case PermissionRange.Company:
-                    data = DataContext.Get(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
+                    query = query.And(x => (x.CurrentStatus != TermData.Canceled || x.CurrentStatus == null)
                                                 && (x.CompanyId == currentUser.CompanyID 
                                                 || authorizeUserIds.Contains(x.BillingOpsId)
                                                 || authorizeUserIds.Contains(x.SalemanId) 
@@ -592,7 +597,7 @@ namespace eFMS.API.Documentation.DL.Services
                     break;
             }
 
-            return data;
+            return query;
         }
 
         /// <summary>
@@ -621,11 +626,13 @@ namespace eFMS.API.Documentation.DL.Services
         public IQueryable<OpsTransactionModel> Query(OpsTransactionCriteria criteria)
         {
             if (criteria.RangeSearch == PermissionRange.None) return null;
-            IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
+            //IQueryable<OpsTransaction> data = QueryByPermission(criteria.RangeSearch);
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
-            data = data.Where(queryDefault);
+            var data = DataContext.Get(queryDefault);
+            var queryPermission = QueryByPermission(criteria.RangeSearch);
+            data = data.Where(queryPermission);
 
             if (data == null) return null;
 
@@ -813,36 +820,54 @@ namespace eFMS.API.Documentation.DL.Services
 
                 //    customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
                 //}
-               
-                HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, model, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
-                if(rs.Message == null)
-                {
-                    if(opsReplicate != null)
+               if(model.IsReplicate)
+               {
+                    HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, model, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
+                    if (rs.Message == null)
                     {
-                        DataContext.Add(opsReplicate, false);
-                        opsTransaction.ReplicatedId = opsReplicate.Id;  // ID của job Replicate.
-                    }
-                    DataContext.Add(opsTransaction, false);
-
-                    result = DataContext.SubmitChanges();
-                    if (result.Success && model.Id == 0)
-                    {
-                        CustomsDeclaration clearance = GetNewClearanceModel(model);
-                        clearance.JobNo = opsTransaction.JobNo;
-                        HandleState hsAddCd = customDeclarationRepository.Add(clearance, false);
-
-                        if(cdReplicate != null)
+                        if (opsReplicate != null)
                         {
-                            cdReplicate.JobNo = opsReplicate.JobNo;
-                            HandleState hsAddCdReplicate = customDeclarationRepository.Add(cdReplicate, false);
+                            DataContext.Add(opsReplicate, false);
+                            opsTransaction.ReplicatedId = opsReplicate.Id;  // ID của job Replicate.
                         }
-                      
-                        result = customDeclarationRepository.SubmitChanges();
+                        DataContext.Add(opsTransaction, false);
+
+                        result = DataContext.SubmitChanges();
+                        if (result.Success && model.Id == 0)
+                        {
+                            CustomsDeclaration clearance = GetNewClearanceModel(model);
+                            clearance.JobNo = opsTransaction.JobNo;
+                            HandleState hsAddCd = customDeclarationRepository.Add(clearance, false);
+
+                            if (cdReplicate != null)
+                            {
+                                cdReplicate.JobNo = opsReplicate.JobNo;
+                                HandleState hsAddCdReplicate = customDeclarationRepository.Add(cdReplicate, false);
+                            }
+
+                            result = customDeclarationRepository.SubmitChanges();
+                        }
                     }
+                    else
+                    {
+                        return new HandleState((object)rs.Message);
+                    }
+
                 }
                 else
                 {
-                    return new HandleState((object)rs.Message);
+                    HandleState hs = DataContext.Add(opsTransaction);
+                    if(hs.Success)
+                    {
+                        CustomsDeclaration clearance = GetNewClearanceModel(model);
+                        clearance.JobNo = opsTransaction.JobNo;
+
+                        result = customDeclarationRepository.Add(clearance);
+                    }
+                    else
+                    {
+                        return new HandleState((object)hs.Message);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1063,58 +1088,66 @@ namespace eFMS.API.Documentation.DL.Services
                                 OpsTransaction opsTransaction = GetNewShipmentToConvert(productService, item, customerContract);
                                 opsTransaction.JobNo = CreateJobNoOps(); //Generate JobNo [17/12/2020]
 
-                                //// Update salemanInfo
-                                //opsTransaction.SalemanId = customerContract.SaleManId;
-                                //SaleManPermissionModel salemanPermissionInfo = GetAndUpdateSaleManInfo(customerContract.SaleManId);
-                                //opsTransaction.SalesGroupId = salemanPermissionInfo.SalesGroupId;
-                                //opsTransaction.SalesDepartmentId = salemanPermissionInfo.SalesDepartmentId;
-                                //opsTransaction.SalesOfficeId = salemanPermissionInfo.SalesOfficeId;
-                                //opsTransaction.SalesCompanyId = salemanPermissionInfo.SalesCompanyId;
-
                                 bool existedJobNo = CheckExistJobNo(opsTransaction.Id, opsTransaction.JobNo);
                                 if (existedJobNo == true)
                                 {
                                     return new HandleState(stringLocalizer[DocumentationLanguageSub.MSG_JOBNO_EXISTED, opsTransaction.JobNo].Value);
                                 }
 
-
                                 CustomsDeclaration clearance = UpdateInfoConvertClearance(item);
 
-                                HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, item, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
-                                if(rs.Message == null)
+                                if(item.IsReplicate)
                                 {
-                                    DataContext.Add(opsTransaction, false);
-                                    if(opsReplicate != null)
+                                    HandleState rs = CreateJobAndClearanceReplicate(opsTransaction, productService, item, customerContract, out OpsTransaction opsReplicate, out CustomsDeclaration cdReplicate);
+                                    if (rs.Message == null)
                                     {
-                                        opsTransaction.ReplicatedId = opsReplicate.Id;
-                                        DataContext.Add(opsReplicate, false);
-                                    }
+                                        DataContext.Add(opsTransaction, false);
+                                        if (opsReplicate != null)
+                                        {
+                                            opsTransaction.ReplicatedId = opsReplicate.Id;
+                                            DataContext.Add(opsReplicate, false);
+                                        }
 
-                                    if(cdReplicate != null)
+                                        if (cdReplicate != null)
+                                        {
+                                            cdReplicate.JobNo = opsReplicate.JobNo;
+                                        }
+                                        customDeclarationRepository.Add(cdReplicate, false);
+
+                                        result = DataContext.SubmitChanges();
+
+                                        if (result.Success)
+                                        {
+                                            clearance.JobNo = opsTransaction.JobNo;
+                                            customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+
+                                            customDeclarationRepository.SubmitChanges();
+                                        }
+
+                                        i = i + 1;
+
+                                        trans.Commit();
+                                    }
+                                    else
                                     {
-                                        cdReplicate.JobNo = opsReplicate.JobNo;
+                                        trans.Rollback();
+                                        return new HandleState(new Exception(Convert.ToString(rs.Message)));
                                     }
-                                    customDeclarationRepository.Add(cdReplicate, false);
-
-                                    result = DataContext.SubmitChanges();
-
-                                    if(result.Success)
+                                } else
+                                {
+                                    HandleState hsJob = DataContext.Add(opsTransaction);
+                                    if(hsJob.Success)
                                     {
                                         clearance.JobNo = opsTransaction.JobNo;
-                                        customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id, false);
+                                        result = customDeclarationRepository.Update(clearance, x => x.Id == clearance.Id);
 
-                                        customDeclarationRepository.SubmitChanges();
+                                        i = i + 1;
+
+                                        trans.Commit();
                                     }
                                    
-                                    i = i + 1;
-
-                                    trans.Commit();
                                 }
-                                else
-                                {
-                                    trans.Rollback();
-                                    return new HandleState(new Exception(Convert.ToString(rs.Message)));
-                                }
+                              
                             }
                             catch (Exception ex)
                             {

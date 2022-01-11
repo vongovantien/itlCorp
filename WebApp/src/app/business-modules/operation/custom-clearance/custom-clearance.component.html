@@ -30,26 +30,20 @@
                                 </span>
                             </span>
                         </button>
-                        <button type="button" class="btn btn-primary  m-btn--icon m-btn--uppercase"
-                            (click)="confirmConvert()">
-                            <span>
-                                <i class="la la-exchange"></i>
-                                <span>
-                                    Convert
-                                </span>
-                            </span>
+
+                        <button class="btn btn-primary dropdown-toggle" [dpToggle]="dropdownMenuClearance"
+                            position="bottomCenter">
+                            <i class="la la-exchange"></i>
+                            Convert
+                            <span class="caret"></span>
                         </button>
 
-                        <div class="dropdown m-dropdown m-dropdown--inline">
-                            <button type="button" class="btn btn-default dropdown-toggle"
-                                data-toggle="dropdown">
-                                <i class="la la-refresh"></i> Get From Ecus<span class="caret"></span>
-                            </button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item pointer" (click)="getDataFromEcus()"> Get From Ecus</a>
-                                <a class="dropdown-item pointer" (click)="getDataOlaFromEcus()"> Get Ola From Ecus</a>
-                            </div>
-                        </div>
+                        <button class="btn btn-default dropdown-toggle" [dpToggle]="dropdownMenuClearanceGetFrom"
+                            position="bottomCenter">
+                            <i class="la la-refresh"></i>
+                            Get From Ecus
+                            <span class="caret"></span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -155,3 +149,20 @@
 </confirm-popup>
 
 <permission-403-popup></permission-403-popup>
+
+<app-dropdown #dropdownMenuClearance>
+    <a class="dropdown-item pointer" (click)="confirmConvert(true)" title="Create clearance with replicate">
+        <i class="la la-copy"></i>
+        <span> Replicate</span>
+    </a>
+
+    <a class="dropdown-item pointer" (click)="confirmConvert(false)" title="Create clearance with non-replicate">
+        <i class="la la-save"></i>
+        <span> Non-Replicate </span>
+    </a>
+</app-dropdown>
+
+<app-dropdown #dropdownMenuClearanceGetFrom>
+    <a class="dropdown-item pointer" (click)="getDataFromEcus()"> Get From Ecus</a>
+    <a class="dropdown-item pointer" (click)="getDataOlaFromEcus()"> Get Ola From Ecus</a>
+</app-dropdown>
