@@ -2139,6 +2139,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.SettlementCode = null;
                                 surcharge.VoucherId = null;
                                 surcharge.VoucherIddate = null;
+                                surcharge.VoucherIdre = null;
+                                surcharge.VoucherIdredate = null;
                                 surcharge.AcctManagementId = null;
                                 surcharge.PayerAcctManagementId = null;
 
