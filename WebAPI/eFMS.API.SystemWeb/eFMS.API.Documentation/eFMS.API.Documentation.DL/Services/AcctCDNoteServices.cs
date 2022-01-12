@@ -59,7 +59,7 @@ namespace eFMS.API.Documentation.DL.Services
         IContextBase<AccAccountingManagement> accountingManagementRepository;
         IContextBase<CatDepartment> departmentRepository;
         readonly IContextBase<AcctCreditManagementAr> acctCreditManagementArRepository;
-        private readonly IContextBase<AcctSoa> acctSoaRepo;
+        IContextBase<AcctSoa> acctSoaRepo;
         private readonly IContextBase<AcctCombineBilling> acctCombineBillingRepository;
         private readonly ICurrencyExchangeService currencyExchangeService;
         private decimal _decimalNumber = Constants.DecimalNumber;
@@ -3199,8 +3199,23 @@ namespace eFMS.API.Documentation.DL.Services
                 var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
                 if (combineCurrent != null)
                 {
-                    combineCurrent.TotalAmountVnd = surchargeCmb.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd));
-                    combineCurrent.TotalAmountUsd = surchargeCmb.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd));
+                    combineCurrent.TotalAmountVnd = combineCurrent.TotalAmountUsd = 0;
+                    foreach (var sur in surchargeCmb)
+                    {
+                        if (sur.Type == DocumentConstants.CHARGE_OBH_TYPE)
+                        {
+                            var test = acctSoaRepo.Get(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
+                            var isCredit = acctSoaRepo.Any(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
+                            isCredit = !isCredit ? DataContext.Any(x => x.Code == sur.CreditNo && x.CombineBillingNo == combineNoUpd) : isCredit;
+                            combineCurrent.TotalAmountVnd += (isCredit ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                            combineCurrent.TotalAmountUsd += (isCredit ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                        }
+                        else
+                        {
+                            combineCurrent.TotalAmountVnd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                            combineCurrent.TotalAmountUsd += (sur.Type == DocumentConstants.CHARGE_BUY_TYPE ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                        }
+                    }
                     acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo);
                 }
             }
