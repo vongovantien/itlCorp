@@ -1340,7 +1340,8 @@ namespace eFMS.API.Catalogue.DL.Services
 
             }
             if (query == null) return null;
-            var results = query.Select(x => new CatPartnerViewModel
+            var dataGrp = query.GroupBy(x => x.partner.Id).Select(x => x.FirstOrDefault());
+            var results = dataGrp.Select(x => new CatPartnerViewModel
             {
                 Id = x.partner.Id,
                 PartnerGroup = x.partner.PartnerGroup,
