@@ -8,12 +8,16 @@ import { catchError, finalize, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute } from '@angular/router';
 import { NgProgress } from '@ngx-progressbar/core';
 import { AppList } from 'src/app/app.list';
+import { CustomDeclaration } from '@models';
+import { InjectViewContainerRefDirective } from '@directives';
+import { ConfirmPopupComponent } from '@common';
 
 @Component({
     selector: 'app-billing-custom-declaration',
     templateUrl: './billing-custom-declaration.component.html',
 })
 export class BillingCustomDeclarationComponent extends AppList implements OnInit {
+    @ViewChild(InjectViewContainerRefDirective) injectViewContainerRef: InjectViewContainerRefDirective;
 
     @ViewChild(AddMoreModalComponent) poupAddMore: AddMoreModalComponent;
     currentJob: OpsTransaction;
@@ -24,6 +28,7 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
     searchImportedString: string = '';
     checkAllImported = false;
     dataImportedSearch: any[];
+    selectedCd: CustomDeclaration;
 
     constructor(
         private pagerService: PagingService,
@@ -236,4 +241,25 @@ export class BillingCustomDeclarationComponent extends AppList implements OnInit
         const pager = this.pagerService.getPager(this.totalItems, this.page, this.pageSize);
         this.customClearances = this.dataImportedSearch.slice(pager.startIndex, pager.endIndex + 1);
     }
+
+    onSelectCd(cd: CustomDeclaration) {
+        this.selectedCd = cd;
+        console.log(this.selectedCd);
+    }
+
+    confirmSyncCDToReplicateJob() {
+        const confirmMessage = `Are you sure you want to sync <span class="font-weight-bold">${this.selectedCd?.clearanceNo}</span> to replicate job?`;
+        this.showPopupDynamicRender(ConfirmPopupComponent, this.injectViewContainerRef.viewContainerRef, {
+            title: 'Sync To Accountant System',
+            body: confirmMessage,
+            iconConfirm: 'la la-cloud-upload',
+            labelConfirm: 'Yes',
+            center: true
+
+        }, () => {
+            console.log("ok");
+        });
+    }
+
+
 }
