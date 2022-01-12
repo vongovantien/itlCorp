@@ -1540,13 +1540,18 @@ namespace eFMS.API.Operation.DL.Services
 
                     if(opsJob.ReplicatedId == null)
                     {
-                        return new HandleState((object)string.Format("Không tìm thấy thông tin job replicate của job {0}", cd.JobNo));
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
 
                     var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
                     if(opsJobReplicate == null)
                     {
-                        return new HandleState((object)string.Format("Không tìm thấy thông tin job replicate của job {0}", cd.JobNo));
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
+                    }
+                    var existedClearance = DataContext.Get(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id)?.FirstOrDefault();
+                    if(existedClearance != null && !string.IsNullOrEmpty(existedClearance.JobNo) && existedClearance.JobNo == opsJobReplicate.JobNo)
+                    {
+                        return new HandleState((object)string.Format("Tờ khai {0} đã được thêm vào lô replicate", cd.ClearanceNo));
                     }
 
                     CustomsDeclaration replicateCd = new CustomsDeclaration();
