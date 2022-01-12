@@ -2132,13 +2132,15 @@ namespace eFMS.API.Documentation.DL.Services
                                 surcharge.Hblno = job.Hwbno;
                                 surcharge.Mblno = job.Mblno;
 
-                                surcharge.VoucherId = null;
-                                surcharge.VoucherIddate = null;
                                 surcharge.Soano = null;
+                                surcharge.PaySoano = null;
                                 surcharge.CreditNo = null;
                                 surcharge.DebitNo = null;
-
-                                
+                                surcharge.SettlementCode = null;
+                                surcharge.VoucherId = null;
+                                surcharge.VoucherIddate = null;
+                                surcharge.AcctManagementId = null;
+                                surcharge.PayerAcctManagementId = null;
 
                                 surcharge.UserCreated = currentUser.UserID;
                                 surcharge.DatetimeCreated = DateTime.Now;
