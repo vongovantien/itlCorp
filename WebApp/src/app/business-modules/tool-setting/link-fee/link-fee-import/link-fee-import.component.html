@@ -86,22 +86,22 @@
                                 <span>Service Selling</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameBuying'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameBuying') }"
-                                (click)="sort('chargeNameBuying')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeBuying'), 'sorting_desc': (!isDesc && sortKey == 'chargeBuying') }"
+                                (click)="sort('chargeBuying')">
                                 <span>Charge Buying</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeNameSelling'), 'sorting_desc': (!isDesc && sortKey == 'chargeNameSelling') }"
-                                (click)="sort('chargeNameSelling')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'chargeSelling'), 'sorting_desc': (!isDesc && sortKey == 'chargeSelling') }"
+                                (click)="sort('chargeSelling')">
                                 <span>Charge Selling</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameBuying'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameBuying') }"
-                                (click)="sort('partnerNameBuying')">
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerBuying'), 'sorting_desc': (!isDesc && sortKey == 'partnerBuying') }"
+                                (click)="sort('partnerBuying')">
                                 <span>Partner Buying</span>
                             </th>
                             <th class="sorting"
-                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerNameSelling'), 'sorting_desc': (!isDesc && sortKey == 'partnerNameSelling') }"
+                                [ngClass]="{ 'sorting_asc ': (isDesc && sortKey == 'partnerSelling'), 'sorting_desc': (!isDesc && sortKey == 'partnerSelling') }"
                                 (click)="sort('nameEn')">
                                 <span>Partner Selling</span>
                             </th>
@@ -126,16 +126,16 @@
                                     <span >{{ item.serviceSelling }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.chargeNameBuying }}</span>
+                                    <span >{{ item.chargeBuying }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.chargeNameSelling }}</span>
+                                    <span >{{ item.chargeSelling }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.partnerNameBuying }}</span>
+                                    <span >{{ item.partnerBuying }}</span>
                                 </td>
                                 <td>
-                                    <span >{{ item.partnerNameSelling }}</span>
+                                    <span >{{ item.partnerSelling }}</span>
                                 </td>
                                 <td>
                                     <span>{{ item.status }}</span>
