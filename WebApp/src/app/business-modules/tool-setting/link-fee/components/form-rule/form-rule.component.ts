@@ -176,30 +176,30 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     }
     getChargeBuying() {
         console.log(this.serviceBuying.value);
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
-            this.configChargeBuying.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE) || [];
+        if (!!this._dataService.getDataByKey('RULE_LINK_SELL')) {
+            this.configChargeBuying.dataSource = this._dataService.getDataByKey('RULE_LINK_SELL') || [];
         } else {
             this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceBuying.value, type: CommonEnum.CHARGE_TYPE.CREDIT })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataCharge: any = []) => {
                         this.configChargeBuying.dataSource = dataCharge;
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CHARGE, dataCharge || []);
+                        this._dataService.setDataService('RULE_LINK_SELL', dataCharge || []);
                     },
                 );
         }
     }
 
     getChargeSelling() {
-        if (!!this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE)) {
-            this.configChargeSelling.dataSource = this._dataService.getDataByKey(SystemConstants.CSTORAGE.CHARGE);
+        if (!!this._dataService.getDataByKey('RULE_LINK_BUY')) {
+            this.configChargeSelling.dataSource = this._dataService.getDataByKey('RULE_LINK_BUY');
         } else {
             this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceSelling.value, type: CommonEnum.CHARGE_TYPE.DEBIT })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataCharge: any = []) => {
                         this.configChargeSelling.dataSource = dataCharge;
-                        this._dataService.setDataService(SystemConstants.CSTORAGE.CHARGE, dataCharge);
+                        this._dataService.setDataService('RULE_LINK_BUY', dataCharge);
                     },
                 );
         }
