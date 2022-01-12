@@ -71,11 +71,10 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? NetAmount { get; set; }
         public decimal? AmountVND { get; set; }
         public decimal? AmountUSD { get; set; }
-        public string PIC { get; set; }
-        public bool IsSynced { get; set; }
         public string SeriesNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public string CombineNo { get; set; }
         public string CombineBillingType { get; set; }
+        public string BillingType { get; set; }
     }
 }

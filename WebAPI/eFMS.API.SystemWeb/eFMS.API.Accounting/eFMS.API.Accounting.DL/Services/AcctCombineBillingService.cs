@@ -1114,7 +1114,7 @@ namespace eFMS.API.Accounting.DL.Services
                     else
                         it.NetAmount = Math.Round((Decimal)(it.Quantity * it.UnitPrice * it.FinalExchangeRate), 2);
 
-                    if (it.Type == "BUY")
+                    if (it.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                     {
                         it.VATAmount = it.VATAmountLocal * (-1);
                         it.NetAmount = it.NetAmount * (-1);
@@ -1232,12 +1232,12 @@ namespace eFMS.API.Accounting.DL.Services
                     MBL = sur.Mblno,
                     Type = sur.Type,
                     CustomNo = _customNo,
-                    Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || ( sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)sur.Total : null,
+                    Debit = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)sur.Total : null,
                     Credit = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (decimal?)sur.Total : null,
                     DebitLocal = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0) : (decimal?)null,
                     CreditLocal = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountVnd ?? 0) + (sur.VatAmountVnd ?? 0) : (decimal?)null,
                     DebitUSD = sur.Type == AccountingConstants.TYPE_CHARGE_SELL || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0) : (decimal?)null,
-                    CreditUSD = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || ( sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0) : (decimal?)null,
+                    CreditUSD = sur.Type == AccountingConstants.TYPE_CHARGE_BUY || (sur.Type == AccountingConstants.TYPE_CHARGE_OBH) ? (sur.AmountUsd ?? 0) + (sur.VatAmountUsd ?? 0) : (decimal?)null,
                     SOANo = soa != null ? soa.Soano : null,
                     IsOBH = false,
                     Currency = sur.CurrencyId,
@@ -1273,8 +1273,6 @@ namespace eFMS.API.Accounting.DL.Services
                     TypeCharge = charge?.Type,
                     ExchangeDate = sur.ExchangeDate,
                     FinalExchangeRate = exRate,
-                    PIC = null,
-                    IsSynced = _isSynced,
                     NetAmount = sur.NetAmount,
                     AmountVND = sur.AmountVnd,
                     AmountUSD = sur.AmountUsd,
@@ -1282,7 +1280,8 @@ namespace eFMS.API.Accounting.DL.Services
                     InvoiceDate = sur.InvoiceDate,
                     TaxCodeOBH = (sur.Type == AccountingConstants.TYPE_CHARGE_OBH && !string.IsNullOrEmpty(sur.PaymentObjectId)) ? partnerRepo.Get(x => x.Id == sur.PaymentObjectId).Select(x => x.TaxCode).FirstOrDefault() : string.Empty,
                     CombineNo = combineBillingNo,
-                    CombineBillingType = soa != null ? "SOA" : "CDNOTE"
+                    CombineBillingType = soa != null ? "SOA" : "CDNOTE",
+                    BillingType = ((soa != null && !string.IsNullOrEmpty(sur.PaySoano)) || (cdNote != null && !string.IsNullOrEmpty(sur.CreditNo))) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT
                 };
                 result.Add(chg);
             }
@@ -1511,15 +1510,13 @@ namespace eFMS.API.Accounting.DL.Services
                               TypeCharge = charge.Type,
                               ExchangeDate = sur.ExchangeDate,
                               FinalExchangeRate = sur.FinalExchangeRate,
-                              PIC = null,
-                              IsSynced = false,
                               NetAmount = criteria.Currency == AccountingConstants.CURRENCY_LOCAL ? sur.AmountVnd : sur.AmountUsd,
                               AmountVND = null,
                               AmountUSD = null,
                               SeriesNo = sur.SeriesNo,
                               InvoiceDate = sur.InvoiceDate,
                               TaxCodeOBH = string.Empty,
-                              CombineNo = criteria.ReferenceNo.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault()
+                              CombineNo = criteria.ReferenceNo.Where(com => com == sur.CombineBillingNo || com == sur.ObhcombineBillingNo).FirstOrDefault(),
                           };
             var dataDoc = from sur in surcharges
                           join charge in chargeDatas on sur.ChargeId equals charge.Id
@@ -1583,8 +1580,6 @@ namespace eFMS.API.Accounting.DL.Services
                               TypeCharge = charge.Type,
                               ExchangeDate = sur.ExchangeDate,
                               FinalExchangeRate = sur.FinalExchangeRate,
-                              PIC = null,
-                              IsSynced = false,
                               NetAmount = criteria.Currency == AccountingConstants.CURRENCY_LOCAL ? sur.AmountVnd : sur.AmountUsd,
                               AmountVND = null,
                               AmountUSD = null,
@@ -1609,6 +1604,7 @@ namespace eFMS.API.Accounting.DL.Services
                     item.SOANo = soaData.Soano;
                     item.FinalExchangeRate = soaData.ExcRateUsdToLocal;
                     item.CombineBillingType = "SOA";
+                    item.BillingType = !string.IsNullOrEmpty(item.PaySoaNo) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
                 }
                 else
                 {
@@ -1616,8 +1612,9 @@ namespace eFMS.API.Accounting.DL.Services
                     item.CDNote = cdNote.Code;
                     item.FinalExchangeRate = cdNote.ExcRateUsdToLocal;
                     item.CombineBillingType = "CDNOTE";
+                    item.BillingType = !string.IsNullOrEmpty(item.CreditNo) ? AccountingConstants.ACCOUNTANT_TYPE_CREDIT : AccountingConstants.ACCOUNTANT_TYPE_DEBIT;
                 }
-                if (item.Type == AccountingConstants.TYPE_CHARGE_BUY)
+                if (item.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
                 {
                     item.VATAmount = item.VATAmount * (-1);
                     item.NetAmount = item.NetAmount * (-1);

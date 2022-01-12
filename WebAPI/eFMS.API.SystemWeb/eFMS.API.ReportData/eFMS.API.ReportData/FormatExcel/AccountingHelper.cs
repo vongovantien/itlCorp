@@ -5642,7 +5642,8 @@ namespace eFMS.API.ReportData.FormatExcel
             workSheet.Cells["A7"].Value = lstSoa.PartnerNameVN;
             workSheet.Cells["A8:V8"].Merge = true;
             workSheet.Cells["A8"].Value = lstSoa.BillingAddressVN;
-            workSheet.Cells["A6:A8"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
+            workSheet.Cells["A6:A7"].Style.Font.SetFromFont(new Font("Times New Roman", 15));
+            workSheet.Cells["A8"].Style.Font.SetFromFont(new Font("Times New Roman", 12));
 
             workSheet.Cells[4, 1, 8, 17].Style.VerticalAlignment = ExcelVerticalAlignment.Center;
             workSheet.Cells[4, 1, 8, 17].Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
