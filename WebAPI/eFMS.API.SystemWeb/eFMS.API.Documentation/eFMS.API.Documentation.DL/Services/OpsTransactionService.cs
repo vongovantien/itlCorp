@@ -2096,6 +2096,9 @@ namespace eFMS.API.Documentation.DL.Services
                             if (part.Count() > 1)
                                 continue;
 
+                            if (part.FirstOrDefault() == null)
+                                continue;
+
                             partnerInternal = part.FirstOrDefault();
                         }
 
