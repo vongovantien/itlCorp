@@ -1549,7 +1549,8 @@ namespace eFMS.API.Operation.DL.Services
                         return new HandleState((object)string.Format("Không tìm thấy thông tin job replicate của job {0}", cd.JobNo));
                     }
 
-                    CustomsDeclaration replicateCd = cd;
+                    CustomsDeclaration replicateCd = new CustomsDeclaration();
+
                     replicateCd.JobNo = opsJobReplicate.JobNo;
                     replicateCd.Source = OperationConstants.FROM_REPLICATE;
                     replicateCd.DatetimeCreated = DateTime.Now;
@@ -1558,6 +1559,27 @@ namespace eFMS.API.Operation.DL.Services
                     replicateCd.DepartmentId = currentUser.DepartmentId;
                     replicateCd.OfficeId = currentUser.OfficeID;
                     replicateCd.CompanyId = currentUser.CompanyID;
+                    replicateCd.AccountNo = cd.AccountNo;
+                    replicateCd.PartnerTaxCode = cd.PartnerTaxCode;
+                    replicateCd.Mblid = cd.Mblid;
+                    replicateCd.Hblid = cd.Hblid;
+                    replicateCd.ClearanceNo = cd.ClearanceNo;
+                    replicateCd.ClearanceDate = cd.ClearanceDate;
+                    replicateCd.ServiceType = cd.ServiceType;
+                    replicateCd.PortCodeNn = cd.PortCodeNn;
+                    replicateCd.UnitCode = cd.UnitCode;
+                    replicateCd.QtyCont = cd.QtyCont;
+                    replicateCd.Pcs = cd.Pcs;
+                    replicateCd.ImportCountryCode = cd.ImportCountryCode;
+                    replicateCd.ExportCountryCode = cd.ExportCountryCode;
+                    replicateCd.GrossWeight = cd.GrossWeight;
+                    replicateCd.Cbm = cd.Cbm;
+                    replicateCd.Gateway = cd.Gateway;
+                    replicateCd.Type = cd.Type;
+                    replicateCd.CargoType = cd.CargoType;
+                    replicateCd.Route = cd.Route;
+                    replicateCd.Shipper = cd.Shipper;
+                    replicateCd.Consignee = cd.Consignee;
 
                     hs = await DataContext.AddAsync(replicateCd);
                 }
