@@ -402,15 +402,15 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.ChargeNameBuying))
+                if (string.IsNullOrEmpty(item.ChargeBuying))
                 {
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.ChargeNameSelling))
+                if (string.IsNullOrEmpty(item.ChargeSelling))
                 {
                     item.IsValid = false;
                 }
-                if (string.IsNullOrEmpty(item.PartnerNameBuying))
+                if (string.IsNullOrEmpty(item.PartnerBuying))
                 {
                     item.IsValid = false;
                 }
@@ -452,8 +452,8 @@ namespace eFMS.API.Setting.DL.Services
         private bool CheckCharge(string chargeBuying, string chargeSelling)
         {
             var charge = catChargeRepo.Get();
-            var buying = charge.Where(x => x.ChargeNameEn.Contains(chargeBuying) && x.Type == "CREDIT").FirstOrDefault();
-            var selling = charge.Where(x => x.ChargeNameEn.Contains(chargeSelling) && x.Type == "DEBIT").FirstOrDefault();
+            var buying = charge.Where(x => x.Code.Contains(chargeBuying) && x.Type == "CREDIT").FirstOrDefault();
+            var selling = charge.Where(x => x.Code.Contains(chargeSelling) && x.Type == "DEBIT").FirstOrDefault();
             if (buying!=null&&selling!=null)
             {
                 return true;
@@ -469,7 +469,7 @@ namespace eFMS.API.Setting.DL.Services
                 var partner = catPartnerRepo.Get();
                 foreach (var item in data)
                 {
-                    if (!CheckCharge(item.ChargeNameBuying,item.ChargeNameSelling))
+                    if (!CheckCharge(item.ChargeBuying,item.ChargeSelling))
                     {
                         return new HandleState(false, "Charge Buying or Selling not match Type");
                     }
@@ -478,10 +478,10 @@ namespace eFMS.API.Setting.DL.Services
                     {
                         Id = Guid.NewGuid(),
                         RuleName = item.RuleName,
-                        ChargeBuying = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameBuying) && x.Type == "CREDIT").FirstOrDefault().Id.ToString(),
-                        ChargeSelling = charge.Where(x => x.ChargeNameEn.Contains(item.ChargeNameSelling) && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
-                        PartnerBuying = partner.Where(x => x.ShortName.Contains(item.PartnerNameBuying)).FirstOrDefault().Id,
-                        PartnerSelling = item.PartnerNameSelling != null ? partner.Where(x => x.ShortName.Contains(item.PartnerNameSelling)).FirstOrDefault().Id : null,
+                        ChargeBuying = charge.Where(x => x.Code.Contains(item.ChargeBuying) && x.Type == "CREDIT").FirstOrDefault().Id.ToString(),
+                        ChargeSelling = charge.Where(x => x.Code.Contains(item.ChargeSelling) && x.Type == "DEBIT").FirstOrDefault().Id.ToString(),
+                        PartnerBuying = partner.Where(x => x.TaxCode.Contains(item.PartnerBuying)).FirstOrDefault().Id,
+                        PartnerSelling = item.PartnerSelling != null ? partner.Where(x => x.TaxCode.Contains(item.PartnerSelling)).FirstOrDefault().Id : null,
                         ServiceBuying = ConvertService(item.ServiceBuying),
                         ServiceSelling = ConvertService(item.ServiceSelling),
                         EffectiveDate = DateTime.Now,

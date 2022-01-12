@@ -214,11 +214,11 @@ namespace eFMS.API.Setting.Controllers
                     IsValid = true,
                     RuleName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                     ServiceBuying = worksheet.Cells[row, 2].Value?.ToString().Trim(),
-                    ChargeNameBuying = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                    PartnerNameBuying = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    ChargeBuying = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    PartnerBuying = worksheet.Cells[row, 6].Value?.ToString().Trim(),
                     ServiceSelling = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                    ChargeNameSelling = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                    PartnerNameSelling = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                    ChargeSelling = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    PartnerSelling = worksheet.Cells[row, 7].Value?.ToString().Trim(),
                     Status = "Active",
                 };
                 list.Add(rulelinkfee);
@@ -232,10 +232,10 @@ namespace eFMS.API.Setting.Controllers
             //    || !string.IsNullOrEmpty(x.PartnerNameSelling)).ToList();
             list = list.Where(x => x.RuleName != null
                 || x.ServiceBuying != null
-                || x.ChargeNameBuying != null
-                || x.PartnerNameBuying != null
+                || x.ChargeBuying != null
+                || x.PartnerBuying != null
                 || x.ServiceSelling != null
-                || x.ChargeNameSelling != null).ToList();
+                || x.ChargeSelling != null).ToList();
             return list;
         }
 
