@@ -2076,7 +2076,7 @@ namespace eFMS.API.Documentation.DL.Services
             CatPartner partnerInternal = new CatPartner();
             try
             {
-                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID && x.JobNo == "HMLOG2201/00053");
+                var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
                 if (lstJobRep != null)
                 {
                     foreach (var jobRep in lstJobRep)
