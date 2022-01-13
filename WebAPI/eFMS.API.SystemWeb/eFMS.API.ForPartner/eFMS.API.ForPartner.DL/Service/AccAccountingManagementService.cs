@@ -2254,7 +2254,7 @@ namespace eFMS.API.ForPartner.DL.Service
             {
                 return new HandleState((object)model.OfficeCode + " không tồn tại");
             }
-            var refNos = model.Details.Select(x => x.BravoRefNo).ToList();
+            var refNos = model.Details.Select(x => x.AcctID).ToList();
             // Có case nào không có ghi nhận công nợ AP k?
             //if(refNos.Count() == 0)
             //{
@@ -2298,11 +2298,9 @@ namespace eFMS.API.ForPartner.DL.Service
             }
             // gom các detail cùng voucherNo, voucherDate,
             var grpVoucherDetail = model.Details
-                .GroupBy(x => new { x.VoucherNo, x.TransactionType })
+                .GroupBy(x => new { x.AcctID })
                 .Select(s => new
                 {
-                    s.Key.VoucherNo,
-                    s.Key.TransactionType,
                     voucherData = s.FirstOrDefault(),
                     surcharges = s.Select(c => new { c.VoucherNo, c.VoucherDate, c.ChargeId, c.AmountVnd, c.AmountUsd, c.VatAmountVnd, c.VatAmountUsd }).ToList()
                 })
@@ -2316,15 +2314,13 @@ namespace eFMS.API.ForPartner.DL.Service
                     SysOffice officeCurrent = officeRepository.Get(x => x.Code == model.OfficeCode)?.FirstOrDefault();
 
                     var isVoucherExisted = DataContext.Any(x => x.Type == ForPartnerConstants.ACCOUNTING_VOUCHER_TYPE
-                                                            && x.VoucherId == item.VoucherNo
-                                                            && x.OfficeId == officeCurrent.Id && x.Date.Value.Month == item.voucherData.VoucherDate.Month);
+                                                           && x.ReferenceNo == item.voucherData.AcctID);
                     if (isVoucherExisted)
                     {
-                        return new HandleState((object)string.Format("Voucher {0} - {1} đã tồn tại", item.VoucherNo, item.voucherData.VoucherDate.Month));
+                        return new HandleState((object)string.Format("Voucher {0} - {1} đã tồn tại", item.voucherData.VoucherNo, item.voucherData.AcctID));
                     }
 
                     VoucherCreateRowModel itemGroup = item.voucherData;
-                    decimal _totalAmount = 0;
                     decimal _totalAmountVnd = 0;
                     decimal _totalAmountUsd = 0;
 
@@ -2361,7 +2357,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         TotalExchangeRate = itemGroup.ExchangeRate,
                         TransactionType = itemGroup.TransactionType,
                         AttachDocInfo = model.DocCode,
-                        ReferenceNo = itemGroup.BravoRefNo,
+                        ReferenceNo = itemGroup.AcctID,
 
                         PartnerId = customer.Id,
                         PartnerAddress = customer.AddressEn,
@@ -2403,7 +2399,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                         List<Guid> surchargesIdInvoucher = itemGrp.surcharges.Select(x => x.ChargeId).ToList();
                                         IQueryable<CsShipmentSurcharge> surcharges = surchargeRepo.Get(x => surchargesIdInvoucher.Contains(x.Id));
 
-                                        AccAccountingManagement voucher = vouchers.Where(v => v.VoucherId == itemGrp.VoucherNo && v.Date == itemGrp.voucherData.VoucherDate)?.FirstOrDefault();
+                                        AccAccountingManagement voucher = vouchers.Where(v => v.VoucherId == itemGrp.voucherData.VoucherNo && v.Date == itemGrp.voucherData.VoucherDate)?.FirstOrDefault();
 
                                         if (surcharges.Count() > 0)
                                         {
@@ -2411,13 +2407,13 @@ namespace eFMS.API.ForPartner.DL.Service
                                             {
                                                 if (surcharge.Type == ForPartnerConstants.TYPE_CHARGE_OBH)
                                                 {
-                                                    surcharge.VoucherIdre = itemGrp.VoucherNo;
+                                                    surcharge.VoucherIdre = itemGrp.voucherData.VoucherNo;
                                                     surcharge.VoucherIdredate = voucher.Date;
                                                     surcharge.PayerAcctManagementId = voucher.Id;
                                                 }
                                                 else
                                                 {
-                                                    surcharge.VoucherId = itemGrp.VoucherNo;
+                                                    surcharge.VoucherId = itemGrp.voucherData.VoucherNo;
                                                     surcharge.VoucherIddate = voucher.Date;
                                                     surcharge.AcctManagementId = voucher.Id;
                                                 }
@@ -2447,7 +2443,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                                 string settlementNo = surcharges.FirstOrDefault().SettlementCode; // các phí trong detail phải cùng số SM.
                                                 if (!string.IsNullOrEmpty(settlementNo))
                                                 {
-                                                    UpdateVoucherSettlement(settlementNo, voucher.VoucherId, voucher.Date);
+                                                    HandleState hsUpdateSM = await UpdateVoucherSettlement(settlementNo, voucher.VoucherId, voucher.Date);
                                                 }
                                             }
                                         }

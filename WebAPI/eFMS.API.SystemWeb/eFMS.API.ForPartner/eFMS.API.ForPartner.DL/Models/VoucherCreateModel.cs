@@ -54,6 +54,7 @@ namespace eFMS.API.ForPartner.DL.Models
         public string MblNo { get; set; }
         public string Hblno { get; set; }
         public string BravoRefNo { get; set; }
+        public string AcctID { get; set; } // bravo generate theo office để phân biệt từng chứng từ riêng.
     }
 
     public class VoucherSyncUpdateModel
