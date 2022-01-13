@@ -1548,8 +1548,8 @@ namespace eFMS.API.Operation.DL.Services
                     {
                         return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
                     }
-                    var existedClearance = DataContext.Get(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id)?.FirstOrDefault();
-                    if(existedClearance != null && !string.IsNullOrEmpty(existedClearance.JobNo) && existedClearance.JobNo == opsJobReplicate.JobNo)
+                    var existedClearance = DataContext.Any(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id && opsJobReplicate.JobNo == x.JobNo);
+                    if(existedClearance)
                     {
                         return new HandleState((object)string.Format("Tờ khai {0} đã được thêm vào lô replicate", cd.ClearanceNo));
                     }
