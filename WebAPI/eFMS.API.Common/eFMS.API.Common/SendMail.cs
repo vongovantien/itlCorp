@@ -37,9 +37,12 @@ namespace eFMS.API.Common
                 {
                     foreach (string ToEmail in toEmails)
                     {
-                        MailAddress EmailTo = new MailAddress(ToEmail);
-                        receivers += ToEmail + ", ";
-                        message.To.Add(EmailTo);
+                        if (IsValidEmail(ToEmail))
+                        {
+                            MailAddress EmailTo = new MailAddress(ToEmail);
+                            receivers += EmailTo.Address + ", ";
+                            message.To.Add(EmailTo.Address);
+                        }
                     }
                 }
 
@@ -52,9 +55,12 @@ namespace eFMS.API.Common
                 {
                     foreach (string EmailCC in emailCCs)
                     {
-                        MailAddress CC = new MailAddress(EmailCC);
-                        CCs += EmailCC + ", ";
-                        message.CC.Add(CC);
+                        if (IsValidEmail(EmailCC))
+                        {
+                            MailAddress CC = new MailAddress(EmailCC);
+                            CCs += CC.Address + ", ";
+                            message.CC.Add(CC.Address);
+                        }
                     }
                 }
 
@@ -63,9 +69,12 @@ namespace eFMS.API.Common
                 {
                     foreach (string EmailBCC in emailBCC)
                     {
-                        MailAddress BCC = new MailAddress(EmailBCC);
-                        BCCs += emailBCC + ", ";
-                        message.Bcc.Add(BCC);
+                        if (IsValidEmail(EmailBCC))
+                        {
+                            MailAddress BCC = new MailAddress(EmailBCC);
+                            BCCs += BCC.Address + ", ";
+                            message.Bcc.Add(BCC.Address);
+                        }
                     }
                 }
 
@@ -122,9 +131,9 @@ namespace eFMS.API.Common
             try
             {
                 var addr = new MailAddress(email);
-                return addr.Address == email;
+                return true;
             }
-            catch
+            catch (FormatException)
             {
                 return false;
             }
