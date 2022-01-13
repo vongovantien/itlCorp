@@ -2364,7 +2364,10 @@ namespace eFMS.API.Documentation.DL.Services
                 && criteria.IssuedDate == null
                 && string.IsNullOrEmpty(criteria.CreatorId)
                 && string.IsNullOrEmpty(criteria.Type)
-                && string.IsNullOrEmpty(criteria.Status))
+                && string.IsNullOrEmpty(criteria.Status)
+                && criteria.FromExportDate == null 
+                && criteria.ToExportDate == null
+                )
             {
                 var maxDate = DataContext.Get().Max(x => x.DatetimeCreated) ?? DateTime.Now;
                 var minDate = maxDate.AddMonths(-1); //Bắt đầu từ ngày MaxDate trở về trước 1 tháng
