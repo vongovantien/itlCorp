@@ -1176,8 +1176,8 @@ namespace eFMS.API.ReportData.FormatExcel
             {
                 //check.SetPosition(7, 15, 2, 0);
                 //check.Checked = eCheckState.Checked;
-                workSheet.Cells["K9"].Value = "X";
-                workSheet.Cells["K9"].Style.Font.Bold = true;
+                workSheet.Cells["C10"].Value = "X";
+                workSheet.Cells["C10"].Style.Font.Bold = true;
             }
             else if (advanceExport.InfoAdvance.PaymentMethod == "Bank")
             {
