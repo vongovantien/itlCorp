@@ -38,6 +38,8 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<CsTransaction> transRepo;
         private readonly IContextBase<CsTransactionDetail> transDetailRepo;
         private readonly IContextBase<CustomsDeclaration> customsRepo;
+        private readonly IContextBase<AcctReceipt> receiptRepo;
+        private readonly IContextBase<AcctReceiptSync> receipSynctRepo;
         private readonly IContextBase<SysUser> userRepo;
         private readonly IContextBase<CsShipmentSurcharge> surchargeRepo;
         readonly IContextBase<SysAuthorizedApproval> authourizedApprovalRepo;
@@ -57,6 +59,8 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<OpsTransaction> opsTransaction,
             IContextBase<CsTransaction> trans,
             IContextBase<CsTransactionDetail> transDetail,
+            IContextBase<AcctReceipt> acctReceipt,
+            IContextBase<AcctReceiptSync> acctSyncReceipt,
             IContextBase<CustomsDeclaration> customs,
             IContextBase<AcctReceipt> receipt,
             IContextBase<SysUser> sysUser,
@@ -82,6 +86,8 @@ namespace eFMS.API.Setting.DL.Services
             userBaseService = userBase;
             authourizedApprovalRepo = authourizedApproval;
             soaRepo = SOA;
+            receiptRepo = acctReceipt;
+            receipSynctRepo = acctSyncReceipt;
         }
 
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -746,7 +752,7 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     return new HandleState(true, (object)updatePaymentId.Message);
                 }
-                if(type==1)
+                if (type == 1)
                 {
                     var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
                     if (SOACurrent == null) return new HandleState("Not found SOA");
@@ -769,24 +775,16 @@ namespace eFMS.API.Setting.DL.Services
                 }
                 else
                 {
-                    var receptCurrent = receiptRepo.Get(x => x.PaymentRefNo == paymentNo).FirstOrDefault();
-                    if (receptCurrent == null) return new HandleState("Not found Receipt");
-                    var newID = Guid.NewGuid();
-                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
-                    string logName = string.Format("UpdateReceipt_{0}_eFMS_Log", (
-                        updatePaymentId.Status ? "Success" : "Fail"
-                   ));
-                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
-                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
-                        JsonConvert.SerializeObject("Receipt"),
-                        JsonConvert.SerializeObject(receptCurrent.Id),
-                        JsonConvert.SerializeObject(newID));
-                    new LogHelper(logName, logMessage);
-                    if (!updatePaymentId.Status)
+                    var receiptCurent = receiptRepo.Get(x => x.PaymentRefNo == paymentNo).FirstOrDefault();
+                    if (receiptCurent == null) return new HandleState("Not found Receipt");
+                    receiptCurent.SyncStatus = null;
+                    var hsReceipt = receiptRepo.Update(receiptCurent, x => x.Id == receiptCurent.Id);
+                    var hsSync = receipSynctRepo.Delete(x => x.ReceiptSyncNo == receiptCurent.PaymentRefNo && x.SyncStatus == "Rejected");
+                    if (!hsSync.Success)
                     {
-                        return new HandleState((object)updatePaymentId.Message);
+                        return new HandleState("Receipt don't have Rejected");
                     }
-                    return new HandleState(true, (object)updatePaymentId.Message);
+                    return new HandleState(true, (object)"Update Success");
                 }
             }
             catch (Exception ex)
