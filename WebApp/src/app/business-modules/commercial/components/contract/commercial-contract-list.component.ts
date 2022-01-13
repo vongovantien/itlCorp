@@ -3,7 +3,7 @@ import { AppList } from 'src/app/app.list';
 import { catchError, finalize } from 'rxjs/operators';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Contract } from 'src/app/shared/models/catalogue/catContract.model';
-import { CatalogueRepo } from '@repositories';
+import { CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { ConfirmPopupComponent, Permission403PopupComponent } from '@common';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -41,8 +41,8 @@ export class CommercialContractListComponent extends AppList implements OnInit {
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _sortService: SortService,
-        protected _activeRoute: ActivatedRoute
-
+        protected _activeRoute: ActivatedRoute,
+        private _systemfileManageRepo: SystemFileManageRepo
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -194,7 +194,18 @@ export class CommercialContractListComponent extends AppList implements OnInit {
 
     getFileContract() {
         this.formContractPopup.isLoading = true;
-        this._catalogueRepo.getContractFilesAttach(this.partnerId, this.formContractPopup.selectedContract.id).
+        // this._catalogueRepo.getContractFilesAttach(this.partnerId, this.formContractPopup.selectedContract.id).
+        //     pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.formContractPopup.isLoading = false;
+        //     }))
+        //     .subscribe(
+        //         (res: any = []) => {
+        //             this.formContractPopup.files = res;
+        //             console.log(this.formContractPopup.files);
+        //         }
+        //     );
+        this._systemfileManageRepo.getContractFilesAttach(this.formContractPopup.selectedContract.id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.formContractPopup.isLoading = false;

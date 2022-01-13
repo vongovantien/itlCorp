@@ -1,6 +1,6 @@
 import { PopupBase } from "src/app/popup.base";
 import { OnInit, Component, Output, EventEmitter } from "@angular/core";
-import { DocumentationRepo } from "@repositories";
+import { DocumentationRepo, SystemFileManageRepo } from "@repositories";
 import { ToastrService } from "ngx-toastr";
 import { NgProgress } from "@ngx-progressbar/core";
 import { IAppState } from "@store";
@@ -24,7 +24,8 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         private _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         private _activedRoute: ActivatedRoute,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
+        private _systemFileManagerRepo:SystemFileManageRepo,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -64,8 +65,20 @@ export class ShareBusinessAddAttachmentPopupComponent extends PopupBase implemen
         const fileList: FileList[] = event.target['files'];
         if (fileList.length > 0) {
             this._progressRef.start();
-            this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
-                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            // this._documentRepo.uploadFileShipment(this.jobId, true, fileList)
+            //     .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+            //     .subscribe(
+            //         (res: CommonInterface.IResult) => {
+            //             if (res.status) {
+            //                 this._toastService.success("Upload file successfully!");
+            //                 if (!!this.jobId) {
+            //                     this.getFileShipment(this.jobId);
+            //                 }
+            //             }
+            //         }
+            //     );
+            this._systemFileManagerRepo.uploadFileShipment(this.jobId, fileList)
+                .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
                         if (res.status) {

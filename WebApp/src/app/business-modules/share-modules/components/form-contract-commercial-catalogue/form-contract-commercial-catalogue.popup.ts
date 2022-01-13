@@ -4,7 +4,7 @@ import { finalize, catchError, distinctUntilChanged, map, takeUntil } from 'rxjs
 import { Office, Company, User, Customer } from '@models';
 import { Validators, FormBuilder, FormGroup, AbstractControl } from '@angular/forms';
 import { JobConstants, SystemConstants } from '@constants';
-import { SystemRepo, CatalogueRepo } from '@repositories';
+import { SystemRepo, CatalogueRepo, SystemFileManageRepo } from '@repositories';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
@@ -127,12 +127,13 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     constructor(
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
+        private _systemFileManageRepo: SystemFileManageRepo,
         private _catalogueRepo: CatalogueRepo,
         protected _router: Router,
         protected _toastService: ToastrService,
         private _ngProgressService: NgProgress,
         protected _activeRoute: ActivatedRoute,
-        private _store: Store<IAppState>
+        private _store: Store<IAppState>,
 
     ) {
         super();
@@ -317,7 +318,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
     }
 
     uploadFileContract(id: string) {
-        this._catalogueRepo.uploadFileContract(this.partnerId, id, this.fileList)
+        this._systemFileManageRepo.uploadFileContract(id, this.fileList)
             .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
             .subscribe(
                 (res: CommonInterface.IResult) => {
@@ -334,7 +335,17 @@ export class FormContractCommercialPopupComponent extends PopupBase {
 
     getFileContract() {
         this.isLoading = true;
-        this._catalogueRepo.getContractFilesAttach(this.partnerId, this.selectedContract.id).
+        // this._catalogueRepo.getContractFilesAttach(this.partnerId, this.selectedContract.id).
+        //     pipe(catchError(this.catchError), finalize(() => {
+        //         this._progressRef.complete();
+        //         this.isLoading = false;
+        //     }))
+        //     .subscribe(
+        //         (res: any = []) => {
+        //             this.files = res;
+        //         }
+        //     );
+        this._systemFileManageRepo.getContractFilesAttach(this.selectedContract.id).
             pipe(catchError(this.catchError), finalize(() => {
                 this._progressRef.complete();
                 this.isLoading = false;
@@ -344,6 +355,7 @@ export class FormContractCommercialPopupComponent extends PopupBase {
                     this.files = res;
                 }
             );
+            
     }
 
     deleteFileContract() {

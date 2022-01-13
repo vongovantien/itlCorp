@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { catchError, finalize, skip, takeUntil } from 'rxjs/operators';
-import { DocumentationRepo } from '@repositories';
+import { DocumentationRepo, SystemFileManageRepo } from '@repositories';
 import { ToastrService } from 'ngx-toastr';
 import { Store } from '@ngrx/store';
 import { IAppState } from '@store';
@@ -31,8 +31,8 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
         private _documentRepo: DocumentationRepo,
         private _toastService: ToastrService,
         private _store: Store<IAppState>,
-        private _activedRoute: ActivatedRoute
-
+        private _activedRoute: ActivatedRoute,
+        private _systemFileManagerRepo: SystemFileManageRepo,
     ) {
         super();
 
@@ -76,7 +76,19 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 this._toastService.warning("maximum file size < 100Mb");
                 return;
             }
-            this._documentRepo.uploadFileShipment(this.jobId, false, fileList)
+            // this._documentRepo.uploadFileShipment(this.jobId, false, fileList)
+            //     .pipe(catchError(this.catchError))
+            //     .subscribe(
+            //         (res: CommonInterface.IResult) => {
+            //             if (res.status) {
+            //                 this._toastService.success("Upload file successfully!");
+            //                 if (!!this.jobId) {
+            //                     this.getFileShipment(this.jobId);
+            //                 }
+            //             }
+            //         }
+            //     );
+            this._systemFileManagerRepo.uploadFileShipment(this.jobId, fileList)
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (res: CommonInterface.IResult) => {
@@ -93,7 +105,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
 
     getFileShipment(jobId: string) {
         this.isLoading = true;
-        this._documentRepo.getShipmentFilesAttach(jobId).
+        this._systemFileManagerRepo.getShipmentFilesAttach(jobId).
             pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))
@@ -109,13 +121,14 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
     deleteFile(file: IShipmentAttachFile) {
         if (!!file) {
             this.selectedFile = file;
+            console.log(this.selectedFile);
             this.confirmDeletePopup.show();
         }
     }
 
     onDeleteFile() {
         this.confirmDeletePopup.hide();
-        this._documentRepo.deleteShipmentFilesAttach(this.selectedFile.id)
+        this._systemFileManagerRepo.deleteShipmentFilesAttach(this.jobId,this.selectedFile.name)
             .pipe(catchError(this.catchError), finalize(() => {
                 this.isLoading = false;
             }))
@@ -138,7 +151,7 @@ export class ShareBussinessFilesAttachComponent extends AppForm implements OnIni
                 objectId: this.jobId,
                 fileName: arr[0] + "_" + arr[1] + ".zip"
             }
-            this._documentRepo.dowloadallAttach(model)
+            this._systemFileManagerRepo.dowloadallAttach(model)
                 .subscribe(
                     (res: any) => {
                         this.downLoadFile(res, "application/zip", model.fileName);

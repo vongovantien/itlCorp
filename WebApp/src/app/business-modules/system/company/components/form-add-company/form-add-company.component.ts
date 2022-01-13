@@ -1,4 +1,4 @@
-import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, NgZone, ViewChild } from '@angular/core';
 import { AppForm } from 'src/app/app.form';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
@@ -13,6 +13,7 @@ declare var $: any;
 export class CompanyInformationFormAddComponent extends AppForm {
 
     @ViewChild('image') el: ElementRef;
+    @Input() companyId='';
 
     formGroup: FormGroup;
     code: AbstractControl;
@@ -88,7 +89,9 @@ export class CompanyInformationFormAddComponent extends AppForm {
                     Module: 'Company',
                     // Path: `dayladuongdanhinh`
                 },
-                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                //imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageUploadURL: `//${environment.HOST.FILE_SYSTEM}/api/v1/en-US/AWSS3/UploadImages/System/Company/${this.companyId}`,
+                imageUploadMethod: 'PUT',
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/company`,
                 imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
                 imageManagerDeleteMethod: 'DELETE',
@@ -116,6 +119,8 @@ export class CompanyInformationFormAddComponent extends AppForm {
                 }
             });
         });
+        console.log(this.code.value);
+        
     }
 }
 
