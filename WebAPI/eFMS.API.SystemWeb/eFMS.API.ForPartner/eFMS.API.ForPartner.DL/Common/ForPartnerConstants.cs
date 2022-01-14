@@ -56,9 +56,10 @@
 
         #region -- PAYMENT METHOD --
         public static readonly string PAYMENT_METHOD_CASH = "Cash";
-        public static readonly string PAYMENT_METHOD_BANK = "Bank";
+        public static readonly string PAYMENT_METHOD_BANK = "Bank Transfer";
         public static readonly string PAYMENT_METHOD_BANK_OR_CASH = "Bank Transfer / Cash";
         public static readonly string PAYMENT_METHOD_OTHER = "Other";
+        public static readonly string PAYMENT_METHOD_NETOFF = "Net Off Shipment";
         #endregion -- PAYMENT METHOD --
 
         #region -- STATUS SOA --
@@ -81,6 +82,8 @@
         public static readonly string CHARGE_AWB_FEE = "Air Waybill fee";
 
         public static readonly string CHARGE_HANDLING_FEE = "Handling fee";
+
+        public static readonly string CHARGE_MODE_NINV = "N.INV";
         #region -- TYPE SOA--
         public static readonly string TYPE_SOA_CREDIT = "Credit";
         public static readonly string TYPE_SOA_DEBIT = "Debit";

@@ -2352,7 +2352,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         UnpaidAmount = itemGroup.Currency == ForPartnerConstants.CURRENCY_LOCAL ? _totalAmountVnd : _totalAmountUsd,
                         UnpaidAmountVnd = _totalAmountVnd,
                         UnpaidAmountUsd = _totalAmountUsd,
-                        PaymentDueDate = itemGroup.VoucherDate.AddDays((double)(itemGroup.PaymentTerm)),
+                        PaymentDueDate = itemGroup.VoucherDate?.AddDays((double)(itemGroup.PaymentTerm)),
                         PaymentMethod = model.PaymentMethod,
                         TotalExchangeRate = itemGroup.ExchangeRate,
                         TransactionType = itemGroup.TransactionType,

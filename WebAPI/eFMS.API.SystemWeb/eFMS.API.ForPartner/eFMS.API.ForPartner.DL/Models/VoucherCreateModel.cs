@@ -29,7 +29,7 @@ namespace eFMS.API.ForPartner.DL.Models
     public class VoucherCreateRowModel
     {
         public string VoucherNo { get; set; }
-        public DateTime VoucherDate { get; set; }
+        public DateTime? VoucherDate { get; set; }
         public Guid ChargeId { get; set; }
         public string Currency { get; set; }
         public decimal ExchangeRate { get; set; }
