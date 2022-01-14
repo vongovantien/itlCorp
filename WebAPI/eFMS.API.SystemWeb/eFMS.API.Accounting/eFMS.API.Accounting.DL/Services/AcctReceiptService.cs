@@ -1154,8 +1154,6 @@ namespace eFMS.API.Accounting.DL.Services
 
                 _payment.InvoiceNo = payment.InvoiceNo;
                 _payment.Type = payment.Type;  // OBH/DEBIT
-                _payment.PaymentAmountUsd = (payment.PaidAmountUsd ?? 0);
-                _payment.PaymentAmountVnd = (payment.PaidAmountVnd ?? 0);
 
                 if (payment.CurrencyId == AccountingConstants.CURRENCY_LOCAL)
                 {
@@ -1260,70 +1258,74 @@ namespace eFMS.API.Accounting.DL.Services
             foreach (var payment in payments)
             {
                 AccAccountingManagement invoice = acctMngtRepository.Get(x => x.Id.ToString() == payment.RefId).FirstOrDefault();
-                AccAccountingPayment _payment = new AccAccountingPayment();
-
-                _payment.Id = Guid.NewGuid();
-                _payment.ReceiptId = receipt.Id;
-
-                _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.BillingRefNo;
-
-                if (payment.PaymentType == "OTHER")
+                if(invoice != null)
                 {
-                    _payment.PaymentNo = receipt.PaymentRefNo;
+                    AccAccountingPayment _payment = new AccAccountingPayment();
+
+                    _payment.Id = Guid.NewGuid();
+                    _payment.ReceiptId = receipt.Id;
+
+                    _payment.BillingRefNo = payment.PaymentType == "OTHER" ? GenerateAdvNo() : payment.BillingRefNo;
+
+                    if (payment.PaymentType == "OTHER")
+                    {
+                        _payment.PaymentNo = receipt.PaymentRefNo;
+                    }
+                    else
+                    {
+                        _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
+                    }
+
+                    //Phát sinh payment amount âm
+                    _payment.PaymentAmount = -payment.PaymentAmount;
+                    _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
+                    _payment.PaymentAmountUsd = -payment.PaymentAmountUsd;
+
+                    // Tính lại Balance
+                    _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
+                    _payment.BalanceVnd = invoice.UnpaidAmountVnd - _payment.PaymentAmountVnd;
+                    _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
+                    _payment.TotalPaidVnd = -payment.TotalPaidVnd;
+                    _payment.TotalPaidUsd = -payment.TotalPaidUsd;
+                    _payment.NetOffUsd = -payment.NetOffUsd;
+                    _payment.NetOffVnd = -payment.NetOffVnd;
+
+                    _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
+                    _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
+                    _payment.InvoiceNo = payment.InvoiceNo;
+                    _payment.RefId = payment.RefId;
+                    _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
+                    _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
+                    _payment.Type = payment.Type;
+                    _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
+                    _payment.ExchangeRateBilling = payment.ExchangeRateBilling; //Exchange Rate trên payment (SOADebit,DebitNote,Invoice)
+
+                    _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
+                    _payment.RefAmount = payment.RefAmount;
+                    _payment.RefCurrency = payment.RefCurrency;
+                    _payment.Note = payment.Note;
+                    _payment.DeptInvoiceId = payment.DeptInvoiceId;
+                    _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
+                    _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
+                    _payment.CreditNo = payment.CreditNo;
+                    _payment.CreditAmountVnd = -payment.CreditAmountVnd;
+                    _payment.CreditAmountUsd = -payment.CreditAmountUsd;
+                    _payment.Hblid = payment.Hblid;
+                    _payment.PartnerId = payment.PartnerId;
+
+
+                    _payment.Negative = true;
+                    _payment.PaymentType = payment.PaymentType;
+                    _payment.UserCreated = _payment.UserModified = currentUser.UserID;
+                    _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
+                    _payment.GroupId = currentUser.GroupId;
+                    _payment.DepartmentId = currentUser.DepartmentId;
+                    _payment.OfficeId = currentUser.OfficeID;
+                    _payment.CompanyId = currentUser.CompanyID;
+
+                    hs = acctPaymentRepository.Add(_payment);
                 }
-                else
-                {
-                    _payment.PaymentNo = payment.InvoiceNo + "_" + receipt.PaymentRefNo; //Invoice No + '_' + Receipt No
-                }
-
-                //Phát sinh payment amount âm
-                _payment.PaymentAmount = -payment.PaymentAmount;
-                _payment.PaymentAmountVnd = -payment.PaymentAmountVnd;
-                _payment.PaymentAmountUsd = -payment.PaymentAmountUsd;
-
-                // Tính lại Balance
-                _payment.Balance = invoice.UnpaidAmount - _payment.PaymentAmount;
-                _payment.BalanceVnd = invoice.UnpaidAmountVnd - _payment.PaymentAmountVnd;
-                _payment.BalanceUsd = invoice.UnpaidAmountUsd - _payment.PaymentAmountUsd;
-                _payment.TotalPaidVnd = -payment.TotalPaidVnd;
-                _payment.TotalPaidUsd = -payment.TotalPaidUsd;
-                _payment.NetOffUsd = -payment.NetOffUsd;
-                _payment.NetOffVnd = -payment.NetOffVnd;
-
-                _payment.UnpaidPaymentAmountVnd = payment.UnpaidPaymentAmountVnd;
-                _payment.UnpaidPaymentAmountUsd = payment.UnpaidPaymentAmountUsd;
-                _payment.InvoiceNo = payment.InvoiceNo;
-                _payment.RefId = payment.RefId;
-                _payment.CurrencyId = receipt.CurrencyId; //Currency Phiếu thu
-                _payment.PaidDate = receipt.PaymentDate; //Payment Date Phiếu thu
-                _payment.Type = payment.Type;
-                _payment.ExchangeRate = receipt.ExchangeRate; //Exchange Rate Phiếu thu
-                _payment.ExchangeRateBilling = payment.ExchangeRateBilling; //Exchange Rate trên payment (SOADebit,DebitNote,Invoice)
-
-                _payment.PaymentMethod = receipt.PaymentMethod; //Payment Method Phiếu thu
-                _payment.RefAmount = payment.RefAmount;
-                _payment.RefCurrency = payment.RefCurrency;
-                _payment.Note = payment.Note;
-                _payment.DeptInvoiceId = payment.DeptInvoiceId;
-                _payment.OfficeInvoiceId = payment.OfficeInvoiceId;
-                _payment.CompanyInvoiceId = payment.CompanyInvoiceId;
-                _payment.CreditNo = payment.CreditNo;
-                _payment.CreditAmountVnd = -payment.CreditAmountVnd;
-                _payment.CreditAmountUsd = -payment.CreditAmountUsd;
-                _payment.Hblid = payment.Hblid;
-                _payment.PartnerId = payment.PartnerId;
-
-
-                _payment.Negative = true;
-                _payment.PaymentType = payment.PaymentType;
-                _payment.UserCreated = _payment.UserModified = currentUser.UserID;
-                _payment.DatetimeCreated = _payment.DatetimeModified = DateTime.Now;
-                _payment.GroupId = currentUser.GroupId;
-                _payment.DepartmentId = currentUser.DepartmentId;
-                _payment.OfficeId = currentUser.OfficeID;
-                _payment.CompanyId = currentUser.CompanyID;
-
-                hs = acctPaymentRepository.Add(_payment);
+               
             }
             return hs;
         }
