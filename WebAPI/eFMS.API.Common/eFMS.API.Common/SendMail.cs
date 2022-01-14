@@ -35,6 +35,7 @@ namespace eFMS.API.Common
             {
                 if (toEmails != null && toEmails.Count() > 0)
                 {
+                    toEmails = GetListEmailValid(toEmails);
                     foreach (string ToEmail in toEmails)
                     {
                         if (IsValidEmail(ToEmail))
@@ -53,6 +54,7 @@ namespace eFMS.API.Common
                 // Add a carbon copy recipient.
                 if (emailCCs != null)
                 {
+                    emailCCs = GetListEmailValid(emailCCs);
                     foreach (string EmailCC in emailCCs)
                     {
                         if (IsValidEmail(EmailCC))
@@ -67,6 +69,7 @@ namespace eFMS.API.Common
                 // Add a carbon copy recipient.
                 if (emailBCC != null)
                 {
+                    emailBCC = GetListEmailValid(emailBCC);
                     foreach (string EmailBCC in emailBCC)
                     {
                         if (IsValidEmail(EmailBCC))
@@ -142,6 +145,30 @@ namespace eFMS.API.Common
         private static DateTime GetDateTime()
         {
             return DateTime.Now;
+        }
+
+        /// <summary>
+        /// Return valid email list
+        /// </summary>
+        /// <param name="emails"></param>
+        /// <returns></returns>
+        private static List<string> GetListEmailValid(List<string> emails)
+        {
+            var emailsReturn = new List<string>();
+            if (emails == null || emails.Count == 0)
+            {
+                return emailsReturn;
+            }
+            foreach (var item in emails)
+            {
+                var email = item.Split(new char[] { ';', '\n' });
+                emailsReturn.AddRange(email.Where(x => !string.IsNullOrEmpty(x)));
+            }
+            if (emailsReturn.Count > 0)
+            {
+                emailsReturn = emailsReturn.Distinct().ToList();
+            }
+            return emailsReturn;
         }
     }
 }
