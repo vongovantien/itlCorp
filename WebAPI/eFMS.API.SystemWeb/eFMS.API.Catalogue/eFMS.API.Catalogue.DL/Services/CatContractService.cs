@@ -432,7 +432,7 @@ namespace eFMS.API.Catalogue.DL.Services
             if (hs.Success)
             {
                 var ObjPartner = catPartnerRepository.Get(x => x.Id == contract.PartnerId).FirstOrDefault();
-                ObjPartner.PartnerGroup = ObjPartner.PartnerGroup + ";CUSTOMER";
+                ObjPartner.PartnerGroup += (ObjPartner.PartnerGroup.Contains(DataEnums.CustomerPartner) ? string.Empty : (";" + DataEnums.CustomerPartner));
                 ObjPartner.UserModified = currentUser.UserID;
                 ObjPartner.DatetimeModified = DateTime.Now;
                 ObjPartner.PartnerType = "Customer";
