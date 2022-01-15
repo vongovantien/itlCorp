@@ -1736,6 +1736,7 @@ namespace eFMS.API.Catalogue.DL.Services
                             ContractType = x.contract.ContractType,
                             CustomerAdvanceAmountVnd = x.contract.CustomerAdvanceAmountVnd ?? 0,
                             CreditCurrency = x.contract.CreditCurrency,
+                            CurrencyId = x.contract.CurrencyId,
                             CustomerAdvanceAmountUsd = x.contract.CustomerAdvanceAmountUsd,
                         }).OrderBy(x => x.ExpiredDate);
                     }
