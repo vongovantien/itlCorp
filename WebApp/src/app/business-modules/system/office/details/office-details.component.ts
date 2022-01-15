@@ -53,7 +53,8 @@ export class OfficeDetailsComponent extends AppList {
         bankAddress_En: '',
         location: '',
         bankName_En: '',
-        bankName_Local: ''
+        bankName_Local: '',
+        internalCode: ''
     };
     officeId: string = '';
 
@@ -104,7 +105,7 @@ export class OfficeDetailsComponent extends AppList {
 
     updateOffice() {
         this.formAdd.isSubmited = true;
-        if (this.formAdd.formGroup.valid) {
+        if (this.formAdd.formGroup.valid && this.formAdd.internalCode.value?.length <= 20) {
             this._progressRef.start();
             const body: any = {
                 id: this.officeId,
@@ -131,6 +132,7 @@ export class OfficeDetailsComponent extends AppList {
                 bankNameEn: this.formAdd.bankName_En.value,
                 bankNameLocal: this.formAdd.bankName_Local.value,
                 officeType: this.formAdd.officeType.value,
+                internalCode: this.formAdd.internalCode.value,
             };
             this._systemRepo.updateOffice(body)
                 .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
@@ -183,7 +185,7 @@ export class OfficeDetailsComponent extends AppList {
                             this.selectedOffice = new Office(res.data);
                             this.formAdd.SelectedOffice = new Office(res.data);
                             this.formAdd.officeType.setValue(res.data.officeType);
-
+                            this.formData.internalCode = res.data.internalCode;
                             this.formData.company = res.data.buid;
                             this.formData.active = res.data.active;
                             this.formData.bankName_En = res.data.bankNameEn;
