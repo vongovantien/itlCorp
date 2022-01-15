@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using eFMS.API.Common;
+using eFMS.API.ReportData.Consts;
 using eFMS.API.ReportData.FormatExcel;
 using eFMS.API.ReportData.Helpers;
 using eFMS.API.ReportData.HttpServices;
@@ -210,7 +212,7 @@ namespace eFMS.API.ReportData.Controllers
         /// <returns></returns>
         [Route("ExportDetailAdvancePayment")]
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> ExportDetailAdvancePayment(Guid advanceId, string lang)
          {
             var accessToken = Request.Headers["Authorization"].ToString();
@@ -220,9 +222,10 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateDetailAdvancePaymentExcel(dataObjects.Result, lang);
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Advance Form - eFMS.xlsx");
-
-            return fileContent;
+            var file = new FileHelper().ReturnFormFile(stream, "Advance Form - eFMS.xlsx");
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + advanceId, accessToken);
+            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            return Ok(result);
         }
 
         /// Export detail SOA
@@ -314,9 +317,10 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Form - eFMS.xlsx");
-
-            return fileContent;
+            var file = new FileHelper().ReturnFormFile(stream, "Settlement Form - eFMS.xlsx");
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            return Ok(result);
         }
 
         /// <summary>
@@ -338,9 +342,10 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateDetailSettlementPaymentExcel(dataObjects.Result, lang, "SettlementPaymentTemplate");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement Template Form - eFMS.xlsx");
-
-            return fileContent;
+            var file = new FileHelper().ReturnFormFile(stream, "Settlement Template Form - eFMS.xlsx");
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            return Ok(result);
         }
 
         /// <summary>
@@ -361,9 +366,10 @@ namespace eFMS.API.ReportData.Controllers
             var stream = new AccountingHelper().GenerateExportGeneralSettlementPayment(dataObjects.Result, "Settlement-General-Preview.xlsx");
             if (stream == null) return new FileHelper().ExportExcel(new MemoryStream(), "");
 
-            FileContentResult fileContent = new FileHelper().ExportExcel(stream, "Settlement General Preview - eFMS.xlsx");
-
-            return fileContent;
+            var file = new FileHelper().ReturnFormFile(stream, "Settlement General Preview - eFMS.xlsx");
+            var response = await HttpServiceExtension.PutDataToApi(file, aPis.FileManagementAPI + Urls.Accounting.UploadFileExcel + ResourceConsts.FolderPreviewUploadFile + "/" + settlementId, accessToken);
+            var result = response.Content.ReadAsAsync<ResultHandle>().Result;
+            return Ok(result);
         }
 
         /// Export detail SOA

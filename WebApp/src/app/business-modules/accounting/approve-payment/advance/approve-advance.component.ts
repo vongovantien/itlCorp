@@ -17,9 +17,11 @@ import { AdvancePaymentFormCreateComponent } from '../../advance-payment/compone
 import { HistoryDeniedPopupComponent } from '../components/popup/history-denied/history-denied.popup';
 import { RoutingConstants } from '@constants';
 
-import { catchError, concatMap, finalize, map } from 'rxjs/operators';
+import { catchError, concatMap, finalize, map, takeUntil } from 'rxjs/operators';
 import { combineLatest, of } from 'rxjs';
 import { ListAdvancePaymentCarrierComponent } from '../../advance-payment/components/list-advance-payment-carrier/list-advance-payment-carrier.component';
+import { getCurrentUserState, IAppState } from '@store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'app-approve-advance',
@@ -56,6 +58,7 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
         private _modalService: BsModalService,
         private _router: Router,
         private _exportRepo: ExportRepo,
+        private readonly _store: Store<IAppState>,
     ) {
         super();
         this._progressRef = this._ngProgressService.ref();
@@ -260,18 +263,23 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
         }
     }
 
-    exportAdvPayment(lang: string) {
+    exportAdvPayment(lang: string, typeExp: string) {
         this._progressRef.start();
-        this._exportRepo.exportAdvancePaymentDetail(this.idAdvPayment, lang)
+        this._exportRepo
+            .exportAdvancePaymentDetail(this.idAdvPayment, lang)
             .pipe(
                 catchError(this.catchError),
                 finalize(() => this._progressRef.complete())
             )
-            .subscribe(
-                (response: ArrayBuffer) => {
-                    this.downLoadFile(response, "application/ms-excel", 'Advance Form - eFMS.xlsx');
-                },
-            );
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
+            });
     }
 
     recall() {
@@ -330,9 +338,5 @@ export class ApproveAdvancePaymentComponent extends AppPage implements ICrystalR
                     }
                 },
             );
-    }
-    
-    previewExportAdvPayment(lang: string) {
-        this._exportRepo.previewExportPayment(this.idAdvPayment, lang, 'Advance');
     }
 }

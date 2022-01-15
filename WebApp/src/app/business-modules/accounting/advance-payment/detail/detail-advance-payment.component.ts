@@ -19,11 +19,13 @@ import { ICrystalReport } from "@interfaces";
 import { AdvancePaymentFormCreateComponent } from "../components/form-create-advance-payment/form-create-advance-payment.component";
 import { AdvancePaymentListRequestComponent } from "../components/list-advance-payment-request/list-advance-payment-request.component";
 
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, takeUntil } from "rxjs/operators";
 import isUUID from "validator/lib/isUUID";
 import { InjectViewContainerRefDirective } from "@directives";
 import { combineLatest } from "rxjs";
 import { ListAdvancePaymentCarrierComponent } from "../components/list-advance-payment-carrier/list-advance-payment-carrier.component";
+import { getCurrentUserState, IAppState } from "@store";
+import { Store } from "@ngrx/store";
 
 @Component({
     selector: "app-advance-payment-detail",
@@ -57,7 +59,8 @@ export class AdvancePaymentDetailComponent
         private _toastService: ToastrService,
         private _router: Router,
         private _exportRepo: ExportRepo,
-        private _cd: ChangeDetectorRef
+        private _cd: ChangeDetectorRef,
+        private readonly _store: Store<IAppState>,
     ) {
         super();
     }
@@ -400,15 +403,20 @@ export class AdvancePaymentDetailComponent
             });
     }
 
-    exportAdvPayment(lang: string) {
+    exportAdvPayment(lang: string, typeExp: string) {
         this._exportRepo
             .exportAdvancePaymentDetail(this.advId, lang)
-            .subscribe((response: ArrayBuffer) => {
-                this.downLoadFile(
-                    response,
-                    "application/ms-excel",
-                    `Advance Form ${this.advancePayment?.advanceNo} - eFMS.xlsx`
-                );
+            .pipe(
+                catchError(this.catchError)
+            )
+            .subscribe((response: any) => {
+                if (response && response.data) {
+                    if (typeExp === 'preview') {
+                        this._exportRepo.previewExport(response.data);
+                    } else {
+                        this._exportRepo.downloadExport(response.data);
+                    }
+                }
             });
     }
 
@@ -432,10 +440,6 @@ export class AdvancePaymentDetailComponent
                     this._toastService.error(res.message, "");
                 }
             });
-    }
-
-    previewExportAdvPayment(lang: string) {
-        this._exportRepo.previewExportPayment(this.advId, lang, "Advance");
     }
 
     changeAdvanceFor(data: string) {

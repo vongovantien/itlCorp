@@ -3966,7 +3966,7 @@ namespace eFMS.API.Accounting.DL.Services
             var _department = catDepartmentRepo.Get(x => x.Id == advancePayment.DepartmentId).FirstOrDefault()?.DeptNameAbbr;
             #endregion -- Info Manager, Accoutant & Department --
 
-            var office = sysOfficeRepo.Get(x => x.Id == currentUser.OfficeID).FirstOrDefault();
+            var office = sysOfficeRepo.Get(x => x.Id == (currentUser.OfficeID)).FirstOrDefault();
             var officeName = office?.BranchNameEn?.ToUpper();
             var _contactOffice = string.Format("{0}\nTel: {1}  Fax: {2}\nE-mail: {3}", office?.AddressEn, office?.Tel, office?.Fax, office?.Email);
             var isCommonOffice = DataTypeEx.IsCommonOffice(office.Code); 

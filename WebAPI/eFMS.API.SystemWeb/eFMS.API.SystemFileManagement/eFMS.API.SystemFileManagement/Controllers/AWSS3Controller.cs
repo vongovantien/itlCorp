@@ -5,13 +5,12 @@ using eFMS.API.SystemFileManagement.Infrastructure.Middlewares;
 using eFMS.API.SystemFileManagement.Service.Models;
 using ITL.NetCore.Common;
 using ITL.NetCore.Connection.EF;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -56,6 +55,37 @@ namespace eFMS.API.SystemFileManagement.Controllers
             if (hs.Success)
             {
                 return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true });
+            }
+            return BadRequest(hs);
+        }
+
+        /// <summary>
+        /// Upload file report to aws then get href url of file
+        /// </summary>
+        /// <param name="files"></param>
+        /// <param name="moduleName"></param>
+        /// <param name="folder"></param>
+        /// <param name="id"></param>
+        /// <param name="child"></param>
+        /// <returns></returns>
+        [HttpPut("UploadFilePreview/{moduleName}/{folder}/{id}")]
+        public async Task<IActionResult> UploadFilePreview(FileReportUpload files, string moduleName, string folder, Guid id, string child = null)
+        {
+            var stream = new MemoryStream(files.FileContent);
+            var fFile = new FormFile(stream, 0, stream.Length, null, files.FileName);
+            var fFiles = new List<IFormFile>() { fFile };
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = fFiles,
+                FolderName = folder,
+                Id = id,
+                Child = child,
+                ModuleName = moduleName
+            };
+            var hs = await _aWSS3Service.PostFileReportAsync(model);
+            if (!string.IsNullOrEmpty(hs))
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = hs });
             }
             return BadRequest(hs);
         }
