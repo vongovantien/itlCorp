@@ -561,14 +561,23 @@ namespace eFMS.API.ReportData.Controllers
         }
 
         [Route("ExportCombineOps")]
-        [HttpGet]
-        public async Task<IActionResult> ExportCombineOps(string combineBillingNo)
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ExportCombineOps(AcctCombineBillingCriteria criteria)
         {
-            var responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataCombineOpsUrl + combineBillingNo);
-
+            HttpResponseMessage responseFromApi;
+            var accessToken = Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(criteria.Currency))
+            {
+                responseFromApi = await HttpServiceExtension.GetApi(aPis.AccountingAPI + Urls.Accounting.GetDataCombineOpsUrl + criteria.ReferenceNo[0], accessToken);
+            }
+            else
+            {
+                responseFromApi = await HttpServiceExtension.PostAPI(criteria, aPis.AccountingAPI + Urls.Accounting.GetDataCombineOpsByPartnerUrl, accessToken);
+            }
             var dataObjects = responseFromApi.Content.ReadAsAsync<CombineOPSModel>();
 
-            var stream = new AccountingHelper().GenerateCombineOPSExcel(dataObjects.Result);
+            var stream = new AccountingHelper().GenerateCombineOPSExcel(dataObjects.Result, criteria);
 
             if (stream == null)
             {

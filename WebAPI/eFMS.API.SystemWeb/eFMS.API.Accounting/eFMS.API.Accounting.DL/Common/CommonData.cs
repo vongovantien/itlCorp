@@ -42,6 +42,7 @@ namespace eFMS.API.Accounting.DL.Common
             new CommonData { Value = "Cash", DisplayName = "Cash" },
             new CommonData { Value = "Bank", DisplayName = "Bank Transfer" },
             new CommonData { Value = "Other", DisplayName = "Other" },
+            new CommonData { Value = "NETOFF_SHPT", DisplayName = "Net Off Shipment" },
         };
 
         //Define list status approve advance

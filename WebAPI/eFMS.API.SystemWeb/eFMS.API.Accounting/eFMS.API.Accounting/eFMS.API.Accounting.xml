@@ -655,6 +655,13 @@
             <param name="model"></param>
             <returns></returns>
         </member>
+        <member name="M:eFMS.API.Accounting.Controllers.AcctCombineBillingController.GetDataExportCombineOpsByPartner(eFMS.API.Accounting.DL.Models.Criteria.AcctCombineBillingCriteria)">
+            <summary>
+            Get Combine OPS data with partner and currency
+            </summary>
+            <param name="criteria"></param>
+            <returns></returns>
+        </member>
         <member name="M:eFMS.API.Accounting.Controllers.AcctReceiptController.GetById(System.Guid)">
             <summary>
             Get detail receipt
