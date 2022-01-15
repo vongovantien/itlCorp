@@ -31,8 +31,9 @@ export class CompanyInformationDetailComponent extends AppList {
         bunameAbbr: '',
         website: '',
         active: true,
-        kbExchangeRate: null
+        kbExchangeRate: null,
     };
+    
     companyId: string = '';
     company: Company;
 
@@ -111,6 +112,7 @@ export class CompanyInformationDetailComponent extends AppList {
 
         this.formAddCompany.formGroup.patchValue(this.formData);
         this.formAddCompany.active.setValue(this.formAddCompany.types.filter(i => i.value === company.active)[0]);
+        
     }
 
     getDetailCompany() {

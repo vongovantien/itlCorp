@@ -1,6 +1,6 @@
 import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 
-import { SystemRepo } from '@repositories';
+import { SystemFileManageRepo, SystemRepo } from '@repositories';
 import { catchError, finalize, map, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { FormGroup, AbstractControl, FormBuilder, Validators } from '@angular/forms';
@@ -72,6 +72,7 @@ export class UserProfilePageComponent extends AppForm {
         private _ngProgressService: NgProgress,
         private _fb: FormBuilder,
         private _systemRepo: SystemRepo,
+        private _systemFileManageRepo: SystemFileManageRepo,
         private _activedRoute: ActivatedRoute,
         private _toastService: ToastrService,
         private _zone: NgZone,
@@ -131,7 +132,8 @@ export class UserProfilePageComponent extends AppForm {
                     Module: 'User', // thu muc anh chua anh cua user.
                     ObjectId: `${this.currentUserId}`,
                 },
-                imageUploadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/image`,
+                imageUploadURL: `//${environment.HOST.FILE_SYSTEM}/api/v1/en-US/AWSS3/UploadImages/System/User/${this.currentUserId}`,
+                imageUploadMethod: 'PUT',
                 imageManagerLoadURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/User?userId=${this.currentUserId}`,
                 imageManagerDeleteURL: `//${environment.HOST.SYSTEM}/api/v1/1/SysImageUpload/Delete`,
                 imageManagerDeleteMethod: 'DELETE',
