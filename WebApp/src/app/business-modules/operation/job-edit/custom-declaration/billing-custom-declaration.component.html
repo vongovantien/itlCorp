@@ -63,7 +63,7 @@
                 </thead>
                 <tbody class="tbody-group" *ngIf="customClearances">
                     <ng-container *ngFor="let clearance of customClearances; let i=index">
-                        <tr class="">
+                        <tr [contextMenu]="cdContextMenu" (onTouch)="onSelectCd(clearance)">
                             <td class="table-actions-col">
                                 <div class="table-actions">
                                     <label class="m-checkbox">
@@ -103,35 +103,25 @@
                             </td>
                         </tr>
                     </ng-container>
+                    <tr app-table-none-record *ngIf="!customClearances.length"></tr>
                 </tbody>
             </table>
         </div>
-        <!-- <app-pagination *ngIf="pagerMaster.totalItems>0" [config]="pagerMaster" (pageChange)="setPageMaster($event)"
-            (pagerObject)="setPageMaster($event)"></app-pagination> -->
-        <div class="pagination-nav">
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="select-box" style="max-width: 190px">
-                        <select class="form-control" id="" aria-label="" [(ngModel)]="pageSize"
-                            (change)="selectPageSize(pageSize)" name="pagesize">
-                            <ng-container *ngFor="let item of numberToShow; index as i; first as isFirst">
-                                <option [ngValue]="item" [selected]="isFirst">{{item}} entries / page
-                                </option>
-                            </ng-container>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-sm-6" *ngIf="totalItems > pageSize">
-                    <div class="float-right">
-                        <pagination [boundaryLinks]="true" [totalItems]="totalItems" [itemsPerPage]="pageSize"
-                            (pageChanged)="pageChanged($event)" [(ngModel)]="page" [maxSize]=10>
-                        </pagination>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+        <app-pagination [total]="totalItems" [pageNum]="page" [itemPerPage]="pageSize"
+            (onChange)="updatePagingData($event)"></app-pagination>
     </div>
 </div>
 
 <app-add-more-modal [currentJob]="currentJob" (isCloseModal)="closeAddMore($event)">
 </app-add-more-modal>
+
+
+<app-context-menu #cdContextMenu (clickOutside)="selectedCd = null">
+    <div class="menu-context__item" (click)="confirmSyncCDToReplicateJob()">
+        <span><i class="la la-refresh"></i><span> Sync to replicate job</span></span>
+    </div>
+</app-context-menu>
+
+<!-- Popup -->
+<ng-template inject></ng-template>
