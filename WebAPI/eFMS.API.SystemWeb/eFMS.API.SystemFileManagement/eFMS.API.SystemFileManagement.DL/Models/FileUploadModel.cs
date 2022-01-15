@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using Microsoft.AspNetCore.Mvc;
 
 namespace eFMS.API.SystemFileManagement.DL.Models
 {
