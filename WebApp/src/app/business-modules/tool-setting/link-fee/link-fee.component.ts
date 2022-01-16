@@ -216,6 +216,7 @@ import { I } from '@angular/cdk/keycodes';
       this.formRule.isSelling = true;
       this.formRule.isShowUpdate = false;
       this.formRule.minDateEffective=this.minDate;
+      this.formRule.minDateExpired=this.minDate;
       this.formRule.show();
     }
 
