@@ -699,92 +699,107 @@ namespace eFMS.API.Setting.DL.Services
         {
             try
             {
+                var paymentNos = paymentNo.Split('\n');
+                var hsSuccess = new HandleState(true, (object)"Updated Sucess");
                 if (type == 3)
                 {
-                    var advanceCurrent = advancePaymentRepo.Get(x => x.AdvanceNo == paymentNo).FirstOrDefault();
-                    if (advanceCurrent == null) return new HandleState("Not found advance payment");
+                    var advanceCurrents = advancePaymentRepo.Get(x => paymentNos.Contains(x.AdvanceNo)).ToList();
+                    if (advanceCurrents.Count() == 0) return new HandleState("Not found advance payment");
 
-                    if (!advanceCurrent.StatusApproval.Contains("Done"))
+                    foreach(var advanceCurrent in advanceCurrents)
                     {
-                        return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
+                        if (!advanceCurrent.StatusApproval.Contains("Done"))
+                        {
+                            return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
+                        }
+                        var newID = Guid.NewGuid();
+                        var updatePaymentId = UpdatePaymentId(advanceCurrent.AdvanceNo, type, newID);
+                        string logName = string.Format("UpdateAdvancePayment_{0}_eFMS_Log", (
+                            updatePaymentId.Status ? "Success" : "Fail"
+                       ));
+                        string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                            DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                            JsonConvert.SerializeObject("AdvancePayment"),
+                            JsonConvert.SerializeObject(advanceCurrent.Id),
+                            JsonConvert.SerializeObject(newID));
+                        new LogHelper(logName, logMessage);
+                        if (!updatePaymentId.Status)
+                        {
+                            return new HandleState((object)updatePaymentId.Message);
+                        }
                     }
-                    var newID = Guid.NewGuid();
-                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
-                    string logName = string.Format("UpdateAdvancePayment_{0}_eFMS_Log", (
-                        updatePaymentId.Status ? "Success" : "Fail"
-                   ));
-                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
-                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
-                        JsonConvert.SerializeObject("AdvancePayment"),
-                        JsonConvert.SerializeObject(advanceCurrent.Id),
-                        JsonConvert.SerializeObject(newID));
-                    new LogHelper(logName, logMessage);
-                    if (!updatePaymentId.Status)
-                    {
-                        return new HandleState((object)updatePaymentId.Message);
-                    }
-                    return new HandleState(true, (object)updatePaymentId.Message);
+                    return hsSuccess;
                 }
                 if (type == 2)
                 {
-                    var settlementCurrent = settlementPaymentRepo.Get(x => x.SettlementNo == paymentNo).FirstOrDefault();
-                    if (settlementCurrent == null) return new HandleState("Not found settlement payment");
+                    var settlementCurrents = settlementPaymentRepo.Get(x => paymentNos.Contains(x.SettlementNo)).ToList();
+                    if (settlementCurrents.Count()==0) return new HandleState("Not found settlement payment");
 
-                    if (!settlementCurrent.StatusApproval.Contains("Done"))
+                    foreach(var settlementCurrent in settlementCurrents)
                     {
-                        return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
-                    }
-                    var newID = Guid.NewGuid();
-                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
-                    string logName = string.Format("UpdateSettlementPayment_{0}_eFMS_Log", (
-                         updatePaymentId.Status ? "Success" : "Fail"
-                    ));
-                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
-                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
-                        JsonConvert.SerializeObject("SettlementPayment"),
-                        JsonConvert.SerializeObject(settlementCurrent.Id),
-                        JsonConvert.SerializeObject(newID));
-                    new LogHelper(logName, logMessage);
+                        if (!settlementCurrent.StatusApproval.Contains("Done"))
+                        {
+                            return new HandleState(SettingConstants.MSG_STATUS_MUST_BE_DONE);
+                        }
+                        var newID = Guid.NewGuid();
+                        var updatePaymentId = UpdatePaymentId(settlementCurrent.SettlementNo, type, newID);
+                        string logName = string.Format("UpdateSettlementPayment_{0}_eFMS_Log", (
+                             updatePaymentId.Status ? "Success" : "Fail"
+                        ));
+                        string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                            DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                            JsonConvert.SerializeObject("SettlementPayment"),
+                            JsonConvert.SerializeObject(settlementCurrent.Id),
+                            JsonConvert.SerializeObject(newID));
+                        new LogHelper(logName, logMessage);
 
-                    if (!updatePaymentId.Status)
-                    {
-                        return new HandleState((object)updatePaymentId.Message);
+                        if (!updatePaymentId.Status)
+                        {
+                            return new HandleState((object)updatePaymentId.Message);
+                        }
                     }
-                    return new HandleState(true, (object)updatePaymentId.Message);
+                    return hsSuccess;
                 }
                 if (type == 1)
                 {
-                    var SOACurrent = soaRepo.Get(x => x.Soano == paymentNo).FirstOrDefault();
-                    if (SOACurrent == null) return new HandleState("Not found SOA");
-                    var newID = Guid.NewGuid();
-                    var updatePaymentId = UpdatePaymentId(paymentNo, type, newID);
-                    string logName = string.Format("UpdateSOAPayment_{0}_eFMS_Log", (
-                        updatePaymentId.Status ? "Success" : "Fail"
-                   ));
-                    string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
-                        DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
-                        JsonConvert.SerializeObject("SOA"),
-                        JsonConvert.SerializeObject(SOACurrent.Id),
-                        JsonConvert.SerializeObject(newID));
-                    new LogHelper(logName, logMessage);
-                    if (!updatePaymentId.Status)
+                    var SOACurrents = soaRepo.Get(x => paymentNos.Contains(x.Soano)).ToList();
+                    if (SOACurrents.Count()==0) return new HandleState("Not found SOA");
+                    foreach(var SOACurrent in SOACurrents)
                     {
-                        return new HandleState((object)updatePaymentId.Message);
+                        var newID = Guid.NewGuid();
+                        var updatePaymentId = UpdatePaymentId(SOACurrent.Soano, type, newID);
+                        string logName = string.Format("UpdateSOAPayment_{0}_eFMS_Log", (
+                            updatePaymentId.Status ? "Success" : "Fail"
+                       ));
+                        string logMessage = string.Format("** DateTime Update: {0} \n ** PaymentType: {1} \n ** Data_OldSettlementId: {2}  Result: {3}",
+                            DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"),
+                            JsonConvert.SerializeObject("SOA"),
+                            JsonConvert.SerializeObject(SOACurrent.Id),
+                            JsonConvert.SerializeObject(newID));
+                        new LogHelper(logName, logMessage);
+                        if (!updatePaymentId.Status)
+                        {
+                            return new HandleState((object)updatePaymentId.Message);
+                        }
                     }
-                    return new HandleState(true, (object)updatePaymentId.Message);
+                    return hsSuccess;
                 }
                 else
                 {
-                    var receiptCurent = receiptRepo.Get(x => x.PaymentRefNo == paymentNo).FirstOrDefault();
-                    if (receiptCurent == null) return new HandleState("Not found Receipt");
-                    receiptCurent.SyncStatus = null;
-                    var hsReceipt = receiptRepo.Update(receiptCurent, x => x.Id == receiptCurent.Id);
-                    var hsSync = receipSynctRepo.Delete(x => x.ReceiptSyncNo == receiptCurent.PaymentRefNo && x.SyncStatus == "Rejected");
-                    if (!hsSync.Success)
+                    var receiptCurents = receiptRepo.Get(x => paymentNos.Contains(x.PaymentRefNo)).ToList();
+                    if (receiptCurents.Count() == 0) return new HandleState("Not found Receipt");
+                    foreach( var receiptCurent in receiptCurents)
                     {
-                        return new HandleState("Receipt don't have Rejected");
+                        receiptCurent.SyncStatus = null;
+                        var hsReceipt = receiptRepo.Update(receiptCurent, x => x.Id == receiptCurent.Id);
+                        var hsSync = receipSynctRepo.Delete(x => x.ReceiptId == receiptCurent.Id && x.SyncStatus == "Rejected");
+                        if (!hsSync.Success)
+                        {
+                            return new HandleState("Receipt don't have Rejected");
+                        }
                     }
-                    return new HandleState(true, (object)"Update Success");
+
+                    return hsSuccess;
                 }
             }
             catch (Exception ex)
