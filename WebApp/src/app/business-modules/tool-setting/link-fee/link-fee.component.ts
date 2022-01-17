@@ -182,14 +182,14 @@ import { I } from '@angular/cdk/keycodes';
                 x => x.id === res.partnerSelling
               );
               this.formRule.selectedChargeBuying =
-                { field: 'chargeNameEn', value: chargeBuying?.chargeNameEn, data: chargeBuying };
+                { field: 'id', value: chargeBuying?.id, data: chargeBuying };
               this.formRule.selectedChargeSelling =
-                { field: 'chargeNameEn', value: chargeSelling?.chargeNameEn, data: chargeSelling };
+                { field: 'id', value: chargeSelling?.id, data: chargeSelling };
               this.formRule.selectedPartnerBuying =
-                { field: 'shortName', value: partnerBuying?.shortName, data: partnerBuying };
+                { field: 'shortName', value: partnerBuying?.shortName };
               this.formRule.selectedPartnerSelling =
-                { field: 'shortName', value: partnerSelling?.shortName, data: partnerSelling };
-              console.log(this.formRule.rule.status);
+                { field: 'shortName', value: partnerSelling?.shortName };
+              console.log(this.formRule.selectedChargeBuying);
               this.formRule.isShowUpdate = true;
               this.formRule.show();
             }

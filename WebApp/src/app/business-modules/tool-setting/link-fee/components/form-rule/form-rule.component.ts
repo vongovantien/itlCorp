@@ -175,34 +175,35 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     }
     getChargeBuying() {
         console.log(this.serviceBuying.value);
-        if (!!this._dataService.getDataByKey('RULE_LINK_SELL')) {
-            this.configChargeBuying.dataSource = this._dataService.getDataByKey('RULE_LINK_SELL') || [];
+        if (!!this._dataService.getDataByKey('RULE_LINK_BUY')) {
+            this.configChargeBuying.dataSource = this._dataService.getDataByKey('RULE_LINK_BUY') || [];
         } else {
             this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceBuying.value, type: CommonEnum.CHARGE_TYPE.CREDIT })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataCharge: any = []) => {
                         this.configChargeBuying.dataSource = dataCharge;
-                        this._dataService.setDataService('RULE_LINK_SELL', dataCharge || []);
+                        this._dataService.setDataService('RULE_LINK_BUY', dataCharge || []);
                     },
                 );
         }
     }
 
     getChargeSelling() {
-        if (!!this._dataService.getDataByKey('RULE_LINK_BUY')) {
-            this.configChargeSelling.dataSource = this._dataService.getDataByKey('RULE_LINK_BUY');
+        if (!!this._dataService.getDataByKey('RULE_LINK_SELL')) {
+            this.configChargeSelling.dataSource = this._dataService.getDataByKey('RULE_LINK_SELL');
         } else {
             this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceSelling.value, type: CommonEnum.CHARGE_TYPE.DEBIT })
                 .pipe(catchError(this.catchError))
                 .subscribe(
                     (dataCharge: any = []) => {
                         this.configChargeSelling.dataSource = dataCharge;
-                        this._dataService.setDataService('RULE_LINK_BUY', dataCharge);
+                        this._dataService.setDataService('RULE_LINK_SELL', dataCharge);
                     },
                 );
         }
     }
+
     enableSelling() {
         this.isSelling = false;
     }
@@ -212,11 +213,11 @@ export class FormRuleComponent extends PopupBase implements OnInit {
     onSelectDataFormInfo(data: Charge | Partner | any, key: string | any) {
         switch (key) {
             case 'chargeBuying':
-                this.selectedChargeBuying = { field: 'shortName', value: data.chargeNameEn, data: data };
+                this.selectedChargeBuying = { field: 'id', value: data.id, data: data };
                 this.rule.chargeBuying = data.id;
                 break;
             case 'chargeSelling':
-                this.selectedChargeSelling = { field: 'shortName', value: data.chargeNameEn, data: data };
+                this.selectedChargeSelling = { field: 'id', value: data.id, data: data };
                 this.rule.chargeSelling = data.id;
                 break;
             case 'partnerBuying':
