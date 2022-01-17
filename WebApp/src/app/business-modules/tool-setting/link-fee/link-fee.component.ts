@@ -208,8 +208,8 @@ import { I } from '@angular/cdk/keycodes';
     showCreateRule() {
       this.formRule.title = 'Add new Rule Link Fee';
       this.formRule.formGroup.reset();
-      this.formRule.selectedChargeBuying = { field: 'chargeNameEn', value: null, data: null };
-      this.formRule.selectedChargeSelling = { field: 'chargeNameEn', value: null, data: null };
+      this.formRule.selectedChargeBuying = { field: 'id', value: null };
+      this.formRule.selectedChargeSelling = { field: 'id', value: null };
       this.formRule.selectedPartnerBuying = { field: 'shortName', value: null, data: null };
       this.formRule.selectedPartnerSelling = { field: 'shortName', value: null, data: null };
       this.formRule.isBuying = true;
