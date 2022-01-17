@@ -32,7 +32,7 @@ namespace eFMS.API.Setting.DL.Services
         private readonly IContextBase<SetUnlockRequestJob> setUnlockRequestJobRepo;
         private readonly IContextBase<SetUnlockRequestApprove> setUnlockRequestApproveRepo;
         private readonly IContextBase<AcctAdvancePayment> advancePaymentRepo;
-        private readonly IContextBase<AcctReceipt> receiptRepo;
+        private readonly IContextBase<AcctCdnote> cdNoteRepo;
         private readonly IContextBase<AcctSettlementPayment> settlementPaymentRepo;
         private readonly IContextBase<OpsTransaction> opsTransactionRepo;
         private readonly IContextBase<CsTransaction> transRepo;
@@ -62,7 +62,7 @@ namespace eFMS.API.Setting.DL.Services
             IContextBase<AcctReceipt> acctReceipt,
             IContextBase<AcctReceiptSync> acctSyncReceipt,
             IContextBase<CustomsDeclaration> customs,
-            IContextBase<AcctReceipt> receipt,
+            IContextBase<AcctCdnote> cdNote,
             IContextBase<SysUser> sysUser,
             IContextBase<CsShipmentSurcharge> surcharge,
             IContextBase<SysAuthorizedApproval> authourizedApproval,
@@ -88,6 +88,7 @@ namespace eFMS.API.Setting.DL.Services
             soaRepo = SOA;
             receiptRepo = acctReceipt;
             receipSynctRepo = acctSyncReceipt;
+            cdNoteRepo = cdNote;
         }
 
         #region --- GET SHIPMENT, ADVANCE, SETTLEMENT TO UNLOCK REQUEST ---
@@ -784,7 +785,7 @@ namespace eFMS.API.Setting.DL.Services
                     }
                     return hsSuccess;
                 }
-                else
+                if(type == 4)
                 {
                     var receiptCurents = receiptRepo.Get(x => paymentNos.Contains(x.PaymentRefNo)).ToList();
                     if (receiptCurents.Count() == 0) return new HandleState("Not found Receipt");
@@ -799,6 +800,22 @@ namespace eFMS.API.Setting.DL.Services
                         }
                     }
 
+                    return hsSuccess;
+                }
+                else
+                {
+                    var cdNoteCurrents = cdNoteRepo.Get(x => paymentNos.Contains(x.Code)).ToList();
+                    if (cdNoteCurrents.Count() == 0) return new HandleState("Not found CD Note");
+                    foreach (var cdNoteCurrent in cdNoteCurrents)
+                    {
+                        var newID = Guid.NewGuid();
+                        cdNoteCurrent.Id = newID;
+                        var hsCDNote = cdNoteRepo.Update(cdNoteCurrent, x => x.Id == cdNoteCurrent.Id);
+                        if (!hsCDNote.Success)
+                        {
+                            return new HandleState("CD Note don't Update");
+                        }
+                    }
                     return hsSuccess;
                 }
             }
