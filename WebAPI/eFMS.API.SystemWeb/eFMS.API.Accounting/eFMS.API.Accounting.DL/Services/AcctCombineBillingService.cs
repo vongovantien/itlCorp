@@ -1293,12 +1293,15 @@ namespace eFMS.API.Accounting.DL.Services
             Crystal result = null;
             var combineBilling = DataContext.Get(x => x.CombineBillingNo == combineBillingNo).FirstOrDefault();
             if (combineBilling == null) return null;
-
-            var charges = surchargeRepo.Get(x => x.CombineBillingNo == combineBillingNo);
-            if (charges == null) return null;
             var partner = partnerRepo.Get(x => x.Id == combineBilling.PartnerId).FirstOrDefault();
-            var grpInvCdNoteByHbl = charges.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
 
+            //var charges = surchargeRepo.Get(x => x.CombineBillingNo == combineBillingNo);
+            //if (charges == null) return null;
+            //var grpInvCdNoteByHbl = charges.GroupBy(g => new { g.Hblid, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.Hblid, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
+
+            var charges = GetChargeByCombineNo(combineBillingNo);
+            if (combineBilling == null) return null;
+            var grpInvCdNoteByHbl = charges.GroupBy(g => new { g.HBLID, g.InvoiceNo, g.CreditNo, g.DebitNo }).Select(s => new { s.Key.HBLID, s.Key.InvoiceNo, CdNote = s.Key.CreditNo ?? s.Key.DebitNo });
 
             var combineCharges = new List<CombineReportGeneral>();
             foreach (var charge in charges)
@@ -1309,12 +1312,12 @@ namespace eFMS.API.Accounting.DL.Services
                 string _jobNo = string.Empty;
 
                 #region -- Info MBL, HBL --
-                _mawb = charge.Mblno;
-                _hwbNo = charge.Hblno;
+                _mawb = charge.MBL;
+                _hwbNo = charge.HBL;
                 //_customNo = charge.TransactionType == "CL" ? charge.ClearanceNo : string.Empty;
-                var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == charge.JobNo).FirstOrDefault();
+                var cus = customsDeclarationRepo.Get().Where(x => x.JobNo == charge.JobId).FirstOrDefault();
                 _customNo = cus != null ? cus.ClearanceNo :string.Empty;
-                _jobNo = charge.JobNo;
+                _jobNo = charge.JobId;
                 #endregion -- Info MBL, HBL --
 
                 #region -- Info CD Note --
@@ -1323,7 +1326,11 @@ namespace eFMS.API.Accounting.DL.Services
 
                 // Exchange Rate from currency charge to current soa
 //                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, charge.CurrencyId);
-                decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, "VND");
+                //decimal _amount = currencyExchangeService.ConvertAmountChargeToAmountObj(charge, "VND");
+                
+                decimal _amount = (charge.AmountVND + charge.VATAmountLocal) ?? 0;
+                if (charge.BillingType == AccountingConstants.ACCOUNTANT_TYPE_CREDIT)
+                    _amount = _amount * (-1);
 
                 var c = new CombineReportGeneral();
                 c.PartnerID = partner?.Id;
@@ -1370,7 +1377,7 @@ namespace eFMS.API.Accounting.DL.Services
                 c.CustomNo = _customNo;
                 c.JobNo = _jobNo;
                 c.CdCode = cdNote?.Code;
-                var grpInvCdNote = grpInvCdNoteByHbl.Where(w => (!string.IsNullOrEmpty(w.InvoiceNo) || !string.IsNullOrEmpty(w.CdNote)) && w.Hblid == charge.Hblid).ToList();
+                var grpInvCdNote = grpInvCdNoteByHbl.Where(w => (!string.IsNullOrEmpty(w.InvoiceNo) || !string.IsNullOrEmpty(w.CdNote)) && w.HBLID == charge.HBLID).ToList();
                 if (grpInvCdNote.Count > 0)
                 {
                     c.Docs = string.Join("\r\n", grpInvCdNote.Select(s => !string.IsNullOrEmpty(s.InvoiceNo) ? s.InvoiceNo : s.CdNote).Distinct()); //Ưu tiên: Invoice No >> CD Note Code
@@ -1415,7 +1422,7 @@ namespace eFMS.API.Accounting.DL.Services
             parameter.Paymentterms = string.Empty; //NOT USE
             parameter.Contact = currentUser.UserName?.ToUpper() ?? string.Empty;
             parameter.CurrDecimalNo = 3;
-            parameter.RefNo = charges.FirstOrDefault()?.CombineBillingNo; //SOA No
+            parameter.RefNo = charges.FirstOrDefault()?.CombineNo; //SOA No
             parameter.Email = office?.Email ?? string.Empty;
 
             result = new Crystal
