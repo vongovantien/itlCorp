@@ -6,6 +6,7 @@ using ITL.NetCore.Connection.BL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.DL.IService
 {
@@ -30,5 +31,6 @@ namespace eFMS.API.Operation.DL.IService
         List<CustomsDeclarationModel> GetListCustomNoAsignPIC();
         bool CheckAllowUpdate(Guid? jobId);
         HandleState ImportClearancesOlaFromEcus();
+        Task<HandleState> ReplicateCustomClearance(int Id);
     }
 }

@@ -75,6 +75,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 return new HandleState(ex.ToString());
             }
         }
+        
         public async Task<List<SysImage>> GetFileSysImage(string moduleName, string folder, Guid id, string child = null)
         {
             var res = await _sysImageRepo.GetAsync(x => x.Folder == folder
@@ -82,6 +83,12 @@ namespace eFMS.API.SystemFileManagement.DL.Services
 
             return res.OrderByDescending(x => x.DateTimeCreated).ToList();
         }
+
+        private string RenameFileS3(string fileName)
+        {
+            return Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#+:'*?<>|%-@$]+", "") + "_" + StringHelper.RandomString(5);
+        }
+
         public async Task<HandleState> PostObjectAsync(FileUploadModel model)
         {
             HandleState result = new HandleState();
@@ -94,7 +101,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
                     var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
                     if (fileExe != null)
-                        fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#]+", "") + "_" + StringHelper.RandomString(5);
+                        fileName = RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
@@ -151,7 +158,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
                     var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
                     if (fileExe != null)
-                        fileName = Regex.Replace(StringHelper.RemoveSign4VietnameseString(fileName), @"[\s#]+", "") + "_" + StringHelper.RandomString(5);
+                        fileName = RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;

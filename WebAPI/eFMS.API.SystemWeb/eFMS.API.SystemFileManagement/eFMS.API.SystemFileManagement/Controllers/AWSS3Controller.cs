@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace eFMS.API.SystemFileManagement.Controllers
@@ -77,16 +78,51 @@ namespace eFMS.API.SystemFileManagement.Controllers
             FileUploadModel model = new FileUploadModel
             {
                 Files = fFiles,
+                 FolderName = folder,
+                Id = id,
+                Child = child,
+                ModuleName = moduleName
+            };
+
+            var hs = await _aWSS3Service.PostFileReportAsync(model);
+            if (!string.IsNullOrEmpty(hs))
+            {
+                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = hs });
+            };
+            return BadRequest(hs);
+        }
+
+        [HttpPut("UploadImages/{moduleName}/{folder}/{id}")]
+        //[Authorize]
+        public async Task<IActionResult> UploadImages(IFormFile file, Guid id, string moduleName, string folder, string child = null)
+        {
+            List<IFormFile> files = new List<IFormFile>();
+            files.Add(file);
+            FileUploadModel model = new FileUploadModel
+            {
+                Files = files,
                 FolderName = folder,
                 Id = id,
                 Child = child,
                 ModuleName = moduleName
             };
-            var hs = await _aWSS3Service.PostFileReportAsync(model);
-            if (!string.IsNullOrEmpty(hs))
+
+            HandleState hs = await _aWSS3Service.PostObjectAsync(model);
+            var imgUrl = _sysImageRepo.Get(x => x.Folder == folder && x.ObjectId == id.ToString()).OrderByDescending(x => x.DatetimeModified).FirstOrDefault().Url;
+            if (hs.Success)
             {
-                return Ok(new ResultHandle { Message = "Upload File Successfully", Status = true, Data = hs });
+                return Ok(new { link = imgUrl });
             }
+            return BadRequest(hs);
+        }
+
+        [HttpDelete("DeleteSpecificFile/{moduleName}/{folder}/{id}/{fileName}")]
+        public async Task<IActionResult> DeleteSpecificFile(string moduleName, string folder, Guid id, string fileName)
+        {
+            Guid imgID = _sysImageRepo.Where(x => x.ObjectId == id.ToString() && x.Name == fileName).FirstOrDefault().Id;
+            HandleState hs = await _aWSS3Service.DeleteFile(moduleName, folder, imgID);
+            if (hs.Success)
+                return Ok(new ResultHandle { Message = "Delete File Successfully", Status = true });
             return BadRequest(hs);
         }
 
