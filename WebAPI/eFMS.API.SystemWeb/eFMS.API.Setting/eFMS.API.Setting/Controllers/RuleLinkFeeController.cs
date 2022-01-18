@@ -70,6 +70,10 @@ namespace eFMS.API.Setting.Controllers
             {
                 return BadRequest(new ResultHandle { Status = false, Message = stringLocalizer[LanguageSub.DO_NOT_HAVE_PERMISSION].Value });
             }
+            if (hs.Code == 412)
+            {
+                return BadRequest(new ResultHandle { Status = false, Message = hs.Exception.Message.ToString() });
+            }
 
             var message = HandleError.GetMessage(hs, Crud.Insert);
             ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = model };
