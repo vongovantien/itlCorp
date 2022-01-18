@@ -24,7 +24,9 @@ namespace eFMS.API.ForPartner.DL.Service
             var receipts = acctReceiptRepository.Get(x => x.Status != ForPartnerConstants.STATUS_CANCEL_RECEIPT);
             var query = from payment in DataContext.Get()
                         join receipt in receipts on payment.ReceiptId equals receipt.Id
-                        where payment.RefId == Id.ToString();
+                        where payment.RefId == Id.ToString()
+                        select receipt;
+
             if (query.Any())
             {
                 result = true;

@@ -687,7 +687,7 @@ namespace eFMS.API.ForPartner.DL.Service
 
                         if(accPaymentService.CheckInvoicePayment(invoiceToDelete.Id))
                         {
-                            return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNo));
+                            return new HandleState((object)string.Format("Hóa đơn {0} đã tồn tại phiếu thu, vui lòng check lại với bộ Phận Thu Công Nợ (AR) ", invoiceToDelete.InvoiceNoReal));
                         }
 
                         data = invoiceToDelete;
