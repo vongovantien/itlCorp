@@ -1297,7 +1297,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountFreight += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Trucking")
+                        else if (ChargeGroupModel?.Name == "Trucking")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1308,7 +1308,7 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountTrucking += charge.AmountVnd;  // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name == "Handling")
+                        else if (ChargeGroupModel?.Name == "Handling")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1319,19 +1319,8 @@ namespace eFMS.API.Documentation.DL.Services
                                 _totalSellAmountHandling += charge.AmountVnd;  // Phí Selling trước thuế
                             }
                         }
-                        if (ChargeGroupModel?.Name != "Handling" && ChargeGroupModel?.Name != "Trucking" && ChargeGroupModel?.Name != "Freight")
-                        {
-                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
-                            {
-                                _totalSellAmountOther += charge.AmountUsd;
-                            }
-                            else
-                            {
-                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
-                            }
-                        }
                         // bổ sung total custom sell
-                        if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
+                        else if (chargeObj.Type == "DEBIT" && ChargeGroupModel?.Name == "Logistics")
                         {
                             if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
                             {
@@ -1340,6 +1329,17 @@ namespace eFMS.API.Documentation.DL.Services
                             else
                             {
                                 _totalSellCustom += charge.AmountVnd; // Phí Selling trước thuế
+                            }
+                        }
+                        else
+                        {
+                            if (criteria.Currency != DocumentConstants.CURRENCY_LOCAL)
+                            {
+                                _totalSellAmountOther += charge.AmountUsd;
+                            }
+                            else
+                            {
+                                _totalSellAmountOther += charge.AmountVnd; // Phí Selling trước thuế
                             }
                         }
                         //END SEL

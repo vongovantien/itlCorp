@@ -156,9 +156,7 @@ namespace eFMS.API.SystemFileManagement.DL.Services
                 foreach (var file in model.Files)
                 {
                     string fileName = Path.GetFileNameWithoutExtension(file.FileName);
-                    var fileExe = _sysImageRepo.Get(x => x.Name == file.FileName).FirstOrDefault();
-                    if (fileExe != null)
-                        fileName = RenameFileS3(fileName);
+                    fileName = RenameFileS3(fileName);
 
                     string extension = Path.GetExtension(file.FileName);
                     key = model.ModuleName + "/" + model.FolderName + "/" + model.Id + "/" + fileName + extension;
