@@ -2481,21 +2481,46 @@ namespace eFMS.API.Documentation.DL.Services
 
         public string GetMaxHAWB()
         {
-            var hblNos = csTransactionDetailRepo.Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
-               .OrderByDescending(o => o.DatetimeCreated)
-               .ThenByDescending(o => o.Hwbno)
-               .Select(s => s.Hwbno);
-            int count = 0;
-            List<int> oders = new List<int>();
-            foreach (var hbl in hblNos)
-            {
-                string _hbl = hbl;
-                _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
-                Int32.TryParse(_hbl, out count);
-                oders.Add(count);
+            // [Update:18/01/22: gen hblno giong ham tao moi hbl]
+            #region delete
+            //var hblNos = csTransactionDetailRepo.Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL)).ToArray()
+            //   .OrderByDescending(o => o.DatetimeCreated)
+            //   .ThenByDescending(o => o.Hwbno)
+            //   .Select(s => s.Hwbno);
+            //int count = 0;
+            //List<int> oders = new List<int>();
+            //foreach (var hbl in hblNos)
+            //{
+            //    string _hbl = hbl;
+            //    _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
+            //    Int32.TryParse(_hbl, out count);
+            //    oders.Add(count);
 
+            //}
+            #endregion
+            //Không order theo DatetimeCreated, chỉ order giảm dần theo số HAWBNo
+            var hblNos = csTransactionDetailRepo.Get(x => x.Hwbno.Contains(DocumentConstants.CODE_ITL) && isNumeric(x.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, x.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) && x.Hwbno.Length <= 11).ToArray()
+                .Where(n =>
+                Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) >= 675 // Số hệ thống gen tới  ITL79390675
+                && Int32.Parse(n.Hwbno.Substring(DocumentConstants.CODE_ITL.Length, n.Hwbno.Length - DocumentConstants.CODE_ITL.Length)) < 9755 // Số user đã giành  ITL79399755
+                )
+                .OrderByDescending(o => o.Hwbno)
+                .Select(s => s.Hwbno);
+            int count = 0;
+            if (hblNos != null && hblNos.Count() > 0)
+            {
+                foreach (var hbl in hblNos)
+                {
+                    string _hbl = hbl;
+                    _hbl = _hbl.Substring(DocumentConstants.CODE_ITL.Length, _hbl.Length - DocumentConstants.CODE_ITL.Length);
+                    Int32.TryParse(_hbl, out count);
+                    if (count > 0)
+                    {
+                        break;
+                    }
+                }
             }
-            int maxCurrentOder = oders.Max();
+            int maxCurrentOder = count;
             maxCurrentOder -= 1;
             return GenerateID.GenerateHBLNo(maxCurrentOder);
         }
