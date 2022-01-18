@@ -376,6 +376,17 @@ namespace eFMS.API.Documentation.Controllers
             }
             return Ok(result);
         }
+
+        [HttpGet("ChargeFromReplicate")]
+        [Authorize]
+        public IActionResult ChargeFromReplicate()
+        {
+            currentUser.Action = "ChargeFromReplicate";
+            ResultHandle hs = transactionService.ChargeFromReplicate();
+            if (!hs.Status)
+                return BadRequest(hs);
+            return Ok(hs);
+        }
         private string CheckHasMBLUpdatePermitted(OpsTransactionModel model)
         {
             string errorMsg = string.Empty;

@@ -38,6 +38,8 @@ namespace eFMS.API.Documentation.Service.ViewModels
         public decimal? Cbm { get; set; }
         public decimal? NetWeight { get; set; }
         public string Mawb { get; set; }
+        public DateTime? ServiceDate { get; set; }
+
 
     }
 }

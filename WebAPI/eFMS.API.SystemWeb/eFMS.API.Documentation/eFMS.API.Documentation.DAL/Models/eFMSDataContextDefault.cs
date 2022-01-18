@@ -2644,10 +2644,14 @@ namespace eFMS.API.Documentation.Service.Models
                     .HasColumnName("KB")
                     .HasDefaultValueSql("((0))");
 
+                entity.Property(e => e.LinkChargeId).HasMaxLength(250);
+
                 entity.Property(e => e.Mblno)
                     .HasColumnName("MBLNo")
                     .HasMaxLength(200)
                     .IsUnicode(false);
+
+                entity.Property(e => e.ModifiedDateLinkFee).HasColumnType("datetime");
 
                 entity.Property(e => e.NetAmount).HasColumnType("decimal(18, 4)");
 
@@ -2746,6 +2750,10 @@ namespace eFMS.API.Documentation.Service.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.UserModified)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.UserNameLinkFee)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
