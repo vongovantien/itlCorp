@@ -6,8 +6,8 @@
         <div class="c-button-actions">
 
             <div class="dropdown m-dropdown m-dropdown--inline no-arrow">
-                <button type="button" class="btn btn-success dropdown-toggle"
-                    data-toggle="dropdown">More...<span class="caret"></span>
+                <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">More...<span
+                        class="caret"></span>
                 </button>
                 <div class="dropdown-menu">
                     <a class="dropdown-item pointer" (click)="chargeFromRep()">Charge From Replicate</a>
@@ -72,7 +72,8 @@
                                     </thead>
                                     <tbody class="tbody-group">
                                         <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
-                                            <tr class="collapse-toggle-row">
+                                            <tr class="collapse-toggle-row" [contextMenu]="opsListContextMenu"
+                                                (onTouch)="onSelectOps(item)">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 100px">
                                                         <button type="button"
@@ -214,3 +215,11 @@
 
 <permission-403-popup></permission-403-popup>
 <loading-popup></loading-popup>
+
+<app-context-menu #opsListContextMenu (clickOutside)="selectedShipment = null">
+    <div class="menu-context__item" (click)="confirmReplicateJob()">
+        <span><i class="la la-copy"></i><span> Replicate job</span></span>
+    </div>
+</app-context-menu>
+
+<ng-template inject></ng-template>
