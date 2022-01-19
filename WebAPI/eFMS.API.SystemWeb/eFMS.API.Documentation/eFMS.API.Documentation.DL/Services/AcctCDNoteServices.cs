@@ -2586,7 +2586,7 @@ namespace eFMS.API.Documentation.DL.Services
         /// </summary>
         /// <param name="criteria"></param>
         /// <returns></returns>
-        private IQueryable<InvoiceListModel> GetDataSoa(CDNoteCriteria criteria)
+        private IQueryable<InvoiceListModel> GetDataSoaNotIssuedCdNote(CDNoteCriteria criteria)
         {
             IQueryable<AcctSoa> soaQuery = GetSoasPermission();
             soaQuery = soaQuery.Where(x => (string.IsNullOrEmpty(criteria.PartnerId) || x.Customer == criteria.PartnerId)
@@ -2597,11 +2597,12 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 soaQuery = soaQuery.Where(x => x.DatetimeCreated.Value.Date >= criteria.FromExportDate.Value.Date && x.DatetimeCreated.Value.Date <= criteria.ToExportDate.Value.Date);
             }
+            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)) && (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.Soano).ToList();
-                surchargesCdNote.AddRange(surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.PaySoano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.PaySoano).ToList());
+                var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.Soano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.Soano).ToList();
+                surchargesCdNote.AddRange(charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.PaySoano) && string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)).Select(s => s.PaySoano).ToList());
                 if (surchargesCdNote.Count > 0)
                 {
                     soaQuery = soaQuery.Where(x => refNos.Any(a => a == x.Soano) || surchargesCdNote.Any(a => a == x.Soano));
@@ -2630,7 +2631,7 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            var charges = surchargeRepository.Get(x => (!string.IsNullOrEmpty(x.Soano) || !string.IsNullOrEmpty(x.PaySoano)) && (string.IsNullOrEmpty(x.CreditNo) && string.IsNullOrEmpty(x.DebitNo)));
+            
             var chargeSoa = charges.Where(x => !string.IsNullOrEmpty(x.Soano));
             var chargePSoa = charges.Where(x => !string.IsNullOrEmpty(x.PaySoano));
             var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
@@ -2787,11 +2788,12 @@ namespace eFMS.API.Documentation.DL.Services
                 query = query.And(perQuery);
             }
 
+            var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
             if (!string.IsNullOrEmpty(criteria.ReferenceNos))
             {
                 IEnumerable<string> refNos = criteria.ReferenceNos.Split('\n').Select(x => x.Trim()).Where(x => x != null);
-                var surchargesCdNote = surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
-                surchargesCdNote.AddRange(surchargeRepository.Get(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.CreditNo)).Select(s => s.CreditNo).ToList());
+                var surchargesCdNote = charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.DebitNo)).Select(s => s.DebitNo).ToList();
+                surchargesCdNote.AddRange(charges.Where(x => refNos.Any(a => a == x.JobNo || a == x.Mblno || a == x.Hblno) && !string.IsNullOrEmpty(x.CreditNo)).Select(s => s.CreditNo).ToList());
                 if (surchargesCdNote.Count > 0)
                 {
                     query = query.And(x => refNos.Any(a => a == x.Code) || surchargesCdNote.Any(a => a == x.Code));
@@ -2821,7 +2823,6 @@ namespace eFMS.API.Documentation.DL.Services
             {
                 return null;
             }
-            var charges = surchargeRepository.Get(x => !string.IsNullOrEmpty(x.CreditNo) || !string.IsNullOrEmpty(x.DebitNo));
             var accMangData = accountingManagementRepository.Get(x => string.IsNullOrEmpty(criteria.PartnerId) || x.PartnerId == criteria.PartnerId);
             var transactionDetailData = trandetailRepositoty.Get();
             var opstransactionData = opstransRepository.Get(x => x.CurrentStatus != DocumentConstants.CURRENT_STATUS_CANCELED);
@@ -2960,7 +2961,7 @@ namespace eFMS.API.Documentation.DL.Services
         {
             List<InvoiceListModel> results = null;
             var cdNoteData = GetDataCdNote(criteria);
-            var soaData = GetDataSoa(criteria);
+            var soaData = GetDataSoaNotIssuedCdNote(criteria);
 
             if (cdNoteData == null && soaData == null)
             {
@@ -3501,7 +3502,7 @@ namespace eFMS.API.Documentation.DL.Services
         public List<AccAccountingManagementResult> GetDataAcctMngtDebCretInvExport(CDNoteCriteria criteria)
         {
             var cdNoteData = GetDataCdNote(criteria);
-            var soaData = GetDataSoa(criteria);
+            var soaData = GetDataSoaNotIssuedCdNote(criteria);
 
             if (cdNoteData == null && soaData == null)
             {
