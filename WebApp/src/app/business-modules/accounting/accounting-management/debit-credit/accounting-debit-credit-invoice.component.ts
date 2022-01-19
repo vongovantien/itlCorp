@@ -75,6 +75,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             { title: 'Issued for Voucher No', field: 'voucherId', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
         ];
         this.getCreditDebitInvoices();
     }

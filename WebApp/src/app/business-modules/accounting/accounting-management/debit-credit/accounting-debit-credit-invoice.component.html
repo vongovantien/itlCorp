@@ -3,7 +3,7 @@
     <div class="m-content">
         <div class="m-portlet__body">
             <tabset class="custom-class-tab">
-                <tab heading="Debit/Credit/Invoice" (selectTab)="onSelectTab('cdi')">
+                <tab heading="Invoice List" (selectTab)="onSelectTab('cdi')">
                     <form-search-accounting-management (onSearch)="searchInvoiceAndCDNotes($event)"
                         (onReset)="resetSearch($event)">
                     </form-search-accounting-management>
@@ -103,6 +103,19 @@
                                                 </td>
                                                 <td>
                                                     <span>{{cdNote.lastSyncDate | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                                                </td>
+                                                <td>
+                                                    <ng-container [ngSwitch]="cdNote.paymentStatus">
+                                                        <span class="text-success" *ngSwitchCase="'Paid'">
+                                                            {{ cdNote.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-warning" *ngSwitchCase="'Paid A Part'">
+                                                            {{ cdNote.paymentStatus }}
+                                                        </span>
+                                                        <span class="text-danger" *ngSwitchDefault>
+                                                            {{ cdNote.paymentStatus }}
+                                                        </span>
+                                                    </ng-container>
                                                 </td>
                                             </tr>
                                         </ng-container>
