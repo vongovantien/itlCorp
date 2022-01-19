@@ -19,6 +19,7 @@ namespace eFMS.API.ForPartner.DL.Models.Payable
         public string TransactionType { get; set; }
         public string BravoRefNo { get; set; }
         public string AdvRefNo { get; set; }
+        public string AcctId { get; set; }
         public string Currency { get; set; }
         public decimal PayOriginAmount { get; set; }
         public decimal PayAmountVND { get; set; }

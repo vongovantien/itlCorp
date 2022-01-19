@@ -312,6 +312,10 @@ namespace eFMS.API.ForPartner.DL.Service
                 {
                     return string.Format("Số phiếu chứng từ không hợp lệ");
                 }
+                if (acc.Details.Any(x => string.IsNullOrEmpty(x.AcctId)))
+                {
+                    return string.Format("Mã định danh của {0} đang trống.", acc.PaymentNo);
+                }
                 foreach (var detail in acc.Details)
                 {
                     if (detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV && detail.TransactionType != ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
@@ -367,16 +371,18 @@ namespace eFMS.API.ForPartner.DL.Service
                                 {
                                     return new HandleState((object)string.Format("Chứng từ {0} và số ref {1} không tồn tại", acc.PaymentNo, detail.BravoRefNo));
                                 }
-                                var payablePayment = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo && x.ReferenceNo == detail.BravoRefNo && x.PaymentType == detail.TransactionType).FirstOrDefault();
+                                // Check trùng mã định danh [acctId] trong lịch sử ghi nhận
+                                var payablePayment = paymentRepository.Get(x => x.AcctId == detail.AcctId && x.PaymentType == detail.TransactionType && x.OfficeId == office.Id).FirstOrDefault();
                                 if (payablePayment != null)
                                 {
-                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}", acc.PaymentNo, detail.BravoRefNo));
+                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}", acc.PaymentNo, detail.AcctId));
                                 }
                                 var accPayablePayment = new AccAccountPayablePayment();
                                 accPayablePayment.Id = Guid.NewGuid();
                                 accPayablePayment.PartnerId = partner.Id;
                                 accPayablePayment.PaymentNo = acc.PaymentNo;
                                 accPayablePayment.ReferenceNo = detail.BravoRefNo;
+                                accPayablePayment.AcctId = detail.AcctId;
                                 accPayablePayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT;
                                 accPayablePayment.Currency = detail.Currency;
                                 accPayablePayment.ExchangeRate = detail.ExchangeRate;
@@ -432,7 +438,7 @@ namespace eFMS.API.ForPartner.DL.Service
                             else if (detail.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV)
                             {
                                 #region ADV
-                                var payablePayment = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo && x.ReferenceNo == detail.AdvRefNo && x.PaymentType == detail.TransactionType).FirstOrDefault();
+                                var payablePayment = paymentRepository.Get(x => x.AcctId == detail.AcctId && x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV && x.OfficeId == office.Id).FirstOrDefault();
                                 if (payablePayment != null)
                                 {
                                     return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}", acc.PaymentNo, detail.BravoRefNo));
@@ -442,6 +448,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 accPayablePayment.PartnerId = partner.Id;
                                 accPayablePayment.PaymentNo = acc.PaymentNo;
                                 accPayablePayment.ReferenceNo = detail.AdvRefNo;
+                                accPayablePayment.AcctId = detail.AcctId;
                                 accPayablePayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_ADV;
                                 accPayablePayment.Currency = detail.Currency;
                                 accPayablePayment.ExchangeRate = detail.ExchangeRate;
@@ -524,15 +531,15 @@ namespace eFMS.API.ForPartner.DL.Service
                                 {
                                     return new HandleState((object)string.Format("Chứng từ {0} và số ref {1} không tồn tại", acc.PaymentNo, detail.AdvRefNo));
                                 }
-                                var payablePaymentCreditExisted = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo && x.ReferenceNo == detail.BravoRefNo && x.PaymentType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT).FirstOrDefault();
+                                var payablePaymentCreditExisted = paymentRepository.Get(x => x.AcctId == detail.AcctId && x.PaymentType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT && x.OfficeId == office.Id).FirstOrDefault();
                                 if (payablePaymentCreditExisted != null)
                                 {
-                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}", acc.PaymentNo, detail.BravoRefNo));
+                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và type credit - ref {1}", acc.PaymentNo, detail.AcctId));
                                 }
-                                var payablePaymentAdvExisted = paymentRepository.Get(x => x.PaymentNo == acc.PaymentNo && x.ReferenceNo == detail.AdvRefNo && x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF).FirstOrDefault();
+                                var payablePaymentAdvExisted = paymentRepository.Get(x => x.AcctId == detail.AcctId && x.PaymentType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF && x.OfficeId == office.Id).FirstOrDefault();
                                 if (payablePaymentAdvExisted != null)
                                 {
-                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và ref {1}", acc.PaymentNo, detail.AdvRefNo));
+                                    return new HandleState((object)string.Format("Đã tồn tại ghi nhận CT {0} và type Adv - ref {1}", acc.PaymentNo, detail.AcctId));
                                 }
                                 var creditPayment = new AccAccountPayablePayment();
                                 var advPayment = new AccAccountPayablePayment();
@@ -540,6 +547,7 @@ namespace eFMS.API.ForPartner.DL.Service
                                 creditPayment.PartnerId = partner.Id;
                                 creditPayment.PaymentNo = acc.PaymentNo;
                                 creditPayment.ReferenceNo = detail.BravoRefNo;
+                                creditPayment.AcctId = detail.AcctId;
                                 creditPayment.PaymentType = ForPartnerConstants.PAYABLE_PAYMENT_TYPE_CREDIT;
                                 creditPayment.Currency = detail.Currency;
                                 creditPayment.ExchangeRate = detail.ExchangeRate;
@@ -674,7 +682,7 @@ namespace eFMS.API.ForPartner.DL.Service
                         var existPayment = DataContext.Get(x => x.BillingNo == acc.PaymentNo && x.OfficeId == office.Id);
                         if (acc.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_COMBINE)
                         {
-                            existPayment = existPayment.Where(x => x.TransactionType == ForPartnerConstants.PAYABLE_PAYMENT_TYPE_NETOFF || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV);
+                            existPayment = existPayment.Where(x => x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_ADV || x.TransactionType == ForPartnerConstants.PAYABLE_TRANSACTION_TYPE_CREDIT);
                         }
                         else
                         {

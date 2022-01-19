@@ -29,5 +29,6 @@ namespace eFMS.API.ForPartner.Service.Models
         public DateTime? DatetimeCreated { get; set; }
         public string UserModified { get; set; }
         public DateTime? DatetimeModified { get; set; }
+        public string AcctId { get; set; }
     }
 }
