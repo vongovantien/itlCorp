@@ -73,7 +73,9 @@
                                     <tbody class="tbody-group">
                                         <ng-container *ngFor="let item of shipments; let i = index; trackBy: trackByFn">
                                             <tr class="collapse-toggle-row" [contextMenu]="opsListContextMenu"
-                                                (onTouch)="onSelectOps(item)">
+                                                (onTouch)="onSelectOps(item)"
+                                                [activeMenuContext]="item.userCreated !== (currentUser$ | async)?.id"
+                                                [class.touch-row]="selectedShipment?.id === item.id">
                                                 <td class="table-actions-col">
                                                     <div class="table-actions" style="width: 100px">
                                                         <button type="button"
@@ -214,6 +216,7 @@
 <confirm-popup (onSubmit)="onDeleteShipment()" [body]="deleteMessage" [labelConfirm]="'Ok'"></confirm-popup>
 
 <permission-403-popup></permission-403-popup>
+
 <loading-popup></loading-popup>
 
 <app-context-menu #opsListContextMenu (clickOutside)="selectedShipment = null">

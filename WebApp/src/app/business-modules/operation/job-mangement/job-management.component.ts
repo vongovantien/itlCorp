@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, QueryList, ViewChildren } from '@angular/core';
 import { ToastrService } from 'ngx-toastr';
 import { NgProgress } from '@ngx-progressbar/core';
 import { Router } from '@angular/router';
@@ -14,7 +14,9 @@ import * as fromOperationStore from './../store';
 import { catchError, finalize, map, takeUntil, withLatestFrom } from 'rxjs/operators';
 import { JobConstants, RoutingConstants } from '@constants';
 import { NgxSpinnerService } from 'ngx-spinner';
-import { InjectViewContainerRefDirective } from '@directives';
+import { InjectViewContainerRefDirective, ContextMenuDirective } from '@directives';
+import { GetCurrenctUser, getCurrentUserState } from '@store';
+import { Observable } from 'rxjs';
 
 
 
@@ -28,6 +30,7 @@ export class JobManagementComponent extends AppList implements OnInit {
     @ViewChild(Permission403PopupComponent) canNotAllowActionPopup: Permission403PopupComponent;
     @ViewChild(LoadingPopupComponent) loadingPopupComponent: LoadingPopupComponent;
     @ViewChild(InjectViewContainerRefDirective) viewContainerRef: InjectViewContainerRefDirective;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     shipments: Shipment[] = [];
     selectedShipment: Shipment = null;
@@ -41,6 +44,8 @@ export class JobManagementComponent extends AppList implements OnInit {
         createdDateFrom: JobConstants.DEFAULT_RANGE_DATE_SEARCH.fromDate,
         createdDateTo: JobConstants.DEFAULT_RANGE_DATE_SEARCH.toDate,
     };
+
+    currentLoggedUser: Observable<Partial<SystemInterface.IClaimUser>>;
 
     constructor(
         private sortService: SortService,
@@ -109,6 +114,8 @@ export class JobManagementComponent extends AppList implements OnInit {
                     this.requestSearchShipment();
                 }
             );
+
+        this.currentUser$ = this._store.select(getCurrentUserState);
     }
 
     requestSearchShipment() {
@@ -269,6 +276,11 @@ export class JobManagementComponent extends AppList implements OnInit {
 
     onSelectOps(shipment) {
         this.selectedShipment = shipment;
+
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
     }
 
     confirmReplicateJob() {
@@ -283,7 +295,7 @@ export class JobManagementComponent extends AppList implements OnInit {
             center: true
         }, () => {
             if (!!currentJob) {
-                this._operationRepo.replicateOps([currentJob.id])
+                this._documentRepo.replicateOps([currentJob.id])
                     .subscribe(
                         (res: CommonInterface.IResult) => {
                             if (res.status) {

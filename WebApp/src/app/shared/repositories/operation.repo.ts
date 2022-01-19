@@ -221,11 +221,6 @@ export class OperationRepo {
         return this._api.put(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/ReplicateClearance`, null, { id });
 
     }
-
-    replicateOps(Ids: string[]) {
-        return this._api.post(`${environment.HOST.OPERATION}/api/${this.VERSION}/vi/CustomsDeclaration/ReplicateJob`, { Ids });
-
-    }
 }
 
 
