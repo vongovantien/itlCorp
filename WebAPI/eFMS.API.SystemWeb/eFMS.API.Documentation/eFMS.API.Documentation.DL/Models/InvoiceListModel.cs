@@ -35,7 +35,7 @@ namespace eFMS.API.Documentation.DL.Models
         public DateTime? VoucherIddate { get; set; }
         public DateTime? IssueDate { get; set; }
         public string AccountNo { get; set; }
-        public string InvType { get; set; }
+        public string BillingType { get; set; }
         public string PaymentStatus { get; set; }
 
     }

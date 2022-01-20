@@ -2653,11 +2653,12 @@ namespace eFMS.API.Documentation.DL.Services
                               Id = Guid.Parse(soa.Id),
                               PartnerId = soa.Customer,
                               ReferenceNo = soa.Soano,
+                              BillingType = "Soa",
                               JobId = trans != null ? trans.Id : ops.Id,
                               HBLId = chg.Hblid,
                               JobNo = chg.JobNo,
                               MBLNo = chg.Mblno,
-                              HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : tranDs.Hwbno,
+                              HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
                               Total = chg.Total,
                               Currency = chg.CurrencyId,
                               IssuedDate = soa.DatetimeCreated, //export date
@@ -2693,11 +2694,12 @@ namespace eFMS.API.Documentation.DL.Services
                                  Id = Guid.Parse(soa.Id),
                                  PartnerId = soa.Customer,
                                  ReferenceNo = soa.Soano,
+                                 BillingType = "Soa",
                                  JobId = trans != null ? trans.Id : ops.Id,
                                  HBLId = chg.Hblid,
                                  JobNo = chg.JobNo,
                                  MBLNo = chg.Mblno,
-                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : tranDs.Hwbno,
+                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
                                  Total = chg.Total,
                                  Currency = chg.CurrencyId,
                                  IssuedDate = soa.DatetimeCreated, //export date
@@ -2739,6 +2741,7 @@ namespace eFMS.API.Documentation.DL.Services
                 PartnerId = se.FirstOrDefault().PartnerId,
                 PartnerName = string.Empty,
                 ReferenceNo = se.FirstOrDefault().ReferenceNo,
+                BillingType = se.FirstOrDefault().BillingType,
                 HBLId = se.FirstOrDefault().HBLId,
                 JobNo = se.FirstOrDefault().JobNo,
                 MBLNo = se.FirstOrDefault().MBLNo,
@@ -2750,7 +2753,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Status = se.FirstOrDefault().Status,
                 InvoiceNo = se.FirstOrDefault().InvoiceNo,
                 VoucherId = se.FirstOrDefault().VoucherId,
-                IssuedStatus = se.FirstOrDefault().IssuedStatus,
+                IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Voucher" : "New",
                 SyncStatus = se.FirstOrDefault().SyncStatus,
                 LastSyncDate = se.FirstOrDefault().LastSyncDate,
                 DatetimeModified = se.FirstOrDefault().DatetimeModified,
@@ -2841,9 +2844,10 @@ namespace eFMS.API.Documentation.DL.Services
                                  JobId = cdNote.JobId,
                                  PartnerId = cdNote.PartnerId,
                                  ReferenceNo = cdNote.Code,
+                                 BillingType = "CdNote",
                                  HBLId = chg.Hblid,
                                  JobNo = chg.JobNo,
-                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : tranDs.Hwbno,
+                                 HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
                                  MBLNo = chg.Mblno,
                                  Total = chg.Total,
                                  Currency = chg.CurrencyId,
@@ -2879,9 +2883,10 @@ namespace eFMS.API.Documentation.DL.Services
                                 JobId = cdNote.JobId,
                                 PartnerId = cdNote.PartnerId,
                                 ReferenceNo = cdNote.Code,
+                                BillingType = "CdNote",
                                 HBLId = chg.Hblid,
                                 JobNo = chg.JobNo,
-                                HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : tranDs.Hwbno,
+                                HBLNo = chg.TransactionType == "CL" ? ops.Hwbno : chg.Hblno,
                                 MBLNo = chg.Mblno,
                                 Total = chg.Total,
                                 Currency = chg.CurrencyId,
@@ -2915,6 +2920,7 @@ namespace eFMS.API.Documentation.DL.Services
             var result = data.GroupBy(g => new
             {
                 ReferenceNo = g.ReferenceNo,
+                g.HBLId,
                 Currency = g.Currency
             }).Select(se => new InvoiceListModel
             {
@@ -2923,10 +2929,11 @@ namespace eFMS.API.Documentation.DL.Services
                 PartnerId = se.FirstOrDefault().PartnerId,
                 PartnerName = string.Empty,
                 ReferenceNo = se.FirstOrDefault().ReferenceNo,
+                BillingType = se.FirstOrDefault().BillingType,
                 HBLId = se.FirstOrDefault().HBLId,
                 JobNo = se.FirstOrDefault().JobNo,
-                MBLNo = se.FirstOrDefault()?.MBLNo,
-                HBLNo = se.FirstOrDefault().HBLNo,
+                MBLNo = string.Join(";", se.Select(x => x.MBLNo)),
+                HBLNo = string.Join(";", se.Select(x => x.HBLNo)),
                 Total = se.Sum(z => z.Total),
                 Currency = se.FirstOrDefault().Currency,
                 IssuedDate = se.FirstOrDefault().IssuedDate,
@@ -2934,7 +2941,7 @@ namespace eFMS.API.Documentation.DL.Services
                 Status = se.FirstOrDefault().Status,
                 InvoiceNo = se.FirstOrDefault().InvoiceNo,
                 VoucherId = se.FirstOrDefault().VoucherId,
-                IssuedStatus = se.FirstOrDefault().IssuedStatus,
+                IssuedStatus = se.Any(y => y.IssuedStatus == "Issued Invoice") ? "Issued Voucher" : "New",
                 SyncStatus = se.FirstOrDefault().SyncStatus,
                 LastSyncDate = se.FirstOrDefault().LastSyncDate,
                 DatetimeModified = se.FirstOrDefault().DatetimeModified,
@@ -2983,7 +2990,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
             // Get by status
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
-            var _resultDatas = queryData.ToList();
+            var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
 
             rowsCount = _resultDatas.Count();
 
@@ -3011,6 +3018,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    PartnerId = cd.PartnerId,
                                    PartnerName = partner != null ? partner.PartnerNameEn : null,
                                    ReferenceNo = cd.ReferenceNo,
+                                   BillingType = cd.BillingType,
                                    JobNo = cd.JobNo,
                                    MBLNo = cd.MBLNo,
                                    HBLNo = cd.HBLNo,
@@ -3029,7 +3037,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    PaymentStatus = cd.PaymentStatus
                                };
 
-                results = joinData.OrderByDescending(o => o.DatetimeModified).ToList();
+                results = joinData.ToList();
             }
             return results;
         }

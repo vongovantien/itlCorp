@@ -145,6 +145,18 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         this.cdNoteDetailPopupComponent.show();
     }
 
+    viewDetail(soaId: string, soano: string) {
+        this._accountingRepo
+            .checkAllowGetDetailSOA(soaId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
+                        queryParams: { no: soano, currency: "VND" }
+                    });
+                }
+            });
+    }
+
     issueVatInvoice() {
         const existCdNoteIssued = this.cdNotes.filter(x => x.isSelected && x.status !== 'New');
         if (!!existCdNoteIssued.length) {
