@@ -2933,7 +2933,7 @@ namespace eFMS.API.Documentation.DL.Services
                 JobNo = se.FirstOrDefault().JobNo,
                 MBLNo = string.Join(";", se.Select(x => x.MBLNo).Distinct()),
                 HBLNo = string.Join(";", se.Select(x => x.HBLNo).Distinct()),
-                Total = se.Sum(z => z.Total),
+                Total = se.GroupBy(x => x.HBLId).Sum(z => z.FirstOrDefault().Total),
                 Currency = se.FirstOrDefault().Currency,
                 IssuedDate = se.FirstOrDefault().IssuedDate,
                 Creator = se.FirstOrDefault().Creator,
