@@ -30,7 +30,7 @@
     </ng-container>
 
 
-    <ng-container *ngIf="opsTransaction?.isLocked === false || isDuplicate">
+    <ng-container *ngIf="(opsTransaction?.isLocked === false && !opsTransaction.replicatedId) || isDuplicate">
         <button type="button" class="btn btn-danger  m-btn--icon m-btn--uppercase m--margin-right-10"
             (click)="checkDelete()" *ngIf="opsTransaction.permission.allowDelete && !isDuplicate"
             title="Shipment was deleted">
@@ -126,8 +126,8 @@
                         <ng-container *ngIf="tab === 'custom-declaration'" loadModule="cd">
                         </ng-container>
                     </tab>
-                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('CDNOTE')"
-                        [disabled]="isDuplicate" [active]="tab === 'CDNOTE'">
+                    <tab heading="Credit Note & Debit Note" (selectTab)="selectTab('CDNOTE')" [disabled]="isDuplicate"
+                        [active]="tab === 'CDNOTE'">
                         <ng-container *ngIf="tab === 'CDNOTE'" loadModule="cdNote">
                         </ng-container>
                     </tab>

@@ -46,7 +46,7 @@ export class Shipment {
     clearanceNo: string = '';
     customerName: string = '';
     isLocked: boolean = false;
-
+    replicatedId: string = null;
     userCreatedName: string = null;
 
     constructor(object?: any) {
