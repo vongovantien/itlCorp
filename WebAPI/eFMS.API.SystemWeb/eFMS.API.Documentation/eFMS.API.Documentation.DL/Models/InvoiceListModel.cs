@@ -29,6 +29,7 @@ namespace eFMS.API.Documentation.DL.Models
         public string MBLNo { get; set; }
         public string CodeNo { get; set; }
         public string CodeType { get; set; }
+        public Guid ChargeId { get; set; }
         public string ChargeType { get; set; }
         public string PayerId { get; set; }
         public int? DepartmentId { get; set; }
