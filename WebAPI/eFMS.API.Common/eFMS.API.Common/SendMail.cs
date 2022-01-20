@@ -161,8 +161,11 @@ namespace eFMS.API.Common
             }
             foreach (var item in emails)
             {
-                var email = item.Split(new char[] { ';', '\n' });
-                emailsReturn.AddRange(email.Where(x => !string.IsNullOrEmpty(x)));
+                if (item != null)
+                {
+                    var email = item.Split(new char[] { ';', '\n' });
+                    emailsReturn.AddRange(email.Where(x => !string.IsNullOrEmpty(x)));
+                }
             }
             if (emailsReturn.Count > 0)
             {
