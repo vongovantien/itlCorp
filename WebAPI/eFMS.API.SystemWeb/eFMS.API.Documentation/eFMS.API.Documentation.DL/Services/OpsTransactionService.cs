@@ -26,6 +26,7 @@ using eFMS.API.Documentation.Service.Contexts;
 using eFMS.API.Documentation.Service.ViewModels;
 using ITL.NetCore.Connection;
 using System.Linq.Expressions;
+using Newtonsoft.Json;
 
 namespace eFMS.API.Documentation.DL.Services
 {
@@ -2079,6 +2080,8 @@ namespace eFMS.API.Documentation.DL.Services
                 var lstJobRep = DataContext.Get(x => x.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE && x.UserCreated == currentUser.UserID);
                 if (lstJobRep != null)
                 {
+                    string logMessage = string.Format(" *  \n ListJobRep: {0} * ",JsonConvert.SerializeObject(lstJobRep));
+                    new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTJOBREP", logMessage);
                     foreach (var jobRep in lstJobRep)
                     {
                         var job = DataContext.Get(x => x.ReplicatedId == jobRep.Id).FirstOrDefault();
@@ -2105,6 +2108,8 @@ namespace eFMS.API.Documentation.DL.Services
                         var charges = surchargeRepository.Get(x => x.JobNo == jobRep.JobNo && x.LinkChargeId==null);
                         if (charges != null)
                         {
+                            logMessage = string.Format(" *  \n Charges: {0} * ", JsonConvert.SerializeObject(charges));
+                            new LogHelper("eFMS_CHARGEFROMREPLICATE_GETLISTCHARGE", logMessage);
                             foreach (var charge in charges)
                             {
                                 if (surchargeRepository.Get(x => x.LinkChargeId == charge.Id.ToString()).FirstOrDefault() != null)
