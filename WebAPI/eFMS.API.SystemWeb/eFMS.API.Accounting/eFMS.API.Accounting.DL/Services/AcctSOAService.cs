@@ -3367,8 +3367,22 @@ namespace eFMS.API.Accounting.DL.Services
                 var combineCurrent = acctCombineBillingRepository.Get(x => x.CombineBillingNo == combineNoUpd).FirstOrDefault();
                 if(combineCurrent != null)
                 {
-                    combineCurrent.TotalAmountVnd = surchargeCmb.Sum(x => (x.AmountVnd ?? 0) + (x.VatAmountVnd));
-                    combineCurrent.TotalAmountUsd = surchargeCmb.Sum(x => (x.AmountUsd ?? 0) + (x.VatAmountUsd));
+                    combineCurrent.TotalAmountVnd = combineCurrent.TotalAmountUsd = 0;
+                    foreach (var sur in surchargeCmb)
+                    {
+                        if (sur.Type == AccountingConstants.TYPE_CHARGE_OBH)
+                        {
+                            var isCredit = DataContext.Any(x => x.Soano == sur.PaySoano && x.CombineBillingNo == combineNoUpd);
+                            isCredit = !isCredit ? acctCdnoteRepo.Any(x => x.Code == sur.CreditNo && x.CombineBillingNo == combineNoUpd) : isCredit;
+                            combineCurrent.TotalAmountVnd += (isCredit ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                            combineCurrent.TotalAmountUsd += (isCredit ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                        }
+                        else
+                        {
+                            combineCurrent.TotalAmountVnd += (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? -1 : 1) * ((sur.AmountVnd ?? 0) + (sur.VatAmountVnd));
+                            combineCurrent.TotalAmountUsd += (sur.Type == AccountingConstants.TYPE_CHARGE_BUY ? -1 : 1) * ((sur.AmountUsd ?? 0) + (sur.VatAmountUsd));
+                        }
+                    }
                     acctCombineBillingRepository.Update(combineCurrent, x => x.CombineBillingNo == combineCurrent.CombineBillingNo);
                 }
             }

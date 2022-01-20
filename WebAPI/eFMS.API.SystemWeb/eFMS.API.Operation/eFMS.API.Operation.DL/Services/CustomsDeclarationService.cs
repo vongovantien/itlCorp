@@ -26,6 +26,7 @@ using eFMS.API.Operation.Service.Contexts;
 using ITL.NetCore.Connection;
 using eFMS.API.Common.Models;
 using AutoMapper.QueryableExtensions;
+using System.Threading.Tasks;
 
 namespace eFMS.API.Operation.DL.Services
 {
@@ -1516,6 +1517,84 @@ namespace eFMS.API.Operation.DL.Services
                     break;
             }
             return serviceType;
+        }
+
+        public async Task<HandleState> ReplicateCustomClearance(int Id)
+        {
+            HandleState hs = new HandleState();
+            CustomsDeclaration cd = DataContext.Get(x => x.Id == Id)?.FirstOrDefault();
+            try
+            {
+                if (cd != null)
+                {
+                    if (string.IsNullOrEmpty(cd.JobNo))
+                    {
+                        throw new NullReferenceException();
+                    }
+
+                    OpsTransaction opsJob = opsTransactionRepo.Get(x => x.JobNo == cd.JobNo)?.FirstOrDefault();
+                    if (opsJob == null)
+                    {
+                        throw new NullReferenceException();
+                    }
+
+                    if(opsJob.ReplicatedId == null)
+                    {
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
+                    }
+
+                    var opsJobReplicate = opsTransactionRepo.Get(x => x.Id == opsJob.ReplicatedId)?.FirstOrDefault();
+                    if(opsJobReplicate == null)
+                    {
+                        return new HandleState((object)string.Format("Không tìm thấy thông tin lô replicate của lô {0}", cd.JobNo));
+                    }
+                    var existedClearance = DataContext.Any(x => x.ClearanceNo == cd.ClearanceNo && x.Id != cd.Id && opsJobReplicate.JobNo == x.JobNo);
+                    if(existedClearance)
+                    {
+                        return new HandleState((object)string.Format("Tờ khai {0} đã được thêm vào lô replicate", cd.ClearanceNo));
+                    }
+
+                    CustomsDeclaration replicateCd = new CustomsDeclaration();
+
+                    replicateCd.JobNo = opsJobReplicate.JobNo;
+                    replicateCd.Source = OperationConstants.FROM_REPLICATE;
+                    replicateCd.DatetimeCreated = DateTime.Now;
+                    replicateCd.DatetimeModified = DateTime.Now;
+                    replicateCd.GroupId = currentUser.GroupId;
+                    replicateCd.DepartmentId = currentUser.DepartmentId;
+                    replicateCd.OfficeId = currentUser.OfficeID;
+                    replicateCd.CompanyId = currentUser.CompanyID;
+                    replicateCd.AccountNo = cd.AccountNo;
+                    replicateCd.PartnerTaxCode = cd.PartnerTaxCode;
+                    replicateCd.Mblid = cd.Mblid;
+                    replicateCd.Hblid = cd.Hblid;
+                    replicateCd.ClearanceNo = cd.ClearanceNo;
+                    replicateCd.ClearanceDate = cd.ClearanceDate;
+                    replicateCd.ServiceType = cd.ServiceType;
+                    replicateCd.PortCodeNn = cd.PortCodeNn;
+                    replicateCd.UnitCode = cd.UnitCode;
+                    replicateCd.QtyCont = cd.QtyCont;
+                    replicateCd.Pcs = cd.Pcs;
+                    replicateCd.ImportCountryCode = cd.ImportCountryCode;
+                    replicateCd.ExportCountryCode = cd.ExportCountryCode;
+                    replicateCd.GrossWeight = cd.GrossWeight;
+                    replicateCd.Cbm = cd.Cbm;
+                    replicateCd.Gateway = cd.Gateway;
+                    replicateCd.Type = cd.Type;
+                    replicateCd.CargoType = cd.CargoType;
+                    replicateCd.Route = cd.Route;
+                    replicateCd.Shipper = cd.Shipper;
+                    replicateCd.Consignee = cd.Consignee;
+
+                    hs = await DataContext.AddAsync(replicateCd);
+                }
+            }
+            catch (NullReferenceException ex)
+            {
+                return new HandleState((object)"Không tìm thấy thông tin job trong tờ khai!");
+            }
+
+            return hs;
         }
     }
 }

@@ -419,8 +419,10 @@
                                             </span>
                                         </ng-container>
                                         <ng-container *ngIf="!isLoading && !!files && isUpdate">
-                                            <a [href]="files.url" target="_blank" [title]="files.name"
-                                                download>{{files.name}}</a>
+                                            <li *ngFor="let file of files">
+                                                <a [href]="file.url" target="_blank" [title]="file.name"
+                                                download>{{file.name}}</a>
+                                            </li>
                                         </ng-container>
                                     </div>
                                 </div>

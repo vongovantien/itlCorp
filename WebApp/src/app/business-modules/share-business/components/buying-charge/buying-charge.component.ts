@@ -23,6 +23,7 @@ import { ChargeConstants } from 'src/constants/charge.const';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { AppComboGridComponent } from '@common';
 import { ActivatedRoute } from '@angular/router';
+import { ContextMenuDirective, InjectViewContainerRefDirective } from '@directives';
 
 @Component({
     selector: 'buying-charge',
@@ -31,8 +32,10 @@ import { ActivatedRoute } from '@angular/router';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShareBussinessBuyingChargeComponent extends AppList {
-
+    @ViewChild(InjectViewContainerRefDirective) viewContainer: InjectViewContainerRefDirective;
     @ViewChild(ConfirmPopupComponent) confirmDeletePopup: ConfirmPopupComponent;
+    @ViewChild('confirmCancelPopup') confirmCancelPopup: ConfirmPopupComponent;
+
     @Input() service: CommonType.SERVICE_TYPE = 'sea';
     @Input() showSyncOtherCharge: boolean = false; // * show/hide sync other charge in getCharge button.
     @Input() showGetCharge: boolean = true; // * show/hide getCharge button
@@ -40,6 +43,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     @Input() showGetChargeStandart: boolean = true; // * show/hide getCharge standart button
     @ViewChildren('container', { read: ViewContainerRef }) public widgetTargets: QueryList<ViewContainerRef>;
     @ViewChildren('containerCharge', { read: ViewContainerRef }) public chargeContainerRef: QueryList<ViewContainerRef>;
+    @ViewChildren(ContextMenuDirective) queryListMenuContext: QueryList<ContextMenuDirective>;
 
     serviceTypeId: string;
     containers: Container[] = [];
@@ -78,6 +82,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
     isSelectedChargeDynamicCombogrid: boolean = false;
     isSelectedPartnerDynamicCombogrid: boolean = false;
     userLogged: any;
+    selectedCs: CsShipmentSurcharge;
+
     constructor(
         protected _catalogueRepo: CatalogueRepo,
         protected _store: Store<fromStore.IShareBussinessState>,
@@ -389,6 +395,8 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             newSurCharge.invoiceNo = null;
             newSurCharge.seriesNo = null;
         }
+
+        newSurCharge.linkChargeId= null;
 
         this.addSurcharges(type, newSurCharge);
     }
@@ -1279,7 +1287,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
             componentRef.instance.fields = ['chargeNameEn'];
             componentRef.instance.active = charge.chargeId;
 
-            // * Listen EventEmiter    
+            // * Listen EventEmiter
             this.subscription = ((componentRef.instance) as AppComboGridComponent<Charge>).onClick.subscribe(
                 (v: Charge) => {
                     this.onSelectDataFormInfo(v, 'charge', this.selectedSurcharge);
@@ -1288,7 +1296,7 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
                     containerRef.clear();
                 });
 
-            // * Listen ClickOutside    
+            // * Listen ClickOutside
             ((componentRef.instance) as AppComboGridComponent<Charge>).clickOutSide
                 .pipe(skip(1))
                 .subscribe(
@@ -1345,6 +1353,46 @@ export class ShareBussinessBuyingChargeComponent extends AppList {
         });
 
         this._accountingRepo.calculatorReceivable({ objectReceivable: objReceivable }).subscribe();
+    }
+
+    onSelectSurcharge(index,cs:CsShipmentSurcharge){
+        this.selectedCs = cs;
+        this.selectedIndexCharge = index;
+        const qContextMenuList = this.queryListMenuContext.toArray();
+        if (!!qContextMenuList.length) {
+            qContextMenuList.forEach((c: ContextMenuDirective) => c.close());
+        }
+    }
+
+    cancelLinkCharge (cs:CsShipmentSurcharge){
+        if(!cs.linkChargeId){
+            this._toastService.warning("Charge without link charge");
+            return;
+        }
+        this.confirmCancelPopup.show();
+    }
+
+    onCancelLinkCharge(type: CommonEnum.SurchargeTypeEnum | string) {
+        this.confirmCancelPopup.hide();
+        if (!!this.selectedCs && this.selectedCs.id !== SystemConstants.EMPTY_GUID) {
+            this._progressRef.start();
+            this._documentRepo.deleteShipmentSurcharge(this.selectedCs.id)
+                .pipe(catchError(this.catchError), finalize(() => this._progressRef.complete()))
+                .subscribe(
+                    (res: CommonInterface.IResult) => {
+                        if (res.status) {
+                            this._toastService.success(res.message);
+                            if (this.selectedIndexCharge > -1) {
+                                this.deleteChargeWithType(type, this.selectedIndexCharge);
+                            }
+                            this.getSurcharges(type);
+                            this.getProfit();
+                        } else {
+                            this._toastService.error(res.message);
+                        }
+                    }
+                );
+        }
     }
 }
 

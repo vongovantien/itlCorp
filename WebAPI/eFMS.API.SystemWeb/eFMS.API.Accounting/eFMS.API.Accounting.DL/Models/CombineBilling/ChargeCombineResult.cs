@@ -23,6 +23,7 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? DebitUSD { get; set; }
         public decimal? CreditUSD { get; set; }
         public string SOANo { get; set; }
+        public string PaySoaNo { get; set; }
         public bool IsOBH { get; set; } 
         public string Currency { get; set; }
         public string InvoiceNo { get; set; }
@@ -38,7 +39,8 @@ namespace eFMS.API.Accounting.DL.Models
         public string Unit { get; set; }
         public decimal? UnitPrice { get; set; }
         public decimal? VATRate { get; set; }
-        public string CreditDebitNo { get; set; }
+        public string CreditNo { get; set; }
+        public string DebitNo { get; set; }
         public DateTime? DatetimeModified { get; set; }
         public short? CommodityGroupID { get; set; }
         public string Commodity { get; set; }
@@ -69,9 +71,10 @@ namespace eFMS.API.Accounting.DL.Models
         public decimal? NetAmount { get; set; }
         public decimal? AmountVND { get; set; }
         public decimal? AmountUSD { get; set; }
-        public string PIC { get; set; }
-        public bool IsSynced { get; set; }
         public string SeriesNo { get; set; }
         public DateTime? InvoiceDate { get; set; }
+        public string CombineNo { get; set; }
+        public string CombineBillingType { get; set; }
+        public string BillingType { get; set; }
     }
 }

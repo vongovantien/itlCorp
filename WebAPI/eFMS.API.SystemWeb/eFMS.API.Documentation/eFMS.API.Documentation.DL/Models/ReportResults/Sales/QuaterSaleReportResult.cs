@@ -37,5 +37,6 @@ namespace eFMS.API.Documentation.DL.Models.ReportResults.Sales
         public string MBLNO { get; set; }
         public string Vessel { get; set; }
         public string TpyeofService { get; set; }
+        public DateTime? ServiceData { get; set; } 
     }
 }

@@ -9,5 +9,16 @@
             A base class for an MVC controller without view support.
             </summary>
         </member>
+        <member name="M:eFMS.API.SystemFileManagement.Controllers.AWSS3Controller.UploadFilePreview(eFMS.API.SystemFileManagement.DL.Models.FileReportUpload,System.String,System.String,System.Guid,System.String)">
+            <summary>
+            Upload file report to aws then get href url of file
+            </summary>
+            <param name="files"></param>
+            <param name="moduleName"></param>
+            <param name="folder"></param>
+            <param name="id"></param>
+            <param name="child"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

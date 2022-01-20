@@ -33,6 +33,6 @@ namespace eFMS.API.Documentation.DL.IService
         ResultHandle ImportDuplicateJob(OpsTransactionModel model, out List<Guid> surchargeIds);
         HandleState UpdateSurchargeOfHousebill(OpsTransactionModel model);
         int CheckUpdateMBL(OpsTransactionModel model, out string mblNo, out List<string> advs);
-       
+        ResultHandle ChargeFromReplicate();
     }
 }

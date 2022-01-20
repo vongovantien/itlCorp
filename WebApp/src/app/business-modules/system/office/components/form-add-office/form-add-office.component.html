@@ -171,12 +171,26 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4">
+                    <div class="col-lg-1">
                         <div class="form-group">
                             <label class="form-control-label">Active</label>
                             <div class="m-checkbox-inline">
                                 <app-switch formControlName="active">
                                 </app-switch>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group" 
+                        [ngClass]="{'m-form__group has-danger': (internalCode.dirty && internalCode.value?.length > 20) || (isSubmited && internalCode.value?.length > 20)}">
+                            <label class="form-control-label">Internal Code</label>
+                            <div class="m-checkbox-inline">
+                                <input type="text" formControlName="internalCode" class="form-control"
+                                placeholder="Please Enter Internal Code">
+                            </div>
+                            <div class="form-control-feedback"
+                                *ngIf="isSubmited && internalCode.value?.length > 20  || internalCode.value?.length > 20 && internalCode.dirty">
+                                Internal code just have maximum 20 character!
                             </div>
                         </div>
                     </div>

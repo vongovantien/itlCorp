@@ -1,4 +1,6 @@
 ﻿using eFMS.API.ReportData.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
@@ -122,6 +124,34 @@ namespace eFMS.API.ReportData.HttpServices
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 }
                 HttpResponseMessage response = await client.GetAsync(url);
+                return response;
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+
+        public async static Task<HttpResponseMessage> PutDataToApi(Object obj, string url, string token)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.Timeout = TimeSpan.FromMinutes(5);
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+                string json = JsonConvert.SerializeObject(obj, Formatting.Indented);
+                var content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
+                if (!string.IsNullOrEmpty(token))
+                {
+                    token = token.Split(" ")[1];
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                }
+                var form = new MultipartFormDataContent();
+
+                HttpResponseMessage response = await client.PutAsync(url, content);
                 return response;
             }
             catch (Exception e)

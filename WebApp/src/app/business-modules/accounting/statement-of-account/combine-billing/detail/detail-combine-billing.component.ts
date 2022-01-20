@@ -244,7 +244,11 @@ export class DetailCombineBillingComponent extends AppForm implements OnInit {
 
   exportCombineOps() {
     this._progressRef.start();
-    this._exportRepo.exportCombineOps(this.detailCombine.combineBillingNo)
+    let criteriaExport: any = {
+      referenceNo: []
+    };
+    criteriaExport.referenceNo.push(this.detailCombine.combineBillingNo);
+    this._exportRepo.exportCombineOps(criteriaExport)
       .pipe(
         catchError(this.catchError),
         finalize(() => this._progressRef.complete())

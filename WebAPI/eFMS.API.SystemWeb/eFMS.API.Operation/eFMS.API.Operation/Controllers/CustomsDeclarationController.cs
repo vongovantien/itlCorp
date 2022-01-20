@@ -540,5 +540,21 @@ namespace eFMS.API.Operation.Controllers
             var data = customsDeclarationService.GetListCustomNoAsignPIC();
             return Ok(data);
         }
+
+        [HttpPut("ReplicateClearance")]
+        [Authorize]
+        public async Task<IActionResult> ReplicateClearance(int Id)
+        {
+            HandleState hs = await customsDeclarationService.ReplicateCustomClearance(Id);
+            string message = HandleError.GetMessage(hs, Crud.Update);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value };
+
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }
