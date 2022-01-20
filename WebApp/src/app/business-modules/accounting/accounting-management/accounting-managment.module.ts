@@ -39,7 +39,7 @@ const routing: Routes = [
         path: "", data: { name: "" }, redirectTo: 'cd-invoice',
     },
     {
-        path: 'cd-invoice', component: AccountingManagementDebitCreditInvoiceComponent, data: { name: 'Debit/Credit/Invoice', title: 'eFMS Invoice List' }
+        path: 'cd-invoice', component: AccountingManagementDebitCreditInvoiceComponent, data: { name: 'Invoice List', title: 'eFMS Invoice List' }
     },
     {
         path: 'vat-invoice', data: { name: 'VAT Invoice' },

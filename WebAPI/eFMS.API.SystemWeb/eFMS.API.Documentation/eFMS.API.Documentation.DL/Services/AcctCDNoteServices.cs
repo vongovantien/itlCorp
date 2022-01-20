@@ -2920,7 +2920,6 @@ namespace eFMS.API.Documentation.DL.Services
             var result = data.GroupBy(g => new
             {
                 ReferenceNo = g.ReferenceNo,
-                g.HBLId,
                 Currency = g.Currency
             }).Select(se => new InvoiceListModel
             {
