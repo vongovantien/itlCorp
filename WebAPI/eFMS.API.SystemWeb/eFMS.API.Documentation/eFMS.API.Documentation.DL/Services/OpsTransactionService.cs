@@ -2228,7 +2228,9 @@ namespace eFMS.API.Documentation.DL.Services
                         entityReplicate.GetType().GetProperty(item.Name).SetValue(entityReplicate, item.GetValue(job, null), null);
                     }
                     entityReplicate.DatetimeCreated = job.DatetimeCreated;
-                    entityReplicate.DatetimeModified = job.DatetimeModified;
+                    entityReplicate.UserCreated = currentUser.UserID;
+                    entityReplicate.UserModified = currentUser.UserID;
+                    entityReplicate.DatetimeModified = DateTime.Now;
                     entityReplicate.JobNo = GeneratePreFixReplicate() + job.JobNo;
                     entityReplicate.Id = Guid.NewGuid();
                     entityReplicate.Hblid = Guid.NewGuid();
