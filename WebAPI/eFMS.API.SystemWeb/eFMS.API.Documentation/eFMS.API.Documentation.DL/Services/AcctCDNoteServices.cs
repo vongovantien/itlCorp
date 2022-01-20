@@ -2725,12 +2725,13 @@ namespace eFMS.API.Documentation.DL.Services
             }
             else if (paySoaData.Count() > 0)
             {
-                data = data.Concat(paySoaData.AsEnumerable());
+                data = data.Union(paySoaData.AsEnumerable());
             }
             var result = data.ToList().GroupBy(g => new
             {
-                ReferenceNo = g.HBLId,
-                Currency = g.Currency
+                g.ReferenceNo,
+                g.HBLId,
+                g.Currency
             }).Select(se => new InvoiceListModel
             {
                 Id = se.FirstOrDefault().Id,
@@ -2982,7 +2983,7 @@ namespace eFMS.API.Documentation.DL.Services
                 queryData = queryData.Where(x => x.VoucherIddate != null && (x.VoucherIddate.Value.Date >= criteria.FromAccountingDate.Value.Date && x.VoucherIddate.Value.Date <= criteria.ToAccountingDate.Value.Date));
             // Get by status
             queryData = GetStatusInvoiceList(criteria.Status, queryData);
-            var _resultDatas = queryData.OrderByDescending(o => o.DatetimeModified).ToList();
+            var _resultDatas = queryData.ToList();
 
             rowsCount = _resultDatas.Count();
 
@@ -3028,7 +3029,7 @@ namespace eFMS.API.Documentation.DL.Services
                                    PaymentStatus = cd.PaymentStatus
                                };
 
-                results = joinData.ToList();
+                results = joinData.OrderByDescending(o => o.DatetimeModified).ToList();
             }
             return results;
         }
@@ -3564,10 +3565,10 @@ namespace eFMS.API.Documentation.DL.Services
                                 IssueDate = cd.IssuedDate,
                                 AccountNo = cd.AccountNo,
                                 ETA = trans != null ? trans.Eta : null,
-                                ETD = trans != null ? trans.Etd : null
+                                ETD = trans != null ? trans.Etd : null                               
                             };
 
-            var res = dataTrans.ToList<AccAccountingManagementResult>();
+            var res = dataTrans.OrderByDescending(o => o.CdNoteNo).ToList<AccAccountingManagementResult>();
             return res;
         }
 
