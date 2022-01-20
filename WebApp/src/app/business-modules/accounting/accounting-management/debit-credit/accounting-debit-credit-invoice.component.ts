@@ -68,7 +68,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Total Amount', field: 'total', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Export Date', field: 'issuedDate', sortable: true },
+            { title: 'Issue Date', field: 'issuedDate', sortable: true },
             { title: 'Accounting Date', field: 'voucherIddate', sortable: true },
             { title: 'Creator', field: 'creator', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
