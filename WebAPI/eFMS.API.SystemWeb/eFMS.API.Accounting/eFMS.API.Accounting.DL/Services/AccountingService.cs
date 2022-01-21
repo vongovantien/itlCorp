@@ -751,7 +751,6 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.CurrencyCode = cdNote.CurrencyId;
                     sync.ExchangeRate = cdNote.ExchangeRate ?? 1;
                     sync.Description0 = cdNote.Note;
-                    sync.DataType = "CDNOTE";
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
 
                     int decimalRound = 0;
@@ -762,6 +761,7 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.CreditNo == cdNote.Code || x.DebitNo == cdNote.Code);
+                    sync.DataType = cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL) ? "VOUCHER" : "CDNOTE";
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -773,7 +773,7 @@ namespace eFMS.API.Accounting.DL.Services
                         var _unit = CatUnitRepository.Get(x => x.Id == surcharge.UnitId).FirstOrDefault();
                         charge.Unit = _unit?.UnitNameVn; //Unit Name En
                         charge.CurrencyCode = surcharge.CurrencyId;
-                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, AccountingConstants.CURRENCY_LOCAL);
+                        charge.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(surcharge.FinalExchangeRate, surcharge.ExchangeDate, surcharge.CurrencyId, cdNote.CurrencyId);
                         charge.BillEntryNo = GetBillEntryNoForSyncAcct(surcharge); //CR: 15559
                         charge.MasterBillNo = surcharge.Mblno;
                         charge.DeptCode = !string.IsNullOrEmpty(_charge?.ProductDept) ? _charge?.ProductDept : GetDeptCode(surcharge.JobNo);
@@ -1052,7 +1052,6 @@ namespace eFMS.API.Accounting.DL.Services
                     sync.CurrencyCode = soa.Currency;
                     sync.ExchangeRate = currencyExchangeService.CurrencyExchangeRateConvert(null, soa.DatetimeCreated, soa.Currency, AccountingConstants.CURRENCY_LOCAL);
                     sync.Description0 = soa.Note;
-                    sync.DataType = "SOA";
                     sync.PaymentMethod = model.PaymentMethod; //Set Payment Method = giá trị truyền vào
 
                     int decimalRound = 0;
@@ -1063,6 +1062,8 @@ namespace eFMS.API.Accounting.DL.Services
 
                     var charges = new List<ChargeCreditSyncModel>();
                     var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
+                    sync.DataType = (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)) ? "VOUCHER" : "SOA";
+
                     foreach (var surcharge in surcharges)
                     {
                         var charge = new ChargeCreditSyncModel();
@@ -1487,12 +1488,13 @@ namespace eFMS.API.Accounting.DL.Services
                         cdNote.LastSyncDate = DateTime.Now;
 
                         var surcharges = SurchargeRepository.Get(x => x.DebitNo == cdNote.Code || x.CreditNo == cdNote.Code);
-                        //Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
-                        if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
-                        {
-                            cdNote.Note += " Request Voucher";
-                        }
-                        else
+                        // [CR: #16976] => Update charge cho phí USD giống với phí VND
+                        ////Tồn tại CDNote có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        //if (cdNote.Type == "CREDIT" && (cdNote.CurrencyId != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
+                        //{
+                        //    cdNote.Note += " Request Voucher";
+                        //}
+                        //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal CDNOTE by CDNote Code
                             foreach (var surcharge in surcharges)
@@ -1548,12 +1550,13 @@ namespace eFMS.API.Accounting.DL.Services
                         soa.LastSyncDate = DateTime.Now;
 
                         var surcharges = SurchargeRepository.Get(x => x.Soano == soa.Soano || x.PaySoano == soa.Soano);
-                        //Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
-                        if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
-                        {
-                            soa.Note += " Request Voucher";
-                        }
-                        else
+                        // [CR: #16976] => Update charge cho phí USD giống với phí VND
+                        ////Tồn tại SOA có [type Credit & Currency ngoại tệ] hoặc list charge có tồn tại ngoại tệ
+                        //if (soa.Type == "Credit" && (soa.Currency != AccountingConstants.CURRENCY_LOCAL || surcharges.Any(x => x.CurrencyId != AccountingConstants.CURRENCY_LOCAL)))
+                        //{
+                        //    soa.Note += " Request Voucher";
+                        //}
+                        //else
                         {
                             //Update PaySyncedFrom or SyncedFrom equal SOA by SOA No
                             foreach (var surcharge in surcharges)
