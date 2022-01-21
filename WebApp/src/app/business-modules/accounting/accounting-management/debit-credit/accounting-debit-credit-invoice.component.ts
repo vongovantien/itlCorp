@@ -151,7 +151,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             .subscribe((value: boolean) => {
                 if (value) {
                     this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
-                        queryParams: { no: soano, currency: "VND" }
+                        queryParams: { no: soano, currency: "VND", action: "inv" }
                     });
                 }
             });
