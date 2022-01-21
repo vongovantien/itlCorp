@@ -1321,10 +1321,23 @@ namespace eFMS.API.Documentation.DL.Services
                         }
                     }
                 }
+                // Xóa job rep thì xóa liên kết với job origin.
+                if(job.LinkSource == DocumentConstants.CLEARANCE_FROM_REPLICATE)
+                {
+                    var jobOrigin = DataContext.First(x => x.ReplicatedId == job.Id);
+                    if(jobOrigin != null)
+                    {
+                        jobOrigin.ReplicatedId = null;
+                        DataContext.Update(jobOrigin, x => x.Id == jobOrigin.Id, false);
+                    }
+                }
             }
-            DataContext.SubmitChanges();
-            surchargeRepository.SubmitChanges();
-            customDeclarationRepository.SubmitChanges();
+            result = DataContext.SubmitChanges();
+            if(result.Success)
+            {
+                surchargeRepository.SubmitChanges();
+                customDeclarationRepository.SubmitChanges();
+            } 
             return result;
         }
 
