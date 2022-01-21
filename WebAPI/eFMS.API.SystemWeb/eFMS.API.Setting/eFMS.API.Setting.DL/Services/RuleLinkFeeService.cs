@@ -418,7 +418,10 @@ namespace eFMS.API.Setting.DL.Services
                 {
                     item.IsValid = false;
                 }
-
+                if (CheckCharge(item.ChargeBuying, item.ChargeSelling) || ConvertService(item.ServiceBuying) is null ||ConvertService(item.ServiceSelling) is null)
+                {
+                    item.IsValid = false;
+                }
                 results.Add(item);
             }
             return results;
