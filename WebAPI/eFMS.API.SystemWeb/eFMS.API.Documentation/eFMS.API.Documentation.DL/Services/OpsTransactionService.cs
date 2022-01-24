@@ -660,6 +660,7 @@ namespace eFMS.API.Documentation.DL.Services
                 var minDate = maxDate.AddMonths(-3).AddDays(-1).Date; //Bắt đầu từ ngày MaxDate trở về trước 3 tháng
                 query = query.And(x => x.DatetimeModified.Value > minDate && x.DatetimeModified.Value < maxDate);
             }
+
             return query;
         }
 
@@ -670,9 +671,8 @@ namespace eFMS.API.Documentation.DL.Services
 
             //Nếu không có điều kiện search thì load 3 tháng kể từ ngày modified mới nhất
             var queryDefault = ExpressionQueryDefault(criteria);
-            var data = DataContext.Get(queryDefault);
-            var queryPermission = QueryByPermission(criteria.RangeSearch);
-            data = data.Where(queryPermission);
+            queryDefault = QuerySearchLinkJob(queryDefault, criteria);
+            data = data.Where(queryDefault);
 
             if (data == null) return null;
 
@@ -1579,7 +1579,7 @@ namespace eFMS.API.Documentation.DL.Services
             result.FormatType = ExportFormatType.PortableDocFormat;
             result.SetParameter(parameter);
 
-            return result;
+            return result; 
         }
         public HandleState Update(OpsTransactionModel model)
         {
@@ -1620,8 +1620,13 @@ namespace eFMS.API.Documentation.DL.Services
                     model.SalesOfficeId = detail.SalesOfficeId;
                     model.SalesCompanyId = detail.SalesCompanyId;
                 }
-                model.Hwbno = model.Hwbno?.Trim();
-                model.Mblno = model.Mblno?.Trim();
+
+                if (model.IsLinkJob && string.IsNullOrEmpty(model.UserCreatedLinkJob))
+                {
+                    model.UserCreatedLinkJob = currentUser.UserName;
+                    model.DateCreatedLinkJob = DateTime.Now;
+                }
+
                 OpsTransaction entity = mapper.Map<OpsTransaction>(model);
                 var hs = DataContext.Update(entity, x => x.Id == model.Id);
                 if (hs.Success)

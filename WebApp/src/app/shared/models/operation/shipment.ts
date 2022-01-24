@@ -46,6 +46,9 @@ export class Shipment {
     clearanceNo: string = '';
     customerName: string = '';
     isLocked: boolean = false;
+
+    userCreatedLinkJob: string = null;
+
     replicatedId: string = null;
     userCreatedName: string = null;
     linkSource: string = null;
