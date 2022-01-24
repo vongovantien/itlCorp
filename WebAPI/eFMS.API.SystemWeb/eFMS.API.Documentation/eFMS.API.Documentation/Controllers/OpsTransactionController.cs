@@ -416,5 +416,24 @@ namespace eFMS.API.Documentation.Controllers
 
             return errorMsg;
         }
+
+
+        [HttpPost("ReplicateJob")]
+        [Authorize]
+        public async Task<IActionResult> ReplicateJob(ReplicateIds model)
+        {
+            currentUser.Action = "ReplicateJob";
+
+            HandleState hs = await transactionService.ReplicateJobs(model);
+
+            string message = HandleError.GetMessage(hs, Crud.Insert);
+
+            ResultHandle result = new ResultHandle { Status = hs.Success, Message = stringLocalizer[message].Value, Data = null };
+            if (!hs.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
     }
 }

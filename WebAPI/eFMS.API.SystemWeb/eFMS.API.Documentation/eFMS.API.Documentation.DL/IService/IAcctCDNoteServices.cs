@@ -25,6 +25,7 @@ namespace eFMS.API.Documentation.DL.IService
         Crystal PreviewSIF(AcctCDNoteDetailsModel data, string currency);
         Crystal PreviewAir(AcctCDNoteDetailsModel data, string currency);
         List<CDNoteModel> Paging(CDNoteCriteria criteria, int page, int size, out int rowsCount);
+        List<InvoiceListModel> PagingInvoiceList(CDNoteCriteria criteria, int page, int size, out int rowsCount);
         HandleState RejectCreditNote(RejectCreditNoteModel model);
         AcctCDNoteDetailsModel GetDataPreviewCDNotes(List<AcctCdnoteModel> acctCdNoteList);
         Crystal PreviewOPSCDNoteWithCurrency(PreviewCdNoteCriteria criteria);

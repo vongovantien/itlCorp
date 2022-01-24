@@ -280,7 +280,7 @@ namespace eFMS.API.Documentation.Controllers
         [Authorize]
         public IActionResult Paging(CDNoteCriteria criteria, int page, int size)
         {
-            var data = cdNoteServices.Paging(criteria, page, size, out int rowsCount);
+            var data = cdNoteServices.PagingInvoiceList(criteria, page, size, out int rowsCount);
             var result = new { data, totalItems = rowsCount, page, size };
             return Ok(result);
         }

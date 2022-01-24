@@ -30,6 +30,8 @@ namespace eFMS.API.ReportData.FormatExcel
 
         const string decimalFormat = "#,##0.00";
         const string decimalFormat2 = "#,##0";
+        const string CURRENCY_LOCAL = "VND";
+        const string CURRENCY_USD = "USD";
 
         /// <summary>
         /// Get folder contain settlement payment template excel
@@ -5089,6 +5091,7 @@ namespace eFMS.API.ReportData.FormatExcel
         {
             SetWidthColumnExcelAccoutingManagement(workSheet);
             workSheet.Column(6).Width = 20; //Cột F
+            workSheet.Column(7).Width = 20; //Cột F
             workSheet.Column(13).Width = 20; //Cột M
             List<string> headers = new List<string>
             {
@@ -5098,7 +5101,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 "HBLNo",//3
                 "VoucherID",//4
                 "Accounting Date",//5
-                "CDNote_Code",//6
+                "Reference No",//6
                 "Code_Type",//7
                 "ChargeType",//8
                 "PayerID",//9
@@ -5144,7 +5147,7 @@ namespace eFMS.API.ReportData.FormatExcel
                 workSheet.Cells[rowStart, 13].Value = item.Currency;
 
                 workSheet.Cells[rowStart, 14].Value = item.Amount;
-                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = decimalFormat;
+                workSheet.Cells[rowStart, 14].Style.Numberformat.Format = item.Currency == CURRENCY_LOCAL ? numberFormat2 : numberFormat;
 
                 workSheet.Cells[rowStart, 15].Value = item.IssueBy;
                 workSheet.Cells[rowStart, 16].Value = item.Bu;

@@ -150,5 +150,8 @@
 
         public static readonly string SYNCED_FROM_CDNOTE = "CDNOTE";
         public static readonly string SYNCED_FROM_SOA = "SOA";
+
+        public static readonly string STATUS_CANCEL_RECEIPT = "Cancel";
+        public static readonly string STATUS_DONE_RECEIPT = "Done";
     }
 }

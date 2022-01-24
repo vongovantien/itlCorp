@@ -68,13 +68,14 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             { title: 'Partner Name', field: 'partnerName', sortable: true },
             { title: 'Total Amount', field: 'total', sortable: true },
             { title: 'Currency', field: 'currency', sortable: true },
-            { title: 'Export Date', field: 'issuedDate', sortable: true },
+            { title: 'Issue Date', field: 'issuedDate', sortable: true },
             { title: 'Accounting Date', field: 'voucherIddate', sortable: true },
             { title: 'Creator', field: 'creator', sortable: true },
             { title: 'Status', field: 'status', sortable: true },
             { title: 'Issued for Voucher No', field: 'voucherId', sortable: true },
             { title: 'Sync Status', field: 'syncStatus', sortable: true },
             { title: 'Last Sync', field: 'lastSyncDate', sortable: true },
+            { title: 'Payment Status', field: 'paymentStatus', sortable: true },
         ];
         this.getCreditDebitInvoices();
     }
@@ -144,6 +145,18 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
         this.cdNoteDetailPopupComponent.show();
     }
 
+    viewDetail(soaId: string, soano: string) {
+        this._accountingRepo
+            .checkAllowGetDetailSOA(soaId)
+            .subscribe((value: boolean) => {
+                if (value) {
+                    this._router.navigate([`${RoutingConstants.ACCOUNTING.STATEMENT_OF_ACCOUNT}/detail/`], {
+                        queryParams: { no: soano, currency: "VND", action: "inv" }
+                    });
+                }
+            });
+    }
+
     issueVatInvoice() {
         const existCdNoteIssued = this.cdNotes.filter(x => x.isSelected && x.status !== 'New');
         if (!!existCdNoteIssued.length) {
@@ -178,7 +191,7 @@ export class AccountingManagementDebitCreditInvoiceComponent extends AppList imp
             mbls: null,
             settlementCodes: null
         };
-        if (type === 'invoice') {
+        if (type === AccountingConstants.ISSUE_TYPE.INVOICE) {
             this._accountingRepo.getChargeSellForInvoiceByCriteria(body)
                 .subscribe(
                     (res: PartnerOfAcctManagementResult[]) => {
