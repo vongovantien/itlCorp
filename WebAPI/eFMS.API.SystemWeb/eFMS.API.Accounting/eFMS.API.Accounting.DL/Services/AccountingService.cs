@@ -2288,7 +2288,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var syncCreditModel in syncCreditModels)
                 {
-                    string type = syncCreditModel.DataType;
                     string creatorEnName = string.Empty;
                     string refNo = string.Empty;
                     string partnerEn = string.Empty;
@@ -2307,10 +2306,12 @@ namespace eFMS.API.Accounting.DL.Services
                     {
                         decRound = 2;
                     }
-
+                    var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
+                    var creditNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncCreditModel.Stt)).FirstOrDefault();
+                    string type = soa == null ? "CDNOTE" : "SOA";
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
+                        //var soa = soaRepository.Get(x => x.Id == syncCreditModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -2334,7 +2335,6 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (type == "CDNOTE")
                     {
-                        var creditNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncCreditModel.Stt)).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == creditNote.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = creditNote.Code;
@@ -2369,7 +2369,6 @@ namespace eFMS.API.Accounting.DL.Services
             {
                 foreach (var syncModel in syncModels)
                 {
-                    string type = syncModel.DataType;
                     string creatorEnName = string.Empty;
                     string refNo = string.Empty;
                     string partnerEn = string.Empty;
@@ -2389,9 +2388,11 @@ namespace eFMS.API.Accounting.DL.Services
                         decRound = 2;
                     }
 
+                    var soa = soaRepository.Get(x => x.Id == syncModel.Stt).FirstOrDefault();
+                    var debitNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncModel.Stt)).FirstOrDefault();
+                    string type = soa == null ? "CDNOTE" : "SOA";
                     if (type == "SOA")
                     {
-                        var soa = soaRepository.Get(x => x.Id == syncModel.Stt).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == soa.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = soa.Soano;
@@ -2414,7 +2415,6 @@ namespace eFMS.API.Accounting.DL.Services
                     }
                     if (type == "CDNOTE")
                     {
-                        var debitNote = cdNoteRepository.Get(x => x.Id == Guid.Parse(syncModel.Stt)).FirstOrDefault();
                         var employeeId = UserRepository.Get(x => x.Id == debitNote.UserCreated).FirstOrDefault()?.EmployeeId;
                         creatorEnName = EmployeeRepository.Get(x => x.Id == employeeId).FirstOrDefault()?.EmployeeNameEn;
                         refNo = debitNote.Code;
