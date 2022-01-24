@@ -503,7 +503,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
     }
 
     insertOtherRowData(type?: string) {
-        const newInvoiceWithAdv: any = new ReceiptInvoiceModel();
+        const newInvoiceWithAdv: ReceiptInvoiceModel = new ReceiptInvoiceModel();
         newInvoiceWithAdv.paymentType = AccountingConstants.RECEIPT_PAYMENT_TYPE.OTHER;
         if (!!type) {
             newInvoiceWithAdv.type = type.toUpperCase();
@@ -525,6 +525,7 @@ export class ARCustomerPaymentReceiptPaymentListComponent extends AppForm implem
         newInvoiceWithAdv.unpaidAmountVnd = 0;
         newInvoiceWithAdv.refNo = null;
         newInvoiceWithAdv.id = this.utility.newGuid();
+        newInvoiceWithAdv.currencyId = this.currencyId.value || 'VND'
 
         this._store.dispatch(InsertAdvance({ data: cloneDeep(newInvoiceWithAdv) }));
 
