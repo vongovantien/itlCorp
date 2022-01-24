@@ -73,8 +73,8 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         this.initBasicData();
         this.getService();
         this.getPartner();
-        this.getChargeBuying();
-        this.getChargeSelling();
+        // this.getChargeBuying();
+        // this.getChargeSelling();
         console.log(this.rule.expiredDate);
 
     }
@@ -174,41 +174,38 @@ export class FormRuleComponent extends PopupBase implements OnInit {
         }
     }
     getChargeBuying() {
-        console.log(this.serviceBuying.value);
-        if (!!this._dataService.getDataByKey('RULE_LINK_BUY')) {
-            this.configChargeBuying.dataSource = this._dataService.getDataByKey('RULE_LINK_BUY') || [];
-        } else {
-            this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceBuying.value, type: CommonEnum.CHARGE_TYPE.CREDIT })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataCharge: any = []) => {
-                        this.configChargeBuying.dataSource = dataCharge;
-                        this._dataService.setDataService('RULE_LINK_BUY', dataCharge || []);
-                    },
-                );
-        }
+
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceBuying.value?.id, type: CommonEnum.CHARGE_TYPE.CREDIT })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataCharge: any = []) => {
+                    this.configChargeBuying.dataSource = dataCharge;
+                    this._dataService.setDataService('RULE_LINK_BUY', dataCharge || []);
+                },
+            );
+
     }
 
     getChargeSelling() {
-        if (!!this._dataService.getDataByKey('RULE_LINK_SELL')) {
-            this.configChargeSelling.dataSource = this._dataService.getDataByKey('RULE_LINK_SELL');
-        } else {
-            this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceSelling.value, type: CommonEnum.CHARGE_TYPE.DEBIT })
-                .pipe(catchError(this.catchError))
-                .subscribe(
-                    (dataCharge: any = []) => {
-                        this.configChargeSelling.dataSource = dataCharge;
-                        this._dataService.setDataService('RULE_LINK_SELL', dataCharge);
-                    },
-                );
-        }
+
+        this._catalogueRepo.getCharges({ active: true, serviceTypeId: this.serviceSelling.value?.id, type: CommonEnum.CHARGE_TYPE.DEBIT })
+            .pipe(catchError(this.catchError))
+            .subscribe(
+                (dataCharge: any = []) => {
+                    this.configChargeSelling.dataSource = dataCharge;
+                    this._dataService.setDataService('RULE_LINK_SELL', dataCharge);
+                },
+            );
+
     }
 
     enableSelling() {
         this.isSelling = false;
+        this.getChargeSelling();
     }
     enableBuying() {
         this.isBuying = false;
+        this.getChargeBuying();
     }
     onSelectDataFormInfo(data: Charge | Partner | any, key: string | any) {
         switch (key) {
