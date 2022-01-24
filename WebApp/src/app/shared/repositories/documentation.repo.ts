@@ -1009,7 +1009,7 @@ export class DocumentationRepo {
     }
 
     getShipmentAssginPICCarrier(type: string) {
-        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPICCarrier`, { type: type});
+        return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/Shipment/GetShipmentAssignPICCarrier`, { type: type });
     }
 
     previewHLSeaBookingNoteById(id: string) {
@@ -1155,8 +1155,8 @@ export class DocumentationRepo {
             map((data: any) => data)
         );
     }
-    dowloadallAttach(body:any) {
-        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`,body).pipe(
+    dowloadallAttach(body: any) {
+        return this._api.downloadfile(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/CsTransaction/DowloadAllFileAttached`, body).pipe(
             catchError((error) => throwError(error)),
             map((data: any) => data)
         );
@@ -1175,5 +1175,10 @@ export class DocumentationRepo {
         return this._api.get(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/en-US/OpsTransaction/ChargeFromReplicate`).pipe(
             map((data: any) => data)
         );
+    }
+
+    replicateOps(Ids: string[]) {
+        return this._api.post(`${environment.HOST.DOCUMENTATION}/api/${this.VERSION}/vi/OpsTransaction/ReplicateJob`, { Ids });
+
     }
 }

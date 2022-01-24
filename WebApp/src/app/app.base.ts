@@ -147,6 +147,7 @@ export abstract class AppPage implements OnInit, OnDestroy, OnChanges, DoCheck, 
     };
 
     currentUser: any;
+    currentUser$: Observable<Partial<SystemInterface.IClaimUser>>;
 
     ngOnInit(): void { }
 
